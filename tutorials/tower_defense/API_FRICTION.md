@@ -1,4 +1,4 @@
-# API Friction Log — Tower Defense Tutorial (Chapters 1–3)
+# API Friction Log — Tower Defense Tutorial (Chapters 1–6)
 
 This document records concrete friction points discovered while building
 `ch1_title_screen.py`, `ch2_game_map.py`, and `ch3_tower_placement.py`
@@ -352,6 +352,174 @@ if event.type == "click" and event.world_x is not None and event.world_y is not 
 
 ---
 
+## 8. Timer cleanup is manual and error-prone — OPEN
+
+### The awkward code
+
+Every scene that uses `game.after()` must track timer IDs and cancel
+them in `on_exit()`:
+
+```python
+def on_enter(self) -> None:
+    self._timer_ids: list[int] = []
+    tid = self.game.after(2.0, self._start_next_wave)
+    self._timer_ids.append(tid)
+
+def on_exit(self) -> None:
+    for tid in self._timer_ids:
+        self.game.cancel(tid)
+    self._timer_ids.clear()
+```
+
+Chapters 4–6 each have this identical pattern, with every `game.after()`
+call needing a corresponding `self._timer_ids.append(tid)` line.  A
+missed append means the timer fires on a dead scene.
+
+### Why it's friction
+
+This is the timer equivalent of friction #2 (manual sprite cleanup).
+Scene-scoped timers are extremely common (wave spawning, delayed events,
+scheduled actions), and the bookkeeping grows linearly with timer usage.
+Forgetting to track even one timer causes a callback on a dead scene.
+
+### Suggested fix
+
+A `Scene.after(delay, callback)` method that auto-cancels all pending
+timers when the scene exits, mirroring `Scene.add_sprite()`.
+
+```python
+# Instead of:
+tid = self.game.after(2.0, self._start_next_wave)
+self._timer_ids.append(tid)
+
+# Proposed:
+self.after(2.0, self._start_next_wave)  # auto-cancelled on scene exit
+```
+
+---
+
+## 9. Composable Action re-entrancy: Sequence + Do + sprite.do() — OPEN
+
+### The awkward code
+
+The natural pattern for chained waypoint movement is:
+
+```python
+enemy["sprite"].do(
+    Sequence(
+        MoveTo(next_waypoint, speed=40),
+        Do(lambda: self._walk_to_next(enemy)),
+    )
+)
+```
+
+But this **doesn't work**.  When `Do` fires `_walk_to_next`, which calls
+`sprite.do(new_sequence)`, the new action is immediately overwritten.
+The parent `Sequence.update()` returns `True` after `Do` completes,
+and the sprite's action update loop sets `_current_action = None`.
+
+### Why it's friction
+
+This is a non-obvious re-entrancy trap.  The composable actions *look*
+like the right tool for chained movement, but `sprite.do()` inside a
+`Do` callback silently breaks.  The workaround is to use
+`sprite.move_to(target, speed, on_arrive=callback)` instead, which
+fires the callback *after* the tween completes cleanly.
+
+### Workaround used
+
+```python
+enemy["sprite"].move_to(
+    target,
+    speed=enemy["speed"],
+    on_arrive=lambda e=enemy: self._walk_to_next(e),
+)
+```
+
+### Suggested fix
+
+Either document the re-entrancy limitation prominently, or have `Do`
+defer `sprite.do()` calls to the next frame so the parent Sequence
+finishes first.
+
+---
+
+## 10. Health bars require raw backend draw_rect calls — OPEN
+
+### The awkward code
+
+Drawing per-enemy health bars in ch5/ch6 requires dropping down to the
+raw backend API and manually converting coordinates:
+
+```python
+def draw(self) -> None:
+    backend = self.game._backend
+
+    for enemy in self._enemies:
+        # ... skip full-HP enemies ...
+        sx, sy = self.camera.world_to_screen(esp._x, esp._y)
+        bar_x = int(sx - HEALTH_BAR_WIDTH / 2)
+        bar_y = int(sy + HEALTH_BAR_Y_OFFSET)
+
+        backend.draw_rect(
+            bar_x, bar_y,
+            HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT,
+            HEALTH_BAR_BG_COLOR,
+        )
+        # ... and a second draw_rect for the fill ...
+```
+
+This accesses the private `self.game._backend`, uses screen-space
+coordinates (requiring manual `camera.world_to_screen()`), and involves
+two draw_rect calls per entity.
+
+### Why it's friction
+
+Health/status bars above sprites are one of the most common needs in any
+game.  Requiring raw backend calls and manual coordinate transforms is a
+lot of ceremony for drawing a rectangle.  The `_backend` is a private
+API — game code shouldn't need it.
+
+### Suggested fix
+
+A `Scene.draw_world_rect(x, y, w, h, color)` method that auto-applies
+camera transform, or better yet, a `Sprite.add_overlay(HealthBar(...))`
+API that draws decorations relative to the sprite automatically.
+
+---
+
+## 11. Audio play_sound requires try/except for missing assets — OPEN
+
+### The awkward code
+
+Every audio call in ch6 is wrapped in try/except:
+
+```python
+def _play_sfx(game, name):
+    try:
+        game.audio.play_sound(name)
+    except Exception:
+        pass
+```
+
+This is because `AssetManager.sound()` raises `AssetNotFoundError` if
+the WAV file doesn't exist, and during development or CI, audio assets
+may not be present.
+
+### Why it's friction
+
+It's common for games to have optional audio — running silently when
+assets are missing is a reasonable default during development.  Every
+audio call needing a try/except wrapper adds noise and fragility.
+
+### Suggested fix
+
+An `AudioManager.play_sound(name, optional=True)` parameter, or a
+global `audio.lenient = True` mode that silently skips missing assets
+instead of raising.
+
+---
+
 ## Summary
 
 | # | Friction | Status |
@@ -363,3 +531,7 @@ if event.type == "click" and event.world_x is not None and event.world_y is not 
 | 5 | Arrow-key scrolling boilerplate | RESOLVED — `Camera.enable_key_scroll()` |
 | 6 | Label styling verbosity | RESOLVED — `font_size`/`text_color` kwargs |
 | 7 | Manual screen-to-world conversion | RESOLVED — `event.world_x`/`event.world_y` |
+| 8 | Timer cleanup is manual and error-prone | OPEN — suggest `Scene.after()` with auto-cancel |
+| 9 | Action re-entrancy: Sequence + Do + sprite.do() | OPEN — document or fix deferred Do |
+| 10 | Health bars require raw backend calls | OPEN — suggest world-space draw or sprite overlays |
+| 11 | Audio requires try/except for missing assets | OPEN — suggest lenient/optional mode |

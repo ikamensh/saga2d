@@ -1,4 +1,4 @@
-"""Generate all placeholder PNG assets for the Tower Defense tutorial (chapters 1-3).
+"""Generate all placeholder assets for the Tower Defense tutorial (chapters 1-6).
 
 Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
 ``generate(output_dir)`` saves all files and returns the list of paths.
@@ -44,6 +44,16 @@ Assets generated::
     HUD:
         hud_top_bar.png      — 320x24 top HUD bar background
 
+    Sound effects (WAV, assets/sounds/):
+        sfx_shoot.wav        — short click/pop for tower firing
+        sfx_hit.wav          — thud for projectile impact
+        sfx_death.wav        — descending tone for enemy death
+        sfx_wave.wav         — rising alert for wave start
+        sfx_lose_life.wav    — low buzz for life lost
+
+    Music (WAV, assets/music/):
+        bgm_game.wav         — short looping placeholder
+
 Run standalone::
 
     python tutorials/tower_defense/generate_td_assets.py
@@ -52,7 +62,9 @@ Run standalone::
 from __future__ import annotations
 
 import math
+import struct
 import sys
+import wave
 from pathlib import Path
 from typing import List, Tuple
 
@@ -621,6 +633,130 @@ def make_hud_top_bar() -> Image.Image:
 
 
 # ===================================================================
+# Audio helpers — generate minimal WAV files
+# ===================================================================
+
+_AUDIO_SAMPLE_RATE = 22050  # Hz — adequate for simple SFX
+
+
+def _write_wav(
+    path: Path,
+    samples: list[int],
+    sample_rate: int = _AUDIO_SAMPLE_RATE,
+) -> None:
+    """Write 16-bit mono WAV from a list of signed 16-bit sample values."""
+    with wave.open(str(path), "w") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)  # 16-bit
+        wf.setframerate(sample_rate)
+        data = struct.pack(f"<{len(samples)}h", *samples)
+        wf.writeframes(data)
+
+
+def _sine_samples(freq: float, duration: float, volume: float = 0.5) -> list[int]:
+    """Generate sine wave samples."""
+    n = int(_AUDIO_SAMPLE_RATE * duration)
+    amp = int(32767 * volume)
+    return [
+        int(amp * math.sin(2 * math.pi * freq * i / _AUDIO_SAMPLE_RATE))
+        for i in range(n)
+    ]
+
+
+def _fade(samples: list[int], fade_in: int = 0, fade_out: int = 0) -> list[int]:
+    """Apply linear fade-in and fade-out to samples."""
+    result = list(samples)
+    for i in range(min(fade_in, len(result))):
+        result[i] = int(result[i] * i / fade_in)
+    for i in range(min(fade_out, len(result))):
+        idx = len(result) - 1 - i
+        result[idx] = int(result[idx] * i / fade_out)
+    return result
+
+
+def generate_sfx_shoot(path: Path) -> None:
+    """Short high-pitched click — tower firing."""
+    # Quick 800 Hz blip with fast decay
+    samples = _sine_samples(800, 0.06, volume=0.4)
+    samples = _fade(samples, fade_out=len(samples) // 2)
+    _write_wav(path, samples)
+
+
+def generate_sfx_hit(path: Path) -> None:
+    """Low thud — projectile impact."""
+    # 200 Hz thump
+    samples = _sine_samples(200, 0.1, volume=0.5)
+    samples = _fade(samples, fade_out=len(samples) * 2 // 3)
+    _write_wav(path, samples)
+
+
+def generate_sfx_death(path: Path) -> None:
+    """Descending tone — enemy death."""
+    n = int(_AUDIO_SAMPLE_RATE * 0.25)
+    amp = int(32767 * 0.4)
+    samples = []
+    for i in range(n):
+        t = i / _AUDIO_SAMPLE_RATE
+        # Frequency slides from 600 Hz down to 150 Hz
+        freq = 600 - 1800 * t
+        samples.append(int(amp * math.sin(2 * math.pi * freq * t)))
+    samples = _fade(samples, fade_in=100, fade_out=n // 2)
+    _write_wav(path, samples)
+
+
+def generate_sfx_wave(path: Path) -> None:
+    """Rising alert tone — new wave starting."""
+    n = int(_AUDIO_SAMPLE_RATE * 0.3)
+    amp = int(32767 * 0.35)
+    samples = []
+    for i in range(n):
+        t = i / _AUDIO_SAMPLE_RATE
+        # Rising from 400 Hz to 900 Hz
+        freq = 400 + 1667 * t
+        samples.append(int(amp * math.sin(2 * math.pi * freq * t)))
+    samples = _fade(samples, fade_in=200, fade_out=n // 3)
+    _write_wav(path, samples)
+
+
+def generate_sfx_lose_life(path: Path) -> None:
+    """Low warning buzz — life lost."""
+    n = int(_AUDIO_SAMPLE_RATE * 0.2)
+    amp = int(32767 * 0.3)
+    samples = []
+    for i in range(n):
+        t = i / _AUDIO_SAMPLE_RATE
+        # Square-ish wave at 120 Hz for a buzzy feel
+        val = math.sin(2 * math.pi * 120 * t)
+        samples.append(int(amp * (1 if val > 0 else -1)))
+    samples = _fade(samples, fade_in=100, fade_out=n // 2)
+    _write_wav(path, samples)
+
+
+def generate_bgm_game(path: Path) -> None:
+    """Short looping background music placeholder — gentle arpeggio."""
+    # 4-second loop: C-E-G-C arpeggio, gentle sine tones
+    notes = [262, 330, 392, 523]  # C4, E4, G4, C5
+    note_dur = 1.0  # 1 second per note
+    all_samples: list[int] = []
+    for freq in notes:
+        samps = _sine_samples(freq, note_dur, volume=0.15)
+        samps = _fade(samps, fade_in=500, fade_out=2000)
+        all_samples.extend(samps)
+    _write_wav(path, all_samples)
+
+
+# Audio file manifest: (subdir, filename, generator_func)
+AUDIO_MANIFEST: list[tuple[str, str, callable]] = [
+    ("sounds", "sfx_shoot.wav", generate_sfx_shoot),
+    ("sounds", "sfx_hit.wav", generate_sfx_hit),
+    ("sounds", "sfx_death.wav", generate_sfx_death),
+    ("sounds", "sfx_wave.wav", generate_sfx_wave),
+    ("sounds", "sfx_lose_life.wav", generate_sfx_lose_life),
+    ("music", "bgm_game.wav", generate_bgm_game),
+]
+
+
+# ===================================================================
 # Manifest and batch generation
 # ===================================================================
 
@@ -661,11 +797,10 @@ MANIFEST: list[tuple[str, callable]] = [
 
 
 def generate(output_dir: Path | None = None) -> List[Path]:
-    """Generate all Tower Defense tutorial PNGs and save them to *output_dir*.
+    """Generate all Tower Defense tutorial assets and save to *output_dir*.
 
-    Files are written into ``<output_dir>/images/`` to match the
-    :class:`AssetManager` convention (``game.assets.image("grass")``
-    resolves to ``<base_path>/images/grass.png``).
+    Image files go into ``<output_dir>/images/``, sound effects into
+    ``<output_dir>/sounds/``, and music into ``<output_dir>/music/``.
 
     Args:
         output_dir: Asset base directory.  Defaults to
@@ -681,10 +816,21 @@ def generate(output_dir: Path | None = None) -> List[Path]:
     images_dir.mkdir(parents=True, exist_ok=True)
 
     written: List[Path] = []
+
+    # --- Image assets ---
     for filename, factory in MANIFEST:
         img = factory()
         path = images_dir / filename
         img.save(path)
+        print(f"  Created {path}")
+        written.append(path)
+
+    # --- Audio assets ---
+    for subdir, filename, gen_func in AUDIO_MANIFEST:
+        audio_dir = output_dir / subdir
+        audio_dir.mkdir(parents=True, exist_ok=True)
+        path = audio_dir / filename
+        gen_func(path)
         print(f"  Created {path}")
         written.append(path)
 
