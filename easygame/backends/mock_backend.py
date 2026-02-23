@@ -5,7 +5,8 @@ protocol without opening a window, rendering pixels, or playing audio.
 It serves two purposes:
 
 1. **Assertions** — tests inspect ``mock.sprites``, ``mock.texts``,
-   ``mock.sounds_played``, ``mock.frame_count``, etc.
+   ``mock.rects``, ``mock.images``, ``mock.fonts``, ``mock.sounds_played``,
+   ``mock.frame_count``, etc.
 2. **Simulation** — tests call ``mock.inject_key("space")``,
    ``mock.inject_click(400, 300)`` to feed events into the framework.
 
@@ -55,6 +56,17 @@ class MockBackend:
         #: Cleared on every :meth:`begin_frame`.
         self.texts: list[dict] = []
 
+        #: ``draw_rect`` calls accumulated during the **current** frame.
+        #: Cleared on every :meth:`begin_frame`.
+        self.rects: list[dict] = []
+
+        #: ``draw_image`` calls accumulated during the **current** frame.
+        #: Cleared on every :meth:`begin_frame`.
+        self.images: list[dict] = []
+
+        #: ``load_font`` registrations. ``name -> path`` (path may be None for system fonts).
+        self.fonts: dict[str, str | None] = {}
+
         #: Number of completed frames (incremented by :meth:`end_frame`).
         self.frame_count: int = 0
 
@@ -64,8 +76,9 @@ class MockBackend:
         # === Audio recording ===========================================
 
         #: Every ``play_sound`` call appended here (cumulative, never
-        #: cleared automatically).
-        self.sounds_played: list[str] = []
+        #: cleared automatically).  Each entry is ``{"handle": str,
+        #: "volume": float}``.
+        self.sounds_played: list[dict] = []
 
         #: Handle string of the music track currently playing, or
         #: ``None`` if nothing is playing.
@@ -100,6 +113,11 @@ class MockBackend:
         #: Per-handle overrides.  ``image_handle -> (width, height)``.
         self._image_sizes: dict[str, tuple[int, int]] = {}
 
+        # === Cursor tracking ===========================================
+        self.cursor_image: str | None = None
+        self.cursor_hotspot: tuple[int, int] = (0, 0)
+        self.cursor_visible: bool = True
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -129,6 +147,8 @@ class MockBackend:
     def begin_frame(self) -> None:
         """Reset per-frame recorded state."""
         self.texts.clear()
+        self.rects.clear()
+        self.images.clear()
 
     def end_frame(self) -> None:
         """Increment the frame counter."""
@@ -165,6 +185,12 @@ class MockBackend:
         if path not in self._loaded_images:
             self._loaded_images[path] = self._make_id("img")
         return self._loaded_images[path]
+
+    def load_image_from_pil(self, pil_image: Image.Image) -> str:
+        """Create an image handle from a PIL Image. Stores dimensions for get_image_size."""
+        handle = self._make_id("pil_img")
+        self._image_sizes[handle] = (pil_image.width, pil_image.height)
+        return handle
 
     def create_solid_color_image(
         self,
@@ -237,33 +263,76 @@ class MockBackend:
         )
 
     # ==================================================================
-    # Backend protocol — text rendering
+    # Backend protocol — rect and text rendering
     # ==================================================================
 
-    def load_font(self, name: str, size: int) -> str:
-        """Return a deterministic string handle like ``"font_medieval_16"``."""
-        return f"font_{name}_{size}"
+    def draw_rect(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        color: tuple[int, int, int, int],
+        *,
+        opacity: float = 1.0,
+    ) -> None:
+        """Record a rect draw call for the current frame."""
+        self.rects.append({
+            "x": x,
+            "y": y,
+            "width": width,
+            "height": height,
+            "color": color,
+            "opacity": opacity,
+        })
+
+    def load_font(self, name: str, path: str | None = None) -> str:
+        """Register a font and return a handle like ``"font_name"``."""
+        self.fonts[name] = path
+        return f"font_{name}"
 
     def draw_text(
         self,
         text: str,
-        font_handle: str,
         x: int,
         y: int,
+        font_size: int,
         color: tuple[int, int, int, int],
         *,
-        width: int | None = None,
-        align: str = "left",
+        font: str | None = None,
+        anchor_x: str = "left",
+        anchor_y: str = "baseline",
     ) -> None:
         """Record a text draw call for the current frame."""
         self.texts.append({
             "text": text,
-            "font": font_handle,
             "x": x,
             "y": y,
+            "font_size": font_size,
             "color": color,
+            "font": font,
+            "anchor_x": anchor_x,
+            "anchor_y": anchor_y,
+        })
+
+    def draw_image(
+        self,
+        image_handle: str,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        *,
+        opacity: float = 1.0,
+    ) -> None:
+        """Record an image draw call for the current frame."""
+        self.images.append({
+            "image": image_handle,
+            "x": x,
+            "y": y,
             "width": width,
-            "align": align,
+            "height": height,
+            "opacity": opacity,
         })
 
     # ==================================================================
@@ -277,8 +346,8 @@ class MockBackend:
         return self._loaded_sounds[path]
 
     def play_sound(self, handle: str, volume: float = 1.0) -> None:
-        """Record that a sound was played."""
-        self.sounds_played.append(handle)
+        """Record that a sound was played (handle and volume)."""
+        self.sounds_played.append({"handle": handle, "volume": volume})
 
     def load_music(self, path: str) -> str:
         """Return a cached string handle like ``"music_1"``."""
@@ -410,6 +479,20 @@ class MockBackend:
                                          button="right"))
         """
         self._pending_events.append(event)
+
+    def set_cursor(
+        self,
+        image_handle: str | None,
+        hotspot_x: int = 0,
+        hotspot_y: int = 0,
+    ) -> None:
+        """Record cursor state for test assertions."""
+        self.cursor_image = image_handle
+        self.cursor_hotspot = (hotspot_x, hotspot_y)
+
+    def set_cursor_visible(self, visible: bool) -> None:
+        """Record cursor visibility for test assertions."""
+        self.cursor_visible = visible
 
     def set_image_size(
         self, image_handle: str, width: int, height: int,

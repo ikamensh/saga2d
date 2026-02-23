@@ -21,7 +21,10 @@ The asset manager is owned by :class:`~easygame.game.Game` and exposed as
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from easygame.rendering.color_swap import ColorSwap
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +65,12 @@ class AssetManager:
         self._base_path = Path(base_path)
         self._scale_factor = scale_factor
         self._image_cache: dict[str, Any] = {}
+        self._swapped_cache: dict[tuple, Any] = {}  # (name, color_swap.cache_key()) -> handle
         self._frames_cache: dict[str, list[str]] = {}
+        self._sound_cache: dict[str, Any] = {}
+        # Music paths are cached (not handles) because streaming sources
+        # cannot be reused across players in pyglet.
+        self._music_path_cache: dict[str, str] = {}
 
     # ------------------------------------------------------------------
     # Image loading
@@ -95,13 +103,35 @@ class AssetManager:
         if name in self._image_cache:
             return self._image_cache[name]
 
-        handle = self._load_image(name)
+        path = self._resolve_image_path(name)
+        handle = self._backend.load_image(str(path))
         self._image_cache[name] = handle
         return handle
 
-    def _load_image(self, name: str) -> Any:
-        """Resolve *name* to a path, try @2x variant, and load."""
-        # Append .png if no extension given.
+    def image_swapped(self, name: str, color_swap: "ColorSwap") -> Any:
+        """Load an image with color replacement applied. Cached per (name, swap).
+
+        Returns:
+            An opaque ImageHandle.
+
+        Raises:
+            AssetNotFoundError: If the image file does not exist.
+        """
+        key = (name, color_swap.cache_key())
+        if key in self._swapped_cache:
+            return self._swapped_cache[key]
+        path = self._resolve_image_path(name)
+        pil_img = color_swap.apply(str(path))
+        handle = self._backend.load_image_from_pil(pil_img)
+        self._swapped_cache[key] = handle
+        return handle
+
+    def _resolve_image_path(self, name: str) -> Path:
+        """Resolve asset name to a file path. Handles @2x variants.
+
+        Raises:
+            AssetNotFoundError: If the file does not exist.
+        """
         if "." not in Path(name).name:
             name_with_ext = name + ".png"
         else:
@@ -110,25 +140,26 @@ class AssetManager:
         images_dir = self._base_path / "images"
         base_path = images_dir / name_with_ext
 
-        # On high-DPI, try @2x variant first.
         if self._scale_factor >= 1.5:
             hi_res_path = _make_2x_path(base_path)
             if hi_res_path.exists():
-                return self._backend.load_image(str(hi_res_path))
+                return hi_res_path
 
-        # Fall back to base resolution.
         if base_path.exists():
-            return self._backend.load_image(str(base_path))
+            return base_path
 
-        # Nothing found — raise with clear message.
         tried = [str(base_path)]
         if self._scale_factor >= 1.5:
             tried.insert(0, str(_make_2x_path(base_path)))
-
         raise AssetNotFoundError(
             f"Image asset '{name}' not found.  "
             f"Looked in: {', '.join(tried)}"
         )
+
+    def _load_image(self, name: str) -> Any:
+        """Resolve *name* to a path and load."""
+        path = self._resolve_image_path(name)
+        return self._backend.load_image(str(path))
 
     # ------------------------------------------------------------------
     # Animation frames
@@ -173,6 +204,105 @@ class AssetManager:
         ]
         self._frames_cache[prefix] = names
         return names
+
+
+    # ------------------------------------------------------------------
+    # Sound loading
+    # ------------------------------------------------------------------
+
+    #: Extension search order for sound effects (WAV preferred — short,
+    #: uncompressed, low latency).
+    _SOUND_EXTENSIONS = [".wav", ".ogg", ".mp3"]
+
+    #: Extension search order for music tracks (OGG preferred — compressed,
+    #: streaming-friendly, patent-free).
+    _MUSIC_EXTENSIONS = [".ogg", ".wav", ".mp3"]
+
+    def sound(self, name: str) -> Any:
+        """Load a sound effect by name (cached).
+
+        Resolution: ``assets/sounds/{name}.wav``, then ``.ogg``, then
+        ``.mp3``.  If *name* contains a ``.`` it is used as-is.
+
+        Returns:
+            An opaque ``SoundHandle``.
+
+        Raises:
+            AssetNotFoundError: If the file does not exist.
+        """
+        if name in self._sound_cache:
+            return self._sound_cache[name]
+
+        path = self._resolve_audio_path(
+            name, self._base_path / "sounds", self._SOUND_EXTENSIONS, "Sound",
+        )
+        handle = self._backend.load_sound(str(path))
+        self._sound_cache[name] = handle
+        return handle
+
+    def music(self, name: str) -> Any:
+        """Load a music track by name (streaming).
+
+        Returns a **fresh** streaming source each time because pyglet
+        streaming sources cannot be reused across players.  The resolved
+        file *path* is cached so repeated calls skip the filesystem probe.
+
+        Resolution: ``assets/music/{name}.ogg``, then ``.wav``, then
+        ``.mp3``.  If *name* contains a ``.`` it is used as-is.
+
+        Returns:
+            An opaque ``SoundHandle`` (streaming).
+
+        Raises:
+            AssetNotFoundError: If the file does not exist.
+        """
+        if name not in self._music_path_cache:
+            path = self._resolve_audio_path(
+                name,
+                self._base_path / "music",
+                self._MUSIC_EXTENSIONS,
+                "Music",
+            )
+            self._music_path_cache[name] = str(path)
+
+        return self._backend.load_music(self._music_path_cache[name])
+
+    def _resolve_audio_path(
+        self,
+        name: str,
+        base_dir: Path,
+        extensions: list[str],
+        kind: str,
+    ) -> Path:
+        """Try *extensions* in order under *base_dir* and return the first hit.
+
+        If *name* already contains a file extension (a ``.`` in the final
+        component), use it directly without trying alternatives.
+
+        Raises:
+            AssetNotFoundError: If no matching file is found.
+        """
+        # If the name already has an extension, use it directly.
+        if "." in Path(name).name:
+            path = base_dir / name
+            if path.exists():
+                return path
+            raise AssetNotFoundError(
+                f"{kind} asset '{name}' not found.  "
+                f"Looked in: {path}"
+            )
+
+        tried: list[str] = []
+        for ext in extensions:
+            path = base_dir / (name + ext)
+            tried.append(str(path))
+            if path.exists():
+                return path
+
+        raise AssetNotFoundError(
+            f"{kind} asset '{name}' not found.  "
+            f"Looked in: {', '.join(tried)}"
+        )
 
 
 def _make_2x_path(path: Path) -> Path:

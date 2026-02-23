@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from easygame.game import Game
     from easygame.input import InputEvent
+    from easygame.rendering.camera import Camera
+    from easygame.ui.component import _UIRoot
 
 
 class Scene:
@@ -28,6 +30,10 @@ class Scene:
 
     The `game` attribute is set by SceneStack before on_enter() so scenes can
     call self.game.push(), self.game.pop(), etc.
+
+    The `camera` attribute is ``None`` for UI-only scenes.  World scenes set
+    it (typically in :meth:`on_enter`) to enable camera-aware rendering with
+    automatic sprite offset and frustum culling.
     """
 
     transparent: bool = False
@@ -36,6 +42,8 @@ class Scene:
     real_time: bool = True
 
     game: Game
+    camera: Camera | None = None
+    _ui: _UIRoot | None = None
 
     def on_enter(self) -> None:
         """Called when this scene becomes active (top of stack)."""
@@ -60,6 +68,44 @@ class Scene:
     def handle_input(self, event: InputEvent) -> bool:
         """Handle input event. Return True to consume, False to pass through."""
         return False
+
+    # ------------------------------------------------------------------
+    # Save / Load
+    # ------------------------------------------------------------------
+
+    def get_save_state(self) -> dict:
+        """Return a JSON-serializable dict of scene state.
+
+        Called by :meth:`Game.save`.  Only the **top** scene's state is
+        saved.  Override in subclasses to persist game-specific data.
+
+        Returns an empty dict by default.
+        """
+        return {}
+
+    def load_save_state(self, state: dict) -> None:
+        """Restore scene state from a previously saved dict.
+
+        Called by game code **after** :meth:`on_enter` to reinitialise
+        the scene from saved data.  Override in subclasses.
+        """
+        pass
+
+    @property
+    def ui(self) -> _UIRoot:
+        """The UI component tree root, created lazily on first access.
+
+        Returns a :class:`~easygame.ui.component._UIRoot` that covers the
+        full logical screen.  Add components via ``self.ui.add(panel)``.
+
+        The root is created on first access (after ``game`` is set by the
+        scene stack), so it is safe to use inside :meth:`on_enter`.
+        """
+        if self._ui is None:
+            from easygame.ui.component import _UIRoot
+
+            self._ui = _UIRoot(self.game)
+        return self._ui
 
 
 class SceneStack:
@@ -174,13 +220,20 @@ class SceneStack:
             s.update(dt)
 
     def draw(self) -> None:
-        """Draw visible scenes from bottom to top.
+        """Draw visible scenes from bottom to top, with HUD interleaved.
 
-        Walks the stack from the top downward to find the lowest scene
-        that needs to be drawn.  An opaque scene (``transparent=False``,
-        the default) blocks everything below it.  A transparent scene
-        lets the scene below show through.  Drawing starts from the
-        lowest visible scene and proceeds upward.
+        Draw order:
+
+        1.  Find the lowest visible scene (walk down from top through
+            transparent scenes).
+        2.  Draw the **base scene** (the lowest opaque one) + its UI.
+        3.  Draw the **HUD** (if it exists, is visible, and the top
+            scene's ``show_hud`` is ``True``).
+        4.  Draw **transparent overlay scenes** + their UIs, from the
+            overlay just above the base upward.
+
+        This ensures the HUD sits above the base scene's content but
+        below modal overlays like ``MessageScreen`` or ``ConfirmDialog``.
         """
         if not self._stack:
             return
@@ -190,6 +243,25 @@ class SceneStack:
         start = len(self._stack) - 1
         while start > 0 and self._stack[start].transparent:
             start -= 1
-        # Draw from ``start`` upward (bottom-up within the visible range).
-        for i in range(start, len(self._stack)):
-            self._stack[i].draw()
+
+        # --- Step 1: draw the base scene (the opaque one at ``start``).
+        base = self._stack[start]
+        base.draw()
+        if base._ui is not None:
+            base._ui._ensure_layout()
+            base._ui.draw()
+
+        # --- Step 2: draw the HUD between base and overlays.
+        hud = self._game._hud
+        if hud is not None:
+            top = self._stack[-1]
+            if hud._should_draw(top.show_hud):
+                hud._draw()
+
+        # --- Step 3: draw overlay scenes above the base.
+        for i in range(start + 1, len(self._stack)):
+            scene = self._stack[i]
+            scene.draw()
+            if scene._ui is not None:
+                scene._ui._ensure_layout()
+                scene._ui.draw()

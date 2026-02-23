@@ -60,8 +60,8 @@ def test_mock_backend_records_sprite_text_sound(mock_game: Game, mock_backend: M
             self.game.backend.update_sprite(self._sprite_id, x=100, y=200)
 
         def draw(self) -> None:
-            font = self.game.backend.load_font("default", 24)
-            self.game.backend.draw_text("Hello", font, 50, 50, (255, 255, 255, 255))
+            self.game.backend.draw_rect(10, 10, 100, 50, (255, 0, 0, 128))
+            self.game.backend.draw_text("Hello", 50, 50, 24, (255, 255, 255, 255))
 
         def update(self, dt: float) -> None:
             snd = self.game.backend.load_sound("beep.wav")
@@ -72,6 +72,8 @@ def test_mock_backend_records_sprite_text_sound(mock_game: Game, mock_backend: M
 
     assert len(mock_backend.sprites) >= 1
     assert any(s["x"] == 100 and s["y"] == 200 for s in mock_backend.sprites.values())
+    assert len(mock_backend.rects) >= 1
+    assert any(r["x"] == 10 and r["width"] == 100 for r in mock_backend.rects)
     assert len(mock_backend.texts) >= 1
     assert any(t["text"] == "Hello" for t in mock_backend.texts)
     assert len(mock_backend.sounds_played) >= 1

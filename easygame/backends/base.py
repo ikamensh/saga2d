@@ -34,9 +34,9 @@ Mock: ``"sound_path"``  /  Pyglet: ``pyglet.media.Source``
 """
 
 FontHandle = Any
-"""Opaque reference to a loaded font at a particular size.
+"""Opaque reference to a loaded font.
 
-Mock: ``"font_name_16"``  /  Pyglet: ``(name, size)`` tuple
+Mock: ``"font_name"`` or ``(name, path)``  /  Pyglet: font name or path
 """
 
 
@@ -181,6 +181,26 @@ class Backend(Protocol):
         """Load an image from *path* and return an opaque handle."""
         ...
 
+    def load_image_from_pil(self, pil_image: "PIL.Image.Image") -> ImageHandle:
+        """Create an image handle from a PIL Image object.
+
+        Used by ColorSwap to load recolored images. The image must be RGBA.
+        """
+        ...
+
+    def set_cursor(
+        self,
+        image_handle: ImageHandle | None,
+        hotspot_x: int = 0,
+        hotspot_y: int = 0,
+    ) -> None:
+        """Set a custom cursor image. None restores system default."""
+        ...
+
+    def set_cursor_visible(self, visible: bool) -> None:
+        """Show or hide the mouse cursor."""
+        ...
+
     def create_solid_color_image(
         self,
         r: int,
@@ -256,27 +276,68 @@ class Backend(Protocol):
         """
         ...
 
-    # -- Text rendering -----------------------------------------------------
+    # -- Rect and text rendering ---------------------------------------------
 
-    def load_font(self, name: str, size: int) -> FontHandle:
-        """Load a font at the given logical *size* and return a handle."""
+    def draw_rect(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        color: tuple[int, int, int, int],
+        *,
+        opacity: float = 1.0,
+    ) -> None:
+        """Draw a filled RGBA rectangle. Per-frame call (cleared each begin_frame)."""
+        ...
+
+    def load_font(self, name: str, path: str | None = None) -> FontHandle:
+        """Load a font from *path* and register it as *name*.
+
+        When *path* is None, use the system font with the given *name*.
+        Returns an opaque handle for use with draw_text.
+        """
         ...
 
     def draw_text(
         self,
         text: str,
-        font_handle: FontHandle,
         x: int,
         y: int,
+        font_size: int,
         color: tuple[int, int, int, int],
         *,
-        width: int | None = None,
-        align: str = "left",
+        font: FontHandle | None = None,
+        anchor_x: str = "left",
+        anchor_y: str = "baseline",
     ) -> None:
-        """Draw *text* at ``(x, y)`` using *font_handle*.
+        """Draw *text* at ``(x, y)``.
 
-        This is a per-frame call (not persistent like sprites).  The backend
-        may batch text draws within the current frame's begin/end cycle.
+        *font_size* is the logical size. *font* is a handle from load_font,
+        or None for the default font. *anchor_x* and *anchor_y* control
+        alignment (e.g. "center", "left", "right", "baseline", "top", "bottom").
+        Per-frame call (cleared each begin_frame).
+        """
+        ...
+
+    def draw_image(
+        self,
+        image_handle: ImageHandle,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        *,
+        opacity: float = 1.0,
+    ) -> None:
+        """Draw an image at ``(x, y)`` scaled to ``(width, height)``.
+
+        *image_handle* is an opaque handle from :meth:`load_image`.
+        *opacity* ranges from 0.0 (fully transparent) to 1.0 (fully opaque).
+        Per-frame call (cleared each begin_frame).
+
+        This is used by UI components (e.g. ``Image`` widget) to draw
+        images in screen space without creating persistent sprites.
         """
         ...
 

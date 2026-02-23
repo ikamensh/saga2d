@@ -111,8 +111,6 @@ class TitleScene(Scene):
         self._sprites: list[Sprite] = []
         self._bg_sprite_id: int | None = None
         self._tween_ids: list[int] = []
-        self._title_font: Any = None
-        self._prompt_font: Any = None
 
         self._create_background()
         self._create_decorative_sprites()
@@ -247,37 +245,35 @@ class TitleScene(Scene):
     def draw(self) -> None:
         backend = self.game.backend
 
-        if self._title_font is None:
-            self._title_font = backend.load_font("Arial", 64)
-        if self._prompt_font is None:
-            self._prompt_font = backend.load_font("Arial", 28)
-
         # Title — centred near the top
         backend.draw_text(
             "BATTLE VIGNETTE",
-            self._title_font,
             SCREEN_W // 2, 180,
+            64,
             (255, 220, 80, 255),
-            align="center",
-            width=SCREEN_W,
+            font="Arial",
+            anchor_x="center",
+            anchor_y="baseline",
         )
 
         # Instructions — centred below title
         backend.draw_text(
             "Press ENTER to start",
-            self._prompt_font,
             SCREEN_W // 2, 320,
+            28,
             (200, 200, 200, 255),
-            align="center",
-            width=SCREEN_W,
+            font="Arial",
+            anchor_x="center",
+            anchor_y="baseline",
         )
         backend.draw_text(
             "Press ESC to quit",
-            self._prompt_font,
             SCREEN_W // 2, 380,
+            28,
             (160, 160, 160, 255),
-            align="center",
-            width=SCREEN_W,
+            font="Arial",
+            anchor_x="center",
+            anchor_y="baseline",
         )
 
     # ------------------------------------------------------------------
@@ -361,8 +357,6 @@ class BattleScene(Scene):
         self._ring_tween_ids: list[int] = []
         self.busy = False  # True while an attack sequence is playing
         self.floaters: list[_FloatingNumber] = []
-        self._font: Any = None
-        self._victory_font: Any = None
 
         # Background sprite id (backend-level, not a Sprite object)
         self._bg_sprite_id: int | None = None
@@ -817,19 +811,17 @@ class BattleScene(Scene):
         """Draw floating damage numbers and victory text via the backend."""
         backend = self.game.backend
 
-        if self._font is None:
-            self._font = backend.load_font("Arial", 24)
-
         for f in self.floaters:
             if not f.alive:
                 continue
             alpha = max(0, min(255, int(f.opacity)))
             backend.draw_text(
                 f.text,
-                self._font,
                 int(f.x),
                 int(f.y),
+                24,
                 (255, 80, 80, alpha),
+                font="Arial",
             )
 
         # Clean up dead floaters
@@ -837,16 +829,15 @@ class BattleScene(Scene):
 
         # Victory overlay
         if self._victory:
-            if self._victory_font is None:
-                self._victory_font = backend.load_font("Arial", 96)
             alpha = max(0, min(255, int(self._victory_opacity)))
             backend.draw_text(
                 "VICTORY",
-                self._victory_font,
                 SCREEN_W // 2, SCREEN_H // 2 - 48,
+                96,
                 (255, 230, 60, alpha),
-                align="center",
-                width=SCREEN_W,
+                font="Arial",
+                anchor_x="center",
+                anchor_y="baseline",
             )
 
 

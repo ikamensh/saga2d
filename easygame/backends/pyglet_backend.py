@@ -100,8 +100,15 @@ class PygletBackend:
         self._sprites: dict[int, pyglet.sprite.Sprite] = {}
         self._next_sprite_id: int = 0
 
-        # Frame-local text labels (cleared each begin_frame)
+        # Frame-local text labels, rects, and image sprites (cleared each begin_frame)
         self._text_labels: list[pyglet.text.Label] = []
+        self._rect_shapes: list = []
+        self._image_sprites: list[pyglet.sprite.Sprite] = []
+
+        # Persistent group for UI overlays (draw_rect / draw_text).
+        # order=100 ensures UI renders above all sprite layers (max is
+        # RenderLayer.UI_WORLD = 4).  Created once and reused.
+        self._ui_overlay_group: pyglet.graphics.Group | None = None
 
     # ==================================================================
     # Coordinate conversion
@@ -187,6 +194,9 @@ class PygletBackend:
 
         # Persistent batch — NOT recreated per frame.
         self.batch = pyglet.graphics.Batch()
+
+        # UI overlay group — order=100 renders above all sprite layers.
+        self._ui_overlay_group = pyglet.graphics.Group(order=100)
 
         # Compute viewport from actual physical window size.
         self._compute_viewport(
@@ -285,10 +295,16 @@ class PygletBackend:
         if self.window is None:
             return
         self.window.clear()
-        # Discard per-frame text labels from the previous frame.
+        # Discard per-frame text labels, rects, and image sprites from the previous frame.
         for label in self._text_labels:
             label.delete()
         self._text_labels.clear()
+        for shape in self._rect_shapes:
+            shape.delete()
+        self._rect_shapes.clear()
+        for img_sprite in self._image_sprites:
+            img_sprite.delete()
+        self._image_sprites.clear()
 
     def end_frame(self) -> None:
         if self.window is None or self.batch is None:
@@ -338,6 +354,20 @@ class PygletBackend:
     def load_image(self, path: str):
         import pyglet
         return pyglet.image.load(path)
+
+    def load_image_from_pil(self, pil_image):
+        """Create a pyglet image from a PIL Image (RGBA)."""
+        import pyglet
+        raw = pil_image.tobytes()
+        # PIL is top-down; negative pitch tells pyglet the row order
+        img_data = pyglet.image.ImageData(
+            pil_image.width,
+            pil_image.height,
+            "RGBA",
+            raw,
+            pitch=-pil_image.width * 4,
+        )
+        return img_data
 
     def create_sprite(
         self,
@@ -421,49 +451,116 @@ class PygletBackend:
         )
 
     # ==================================================================
-    # Backend protocol — text rendering
+    # Backend protocol — rect and text rendering
     # ==================================================================
 
-    def load_font(self, name: str, size: int) -> tuple[str, int]:
-        """Return ``(font_name, logical_size)`` tuple.
-
-        Physical size is computed at draw time using the scale factor.
-        """
-        return (name, size)
-
-    def draw_text(
+    def draw_rect(
         self,
-        text: str,
-        font_handle: tuple[str, int],
         x: int,
         y: int,
+        width: int,
+        height: int,
         color: tuple[int, int, int, int],
         *,
-        width: int | None = None,
-        align: str = "left",
+        opacity: float = 1.0,
     ) -> None:
         if self.batch is None:
             return
         import pyglet
-        name, logical_size = font_handle
-        physical_size = int(logical_size * self.scale_factor)
+        # Framework (x,y) is top-left; pyglet Rectangle expects bottom-left.
+        phys_tl_x, phys_tl_y = self._to_physical(x, y)
+        phys_br_x, phys_br_y = self._to_physical(x + width, y + height)
+        phys_w = int(phys_br_x - phys_tl_x)
+        phys_h = int(phys_tl_y - phys_br_y)  # y-flipped
+        r, g, b, a = color
+        alpha = int(a * opacity)
+        rect = pyglet.shapes.Rectangle(
+            int(phys_tl_x),
+            int(phys_br_y),
+            phys_w,
+            phys_h,
+            color=(r, g, b, alpha),
+            batch=self.batch,
+            group=self._ui_overlay_group,
+        )
+        self._rect_shapes.append(rect)
+
+    def load_font(self, name: str, path: str | None = None) -> str:
+        """Register a font from *path* or use system font when path is None."""
+        if path is not None:
+            import pyglet
+            pyglet.font.add_file(path)
+        return name
+
+    def draw_text(
+        self,
+        text: str,
+        x: int,
+        y: int,
+        font_size: int,
+        color: tuple[int, int, int, int],
+        *,
+        font: str | None = None,
+        anchor_x: str = "left",
+        anchor_y: str = "baseline",
+    ) -> None:
+        if self.batch is None:
+            return
+        import pyglet
+        font_name = font if font is not None else "sans-serif"
+        physical_size = int(font_size * self.scale_factor)
         phys_x, phys_y = self._to_physical(x, y)
-        physical_width = int(width * self.scale_factor) if width else None
         label = pyglet.text.Label(
             text,
-            font_name=name,
+            font_name=font_name,
             font_size=physical_size,
             x=int(phys_x),
             y=int(phys_y),
             color=color,
-            width=physical_width,
-            multiline=physical_width is not None,
-            anchor_x=align,
+            anchor_x=anchor_x,
+            anchor_y=anchor_y,
             batch=self.batch,
+            group=self._ui_overlay_group,
         )
-        # Keep a reference so the label survives until end_frame draws
-        # the batch; delete in the next begin_frame.
         self._text_labels.append(label)
+
+    def draw_image(
+        self,
+        image_handle,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        *,
+        opacity: float = 1.0,
+    ) -> None:
+        """Draw an image at ``(x, y)`` scaled to ``(width, height)``.
+
+        Creates a per-frame pyglet Sprite in the UI overlay group.
+        The sprite is deleted on the next :meth:`begin_frame`.
+        """
+        if self.batch is None:
+            return
+        import pyglet
+
+        # Convert top-left logical → bottom-left physical.
+        phys_tl_x, phys_tl_y = self._to_physical(x, y)
+        phys_br_x, phys_br_y = self._to_physical(x + width, y + height)
+        phys_w = phys_br_x - phys_tl_x
+        phys_h = phys_tl_y - phys_br_y  # y-flipped
+
+        sprite = pyglet.sprite.Sprite(
+            image_handle,
+            x=int(phys_tl_x),
+            y=int(phys_br_y),
+            batch=self.batch,
+            group=self._ui_overlay_group,
+        )
+        # Scale to requested size.
+        sprite.scale_x = phys_w / image_handle.width
+        sprite.scale_y = phys_h / image_handle.height
+        sprite.opacity = int(opacity * 255)
+        self._image_sprites.append(sprite)
 
     # ==================================================================
     # Backend protocol — audio
@@ -502,3 +599,29 @@ class PygletBackend:
     def stop_player(self, player_id) -> None:
         player_id.pause()
         player_id.delete()
+
+    # ==================================================================
+    # Backend protocol — cursor
+    # ==================================================================
+
+    def set_cursor(
+        self,
+        image_handle,
+        hotspot_x: int = 0,
+        hotspot_y: int = 0,
+    ) -> None:
+        """Set a custom cursor image. None restores system default."""
+        import pyglet
+        if image_handle is None:
+            self.window.set_mouse_cursor(None)
+            return
+        # Pyglet uses y-up for hot_y; framework uses y-down.
+        hot_y = image_handle.height - hotspot_y
+        cursor = pyglet.window.ImageMouseCursor(
+            image_handle, hot_x=hotspot_x, hot_y=hot_y,
+        )
+        self.window.set_mouse_cursor(cursor)
+
+    def set_cursor_visible(self, visible: bool) -> None:
+        """Show or hide the mouse cursor."""
+        self.window.set_mouse_visible(visible)

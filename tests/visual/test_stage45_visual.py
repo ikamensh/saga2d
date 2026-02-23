@@ -56,7 +56,6 @@ class Stage45Scene(Scene):
         self._timer_sprite = Sprite("sprites/crate", position=(600, 100))
         self.game.every(2.0, self._on_timer)
 
-        self._font = backend.load_font("Arial", 20)
 
     def _slide_right(self) -> None:
         tween(
@@ -104,15 +103,17 @@ class Stage45Scene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "Click = move knight  |  Keys = print action  |  ESC = quit",
-            self._font,
             20, backend.logical_height - 25,
+            20,
             (255, 255, 255, 255),
+            font="Arial",
         )
         backend.draw_text(
             "Sliding crate (EASE_IN_OUT) | Fading enemy | Timer sprite teleports every 2s",
-            self._font,
             20, backend.logical_height - 48,
+            20,
             (200, 200, 200, 255),
+            font="Arial",
         )
 
     def handle_input(self, event: InputEvent) -> bool:

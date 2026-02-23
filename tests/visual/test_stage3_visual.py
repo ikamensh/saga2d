@@ -40,7 +40,6 @@ class AnimationScene(Scene):
         self._knight = Sprite("sprites/knight_walk_01", position=(400, 300))
         self._knight.play(WALK)
 
-        self._font = backend.load_font("Arial", 24)
 
     def on_exit(self) -> None:
         self._knight.remove()
@@ -51,15 +50,17 @@ class AnimationScene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "A = attack (once, then back to walk)  |  Close = quit",
-            self._font,
             20, backend.logical_height - 30,
+            24,
             (255, 255, 255, 255),
+            font="Arial",
         )
         backend.draw_text(
             "Knight cycles knight_walk frames. Attack uses on_complete callback.",
-            self._font,
             20, backend.logical_height - 55,
+            24,
             (200, 200, 200, 255),
+            font="Arial",
         )
 
     def handle_input(self, event: object) -> bool:

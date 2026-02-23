@@ -10,7 +10,7 @@ from easygame.scene import Scene, SceneStack
 class FakeGame:
     """Minimal game object for SceneStack tests."""
 
-    pass
+    _hud = None
 
 
 class TrackingScene(Scene):

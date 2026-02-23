@@ -26,7 +26,9 @@ from typing import TYPE_CHECKING, Any, Callable
 from easygame.rendering.layers import RenderLayer, SpriteAnchor
 
 if TYPE_CHECKING:
+    from easygame.actions import Action
     from easygame.animation import AnimationDef, AnimationPlayer
+    from easygame.rendering.color_swap import ColorSwap
 
 # Module-level reference set by Game.__init__().
 # Sprites read this at construction time.
@@ -89,12 +91,15 @@ class Sprite:
     """A visible game object rendered via the backend batch.
 
     Parameters:
-        image:    Asset name resolved by :meth:`AssetManager.image`.
-        position: ``(x, y)`` logical coordinates.
-        anchor:   Where the position point lies on the image.
-        layer:    Render layer (back-to-front draw order).
-        opacity:  0 (transparent) to 255 (opaque).
-        visible:  Whether the sprite is drawn at all.
+        image:         Asset name resolved by :meth:`AssetManager.image`.
+        position:      ``(x, y)`` logical coordinates.
+        anchor:        Where the position point lies on the image.
+        layer:         Render layer (back-to-front draw order).
+        opacity:       0 (transparent) to 255 (opaque).
+        visible:       Whether the sprite is drawn at all.
+        color_swap:    Optional ColorSwap for per-pixel color replacement.
+        team_palette:  Optional registered palette name (e.g. "blue").
+                       Ignored if color_swap is set.
     """
 
     def __init__(
@@ -106,6 +111,8 @@ class Sprite:
         layer: RenderLayer = RenderLayer.UNITS,
         opacity: int = 255,
         visible: bool = True,
+        color_swap: "ColorSwap | None" = None,
+        team_palette: str | None = None,
     ) -> None:
         if _current_game is None:
             raise RuntimeError(
@@ -117,7 +124,16 @@ class Sprite:
         self._assets = game.assets
         self._game = game
         self._image_name = image
-        self._image_handle = self._assets.image(image)
+
+        # Resolve image handle: color_swap > team_palette > plain image
+        swap = color_swap
+        if swap is None and team_palette is not None:
+            from easygame.rendering.color_swap import get_palette
+            swap = get_palette(team_palette)
+        if swap is not None:
+            self._image_handle = self._assets.image_swapped(image, swap)
+        else:
+            self._image_handle = self._assets.image(image)
         self._anchor = anchor
         self._layer = layer
         self._x = float(position[0])
@@ -131,6 +147,9 @@ class Sprite:
         self._anim_queue: list[tuple[AnimationDef, Callable[[], Any] | None]] = []
         self._move_tween_ids: list[int] = []
 
+        # Action state (Stage 10 Composable Actions).
+        self._current_action: Action | None = None
+
         # Cache image dimensions for anchor offset.
         self._img_w, self._img_h = self._backend.get_image_size(
             self._image_handle,
@@ -141,6 +160,9 @@ class Sprite:
         self._sprite_id = self._backend.create_sprite(
             self._image_handle, order,
         )
+
+        # Register in the game's sprite registry (for camera render sync).
+        self._game._all_sprites.add(self)
 
         # Push initial position + visual state.
         self._sync_to_backend()
@@ -239,18 +261,56 @@ class Sprite:
         return self._sprite_id
 
     # ------------------------------------------------------------------
+    # Composable Actions
+    # ------------------------------------------------------------------
+
+    def do(self, action: Action) -> None:
+        """Start an action sequence, cancelling any current action.
+
+        The sprite is registered in ``Game._action_sprites`` and its
+        :meth:`update_action` will be called each frame.
+        """
+        if self._removed:
+            return
+        self.stop_actions()
+        self._current_action = action
+        action.start(self)
+        self._game._action_sprites.add(self)
+
+    def stop_actions(self) -> None:
+        """Cancel the current action sequence (if any)."""
+        if self._current_action is not None:
+            self._current_action.stop()
+            self._current_action = None
+        self._game._action_sprites.discard(self)
+
+    def update_action(self, dt: float) -> None:
+        """Advance the current action by *dt* seconds.
+
+        Called automatically by :meth:`Game._update_actions` each frame.
+        When the action completes, the sprite is deregistered.
+        """
+        if self._current_action is None or self._removed:
+            return
+        if self._current_action.update(dt):
+            self._current_action = None
+            self._game._action_sprites.discard(self)
+
+    # ------------------------------------------------------------------
     # Removal
     # ------------------------------------------------------------------
 
     def remove(self) -> None:
         """Remove the sprite from the backend batch.
 
-        Also stops any active animation, cancels move tweens, and
-        deregisters from the game's animated-sprites set.  Safe to call
-        multiple times.
+        Also stops any active action, animation, cancels move tweens, and
+        deregisters from the game's sprite sets.  Safe to call multiple
+        times.
         """
         if self._removed:
             return
+        # Stop action before setting _removed so stop() can still access state.
+        self.stop_actions()
         self._removed = True
         self._anim_player = None
         self._anim_queue.clear()
@@ -258,6 +318,8 @@ class Sprite:
             self._game._tween_manager.cancel(tid)
         self._move_tween_ids.clear()
         self._game._animated_sprites.discard(self)
+        self._game._all_sprites.discard(self)
+        self._game._action_sprites.discard(self)
         self._backend.remove_sprite(self._sprite_id)
 
     @property

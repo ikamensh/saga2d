@@ -72,7 +72,6 @@ class SpriteScene(Scene):
         )
         backend.update_sprite(self._enemy, 550, 300)
 
-        self._font = backend.load_font("Arial", 24)
         self._knight_removed = False
 
     def on_exit(self) -> None:
@@ -96,15 +95,17 @@ class SpriteScene(Scene):
 
         backend.draw_text(
             "Arrows = move knight  |  DELETE = remove knight  |  Close = quit",
-            self._font,
             20, backend.logical_height - 30,
+            24,
             (255, 255, 255, 255),
+            font="Arial",
         )
         backend.draw_text(
             "Trees (OBJECTS) behind knight/enemy (UNITS). Y-sort: higher y = in front.",
-            self._font,
             20, backend.logical_height - 55,
+            24,
             (200, 200, 200, 255),
+            font="Arial",
         )
 
     def handle_input(self, event: object) -> bool:

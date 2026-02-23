@@ -27,7 +27,6 @@ class MainScene(Scene):
         )
         self._bg_sprite = backend.create_sprite(img, 0)
         backend.update_sprite(self._bg_sprite, 0, 0)
-        self._font = backend.load_font("Arial", 36)
 
     def on_exit(self) -> None:
         print("[MainScene] on_exit")
@@ -48,15 +47,17 @@ class MainScene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "Scene: Main",
-            self._font,
             100, 500,
+            36,
             (255, 255, 255, 255),
+            font="Arial",
         )
         backend.draw_text(
             "SPACE = push overlay  |  ESC = pop  |  Close window = quit",
-            self._font,
             100, 440,
+            36,
             (200, 200, 200, 255),
+            font="Arial",
         )
 
     def handle_input(self, event: object) -> bool:
@@ -79,7 +80,6 @@ class OverlayScene(Scene):
         )
         self._bg_sprite = backend.create_sprite(img, 0)
         backend.update_sprite(self._bg_sprite, 0, 0)
-        self._font = backend.load_font("Arial", 36)
 
     def on_exit(self) -> None:
         print("[OverlayScene] on_exit")
@@ -93,15 +93,17 @@ class OverlayScene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "Scene: Overlay",
-            self._font,
             100, 500,
+            36,
             (255, 255, 255, 255),
+            font="Arial",
         )
         backend.draw_text(
             "ESC = pop back to Main",
-            self._font,
             100, 440,
+            36,
             (255, 255, 220, 255),
+            font="Arial",
         )
 
     def handle_input(self, event: object) -> bool:

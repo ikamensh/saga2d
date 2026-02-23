@@ -26,7 +26,7 @@ class DialogScene(Scene):
         dialog.add(ImageBox(self.portrait_img, width=96, height=96))
 
         # Right: text + choices
-        right = Panel(layout=Layout.VERTICAL, spacing=8, fill=True)
+        right = Panel(layout=Layout.VERTICAL, spacing=8)
         right.add(Label(self.speaker_name, style=Style(font_size=28)))
         right.add(TextBox(self.dialog_text, typewriter_speed=30))  # auto word-wrap, typewriter
 
