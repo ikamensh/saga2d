@@ -1,0 +1,704 @@
+"""Generate all placeholder PNG assets for the Tower Defense tutorial (chapters 1-3).
+
+Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
+``generate(output_dir)`` saves all files and returns the list of paths.
+
+Assets generated::
+
+    Terrain (32x32):
+        grass.png            — green grass tile with subtle texture
+        path_straight.png    — tan/brown walkable path
+        path_turn.png        — path corner piece
+
+    Towers (32x32):
+        tower_basic.png      — simple turret (grey base + barrel)
+        tower_sniper.png     — long-range tower (narrow barrel, blue tint)
+        tower_splash.png     — area-of-effect tower (wide barrel, red tint)
+        tower_slot.png       — empty buildable slot marker
+
+    Enemies (24x24):
+        enemy_basic.png      — red foot soldier
+        enemy_fast.png       — orange scout (smaller, triangular)
+        enemy_tank.png       — dark-red heavy (armoured look)
+
+    Projectiles (8x8):
+        projectile_basic.png — yellow dot
+        projectile_sniper.png — cyan bolt
+        projectile_splash.png — orange ball
+
+    Effects (various):
+        explosion.png        — 16x16 orange/yellow burst
+        range_indicator.png  — 64x64 semi-transparent circle
+
+    UI elements:
+        btn_normal.png       — 80x32 dark button
+        btn_hover.png        — 80x32 lighter button
+        btn_pressed.png      — 80x32 darker pressed button
+        panel_bg.png         — 120x200 dark UI panel
+        health_bar_bg.png    — 24x4 dark health bar background
+        health_bar_fill.png  — 24x4 green health bar fill
+        coin_icon.png        — 16x16 gold coin
+        heart_icon.png       — 16x16 red heart
+        wave_banner.png      — 160x40 wave announcement banner
+
+    HUD:
+        hud_top_bar.png      — 320x24 top HUD bar background
+
+Run standalone::
+
+    python tutorials/tower_defense/generate_td_assets.py
+"""
+
+from __future__ import annotations
+
+import math
+import sys
+from pathlib import Path
+from typing import List, Tuple
+
+from PIL import Image, ImageDraw, ImageFont
+
+# ---------------------------------------------------------------------------
+# Ensure project root is on sys.path so `assetgen` is importable
+# ---------------------------------------------------------------------------
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+from assetgen.primitives import (
+    circle,
+    crosshatch,
+    filled_ellipse,
+    filled_polygon,
+    labeled_rect,
+    outlined_ellipse,
+    outlined_polygon,
+    solid_rect,
+    vertical_gradient,
+)
+
+# ---------------------------------------------------------------------------
+# Type aliases
+# ---------------------------------------------------------------------------
+Color = Tuple[int, int, int, int]  # RGBA
+
+# ---------------------------------------------------------------------------
+# Colour palette
+# ---------------------------------------------------------------------------
+
+# Terrain
+GRASS_GREEN = (60, 140, 50, 255)
+GRASS_LIGHT = (75, 160, 65, 255)
+GRASS_DARK = (45, 110, 35, 255)
+PATH_TAN = (180, 155, 110, 255)
+PATH_DARK = (145, 120, 85, 255)
+PATH_LIGHT = (200, 175, 135, 255)
+
+# Towers
+TOWER_GREY = (120, 120, 130, 255)
+TOWER_DARK = (80, 80, 90, 255)
+TOWER_LIGHT = (160, 160, 170, 255)
+TOWER_SNIPER_TINT = (100, 130, 180, 255)
+TOWER_SPLASH_TINT = (180, 100, 90, 255)
+SLOT_GREEN = (80, 180, 80, 100)
+SLOT_BORDER = (100, 200, 100, 180)
+
+# Enemies
+ENEMY_RED = (200, 50, 50, 255)
+ENEMY_RED_DARK = (150, 30, 30, 255)
+ENEMY_ORANGE = (220, 140, 40, 255)
+ENEMY_ORANGE_DARK = (180, 100, 20, 255)
+ENEMY_TANK_RED = (140, 30, 30, 255)
+ENEMY_TANK_DARK = (100, 20, 20, 255)
+
+# Projectiles
+PROJ_YELLOW = (255, 230, 50, 255)
+PROJ_CYAN = (80, 220, 255, 255)
+PROJ_ORANGE = (255, 160, 40, 255)
+
+# Effects
+EXPLOSION_ORANGE = (255, 160, 30, 220)
+EXPLOSION_YELLOW = (255, 230, 80, 200)
+RANGE_INDICATOR = (100, 200, 255, 50)
+RANGE_BORDER = (100, 200, 255, 100)
+
+# UI
+UI_DARK = (30, 30, 40, 230)
+UI_MID = (50, 50, 65, 230)
+UI_LIGHT = (70, 70, 90, 230)
+UI_BORDER = (90, 90, 110, 255)
+UI_TEXT = (220, 220, 230, 255)
+GOLD = (255, 210, 50, 255)
+GOLD_DARK = (200, 160, 30, 255)
+HEALTH_GREEN = (60, 200, 60, 255)
+HEALTH_BG = (40, 40, 40, 200)
+HEART_RED = (220, 40, 60, 255)
+HEART_DARK = (170, 20, 40, 255)
+BANNER_BG = (40, 30, 60, 220)
+BANNER_BORDER = (180, 150, 60, 255)
+HUD_BG = (20, 20, 30, 220)
+
+
+# ===================================================================
+# Terrain tiles (32x32)
+# ===================================================================
+
+def make_grass() -> Image.Image:
+    """32x32 grass tile with subtle texture variation."""
+    img = Image.new("RGBA", (32, 32), GRASS_GREEN)
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Scattered lighter grass tufts for visual interest
+    tufts = [
+        (4, 6), (18, 3), (26, 12), (8, 20), (22, 24),
+        (14, 14), (2, 28), (28, 28), (12, 8), (24, 18),
+    ]
+    for tx, ty in tufts:
+        draw.line([(tx, ty), (tx, ty - 3)], fill=GRASS_LIGHT, width=1)
+        draw.line([(tx - 1, ty), (tx - 1, ty - 2)], fill=GRASS_LIGHT, width=1)
+
+    # A few darker spots for depth
+    dark_spots = [(10, 25), (25, 7), (6, 14), (20, 20)]
+    for dx, dy in dark_spots:
+        draw.point((dx, dy), fill=GRASS_DARK)
+        draw.point((dx + 1, dy), fill=GRASS_DARK)
+
+    return img
+
+
+def make_path_straight() -> Image.Image:
+    """32x32 straight path tile — tan with darker edges."""
+    img = Image.new("RGBA", (32, 32), PATH_TAN)
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Darker edges (top and bottom) to show path borders
+    for y in range(3):
+        draw.line([(0, y), (31, y)], fill=PATH_DARK, width=1)
+        draw.line([(0, 31 - y), (31, 31 - y)], fill=PATH_DARK, width=1)
+
+    # Subtle lighter centre stripe
+    for y in range(14, 18):
+        draw.line([(2, y), (29, y)], fill=PATH_LIGHT, width=1)
+
+    # Scattered pebbles
+    pebbles = [(6, 8), (20, 12), (12, 22), (26, 26)]
+    for px, py in pebbles:
+        draw.point((px, py), fill=PATH_DARK)
+
+    return img
+
+
+def make_path_turn() -> Image.Image:
+    """32x32 path corner tile — top-to-right turn.
+
+    Path enters from top edge, exits from right edge.
+    """
+    img = Image.new("RGBA", (32, 32), GRASS_GREEN)
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Fill the L-shaped path region
+    # Vertical segment (top half)
+    draw.rectangle((6, 0, 25, 18), fill=PATH_TAN)
+    # Horizontal segment (right half)
+    draw.rectangle((14, 6, 31, 25), fill=PATH_TAN)
+
+    # Darker edges along outer borders
+    draw.line([(6, 0), (6, 18)], fill=PATH_DARK, width=1)
+    draw.line([(6, 18), (14, 18)], fill=PATH_DARK, width=1)
+    draw.line([(14, 18), (14, 25)], fill=PATH_DARK, width=1)
+    draw.line([(14, 25), (31, 25)], fill=PATH_DARK, width=1)
+    draw.line([(25, 0), (25, 6)], fill=PATH_DARK, width=1)
+    draw.line([(25, 6), (31, 6)], fill=PATH_DARK, width=1)
+
+    return img
+
+
+# ===================================================================
+# Tower sprites (32x32)
+# ===================================================================
+
+def _draw_tower_base(img: Image.Image, base_color: Color, accent: Color) -> None:
+    """Draw a common tower platform/base onto *img*."""
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Stone platform — rounded rectangle approximation
+    draw.rectangle((6, 18, 25, 30), fill=base_color)
+    # Lighter top edge
+    draw.line([(6, 18), (25, 18)], fill=accent, width=1)
+    # Darker bottom edge
+    r, g, b, a = base_color
+    dark = (max(0, r - 40), max(0, g - 40), max(0, b - 40), a)
+    draw.line([(6, 30), (25, 30)], fill=dark, width=1)
+
+    # Battlements (crenellations)
+    for bx in (7, 13, 19):
+        draw.rectangle((bx, 15, bx + 4, 18), fill=base_color)
+        draw.line([(bx, 15), (bx + 4, 15)], fill=accent, width=1)
+
+
+def make_tower_basic() -> Image.Image:
+    """32x32 basic tower — grey base with simple barrel pointing up."""
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    _draw_tower_base(img, TOWER_GREY, TOWER_LIGHT)
+
+    # Barrel — vertical rectangle on top
+    draw.rectangle((13, 4, 18, 17), fill=TOWER_DARK)
+    draw.line([(13, 4), (18, 4)], fill=TOWER_LIGHT, width=1)
+    # Barrel tip
+    draw.rectangle((12, 2, 19, 5), fill=TOWER_GREY)
+
+    return img
+
+
+def make_tower_sniper() -> Image.Image:
+    """32x32 sniper tower — blue-tinted, long narrow barrel."""
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    _draw_tower_base(img, TOWER_SNIPER_TINT, (140, 170, 220, 255))
+
+    # Long narrow barrel
+    draw.rectangle((14, 1, 17, 17), fill=(60, 90, 140, 255))
+    draw.line([(14, 1), (17, 1)], fill=(120, 160, 220, 255), width=1)
+    # Scope dot at tip
+    draw.point((15, 1), fill=PROJ_CYAN)
+    draw.point((16, 1), fill=PROJ_CYAN)
+
+    return img
+
+
+def make_tower_splash() -> Image.Image:
+    """32x32 splash tower — red-tinted, wide barrel (cannon look)."""
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    _draw_tower_base(img, TOWER_SPLASH_TINT, (220, 140, 130, 255))
+
+    # Wide cannon barrel
+    draw.rectangle((11, 6, 20, 17), fill=(140, 60, 50, 255))
+    draw.line([(11, 6), (20, 6)], fill=(200, 120, 110, 255), width=1)
+    # Flared muzzle
+    draw.rectangle((9, 4, 22, 7), fill=(160, 80, 70, 255))
+
+    return img
+
+
+def make_tower_slot() -> Image.Image:
+    """32x32 empty tower slot — semi-transparent green marker."""
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Dashed border rectangle
+    draw.rectangle((2, 2, 29, 29), fill=SLOT_GREEN)
+    outlined_polygon(
+        img,
+        [(2, 2), (29, 2), (29, 29), (2, 29)],
+        outline=SLOT_BORDER,
+        width=1,
+    )
+
+    # Plus sign in centre
+    draw.line([(12, 16), (20, 16)], fill=SLOT_BORDER, width=2)
+    draw.line([(16, 12), (16, 20)], fill=SLOT_BORDER, width=2)
+
+    return img
+
+
+# ===================================================================
+# Enemy sprites (24x24)
+# ===================================================================
+
+def make_enemy_basic() -> Image.Image:
+    """24x24 basic enemy — red circle with darker core, simple foot soldier."""
+    img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Body — filled circle
+    filled_ellipse(img, (2, 2, 21, 21), fill=ENEMY_RED)
+    # Darker inner circle for depth
+    filled_ellipse(img, (6, 6, 17, 17), fill=ENEMY_RED_DARK)
+    # Eye dots
+    draw.point((9, 9), fill=(255, 255, 255, 255))
+    draw.point((14, 9), fill=(255, 255, 255, 255))
+
+    return img
+
+
+def make_enemy_fast() -> Image.Image:
+    """24x24 fast enemy — orange diamond/arrow shape suggesting speed."""
+    img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
+
+    # Arrow-like diamond pointing right (direction of travel)
+    points = [
+        (2, 12),   # left
+        (10, 3),   # top
+        (22, 12),  # right tip
+        (10, 21),  # bottom
+    ]
+    filled_polygon(img, points, fill=ENEMY_ORANGE)
+    # Darker inner diamond
+    inner = [
+        (6, 12),
+        (11, 6),
+        (18, 12),
+        (11, 18),
+    ]
+    filled_polygon(img, inner, fill=ENEMY_ORANGE_DARK)
+
+    return img
+
+
+def make_enemy_tank() -> Image.Image:
+    """24x24 tank enemy — dark red, armoured square with shield lines."""
+    img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Bulky square body
+    draw.rectangle((2, 2, 21, 21), fill=ENEMY_TANK_RED)
+    # Armour plate highlight
+    draw.rectangle((4, 4, 19, 19), fill=ENEMY_TANK_DARK)
+    # Shield cross
+    draw.line([(4, 12), (19, 12)], fill=ENEMY_TANK_RED, width=2)
+    draw.line([(12, 4), (12, 19)], fill=ENEMY_TANK_RED, width=2)
+    # Corner rivets
+    for rx, ry in [(5, 5), (18, 5), (5, 18), (18, 18)]:
+        draw.point((rx, ry), fill=(180, 60, 60, 255))
+
+    return img
+
+
+# ===================================================================
+# Projectiles (8x8)
+# ===================================================================
+
+def make_projectile_basic() -> Image.Image:
+    """8x8 basic projectile — bright yellow dot with glow."""
+    img = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+
+    # Outer glow
+    filled_ellipse(img, (0, 0, 7, 7), fill=(255, 230, 50, 120))
+    # Inner core
+    filled_ellipse(img, (2, 2, 5, 5), fill=PROJ_YELLOW)
+
+    return img
+
+
+def make_projectile_sniper() -> Image.Image:
+    """8x8 sniper projectile — cyan bolt, elongated."""
+    img = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Elongated horizontal bolt
+    draw.line([(1, 4), (6, 4)], fill=PROJ_CYAN, width=2)
+    # Bright tip
+    draw.point((7, 4), fill=(200, 255, 255, 255))
+    # Faint trail
+    draw.line([(0, 4), (2, 4)], fill=(80, 220, 255, 100), width=1)
+
+    return img
+
+
+def make_projectile_splash() -> Image.Image:
+    """8x8 splash projectile — orange ball."""
+    img = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+
+    # Outer glow
+    filled_ellipse(img, (0, 0, 7, 7), fill=(255, 160, 40, 100))
+    # Inner core
+    filled_ellipse(img, (1, 1, 6, 6), fill=PROJ_ORANGE)
+
+    return img
+
+
+# ===================================================================
+# Effects
+# ===================================================================
+
+def make_explosion() -> Image.Image:
+    """16x16 explosion burst — orange/yellow radial effect."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Outer orange burst
+    filled_ellipse(img, (0, 0, 15, 15), fill=EXPLOSION_ORANGE)
+    # Inner yellow core
+    filled_ellipse(img, (3, 3, 12, 12), fill=EXPLOSION_YELLOW)
+    # Bright centre
+    filled_ellipse(img, (5, 5, 10, 10), fill=(255, 255, 200, 255))
+
+    # Radiating spikes
+    cx, cy = 8, 8
+    spike_color = (255, 200, 60, 180)
+    for angle_deg in range(0, 360, 45):
+        angle = math.radians(angle_deg)
+        ex = cx + int(7 * math.cos(angle))
+        ey = cy + int(7 * math.sin(angle))
+        draw.line([(cx, cy), (ex, ey)], fill=spike_color, width=1)
+
+    return img
+
+
+def make_range_indicator() -> Image.Image:
+    """64x64 semi-transparent range circle for tower placement preview."""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+
+    # Filled translucent circle
+    filled_ellipse(img, (1, 1, 62, 62), fill=RANGE_INDICATOR)
+    # Border ring
+    outlined_ellipse(img, (1, 1, 62, 62), outline=RANGE_BORDER, width=1)
+
+    return img
+
+
+# ===================================================================
+# UI elements
+# ===================================================================
+
+def _make_button(w: int, h: int, base: Color, lighter: Color, darker: Color) -> Image.Image:
+    """Internal helper: create a beveled button image."""
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Fill
+    draw.rectangle((0, 0, w - 1, h - 1), fill=base)
+    # Top/left highlight
+    draw.line([(0, 0), (w - 1, 0)], fill=lighter, width=1)
+    draw.line([(0, 0), (0, h - 1)], fill=lighter, width=1)
+    # Bottom/right shadow
+    draw.line([(0, h - 1), (w - 1, h - 1)], fill=darker, width=1)
+    draw.line([(w - 1, 0), (w - 1, h - 1)], fill=darker, width=1)
+
+    return img
+
+
+def make_btn_normal() -> Image.Image:
+    """80x32 button in normal/idle state."""
+    return _make_button(
+        80, 32,
+        base=UI_MID,
+        lighter=UI_LIGHT,
+        darker=(25, 25, 35, 230),
+    )
+
+
+def make_btn_hover() -> Image.Image:
+    """80x32 button in hover state — lighter tint."""
+    return _make_button(
+        80, 32,
+        base=UI_LIGHT,
+        lighter=(100, 100, 120, 230),
+        darker=UI_MID,
+    )
+
+
+def make_btn_pressed() -> Image.Image:
+    """80x32 button in pressed state — inverted bevel."""
+    return _make_button(
+        80, 32,
+        base=UI_DARK,
+        lighter=(20, 20, 30, 230),
+        darker=UI_LIGHT,
+    )
+
+
+def make_panel_bg() -> Image.Image:
+    """120x200 dark UI panel with subtle border."""
+    w, h = 120, 200
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Background fill
+    draw.rectangle((0, 0, w - 1, h - 1), fill=UI_DARK)
+    # Border
+    outlined_polygon(
+        img,
+        [(0, 0), (w - 1, 0), (w - 1, h - 1), (0, h - 1)],
+        outline=UI_BORDER,
+        width=1,
+    )
+    # Subtle top highlight
+    draw.line([(1, 1), (w - 2, 1)], fill=UI_MID, width=1)
+
+    return img
+
+
+def make_health_bar_bg() -> Image.Image:
+    """24x4 dark health bar background."""
+    img = Image.new("RGBA", (24, 4), HEALTH_BG)
+    return img
+
+
+def make_health_bar_fill() -> Image.Image:
+    """24x4 green health bar fill."""
+    img = Image.new("RGBA", (24, 4), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+    draw.rectangle((0, 0, 23, 3), fill=HEALTH_GREEN)
+    # Lighter top pixel row for shine
+    draw.line([(0, 0), (23, 0)], fill=(100, 240, 100, 255), width=1)
+    return img
+
+
+def make_coin_icon() -> Image.Image:
+    """16x16 gold coin icon."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Outer coin
+    filled_ellipse(img, (1, 1, 14, 14), fill=GOLD)
+    # Inner darker ring for depth
+    outlined_ellipse(img, (3, 3, 12, 12), outline=GOLD_DARK, width=1)
+    # Dollar sign approximation — two vertical ticks + horizontal
+    draw.line([(8, 5), (8, 11)], fill=GOLD_DARK, width=1)
+    draw.line([(6, 7), (10, 7)], fill=GOLD_DARK, width=1)
+    draw.line([(6, 9), (10, 9)], fill=GOLD_DARK, width=1)
+
+    return img
+
+
+def make_heart_icon() -> Image.Image:
+    """16x16 red heart icon for lives display."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+
+    # Heart shape using two overlapping circles + triangle
+    # Left bump
+    filled_ellipse(img, (1, 2, 9, 9), fill=HEART_RED)
+    # Right bump
+    filled_ellipse(img, (7, 2, 15, 9), fill=HEART_RED)
+    # Bottom triangle
+    filled_polygon(img, [(1, 6), (15, 6), (8, 14)], fill=HEART_RED)
+
+    # Darker shadow on bottom half
+    filled_polygon(img, [(3, 8), (13, 8), (8, 14)], fill=HEART_DARK)
+
+    # Highlight spot
+    draw = ImageDraw.Draw(img, "RGBA")
+    draw.point((4, 4), fill=(255, 120, 140, 255))
+    draw.point((5, 3), fill=(255, 120, 140, 255))
+
+    return img
+
+
+def make_wave_banner() -> Image.Image:
+    """160x40 wave announcement banner background."""
+    w, h = 160, 40
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Background fill with gradient
+    vertical_gradient(img, (50, 40, 70, 220), (30, 20, 50, 220))
+    # Gold border
+    outlined_polygon(
+        img,
+        [(0, 0), (w - 1, 0), (w - 1, h - 1), (0, h - 1)],
+        outline=BANNER_BORDER,
+        width=2,
+    )
+    # Inner border
+    outlined_polygon(
+        img,
+        [(3, 3), (w - 4, 3), (w - 4, h - 4), (3, h - 4)],
+        outline=(120, 100, 40, 180),
+        width=1,
+    )
+
+    return img
+
+
+def make_hud_top_bar() -> Image.Image:
+    """320x24 top HUD bar background."""
+    w, h = 320, 24
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Background
+    draw.rectangle((0, 0, w - 1, h - 1), fill=HUD_BG)
+    # Bottom border line
+    draw.line([(0, h - 1), (w - 1, h - 1)], fill=UI_BORDER, width=1)
+
+    return img
+
+
+# ===================================================================
+# Manifest and batch generation
+# ===================================================================
+
+MANIFEST: list[tuple[str, callable]] = [
+    # Terrain
+    ("grass.png", make_grass),
+    ("path_straight.png", make_path_straight),
+    ("path_turn.png", make_path_turn),
+    # Towers
+    ("tower_basic.png", make_tower_basic),
+    ("tower_sniper.png", make_tower_sniper),
+    ("tower_splash.png", make_tower_splash),
+    ("tower_slot.png", make_tower_slot),
+    # Enemies
+    ("enemy_basic.png", make_enemy_basic),
+    ("enemy_fast.png", make_enemy_fast),
+    ("enemy_tank.png", make_enemy_tank),
+    # Projectiles
+    ("projectile_basic.png", make_projectile_basic),
+    ("projectile_sniper.png", make_projectile_sniper),
+    ("projectile_splash.png", make_projectile_splash),
+    # Effects
+    ("explosion.png", make_explosion),
+    ("range_indicator.png", make_range_indicator),
+    # UI
+    ("btn_normal.png", make_btn_normal),
+    ("btn_hover.png", make_btn_hover),
+    ("btn_pressed.png", make_btn_pressed),
+    ("panel_bg.png", make_panel_bg),
+    ("health_bar_bg.png", make_health_bar_bg),
+    ("health_bar_fill.png", make_health_bar_fill),
+    ("coin_icon.png", make_coin_icon),
+    ("heart_icon.png", make_heart_icon),
+    ("wave_banner.png", make_wave_banner),
+    # HUD
+    ("hud_top_bar.png", make_hud_top_bar),
+]
+
+
+def generate(output_dir: Path | None = None) -> List[Path]:
+    """Generate all Tower Defense tutorial PNGs and save them to *output_dir*.
+
+    Files are written into ``<output_dir>/images/`` to match the
+    :class:`AssetManager` convention (``game.assets.image("grass")``
+    resolves to ``<base_path>/images/grass.png``).
+
+    Args:
+        output_dir: Asset base directory.  Defaults to
+                    ``tutorials/tower_defense/assets/``.
+
+    Returns:
+        List of ``Path`` objects for every file written.
+    """
+    if output_dir is None:
+        output_dir = Path(__file__).resolve().parent / "assets"
+
+    images_dir = output_dir / "images"
+    images_dir.mkdir(parents=True, exist_ok=True)
+
+    written: List[Path] = []
+    for filename, factory in MANIFEST:
+        img = factory()
+        path = images_dir / filename
+        img.save(path)
+        print(f"  Created {path}")
+        written.append(path)
+
+    return written
+
+
+def main() -> None:
+    """Entry point for standalone execution."""
+    print("=== Tower Defense Tutorial Assets ===\n")
+    files = generate()
+    print(f"\n{'=' * 50}")
+    print(f"Generated {len(files)} asset files.")
+    print(f"{'=' * 50}")
+
+
+if __name__ == "__main__":
+    main()

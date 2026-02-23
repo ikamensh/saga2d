@@ -518,3 +518,41 @@ class Backend(Protocol):
 
 **Persistent sprites** (`create_sprite`/`update_sprite`) participate in camera sync.
 **Per-frame draws** (`draw_rect`/`draw_text`/`draw_image`) are screen-space UI only.
+
+---
+
+## Example & Tutorial Conventions
+
+**Directory layout:**
+```
+examples/<name>/          # standalone demos (battle_vignette)
+tutorials/<name>/         # multi-chapter tutorials (tower_defense)
+  ├── assets/images/...   # local generated assets
+  ├── chapter_NN_topic.py # one runnable file per chapter
+  └── README.md           # setup + run instructions
+```
+
+**Entry point pattern** (every runnable .py):
+```python
+_project_root = Path(__file__).resolve().parents[N]   # N = depth to repo root
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
+
+game = Game("Title", resolution=(1920, 1080), fullscreen=False, backend="pyglet")
+game.assets = AssetManager(game.backend, base_path=Path(__file__).resolve().parent / "assets")
+game.run(StartScene())
+```
+
+**Asset generation:** All placeholder art is Pillow-generated via `assetgen/` primitives
+(`solid_rect`, `labeled_rect`, `circle`, `triangle`, `ring`, `filled_ellipse`,
+`vertical_gradient`, `crosshatch`, wireframe 3D). Each example/tutorial adds a
+generator module in `assetgen/` and a corresponding call in `generate_assets.py`.
+Assets go to both `assets/images/sprites/` (tests) and the local example dir.
+
+**Import style:** Flat from `easygame` — never from subpackages:
+```python
+from easygame import Game, Scene, Sprite, Camera, Panel, Label, Button, ...
+```
+
+**Scene cleanup:** Every scene must cancel tweens, remove sprites, and clear
+collections in `on_exit()` to prevent leaks across push/pop transitions.
