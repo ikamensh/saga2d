@@ -1,0 +1,448 @@
+"""Sprite — the visible on-screen object backed by the render batch.
+
+A :class:`Sprite` wraps a backend sprite id with properties that automatically
+sync to the backend whenever they change.  Game code creates sprites like::
+
+    knight = Sprite("sprites/knight", position=(400, 300))
+    knight.position = (500, 350)   # moves on screen immediately
+    knight.remove()                # gone from the batch
+
+The Sprite reads ``_current_game`` (a module-level reference set by
+:class:`~easygame.game.Game`) at construction time to obtain the backend and
+asset manager.  This keeps the public API clean — no explicit ``game`` arg.
+
+Y-sort draw ordering
+--------------------
+Draw order is ``layer.value * 100_000 + int(y)``.  Higher y (further down
+the screen) produces a larger order value, so it draws later and appears
+in front — correct for top-down 2D games.
+"""
+
+from __future__ import annotations
+
+import math
+from typing import TYPE_CHECKING, Any, Callable
+
+from easygame.rendering.layers import RenderLayer, SpriteAnchor
+
+if TYPE_CHECKING:
+    from easygame.animation import AnimationDef, AnimationPlayer
+
+# Module-level reference set by Game.__init__().
+# Sprites read this at construction time.
+_current_game: Any = None
+
+
+# ---------------------------------------------------------------------------
+# Anchor offset helper
+# ---------------------------------------------------------------------------
+
+def _anchor_offset(
+    anchor: SpriteAnchor,
+    img_w: int,
+    img_h: int,
+) -> tuple[int, int]:
+    """Return ``(dx, dy)`` to subtract from position to get top-left draw corner.
+
+    In the framework's coordinate system (y-down, top-left origin):
+
+    - ``dx``: how far left the top-left corner is from the anchor point.
+    - ``dy``: how far up the top-left corner is from the anchor point.
+
+    Example: BOTTOM_CENTER with a 64x64 image at (400, 300)
+    → dx=32, dy=64 → draw at (368, 236).
+    """
+    TL = SpriteAnchor.TOP_LEFT
+    TC = SpriteAnchor.TOP_CENTER
+    TR = SpriteAnchor.TOP_RIGHT
+    CL = SpriteAnchor.CENTER_LEFT
+    C = SpriteAnchor.CENTER
+    CR = SpriteAnchor.CENTER_RIGHT
+    BL = SpriteAnchor.BOTTOM_LEFT
+    BC = SpriteAnchor.BOTTOM_CENTER
+    BR = SpriteAnchor.BOTTOM_RIGHT
+
+    # Horizontal
+    if anchor in (TL, CL, BL):
+        dx = 0
+    elif anchor in (TC, C, BC):
+        dx = img_w // 2
+    else:  # RIGHT variants
+        dx = img_w
+
+    # Vertical (y-down: top=0, bottom=height)
+    if anchor in (TL, TC, TR):
+        dy = 0
+    elif anchor in (CL, C, CR):
+        dy = img_h // 2
+    else:  # BOTTOM variants
+        dy = img_h
+
+    return dx, dy
+
+
+# ---------------------------------------------------------------------------
+# Sprite
+# ---------------------------------------------------------------------------
+
+class Sprite:
+    """A visible game object rendered via the backend batch.
+
+    Parameters:
+        image:    Asset name resolved by :meth:`AssetManager.image`.
+        position: ``(x, y)`` logical coordinates.
+        anchor:   Where the position point lies on the image.
+        layer:    Render layer (back-to-front draw order).
+        opacity:  0 (transparent) to 255 (opaque).
+        visible:  Whether the sprite is drawn at all.
+    """
+
+    def __init__(
+        self,
+        image: str,
+        *,
+        position: tuple[float, float] = (0, 0),
+        anchor: SpriteAnchor = SpriteAnchor.BOTTOM_CENTER,
+        layer: RenderLayer = RenderLayer.UNITS,
+        opacity: int = 255,
+        visible: bool = True,
+    ) -> None:
+        if _current_game is None:
+            raise RuntimeError(
+                "No active Game. Create a Game instance before creating Sprites."
+            )
+
+        game = _current_game
+        self._backend = game.backend
+        self._assets = game.assets
+        self._game = game
+        self._image_name = image
+        self._image_handle = self._assets.image(image)
+        self._anchor = anchor
+        self._layer = layer
+        self._x = float(position[0])
+        self._y = float(position[1])
+        self._opacity = opacity
+        self._visible = visible
+        self._removed = False
+
+        # Animation state.
+        self._anim_player: AnimationPlayer | None = None
+        self._anim_queue: list[tuple[AnimationDef, Callable[[], Any] | None]] = []
+        self._move_tween_ids: list[int] = []
+
+        # Cache image dimensions for anchor offset.
+        self._img_w, self._img_h = self._backend.get_image_size(
+            self._image_handle,
+        )
+
+        # Create the backend sprite.
+        order = self._compute_order()
+        self._sprite_id = self._backend.create_sprite(
+            self._image_handle, order,
+        )
+
+        # Push initial position + visual state.
+        self._sync_to_backend()
+
+    # ------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------
+
+    @property
+    def position(self) -> tuple[float, float]:
+        """Logical ``(x, y)`` position."""
+        return (self._x, self._y)
+
+    @position.setter
+    def position(self, value: tuple[float, float]) -> None:
+        self._x = float(value[0])
+        self._y = float(value[1])
+        self._sync_to_backend()
+        if not self._removed:
+            self._backend.set_sprite_order(
+                self._sprite_id, self._compute_order(),
+            )
+
+    @property
+    def x(self) -> float:
+        return self._x
+
+    @x.setter
+    def x(self, value: float) -> None:
+        self.position = (value, self._y)
+
+    @property
+    def y(self) -> float:
+        return self._y
+
+    @y.setter
+    def y(self, value: float) -> None:
+        self.position = (self._x, value)
+
+    @property
+    def opacity(self) -> int:
+        """Opacity (0 = invisible, 255 = fully opaque)."""
+        return self._opacity
+
+    @opacity.setter
+    def opacity(self, value: int | float) -> None:
+        self._opacity = int(value)
+        self._sync_to_backend()
+
+    @property
+    def visible(self) -> bool:
+        """Whether the sprite is drawn."""
+        return self._visible
+
+    @visible.setter
+    def visible(self, value: bool) -> None:
+        self._visible = value
+        self._sync_to_backend()
+
+    @property
+    def layer(self) -> RenderLayer:
+        """Render layer."""
+        return self._layer
+
+    @property
+    def anchor(self) -> SpriteAnchor:
+        """Sprite anchor point."""
+        return self._anchor
+
+    @property
+    def image(self) -> str:
+        """The current asset name.
+
+        Setting this property changes the displayed image immediately::
+
+            sprite.image = "sprites/knight_hit"
+        """
+        return self._image_name
+
+    @image.setter
+    def image(self, name: str) -> None:
+        if self._removed:
+            return
+        handle = self._assets.image(name)
+        self._image_name = name
+        self._set_image(handle)
+
+    @property
+    def image_handle(self) -> Any:
+        """The opaque backend image handle (read-only)."""
+        return self._image_handle
+
+    @property
+    def sprite_id(self) -> Any:
+        """The opaque backend sprite id (read-only, for testing)."""
+        return self._sprite_id
+
+    # ------------------------------------------------------------------
+    # Removal
+    # ------------------------------------------------------------------
+
+    def remove(self) -> None:
+        """Remove the sprite from the backend batch.
+
+        Also stops any active animation, cancels move tweens, and
+        deregisters from the game's animated-sprites set.  Safe to call
+        multiple times.
+        """
+        if self._removed:
+            return
+        self._removed = True
+        self._anim_player = None
+        self._anim_queue.clear()
+        for tid in self._move_tween_ids:
+            self._game._tween_manager.cancel(tid)
+        self._move_tween_ids.clear()
+        self._game._animated_sprites.discard(self)
+        self._backend.remove_sprite(self._sprite_id)
+
+    @property
+    def is_removed(self) -> bool:
+        """Whether :meth:`remove` has been called."""
+        return self._removed
+
+    # ------------------------------------------------------------------
+    # Animation
+    # ------------------------------------------------------------------
+
+    def play(
+        self,
+        anim: AnimationDef,
+        *,
+        on_complete: Callable[[], Any] | None = None,
+    ) -> None:
+        """Start *anim* immediately, replacing any current animation.
+
+        Resolves frame names to image handles via the asset manager, creates
+        an :class:`AnimationPlayer`, and registers this sprite for automatic
+        updates during :meth:`Game.tick`.
+
+        Parameters:
+            anim:        The animation definition to play.
+            on_complete: Called once when a non-looping animation finishes.
+        """
+        if self._removed:
+            return
+
+        from easygame.animation import AnimationPlayer
+
+        handles = self._resolve_frames(anim)
+
+        # Wrap on_complete to drain the queue after the user callback fires.
+        def _wrapped_on_complete() -> None:
+            if on_complete is not None:
+                on_complete()
+            self._drain_queue()
+
+        self._anim_queue.clear()
+        self._anim_player = AnimationPlayer(
+            frames=handles,
+            frame_duration=anim.frame_duration,
+            loop=anim.loop,
+            on_complete=_wrapped_on_complete if not anim.loop else None,
+        )
+
+        # Immediately display the first frame.
+        self._set_image(self._anim_player.current_frame)
+
+        # Register for automatic updates.
+        self._game._animated_sprites.add(self)
+
+    def queue(
+        self,
+        anim: AnimationDef,
+        *,
+        on_complete: Callable[[], Any] | None = None,
+    ) -> None:
+        """Queue *anim* to play after the current animation finishes.
+
+        If nothing is currently playing, starts immediately (equivalent to
+        :meth:`play`).
+        """
+        if self._removed:
+            return
+        if self._anim_player is None or self._anim_player.is_finished:
+            self.play(anim, on_complete=on_complete)
+        else:
+            self._anim_queue.append((anim, on_complete))
+
+    def stop_animation(self) -> None:
+        """Stop playback and clear the queue.
+
+        The sprite stays on its current frame.
+        """
+        self._anim_player = None
+        self._anim_queue.clear()
+        self._game._animated_sprites.discard(self)
+
+    def move_to(
+        self,
+        target_pos: tuple[float, float],
+        speed: float,
+        *,
+        ease: Any = None,
+        on_arrive: Callable[[], Any] | None = None,
+    ) -> None:
+        """Move to *target_pos* at *speed* pixels per second.
+
+        Cancels any in-progress movement. If distance is zero, fires
+        *on_arrive* immediately.
+        """
+        if self._removed:
+            return
+
+        from easygame.util.tween import Ease, tween
+
+        use_ease = Ease.LINEAR if ease is None else ease
+
+        target_x, target_y = float(target_pos[0]), float(target_pos[1])
+        dx = target_x - self._x
+        dy = target_y - self._y
+        distance = math.hypot(dx, dy)
+
+        if distance < 1e-6:
+            if on_arrive is not None:
+                on_arrive()
+            return
+
+        duration = distance / speed
+
+        for tid in self._move_tween_ids:
+            self._game._tween_manager.cancel(tid)
+        self._move_tween_ids.clear()
+
+        tid_x = tween(self, "x", self._x, target_x, duration, ease=use_ease)
+        tid_y = tween(
+            self, "y", self._y, target_y, duration,
+            ease=use_ease,
+            on_complete=lambda: self._on_move_arrive(on_arrive),
+        )
+        self._move_tween_ids = [tid_x, tid_y]
+
+    def _on_move_arrive(self, on_arrive: Callable[[], Any] | None) -> None:
+        """Called when move tweens complete. Clears _move_tween_ids and fires callback."""
+        self._move_tween_ids.clear()
+        if on_arrive is not None:
+            on_arrive()
+
+    def update_animation(self, dt: float) -> None:
+        """Advance the animation player by *dt* seconds.
+
+        Called automatically by :meth:`Game.tick` each frame.  If the frame
+        changes, pushes the new image handle to the backend.
+        """
+        if self._removed or self._anim_player is None:
+            return
+
+        new_handle = self._anim_player.update(dt)
+        if new_handle is not None:
+            self._set_image(new_handle)
+
+    # ------------------------------------------------------------------
+    # Internals
+    # ------------------------------------------------------------------
+
+    def _compute_order(self) -> int:
+        """Compute the y-sort draw order: ``layer * 100_000 + int(y)``."""
+        return self._layer.value * 100_000 + int(self._y)
+
+    def _resolve_frames(self, anim: AnimationDef) -> list[Any]:
+        """Resolve an AnimationDef's frame names to image handles."""
+        if isinstance(anim.frames, str):
+            # Prefix string → discover numbered files via AssetManager.frames().
+            names = self._assets.frames(anim.frames)
+            return [self._assets.image(n) for n in names]
+        else:
+            return [self._assets.image(n) for n in anim.frames]
+
+    def _set_image(self, handle: Any) -> None:
+        """Swap the displayed image and re-cache dimensions."""
+        self._image_handle = handle
+        self._img_w, self._img_h = self._backend.get_image_size(handle)
+        self._sync_to_backend(image=handle)
+
+    def _drain_queue(self) -> None:
+        """Pop the next queued animation and play it, if any."""
+        if self._anim_queue:
+            next_anim, next_cb = self._anim_queue.pop(0)
+            self.play(next_anim, on_complete=next_cb)
+
+    def _sync_to_backend(self, *, image: Any | None = None) -> None:
+        """Push current visual state to the backend."""
+        if self._removed:
+            return
+        dx, dy = _anchor_offset(self._anchor, self._img_w, self._img_h)
+        draw_x = int(self._x - dx)
+        draw_y = int(self._y - dy)
+        self._backend.update_sprite(
+            self._sprite_id,
+            draw_x,
+            draw_y,
+            image=image,
+            opacity=self._opacity,
+            visible=self._visible,
+        )

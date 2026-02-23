@@ -1,0 +1,8 @@
+{
+  "mode": "saga",
+  "orchestrator": "api",
+  "orchestrator_model": "opus",
+  "max_exchanges": 30,
+  "max_cycles": 15,
+  "budget_per_step": null
+}
