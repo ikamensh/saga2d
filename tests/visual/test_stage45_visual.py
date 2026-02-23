@@ -138,7 +138,7 @@ def main() -> None:
     if not ASSETS_DIR.exists():
         raise SystemExit(
             f"Assets not found at {ASSETS_DIR}. "
-            "Run: python tests/generate_test_assets.py"
+            "Run: python generate_assets.py"
         )
 
     backend = PygletBackend()

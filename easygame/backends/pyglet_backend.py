@@ -168,6 +168,7 @@ class PygletBackend:
         height: int,
         title: str,
         fullscreen: bool,
+        visible: bool = True,
     ) -> None:
         import pyglet
         import pyglet.event
@@ -181,6 +182,7 @@ class PygletBackend:
             caption=title,
             fullscreen=fullscreen,
             vsync=True,
+            visible=visible,
         )
 
         # Persistent batch — NOT recreated per frame.
@@ -387,6 +389,36 @@ class PygletBackend:
         import pyglet
         pyg = self._sprites[sprite_id]
         pyg.group = pyglet.graphics.Group(order=order)
+
+    def capture_frame(self):
+        """Return a PIL Image of the current framebuffer via glReadPixels.
+
+        Call after tick() — reads from the front buffer (the frame just
+        displayed). OpenGL returns bottom-up rows; we flip to match the
+        framework's top-left origin.
+        """
+        import ctypes
+
+        from PIL import Image
+
+        from pyglet.gl import (
+            GL_BACK_LEFT,
+            GL_FRONT_LEFT,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            glReadBuffer,
+            glReadPixels,
+        )
+
+        w, h = self.get_display_info()
+        buffer = (ctypes.c_ubyte * (w * h * 4))()
+        glReadBuffer(GL_FRONT_LEFT)
+        glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer)
+        glReadBuffer(GL_BACK_LEFT)  # restore default
+        data = bytes(buffer)
+        return Image.frombytes("RGBA", (w, h), data).transpose(
+            Image.FLIP_TOP_BOTTOM
+        )
 
     # ==================================================================
     # Backend protocol — text rendering

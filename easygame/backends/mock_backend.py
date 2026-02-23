@@ -15,6 +15,8 @@ All coordinates stay in *logical* space (no y-flip, no scaling, no offset).
 
 from __future__ import annotations
 
+from PIL import Image
+
 from easygame.backends.base import (
     Event,
     KeyEvent,
@@ -118,6 +120,7 @@ class MockBackend:
         height: int,
         title: str,
         fullscreen: bool,
+        visible: bool = True,
     ) -> None:
         """No-op — there is no window in the mock."""
         self.logical_width = width
@@ -162,6 +165,20 @@ class MockBackend:
         if path not in self._loaded_images:
             self._loaded_images[path] = self._make_id("img")
         return self._loaded_images[path]
+
+    def create_solid_color_image(
+        self,
+        r: int,
+        g: int,
+        b: int,
+        a: int,
+        width: int,
+        height: int,
+    ) -> str:
+        """Return a mock image handle for a solid-color image."""
+        handle = self._make_id("solid")
+        self._image_sizes[handle] = (width, height)
+        return handle
 
     def create_sprite(self, image_handle: str, layer_order: int) -> str:
         """Register a new sprite and return its id."""
@@ -210,6 +227,14 @@ class MockBackend:
     def set_sprite_order(self, sprite_id: str, order: int) -> None:
         """Update the draw order of an existing sprite."""
         self.sprites[sprite_id]["layer"] = order
+
+    def capture_frame(self) -> Image.Image:
+        """Return a blank RGBA image of the window dimensions."""
+        return Image.new(
+            "RGBA",
+            (self.logical_width, self.logical_height),
+            (0, 0, 0, 0),
+        )
 
     # ==================================================================
     # Backend protocol — text rendering

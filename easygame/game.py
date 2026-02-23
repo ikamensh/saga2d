@@ -36,6 +36,9 @@ class Game:
         backend:    ``"mock"`` or ``"pyglet"`` (string), or a backend
                     instance that satisfies the
                     :class:`~easygame.backends.base.Backend` protocol.
+        visible:    Whether the window is initially visible (default
+                    ``True``).  Pass ``False`` to create a hidden window
+                    (useful for headless rendering or testing).
     """
 
     def __init__(
@@ -45,10 +48,12 @@ class Game:
         resolution: tuple[int, int] = (1920, 1080),
         fullscreen: bool = True,
         backend: str | object = "pyglet",
+        visible: bool = True,
     ) -> None:
         self._title = title
         self._resolution = resolution
         self._fullscreen = fullscreen
+        self._visible = visible
 
         # --- Backend selection ------------------------------------------------
         if backend == "mock":
@@ -86,7 +91,7 @@ class Game:
         # Tell the backend to (notionally) create a window.  The mock backend
         # stores the resolution; the pyglet backend opens a real window.
         self._backend.create_window(
-            resolution[0], resolution[1], title, fullscreen,
+            resolution[0], resolution[1], title, fullscreen, visible,
         )
 
         # Set the module-level game reference so Sprite() can find us.

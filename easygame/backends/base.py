@@ -123,12 +123,14 @@ class Backend(Protocol):
         height: int,
         title: str,
         fullscreen: bool,
+        visible: bool = True,
     ) -> None:
         """Create (or reconfigure) the application window.
 
         *width* and *height* are the logical resolution.  The backend may
         open a physical window at a different size and compute the scale
-        factor accordingly.
+        factor accordingly.  *visible* controls whether the window is
+        initially visible (default ``True``).
         """
         ...
 
@@ -179,6 +181,22 @@ class Backend(Protocol):
         """Load an image from *path* and return an opaque handle."""
         ...
 
+    def create_solid_color_image(
+        self,
+        r: int,
+        g: int,
+        b: int,
+        a: int,
+        width: int,
+        height: int,
+    ) -> ImageHandle:
+        """Create a solid-color image of the given size and return a handle.
+
+        Useful for programmatic backgrounds and overlays that don't need
+        a PNG file on disk.
+        """
+        ...
+
     def create_sprite(
         self,
         image_handle: ImageHandle,
@@ -227,6 +245,14 @@ class Backend(Protocol):
         Called when a sprite's y-position changes (y-sorting) so that
         sprites further down the screen are drawn in front.  *order*
         combines the render layer and y-position into a single integer.
+        """
+        ...
+
+    def capture_frame(self) -> "PIL.Image.Image":
+        """Return a PIL Image of the current framebuffer contents.
+
+        The returned image has the same dimensions as the window
+        (logical or physical, backend-dependent) and is in RGBA format.
         """
         ...
 

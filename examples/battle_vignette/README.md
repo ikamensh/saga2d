@@ -7,7 +7,7 @@ A stress-test of the EasyGame framework's animation, tween, timer, and input sys
 From the project root:
 
 ```bash
-python examples/battle_vignette/generate_assets.py
+python generate_assets.py
 ```
 
 ## Run
