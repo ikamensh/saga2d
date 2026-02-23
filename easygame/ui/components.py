@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable
 
 from easygame.ui.component import Component
-from easygame.ui.layout import Anchor, Layout, compute_anchor_position, compute_content_size, compute_flow_layout
+from easygame.ui.layout import Layout, compute_anchor_position, compute_content_size, compute_flow_layout
 from easygame.ui.theme import ResolvedStyle, Style
 
 if TYPE_CHECKING:

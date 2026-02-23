@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
-from easygame.ui.layout import Anchor, Layout
+from easygame.ui.layout import Anchor
 from easygame.ui.theme import Style
 
 if TYPE_CHECKING:

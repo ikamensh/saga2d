@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any
 
 # Ensure the project root is on sys.path so ``import easygame`` works
 # when invoked as ``python examples/battle_vignette/battle_demo.py``.
@@ -37,7 +36,7 @@ _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-from easygame import (
+from easygame import (  # noqa: E402
     AnimationDef,
     AssetManager,
     Ease,

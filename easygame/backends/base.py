@@ -11,7 +11,10 @@ grows as later stages add rendering, audio, and asset operations.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
+
+if TYPE_CHECKING:
+    from PIL import Image as PILImage
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +184,7 @@ class Backend(Protocol):
         """Load an image from *path* and return an opaque handle."""
         ...
 
-    def load_image_from_pil(self, pil_image: "PIL.Image.Image") -> ImageHandle:
+    def load_image_from_pil(self, pil_image: "PILImage.Image") -> ImageHandle:
         """Create an image handle from a PIL Image object.
 
         Used by ColorSwap to load recolored images. The image must be RGBA.
@@ -268,7 +271,7 @@ class Backend(Protocol):
         """
         ...
 
-    def capture_frame(self) -> "PIL.Image.Image":
+    def capture_frame(self) -> "PILImage.Image":
         """Return a PIL Image of the current framebuffer contents.
 
         The returned image has the same dimensions as the window

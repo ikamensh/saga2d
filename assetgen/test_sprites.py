@@ -27,7 +27,6 @@ from assetgen.primitives import (
     crosshatch,
     labeled_rect,
     solid_rect,
-    triangle,
     vertical_gradient,
 )
 from assetgen.wireframe import (

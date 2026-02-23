@@ -62,7 +62,6 @@ def _anchor_offset(
     CR = SpriteAnchor.CENTER_RIGHT
     BL = SpriteAnchor.BOTTOM_LEFT
     BC = SpriteAnchor.BOTTOM_CENTER
-    BR = SpriteAnchor.BOTTOM_RIGHT
 
     # Horizontal
     if anchor in (TL, CL, BL):
@@ -437,11 +436,23 @@ class Sprite:
             self._game._tween_manager.cancel(tid)
         self._move_tween_ids.clear()
 
-        tid_x = tween(self, "x", self._x, target_x, duration, ease=use_ease)
+        arrived = [False]  # mutable guard — ensures on_arrive fires at most once
+
+        def _on_axis_done() -> None:
+            if arrived[0]:
+                return
+            arrived[0] = True
+            self._on_move_arrive(on_arrive)
+
+        tid_x = tween(
+            self, "x", self._x, target_x, duration,
+            ease=use_ease,
+            on_complete=_on_axis_done,
+        )
         tid_y = tween(
             self, "y", self._y, target_y, duration,
             ease=use_ease,
-            on_complete=lambda: self._on_move_arrive(on_arrive),
+            on_complete=_on_axis_done,
         )
         self._move_tween_ids = [tid_x, tid_y]
 

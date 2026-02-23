@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Sprite
+from easygame import Game, Scene, Sprite
 from easygame.assets import AssetManager
 from easygame.backends.mock_backend import MockBackend
 from easygame.rendering.layers import RenderLayer, SpriteAnchor
@@ -518,3 +518,25 @@ def test_custom_layer(game: Game, backend: MockBackend) -> None:
     record = backend.sprites[sprite.sprite_id]
     # BACKGROUND = 0, y = 200 → order = 200
     assert record["layer"] == 200
+
+
+# ------------------------------------------------------------------
+# move_to and on_arrive
+# ------------------------------------------------------------------
+
+
+def test_move_to_on_arrive_called_once_when_both_axes_finish_same_frame(
+    game: Game,
+) -> None:
+    """on_arrive is called exactly once even when x and y tweens complete in the same tick."""
+    game.push(Scene())
+    sprite = Sprite("sprites/knight", position=(100, 300))
+    arrive_calls: list[None] = []
+
+    sprite.move_to((200, 400), speed=200, on_arrive=lambda: arrive_calls.append(None))
+
+    # Distance ≈ 141.4 px, duration ≈ 0.707 s. Single tick with dt >= duration
+    # causes both x and y tweens to complete in the same TweenManager.update().
+    game.tick(dt=0.8)
+
+    assert len(arrive_calls) == 1

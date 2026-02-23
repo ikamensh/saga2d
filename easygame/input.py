@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from easygame.backends.base import Event, KeyEvent, MouseEvent, WindowEvent
+from easygame.backends.base import Event, KeyEvent, MouseEvent
 
 
 # ---------------------------------------------------------------------------
