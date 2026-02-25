@@ -71,9 +71,9 @@ class Game:
     def clear_and_push(self, scene: Scene) -> None
 
     # Timers
-    def after(self, delay: float, callback) -> int
-    def every(self, interval: float, callback) -> int
-    def cancel(self, timer_id: int) -> None
+    def after(self, delay: float, callback) -> TimerHandle
+    def every(self, interval: float, callback) -> TimerHandle
+    def cancel(self, timer_id: int | TimerHandle) -> None  # TimerHandle cancels whole chain
     def cancel_tween(self, tween_id: int) -> None
 
     # Save/load
@@ -128,9 +128,9 @@ class Scene:
     def remove_sprite(self, sprite: Sprite) -> None   # deregister + sprite.remove()
 
     # Timer ownership — auto-cancelled after on_exit()
-    def after(self, delay: float, callback) -> int    # scene-scoped game.after()
-    def every(self, interval: float, callback) -> int # scene-scoped game.every()
-    def cancel_timer(self, timer_id: int) -> None     # deregister + game.cancel()
+    def after(self, delay: float, callback) -> TimerHandle    # scene-scoped game.after()
+    def every(self, interval: float, callback) -> TimerHandle # scene-scoped game.every()
+    def cancel_timer(self, timer_id: int | TimerHandle) -> None  # deregister + game.cancel()
 
     # Draw helpers — call in draw(), cleared each frame
     def draw_rect(self, x, y, w, h, color) -> None          # screen-space
@@ -315,7 +315,7 @@ class AssetNotFoundError(FileNotFoundError): ...
 ## Timers & Tweens
 
 ```python
-class TimerManager:  # after(delay, cb)->int, every(interval, cb)->int, cancel(id), cancel_all()
+class TimerManager:  # after(delay, cb)->TimerHandle, every(interval, cb)->TimerHandle, cancel(id), cancel_all()
 class TweenManager:  # create(target, prop, from, to, duration, ease, on_complete)->int, cancel(id)
 def tween(target, prop, from_val, to_val, duration, *, ease=Ease.LINEAR, on_complete=None) -> int
 class Ease(Enum): LINEAR, EASE_IN, EASE_OUT, EASE_IN_OUT
@@ -323,6 +323,150 @@ class Ease(Enum): LINEAR, EASE_IN, EASE_OUT, EASE_IN_OUT
 
 Game exposes: `game.after()`, `game.every()`, `game.cancel()`, `game.cancel_tween()`.
 **Prefer `Scene.after()`/`Scene.every()`** for auto-cleanup (see Scene section).
+
+### Timer Chaining (TimerHandle)
+
+**Problem:** Sequencing delayed callbacks requires nested lambdas:
+```python
+self.after(1.0, lambda: self.after(0.5, lambda: self.after(0.2, final_cb)))
+```
+
+**Solution:** `after()` and `every()` return a `TimerHandle` instead of a bare `int`.
+`TimerHandle.then(callback, delay)` chains a follow-up timer that starts when the
+parent fires. The handle is backward-compatible: `int(handle)` and scene ownership
+(`set[int]`) work via `__eq__`/`__hash__` delegation to `timer_id`.
+
+#### Public API
+
+```python
+class TimerHandle:
+    """Lightweight wrapper around a timer ID that supports .then() chaining."""
+
+    timer_id: int               # ID of the *first* timer in this handle's chain
+    _manager: TimerManager      # back-reference (not exposed to users)
+    _chain_ids: list[int]       # all timer IDs owned by this chain (for cancellation)
+
+    def then(self, callback: Callable[[], Any], delay: float = 0.0) -> TimerHandle:
+        """Chain a callback to run *delay* seconds after the parent fires.
+
+        Returns the SAME handle (``self``) for fluent chaining.  The
+        callback/delay pair is appended to the root _Timer's then_chain
+        list and threaded forward step-by-step when each link fires.
+        """
+
+    # Backward compat with bare int
+    def __eq__(self, other): ...   # compare as timer_id
+    def __hash__(self): ...        # hash as timer_id
+    def __int__(self): ...         # int(handle) → timer_id
+```
+
+#### Signature changes
+
+```python
+# TimerManager (internal)
+def after(self, delay, callback) -> TimerHandle   # was -> int
+def every(self, interval, callback) -> TimerHandle # was -> int
+def cancel(self, timer_id: int | TimerHandle) -> None  # accepts both
+
+# Game (public) — same change
+def after(self, delay, callback) -> TimerHandle
+def every(self, interval, callback) -> TimerHandle
+def cancel(self, timer_id: int | TimerHandle) -> None
+
+# Scene — returns TimerHandle, owned set still uses int IDs internally
+def after(self, delay, callback) -> TimerHandle
+def every(self, interval, callback) -> TimerHandle
+```
+
+#### How .then() works internally
+
+`handle.then(cb, delay)` does NOT immediately create a timer. It appends `(cb, delay)`
+to the root `_Timer`'s `then_chain` list and returns `self` (the same handle) for
+fluent chaining. No callback wrapping occurs.
+
+**TimerHandle.then():**
+```python
+def then(self, callback, delay=0.0):
+    root = self._manager._timers.get(self.timer_id)
+    if root is not None:
+        root.then_chain.append((callback, delay))
+    return self  # fluent — same handle, same timer_id
+```
+
+**TimerManager.update() — chain propagation:** After a one-shot timer fires, if it has
+a non-empty `then_chain`, `_schedule_chain_step(chain, chain_ids)` pops the first entry,
+schedules it via `after()`, threads the remaining chain onto the child's `then_chain`,
+and shares the `chain_ids` list so cancellation reaches all children. For repeating
+timers the chain is cloned (via `list()`) per repetition so each cycle gets its own
+independent chain sequence.
+
+**`handle.timer_id` always refers to the root timer.** Cancelling via
+`game.cancel(handle)` iterates `_chain_ids` and cancels the root + all
+already-scheduled children. Children not yet created are never scheduled because
+the root (or parent link) is gone.
+
+#### Behavior by use case
+
+**1. `game.after(1, cb1).then(cb2, 0.5).then(cb3, 0.2)`**
+- t=0: root timer created (ID=0, delay=1s). cb1 is wrapped twice (by each `.then()`).
+- t=1.0: cb1 fires → wrapper schedules after(0.5, cb2_wrapped). chain_ids=[0, 1].
+- t=1.5: cb2 fires → wrapper schedules after(0.2, cb3). chain_ids=[0, 1, 2].
+- t=1.7: cb3 fires. One-shot, removed.
+
+**2. `game.every(1, cb1).then(cb2, 0.5)`**
+- t=0: repeating timer created (ID=0, interval=1s). cb1 wrapped.
+- t=1.0: cb1 fires → after(0.5, cb2) created (ID=1). chain_ids=[0, 1].
+- t=1.5: cb2 fires. One-shot, removed.
+- t=2.0: cb1 fires again → after(0.5, cb2) created (ID=2). chain_ids=[0, 1, 2].
+- t=2.5: cb2 fires again. Pattern repeats.
+- On cancel: root repeating timer cancelled. Any pending child one-shots in
+  chain_ids also cancelled.
+
+**3. Cancellation: `game.cancel(handle)` or `game.cancel(handle.timer_id)`**
+- `cancel()` checks if the argument is a `TimerHandle`. If so, iterates `_chain_ids`
+  and cancels ALL timer IDs in the list (both already-scheduled and future-proof).
+- If argument is a bare `int`, behaves as before (cancels that single timer only).
+- Cancelled root = wrapper never fires = children never created. Safe.
+
+#### Scene ownership integration
+
+`_owned_timers` is `set[TimerHandle]`. `_cleanup_owned_timers()` iterates the set and
+calls `game.cancel(handle)` — since `cancel()` receives a `TimerHandle`, it iterates
+`_chain_ids` and cancels the root + all already-scheduled children.
+
+**Critical invariant (scene.py `_wrapper`):** `Scene.after()`'s internal `_wrapper`
+must NOT discard the handle from `_owned_timers` when the root fires if a `then_chain`
+is pending. Otherwise the handle is orphaned and scene-exit cleanup never cancels the
+in-flight chain children. The wrapper checks `root.then_chain` before discarding.
+For plain (non-chained) one-shot timers the handle is still discarded on fire,
+preserving the original cleanup semantics.
+
+#### Backward compatibility
+
+- `TimerHandle.__eq__` and `__hash__` delegate to `timer_id`, so `handle == 5`,
+  `handle in {5}`, `{handle} == {5}` all work. Existing code that stores timer IDs
+  as ints and compares them continues to work.
+- `game.cancel(int_id)` still works for bare ints (single timer cancellation).
+- `game.cancel(handle)` cancels the whole chain (new behavior, but only triggers
+  when users pass a handle — which they got from the new API).
+- `Scene.after()` returns `TimerHandle` instead of `int`. Since `TimerHandle`
+  compares as int, existing `if tid: ...` and `cancel_timer(tid)` patterns work.
+
+#### Key decisions
+
+- **`timer_id` = root timer** on all handles in a chain. Predictable, cancellation is
+  always "cancel the whole sequence".
+- **Shared mutable `_chain_ids` list** across all handles in a chain. One cancel
+  cleans up everything.
+- **Lazy child creation** (children scheduled only when parent fires). No pre-allocated
+  IDs. Simpler, no wasted timer slots.
+- **`every().then()` creates a new one-shot child per repetition.** Each child is
+  appended to `_chain_ids` so cancellation catches them.
+- **`TimerHandle` lives in `easygame/util/timer.py`** (same module as `TimerManager`).
+  Re-exported from `easygame/__init__.py` for `from easygame import TimerHandle`.
+- **No `.cancel()` on TimerHandle itself.** Users call `game.cancel(handle)` or
+  `scene.cancel_timer(handle)`. Keeps TimerHandle lightweight (no game back-ref needed
+  in the public API — `_manager` is internal).
 
 ---
 

@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
+from easygame.util.timer import TimerHandle
+
 if TYPE_CHECKING:
     from easygame.game import Game
     from easygame.input import InputEvent
@@ -106,54 +108,62 @@ class Scene:
     # Timer ownership
     # ------------------------------------------------------------------
 
-    def _get_owned_timers(self) -> set[int]:
-        """Return the owned-timer-IDs set, creating it lazily."""
+    def _get_owned_timers(self) -> set[TimerHandle]:
+        """Return the owned-timer set, creating it lazily."""
         try:
             return self._owned_timers  # type: ignore[has-type]
         except AttributeError:
-            self._owned_timers: set[int] = set()
+            self._owned_timers: set[TimerHandle] = set()
             return self._owned_timers
 
-    def after(self, delay: float, callback: Callable[[], Any]) -> int:
+    def after(self, delay: float, callback: Callable[[], Any]) -> TimerHandle:
         """Schedule a one-shot callback after *delay* seconds.
 
         The timer is automatically cancelled when this scene exits (after
-        the user's :meth:`on_exit` runs).  Returns a timer ID that can be
+        the user's :meth:`on_exit` runs).  Returns a TimerHandle that can be
         passed to :meth:`cancel_timer` for early manual cancellation.
 
         Equivalent to ``self.game.after(delay, callback)`` with automatic
         lifecycle management.
         """
-        # Wrap the callback so the timer ID is removed from the owned set
-        # when a one-shot fires naturally (not cancelled).
         owned = self._get_owned_timers()
+        handle: TimerHandle | None = None
 
         def _wrapper() -> None:
-            owned.discard(timer_id)
+            # Only remove from the owned set when the root timer fires
+            # AND there is no pending then-chain.  If a chain exists the
+            # handle must stay owned so that scene-exit cleanup can cancel
+            # the still-running child timers via the shared _chain_ids.
+            if handle is not None:
+                root = handle._manager._timers.get(handle.timer_id)
+                has_chain = root is not None and bool(root.then_chain)
+                if not has_chain:
+                    owned.discard(handle)
             callback()
 
-        timer_id = self.game.after(delay, _wrapper)
-        owned.add(timer_id)
-        return timer_id
+        handle = self.game.after(delay, _wrapper)
+        owned.add(handle)
+        return handle
 
-    def every(self, interval: float, callback: Callable[[], Any]) -> int:
+    def every(self, interval: float, callback: Callable[[], Any]) -> TimerHandle:
         """Schedule a repeating callback every *interval* seconds.
 
         The timer is automatically cancelled when this scene exits (after
-        the user's :meth:`on_exit` runs).  Returns a timer ID that can be
+        the user's :meth:`on_exit` runs).  Returns a TimerHandle that can be
         passed to :meth:`cancel_timer` for early manual cancellation.
 
         Equivalent to ``self.game.every(interval, callback)`` with automatic
         lifecycle management.
         """
-        timer_id = self.game.every(interval, callback)
-        self._get_owned_timers().add(timer_id)
-        return timer_id
+        handle = self.game.every(interval, callback)
+        self._get_owned_timers().add(handle)
+        return handle
 
-    def cancel_timer(self, timer_id: int) -> None:
+    def cancel_timer(self, timer_id: int | TimerHandle) -> None:
         """Manually cancel a scene-owned timer.
 
-        Safe to call on already-fired or already-cancelled timer IDs.
+        Accepts a timer ID or TimerHandle. If a TimerHandle is given, cancels
+        the entire chain. Safe to call on already-fired or already-cancelled.
         """
         self._get_owned_timers().discard(timer_id)
         self.game.cancel(timer_id)

@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from easygame import Game, Scene
+from easygame.util.timer import TimerHandle
 
 
 # ------------------------------------------------------------------
@@ -42,13 +43,13 @@ def test_scene_after_fires(game: Game) -> None:
 
 
 def test_scene_after_returns_timer_id(game: Game) -> None:
-    """Scene.after() returns a valid timer ID."""
+    """Scene.after() returns a TimerHandle usable for cancellation."""
     scene = Scene()
     game.push(scene)
 
-    tid = scene.after(1.0, lambda: None)
+    handle = scene.after(1.0, lambda: None)
 
-    assert isinstance(tid, int)
+    assert isinstance(handle, TimerHandle)
 
 
 def test_scene_after_zero_delay(game: Game) -> None:
@@ -109,13 +110,13 @@ def test_scene_every_fires_repeatedly(game: Game) -> None:
 
 
 def test_scene_every_returns_timer_id(game: Game) -> None:
-    """Scene.every() returns a valid timer ID."""
+    """Scene.every() returns a TimerHandle usable for cancellation."""
     scene = Scene()
     game.push(scene)
 
-    tid = scene.every(1.0, lambda: None)
+    handle = scene.every(1.0, lambda: None)
 
-    assert isinstance(tid, int)
+    assert isinstance(handle, TimerHandle)
 
 
 # ------------------------------------------------------------------

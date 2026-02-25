@@ -106,7 +106,7 @@ class Game:
 
         from easygame.input import InputManager
         import easygame.util.tween as _tween_mod
-        from easygame.util.timer import TimerManager
+        from easygame.util.timer import TimerHandle, TimerManager
 
         self._input = InputManager()
 
@@ -374,22 +374,24 @@ class Game:
     # Timers
     # ------------------------------------------------------------------
 
-    def after(self, delay: float, callback: Callable[[], Any]) -> int:
+    def after(self, delay: float, callback: Callable[[], Any]) -> TimerHandle:
         """Schedule a one-shot callback after *delay* seconds.
 
-        Returns a timer ID for cancellation.
+        Returns a TimerHandle for cancellation and chaining.
         """
         return self._timer_manager.after(delay, callback)
 
-    def every(self, interval: float, callback: Callable[[], Any]) -> int:
+    def every(self, interval: float, callback: Callable[[], Any]) -> TimerHandle:
         """Schedule a repeating callback every *interval* seconds.
 
-        Returns a timer ID for cancellation.
+        Returns a TimerHandle for cancellation and chaining.
         """
         return self._timer_manager.every(interval, callback)
 
-    def cancel(self, timer_id: int) -> None:
-        """Cancel a timer by ID."""
+    def cancel(self, timer_id: int | TimerHandle) -> None:
+        """Cancel a timer by ID or TimerHandle. If a TimerHandle is given,
+        cancels the entire chain.
+        """
         self._timer_manager.cancel(timer_id)
 
     def cancel_tween(self, tween_id: int) -> None:
