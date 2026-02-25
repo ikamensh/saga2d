@@ -646,6 +646,7 @@ class Game:
                 screen_y,
                 opacity=sprite._opacity,
                 visible=effective_visible,
+                tint=sprite.tint,
             )
 
         return saved
@@ -667,6 +668,7 @@ class Game:
                 orig_y,
                 opacity=sprite._opacity,
                 visible=orig_visible,
+                tint=sprite.tint,
             )
 
     # ------------------------------------------------------------------

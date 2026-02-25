@@ -401,6 +401,7 @@ class PygletBackend:
         image=None,
         opacity: int = 255,
         visible: bool = True,
+        tint: tuple[float, float, float] = (1.0, 1.0, 1.0),
     ) -> None:
         phys_x, phys_y = self._to_physical(x, y)
         pyg = self._sprites[sprite_id]
@@ -408,6 +409,8 @@ class PygletBackend:
         pyg.y = phys_y
         pyg.opacity = opacity
         pyg.visible = visible
+        r, g, b = tint
+        pyg.color = (int(r * 255), int(g * 255), int(b * 255))
         if image is not None:
             pyg.image = image
 

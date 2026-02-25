@@ -220,6 +220,7 @@ class MockBackend:
             "opacity": 255,
             "visible": True,
             "layer": layer_order,
+            "tint": (1.0, 1.0, 1.0),
         }
         return sid
 
@@ -232,6 +233,7 @@ class MockBackend:
         image: str | None = None,
         opacity: int = 255,
         visible: bool = True,
+        tint: tuple[float, float, float] = (1.0, 1.0, 1.0),
     ) -> None:
         """Record updated position / visual properties."""
         s = self.sprites[sprite_id]
@@ -239,6 +241,7 @@ class MockBackend:
         s["y"] = y
         s["opacity"] = opacity
         s["visible"] = visible
+        s["tint"] = tint
         if image is not None:
             s["image"] = image
 

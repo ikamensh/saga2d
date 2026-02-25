@@ -31,7 +31,8 @@
 
 ```
 Sprite world pos → anchor_offset → world draw corner → subtract camera offset
-  → screen draw corner → backend.update_sprite → [Pyglet] y-flip + scale → GPU
+  → screen draw corner → backend.update_sprite(pos, opacity, visible, tint)
+  → [Pyglet] y-flip + scale + tint color multiply → GPU
 ```
 
 Without camera: sprites render at world pos (world == screen). Mouse `InputEvent`s
@@ -44,7 +45,9 @@ camera when present, else equal to screen coords). Non-mouse events: `None`.
 
 **Sync/Restore:** Camera applies per-frame offsets for rendering, then restores
 original world positions after `end_frame()`. Prevents double-offsetting since
-sprites eagerly push positions on every property change.
+sprites eagerly push positions on every property change. Both `_sync_sprites_to_camera`
+and `_restore_sprites` must pass `tint=sprite._tint` to `update_sprite` to preserve
+the sprite's tint through the camera sync/restore cycle.
 
 **Lazy Subsystems:** `game.audio`, `game.theme`, `game.cursor`, `game.hud`,
 `game.save_manager`, `scene.ui` — all created on first access via `@property`.
@@ -154,10 +157,12 @@ class Sprite:
     def __init__(self, image: str, *, position=(0,0),
                  anchor=SpriteAnchor.BOTTOM_CENTER,
                  layer=RenderLayer.UNITS, opacity=255, visible=True,
+                 tint: tuple[float, float, float] = (1.0, 1.0, 1.0),
                  color_swap: ColorSwap | None = None,
                  team_palette: str | None = None)
 
-    # Properties (all settable): position, x, y, opacity (0-255), visible, image
+    # Properties (all settable): position, x, y, opacity (0-255), visible, image,
+    #   tint ((r, g, b) floats 0.0–1.0, default (1.0, 1.0, 1.0) = no tint)
     # Read-only: layer (RenderLayer), anchor (SpriteAnchor)
     def move_to(self, target_pos, speed, *, ease=None, on_arrive=None) -> None
     def play(self, anim: AnimationDef, *, on_complete=None) -> None
@@ -484,6 +489,11 @@ Game code should NOT access `game._backend` directly — use `Scene.draw_rect()`
 `remove_sprite`), per-frame drawing (`draw_rect`, `draw_text`, `draw_image`, `load_font`),
 cursor (`set_cursor`, `set_cursor_visible`), audio (`load_sound`/`play_sound`,
 `load_music`/`play_music`, `set_player_volume`, `stop_player`).
+
+**`update_sprite` signature:** `update_sprite(sprite_id, x, y, *, image=None, opacity=255,
+visible=True, tint=(1.0, 1.0, 1.0))`. The `tint` parameter is an `(r, g, b)` tuple of
+floats (0.0–1.0) that multiplies the sprite's color channels. Default `(1.0, 1.0, 1.0)`
+means no tint. Backends must accept and apply this parameter.
 
 **Persistent sprites** participate in camera sync. **Per-frame draws** are screen-space only.
 

@@ -248,6 +248,7 @@ class Backend(Protocol):
         image: ImageHandle | None = None,
         opacity: int = 255,
         visible: bool = True,
+        tint: tuple[float, float, float] = (1.0, 1.0, 1.0),
     ) -> None:
         """Update a sprite's position and visual properties.
 
