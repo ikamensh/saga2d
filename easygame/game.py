@@ -407,7 +407,7 @@ class Game:
         self._tween_manager.cancel(tween_id)
 
     # ------------------------------------------------------------------
-    # Quit
+    # Quit / Teardown
     # ------------------------------------------------------------------
 
     def quit(self) -> None:
@@ -417,6 +417,36 @@ class Game:
         callers can inspect ``game.running`` after each tick.
         """
         self.running = False
+
+    def _teardown(self) -> None:
+        """Release resources and clear module-level references.
+
+        Called automatically by :meth:`run` on exit and by ``__del__``
+        as a safety net.  Safe to call multiple times.
+        """
+        # Cancel all outstanding timers and tweens so their callbacks
+        # (which may capture scenes, sprites, etc.) can be GC'd.
+        self._timer_manager.cancel_all()
+        self._tween_manager.cancel_all()
+
+        # Clear module-level globals only if they still point to *this*
+        # Game instance, so concurrent Game objects don't clobber each
+        # other (relevant in test suites).
+        import easygame.rendering.sprite as _sprite_mod
+        import easygame.util.tween as _tween_mod
+
+        if _sprite_mod._current_game is self:
+            _sprite_mod._current_game = None
+        if _tween_mod._tween_manager is self._tween_manager:
+            _tween_mod._tween_manager = None
+
+    def __del__(self) -> None:
+        # Best-effort cleanup if the caller forgot to call run() or
+        # the Game is collected without a clean shutdown.
+        try:
+            self._teardown()
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     # Tick — single frame (primary test entry point)
@@ -698,7 +728,9 @@ class Game:
         """
         self.push(start_scene)
 
-        while self.running:
-            self.tick()
-
-        self._backend.quit()
+        try:
+            while self.running:
+                self.tick()
+        finally:
+            self._teardown()
+            self._backend.quit()

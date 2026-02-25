@@ -383,6 +383,8 @@ class Panel(Component):
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
+        if spacing < 0:
+            raise ValueError("spacing cannot be negative")
         super().__init__(style=style, **kwargs)
         self._layout = layout
         self._spacing = spacing

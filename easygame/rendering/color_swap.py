@@ -73,6 +73,7 @@ class ColorSwap:
 
         img = Image.open(image_path).convert("RGBA")
         pixels = img.load()
+        assert pixels is not None
         color_map = dict(zip(self.source_colors, self.target_colors))
 
         for y in range(img.height):

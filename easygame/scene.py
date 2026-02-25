@@ -8,6 +8,7 @@ deferred and flushed after those phases complete.
 
 from __future__ import annotations
 
+import collections
 from typing import TYPE_CHECKING, Any, Callable
 
 from easygame.util.timer import TimerHandle
@@ -175,6 +176,35 @@ class Scene:
             self.game.cancel(timer_id)
         owned.clear()
 
+    # ------------------------------------------------------------------
+    # Particle emitter ownership
+    # ------------------------------------------------------------------
+
+    def _get_owned_emitters(self) -> set:
+        """Return the owned-emitter set, creating it lazily."""
+        try:
+            return self._owned_emitters  # type: ignore[has-type]
+        except AttributeError:
+            self._owned_emitters: set = set()
+            return self._owned_emitters
+
+    def add_emitter(self, emitter: Any) -> Any:
+        """Register a :class:`~easygame.rendering.particles.ParticleEmitter`
+        as owned by this scene.
+
+        Owned emitters are automatically removed (stopped + unregistered)
+        when the scene exits.  Returns the emitter for chaining.
+        """
+        self._get_owned_emitters().add(emitter)
+        return emitter
+
+    def _cleanup_owned_emitters(self) -> None:
+        """Remove all owned emitters.  Called by SceneStack after on_exit()."""
+        owned = self._get_owned_emitters()
+        for emitter in list(owned):
+            emitter.remove()
+        owned.clear()
+
     def on_enter(self) -> None:
         """Called when this scene becomes active (top of stack)."""
         pass
@@ -318,8 +348,12 @@ class SceneStack:
     def __init__(self, game: Game) -> None:
         self._game: Game = game
         self._stack: list[Scene] = []
-        self._pending_ops: list[tuple[str] | tuple[str, Scene]] = []
+        self._pending_ops: collections.deque[tuple[str] | tuple[str, Scene]] = (
+            collections.deque()
+        )
         self._in_tick: bool = False
+        self._flushing: bool = False
+        self._in_on_exit: bool = False
 
     def top(self) -> Scene | None:
         """Return the top scene, or None if stack is empty."""
@@ -337,18 +371,22 @@ class SceneStack:
             start -= 1
         return self._stack[start]
 
+    def _should_defer(self) -> bool:
+        """True when stack mutations must be queued instead of applied."""
+        return self._in_tick or self._flushing or self._in_on_exit
+
     def push(self, scene: Scene) -> None:
         """Push scene on top. Current top gets on_exit, new scene gets on_enter."""
         if scene is None:
             raise ValueError("scene must not be None")
-        if self._in_tick:
+        if self._should_defer():
             self._pending_ops.append(("push", scene))
             return
         self._apply_push(scene)
 
     def pop(self) -> None:
         """Pop top scene. Top gets on_exit, new top (if any) gets on_reveal."""
-        if self._in_tick:
+        if self._should_defer():
             self._pending_ops.append(("pop",))
             return
         self._apply_pop()
@@ -357,7 +395,7 @@ class SceneStack:
         """Replace top scene. Old gets on_exit, new gets on_enter. No on_reveal."""
         if scene is None:
             raise ValueError("scene must not be None")
-        if self._in_tick:
+        if self._should_defer():
             self._pending_ops.append(("replace", scene))
             return
         self._apply_replace(scene)
@@ -366,7 +404,7 @@ class SceneStack:
         """Clear stack, push scene. All cleared scenes get on_exit."""
         if scene is None:
             raise ValueError("scene must not be None")
-        if self._in_tick:
+        if self._should_defer():
             self._pending_ops.append(("clear_and_push", scene))
             return
         self._apply_clear_and_push(scene)
@@ -378,27 +416,54 @@ class SceneStack:
     def flush_pending_ops(self) -> None:
         """Execute all queued operations, then end tick."""
         self._in_tick = False
-        while self._pending_ops:
-            op = self._pending_ops.pop(0)
-            kind = op[0]
-            if kind == "pop":
-                self._apply_pop()
-            elif kind == "push":
-                scene = op[1]  # type: ignore[misc]
-                self._apply_push(scene)
-            elif kind == "replace":
-                scene = op[1]  # type: ignore[misc]
-                self._apply_replace(scene)
-            elif kind == "clear_and_push":
-                scene = op[1]  # type: ignore[misc]
-                self._apply_clear_and_push(scene)
+        if self._flushing:
+            # Re-entrant call (e.g. on_exit triggers pop) — the outer
+            # loop will pick up any newly appended ops.
+            return
+        self._flushing = True
+        try:
+            while self._pending_ops:
+                op = self._pending_ops.popleft()
+                kind = op[0]
+                if kind == "pop":
+                    self._apply_pop()
+                elif kind == "push":
+                    scene = op[1]  # type: ignore[misc]
+                    self._apply_push(scene)
+                elif kind == "replace":
+                    scene = op[1]  # type: ignore[misc]
+                    self._apply_replace(scene)
+                elif kind == "clear_and_push":
+                    scene = op[1]  # type: ignore[misc]
+                    self._apply_clear_and_push(scene)
+        finally:
+            self._flushing = False
+
+    def _cleanup_exiting_scene(self, scene: Scene) -> None:
+        """Run all cleanup for a scene that is leaving the stack.
+
+        Called **after** ``scene.on_exit()``.  Cleans up owned sprites,
+        timers, particle emitters, and cancels camera pan tweens.
+        """
+        scene._cleanup_owned_sprites()
+        scene._cleanup_owned_timers()
+        # Remove any particle emitters the scene created from the game's
+        # update set so they stop spawning after the scene is gone.
+        scene._cleanup_owned_emitters()
+        # Cancel camera pan tweens so they don't hold a strong ref to the
+        # camera (and therefore the scene) after the scene exits.
+        if scene.camera is not None:
+            scene.camera._cancel_pan()
 
     def _apply_push(self, scene: Scene) -> None:
         if self._stack:
             old = self._stack[-1]
-            old.on_exit()
-            old._cleanup_owned_sprites()
-            old._cleanup_owned_timers()
+            self._in_on_exit = True
+            try:
+                old.on_exit()
+                self._cleanup_exiting_scene(old)
+            finally:
+                self._in_on_exit = False
         scene.game = self._game
         self._stack.append(scene)
         scene.on_enter()
@@ -406,31 +471,40 @@ class SceneStack:
     def _apply_pop(self) -> None:
         if not self._stack:
             return
-        old = self._stack[-1]
-        old.on_exit()
-        old._cleanup_owned_sprites()
-        old._cleanup_owned_timers()
-        self._stack.pop()
-        if self._stack:
-            self._stack[-1].on_reveal()
+        self._in_on_exit = True
+        try:
+            old = self._stack[-1]
+            old.on_exit()
+            self._cleanup_exiting_scene(old)
+            self._stack.pop()
+            if self._stack:
+                self._stack[-1].on_reveal()
+        finally:
+            self._in_on_exit = False
 
     def _apply_replace(self, scene: Scene) -> None:
         if self._stack:
             old = self._stack[-1]
-            old.on_exit()
-            old._cleanup_owned_sprites()
-            old._cleanup_owned_timers()
-            self._stack.pop()
+            self._in_on_exit = True
+            try:
+                old.on_exit()
+                self._cleanup_exiting_scene(old)
+                self._stack.pop()
+            finally:
+                self._in_on_exit = False
         scene.game = self._game
         self._stack.append(scene)
         scene.on_enter()
 
     def _apply_clear_and_push(self, scene: Scene) -> None:
-        for s in reversed(self._stack):
-            s.on_exit()
-            s._cleanup_owned_sprites()
-            s._cleanup_owned_timers()
-        self._stack.clear()
+        self._in_on_exit = True
+        try:
+            for s in reversed(self._stack):
+                s.on_exit()
+                self._cleanup_exiting_scene(s)
+            self._stack.clear()
+        finally:
+            self._in_on_exit = False
         scene.game = self._game
         self._stack.append(scene)
         scene.on_enter()

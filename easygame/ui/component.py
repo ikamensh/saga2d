@@ -74,6 +74,12 @@ class Component:
         drop_accept: Callable[[Any], bool] | None = None,
         on_drop: Callable[[Any, Any], Any] | None = None,
     ) -> None:
+        if width is not None and width < 0:
+            raise ValueError("width cannot be negative")
+        if height is not None and height < 0:
+            raise ValueError("height cannot be negative")
+        if margin < 0:
+            raise ValueError("margin cannot be negative")
         self._width = width
         self._height = height
         self._anchor = anchor
@@ -113,6 +119,8 @@ class Component:
         Sets the child's parent reference and propagates the ``_game``
         reference so that all descendants can access the backend.
         """
+        if child is self:
+            raise ValueError("Cannot add component to itself")
         if child._parent is not None:
             child._parent.remove(child)
         child._parent = self

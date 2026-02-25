@@ -96,6 +96,8 @@ class TweenManager:
         on_complete: Callable[[], Any] | None = None,
     ) -> int:
         """Create a tween. Returns tween_id for cancellation."""
+        if not hasattr(target, prop):
+            raise AttributeError(f"'{type(target).__name__}' has no attribute '{prop}'")
         tween_id = self._next_id
         self._next_id += 1
         self._tweens[tween_id] = _Tween(

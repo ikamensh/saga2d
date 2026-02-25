@@ -156,11 +156,6 @@ class AssetManager:
             f"Looked in: {', '.join(tried)}"
         )
 
-    def _load_image(self, name: str) -> Any:
-        """Resolve *name* to a path and load."""
-        path = self._resolve_image_path(name)
-        return self._backend.load_image(str(path))
-
     # ------------------------------------------------------------------
     # Animation frames
     # ------------------------------------------------------------------

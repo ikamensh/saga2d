@@ -720,6 +720,8 @@ class Grid(Component):
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
+        if spacing < 0:
+            raise ValueError("spacing cannot be negative")
         super().__init__(width=width, height=height, style=style, **kwargs)
         self._columns = columns
         self._rows = rows

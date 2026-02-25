@@ -461,7 +461,7 @@ class TestCameraFollowEdgeCases:
         # Should not crash on update with no follow target.
         cam.update(0.016)
 
-    def test_pan_to_zero_duration(self) -> None:
+    def test_pan_to_zero_duration(self, game: Game) -> None:
         """pan_to with duration=0 still works (instant pan)."""
         cam = Camera((800, 600))
         # Duration of 0 — tween system handles it.

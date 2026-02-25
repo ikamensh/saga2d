@@ -293,6 +293,8 @@ class Camera:
             easing:   An :class:`~easygame.util.tween.Ease` value (default
                       ``Ease.EASE_IN_OUT``).
         """
+        if not math.isfinite(x) or not math.isfinite(y):
+            raise ValueError("pan_to requires finite x and y")
         from easygame.util.tween import Ease, tween
 
         self._cancel_pan()

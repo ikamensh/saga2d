@@ -457,9 +457,11 @@ class PygletBackend:
         glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer)
         glReadBuffer(GL_BACK_LEFT)  # restore default
         data = bytes(buffer)
-        return Image.frombytes("RGBA", (w, h), data).transpose(
-            Image.FLIP_TOP_BOTTOM
+        # Pillow 10+ moved FLIP_TOP_BOTTOM to Image.Transpose; old attr removed
+        flip = getattr(
+            Image.Transpose, "FLIP_TOP_BOTTOM", getattr(Image, "FLIP_TOP_BOTTOM", 1)
         )
+        return Image.frombytes("RGBA", (w, h), data).transpose(flip)
 
     # ==================================================================
     # Backend protocol — rect and text rendering
