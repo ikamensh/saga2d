@@ -96,6 +96,7 @@ class Sprite:
         layer:         Render layer (back-to-front draw order).
         opacity:       0 (transparent) to 255 (opaque).
         visible:       Whether the sprite is drawn at all.
+        tint:          Color tint (r, g, b) in 0.0–1.0. Default (1.0, 1.0, 1.0).
         color_swap:    Optional ColorSwap for per-pixel color replacement.
         team_palette:  Optional registered palette name (e.g. "blue").
                        Ignored if color_swap is set.
@@ -110,6 +111,7 @@ class Sprite:
         layer: RenderLayer = RenderLayer.UNITS,
         opacity: int = 255,
         visible: bool = True,
+        tint: tuple[float, float, float] = (1.0, 1.0, 1.0),
         color_swap: "ColorSwap | None" = None,
         team_palette: str | None = None,
     ) -> None:
@@ -139,6 +141,7 @@ class Sprite:
         self._y = float(position[1])
         self._opacity = opacity
         self._visible = visible
+        self._tint = tint
         self._removed = False
 
         # Animation state.
@@ -222,6 +225,16 @@ class Sprite:
     @visible.setter
     def visible(self, value: bool) -> None:
         self._visible = value
+        self._sync_to_backend()
+
+    @property
+    def tint(self) -> tuple[float, float, float]:
+        """Color tint (r, g, b) in 0.0–1.0. Default (1.0, 1.0, 1.0) = no tint."""
+        return self._tint
+
+    @tint.setter
+    def tint(self, value: tuple[float, float, float]) -> None:
+        self._tint = value
         self._sync_to_backend()
 
     @property
@@ -525,4 +538,5 @@ class Sprite:
             image=image,
             opacity=self._opacity,
             visible=self._visible,
+            tint=self._tint,
         )
