@@ -787,6 +787,22 @@ review. **13 fix, 31 skip, 1 needs-decision.** Key lessons:
 - **Skip rationale:** style-only issues, documented behavior (Audio KeyError), test imports,
   docstring gaps, and Theme complexity are all deferred.
 
+## Fix & Report (Stage 6) — Verified
+
+All 13 "fix" + 1 "needs-decision" findings implemented. **1252 tests passing.**
+
+**Key implementation patterns:**
+- `SceneStack._cleanup_exiting_scene(scene)` centralizes post-on_exit cleanup (sprites,
+  timers, emitters, camera pan tweens) — called from all 4 apply methods.
+- Re-entrancy: `_in_on_exit` flag + `_should_defer()` check defers ops triggered during
+  `on_exit()`. `_flushing` flag prevents re-entrant `flush_pending_ops()`.
+- `Game._teardown()` clears module globals conditionally (`is self` check) + cancels
+  timer/tween managers. Called from `run()` finally block + `__del__` safety net.
+- FLIP_TOP_BOTTOM: graceful `getattr` chain works on both old and new Pillow.
+- **Needs-decision:** `cleanup_globals` autouse fixture was reverted; test isolation
+  currently relies on `Game._teardown()` in production code. A dedicated conftest fixture
+  would be more robust but is deferred pending owner decision.
+
 ---
 
 ## Edge Case Decisions (Stage 2)
