@@ -312,7 +312,7 @@ class PygletBackend:
             # Prevent pyglet's default window.close().  The framework
             # handles quit via Game.quit() after seeing the WindowEvent.
             backend._event_queue.append(WindowEvent(type="close"))
-            return pyglet.event.EVENT_HANDLED  # type: ignore[return-value]
+            return pyglet.event.EVENT_HANDLED
 
         @self.window.event
         def on_resize(new_width: int, new_height: int) -> None:

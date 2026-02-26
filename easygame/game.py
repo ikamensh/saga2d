@@ -88,9 +88,7 @@ class Game:
 
             self._backend = MockBackend(resolution[0], resolution[1])
         elif backend == "pyglet":
-            from easygame.backends.pyglet_backend import (
-                PygletBackend,  # type: ignore[import-not-found]
-            )
+            from easygame.backends.pyglet_backend import PygletBackend
 
             self._backend = PygletBackend()
         elif hasattr(backend, "poll_events"):  # duck-type check
