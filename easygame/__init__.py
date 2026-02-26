@@ -8,8 +8,6 @@ Public API re-exports.  Game code imports from here::
 Internal modules (backends, rendering internals) are **not** re-exported.
 """
 
-__version__ = "0.1.0"
-
 from easygame.actions import (
     Action,
     Delay,
@@ -45,9 +43,6 @@ from easygame.ui import (
     HUD,
     Anchor,
     Button,
-    compute_anchor_position,
-    compute_content_size,
-    compute_flow_layout,
     ChoiceScreen,
     Component,
     ConfirmDialog,
@@ -58,7 +53,6 @@ from easygame.ui import (
     Label,
     Layout,
     List,
-    ListWidget,
     MessageScreen,
     Panel,
     ProgressBar,
@@ -76,9 +70,6 @@ from easygame.util.tween import Ease, tween
 __all__ = [
     "Action",
     "Anchor",
-    "compute_anchor_position",
-    "compute_content_size",
-    "compute_flow_layout",
     "AnimationDef",
     "AssetManager",
     "AssetNotFoundError",
@@ -109,7 +100,6 @@ __all__ = [
     "Label",
     "Layout",
     "List",
-    "ListWidget",
     "MessageScreen",
     "MouseEvent",
     "MoveTo",

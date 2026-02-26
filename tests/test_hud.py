@@ -194,6 +194,7 @@ class TestHUDInputOrder:
                     style=Style(background_color=(0, 0, 0, 255)),
                 )
                 # Attach a handler that records events.
+                original_on_event = btn.on_event
 
                 def spy_on_event(event):
                     scene_ui_hit.append(event)
@@ -210,6 +211,7 @@ class TestHUDInputOrder:
             anchor=Anchor.CENTER,
             style=Style(background_color=(0, 0, 0, 0)),
         )
+        original = hud_btn.on_event
 
         def hud_spy(event):
             hud_hit.append(event)
@@ -448,6 +450,7 @@ class TestHUDDrawOrder:
         self, game: Game, backend: MockBackend,
     ) -> None:
         """HUD doesn't draw when the top scene has show_hud=False."""
+        hud_draw_count = [0]
 
         class BaseScene(Scene):
             pass

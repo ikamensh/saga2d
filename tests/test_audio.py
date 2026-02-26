@@ -426,9 +426,11 @@ class TestCrossfadeMusic:
         self, game: Game,
     ) -> None:
         """New player starts at volume 0 during crossfade."""
+        backend = game.backend
         game.audio.play_music("exploration")
         game.audio.crossfade_music("battle", duration=1.0)
 
+        new_player_id = game.audio._current_player_id
         # The new player was created with volume=0.0
         # But the tween may have already advanced slightly, check initial create
         # The play_music call in crossfade passes volume=0.0
@@ -515,6 +517,7 @@ class TestCrossfadeMusic:
 
         # Start first crossfade.
         game.audio.crossfade_music("battle", duration=2.0)
+        battle_player = game.audio._current_player_id
 
         # Advance a bit (not complete).
         for _ in range(10):
@@ -850,8 +853,8 @@ class TestAssetManagerAudio:
 
         The path is cached, but each call produces a new backend handle.
         """
-        assets.music("exploration")
-        assets.music("exploration")
+        h1 = assets.music("exploration")
+        h2 = assets.music("exploration")
         # Mock backend caches by path, so handles will be same string.
         # But the method itself should NOT cache the handle.
         assert "exploration" in assets._music_path_cache

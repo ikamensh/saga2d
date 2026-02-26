@@ -14,13 +14,6 @@ Game code checks ``event.action`` for intent-based input::
 The ``InputManager`` is owned by :class:`~easygame.game.Game` and exposed
 as ``game.input``.  It provides default bindings for common actions (confirm,
 cancel, directional) and supports rebinding at runtime.
-
-Multiple keys can be bound to the same action::
-
-    game.input.bind("move_left", "left", "a")   # arrow key OR 'a'
-
-Each key still maps to at most one action.  Binding a key that is already
-bound to a *different* action steals it from the old action.
 """
 
 from __future__ import annotations
@@ -124,8 +117,10 @@ def _with_world_coords(
 class InputManager:
     """Translates raw backend events into :class:`InputEvent` objects.
 
-    Maintains a many-to-one key→action mapping: multiple keys can trigger
-    the same action, but each key maps to at most one action.
+    Maintains a bidirectional key↔action mapping.  Each action maps to
+    exactly one key; binding a new key to an existing action replaces the
+    old binding.  Binding a key that is already bound to a *different*
+    action steals it (unbinds the old action first).
 
     Default bindings::
 
@@ -139,63 +134,42 @@ class InputManager:
 
     def __init__(self) -> None:
         self._key_to_action: dict[str, str] = {}
-        self._action_to_keys: dict[str, list[str]] = {}
+        self._action_to_key: dict[str, str] = {}
         self._setup_defaults()
 
     # ------------------------------------------------------------------
     # Binding API
     # ------------------------------------------------------------------
 
-    def bind(self, action: str, *keys: str) -> None:
-        """Bind *action* to one or more *keys*.
+    def bind(self, action: str, key: str) -> None:
+        """Bind *action* to *key*.
 
-        Replaces any previous binding for *action*.  If a key is already
-        bound to a *different* action, it is stolen (the old action loses
-        that key).
-
-        Examples::
-
-            game.input.bind("confirm", "return")          # single key
-            game.input.bind("move_left", "left", "a")     # two keys
+        If *action* was already bound to a different key, the old binding
+        is removed.  If *key* was already bound to a different action, that
+        action is unbound first (key stealing).
         """
-        if not keys:
-            raise ValueError("bind() requires at least one key")
-
-        # Remove all old keys for this action.
-        old_keys = self._action_to_keys.pop(action, [])
-        for old_key in old_keys:
+        # Remove old key for this action (if any).
+        old_key = self._action_to_key.pop(action, None)
+        if old_key is not None:
             self._key_to_action.pop(old_key, None)
 
-        # Steal keys from any other actions that had them.
-        new_keys: list[str] = []
-        for key in keys:
-            old_action = self._key_to_action.pop(key, None)
-            if old_action is not None and old_action != action:
-                # Remove this key from the old action's key list.
-                old_action_keys = self._action_to_keys.get(old_action, [])
-                if key in old_action_keys:
-                    old_action_keys.remove(key)
-                # If the old action has no keys left, remove it entirely.
-                if not old_action_keys:
-                    self._action_to_keys.pop(old_action, None)
+        # Steal key from any other action that had it.
+        old_action = self._key_to_action.pop(key, None)
+        if old_action is not None:
+            self._action_to_key.pop(old_action, None)
 
-            self._key_to_action[key] = action
-            new_keys.append(key)
-
-        self._action_to_keys[action] = new_keys
+        self._key_to_action[key] = action
+        self._action_to_key[action] = key
 
     def unbind(self, action: str) -> None:
-        """Remove all bindings for *action*.  No-op if not bound."""
-        keys = self._action_to_keys.pop(action, [])
-        for key in keys:
+        """Remove the binding for *action*.  No-op if not bound."""
+        key = self._action_to_key.pop(action, None)
+        if key is not None:
             self._key_to_action.pop(key, None)
 
-    def get_bindings(self) -> dict[str, list[str]]:
-        """Return a copy of the current action→keys mapping.
-
-        Each value is a list of key strings (may have one or more entries).
-        """
-        return {action: list(keys) for action, keys in self._action_to_keys.items()}
+    def get_bindings(self) -> dict[str, str]:
+        """Return a copy of the current action→key mapping."""
+        return dict(self._action_to_key)
 
     # ------------------------------------------------------------------
     # Translation

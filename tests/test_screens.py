@@ -16,7 +16,6 @@ import pytest
 
 from easygame import Game, Scene
 from easygame.backends.mock_backend import MockBackend
-from easygame.ui.components import Button
 from easygame.save import SaveManager
 from easygame.ui.screens import (
     ChoiceScreen,
@@ -205,7 +204,7 @@ class TestChoiceScreen:
         game.tick(dt=0.016)
 
         # Find the buttons in the UI tree.
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
 
         assert len(buttons) == 3  # One per choice.
@@ -289,7 +288,7 @@ class TestChoiceScreen:
         screen = ChoiceScreen("Question?", ["Yes", "No", "Maybe"])
         game.push(screen)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
         assert len(buttons) == 3
 
@@ -321,7 +320,7 @@ class TestConfirmDialog:
         game.push(dialog)
         game.tick(dt=0.016)  # Layout pass.
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(dialog._ui, buttons)
 
         # First button should be "Yes".
@@ -344,7 +343,7 @@ class TestConfirmDialog:
         game.push(dialog)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(dialog._ui, buttons)
 
         assert buttons[1]._text == "No"
@@ -425,7 +424,7 @@ class TestConfirmDialog:
         dialog = ConfirmDialog("Question?")
         game.push(dialog)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(dialog._ui, buttons)
         texts = [b._text for b in buttons]
         assert "Yes" in texts
@@ -463,7 +462,7 @@ class TestSaveLoadScreen:
         )
         game.push(screen)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
         # 3 slot buttons + 1 Back button = 4.
         assert len(buttons) == 4
@@ -497,7 +496,7 @@ class TestSaveLoadScreen:
         game.push(screen)
         game.tick(dt=0.016)  # Layout.
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
 
         # Click slot 1 button.
@@ -526,7 +525,7 @@ class TestSaveLoadScreen:
         game.push(screen)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
 
         # Click slot 2 (index 1).
@@ -552,7 +551,7 @@ class TestSaveLoadScreen:
         game.push(screen)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
 
         # Click slot 1 (empty).
@@ -573,7 +572,7 @@ class TestSaveLoadScreen:
         game.push(screen)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(screen._ui, buttons)
 
         # Last button should be "Back".

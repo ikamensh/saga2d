@@ -8,13 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from easygame import (
-    Game,
-    Scene,
-    compute_anchor_position,
-    compute_content_size,
-    compute_flow_layout,
-)
+from easygame import Game, Scene
 from easygame.assets import AssetManager
 from easygame.backends.mock_backend import MockBackend
 from easygame.input import InputEvent
@@ -31,6 +25,11 @@ from easygame.ui import (
 )
 from easygame.ui.component import _UIRoot
 from easygame.ui.components import _estimate_text_width
+from easygame.ui.layout import (
+    compute_anchor_position,
+    compute_content_size,
+    compute_flow_layout,
+)
 
 
 # ------------------------------------------------------------------
@@ -64,19 +63,6 @@ def asset_dir(tmp_path: Path) -> Path:
     sprites.mkdir()
     (sprites / "portrait.png").write_bytes(b"png")
     return tmp_path
-
-
-# ==================================================================
-# 0. Package API
-# ==================================================================
-
-
-def test_version_attribute() -> None:
-    """__version__ is exposed and non-empty."""
-    import easygame
-    assert hasattr(easygame, "__version__")
-    assert isinstance(easygame.__version__, str)
-    assert len(easygame.__version__) > 0
 
 
 # ==================================================================

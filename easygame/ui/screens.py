@@ -550,7 +550,7 @@ class _SettingsScene(Scene):
             )
         )
         bindings = self.game.input.get_bindings()
-        for action, keys in sorted(bindings.items()):
+        for action, key in sorted(bindings.items()):
             row = Panel(layout=Layout.HORIZONTAL, spacing=8)
 
             row.add(
@@ -575,11 +575,9 @@ class _SettingsScene(Scene):
                 return handler
 
             # We need the button reference for the closure.
-            # Display the primary (first) key; rebinding replaces all keys.
-            display_key = keys[0] if keys else "?"
             btn_ref: list[Button | None] = [None]
             btn = Button(
-                f"[{display_key.upper()}]",
+                f"[{key.upper()}]",
                 on_click=make_rebind_handler(action, btn_ref),
             )
             btn_ref[0] = btn
@@ -641,8 +639,7 @@ class _SettingsScene(Scene):
         if self._listening_button is not None and self._listening_action is not None:
             # Restore the button text to the current binding.
             bindings = self.game.input.get_bindings()
-            keys = bindings.get(self._listening_action, [])
-            current_key = keys[0] if keys else "?"
+            current_key = bindings.get(self._listening_action, "?")
             self._listening_button.text = f"[{current_key.upper()}]"
         self._listening_action = None
         self._listening_button = None

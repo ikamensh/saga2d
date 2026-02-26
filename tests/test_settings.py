@@ -14,9 +14,7 @@ import pytest
 
 from easygame import Game, Scene
 from easygame.backends.mock_backend import MockBackend
-from easygame.ui.components import Button, Label
 from easygame.ui.screens import _SettingsScene
-from easygame.ui.widgets import ProgressBar
 
 
 # ---------------------------------------------------------------------------
@@ -105,7 +103,7 @@ class TestSettingsUIStructure:
         settings = _SettingsScene()
         game.push(settings)
 
-        labels: list[Label] = []
+        labels = []
         _find_labels(settings._ui, labels)
         title_texts = [lb._text for lb in labels]
         assert "Settings" in title_texts
@@ -118,7 +116,7 @@ class TestSettingsUIStructure:
         settings = _SettingsScene()
         game.push(settings)
 
-        labels: list[Label] = []
+        labels = []
         _find_labels(settings._ui, labels)
         texts = [lb._text for lb in labels]
         assert "Volume" in texts
@@ -131,7 +129,7 @@ class TestSettingsUIStructure:
         settings = _SettingsScene()
         game.push(settings)
 
-        labels: list[Label] = []
+        labels = []
         _find_labels(settings._ui, labels)
         texts = [lb._text for lb in labels]
         assert "Key Bindings" in texts
@@ -144,7 +142,7 @@ class TestSettingsUIStructure:
         settings = _SettingsScene()
         game.push(settings)
 
-        bars: list[ProgressBar] = []
+        bars = []
         _find_progressbars(settings._ui, bars)
         assert len(bars) == 4
 
@@ -156,7 +154,7 @@ class TestSettingsUIStructure:
         settings = _SettingsScene()
         game.push(settings)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         texts = [b._text for b in buttons]
         assert "Back" in texts
@@ -169,7 +167,7 @@ class TestSettingsUIStructure:
         settings = _SettingsScene()
         game.push(settings)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         texts = [b._text for b in buttons]
         # 4 channels × 2 buttons (− and +) = 8 volume buttons.
@@ -185,7 +183,7 @@ class TestSettingsUIStructure:
         game.push(settings)
 
         bindings = game.input.get_bindings()
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         # Find buttons that look like "[KEY]".
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
@@ -218,7 +216,7 @@ class TestVolumeControls:
         game.tick(dt=0.016)
 
         # Find the plus button for master (first + button).
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         assert len(plus_buttons) >= 1
@@ -238,7 +236,7 @@ class TestVolumeControls:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         minus_buttons = [b for b in buttons if b._text == "−"]
         assert len(minus_buttons) >= 1
@@ -258,7 +256,7 @@ class TestVolumeControls:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         plus_buttons[0]._on_click()
@@ -275,7 +273,7 @@ class TestVolumeControls:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         minus_buttons = [b for b in buttons if b._text == "−"]
         minus_buttons[0]._on_click()
@@ -297,7 +295,7 @@ class TestVolumeControls:
         assert abs(bar.value - 50.0) < 0.1
 
         # Click plus.
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         plus_buttons[0]._on_click()
@@ -317,7 +315,7 @@ class TestVolumeControls:
         label = settings._volume_labels["master"]
         assert label._text == "50%"
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         plus_buttons[0]._on_click()
@@ -336,7 +334,7 @@ class TestVolumeControls:
         game.tick(dt=0.016)
 
         # Click + on master (first + button).
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         plus_buttons[0]._on_click()  # master
@@ -354,7 +352,7 @@ class TestVolumeControls:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         # Order: master, music, sfx, ui → second + is music.
@@ -380,7 +378,7 @@ class TestKeyRebinding:
         game.tick(dt=0.016)
 
         # Find a binding button (e.g. for "confirm").
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
         assert len(binding_buttons) > 0
@@ -401,7 +399,7 @@ class TestKeyRebinding:
         game.tick(dt=0.016)
 
         # Find the binding button for "confirm" action.
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
 
@@ -422,7 +420,7 @@ class TestKeyRebinding:
 
         # Confirm should now be bound to space.
         bindings = game.input.get_bindings()
-        assert bindings.get("confirm") == ["space"]
+        assert bindings.get("confirm") == "space"
         assert confirm_btn._text == "[SPACE]"
         assert settings._listening_action is None
 
@@ -435,7 +433,7 @@ class TestKeyRebinding:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
 
@@ -456,7 +454,7 @@ class TestKeyRebinding:
 
         # Binding should be unchanged.
         bindings = game.input.get_bindings()
-        assert bindings.get("confirm") == ["return"]
+        assert bindings.get("confirm") == "return"
         assert confirm_btn._text == "[RETURN]"
         assert settings._listening_action is None
         # Settings should NOT have popped (escape was consumed by listening cancel).
@@ -471,7 +469,7 @@ class TestKeyRebinding:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
 
@@ -492,7 +490,7 @@ class TestKeyRebinding:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
         assert len(binding_buttons) >= 2
@@ -526,7 +524,7 @@ class TestSettingsNavigation:
 
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(game._scene_stack._stack[-1]._ui, buttons)
         back_btn = [b for b in buttons if b._text == "Back"][0]
         back_btn._on_click()
@@ -622,7 +620,7 @@ class TestSettingsEdgeCases:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         minus_buttons = [b for b in buttons if b._text == "−"]
         minus_buttons[0]._on_click()
@@ -639,7 +637,7 @@ class TestSettingsEdgeCases:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         plus_buttons[0]._on_click()
@@ -656,7 +654,7 @@ class TestSettingsEdgeCases:
         game.push(settings)
         game.tick(dt=0.016)
 
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         plus_buttons = [b for b in buttons if b._text == "+"]
         plus_buttons[0]._on_click()
@@ -679,7 +677,7 @@ class TestSettingsEdgeCases:
         game.tick(dt=0.016)  # Should not raise.
 
         # No binding buttons (just volume buttons and Back).
-        buttons: list[Button] = []
+        buttons = []
         _find_buttons(settings._ui, buttons)
         binding_buttons = [b for b in buttons if b._text.startswith("[") and b._text.endswith("]")]
         assert len(binding_buttons) == 0

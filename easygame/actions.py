@@ -92,7 +92,8 @@ class Sequence(Action):
         for i, action in enumerate(actions):
             if not isinstance(action, Action):
                 raise TypeError(
-                    f"Sequence child {i} is {type(action).__name__}, expected Action"
+                    "Sequence child %s is %s, expected Action"
+                    % (i, type(action).__name__)
                 )
         self._actions = list(actions)
         self._index = 0
@@ -144,7 +145,8 @@ class Parallel(Action):
         for i, action in enumerate(actions):
             if not isinstance(action, Action):
                 raise TypeError(
-                    f"Parallel child {i} is {type(action).__name__}, expected Action"
+                    "Parallel child %s is %s, expected Action"
+                    % (i, type(action).__name__)
                 )
         self._actions = list(actions)
         self._done: list[bool] = [False] * len(actions)
