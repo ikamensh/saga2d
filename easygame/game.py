@@ -16,6 +16,7 @@ Scene stack convenience methods (``push``, ``pop``, ``replace``,
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 from weakref import WeakSet
@@ -436,6 +437,8 @@ class Game:
         # Clear module-level globals only if they still point to *this*
         # Game instance, so concurrent Game objects don't clobber each
         # other (relevant in test suites).
+        if sys.meta_path is None:
+            return  # Python shutting down; imports would fail
         import easygame.rendering.sprite as _sprite_mod
         import easygame.util.tween as _tween_mod
 

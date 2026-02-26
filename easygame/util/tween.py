@@ -128,6 +128,8 @@ class TweenManager:
 
     def cancel_all(self) -> None:
         """Cancel all active tweens."""
+        for t in self._tweens.values():
+            t.cancelled = True
         self._tweens.clear()
 
     def update(self, dt: float) -> None:

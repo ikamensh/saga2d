@@ -175,6 +175,8 @@ class TimerManager:
 
     def cancel_all(self) -> None:
         """Cancel all active timers."""
+        for timer in self._timers.values():
+            timer.cancelled = True
         self._timers.clear()
 
     def update(self, dt: float) -> None:
