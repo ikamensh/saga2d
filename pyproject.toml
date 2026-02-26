@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easygame"
+version = "0.1.0"
+description = "A lightweight 2D game framework"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Ilya Kamenshchikov", email = "ilya.kamenshchikov@gmail.com" },
+]
+dependencies = [
+    "Pillow>=12.1.1",
+    "pyglet>=2.1.13",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

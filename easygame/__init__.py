@@ -8,6 +8,8 @@ Public API re-exports.  Game code imports from here::
 Internal modules (backends, rendering internals) are **not** re-exported.
 """
 
+__version__ = "0.1.0"
+
 from easygame.actions import (
     Action,
     Delay,
@@ -62,6 +64,9 @@ from easygame.ui import (
     TextBox,
     Theme,
     Tooltip,
+    compute_anchor_position,
+    compute_content_size,
+    compute_flow_layout,
 )
 from easygame.util.fsm import StateMachine
 from easygame.util.timer import TimerHandle
@@ -90,12 +95,11 @@ __all__ = [
     "FadeIn",
     "FadeOut",
     "Game",
-    "get_palette",
     "Grid",
     "HUD",
     "ImageBox",
-    "InputManager",
     "InputEvent",
+    "InputManager",
     "KeyEvent",
     "Label",
     "Layout",
@@ -108,7 +112,6 @@ __all__ = [
     "ParticleEmitter",
     "PlayAnim",
     "ProgressBar",
-    "register_palette",
     "Remove",
     "RenderLayer",
     "Repeat",
@@ -117,15 +120,20 @@ __all__ = [
     "SaveManager",
     "Scene",
     "Sequence",
-    "StateMachine",
     "Sprite",
     "SpriteAnchor",
+    "StateMachine",
     "Style",
     "TabGroup",
     "TextBox",
-    "TimerHandle",
     "Theme",
+    "TimerHandle",
     "Tooltip",
     "WindowEvent",
+    "compute_anchor_position",
+    "compute_content_size",
+    "compute_flow_layout",
+    "get_palette",
+    "register_palette",
     "tween",
 ]

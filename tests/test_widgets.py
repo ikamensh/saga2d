@@ -965,7 +965,7 @@ class TestTabGroup:
         """Active tab's content is visible, others are hidden."""
         c1 = Panel(width=200, height=100)
         c2 = Panel(width=200, height=100)
-        tg = TabGroup({"A": c1, "B": c2})
+        TabGroup({"A": c1, "B": c2})
         assert c1.visible is True
         assert c2.visible is False
 
