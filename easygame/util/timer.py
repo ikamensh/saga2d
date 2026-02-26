@@ -49,7 +49,9 @@ class TimerHandle:
     # -- chaining -----------------------------------------------------
 
     def then(
-        self, callback: Callable[[], Any], delay: float = 0.0,
+        self,
+        callback: Callable[[], Any],
+        delay: float = 0.0,
     ) -> TimerHandle:
         """Schedule *callback* to fire *delay* seconds after the parent.
 
@@ -203,7 +205,8 @@ class TimerManager:
                     # One-shot: propagate then-chain
                     if timer.then_chain:
                         self._schedule_chain_step(
-                            timer.then_chain, timer.chain_ids,
+                            timer.then_chain,
+                            timer.chain_ids,
                         )
                     to_remove.append(timer_id)
                 else:
@@ -212,7 +215,8 @@ class TimerManager:
                     # Clone the full chain as a one-shot sequence
                     if timer.then_chain:
                         self._schedule_chain_step(
-                            list(timer.then_chain), timer.chain_ids,
+                            list(timer.then_chain),
+                            timer.chain_ids,
                         )
         for timer_id in to_remove:
             if timer_id in self._timers:

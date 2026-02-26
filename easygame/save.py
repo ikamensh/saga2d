@@ -35,7 +35,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 class SaveError(Exception):
@@ -101,7 +101,7 @@ class SaveManager:
             return None
         try:
             text = path.read_text(encoding="utf-8")
-            return json.loads(text)
+            return cast(dict[str, Any], json.loads(text))
         except (json.JSONDecodeError, TypeError, OSError) as exc:
             raise SaveError(
                 f"Corrupted save file in slot {slot}: {path} "

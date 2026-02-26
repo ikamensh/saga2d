@@ -30,7 +30,8 @@ Usage::
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from easygame.input import InputEvent
 from easygame.scene import Scene
@@ -46,6 +47,7 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 # MessageScreen
 # ---------------------------------------------------------------------------
+
 
 class MessageScreen(Scene):
     """Full-screen text overlay that dismisses on any key press or click.
@@ -76,15 +78,19 @@ class MessageScreen(Scene):
             spacing=20,
         )
         # Main text.
-        bg.add(Label(
-            self._text,
-            style=Style(text_color=(240, 240, 240, 255), font_size=28),
-        ))
+        bg.add(
+            Label(
+                self._text,
+                style=Style(text_color=(240, 240, 240, 255), font_size=28),
+            )
+        )
         # Hint at bottom.
-        bg.add(Label(
-            "Press any key...",
-            style=Style(text_color=(180, 180, 180, 200), font_size=18),
-        ))
+        bg.add(
+            Label(
+                "Press any key...",
+                style=Style(text_color=(180, 180, 180, 200), font_size=18),
+            )
+        )
         self.ui.add(bg)
 
     def handle_input(self, event: InputEvent) -> bool:
@@ -103,6 +109,7 @@ class MessageScreen(Scene):
 # ---------------------------------------------------------------------------
 # ChoiceScreen
 # ---------------------------------------------------------------------------
+
 
 class ChoiceScreen(Scene):
     """Prompt with a vertical list of button choices.
@@ -136,10 +143,12 @@ class ChoiceScreen(Scene):
             spacing=12,
         )
         # Prompt label.
-        container.add(Label(
-            self._prompt,
-            style=Style(text_color=(240, 240, 240, 255), font_size=26),
-        ))
+        container.add(
+            Label(
+                self._prompt,
+                style=Style(text_color=(240, 240, 240, 255), font_size=26),
+            )
+        )
         # Choice buttons.
         for i, text in enumerate(self._choices):
             idx = i  # capture for closure
@@ -147,6 +156,7 @@ class ChoiceScreen(Scene):
             def make_handler(index: int) -> Callable[[], None]:
                 def handler() -> None:
                     self._select(index)
+
                 return handler
 
             container.add(Button(text, on_click=make_handler(idx)))
@@ -176,6 +186,7 @@ class ChoiceScreen(Scene):
 # ---------------------------------------------------------------------------
 # ConfirmDialog
 # ---------------------------------------------------------------------------
+
 
 class ConfirmDialog(Scene):
     """Yes/No confirmation dialog.
@@ -208,10 +219,12 @@ class ConfirmDialog(Scene):
             spacing=20,
         )
         # Question text.
-        container.add(Label(
-            self._question,
-            style=Style(text_color=(240, 240, 240, 255), font_size=26),
-        ))
+        container.add(
+            Label(
+                self._question,
+                style=Style(text_color=(240, 240, 240, 255), font_size=26),
+            )
+        )
         # Button row.
         button_row = Panel(layout=Layout.HORIZONTAL, spacing=20)
         button_row.add(Button("Yes", on_click=self._confirm))
@@ -246,6 +259,7 @@ class ConfirmDialog(Scene):
 # SaveLoadScreen
 # ---------------------------------------------------------------------------
 
+
 class SaveLoadScreen(Scene):
     """Save/Load slot selection screen.
 
@@ -270,7 +284,7 @@ class SaveLoadScreen(Scene):
         *,
         save_manager: SaveManager | None = None,
         on_save: Callable[[int], Any] | None = None,
-        on_load: Callable[[int, dict], Any] | None = None,
+        on_load: Callable[[int, dict[str, Any]], Any] | None = None,
         slot_count: int = 10,
     ) -> None:
         if mode not in ("save", "load"):
@@ -300,10 +314,12 @@ class SaveLoadScreen(Scene):
 
         # Title.
         title_text = "Save Game" if self._mode == "save" else "Load Game"
-        container.add(Label(
-            title_text,
-            style=Style(text_color=(240, 240, 240, 255), font_size=28),
-        ))
+        container.add(
+            Label(
+                title_text,
+                style=Style(text_color=(240, 240, 240, 255), font_size=28),
+            )
+        )
 
         # Slot buttons.
         for i, slot_data in enumerate(slots):
@@ -317,9 +333,12 @@ class SaveLoadScreen(Scene):
             else:
                 label = f"Slot {slot_num} — Empty"
 
-            def make_handler(num: int, data: dict | None) -> Callable[[], None]:
+            def make_handler(
+                num: int, data: dict[str, Any] | None
+            ) -> Callable[[], None]:
                 def handler() -> None:
                     self._on_slot_click(num, data)
+
                 return handler
 
             container.add(Button(label, on_click=make_handler(slot_num, slot_data)))
@@ -369,6 +388,7 @@ class SaveLoadScreen(Scene):
 # ---------------------------------------------------------------------------
 # _SequenceRunner — internal helper for game.show_sequence()
 # ---------------------------------------------------------------------------
+
 
 class _SequenceRunner(Scene):
     """Internal scene that chains a series of :class:`MessageScreen` pushes.
@@ -459,33 +479,40 @@ class _SettingsScene(Scene):
         )
 
         # Title.
-        container.add(Label(
-            "Settings",
-            style=Style(text_color=(240, 240, 240, 255), font_size=28),
-        ))
+        container.add(
+            Label(
+                "Settings",
+                style=Style(text_color=(240, 240, 240, 255), font_size=28),
+            )
+        )
 
         # --- Volume controls ---
-        container.add(Label(
-            "Volume",
-            style=Style(text_color=(200, 200, 200, 255), font_size=22),
-        ))
+        container.add(
+            Label(
+                "Volume",
+                style=Style(text_color=(200, 200, 200, 255), font_size=22),
+            )
+        )
         for channel, display_name in _VOLUME_CHANNELS:
             row = Panel(layout=Layout.HORIZONTAL, spacing=8)
 
             # Channel label.
-            row.add(Label(
-                display_name,
-                style=Style(
-                    text_color=(200, 200, 200, 255),
-                    font_size=18,
-                ),
-                width=80,
-            ))
+            row.add(
+                Label(
+                    display_name,
+                    style=Style(
+                        text_color=(200, 200, 200, 255),
+                        font_size=18,
+                    ),
+                    width=80,
+                )
+            )
 
             # Minus button.
             def make_vol_handler(ch: str, delta: float) -> Callable[[], None]:
                 def handler() -> None:
                     self._adjust_volume(ch, delta)
+
                 return handler
 
             row.add(Button("−", on_click=make_vol_handler(channel, -_VOLUME_STEP)))
@@ -516,26 +543,31 @@ class _SettingsScene(Scene):
             container.add(row)
 
         # --- Key bindings ---
-        container.add(Label(
-            "Key Bindings",
-            style=Style(text_color=(200, 200, 200, 255), font_size=22),
-        ))
+        container.add(
+            Label(
+                "Key Bindings",
+                style=Style(text_color=(200, 200, 200, 255), font_size=22),
+            )
+        )
         bindings = self.game.input.get_bindings()
         for action, key in sorted(bindings.items()):
             row = Panel(layout=Layout.HORIZONTAL, spacing=8)
 
-            row.add(Label(
-                action,
-                style=Style(
-                    text_color=(200, 200, 200, 255),
-                    font_size=18,
-                ),
-                width=120,
-            ))
+            row.add(
+                Label(
+                    action,
+                    style=Style(
+                        text_color=(200, 200, 200, 255),
+                        font_size=18,
+                    ),
+                    width=120,
+                )
+            )
 
             def make_rebind_handler(act: str, btn_ref: list) -> Callable[[], None]:
                 def handler() -> None:
                     self._start_listening(act, btn_ref[0])
+
                 return handler
 
             # We need the button reference for the closure.

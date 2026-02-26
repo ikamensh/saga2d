@@ -47,6 +47,7 @@ Mock: ``"font_name"`` or ``(name, path)``  /  Pyglet: font name or path
 # Event dataclasses  (frozen — events are immutable value objects)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class KeyEvent:
     """Keyboard press or release.
@@ -105,6 +106,7 @@ Event = KeyEvent | MouseEvent | WindowEvent
 # ---------------------------------------------------------------------------
 # Backend protocol
 # ---------------------------------------------------------------------------
+
 
 class Backend(Protocol):
     """Interface that every backend must satisfy (structural subtyping).

@@ -270,7 +270,8 @@ class Theme:
             font_size=_pick(e.font_size, self._tooltip_font_size),
             text_color=_pick(e.text_color, self._tooltip_text_color),
             background_color=_pick(
-                e.background_color, self._tooltip_background_color,
+                e.background_color,
+                self._tooltip_background_color,
             ),
             padding=_pick(e.padding, self._tooltip_padding),
             border_color=_pick(e.border_color, self._panel_border_color),
@@ -291,7 +292,8 @@ class Theme:
             font_size=_pick(e.font_size, self._tab_font_size),
             text_color=_pick(e.text_color, self._tab_text_color),
             background_color=_pick(
-                e.background_color, self._panel_background_color,
+                e.background_color,
+                self._panel_background_color,
             ),
             padding=_pick(e.padding, self._tab_padding),
             border_color=_pick(e.border_color, self._panel_border_color),
@@ -322,7 +324,8 @@ class Theme:
             font_size=_pick(e.font_size, self._font_size),
             text_color=_pick(e.text_color, self._text_color),
             background_color=_pick(
-                e.background_color, self._panel_background_color,
+                e.background_color,
+                self._panel_background_color,
             ),
             padding=_pick(e.padding, 6),
             border_color=_pick(e.border_color, self._panel_border_color),

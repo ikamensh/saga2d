@@ -50,9 +50,7 @@ class CursorManager:
             self._current = "default"
             return
         if name not in self._cursors:
-            raise KeyError(
-                f"Cursor '{name}' not registered. Use register() first."
-            )
+            raise KeyError(f"Cursor '{name}' not registered. Use register() first.")
         handle, (hx, hy) = self._cursors[name]
         self._backend.set_cursor(handle, hx, hy)
         self._current = name

@@ -22,6 +22,7 @@ from easygame.assets import AssetManager, AssetNotFoundError
 # Crossfade tween proxy
 # ---------------------------------------------------------------------------
 
+
 class _CrossfadeProxy:
     """Tween target that forwards volume changes to backend players.
 
@@ -51,11 +52,7 @@ class _CrossfadeProxy:
     @old_volume.setter
     def old_volume(self, val: float) -> None:
         self._old_vol = val
-        effective = (
-            self._audio._volumes["master"]
-            * self._audio._volumes["music"]
-            * val
-        )
+        effective = self._audio._volumes["master"] * self._audio._volumes["music"] * val
         self._audio._backend.set_player_volume(self._old_player, effective)
 
     @property
@@ -65,11 +62,7 @@ class _CrossfadeProxy:
     @new_volume.setter
     def new_volume(self, val: float) -> None:
         self._new_vol = val
-        effective = (
-            self._audio._volumes["master"]
-            * self._audio._volumes["music"]
-            * val
-        )
+        effective = self._audio._volumes["master"] * self._audio._volumes["music"] * val
         self._audio._backend.set_player_volume(self._new_player, effective)
         # Keep AudioManager's tracked base volume in sync with the new player.
         self._audio._current_player_base_volume = val
@@ -78,6 +71,7 @@ class _CrossfadeProxy:
 # ---------------------------------------------------------------------------
 # AudioManager
 # ---------------------------------------------------------------------------
+
 
 class AudioManager:
     """Framework-level audio system.  Owned by Game as ``game.audio``.
@@ -114,8 +108,8 @@ class AudioManager:
         self._tween_manager: Any = None  # set when crossfade tweens are created
 
         # Sound pools
-        self._pools: dict[str, list[str]] = {}      # pool_name -> [sound_names]
-        self._pool_last: dict[str, int] = {}         # pool_name -> last played index
+        self._pools: dict[str, list[str]] = {}  # pool_name -> [sound_names]
+        self._pool_last: dict[str, int] = {}  # pool_name -> last played index
 
     # ------------------------------------------------------------------
     # Volume
@@ -166,7 +160,9 @@ class AudioManager:
     # Sound effects
     # ------------------------------------------------------------------
 
-    def play_sound(self, name: str, *, channel: str = "sfx", optional: bool = False) -> None:
+    def play_sound(
+        self, name: str, *, channel: str = "sfx", optional: bool = False
+    ) -> None:
         """Play a sound effect by name (fire-and-forget).
 
         The effective volume is ``master * channel``.
@@ -191,7 +187,9 @@ class AudioManager:
     # Music
     # ------------------------------------------------------------------
 
-    def play_music(self, name: str, *, loop: bool = True, optional: bool = False) -> None:
+    def play_music(
+        self, name: str, *, loop: bool = True, optional: bool = False
+    ) -> None:
         """Stop any current music and start playing *name*.
 
         No crossfade — immediate switch.  Use :meth:`crossfade_music` for
@@ -273,12 +271,20 @@ class AudioManager:
 
         # Tween old volume from current base → 0.0.
         tid_out = tween(
-            fade, "old_volume", old_base_volume, 0.0, duration,
+            fade,
+            "old_volume",
+            old_base_volume,
+            0.0,
+            duration,
             ease=Ease.LINEAR,
         )
         # Tween new volume from 0.0 → 1.0; on_complete cleans up old player.
         tid_in = tween(
-            fade, "new_volume", 0.0, 1.0, duration,
+            fade,
+            "new_volume",
+            0.0,
+            1.0,
+            duration,
             ease=Ease.LINEAR,
             on_complete=lambda: self._finish_crossfade(old_player),
         )

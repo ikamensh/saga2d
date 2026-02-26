@@ -31,7 +31,9 @@ def get_palette(name: str) -> "ColorSwap":
         KeyError: If the name is not registered.
     """
     if name not in _TEAM_PALETTES:
-        raise KeyError(f"Palette '{name}' not registered. Use register_palette() first.")
+        raise KeyError(
+            f"Palette '{name}' not registered. Use register_palette() first."
+        )
     return _TEAM_PALETTES[name]
 
 
@@ -74,9 +76,7 @@ class ColorSwap:
         img = Image.open(image_path).convert("RGBA")
         pixels = img.load()
         if pixels is None:
-            raise RuntimeError(
-                f"Failed to load pixel data from image: {image_path}"
-            )
+            raise RuntimeError(f"Failed to load pixel data from image: {image_path}")
         color_map = dict(zip(self.source_colors, self.target_colors))
 
         for y in range(img.height):
@@ -89,6 +89,8 @@ class ColorSwap:
 
         return img
 
-    def cache_key(self) -> tuple:
+    def cache_key(
+        self,
+    ) -> tuple[tuple[tuple[int, int, int], tuple[int, int, int]], ...]:
         """Hashable key for caching: tuple of (src, tgt) pairs."""
         return tuple(zip(self.source_colors, self.target_colors))

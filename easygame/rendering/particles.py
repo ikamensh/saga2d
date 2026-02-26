@@ -40,14 +40,15 @@ if TYPE_CHECKING:
 # Internal particle state
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class _Particle:
     """Lightweight bookkeeping for one living particle."""
 
     sprite: Sprite
-    vx: float              # pixels / sec
-    vy: float              # pixels / sec
-    remaining: float       # seconds until death
+    vx: float  # pixels / sec
+    vy: float  # pixels / sec
+    remaining: float  # seconds until death
     total_lifetime: float  # initial lifetime (for fade ratio)
     fade_out: bool
 
@@ -55,6 +56,7 @@ class _Particle:
 # ---------------------------------------------------------------------------
 # ParticleEmitter
 # ---------------------------------------------------------------------------
+
 
 class ParticleEmitter:
     """Managed particle spawner.
@@ -105,9 +107,7 @@ class ParticleEmitter:
             )
 
         self._game: Any = _current_game
-        self._images: list[str] = (
-            image if isinstance(image, list) else [image]
-        )
+        self._images: list[str] = image if isinstance(image, list) else [image]
         self._x = float(position[0])
         self._y = float(position[1])
         self._count = count
@@ -122,7 +122,7 @@ class ParticleEmitter:
 
         # Continuous spawning state.
         self._continuous_rate: float = 0.0  # particles per second (0 = off)
-        self._spawn_accum: float = 0.0      # fractional particle accumulator
+        self._spawn_accum: float = 0.0  # fractional particle accumulator
 
         # Register for automatic updates.
         self._game._particle_emitters.add(self)
@@ -252,11 +252,13 @@ class ParticleEmitter:
 
         lt = random.uniform(self._lifetime[0], self._lifetime[1])
 
-        self._particles.append(_Particle(
-            sprite=sprite,
-            vx=vx,
-            vy=vy,
-            remaining=lt,
-            total_lifetime=lt,
-            fade_out=self._fade_out,
-        ))
+        self._particles.append(
+            _Particle(
+                sprite=sprite,
+                vx=vx,
+                vy=vy,
+                remaining=lt,
+                total_lifetime=lt,
+                fade_out=self._fade_out,
+            )
+        )

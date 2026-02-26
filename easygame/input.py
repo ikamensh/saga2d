@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 # InputEvent — frozen dataclass, public
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class InputEvent:
     """Translated input event with optional action mapping.
@@ -112,6 +113,7 @@ def _with_world_coords(
 # InputManager — internal, accessed via game.input
 # ---------------------------------------------------------------------------
 
+
 class InputManager:
     """Translates raw backend events into :class:`InputEvent` objects.
 
@@ -184,20 +186,24 @@ class InputManager:
         for event in raw_events:
             if isinstance(event, KeyEvent):
                 action = self._key_to_action.get(event.key)
-                result.append(InputEvent(
-                    type=event.type,
-                    key=event.key,
-                    action=action,
-                ))
+                result.append(
+                    InputEvent(
+                        type=event.type,
+                        key=event.key,
+                        action=action,
+                    )
+                )
             elif isinstance(event, MouseEvent):
-                result.append(InputEvent(
-                    type=event.type,
-                    x=event.x,
-                    y=event.y,
-                    button=event.button,
-                    dx=event.dx,
-                    dy=event.dy,
-                ))
+                result.append(
+                    InputEvent(
+                        type=event.type,
+                        x=event.x,
+                        y=event.y,
+                        button=event.button,
+                        dx=event.dx,
+                        dy=event.dy,
+                    )
+                )
             # WindowEvent is intentionally skipped — handled by Game.tick().
         return result
 

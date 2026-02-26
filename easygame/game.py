@@ -130,7 +130,11 @@ class Game:
         # Tell the backend to (notionally) create a window.  The mock backend
         # stores the resolution; the pyglet backend opens a real window.
         self._backend.create_window(
-            resolution[0], resolution[1], title, fullscreen, visible,
+            resolution[0],
+            resolution[1],
+            title,
+            fullscreen,
+            visible,
         )
 
         # Set the module-level game reference so Sprite() can find us.
@@ -163,7 +167,9 @@ class Game:
             from easygame.assets import AssetManager as _AM
 
             scale = getattr(self._backend, "scale_factor", 1.0)
-            base_path = self._asset_path if self._asset_path is not None else Path("assets")
+            base_path = (
+                self._asset_path if self._asset_path is not None else Path("assets")
+            )
             self._assets = _AM(
                 self._backend,
                 base_path=base_path,
@@ -530,7 +536,8 @@ class Game:
                 non_window.append(event)
                 # Track mouse position from move and drag events.
                 if isinstance(event, MouseEvent) and event.type in (
-                    "move", "drag",
+                    "move",
+                    "drag",
                 ):
                     self._mouse_x = float(event.x)
                     self._mouse_y = float(event.y)
@@ -670,7 +677,8 @@ class Game:
     # ------------------------------------------------------------------
 
     def _sync_sprites_to_camera(
-        self, camera: Camera,
+        self,
+        camera: Camera,
     ) -> list[tuple[Any, int, int, bool]]:
         """Shift all sprite backend positions by the camera offset.
 
@@ -693,7 +701,9 @@ class Game:
         for sprite in list(self._all_sprites):
             # Compute the draw corner (world-space top-left of the image).
             anchor_dx, anchor_dy = _anchor_offset(
-                sprite._anchor, sprite._img_w, sprite._img_h,
+                sprite._anchor,
+                sprite._img_w,
+                sprite._img_h,
             )
             world_draw_x = sprite._x - anchor_dx
             world_draw_y = sprite._y - anchor_dy
@@ -717,7 +727,11 @@ class Game:
             effective_visible = sprite._visible and in_view
 
             # Save original backend state for restoration.
-            rec = self._backend.sprites[sprite._sprite_id] if hasattr(self._backend, "sprites") else None
+            rec = (
+                self._backend.sprites[sprite._sprite_id]
+                if hasattr(self._backend, "sprites")
+                else None
+            )
             if rec is not None:
                 saved.append((sprite, rec["x"], rec["y"], rec["visible"]))
             else:
@@ -739,7 +753,8 @@ class Game:
         return saved
 
     def _restore_sprites(
-        self, saved: list[tuple[Any, int, int, bool]],
+        self,
+        saved: list[tuple[Any, int, int, bool]],
     ) -> None:
         """Restore sprite backend positions after the camera-adjusted draw.
 

@@ -60,7 +60,7 @@ class Scene:
     def _get_owned_sprites(self) -> set[Sprite]:
         """Return the owned-sprites set, creating it lazily."""
         try:
-            return self._owned_sprites  # type: ignore[has-type]
+            return self._owned_sprites
         except AttributeError:
             self._owned_sprites: set[Sprite] = set()
             return self._owned_sprites
@@ -112,7 +112,7 @@ class Scene:
     def _get_owned_timers(self) -> set[TimerHandle]:
         """Return the owned-timer set, creating it lazily."""
         try:
-            return self._owned_timers  # type: ignore[has-type]
+            return self._owned_timers
         except AttributeError:
             self._owned_timers: set[TimerHandle] = set()
             return self._owned_timers
@@ -184,7 +184,7 @@ class Scene:
     def _get_owned_emitters(self) -> set[Any]:
         """Return the owned-emitter set, creating it lazily."""
         try:
-            return self._owned_emitters  # type: ignore[has-type]
+            return self._owned_emitters
         except AttributeError:
             self._owned_emitters: set[Any] = set()
             return self._owned_emitters
@@ -258,7 +258,12 @@ class Scene:
             opacity: Extra opacity multiplier (0.0–1.0, default 1.0).
         """
         self.game._backend.draw_rect(
-            int(x), int(y), int(width), int(height), color, opacity=opacity,
+            int(x),
+            int(y),
+            int(width),
+            int(height),
+            color,
+            opacity=opacity,
         )
 
     def draw_world_rect(
@@ -296,7 +301,12 @@ class Scene:
             )
         sx, sy = self.camera.world_to_screen(x, y)
         self.game._backend.draw_rect(
-            int(sx), int(sy), int(width), int(height), color, opacity=opacity,
+            int(sx),
+            int(sy),
+            int(width),
+            int(height),
+            color,
+            opacity=opacity,
         )
 
     # ------------------------------------------------------------------

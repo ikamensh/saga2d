@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 # Custom exception
 # ---------------------------------------------------------------------------
 
+
 class AssetNotFoundError(FileNotFoundError):
     """Raised when an asset file cannot be found.
 
@@ -42,6 +43,7 @@ class AssetNotFoundError(FileNotFoundError):
 # ---------------------------------------------------------------------------
 # AssetManager
 # ---------------------------------------------------------------------------
+
 
 class AssetManager:
     """Convention-based asset loader with caching.
@@ -65,7 +67,9 @@ class AssetManager:
         self._base_path = Path(base_path)
         self._scale_factor = scale_factor
         self._image_cache: dict[str, Any] = {}
-        self._swapped_cache: dict[tuple[str, tuple[Any, ...]], Any] = {}  # (name, color_swap.cache_key()) -> handle
+        self._swapped_cache: dict[
+            tuple[str, tuple[Any, ...]], Any
+        ] = {}  # (name, color_swap.cache_key()) -> handle
         self._frames_cache: dict[str, list[str]] = {}
         self._sound_cache: dict[str, Any] = {}
         # Music paths are cached (not handles) because streaming sources
@@ -152,8 +156,7 @@ class AssetManager:
         if self._scale_factor >= 1.5:
             tried.insert(0, str(_make_2x_path(base_path)))
         raise AssetNotFoundError(
-            f"Image asset '{name}' not found.  "
-            f"Looked in: {', '.join(tried)}"
+            f"Image asset '{name}' not found.  Looked in: {', '.join(tried)}"
         )
 
     # ------------------------------------------------------------------
@@ -193,13 +196,9 @@ class AssetManager:
                 f"Looked for: {full_prefix.parent / pattern}"
             )
 
-        names = [
-            str(m.relative_to(images_dir).with_suffix(""))
-            for m in matches
-        ]
+        names = [str(m.relative_to(images_dir).with_suffix("")) for m in matches]
         self._frames_cache[prefix] = names
         return names
-
 
     # ------------------------------------------------------------------
     # Sound loading
@@ -229,7 +228,10 @@ class AssetManager:
             return self._sound_cache[name]
 
         path = self._resolve_audio_path(
-            name, self._base_path / "sounds", self._SOUND_EXTENSIONS, "Sound",
+            name,
+            self._base_path / "sounds",
+            self._SOUND_EXTENSIONS,
+            "Sound",
         )
         handle = self._backend.load_sound(str(path))
         self._sound_cache[name] = handle
@@ -283,8 +285,7 @@ class AssetManager:
             if path.exists():
                 return path
             raise AssetNotFoundError(
-                f"{kind} asset '{name}' not found.  "
-                f"Looked in: {path}"
+                f"{kind} asset '{name}' not found.  Looked in: {path}"
             )
 
         tried: list[str] = []
@@ -295,8 +296,7 @@ class AssetManager:
                 return path
 
         raise AssetNotFoundError(
-            f"{kind} asset '{name}' not found.  "
-            f"Looked in: {', '.join(tried)}"
+            f"{kind} asset '{name}' not found.  Looked in: {', '.join(tried)}"
         )
 
 

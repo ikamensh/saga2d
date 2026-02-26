@@ -27,7 +27,8 @@ from __future__ import annotations
 
 import copy
 import math
-from typing import TYPE_CHECKING, Any, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from easygame.animation import AnimationDef
@@ -37,6 +38,7 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 # Base class
 # ---------------------------------------------------------------------------
+
 
 class Action:
     """Base class for all composable actions."""
@@ -58,8 +60,8 @@ class Action:
         Store the sprite reference for use during :meth:`update`.
         """
 
-    def update(self, dt: float) -> bool:
-        """Advance by *dt* seconds.  Return ``True`` when done.
+    def update(self, _dt: float) -> bool:
+        """Advance by *_dt* seconds.  Return ``True`` when done.
 
         Called each frame by the sprite's action update loop.
         Return ``False`` while still running, ``True`` when complete.
@@ -78,6 +80,7 @@ class Action:
 # Sequence
 # ---------------------------------------------------------------------------
 
+
 class Sequence(Action):
     """Run actions one after another.
 
@@ -89,7 +92,8 @@ class Sequence(Action):
         for i, action in enumerate(actions):
             if not isinstance(action, Action):
                 raise TypeError(
-                    f"Sequence child {i} is {type(action).__name__}, expected Action"
+                    "Sequence child %s is %s, expected Action"
+                    % (i, type(action).__name__)
                 )
         self._actions = list(actions)
         self._index = 0
@@ -128,6 +132,7 @@ class Sequence(Action):
 # Parallel
 # ---------------------------------------------------------------------------
 
+
 class Parallel(Action):
     """Run actions simultaneously.
 
@@ -140,7 +145,8 @@ class Parallel(Action):
         for i, action in enumerate(actions):
             if not isinstance(action, Action):
                 raise TypeError(
-                    f"Parallel child {i} is {type(action).__name__}, expected Action"
+                    "Parallel child %s is %s, expected Action"
+                    % (i, type(action).__name__)
                 )
         self._actions = list(actions)
         self._done: list[bool] = [False] * len(actions)
@@ -180,6 +186,7 @@ class Parallel(Action):
 # Delay
 # ---------------------------------------------------------------------------
 
+
 class Delay(Action):
     """Wait for *seconds*, then finish."""
 
@@ -199,6 +206,7 @@ class Delay(Action):
 # Do
 # ---------------------------------------------------------------------------
 
+
 class Do(Action):
     """Call *fn* once, then finish immediately (instant action)."""
 
@@ -208,7 +216,7 @@ class Do(Action):
     def start(self, sprite: Sprite) -> None:
         pass
 
-    def update(self, dt: float) -> bool:
+    def update(self, _dt: float) -> bool:
         self._fn()
         return True
 
@@ -216,6 +224,7 @@ class Do(Action):
 # ---------------------------------------------------------------------------
 # PlayAnim
 # ---------------------------------------------------------------------------
+
 
 class PlayAnim(Action):
     """Play an animation on the sprite.
@@ -248,7 +257,7 @@ class PlayAnim(Action):
     def _on_complete(self) -> None:
         self._done = True
 
-    def update(self, dt: float) -> bool:
+    def update(self, _dt: float) -> bool:
         return self._done
 
     def stop(self) -> None:
@@ -259,6 +268,7 @@ class PlayAnim(Action):
 # ---------------------------------------------------------------------------
 # MoveTo
 # ---------------------------------------------------------------------------
+
 
 class MoveTo(Action):
     """Move the sprite to *position* at *speed* pixels per second.
@@ -303,6 +313,7 @@ class MoveTo(Action):
 # FadeOut
 # ---------------------------------------------------------------------------
 
+
 class FadeOut(Action):
     """Fade opacity from current value to 0 over *duration* seconds."""
 
@@ -334,6 +345,7 @@ class FadeOut(Action):
 # ---------------------------------------------------------------------------
 # FadeIn
 # ---------------------------------------------------------------------------
+
 
 class FadeIn(Action):
     """Fade opacity from current value to 255 over *duration* seconds."""
@@ -369,6 +381,7 @@ class FadeIn(Action):
 # Remove
 # ---------------------------------------------------------------------------
 
+
 class Remove(Action):
     """Call ``sprite.remove()`` and finish immediately (instant action)."""
 
@@ -388,6 +401,7 @@ class Remove(Action):
 # ---------------------------------------------------------------------------
 # Repeat
 # ---------------------------------------------------------------------------
+
 
 class Repeat(Action):
     """Repeat *action* a fixed number of times, or forever.

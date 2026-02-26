@@ -116,7 +116,8 @@ class Camera:
 
     @world_bounds.setter
     def world_bounds(
-        self, value: tuple[float, float, float, float] | None,
+        self,
+        value: tuple[float, float, float, float] | None,
     ) -> None:
         self._world_bounds = value
         self._clamp()
@@ -134,9 +135,7 @@ class Camera:
             ValueError: If *x* or *y* is NaN or Inf.
         """
         if not math.isfinite(x) or not math.isfinite(y):
-            raise ValueError(
-                "camera coordinates must be finite (not NaN or Inf)"
-            )
+            raise ValueError("camera coordinates must be finite (not NaN or Inf)")
         self._cancel_pan()
         self._follow_target = None
         self._x = x - self._vw / 2
@@ -261,13 +260,17 @@ class Camera:
     # ------------------------------------------------------------------
 
     def screen_to_world(
-        self, sx: float, sy: float,
+        self,
+        sx: float,
+        sy: float,
     ) -> tuple[float, float]:
         """Convert screen (logical) coordinates to world coordinates."""
         return (sx + self._x, sy + self._y)
 
     def world_to_screen(
-        self, wx: float, wy: float,
+        self,
+        wx: float,
+        wy: float,
     ) -> tuple[float, float]:
         """Convert world coordinates to screen (logical) coordinates."""
         return (wx - self._x, wy - self._y)
@@ -321,11 +324,19 @@ class Camera:
             target_y = max(top, min(target_y, bottom - self._vh))
 
         self._pan_tween_x = tween(
-            self, "_x", self._x, target_x, duration,
+            self,
+            "_x",
+            self._x,
+            target_x,
+            duration,
             ease=ease,
         )
         self._pan_tween_y = tween(
-            self, "_y", self._y, target_y, duration,
+            self,
+            "_y",
+            self._y,
+            target_y,
+            duration,
             ease=ease,
             on_complete=self._on_pan_complete,
         )
@@ -366,11 +377,7 @@ class Camera:
                 self._clamp()
 
         # 2. Edge scroll.
-        if (
-            self._edge_scroll_enabled
-            and mouse_x is not None
-            and mouse_y is not None
-        ):
+        if self._edge_scroll_enabled and mouse_x is not None and mouse_y is not None:
             scroll_dx = 0.0
             scroll_dy = 0.0
             margin = self._edge_margin
@@ -415,9 +422,15 @@ class Camera:
                 self._shake_duration = 0.0
             else:
                 progress = self._shake_elapsed / self._shake_duration
-                decayed_intensity = self._shake_intensity * (1.0 - progress) ** self._shake_decay
-                self._shake_offset_x = random.uniform(-decayed_intensity, decayed_intensity)
-                self._shake_offset_y = random.uniform(-decayed_intensity, decayed_intensity)
+                decayed_intensity = (
+                    self._shake_intensity * (1.0 - progress) ** self._shake_decay
+                )
+                self._shake_offset_x = random.uniform(
+                    -decayed_intensity, decayed_intensity
+                )
+                self._shake_offset_y = random.uniform(
+                    -decayed_intensity, decayed_intensity
+                )
 
     # ------------------------------------------------------------------
     # Internals

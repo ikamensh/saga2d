@@ -121,12 +121,20 @@ def compute_content_size(
 
     if layout == Layout.VERTICAL:
         width = max(cw for cw, _ in children_sizes) + 2 * padding
-        height = sum(ch for _, ch in children_sizes) + (len(children_sizes) - 1) * spacing + 2 * padding
+        height = (
+            sum(ch for _, ch in children_sizes)
+            + (len(children_sizes) - 1) * spacing
+            + 2 * padding
+        )
         return (width, height)
 
     if layout == Layout.HORIZONTAL:
         height = max(ch for _, ch in children_sizes) + 2 * padding
-        width = sum(cw for cw, _ in children_sizes) + (len(children_sizes) - 1) * spacing + 2 * padding
+        width = (
+            sum(cw for cw, _ in children_sizes)
+            + (len(children_sizes) - 1) * spacing
+            + 2 * padding
+        )
         return (width, height)
 
     valid = ", ".join(lay.name for lay in Layout)

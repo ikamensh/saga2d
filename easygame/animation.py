@@ -41,6 +41,7 @@ from typing import Any, Callable
 # AnimationDef — public, re-exported from easygame
 # ---------------------------------------------------------------------------
 
+
 class AnimationDef:
     """Reusable animation template.
 
@@ -73,16 +74,13 @@ class AnimationDef:
             desc = f"prefix={self.frames!r}"
         else:
             desc = f"{len(self.frames)} frames"
-        return (
-            f"AnimationDef({desc}, "
-            f"duration={self.frame_duration}, "
-            f"loop={self.loop})"
-        )
+        return f"AnimationDef({desc}, duration={self.frame_duration}, loop={self.loop})"
 
 
 # ---------------------------------------------------------------------------
 # AnimationPlayer — internal, NOT re-exported
 # ---------------------------------------------------------------------------
+
 
 class AnimationPlayer:
     """Internal per-sprite playback state.

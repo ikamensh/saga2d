@@ -153,8 +153,12 @@ class ProgressBar(Component):
         if self._game is None:
             return
         theme = self._game.theme
-        bg = self._bg_color if self._bg_color is not None else theme.progressbar_bg_color
-        bar = self._bar_color if self._bar_color is not None else theme.progressbar_color
+        bg = (
+            self._bg_color if self._bg_color is not None else theme.progressbar_bg_color
+        )
+        bar = (
+            self._bar_color if self._bar_color is not None else theme.progressbar_color
+        )
 
         # Background track (full width)
         self._game._backend.draw_rect(
@@ -180,6 +184,7 @@ class ProgressBar(Component):
 # ---------------------------------------------------------------------------
 # Word-wrap helper
 # ---------------------------------------------------------------------------
+
 
 def _word_wrap(text: str, max_width: int, font_size: int) -> list[str]:
     """Split *text* into lines that fit within *max_width* pixels.
@@ -217,6 +222,7 @@ def _word_wrap(text: str, max_width: int, font_size: int) -> list[str]:
 # ---------------------------------------------------------------------------
 # TextBox
 # ---------------------------------------------------------------------------
+
 
 class TextBox(Component):
     """Multi-line text display with word wrapping and optional typewriter effect.
@@ -422,6 +428,7 @@ class TextBox(Component):
         if self._game is not None:
             return self._game.theme.resolve_label_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_label_style(self.style)
 
     def _wrap(self, font_size: int, max_width: int) -> list[str]:
@@ -438,6 +445,7 @@ class TextBox(Component):
 # ---------------------------------------------------------------------------
 # List
 # ---------------------------------------------------------------------------
+
 
 class List(Component):
     """Scrollable list of selectable text items with keyboard navigation.
@@ -640,6 +648,7 @@ class List(Component):
         if self._game is not None:
             return self._game.theme.resolve_list_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_list_style(self.style)
 
     def _visible_count(self) -> int:
@@ -674,7 +683,8 @@ class List(Component):
             self._selected_index = 0 if delta > 0 else len(self._items) - 1
         else:
             self._selected_index = max(
-                0, min(self._selected_index + delta, len(self._items) - 1),
+                0,
+                min(self._selected_index + delta, len(self._items) - 1),
             )
         self._ensure_selected_visible()
         if self.on_select is not None:
@@ -684,6 +694,7 @@ class List(Component):
 # ---------------------------------------------------------------------------
 # Grid
 # ---------------------------------------------------------------------------
+
 
 class Grid(Component):
     """Grid of fixed-size cells, each optionally holding a child component.
@@ -888,13 +899,20 @@ class Grid(Component):
 
                 # Cell background.
                 self._game._backend.draw_rect(
-                    cx, cy, self._cell_w, self._cell_h, cell_bg,
+                    cx,
+                    cy,
+                    self._cell_w,
+                    self._cell_h,
+                    cell_bg,
                 )
 
                 # Highlight selected cell.
                 if self._selected == (col, row):
                     self._game._backend.draw_rect(
-                        cx, cy, self._cell_w, self._cell_h,
+                        cx,
+                        cy,
+                        self._cell_w,
+                        self._cell_h,
                         theme.selected_color,
                     )
 
@@ -905,6 +923,7 @@ class Grid(Component):
         if self._game is not None:
             return self._game.theme.resolve_grid_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_grid_style(self.style)
 
     def _cell_at(self, x: int, y: int) -> tuple[int, int] | None:
@@ -946,6 +965,7 @@ class Grid(Component):
 # ---------------------------------------------------------------------------
 # Tooltip
 # ---------------------------------------------------------------------------
+
 
 class Tooltip(Component):
     """Hover popup that appears after a delay and renders on top.
@@ -1104,7 +1124,10 @@ class Tooltip(Component):
 
         # Background rectangle.
         self._game._backend.draw_rect(
-            draw_x, draw_y, box_w, box_h,
+            draw_x,
+            draw_y,
+            box_w,
+            box_h,
             resolved.background_color,
         )
 
@@ -1125,12 +1148,14 @@ class Tooltip(Component):
         if self._game is not None:
             return self._game.theme.resolve_tooltip_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_tooltip_style(self.style)
 
 
 # ---------------------------------------------------------------------------
 # TabGroup
 # ---------------------------------------------------------------------------
+
 
 class TabGroup(Component):
     """Tabbed container that switches between content components.
@@ -1215,9 +1240,7 @@ class TabGroup(Component):
         """
         if label not in self._tab_components:
             available = ", ".join(repr(k) for k in self._tab_labels)
-            raise KeyError(
-                f"No tab named {label!r}; available tabs: {available}"
-            )
+            raise KeyError(f"No tab named {label!r}; available tabs: {available}")
         self._active_tab = label
         self._sync_visibility()
         self._mark_layout_dirty()
@@ -1304,7 +1327,11 @@ class TabGroup(Component):
             # Tab header background.
             bg = theme.tab_active_color if is_active else theme.tab_inactive_color
             self._game._backend.draw_rect(
-                x, y, tw, self._tab_height, bg,
+                x,
+                y,
+                tw,
+                self._tab_height,
+                bg,
             )
 
             # Tab label text, vertically centred.
@@ -1325,7 +1352,10 @@ class TabGroup(Component):
         remaining = self._computed_w - (x - self._computed_x)
         if remaining > 0:
             self._game._backend.draw_rect(
-                x, y, remaining, self._tab_height,
+                x,
+                y,
+                remaining,
+                self._tab_height,
                 theme.tab_inactive_color,
             )
 
@@ -1345,17 +1375,20 @@ class TabGroup(Component):
     def _sync_visibility(self) -> None:
         """Set ``visible=True`` on the active tab's component, ``False`` on others."""
         for label, comp in self._tab_components.items():
-            comp.visible = (label == self._active_tab)
+            comp.visible = label == self._active_tab
 
     def _resolve_style(self) -> ResolvedStyle:
         """Merge explicit style with tab-group defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_tabgroup_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_tabgroup_style(self.style)
 
     def _compute_tab_widths(
-        self, font_size: int, padding: int,
+        self,
+        font_size: int,
+        padding: int,
     ) -> list[int]:
         """Compute pixel width for each tab header from text measurement."""
         widths: list[int] = []
@@ -1383,6 +1416,7 @@ class TabGroup(Component):
 # ---------------------------------------------------------------------------
 # DataTable
 # ---------------------------------------------------------------------------
+
 
 class DataTable(Component):
     """Table with column headers and data rows.
@@ -1565,7 +1599,10 @@ class DataTable(Component):
 
         # -- Header row ----------------------------------------------------
         self._game._backend.draw_rect(
-            x0, y0, self._computed_w, self._header_height,
+            x0,
+            y0,
+            self._computed_w,
+            self._header_height,
             theme.datatable_header_bg_color,
         )
 
@@ -1600,13 +1637,20 @@ class DataTable(Component):
                 row_bg = theme.datatable_alt_row_bg_color
 
             self._game._backend.draw_rect(
-                x0, row_y, self._computed_w, self._row_height, row_bg,
+                x0,
+                row_y,
+                self._computed_w,
+                self._row_height,
+                row_bg,
             )
 
             # Selection highlight (drawn on top of the row background).
             if ri == self._selected_row:
                 self._game._backend.draw_rect(
-                    x0, row_y, self._computed_w, self._row_height,
+                    x0,
+                    row_y,
+                    self._computed_w,
+                    self._row_height,
                     theme.selected_color,
                 )
 
@@ -1637,6 +1681,7 @@ class DataTable(Component):
         if self._game is not None:
             return self._game.theme.resolve_datatable_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_datatable_style(self.style)
 
     def _effective_col_widths(self, padding: int) -> list[int]:
@@ -1691,6 +1736,7 @@ class DataTable(Component):
             self._selected_row = 0 if delta > 0 else len(self._rows) - 1
         else:
             self._selected_row = max(
-                0, min(self._selected_row + delta, len(self._rows) - 1),
+                0,
+                min(self._selected_row + delta, len(self._rows) - 1),
             )
         self._ensure_selected_visible()

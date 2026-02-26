@@ -16,6 +16,8 @@ All coordinates stay in *logical* space (no y-flip, no scaling, no offset).
 
 from __future__ import annotations
 
+from typing import Any
+
 from PIL import Image
 
 from easygame.backends.base import (
@@ -50,19 +52,19 @@ class MockBackend:
 
         #: Registered sprites.  ``sprite_id -> {image, x, y, opacity,
         #: visible, layer}``.
-        self.sprites: dict[str, dict] = {}
+        self.sprites: dict[str, dict[str, Any]] = {}
 
         #: ``draw_text`` calls accumulated during the **current** frame.
         #: Cleared on every :meth:`begin_frame`.
-        self.texts: list[dict] = []
+        self.texts: list[dict[str, Any]] = []
 
         #: ``draw_rect`` calls accumulated during the **current** frame.
         #: Cleared on every :meth:`begin_frame`.
-        self.rects: list[dict] = []
+        self.rects: list[dict[str, Any]] = []
 
         #: ``draw_image`` calls accumulated during the **current** frame.
         #: Cleared on every :meth:`begin_frame`.
-        self.images: list[dict] = []
+        self.images: list[dict[str, Any]] = []
 
         #: ``load_font`` registrations. ``name -> path`` (path may be None for system fonts).
         self.fonts: dict[str, str | None] = {}
@@ -78,7 +80,7 @@ class MockBackend:
         #: Every ``play_sound`` call appended here (cumulative, never
         #: cleared automatically).  Each entry is ``{"handle": str,
         #: "volume": float}``.
-        self.sounds_played: list[dict] = []
+        self.sounds_played: list[dict[str, Any]] = []
 
         #: Handle string of the music track currently playing, or
         #: ``None`` if nothing is playing.
@@ -91,7 +93,7 @@ class MockBackend:
         # === Music player tracking =====================================
 
         #: ``player_id -> {handle, volume, loop, playing}``
-        self._music_players: dict[str, dict] = {}
+        self._music_players: dict[str, dict[str, Any]] = {}
 
         # === Event injection (how tests simulate input) ================
 
@@ -100,9 +102,9 @@ class MockBackend:
         # === Handle bookkeeping ========================================
 
         self._next_id: int = 0
-        self._loaded_images: dict[str, str] = {}   # path -> handle
-        self._loaded_sounds: dict[str, str] = {}    # path -> handle
-        self._loaded_music: dict[str, str] = {}     # path -> handle
+        self._loaded_images: dict[str, str] = {}  # path -> handle
+        self._loaded_sounds: dict[str, str] = {}  # path -> handle
+        self._loaded_music: dict[str, str] = {}  # path -> handle
 
         # === Image size tracking ============================================
 
@@ -284,14 +286,16 @@ class MockBackend:
         opacity: float = 1.0,
     ) -> None:
         """Record a rect draw call for the current frame."""
-        self.rects.append({
-            "x": x,
-            "y": y,
-            "width": width,
-            "height": height,
-            "color": color,
-            "opacity": opacity,
-        })
+        self.rects.append(
+            {
+                "x": x,
+                "y": y,
+                "width": width,
+                "height": height,
+                "color": color,
+                "opacity": opacity,
+            }
+        )
 
     def load_font(self, name: str, path: str | None = None) -> str:
         """Register a font and return a handle like ``"font_name"``."""
@@ -311,16 +315,18 @@ class MockBackend:
         anchor_y: str = "baseline",
     ) -> None:
         """Record a text draw call for the current frame."""
-        self.texts.append({
-            "text": text,
-            "x": x,
-            "y": y,
-            "font_size": font_size,
-            "color": color,
-            "font": font,
-            "anchor_x": anchor_x,
-            "anchor_y": anchor_y,
-        })
+        self.texts.append(
+            {
+                "text": text,
+                "x": x,
+                "y": y,
+                "font_size": font_size,
+                "color": color,
+                "font": font,
+                "anchor_x": anchor_x,
+                "anchor_y": anchor_y,
+            }
+        )
 
     def draw_image(
         self,
@@ -333,14 +339,16 @@ class MockBackend:
         opacity: float = 1.0,
     ) -> None:
         """Record an image draw call for the current frame."""
-        self.images.append({
-            "image": image_handle,
-            "x": x,
-            "y": y,
-            "width": width,
-            "height": height,
-            "opacity": opacity,
-        })
+        self.images.append(
+            {
+                "image": image_handle,
+                "x": x,
+                "y": y,
+                "width": width,
+                "height": height,
+                "opacity": opacity,
+            }
+        )
 
     # ==================================================================
     # Backend protocol — audio
@@ -397,10 +405,7 @@ class MockBackend:
         # If we just stopped the player that was providing music_playing,
         # see if any other player is still active.
         if self.music_playing == player["handle"]:
-            active = [
-                p for p in self._music_players.values()
-                if p["playing"]
-            ]
+            active = [p for p in self._music_players.values() if p["playing"]]
             if active:
                 last = active[-1]
                 self.music_playing = last["handle"]
@@ -502,7 +507,10 @@ class MockBackend:
         self.cursor_visible = visible
 
     def set_image_size(
-        self, image_handle: str, width: int, height: int,
+        self,
+        image_handle: str,
+        width: int,
+        height: int,
     ) -> None:
         """Set the size returned by :meth:`get_image_size` for *image_handle*.
 

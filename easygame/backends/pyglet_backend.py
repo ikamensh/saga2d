@@ -76,6 +76,7 @@ def _buttons_to_name(buttons: int) -> str | None:
 # PygletBackend
 # ---------------------------------------------------------------------------
 
+
 class PygletBackend:
     """GPU-accelerated backend using pyglet 2.x.
 
@@ -137,7 +138,9 @@ class PygletBackend:
             self.offset_y = (physical_h - logical_h * self.scale_factor) / 2
 
     def _to_physical(
-        self, logical_x: float, logical_y: float,
+        self,
+        logical_x: float,
+        logical_y: float,
     ) -> tuple[float, float]:
         """Convert framework logical coords → pyglet physical coords.
 
@@ -146,13 +149,14 @@ class PygletBackend:
         """
         physical_x = logical_x * self.scale_factor + self.offset_x
         physical_y = (
-            (self.logical_height - logical_y) * self.scale_factor
-            + self.offset_y
-        )
+            self.logical_height - logical_y
+        ) * self.scale_factor + self.offset_y
         return physical_x, physical_y
 
     def _to_logical(
-        self, physical_x: float, physical_y: float,
+        self,
+        physical_x: float,
+        physical_y: float,
     ) -> tuple[int, int]:
         """Convert pyglet physical coords → framework logical coords.
 
@@ -160,8 +164,7 @@ class PygletBackend:
         """
         logical_x = (physical_x - self.offset_x) / self.scale_factor
         logical_y = (
-            self.logical_height
-            - (physical_y - self.offset_y) / self.scale_factor
+            self.logical_height - (physical_y - self.offset_y) / self.scale_factor
         )
         return int(logical_x), int(logical_y)
 
@@ -200,7 +203,10 @@ class PygletBackend:
 
         # Compute viewport from actual physical window size.
         self._compute_viewport(
-            width, height, self.window.width, self.window.height,
+            width,
+            height,
+            self.window.width,
+            self.window.height,
         )
 
         # --- Register event handlers ONCE ---------------------------------
@@ -220,24 +226,34 @@ class PygletBackend:
 
         @self.window.event
         def on_mouse_press(
-            x: int, y: int, button: int, modifiers: int,
+            x: int,
+            y: int,
+            button: int,
+            modifiers: int,
         ) -> None:
             lx, ly = backend._to_logical(x, y)
             backend._event_queue.append(
                 MouseEvent(
-                    type="click", x=lx, y=ly,
+                    type="click",
+                    x=lx,
+                    y=ly,
                     button=_button_to_name(button),
                 ),
             )
 
         @self.window.event
         def on_mouse_release(
-            x: int, y: int, button: int, modifiers: int,
+            x: int,
+            y: int,
+            button: int,
+            modifiers: int,
         ) -> None:
             lx, ly = backend._to_logical(x, y)
             backend._event_queue.append(
                 MouseEvent(
-                    type="release", x=lx, y=ly,
+                    type="release",
+                    x=lx,
+                    y=ly,
                     button=_button_to_name(button),
                 ),
             )
@@ -251,8 +267,12 @@ class PygletBackend:
 
         @self.window.event
         def on_mouse_drag(
-            x: int, y: int, dx: int, dy: int,
-            buttons: int, modifiers: int,
+            x: int,
+            y: int,
+            dx: int,
+            dy: int,
+            buttons: int,
+            modifiers: int,
         ) -> None:
             lx, ly = backend._to_logical(x, y)
             ldx = int(dx / backend.scale_factor)
@@ -260,19 +280,30 @@ class PygletBackend:
             button = _buttons_to_name(buttons)
             backend._event_queue.append(
                 MouseEvent(
-                    type="drag", x=lx, y=ly, button=button, dx=ldx, dy=ldy,
+                    type="drag",
+                    x=lx,
+                    y=ly,
+                    button=button,
+                    dx=ldx,
+                    dy=ldy,
                 ),
             )
 
         @self.window.event
         def on_mouse_scroll(
-            x: int, y: int, scroll_x: float, scroll_y: float,
+            x: int,
+            y: int,
+            scroll_x: float,
+            scroll_y: float,
         ) -> None:
             lx, ly = backend._to_logical(x, y)
             backend._event_queue.append(
                 MouseEvent(
-                    type="scroll", x=lx, y=ly,
-                    dx=int(scroll_x), dy=int(scroll_y),
+                    type="scroll",
+                    x=lx,
+                    y=ly,
+                    dx=int(scroll_x),
+                    dy=int(scroll_y),
                 ),
             )
 
@@ -286,8 +317,10 @@ class PygletBackend:
         @self.window.event
         def on_resize(new_width: int, new_height: int) -> None:
             backend._compute_viewport(
-                backend.logical_width, backend.logical_height,
-                new_width, new_height,
+                backend.logical_width,
+                backend.logical_height,
+                new_width,
+                new_height,
             )
             backend._event_queue.append(WindowEvent(type="resize"))
 
@@ -299,7 +332,12 @@ class PygletBackend:
             return
         if clear_color is not None:
             import pyglet.gl as gl
-            r, g, b = clear_color[0] / 255.0, clear_color[1] / 255.0, clear_color[2] / 255.0
+
+            r, g, b = (
+                clear_color[0] / 255.0,
+                clear_color[1] / 255.0,
+                clear_color[2] / 255.0,
+            )
             a = clear_color[3] / 255.0 if len(clear_color) > 3 else 1.0
             gl.glClearColor(r, g, b, a)
         self.window.clear()
@@ -334,6 +372,7 @@ class PygletBackend:
 
     def get_dt(self) -> float:
         import pyglet
+
         return pyglet.clock.tick()
 
     def quit(self) -> None:
@@ -356,16 +395,19 @@ class PygletBackend:
     ) -> Any:
         """Create a solid-color image (PygletBackend-specific, for demos)."""
         import pyglet
+
         pattern = pyglet.image.SolidColorImagePattern((r, g, b, a))
         return pattern.create_image(width, height)
 
     def load_image(self, path: str) -> Any:
         import pyglet
+
         return pyglet.image.load(path)
 
     def load_image_from_pil(self, pil_image: Any) -> Any:
         """Create a pyglet image from a PIL Image (RGBA)."""
         import pyglet
+
         raw = pil_image.tobytes()
         # PIL is top-down; negative pitch tells pyglet the row order
         img_data = pyglet.image.ImageData(
@@ -383,9 +425,12 @@ class PygletBackend:
         layer_order: int,
     ) -> int:
         import pyglet
+
         group = pyglet.graphics.Group(order=layer_order)
         pyg_sprite = pyglet.sprite.Sprite(
-            image_handle, batch=self.batch, group=group,
+            image_handle,
+            batch=self.batch,
+            group=group,
         )
         sid = self._next_sprite_id
         self._next_sprite_id += 1
@@ -428,6 +473,7 @@ class PygletBackend:
         Replaces the sprite's group with a new one at the given *order*.
         """
         import pyglet
+
         pyg = self._sprites[sprite_id]
         pyg.group = pyglet.graphics.Group(order=order)
 
@@ -478,6 +524,7 @@ class PygletBackend:
         if self.batch is None:
             return
         import pyglet
+
         # Framework (x,y) is top-left; pyglet Rectangle expects bottom-left.
         phys_tl_x, phys_tl_y = self._to_physical(x, y)
         phys_br_x, phys_br_y = self._to_physical(x + width, y + height)
@@ -500,6 +547,7 @@ class PygletBackend:
         """Register a font from *path* or use system font when path is None."""
         if path is not None:
             import pyglet
+
             pyglet.font.add_file(path)
         return name
 
@@ -518,6 +566,7 @@ class PygletBackend:
         if self.batch is None:
             return
         import pyglet
+
         font_name = font if font is not None else "sans-serif"
         physical_size = int(font_size * self.scale_factor)
         phys_x, phys_y = self._to_physical(x, y)
@@ -579,6 +628,7 @@ class PygletBackend:
 
     def load_sound(self, path: str) -> Any:
         import pyglet
+
         return pyglet.media.load(path, streaming=False)
 
     def play_sound(self, handle: Any, volume: float = 1.0) -> None:
@@ -587,6 +637,7 @@ class PygletBackend:
 
     def load_music(self, path: str) -> Any:
         import pyglet
+
         return pyglet.media.load(path, streaming=True)
 
     def play_music(
@@ -597,6 +648,7 @@ class PygletBackend:
         volume: float = 1.0,
     ) -> Any:
         import pyglet
+
         player = pyglet.media.Player()
         player.queue(handle)
         player.loop = loop
@@ -625,13 +677,16 @@ class PygletBackend:
         if self.window is None:
             return
         import pyglet
+
         if image_handle is None:
             self.window.set_mouse_cursor(None)
             return
         # Pyglet uses y-up for hot_y; framework uses y-down.
         hot_y = image_handle.height - hotspot_y
         cursor = pyglet.window.ImageMouseCursor(
-            image_handle, hot_x=hotspot_x, hot_y=hot_y,
+            image_handle,
+            hot_x=hotspot_x,
+            hot_y=hot_y,
         )
         self.window.set_mouse_cursor(cursor)
 

@@ -16,7 +16,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable, Literal
 
 from easygame.ui.component import Component
-from easygame.ui.layout import Layout, compute_anchor_position, compute_content_size, compute_flow_layout
+from easygame.ui.layout import (
+    Layout,
+    compute_anchor_position,
+    compute_content_size,
+    compute_flow_layout,
+)
 from easygame.ui.theme import ResolvedStyle, Style
 
 if TYPE_CHECKING:
@@ -26,6 +31,7 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 # Text size heuristic
 # ---------------------------------------------------------------------------
+
 
 def _estimate_text_width(text: str, font_size: int) -> int:
     """Estimate rendered text width using a per-character heuristic.
@@ -62,6 +68,7 @@ def _estimate_text_width(text: str, font_size: int) -> int:
 # ---------------------------------------------------------------------------
 # Label
 # ---------------------------------------------------------------------------
+
 
 def _merge_label_style(
     style: Style | None,
@@ -147,7 +154,11 @@ class Label(Component):
         """
         resolved = self._resolve_style()
         font_size = resolved.font_size
-        w = _estimate_text_width(self._text, font_size) if self._width is None else self._width
+        w = (
+            _estimate_text_width(self._text, font_size)
+            if self._width is None
+            else self._width
+        )
         h = int(font_size * 1.4) if self._height is None else self._height
         return (w, h)
 
@@ -177,12 +188,14 @@ class Label(Component):
             return self._game.theme.resolve_label_style(self.style)
         # Fallback when not yet attached to a game tree.
         from easygame.ui.theme import Theme
+
         return Theme().resolve_label_style(self.style)
 
 
 # ---------------------------------------------------------------------------
 # Button
 # ---------------------------------------------------------------------------
+
 
 class Button(Component):
     """Clickable button with hover / press visual states.
@@ -323,8 +336,10 @@ class Button(Component):
 
         # Background rect.
         self._game._backend.draw_rect(
-            self._computed_x, self._computed_y,
-            self._computed_w, self._computed_h,
+            self._computed_x,
+            self._computed_y,
+            self._computed_w,
+            self._computed_h,
             resolved.background_color,
         )
 
@@ -354,12 +369,14 @@ class Button(Component):
         if self._game is not None:
             return self._game.theme.resolve_button_style(self.style, state)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_button_style(self.style, state)
 
 
 # ---------------------------------------------------------------------------
 # Panel
 # ---------------------------------------------------------------------------
+
 
 class Panel(Component):
     """Container component with optional background and flow layout.
@@ -430,7 +447,10 @@ class Panel(Component):
         if self._layout in (Layout.VERTICAL, Layout.HORIZONTAL):
             children_sizes = [c.get_preferred_size() for c in self._children]
             content_w, content_h = compute_content_size(
-                self._layout, children_sizes, self._spacing, padding,
+                self._layout,
+                children_sizes,
+                self._spacing,
+                padding,
             )
             w = self._width if self._width is not None else content_w
             h = self._height if self._height is not None else content_h
@@ -451,7 +471,14 @@ class Panel(Component):
 
         if self._anchor is not None:
             ax, ay = compute_anchor_position(
-                self._anchor, x, y, w, h, own_w, own_h, self._margin,
+                self._anchor,
+                x,
+                y,
+                w,
+                h,
+                own_w,
+                own_h,
+                self._margin,
             )
             self._computed_x = ax
             self._computed_y = ay
@@ -473,20 +500,28 @@ class Panel(Component):
             children_sizes = [c.get_preferred_size() for c in self._children]
             positions = compute_flow_layout(
                 self._layout,
-                self._computed_x, self._computed_y,
-                self._computed_w, self._computed_h,
-                children_sizes, self._spacing, padding,
+                self._computed_x,
+                self._computed_y,
+                self._computed_w,
+                self._computed_h,
+                children_sizes,
+                self._spacing,
+                padding,
             )
             for child, (cx, cy), (cw, ch) in zip(
-                self._children, positions, children_sizes,
+                self._children,
+                positions,
+                children_sizes,
             ):
                 child.compute_layout(cx, cy, cw, ch)
         else:
             # Layout.NONE: each child gets the full panel bounds.
             for child in self._children:
                 child.compute_layout(
-                    self._computed_x, self._computed_y,
-                    self._computed_w, self._computed_h,
+                    self._computed_x,
+                    self._computed_y,
+                    self._computed_w,
+                    self._computed_h,
                 )
 
     # -- Drawing -----------------------------------------------------------
@@ -499,8 +534,10 @@ class Panel(Component):
         bg = resolved.background_color
         if bg is not None:
             self._game._backend.draw_rect(
-                self._computed_x, self._computed_y,
-                self._computed_w, self._computed_h,
+                self._computed_x,
+                self._computed_y,
+                self._computed_w,
+                self._computed_h,
                 bg,
             )
 
@@ -511,4 +548,5 @@ class Panel(Component):
         if self._game is not None:
             return self._game.theme.resolve_panel_style(self.style)
         from easygame.ui.theme import Theme
+
         return Theme().resolve_panel_style(self.style)

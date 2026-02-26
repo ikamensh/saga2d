@@ -40,25 +40,27 @@ if TYPE_CHECKING:
 # Internal drag session state
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class _DragSession:
     """Bookkeeping for one active drag operation."""
 
-    source: Component           # the component being dragged
-    data: Any                   # the drag_data payload
-    start_x: int                # mouse-down position
+    source: Component  # the component being dragged
+    data: Any  # the drag_data payload
+    start_x: int  # mouse-down position
     start_y: int
-    ghost_x: int                # current ghost top-left position
+    ghost_x: int  # current ghost top-left position
     ghost_y: int
-    ghost_offset_x: int         # offset from cursor to ghost top-left
+    ghost_offset_x: int  # offset from cursor to ghost top-left
     ghost_offset_y: int
     current_target: Component | None  # component under cursor with drop_accept
-    target_accepts: bool        # result of drop_accept(data) on current_target
+    target_accepts: bool  # result of drop_accept(data) on current_target
 
 
 # ---------------------------------------------------------------------------
 # DragManager
 # ---------------------------------------------------------------------------
+
 
 class DragManager:
     """Coordinates drag-and-drop sessions within a scene's UI tree.

@@ -18,6 +18,7 @@ from typing import Any, Callable
 # Easing functions (quadratic, t in 0.0..1.0)
 # ---------------------------------------------------------------------------
 
+
 def _ease_linear(t: float) -> float:
     return t
 
@@ -37,6 +38,7 @@ def _ease_in_out(t: float) -> float:
 # ---------------------------------------------------------------------------
 # Ease enum
 # ---------------------------------------------------------------------------
+
 
 class Ease(Enum):
     """Easing curves for tween interpolation (quadratic)."""
@@ -59,6 +61,7 @@ _EASE_FNS: dict[Ease, Callable[[float], float]] = {
 # _Tween — internal
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class _Tween:
     """Internal tween state."""
@@ -77,6 +80,7 @@ class _Tween:
 # ---------------------------------------------------------------------------
 # TweenManager
 # ---------------------------------------------------------------------------
+
 
 class TweenManager:
     """Manages active tweens. Updates property values each frame."""
@@ -100,13 +104,9 @@ class TweenManager:
         if not hasattr(target, prop):
             raise AttributeError(f"'{type(target).__name__}' has no attribute '{prop}'")
         if not math.isfinite(from_val):
-            raise ValueError(
-                f"from_val must be finite, got {from_val}"
-            )
+            raise ValueError(f"from_val must be finite, got {from_val}")
         if not math.isfinite(to_val):
-            raise ValueError(
-                f"to_val must be finite, got {to_val}"
-            )
+            raise ValueError(f"to_val must be finite, got {to_val}")
         tween_id = self._next_id
         self._next_id += 1
         self._tweens[tween_id] = _Tween(
@@ -128,9 +128,7 @@ class TweenManager:
 
     def cancel_by_target(self, target: object) -> None:
         """Cancel all active tweens targeting *target*."""
-        to_remove = [
-            tid for tid, t in self._tweens.items() if t.target is target
-        ]
+        to_remove = [tid for tid, t in self._tweens.items() if t.target is target]
         for tid in to_remove:
             self._tweens[tid].cancelled = True
             del self._tweens[tid]
@@ -174,6 +172,7 @@ _tween_manager: TweenManager | None = None
 # Public tween() function
 # ---------------------------------------------------------------------------
 
+
 def tween(
     target: Any,
     prop: str,
@@ -193,6 +192,11 @@ def tween(
             "No active Game. Create a Game instance before calling tween()."
         )
     return _tween_manager.create(
-        target, prop, from_val, to_val, duration,
-        ease=ease, on_complete=on_complete,
+        target,
+        prop,
+        from_val,
+        to_val,
+        duration,
+        ease=ease,
+        on_complete=on_complete,
     )

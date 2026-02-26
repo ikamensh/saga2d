@@ -39,6 +39,7 @@ _current_game: Any = None
 # Anchor offset helper
 # ---------------------------------------------------------------------------
 
+
 def _anchor_offset(
     anchor: SpriteAnchor,
     img_w: int,
@@ -86,6 +87,7 @@ def _anchor_offset(
 # Sprite
 # ---------------------------------------------------------------------------
 
+
 class Sprite:
     """A visible game object rendered via the backend batch.
 
@@ -130,6 +132,7 @@ class Sprite:
         swap = color_swap
         if swap is None and team_palette is not None:
             from easygame.rendering.color_swap import get_palette
+
             swap = get_palette(team_palette)
         if swap is not None:
             self._image_handle = self._assets.image_swapped(image, swap)
@@ -168,7 +171,8 @@ class Sprite:
         order = self._compute_order()
         self._last_order: int = order
         self._sprite_id = self._backend.create_sprite(
-            self._image_handle, order,
+            self._image_handle,
+            order,
         )
 
         # Register in the game's sprite registry (for camera render sync).
@@ -191,9 +195,7 @@ class Sprite:
         new_x = float(value[0])
         new_y = float(value[1])
         if not (math.isfinite(new_x) and math.isfinite(new_y)):
-            raise ValueError(
-                f"Sprite position must be finite, got ({new_x}, {new_y})"
-            )
+            raise ValueError(f"Sprite position must be finite, got ({new_x}, {new_y})")
         if new_x == self._x and new_y == self._y:
             return
         self._x = new_x
@@ -506,12 +508,20 @@ class Sprite:
             self._on_move_arrive(on_arrive)
 
         tid_x = tween(
-            self, "x", self._x, target_x, duration,
+            self,
+            "x",
+            self._x,
+            target_x,
+            duration,
             ease=use_ease,
             on_complete=_on_axis_done,
         )
         tid_y = tween(
-            self, "y", self._y, target_y, duration,
+            self,
+            "y",
+            self._y,
+            target_y,
+            duration,
             ease=use_ease,
             on_complete=_on_axis_done,
         )

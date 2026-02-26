@@ -178,7 +178,14 @@ class Component:
 
         if self._anchor is not None:
             ax, ay = compute_anchor_position(
-                self._anchor, x, y, w, h, own_w, own_h, self._margin,
+                self._anchor,
+                x,
+                y,
+                w,
+                h,
+                own_w,
+                own_h,
+                self._margin,
             )
             self._computed_x = ax
             self._computed_y = ay
@@ -351,6 +358,7 @@ class Component:
 # ---------------------------------------------------------------------------
 # _UIRoot — invisible root container for a scene's UI tree
 # ---------------------------------------------------------------------------
+
 
 class _UIRoot(Component):
     """Root component of a scene's UI tree.  Covers the full logical screen.
