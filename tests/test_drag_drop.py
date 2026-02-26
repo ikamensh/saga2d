@@ -160,8 +160,12 @@ class TestComponentDragAttributes:
         assert c.drag_data == "sword"
 
     def test_drop_target_set(self) -> None:
-        accept_fn = lambda data: isinstance(data, str)
-        drop_fn = lambda comp, data: None
+        def accept_fn(data: object) -> bool:
+            return isinstance(data, str)
+
+        def drop_fn(comp: object, data: object) -> None:
+            pass
+
         c = Component(
             width=10, height=10,
             drop_accept=accept_fn,
