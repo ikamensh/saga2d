@@ -19,13 +19,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
-from easygame.ui.layout import Anchor
-from easygame.ui.theme import Style
+from saga2d.ui.layout import Anchor
+from saga2d.ui.theme import Style
 
 if TYPE_CHECKING:
-    from easygame.game import Game
-    from easygame.input import InputEvent
-    from easygame.ui.drag_drop import DragManager
+    from saga2d.game import Game
+    from saga2d.input import InputEvent
+    from saga2d.ui.drag_drop import DragManager
 
 
 class Component:
@@ -172,7 +172,7 @@ class Component:
         within ``(x, y, w, h)`` according to that anchor.  Otherwise it
         fills the given bounds (or uses its preferred size).
         """
-        from easygame.ui.layout import compute_anchor_position
+        from saga2d.ui.layout import compute_anchor_position
 
         own_w, own_h = self.get_preferred_size()
 
@@ -397,7 +397,7 @@ class _UIRoot(Component):
         intercepts events during an active drag and draws ghost overlays.
         """
         if self._drag_manager is None:
-            from easygame.ui.drag_drop import DragManager as _DM
+            from saga2d.ui.drag_drop import DragManager as _DM
 
             self._drag_manager = _DM(self)
         return self._drag_manager

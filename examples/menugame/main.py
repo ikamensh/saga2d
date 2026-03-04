@@ -1,4 +1,4 @@
-from easygame import Game, Scene, Button, Label, Panel, Layout, Anchor
+from saga2d import Game, Scene, Button, Label, Panel, Layout, Anchor
 
 class MenuScene(Scene):
     def on_enter(self) -> None:

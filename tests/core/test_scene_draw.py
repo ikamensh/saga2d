@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.mock_backend import MockBackend
-from easygame.rendering.camera import Camera
+from saga2d import Game, Scene
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.rendering.camera import Camera
 
 
 # ------------------------------------------------------------------

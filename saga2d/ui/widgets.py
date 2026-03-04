@@ -23,12 +23,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
-from easygame.ui.component import Component
-from easygame.ui.components import _estimate_text_width
-from easygame.ui.theme import ResolvedStyle, Style
+from saga2d.ui.component import Component
+from saga2d.ui.components import _estimate_text_width
+from saga2d.ui.theme import ResolvedStyle, Style
 
 if TYPE_CHECKING:
-    from easygame.input import InputEvent
+    from saga2d.input import InputEvent
 
 # RGBA tuple
 Color = tuple[int, int, int, int]
@@ -427,7 +427,7 @@ class TextBox(Component):
         """
         if self._game is not None:
             return self._game.theme.resolve_label_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_label_style(self.style)
 
@@ -647,7 +647,7 @@ class List(Component):
         """Merge explicit style with list defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_list_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_list_style(self.style)
 
@@ -922,7 +922,7 @@ class Grid(Component):
         """Merge explicit style with grid defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_grid_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_grid_style(self.style)
 
@@ -1147,7 +1147,7 @@ class Tooltip(Component):
         """Merge explicit style with tooltip defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_tooltip_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_tooltip_style(self.style)
 
@@ -1381,7 +1381,7 @@ class TabGroup(Component):
         """Merge explicit style with tab-group defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_tabgroup_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_tabgroup_style(self.style)
 
@@ -1680,7 +1680,7 @@ class DataTable(Component):
         """Merge explicit style with datatable defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_datatable_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_datatable_style(self.style)
 

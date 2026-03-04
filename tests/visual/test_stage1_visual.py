@@ -10,9 +10,9 @@ Lifecycle hooks print to the console.
 
 from __future__ import annotations
 
-from easygame import Game, Scene
-from easygame.backends.base import KeyEvent
-from easygame.backends.pyglet_backend import PygletBackend
+from saga2d import Game, Scene
+from saga2d.backends.base import KeyEvent
+from saga2d.backends.pyglet_backend import PygletBackend
 
 
 class MainScene(Scene):

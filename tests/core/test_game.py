@@ -1,7 +1,7 @@
 """Tests for Game, mock backend, tick/quit/run behavior."""
 
-from easygame import Game, Scene
-from easygame.backends.mock_backend import MockBackend
+from saga2d import Game, Scene
+from saga2d.backends.mock_backend import MockBackend
 
 
 class InputTrackingScene(Scene):

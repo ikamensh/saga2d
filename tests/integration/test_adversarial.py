@@ -17,7 +17,7 @@ from typing import Any, cast
 
 import pytest
 
-from easygame import (
+from saga2d import (
     Action,
     Camera,
     Delay,
@@ -31,16 +31,16 @@ from easygame import (
     Sprite,
     tween,
 )
-from easygame.assets import AssetManager, AssetNotFoundError
-from easygame.backends.base import Backend
-from easygame.backends.mock_backend import MockBackend
-from easygame.input import InputEvent
-from easygame.save import SaveManager
-from easygame.scene import SceneStack
-from easygame.ui import Anchor, Button, Component, Label, Layout, Panel
-from easygame.ui.component import _UIRoot
-from easygame.ui.widgets import Tooltip
-from easygame.util.fsm import StateMachine
+from saga2d.assets import AssetManager, AssetNotFoundError
+from saga2d.backends.base import Backend
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.input import InputEvent
+from saga2d.save import SaveManager
+from saga2d.scene import SceneStack
+from saga2d.ui import Anchor, Button, Component, Label, Layout, Panel
+from saga2d.ui.component import _UIRoot
+from saga2d.ui.widgets import Tooltip
+from saga2d.util.fsm import StateMachine
 
 
 # ------------------------------------------------------------------

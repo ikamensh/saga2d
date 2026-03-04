@@ -32,8 +32,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from easygame.input import InputEvent
-    from easygame.ui.component import Component, _UIRoot
+    from saga2d.input import InputEvent
+    from saga2d.ui.component import Component, _UIRoot
 
 
 # ---------------------------------------------------------------------------

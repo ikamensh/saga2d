@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from easygame.assets import AssetManager, AssetNotFoundError
-from easygame.backends.mock_backend import MockBackend
+from saga2d.assets import AssetManager, AssetNotFoundError
+from saga2d.backends.mock_backend import MockBackend
 
 
 @pytest.fixture
@@ -210,7 +210,7 @@ def test_game_asset_path_parameter_uses_custom_path(
     asset_dir: Path,
 ) -> None:
     """Game(asset_path=...) creates AssetManager with that base path."""
-    from easygame import Game
+    from saga2d import Game
 
     game = Game(
         "Test",
@@ -227,7 +227,7 @@ def test_game_asset_path_parameter_uses_custom_path(
 
 def test_game_assets_property_creates_manager() -> None:
     """Game.assets lazily creates an AssetManager."""
-    from easygame import Game
+    from saga2d import Game
 
     game = Game("Test", backend="mock", resolution=(800, 600))
     mgr = game.assets
@@ -237,7 +237,7 @@ def test_game_assets_property_creates_manager() -> None:
 
 def test_game_assets_is_same_instance() -> None:
     """Accessing game.assets twice returns the same instance."""
-    from easygame import Game
+    from saga2d import Game
 
     game = Game("Test", backend="mock", resolution=(800, 600))
 
@@ -246,7 +246,7 @@ def test_game_assets_is_same_instance() -> None:
 
 def test_game_assets_can_be_overridden() -> None:
     """game.assets can be set to a custom AssetManager (overrides asset_path)."""
-    from easygame import Game
+    from saga2d import Game
 
     game = Game(
         "Test",

@@ -6,12 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Do, Game, Scene, Sprite
-from easygame.actions import Action
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
-from easygame.rendering.sprite import _anchor_offset
+from saga2d import Do, Game, Scene, Sprite
+from saga2d.actions import Action
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d.rendering.sprite import _anchor_offset
 
 
 # ------------------------------------------------------------------
@@ -496,7 +496,7 @@ def test_initial_visible_false_synced(game: Game, backend: MockBackend) -> None:
 
 def test_no_game_raises_runtime_error(asset_dir: Path) -> None:
     """Creating a Sprite when no Game exists raises RuntimeError."""
-    import easygame.rendering.sprite as sprite_mod
+    import saga2d.rendering.sprite as sprite_mod
 
     old = sprite_mod._current_game
     try:

@@ -2,9 +2,9 @@
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.input import InputEvent
-from easygame.scene import SceneStack
+from saga2d import Game, Scene
+from saga2d.input import InputEvent
+from saga2d.scene import SceneStack
 
 
 class TrackingScene(Scene):

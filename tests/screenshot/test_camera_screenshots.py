@@ -23,9 +23,9 @@ from pathlib import Path
 import pytest
 from PIL import Image, ImageDraw
 
-from easygame import Scene, Sprite
-from easygame.rendering.camera import Camera
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d import Scene, Sprite
+from saga2d.rendering.camera import Camera
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
 
 from tests.screenshot.harness import assert_screenshot, render_scene
 

@@ -27,10 +27,10 @@ if str(_project_root) not in sys.path:
 
 from PIL import Image  # noqa: E402
 
-from easygame import ColorSwap, Game, ParticleEmitter, Scene, Sprite  # noqa: E402
-from easygame.assets import AssetManager  # noqa: E402
-from easygame.input import InputEvent  # noqa: E402
-from easygame.backends.pyglet_backend import PygletBackend  # noqa: E402
+from saga2d import ColorSwap, Game, ParticleEmitter, Scene, Sprite  # noqa: E402
+from saga2d.assets import AssetManager  # noqa: E402
+from saga2d.input import InputEvent  # noqa: E402
+from saga2d.backends.pyglet_backend import PygletBackend  # noqa: E402
 
 
 def _create_assets(tmp: Path) -> None:

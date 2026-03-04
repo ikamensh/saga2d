@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Scene, Sprite
-from easygame.rendering.color_swap import ColorSwap, register_palette
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d import Scene, Sprite
+from saga2d.rendering.color_swap import ColorSwap, register_palette
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
 
 from tests.screenshot.harness import assert_screenshot, render_scene
 

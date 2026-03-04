@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Scene, StateMachine
-from easygame.ui import Anchor, Label, Layout, Panel, Style
+from saga2d import Scene, StateMachine
+from saga2d.ui import Anchor, Label, Layout, Panel, Style
 
 from tests.screenshot.harness import assert_screenshot, render_scene
 

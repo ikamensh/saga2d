@@ -12,15 +12,15 @@ import pytest
 
 from PIL import Image
 
-from easygame import (
+from saga2d import (
     ColorSwap,
     Game,
     Sprite,
     get_palette,
     register_palette,
 )
-from easygame.assets import AssetManager, AssetNotFoundError
-from easygame.backends.mock_backend import MockBackend
+from saga2d.assets import AssetManager, AssetNotFoundError
+from saga2d.backends.mock_backend import MockBackend
 
 
 # ------------------------------------------------------------------

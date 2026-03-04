@@ -22,11 +22,11 @@ import math
 import random
 from typing import TYPE_CHECKING, Any
 
-from easygame.util.tween import Ease
+from saga2d.util.tween import Ease
 
 if TYPE_CHECKING:
-    from easygame.input import InputEvent
-    from easygame.rendering.sprite import Sprite
+    from saga2d.input import InputEvent
+    from saga2d.rendering.sprite import Sprite
 
 
 class Camera:
@@ -304,8 +304,8 @@ class Camera:
         """
         if not math.isfinite(x) or not math.isfinite(y):
             raise ValueError(f"pan_to requires finite x and y, got ({x}, {y})")
-        from easygame.util import tween as tween_mod
-        from easygame.util.tween import Ease, tween
+        from saga2d.util import tween as tween_mod
+        from saga2d.util.tween import Ease, tween
 
         # Capture the instance tween manager so _cancel_pan doesn't rely on
         # the module-level global (which may point to a different Game).

@@ -32,8 +32,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from easygame.animation import AnimationDef
-    from easygame.rendering.sprite import Sprite
+    from saga2d.animation import AnimationDef
+    from saga2d.rendering.sprite import Sprite
 
 
 # ---------------------------------------------------------------------------

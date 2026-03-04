@@ -670,8 +670,11 @@ adds a generator module called from `generate_assets.py`. Assets go to both
 `assets/images/sprites/` (tests) and the local example/tutorial dir.
 
 **Import style:** Flat from `easygame` — never from subpackages:
+
 ```python
-from easygame import Game, Scene, Sprite, Camera, Panel, Label, Button, ...
+from saga2d import Game, Scene, Sprite, Camera, Panel, Label, Button,
+
+...
 ```
 
 **Scene cleanup:** Sprites registered via `scene.add_sprite()` are auto-removed after

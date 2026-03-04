@@ -22,21 +22,21 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable
 from weakref import WeakSet
 
-from easygame.backends.base import Event, MouseEvent, WindowEvent
-from easygame.input import _with_world_coords
-from easygame.scene import Scene, SceneStack
+from saga2d.backends.base import Event, MouseEvent, WindowEvent
+from saga2d.input import _with_world_coords
+from saga2d.scene import Scene, SceneStack
 
 if TYPE_CHECKING:
-    from easygame.assets import AssetManager
-    from easygame.audio import AudioManager
-    from easygame.backends.base import Backend
-    from easygame.cursor import CursorManager
-    from easygame.input import InputManager
-    from easygame.rendering.camera import Camera
-    from easygame.save import SaveManager
-    from easygame.ui.hud import HUD
-    from easygame.ui.theme import Theme
-    from easygame.util.timer import TimerHandle
+    from saga2d.assets import AssetManager
+    from saga2d.audio import AudioManager
+    from saga2d.backends.base import Backend
+    from saga2d.cursor import CursorManager
+    from saga2d.input import InputManager
+    from saga2d.rendering.camera import Camera
+    from saga2d.save import SaveManager
+    from saga2d.ui.hud import HUD
+    from saga2d.ui.theme import Theme
+    from saga2d.util.timer import TimerHandle
 
 _logger = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ class Game:
         save_dir: Path | str | None = None,
         asset_path: Path | str | None = None,
     ) -> None:
-        import easygame.rendering.sprite as _sprite_mod
+        import saga2d.rendering.sprite as _sprite_mod
 
         if _sprite_mod._current_game is not None:
             raise RuntimeError(
@@ -93,11 +93,11 @@ class Game:
         # --- Backend selection ------------------------------------------------
         self._backend: Backend
         if backend == "mock":
-            from easygame.backends.mock_backend import MockBackend
+            from saga2d.backends.mock_backend import MockBackend
 
             self._backend = MockBackend(resolution[0], resolution[1])
         elif backend == "pyglet":
-            from easygame.backends.pyglet_backend import PygletBackend
+            from saga2d.backends.pyglet_backend import PygletBackend
 
             self._backend = PygletBackend()
         elif hasattr(backend, "poll_events"):  # duck-type check
@@ -126,9 +126,9 @@ class Game:
         self._mouse_x: float | None = None
         self._mouse_y: float | None = None
 
-        import easygame.util.tween as _tween_mod
-        from easygame.input import InputManager
-        from easygame.util.timer import TimerManager
+        import saga2d.util.tween as _tween_mod
+        from saga2d.input import InputManager
+        from saga2d.util.timer import TimerManager
 
         self._input = InputManager()
 
@@ -148,7 +148,7 @@ class Game:
         # Only set globals after window creation succeeds — avoids leaving
         # stale references if create_window() raises.
         _tween_mod._tween_manager = self._tween_manager
-        import easygame.rendering.sprite as _sprite_mod
+        import saga2d.rendering.sprite as _sprite_mod
 
         _sprite_mod._current_game = self
 
@@ -174,7 +174,7 @@ class Game:
         directly to override the base path or scale factor.
         """
         if self._assets is None:
-            from easygame.assets import AssetManager as _AM
+            from saga2d.assets import AssetManager as _AM
 
             scale = getattr(self._backend, "scale_factor", 1.0)
             base_path = (
@@ -199,7 +199,7 @@ class Game:
         :attr:`assets` manager.
         """
         if self._audio is None:
-            from easygame.audio import AudioManager as _AM
+            from saga2d.audio import AudioManager as _AM
 
             self._audio = _AM(self._backend, self.assets)
         return self._audio
@@ -216,7 +216,7 @@ class Game:
         styles.  Set ``game.theme`` to override the default theme.
         """
         if self._theme is None:
-            from easygame.ui.theme import Theme as _Theme
+            from saga2d.ui.theme import Theme as _Theme
 
             self._theme = _Theme()
         return self._theme
@@ -236,7 +236,7 @@ class Game:
             game.cursor.set("default")  # restore system cursor
         """
         if self._cursor is None:
-            from easygame.cursor import CursorManager as _CM
+            from saga2d.cursor import CursorManager as _CM
 
             self._cursor = _CM(self._backend, self.assets)
         return self._cursor
@@ -260,7 +260,7 @@ class Game:
         or ``~/.{game_title_slug}/saves/`` by default.
         """
         if self._save_manager is None:
-            from easygame.save import SaveManager as _SM
+            from saga2d.save import SaveManager as _SM
 
             if self._save_dir_override is not None:
                 save_dir = self._save_dir_override
@@ -286,7 +286,7 @@ class Game:
             game.hud.add(Label("Gold: 0", anchor=Anchor.TOP_RIGHT))
         """
         if self._hud is None:
-            from easygame.ui.hud import HUD as _HUD
+            from saga2d.ui.hud import HUD as _HUD
 
             self._hud = _HUD(self)
         return self._hud
@@ -392,7 +392,7 @@ class Game:
             screens:     List of :class:`MessageScreen` instances.
             on_complete: Callback fired after the last screen is dismissed.
         """
-        from easygame.ui.screens import _SequenceRunner
+        from saga2d.ui.screens import _SequenceRunner
 
         runner = _SequenceRunner(screens, on_complete=on_complete)
         self.push(runner)
@@ -407,7 +407,7 @@ class Game:
 
         Press Escape or click Back to dismiss.
         """
-        from easygame.ui.screens import _SettingsScene
+        from saga2d.ui.screens import _SettingsScene
 
         self.push(_SettingsScene())
 
@@ -510,15 +510,15 @@ class Game:
         # other (relevant in test suites).
         if sys.meta_path is None:
             return  # Python shutting down; imports would fail
-        import easygame.rendering.sprite as _sprite_mod
-        import easygame.util.tween as _tween_mod
+        import saga2d.rendering.sprite as _sprite_mod
+        import saga2d.util.tween as _tween_mod
 
         if _sprite_mod._current_game is self:
             _sprite_mod._current_game = None
         if _tween_mod._tween_manager is self._tween_manager:
             _tween_mod._tween_manager = None
 
-        import easygame.rendering.color_swap as _cs_mod
+        import saga2d.rendering.color_swap as _cs_mod
 
         _cs_mod._clear_palettes()
 
@@ -733,7 +733,7 @@ class Game:
         Returns a list of ``(sprite, orig_x, orig_y, orig_visible)`` tuples
         so positions can be restored after drawing.
         """
-        from easygame.rendering.sprite import _anchor_offset
+        from saga2d.rendering.sprite import _anchor_offset
 
         cam_x = camera._x + camera.shake_offset_x
         cam_y = camera._y + camera.shake_offset_y

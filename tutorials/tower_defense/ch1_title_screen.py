@@ -52,7 +52,7 @@ if not _asset_dir.exists():
 # ---------------------------------------------------------------------------
 # EasyGame imports — everything comes from the top-level ``easygame`` package.
 # ---------------------------------------------------------------------------
-from easygame import (  # noqa: E402
+from saga2d import (  # noqa: E402
     Anchor,        # Where a UI component sits within its parent
     Button,        # Clickable button with hover/press states
     Game,          # Top-level object: owns the window, scene stack, and loop

@@ -34,7 +34,7 @@ Every EasyGame program starts the same way: create a `Game`, define a `Scene`, a
 ### The Minimal Setup
 
 ```python
-from easygame import Game, Scene, Theme
+from saga2d import Game, Scene, Theme
 
 game = Game(
     "Tower Defense",

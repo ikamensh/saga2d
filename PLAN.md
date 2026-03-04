@@ -195,8 +195,10 @@ tests/
    ```
 
 **Validation — write and run `tests/test_stage0.py`:**
+
 ```python
-from easygame import Game, Scene
+from saga2d import Game, Scene
+
 
 class CountingScene(Scene):
     def __init__(self):
@@ -213,6 +215,7 @@ class CountingScene(Scene):
     def update(self, dt):
         self.updates += 1
 
+
 def test_scene_lifecycle():
     game = Game("Test", backend="mock")
     scene = CountingScene()
@@ -225,6 +228,7 @@ def test_scene_lifecycle():
 
     game.tick(dt=0.016)
     assert scene.updates == 2
+
 
 def test_scene_push_pop():
     game = Game("Test", backend="mock")
@@ -240,6 +244,7 @@ def test_scene_push_pop():
     assert scene_b.exited
     # scene_a should get on_reveal
 
+
 def test_input_dispatch():
     received = []
 
@@ -254,6 +259,7 @@ def test_input_dispatch():
     game.tick(dt=0.016)
     assert len(received) == 1
     assert received[0].key == "space"
+
 
 def test_quit():
     game = Game("Test", backend="mock")
@@ -446,11 +452,14 @@ easygame/
 5. `__init__.py` — re-export: `Game`, `Scene`
 
 **Validation — write and run `tests/test_stage1.py`:**
+
 ```python
-from easygame import Game, Scene
+from saga2d import Game, Scene
+
 
 class RedScene(Scene):
     """Draws a red-tinted screen. Press SPACE to push blue, ESC to pop."""
+
     def draw(self, ctx):
         pass  # just clear color for now
 
@@ -462,6 +471,7 @@ class RedScene(Scene):
             self.game.pop()
             return True
 
+
 class BlueScene(Scene):
     transparent = True  # should still see red underneath (once drawing exists)
 
@@ -469,6 +479,7 @@ class BlueScene(Scene):
         if event.type == "key_press" and event.key == "escape":
             self.game.pop()
             return True
+
 
 game = Game("Stage 1 Test", resolution=(1920, 1080), fullscreen=False)
 game.run(RedScene())
@@ -545,8 +556,10 @@ easygame/
    (via the batch). The scene's `draw()` is for additional custom drawing.
 
 **Validation — write and run `tests/test_stage2.py`:**
+
 ```python
-from easygame import Game, Scene, Sprite, RenderLayer
+from saga2d import Game, Scene, Sprite, RenderLayer
+
 
 class SpriteTest(Scene):
     def on_enter(self):
@@ -555,6 +568,7 @@ class SpriteTest(Scene):
         Sprite("sprites/tree", position=(500, 350), layer=RenderLayer.OBJECTS)
         Sprite("sprites/knight", position=(450, 420), layer=RenderLayer.UNITS)
         # Knight should appear in front of trees (UNITS > OBJECTS layer)
+
 
 game = Game("Stage 2 Test", fullscreen=False)
 game.run(SpriteTest())
@@ -615,12 +629,14 @@ easygame/
    advance all active animation players.
 
 **Validation — write and run `tests/test_stage3.py`:**
+
 ```python
-from easygame import Game, Scene, Sprite, AnimationDef
+from saga2d import Game, Scene, Sprite, AnimationDef
 
 idle = AnimationDef(frames="sprites/knight_idle", frame_duration=0.2, loop=True)
 walk = AnimationDef(frames="sprites/knight_walk", frame_duration=0.15, loop=True)
 attack = AnimationDef(frames="sprites/knight_attack", frame_duration=0.1, loop=False)
+
 
 class AnimTest(Scene):
     def on_enter(self):
@@ -631,6 +647,7 @@ class AnimTest(Scene):
         if event.type == "key_press" and event.key == "a":
             self.knight.play(attack, on_complete=lambda: self.knight.play(idle))
             return True
+
 
 game = Game("Stage 3 Test", fullscreen=False)
 game.run(AnimTest())
@@ -686,9 +703,11 @@ easygame/
 4. Wire timer and tween updates into the game loop, after scene update but before draw.
 
 **Validation — write and run `tests/test_stage4.py`:**
+
 ```python
-from easygame import Game, Scene, Sprite
-from easygame.util.tween import tween, Ease
+from saga2d import Game, Scene, Sprite
+from saga2d.util.tween import tween, Ease
+
 
 class TweenTest(Scene):
     def on_enter(self):
@@ -705,6 +724,7 @@ class TweenTest(Scene):
             # Click to move sprite there
             self.box.move_to((event.x, event.y), speed=300)
             return True
+
 
 game = Game("Stage 4 Test", fullscreen=False)
 game.run(TweenTest())
@@ -757,8 +777,10 @@ easygame/
    scenes see logical coordinates (0..1920, 0..1080), never physical pixels.
 
 **Validation — write and run `tests/test_stage5.py`:**
+
 ```python
-from easygame import Game, Scene
+from saga2d import Game, Scene
+
 
 class InputTest(Scene):
     def on_enter(self):
@@ -775,6 +797,7 @@ class InputTest(Scene):
         if event.type == "click":
             print(f"Clicked at logical ({event.x}, {event.y})")
             return True
+
 
 game = Game("Stage 5 Test", fullscreen=False)
 game.run(InputTest())
@@ -825,9 +848,11 @@ easygame/
    scenes). Scenes without a camera render sprites at their raw positions (no scroll).
 
 **Validation — write and run `tests/test_stage6.py`:**
+
 ```python
-from easygame import Game, Scene, Sprite, Camera, RenderLayer
+from saga2d import Game, Scene, Sprite, Camera, RenderLayer
 import random
+
 
 class WorldTest(Scene):
     def on_enter(self):
@@ -848,6 +873,7 @@ class WorldTest(Scene):
             world_pos = self.camera.screen_to_world(event.x, event.y)
             self.player.move_to(world_pos, speed=200)
             return True
+
 
 game = Game("Stage 6 Test", fullscreen=False)
 game.run(WorldTest())
@@ -903,8 +929,10 @@ easygame/
 4. Owned by Game: `game.audio`
 
 **Validation — write and run `tests/test_stage7.py`:**
+
 ```python
-from easygame import Game, Scene
+from saga2d import Game, Scene
+
 
 class AudioTest(Scene):
     def on_enter(self):
@@ -925,6 +953,7 @@ class AudioTest(Scene):
             vol = self.game.audio.get_volume("music")
             self.game.audio.set_volume("music", 0.0 if vol > 0 else 0.7)
             return True
+
 
 game = Game("Stage 7 Test", fullscreen=False)
 game.run(AudioTest())
@@ -1013,9 +1042,11 @@ easygame/
 6. Extend `__init__.py` re-exports for UI classes.
 
 **Validation — write and run `tests/test_stage8.py`:**
+
 ```python
-from easygame import Game, Scene
-from easygame.ui import Panel, Label, Button, Anchor, Layout, Style
+from saga2d import Game, Scene
+from saga2d.ui import Panel, Label, Button, Anchor, Layout, Style
+
 
 class MenuTest(Scene):
     def on_enter(self):
@@ -1025,6 +1056,7 @@ class MenuTest(Scene):
         panel.add(Button("Button 2", on_click=lambda: print("Clicked 2")))
         panel.add(Button("Quit", on_click=self.game.quit))
         self.ui.add(panel)
+
 
 game = Game("Stage 8 Test", fullscreen=False)
 game.run(MenuTest())
@@ -1121,12 +1153,14 @@ See DESIGN.md "Composable Actions" for the full API.
    - Active action's `update(dt)` is called each frame (alongside animation updates)
 
 **Validation — write and run `tests/test_stage10.py`:**
+
 ```python
-from easygame import Game, Scene, Sprite, AnimationDef
-from easygame.actions import Sequence, Parallel, Delay, Do, PlayAnim, MoveTo, FadeOut, Remove
+from saga2d import Game, Scene, Sprite, AnimationDef
+from saga2d.actions import Sequence, Parallel, Delay, Do, PlayAnim, MoveTo, FadeOut, Remove
 
 idle = AnimationDef(frames="sprites/knight_idle", frame_duration=0.2, loop=True)
 walk = AnimationDef(frames="sprites/knight_walk", frame_duration=0.15, loop=True)
+
 
 class ActionTest(Scene):
     def on_enter(self):
@@ -1139,6 +1173,7 @@ class ActionTest(Scene):
             Delay(1.0),
             Do(lambda: print("Sequence complete!")),
         ))
+
 
 game = Game("Stage 10 Test", fullscreen=False)
 game.run(ActionTest())

@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
-from easygame.input import InputEvent
-from easygame.ui import (
+from saga2d import Game
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.input import InputEvent
+from saga2d.ui import (
     Anchor,
     DataTable,
     Grid,
@@ -27,9 +27,9 @@ from easygame.ui import (
     Theme,
     Tooltip,
 )
-from easygame.ui.component import _UIRoot
-from easygame.ui.components import _estimate_text_width
-from easygame.ui.widgets import _word_wrap
+from saga2d.ui.component import _UIRoot
+from saga2d.ui.components import _estimate_text_width
+from saga2d.ui.widgets import _word_wrap
 
 
 # ------------------------------------------------------------------

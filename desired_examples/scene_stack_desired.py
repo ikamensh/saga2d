@@ -2,8 +2,8 @@
 Scene management: title screen → game world → inventory overlay → back.
 This is what we want it to look like with EasyGame.
 """
-from easygame import Game, Scene, Sprite
-from easygame.ui import Panel, Label, Button, List, Anchor, Layout, Style
+from saga2d import Game, Scene, Sprite
+from saga2d.ui import Panel, Label, Button, List, Anchor, Layout, Style
 
 
 class TitleScreen(Scene):

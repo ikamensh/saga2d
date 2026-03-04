@@ -1,6 +1,6 @@
 """Verify UI API pattern from acceptance criteria."""
-from easygame import Panel, Label, Button, Anchor, Layout, Style, Theme, Component
-from easygame.ui import Panel as UIPanel, Label as UILabel, Button as UIButton, Anchor as UIAnchor, Layout as UILayout
+from saga2d import Panel, Label, Button, Anchor, Layout, Style, Theme, Component
+from saga2d.ui import Panel as UIPanel, Label as UILabel, Button as UIButton, Anchor as UIAnchor, Layout as UILayout
 
 # Verify all imports work
 assert Panel is not None

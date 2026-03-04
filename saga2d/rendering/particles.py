@@ -30,10 +30,10 @@ import random
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
 
 if TYPE_CHECKING:
-    from easygame.rendering.sprite import Sprite
+    from saga2d.rendering.sprite import Sprite
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ class ParticleEmitter:
         fade_out: bool = True,
         layer: RenderLayer = RenderLayer.EFFECTS,
     ) -> None:
-        from easygame.rendering.sprite import _current_game
+        from saga2d.rendering.sprite import _current_game
 
         if _current_game is None:
             raise RuntimeError(
@@ -233,7 +233,7 @@ class ParticleEmitter:
 
     def _spawn_particle(self) -> None:
         """Create one particle sprite with randomised velocity and lifetime."""
-        from easygame.rendering.sprite import Sprite
+        from saga2d.rendering.sprite import Sprite
 
         image_name = random.choice(self._images)
 

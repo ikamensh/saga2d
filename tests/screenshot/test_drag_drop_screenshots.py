@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.ui import Anchor, Layout, Panel, Style
+from saga2d import Game, Scene
+from saga2d.ui import Anchor, Layout, Panel, Style
 
 from tests.screenshot.harness import assert_screenshot, render_scene
 

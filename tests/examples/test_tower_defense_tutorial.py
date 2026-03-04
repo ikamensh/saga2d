@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Theme
+from saga2d import Game, Theme
 
 _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:

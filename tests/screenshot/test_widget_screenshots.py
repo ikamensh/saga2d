@@ -17,8 +17,8 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.ui import (
+from saga2d import Game, Scene
+from saga2d.ui import (
     Anchor,
     Button,
     DataTable,

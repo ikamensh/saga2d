@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Sprite, Ease, tween
-from easygame.assets import AssetManager
-from easygame.rendering.layers import SpriteAnchor
-from easygame.util.tween import TweenManager
+from saga2d import Game, Sprite, Ease, tween
+from saga2d.assets import AssetManager
+from saga2d.rendering.layers import SpriteAnchor
+from saga2d.util.tween import TweenManager
 
 
 # ------------------------------------------------------------------
@@ -126,7 +126,7 @@ def test_tween_sprite_x_updates_backend(game: Game) -> None:
 
 def test_tween_no_game_raises(game: Game) -> None:
     """tween() before Game raises RuntimeError."""
-    import easygame.util.tween as tween_mod
+    import saga2d.util.tween as tween_mod
 
     old = tween_mod._tween_manager
     tween_mod._tween_manager = None

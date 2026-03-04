@@ -3,8 +3,8 @@ Multi-step game sequence: Heroes 2-style battle attack turn.
 Attacker walks forward, attacks, defender reacts, attacker walks back.
 This is what we want it to look like with EasyGame's composable Actions.
 """
-from easygame import Sprite, RenderLayer, ParticleEmitter
-from easygame.actions import (
+from saga2d import Sprite, RenderLayer, ParticleEmitter
+from saga2d.actions import (
     Sequence, Parallel, Delay, Do, PlayAnim, MoveTo, FadeOut, FadeIn, Remove, Repeat,
 )
 

@@ -4,11 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Sprite
-from easygame.animation import AnimationDef, AnimationPlayer
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
-from easygame.rendering.layers import SpriteAnchor
+from saga2d import Game, Sprite
+from saga2d.animation import AnimationDef, AnimationPlayer
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.rendering.layers import SpriteAnchor
 
 
 # ==================================================================
@@ -54,7 +54,7 @@ class TestAnimationDef:
         assert "sprites/walk" in r
 
     def test_importable_from_easygame(self) -> None:
-        from easygame import AnimationDef as AD
+        from saga2d import AnimationDef as AD
         assert AD is AnimationDef
 
 

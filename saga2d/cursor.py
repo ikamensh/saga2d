@@ -6,8 +6,8 @@ Game code uses ``game.cursor.set("attack")`` to change the cursor.
 
 from __future__ import annotations
 
-from easygame.assets import AssetManager
-from easygame.backends.base import Backend, ImageHandle
+from saga2d.assets import AssetManager
+from saga2d.backends.base import Backend, ImageHandle
 
 
 class CursorManager:

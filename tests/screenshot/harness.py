@@ -28,7 +28,7 @@ from typing import Callable
 
 from PIL import Image
 
-from easygame import Game
+from saga2d import Game
 
 # ---------------------------------------------------------------------------
 # Directory layout
@@ -69,8 +69,8 @@ def render_scene(
     Returns:
         A Pillow ``Image.Image`` (RGBA) of the captured framebuffer.
     """
-    import easygame.rendering.sprite as _sprite_mod
-    import easygame.util.tween as _tween_mod
+    import saga2d.rendering.sprite as _sprite_mod
+    import saga2d.util.tween as _tween_mod
 
     old_game = _sprite_mod._current_game
     old_tween = _tween_mod._tween_manager

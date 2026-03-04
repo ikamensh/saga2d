@@ -14,12 +14,12 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Scene, Sprite
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
-from easygame.input import InputEvent, _with_world_coords
-from easygame.rendering.camera import Camera
-from easygame.rendering.layers import SpriteAnchor
+from saga2d import Game, Scene, Sprite
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.input import InputEvent, _with_world_coords
+from saga2d.rendering.camera import Camera
+from saga2d.rendering.layers import SpriteAnchor
 
 
 # ------------------------------------------------------------------
@@ -850,7 +850,7 @@ class TestPanTo:
 
     def test_pan_to_with_custom_easing(self, game: Game) -> None:
         """pan_to accepts a custom ease value."""
-        from easygame.util.tween import Ease
+        from saga2d.util.tween import Ease
 
         cam = Camera((800, 600))
         cam.center_on(400, 300)
@@ -1287,7 +1287,7 @@ class TestPanToEaseRename:
 
     def test_pan_to_ease_keyword_works(self, game: Game) -> None:
         """pan_to accepts 'ease' keyword (renamed from 'easing')."""
-        from easygame.util.tween import Ease
+        from saga2d.util.tween import Ease
 
         cam = Camera((800, 600))
         cam.center_on(400, 300)

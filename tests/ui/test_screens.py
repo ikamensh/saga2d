@@ -14,10 +14,10 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.mock_backend import MockBackend
-from easygame.save import SaveManager
-from easygame.ui.screens import (
+from saga2d import Game, Scene
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.save import SaveManager
+from saga2d.ui.screens import (
     ChoiceScreen,
     ConfirmDialog,
     MessageScreen,
@@ -713,7 +713,7 @@ class TestShowSequence:
 
 def _find_buttons(component, result: list) -> None:
     """Recursively find all Button instances in a component tree."""
-    from easygame.ui.components import Button
+    from saga2d.ui.components import Button
     if isinstance(component, Button):
         result.append(component)
     for child in component._children:

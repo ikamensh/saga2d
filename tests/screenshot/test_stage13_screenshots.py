@@ -23,9 +23,9 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.save import SaveManager
-from easygame.ui import (
+from saga2d import Game, Scene
+from saga2d.save import SaveManager
+from saga2d.ui import (
     Anchor,
     Button,
     Label,
@@ -34,7 +34,7 @@ from easygame.ui import (
     ProgressBar,
     Style,
 )
-from easygame.ui.screens import (
+from saga2d.ui.screens import (
     ChoiceScreen,
     ConfirmDialog,
     MessageScreen,

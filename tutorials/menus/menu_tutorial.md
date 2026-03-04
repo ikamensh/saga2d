@@ -35,18 +35,20 @@ that every game's menu system needs.
 ## Building a title screen
 
 ```python
-from easygame import Game, Scene, Panel, Label, Button, Anchor, Layout
+from saga2d import Game, Scene, Panel, Label, Button, Anchor, Layout
+
 
 class TitleScreen(Scene):
-    background_color = (20, 24, 35, 255)   # dark blue-grey
+    background_color = (20, 24, 35, 255)  # dark blue-grey
 
     def on_enter(self):
         panel = Panel(anchor=Anchor.CENTER, layout=Layout.VERTICAL, spacing=20)
         panel.add(Label("My Game", font_size=52))
-        panel.add(Button("Play",     on_click=lambda: self.game.replace(GameScreen())))
+        panel.add(Button("Play", on_click=lambda: self.game.replace(GameScreen())))
         panel.add(Button("Settings", on_click=lambda: self.game.push(SettingsOverlay())))
-        panel.add(Button("Quit",     on_click=self.game.quit))
+        panel.add(Button("Quit", on_click=self.game.quit))
         self.ui.add(panel)
+
 
 game = Game("My Game", resolution=(800, 600), fullscreen=False)
 game.run(TitleScreen())
@@ -195,7 +197,7 @@ consumed.
 Five screens.  Full navigation.  ~70 lines.
 
 ```python
-from easygame import Game, Scene, Panel, Label, Button, Anchor, Layout, Style
+from saga2d import Game, Scene, Panel, Label, Button, Anchor, Layout, Style
 
 
 class TitleScreen(Scene):
@@ -205,9 +207,9 @@ class TitleScreen(Scene):
     def on_enter(self):
         panel = Panel(anchor=Anchor.CENTER, layout=Layout.VERTICAL, spacing=20)
         panel.add(Label("My Game", font_size=52))
-        panel.add(Button("Play",     on_click=lambda: self.game.replace(GameScreen())))
+        panel.add(Button("Play", on_click=lambda: self.game.replace(GameScreen())))
         panel.add(Button("Settings", on_click=lambda: self.game.push(SettingsOverlay())))
-        panel.add(Button("Quit",     on_click=self.game.quit))
+        panel.add(Button("Quit", on_click=self.game.quit))
         self.ui.add(panel)
 
 
@@ -232,7 +234,7 @@ class GameScreen(Scene):
 
     def on_enter(self):
         self.bind_key("cancel", lambda: self.game.push(PauseMenu()))
-        self.bind_key("i",      lambda: self.game.push(InventoryScreen()))
+        self.bind_key("i", lambda: self.game.push(InventoryScreen()))
 
         self.ui.add(Label("I=Inventory  ESC=Pause",
                           font_size=16, anchor=Anchor.BOTTOM_LEFT, margin=12))
@@ -249,7 +251,7 @@ class PauseMenu(Scene):
             style=Style(background_color=(0, 0, 0, 160), padding=40),
         )
         menu.add(Label("PAUSED", font_size=48))
-        menu.add(Button("Resume",        on_click=lambda: self.game.pop()))
+        menu.add(Button("Resume", on_click=lambda: self.game.pop()))
         menu.add(Button("Quit to Title", on_click=lambda: self.game.clear_and_push(TitleScreen())))
         self.ui.add(menu)
 

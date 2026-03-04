@@ -20,7 +20,7 @@ from typing import Any
 
 from PIL import Image
 
-from easygame.backends.base import (
+from saga2d.backends.base import (
     Event,
     KeyEvent,
     MouseEvent,

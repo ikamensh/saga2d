@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from easygame import (
+from saga2d import (
     Game,
     Sprite,
     AnimationDef,
@@ -27,8 +27,8 @@ from easygame import (
     Repeat,
     Sequence,
 )
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
 
 
 # ------------------------------------------------------------------
@@ -1060,7 +1060,7 @@ class TestActionEdgeCasesUnique:
 
 
 def test_actions_importable_from_easygame() -> None:
-    from easygame import (
+    from saga2d import (
         Delay,
         Sequence,
     )

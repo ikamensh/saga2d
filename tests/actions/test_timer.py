@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game
-from easygame.util.timer import TimerHandle, TimerManager
+from saga2d import Game
+from saga2d.util.timer import TimerHandle, TimerManager
 
 
 # ------------------------------------------------------------------

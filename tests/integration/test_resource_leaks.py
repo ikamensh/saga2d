@@ -19,10 +19,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.mock_backend import MockBackend
-from easygame.util.timer import TimerManager
-from easygame.util.tween import TweenManager, Ease
+from saga2d import Game, Scene
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.util.timer import TimerManager
+from saga2d.util.tween import TweenManager, Ease
 
 
 # ------------------------------------------------------------------
@@ -146,7 +146,7 @@ class TestDragManagerCancelActive:
 
     def test_cancel_active_clears_drag(self, game: Game) -> None:
         """cancel_active() ends an active drag session."""
-        from easygame.ui.drag_drop import DragManager
+        from saga2d.ui.drag_drop import DragManager
 
         scene = Scene()
         game.push(scene)
@@ -319,10 +319,10 @@ class TestDrawPhaseTryFinally:
         We verify by checking that the sprite's backend position is
         restored to the pre-camera value after a draw exception.
         """
-        from easygame.rendering.camera import Camera
-        from easygame.rendering.layers import SpriteAnchor
-        from easygame import Sprite
-        from easygame.assets import AssetManager
+        from saga2d.rendering.camera import Camera
+        from saga2d.rendering.layers import SpriteAnchor
+        from saga2d import Sprite
+        from saga2d.assets import AssetManager
 
         backend = game.backend
 

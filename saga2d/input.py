@@ -21,10 +21,10 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
-from easygame.backends.base import Event, KeyEvent, MouseEvent
+from saga2d.backends.base import Event, KeyEvent, MouseEvent
 
 if TYPE_CHECKING:
-    from easygame.rendering.camera import Camera
+    from saga2d.rendering.camera import Camera
 
 
 # ---------------------------------------------------------------------------

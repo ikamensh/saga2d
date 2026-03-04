@@ -11,14 +11,14 @@ from __future__ import annotations
 import collections
 from typing import TYPE_CHECKING, Any, Callable
 
-from easygame.util.timer import TimerHandle
+from saga2d.util.timer import TimerHandle
 
 if TYPE_CHECKING:
-    from easygame.game import Game
-    from easygame.input import InputEvent
-    from easygame.rendering.camera import Camera
-    from easygame.rendering.sprite import Sprite
-    from easygame.ui.component import _UIRoot
+    from saga2d.game import Game
+    from saga2d.input import InputEvent
+    from saga2d.rendering.camera import Camera
+    from saga2d.rendering.sprite import Sprite
+    from saga2d.ui.component import _UIRoot
 
 
 class Scene:
@@ -388,7 +388,7 @@ class Scene:
         scene stack), so it is safe to use inside :meth:`on_enter`.
         """
         if self._ui is None:
-            from easygame.ui.component import _UIRoot
+            from saga2d.ui.component import _UIRoot
 
             self._ui = _UIRoot(self.game)
         return self._ui

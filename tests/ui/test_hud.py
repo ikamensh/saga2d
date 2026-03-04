@@ -15,11 +15,11 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.mock_backend import MockBackend
-from easygame.ui import Anchor, Label, Panel, Style
-from easygame.ui.component import Component, _UIRoot
-from easygame.ui.hud import HUD
+from saga2d import Game, Scene
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.ui import Anchor, Label, Panel, Style
+from saga2d.ui.component import Component, _UIRoot
+from saga2d.ui.hud import HUD
 
 
 # ---------------------------------------------------------------------------

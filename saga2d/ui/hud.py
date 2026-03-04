@@ -38,9 +38,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from easygame.game import Game
-    from easygame.input import InputEvent
-    from easygame.ui.component import Component, _UIRoot
+    from saga2d.game import Game
+    from saga2d.input import InputEvent
+    from saga2d.ui.component import Component, _UIRoot
 
 
 class HUD:
@@ -51,7 +51,7 @@ class HUD:
     """
 
     def __init__(self, game: Game) -> None:
-        from easygame.ui.component import _UIRoot
+        from saga2d.ui.component import _UIRoot
 
         self._game = game
         self._root: _UIRoot = _UIRoot(game)

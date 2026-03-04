@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import AnimationDef, Scene, Sprite
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
-from easygame.util.tween import Ease, tween
+from saga2d import AnimationDef, Scene, Sprite
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d.util.tween import Ease, tween
 
 from tests.screenshot.harness import assert_screenshot, render_scene
 

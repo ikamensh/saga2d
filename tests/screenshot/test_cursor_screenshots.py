@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene, Sprite
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d import Game, Scene, Sprite
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
 
 from tests.screenshot.harness import assert_screenshot, render_scene
 

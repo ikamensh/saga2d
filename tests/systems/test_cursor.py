@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
-from easygame import CursorManager, Game
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
+from saga2d import CursorManager, Game
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
 
 
 # ------------------------------------------------------------------

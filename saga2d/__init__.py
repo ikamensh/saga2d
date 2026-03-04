@@ -10,7 +10,7 @@ Internal modules (backends, rendering internals) are **not** re-exported.
 
 __version__ = "0.1.0"
 
-from easygame.actions import (
+from saga2d.actions import (
     Action,
     Delay,
     Do,
@@ -23,25 +23,25 @@ from easygame.actions import (
     Repeat,
     Sequence,
 )
-from easygame.animation import AnimationDef
-from easygame.assets import AssetManager, AssetNotFoundError
-from easygame.audio import AudioManager
-from easygame.backends.base import (
+from saga2d.animation import AnimationDef
+from saga2d.assets import AssetManager, AssetNotFoundError
+from saga2d.audio import AudioManager
+from saga2d.backends.base import (
     Event,
     KeyEvent,
     MouseEvent,
     WindowEvent,
 )
-from easygame.cursor import CursorManager
-from easygame.game import Game
-from easygame.input import InputEvent, InputManager
-from easygame.rendering import Camera, ColorSwap, get_palette, register_palette
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
-from easygame.rendering.particles import ParticleEmitter
-from easygame.rendering.sprite import Sprite
-from easygame.save import SaveError, SaveManager
-from easygame.scene import Scene
-from easygame.ui import (
+from saga2d.cursor import CursorManager
+from saga2d.game import Game
+from saga2d.input import InputEvent, InputManager
+from saga2d.rendering import Camera, ColorSwap, get_palette, register_palette
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d.rendering.particles import ParticleEmitter
+from saga2d.rendering.sprite import Sprite
+from saga2d.save import SaveError, SaveManager
+from saga2d.scene import Scene
+from saga2d.ui import (
     HUD,
     Anchor,
     Button,
@@ -68,9 +68,9 @@ from easygame.ui import (
     compute_content_size,
     compute_flow_layout,
 )
-from easygame.util.fsm import StateMachine
-from easygame.util.timer import TimerHandle
-from easygame.util.tween import Ease, tween
+from saga2d.util.fsm import StateMachine
+from saga2d.util.timer import TimerHandle
+from saga2d.util.tween import Ease, tween
 
 __all__ = [
     "HUD",

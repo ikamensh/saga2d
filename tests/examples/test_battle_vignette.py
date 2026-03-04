@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
+from saga2d import Game
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
 
 # Import the demo's scene and constants directly.
 from examples.battle_vignette.battle_demo import (

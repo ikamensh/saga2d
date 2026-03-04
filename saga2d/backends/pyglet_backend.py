@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from easygame.backends.base import (
+from saga2d.backends.base import (
     Event,
     KeyEvent,
     MouseEvent,

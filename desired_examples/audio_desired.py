@@ -2,7 +2,7 @@
 Audio: background music with crossfade, sound effects with channels, sound pools.
 This is what we want it to look like with EasyGame.
 """
-from easygame import Game
+from saga2d import Game
 
 game = Game("Audio Demo")
 

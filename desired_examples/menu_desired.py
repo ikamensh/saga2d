@@ -2,8 +2,8 @@
 Main menu with 4 buttons, background image, custom font, hover effects.
 This is what we want it to look like with EasyGame.
 """
-from easygame import Game, Scene
-from easygame.ui import Panel, Label, Button, Anchor, Layout, Style, Theme
+from saga2d import Game, Scene
+from saga2d.ui import Panel, Label, Button, Anchor, Layout, Style, Theme
 
 
 class SaveLoadScreen(Scene):

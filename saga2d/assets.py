@@ -23,10 +23,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from easygame.backends.base import Backend, ImageHandle, SoundHandle
+from saga2d.backends.base import Backend, ImageHandle, SoundHandle
 
 if TYPE_CHECKING:
-    from easygame.rendering.color_swap import ColorSwap
+    from saga2d.rendering.color_swap import ColorSwap
 
 
 # ---------------------------------------------------------------------------

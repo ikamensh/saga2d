@@ -32,18 +32,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from easygame.input import InputEvent
+from saga2d.input import InputEvent
 
-from easygame.scene import Scene
-from easygame.ui.components import Button, Label, Panel
-from easygame.ui.layout import Anchor, Layout
-from easygame.ui.theme import Style
-from easygame.ui.widgets import ProgressBar
+from saga2d.scene import Scene
+from saga2d.ui.components import Button, Label, Panel
+from saga2d.ui.layout import Anchor, Layout
+from saga2d.ui.theme import Style
+from saga2d.ui.widgets import ProgressBar
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from easygame.save import SaveManager
+    from saga2d.save import SaveManager
 
 
 # ---------------------------------------------------------------------------

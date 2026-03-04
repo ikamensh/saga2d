@@ -15,17 +15,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Literal
 
-from easygame.ui.component import Component
-from easygame.ui.layout import (
+from saga2d.ui.component import Component
+from saga2d.ui.layout import (
     Layout,
     compute_anchor_position,
     compute_content_size,
     compute_flow_layout,
 )
-from easygame.ui.theme import ResolvedStyle, Style
+from saga2d.ui.theme import ResolvedStyle, Style
 
 if TYPE_CHECKING:
-    from easygame.input import InputEvent
+    from saga2d.input import InputEvent
 
 
 # ---------------------------------------------------------------------------
@@ -187,7 +187,7 @@ class Label(Component):
         if self._game is not None:
             return self._game.theme.resolve_label_style(self.style)
         # Fallback when not yet attached to a game tree.
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_label_style(self.style)
 
@@ -368,7 +368,7 @@ class Button(Component):
         """Merge explicit style with button defaults, considering state."""
         if self._game is not None:
             return self._game.theme.resolve_button_style(self.style, state)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_button_style(self.style, state)
 
@@ -547,6 +547,6 @@ class Panel(Component):
         """Merge explicit style with panel defaults from the theme."""
         if self._game is not None:
             return self._game.theme.resolve_panel_style(self.style)
-        from easygame.ui.theme import Theme
+        from saga2d.ui.theme import Theme
 
         return Theme().resolve_panel_style(self.style)

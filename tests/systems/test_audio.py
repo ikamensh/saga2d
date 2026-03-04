@@ -8,10 +8,10 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game
-from easygame.assets import AssetManager, AssetNotFoundError
-from easygame.audio import AudioManager
-from easygame.backends.mock_backend import MockBackend
+from saga2d import Game
+from saga2d.assets import AssetManager, AssetNotFoundError
+from saga2d.audio import AudioManager
+from saga2d.backends.mock_backend import MockBackend
 
 
 # ------------------------------------------------------------------
@@ -923,7 +923,7 @@ class TestGameIntegration:
 
     def test_game_audio_importable_from_easygame(self) -> None:
         """AudioManager is importable from the top-level package."""
-        from easygame import AudioManager as AM
+        from saga2d import AudioManager as AM
         assert AM is AudioManager
 
     def test_game_audio_play_sound_end_to_end(self, game: Game) -> None:

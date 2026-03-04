@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Scene, Sprite
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
-from easygame.rendering.layers import SpriteAnchor
+from saga2d import Game, Scene, Sprite
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.rendering.layers import SpriteAnchor
 
 
 # ------------------------------------------------------------------

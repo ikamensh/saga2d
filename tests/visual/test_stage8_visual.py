@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene, Anchor, Layout, Panel, Label, Button, Style
-from easygame.backends.pyglet_backend import PygletBackend
+from saga2d import Game, Scene, Anchor, Layout, Panel, Label, Button, Style
+from saga2d.backends.pyglet_backend import PygletBackend
 
 
 class MainMenuScene(Scene):

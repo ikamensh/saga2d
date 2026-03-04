@@ -13,7 +13,7 @@ Re-exported for convenience within the framework:
 * Protocol: :class:`Backend`
 """
 
-from easygame.backends.base import (
+from saga2d.backends.base import (
     Backend,
     Event,
     FontHandle,
@@ -23,7 +23,7 @@ from easygame.backends.base import (
     SoundHandle,
     WindowEvent,
 )
-from easygame.backends.mock_backend import MockBackend
+from saga2d.backends.mock_backend import MockBackend
 
 __all__ = [
     "Backend",

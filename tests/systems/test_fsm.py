@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from easygame.util.fsm import StateMachine
+from saga2d.util.fsm import StateMachine
 
 
 def test_construction_valid() -> None:

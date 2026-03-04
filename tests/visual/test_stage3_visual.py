@@ -12,9 +12,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from easygame import Game, Scene, Sprite, AnimationDef
-from easygame.backends.base import KeyEvent
-from easygame.backends.pyglet_backend import PygletBackend
+from saga2d import Game, Scene, Sprite, AnimationDef
+from saga2d.backends.base import KeyEvent
+from saga2d.backends.pyglet_backend import PygletBackend
 
 ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "assets" / "images" / "sprites"
 

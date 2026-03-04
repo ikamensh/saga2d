@@ -15,11 +15,11 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from easygame.assets import AssetManager, AssetNotFoundError
-from easygame.backends.base import Backend, MusicPlayerId
+from saga2d.assets import AssetManager, AssetNotFoundError
+from saga2d.backends.base import Backend, MusicPlayerId
 
 if TYPE_CHECKING:
-    from easygame.util.tween import TweenManager
+    from saga2d.util.tween import TweenManager
 
 
 # ---------------------------------------------------------------------------
@@ -273,8 +273,8 @@ class AudioManager:
         # Use a proxy object for tweening (tween system sets attributes).
         fade = _CrossfadeProxy(self, old_player, new_player, old_base_volume)
 
-        from easygame.util import tween as tween_mod
-        from easygame.util.tween import Ease, tween
+        from saga2d.util import tween as tween_mod
+        from saga2d.util.tween import Ease, tween
 
         # Capture the instance tween manager so _cancel_crossfade doesn't
         # rely on the module-level global.

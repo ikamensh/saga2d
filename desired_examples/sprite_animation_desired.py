@@ -2,7 +2,7 @@
 Animated unit: walks to a target, plays attack animation, then idles.
 This is what we want it to look like with EasyGame.
 """
-from easygame import Game, Scene, Sprite, AnimationDef
+from saga2d import Game, Scene, Sprite, AnimationDef
 
 
 # Define animations — reusable templates, not tied to any sprite instance

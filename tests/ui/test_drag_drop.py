@@ -16,12 +16,12 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.base import MouseEvent
-from easygame.input import InputEvent
-from easygame.ui.component import Component
-from easygame.ui.drag_drop import DragManager, _DragSession
-from easygame.ui.theme import Theme
+from saga2d import Game, Scene
+from saga2d.backends.base import MouseEvent
+from saga2d.input import InputEvent
+from saga2d.ui.component import Component
+from saga2d.ui.drag_drop import DragManager, _DragSession
+from saga2d.ui.theme import Theme
 
 
 # ---------------------------------------------------------------------------

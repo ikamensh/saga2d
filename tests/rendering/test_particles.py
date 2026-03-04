@@ -12,10 +12,10 @@ import random
 
 import pytest
 
-from easygame import Game, Scene, Sprite
-from easygame.backends.mock_backend import MockBackend
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
-from easygame.rendering.particles import ParticleEmitter, _Particle
+from saga2d import Game, Scene, Sprite
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d.rendering.particles import ParticleEmitter, _Particle
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ class TestConstruction:
 
     def test_no_game_raises(self) -> None:
         """Creating a ParticleEmitter without an active Game raises RuntimeError."""
-        import easygame.rendering.sprite as mod
+        import saga2d.rendering.sprite as mod
         old = mod._current_game
         mod._current_game = None
         try:

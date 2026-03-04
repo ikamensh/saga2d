@@ -2,9 +2,9 @@
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.base import KeyEvent, MouseEvent
-from easygame.input import InputEvent, InputManager
+from saga2d import Game, Scene
+from saga2d.backends.base import KeyEvent, MouseEvent
+from saga2d.input import InputEvent, InputManager
 
 
 # ==================================================================
@@ -48,7 +48,7 @@ class TestInputEvent:
         assert e.dy == 0
 
     def test_importable_from_easygame(self) -> None:
-        from easygame import InputEvent as IE
+        from saga2d import InputEvent as IE
         assert IE is InputEvent
 
 

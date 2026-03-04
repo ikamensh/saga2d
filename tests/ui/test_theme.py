@@ -1,7 +1,7 @@
 """Tests for easygame.ui.theme."""
 
 
-from easygame.ui.theme import Style, Theme
+from saga2d.ui.theme import Style, Theme
 
 
 class TestStyle:

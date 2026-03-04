@@ -15,11 +15,12 @@ The pattern that works — monkey-patch `end_frame`:
 
 ```python
 import pyglet
-from easygame import Game
+from saga2d import Game
 
 game = Game("Test", resolution=(800, 600), backend="pyglet")
 _orig = game.backend.end_frame
 _capture = None
+
 
 def _patched():
     if game.backend.window is None or game.backend.batch is None:
@@ -28,6 +29,7 @@ def _patched():
     if _capture:
         pyglet.image.get_buffer_manager().get_color_buffer().save(_capture)
     game.backend.window.flip()
+
 
 game.backend.end_frame = _patched
 ```

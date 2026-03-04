@@ -8,17 +8,17 @@ from pathlib import Path
 
 import pytest
 
-from easygame import (
+from saga2d import (
     Game,
     Scene,
     compute_anchor_position,
     compute_content_size,
     compute_flow_layout,
 )
-from easygame.assets import AssetManager
-from easygame.backends.mock_backend import MockBackend
-from easygame.input import InputEvent
-from easygame.ui import (
+from saga2d.assets import AssetManager
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.input import InputEvent
+from saga2d.ui import (
     Anchor,
     Button,
     ImageBox,
@@ -29,8 +29,8 @@ from easygame.ui import (
     Style,
     Theme,
 )
-from easygame.ui.component import _UIRoot
-from easygame.ui.components import _estimate_text_width
+from saga2d.ui.component import _UIRoot
+from saga2d.ui.components import _estimate_text_width
 
 
 # ------------------------------------------------------------------
@@ -73,10 +73,10 @@ def asset_dir(tmp_path: Path) -> Path:
 
 def test_version_attribute() -> None:
     """__version__ is exposed and non-empty."""
-    import easygame
-    assert hasattr(easygame, "__version__")
-    assert isinstance(easygame.__version__, str)
-    assert len(easygame.__version__) > 0
+    import saga2d
+    assert hasattr(saga2d, "__version__")
+    assert isinstance(saga2d.__version__, str)
+    assert len(saga2d.__version__) > 0
 
 
 # ==================================================================

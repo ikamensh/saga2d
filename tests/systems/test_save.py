@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.save import SaveManager
+from saga2d import Game, Scene
+from saga2d.save import SaveManager
 
 
 # ---------------------------------------------------------------------------
@@ -638,7 +638,7 @@ class TestEdgeCases:
         self, save_dir: Path,
     ) -> None:
         """SaveError message includes a recovery hint about deleting the file."""
-        from easygame.save import SaveError
+        from saga2d.save import SaveError
 
         save_dir.mkdir(parents=True, exist_ok=True)
         corrupt_file = save_dir / "save_1.json"
@@ -652,7 +652,7 @@ class TestEdgeCases:
         self, save_dir: Path,
     ) -> None:
         """SaveError message includes slot number and file path."""
-        from easygame.save import SaveError
+        from saga2d.save import SaveError
 
         save_dir.mkdir(parents=True, exist_ok=True)
         corrupt_file = save_dir / "save_3.json"

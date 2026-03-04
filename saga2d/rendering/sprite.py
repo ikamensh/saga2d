@@ -24,13 +24,13 @@ import math
 from collections import deque
 from typing import TYPE_CHECKING, Any, Callable
 
-from easygame.rendering.layers import RenderLayer, SpriteAnchor
-from easygame.util.tween import Ease
+from saga2d.rendering.layers import RenderLayer, SpriteAnchor
+from saga2d.util.tween import Ease
 
 if TYPE_CHECKING:
-    from easygame.actions import Action
-    from easygame.animation import AnimationDef, AnimationPlayer
-    from easygame.rendering.color_swap import ColorSwap
+    from saga2d.actions import Action
+    from saga2d.animation import AnimationDef, AnimationPlayer
+    from saga2d.rendering.color_swap import ColorSwap
 
 # Module-level reference set by Game.__init__().
 # Sprites read this at construction time.
@@ -136,7 +136,7 @@ class Sprite:
         # Resolve image handle: color_swap > team_palette > plain image
         swap = color_swap
         if swap is None and team_palette is not None:
-            from easygame.rendering.color_swap import get_palette
+            from saga2d.rendering.color_swap import get_palette
 
             swap = get_palette(team_palette)
         if swap is not None:
@@ -423,7 +423,7 @@ class Sprite:
         if self._removed:
             return
 
-        from easygame.animation import AnimationPlayer
+        from saga2d.animation import AnimationPlayer
 
         handles = self._resolve_frames(anim)
 
@@ -490,7 +490,7 @@ class Sprite:
         if self._removed:
             return
 
-        from easygame.util.tween import Ease, tween
+        from saga2d.util.tween import Ease, tween
 
         use_ease = Ease.LINEAR if ease is None else ease
 

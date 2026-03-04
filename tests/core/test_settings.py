@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import pytest
 
-from easygame import Game, Scene
-from easygame.backends.mock_backend import MockBackend
-from easygame.ui.screens import _SettingsScene
+from saga2d import Game, Scene
+from saga2d.backends.mock_backend import MockBackend
+from saga2d.ui.screens import _SettingsScene
 
 
 # ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ def backend(game: Game) -> MockBackend:
 
 def _find_buttons(component, result: list) -> None:
     """Recursively find all Button instances in a component tree."""
-    from easygame.ui.components import Button
+    from saga2d.ui.components import Button
     if isinstance(component, Button):
         result.append(component)
     for child in component._children:
@@ -44,7 +44,7 @@ def _find_buttons(component, result: list) -> None:
 
 def _find_progressbars(component, result: list) -> None:
     """Recursively find all ProgressBar instances in a component tree."""
-    from easygame.ui.widgets import ProgressBar
+    from saga2d.ui.widgets import ProgressBar
     if isinstance(component, ProgressBar):
         result.append(component)
     for child in component._children:
@@ -53,7 +53,7 @@ def _find_progressbars(component, result: list) -> None:
 
 def _find_labels(component, result: list) -> None:
     """Recursively find all Label instances in a component tree."""
-    from easygame.ui.components import Label
+    from saga2d.ui.components import Label
     if isinstance(component, Label):
         result.append(component)
     for child in component._children:
