@@ -271,7 +271,7 @@ class TestLabel:
         t = backend.texts[0]
         assert t["text"] == "Test"
         assert t["font_size"] == 24  # default
-        assert t["color"] == (220, 220, 220, 255)  # default label color
+        assert t["color"] == (220, 225, 240, 255)  # default label color
 
     def test_draw_empty_text_no_call(self, root: _UIRoot, backend: MockBackend) -> None:
         """Empty text string produces no draw_text call."""
@@ -473,18 +473,19 @@ class TestButton:
     def test_draw_calls_rect_and_text(
         self, root: _UIRoot, backend: MockBackend,
     ) -> None:
-        """Drawing a button produces one rect and one text draw call."""
+        """Drawing a button produces background + border rects and one text draw call."""
         btn = Button("Play", width=200, height=50, anchor=Anchor.TOP_LEFT)
         root.add(btn)
         root._ensure_layout()
         root.draw()
 
-        assert len(backend.rects) == 1
-        r = backend.rects[0]
-        assert r["x"] == 0
-        assert r["y"] == 0
-        assert r["width"] == 200
-        assert r["height"] == 50
+        # Button now draws 5 rects: 1 background + 4 border rects (top, bottom, left, right)
+        assert len(backend.rects) == 5
+        bg = backend.rects[0]
+        assert bg["x"] == 0
+        assert bg["y"] == 0
+        assert bg["width"] == 200
+        assert bg["height"] == 50
 
         assert len(backend.texts) == 1
         t = backend.texts[0]
@@ -645,17 +646,18 @@ class TestPanel:
     def test_background_draw(
         self, root: _UIRoot, backend: MockBackend, game: Game,
     ) -> None:
-        """Panel draws its background rect."""
+        """Panel draws its background rect and border."""
         panel = Panel(width=200, height=100, anchor=Anchor.TOP_LEFT)
         root.add(panel)
         root._ensure_layout()
         root.draw()
 
-        assert len(backend.rects) == 1
-        r = backend.rects[0]
-        assert r["width"] == 200
-        assert r["height"] == 100
-        assert r["color"] == game.theme.resolve_panel_style(None).background_color
+        # Panel now draws 5 rects: 1 background + 4 border rects (top, bottom, left, right)
+        assert len(backend.rects) == 5
+        bg = backend.rects[0]
+        assert bg["width"] == 200
+        assert bg["height"] == 100
+        assert bg["color"] == game.theme.resolve_panel_style(None).background_color
 
     def test_spacing_between_children(self, root: _UIRoot) -> None:
         """Spacing inserts gap between children in flow layout."""
@@ -701,7 +703,7 @@ class TestThemeStyle:
         resolved = theme.resolve_label_style(None)
         assert resolved.font == "serif"
         assert resolved.font_size == 24
-        assert resolved.text_color == (220, 220, 220, 255)
+        assert resolved.text_color == (220, 225, 240, 255)
 
     def test_style_override_merging(self) -> None:
         """Explicit Style fields take precedence; None inherits from theme."""
@@ -717,26 +719,28 @@ class TestThemeStyle:
         """Normal state uses background_color default."""
         theme = Theme()
         resolved = theme.resolve_button_style(None, "normal")
-        assert resolved.background_color == (70, 70, 90, 255)
+        assert resolved.background_color == (45, 55, 85, 255)
 
     def test_button_state_hovered(self) -> None:
         """Hovered state uses hover_color."""
         theme = Theme()
         resolved = theme.resolve_button_style(None, "hovered")
-        assert resolved.background_color == (100, 100, 130, 255)
+        assert resolved.background_color == (65, 80, 120, 255)
 
     def test_button_state_pressed(self) -> None:
         """Pressed state uses press_color."""
         theme = Theme()
         resolved = theme.resolve_button_style(None, "pressed")
-        assert resolved.background_color == (50, 50, 70, 255)
+        assert resolved.background_color == (35, 45, 75, 255)
 
     def test_panel_style_defaults(self) -> None:
-        """Panel defaults include background color and padding."""
+        """Panel defaults include background color, padding, and border."""
         theme = Theme()
         resolved = theme.resolve_panel_style(None)
-        assert resolved.background_color == (40, 40, 50, 200)
+        assert resolved.background_color == (32, 38, 54, 230)
         assert resolved.padding == 16
+        assert resolved.border_color == (80, 80, 110, 180)
+        assert resolved.border_width == 1
 
     def test_progressbar_theme_defaults(self) -> None:
         """Theme has progressbar_color and progressbar_bg_color."""
@@ -1041,8 +1045,9 @@ class TestSceneIntegration:
         game.push(scene)
         game.tick(dt=0.016)
 
-        # Should have 3 rects (panel bg + 2 button bgs) and 3 texts
-        assert len(backend.rects) == 3
+        # Should have 15 rects: panel (1 bg + 4 border) + 2 buttons (each 1 bg + 4 border) = 5 + 5 + 5
+        # and 3 texts (1 label + 2 buttons)
+        assert len(backend.rects) == 15
         assert len(backend.texts) == 3
         text_strs = [t["text"] for t in backend.texts]
         assert "Menu" in text_strs
