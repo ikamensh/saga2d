@@ -271,7 +271,7 @@ class TestLabel:
         t = backend.texts[0]
         assert t["text"] == "Test"
         assert t["font_size"] == 24  # default
-        assert t["color"] == (220, 225, 240, 255)  # default label color
+        assert t["color"] == (248, 250, 252, 255)  # default label color
 
     def test_draw_empty_text_no_call(self, root: _UIRoot, backend: MockBackend) -> None:
         """Empty text string produces no draw_text call."""
@@ -652,9 +652,13 @@ class TestPanel:
         root._ensure_layout()
         root.draw()
 
-        # Panel now draws 5 rects: 1 background + 4 border rects (top, bottom, left, right)
-        assert len(backend.rects) == 5
-        bg = backend.rects[0]
+        # Panel now draws 6 rects: 1 shadow + 1 background + 4 border rects
+        assert len(backend.rects) == 6
+        shadow = backend.rects[0]
+        assert shadow["width"] == 200
+        assert shadow["height"] == 100
+        assert shadow["color"] == game.theme.panel_shadow_color
+        bg = backend.rects[1]
         assert bg["width"] == 200
         assert bg["height"] == 100
         assert bg["color"] == game.theme.resolve_panel_style(None).background_color
@@ -703,7 +707,7 @@ class TestThemeStyle:
         resolved = theme.resolve_label_style(None)
         assert resolved.font == "serif"
         assert resolved.font_size == 24
-        assert resolved.text_color == (220, 225, 240, 255)
+        assert resolved.text_color == (248, 250, 252, 255)
 
     def test_style_override_merging(self) -> None:
         """Explicit Style fields take precedence; None inherits from theme."""
@@ -719,34 +723,34 @@ class TestThemeStyle:
         """Normal state uses background_color default."""
         theme = Theme()
         resolved = theme.resolve_button_style(None, "normal")
-        assert resolved.background_color == (45, 55, 85, 255)
+        assert resolved.background_color == (51, 65, 85, 255)
 
     def test_button_state_hovered(self) -> None:
         """Hovered state uses hover_color."""
         theme = Theme()
         resolved = theme.resolve_button_style(None, "hovered")
-        assert resolved.background_color == (65, 80, 120, 255)
+        assert resolved.background_color == (71, 85, 105, 255)
 
     def test_button_state_pressed(self) -> None:
         """Pressed state uses press_color."""
         theme = Theme()
         resolved = theme.resolve_button_style(None, "pressed")
-        assert resolved.background_color == (35, 45, 75, 255)
+        assert resolved.background_color == (56, 189, 248, 255)
 
     def test_panel_style_defaults(self) -> None:
         """Panel defaults include background color, padding, and border."""
         theme = Theme()
         resolved = theme.resolve_panel_style(None)
-        assert resolved.background_color == (32, 38, 54, 230)
+        assert resolved.background_color == (30, 41, 59, 255)
         assert resolved.padding == 16
-        assert resolved.border_color == (80, 80, 110, 180)
-        assert resolved.border_width == 1
+        assert resolved.border_color == (71, 85, 105, 255)
+        assert resolved.border_width == 2
 
     def test_progressbar_theme_defaults(self) -> None:
         """Theme has progressbar_color and progressbar_bg_color."""
         theme = Theme()
-        assert theme.progressbar_color == (80, 150, 220, 255)
-        assert theme.progressbar_bg_color == (28, 32, 42, 220)
+        assert theme.progressbar_color == (56, 189, 248, 255)
+        assert theme.progressbar_bg_color == (15, 23, 42, 220)
 
     def test_custom_theme_propagates(self, game: Game) -> None:
         """Custom theme set on Game is used by components."""
@@ -1045,9 +1049,9 @@ class TestSceneIntegration:
         game.push(scene)
         game.tick(dt=0.016)
 
-        # Should have 15 rects: panel (1 bg + 4 border) + 2 buttons (each 1 bg + 4 border) = 5 + 5 + 5
+        # Should have 16 rects: panel (1 shadow + 1 bg + 4 border) + 2 buttons (each 1 bg + 4 border) = 6 + 5 + 5
         # and 3 texts (1 label + 2 buttons)
-        assert len(backend.rects) == 15
+        assert len(backend.rects) == 16
         assert len(backend.texts) == 3
         text_strs = [t["text"] for t in backend.texts]
         assert "Menu" in text_strs

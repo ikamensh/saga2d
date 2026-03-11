@@ -980,3 +980,29 @@ Findings from adversarial testing (`tests/test_edge_cases.py`, 48 tests;
 **Verdict counts:** 24 fix, 13 skip, 2 needs-decision. All verdicts defensible against source code.
 
 **Note for Stage 6 (Fix & Report):** The draw phase in `tick()` (game.py:646-648) remains unprotected — if `draw()` raises, `end_frame()` and `_restore_sprites()` are skipped, corrupting backend state. This is the highest-priority fix.
+
+---
+
+## Tailwind Slate Palette + Panel/Button Enhancements (2026-03-11)
+
+### Theme changes (`saga2d/ui/theme.py`)
+Shifted from bespoke dark-blue palette to **Tailwind CSS Slate scale** with Sky 400 accent. Every color now has an inline comment referencing its Slate/Sky token, giving the palette a well-documented, widely-recognized design system foundation.
+
+Key additions:
+- **`panel_shadow_offset: int = 4`** — new constructor param + property (lines 73–74, 385–392)
+- **`panel_shadow_color: Color = (0,0,0,120)`** — new constructor param + property
+- **`panel_border_width`** raised from 1 → 2px for better visibility
+- All colors fully opaque (alpha 255) except where translucency is intentional (shadow, selected, alt-row)
+
+### Component changes (`saga2d/ui/components.py`)
+1. **Label anchor fix** — `Label.on_draw()` now passes explicit `anchor_x="left"`, `anchor_y="top"` to `draw_text()`. Previously relied on backend defaults (`anchor_y="baseline"`), causing text baseline positioning instead of top-edge pinning. This fixes label clipping.
+
+2. **Panel shadow** — `Panel.on_draw()` draws an offset dark rect behind the panel background when `shadow_offset > 0`. Draw order: shadow → bg → border → children.
+
+3. **Button hover glow** — When `_state == "hovered"`, a bright outer border (light blue `(100,181,246,200)`, 3px) is drawn 2px outside the button bounds before the normal border, providing clear hover feedback.
+
+### Architectural notes
+- Hover outline color is **hardcoded** in `Button.on_draw()` (line 392), not theme-configurable. Acceptable for now; should move to theme if games need custom hover appearance.
+- Button border still falls back to `_panel_border_color`/`_panel_border_width` in `resolve_button_style()` (line 194). Fine for shared look; dedicated button border params deferred.
+- Shadow is a simple offset rect (no blur). Consistent with the "4 rects for borders" approach — no backend changes needed.
+- Golden PNGs must be regenerated after this palette change (see prior constraint note).

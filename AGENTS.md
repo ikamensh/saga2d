@@ -2,6 +2,38 @@
 
 Instructions for AI agents working on this codebase.
 
+## CRITICAL: NEVER Launch GUI Windows
+
+**Do NOT run game demos or any script that creates a visible pyglet window.**
+This includes:
+- `python examples/battle_vignette/battle_demo.py` (or any script in examples/)
+- `python -c "... game.run() ..."` or any code calling `game.run()`
+- `pyglet.app.run()` or any interactive event loop
+
+**Why:** On macOS, fullscreen pyglet windows steal all input focus and can
+lock out the user entirely, requiring a hard reboot. This has happened before.
+
+**What to do instead:**
+- Use `backend="mock"` for logic testing
+- Use `game.tick(dt=0.016)` to step frames — never `game.run()`
+- Use the screenshot harness (`render_scene()`) for visual verification
+- Use `visible=False` if you must create a pyglet backend
+
+```python
+# CORRECT: headless screenshot verification
+from tests.screenshot.harness import render_scene
+image = render_scene(setup, tick_count=2, resolution=(800, 600))
+image.save("/tmp/verify.png")
+
+# CORRECT: mock backend testing
+game = Game("test", resolution=(800, 600), backend="mock")
+game.tick(dt=0.016)
+
+# WRONG — NEVER DO THIS:
+# game.run(some_scene)  # Opens interactive window!
+# python examples/battle_vignette/battle_demo.py  # Opens fullscreen!
+```
+
 ## The #1 Rule: Visually Verify Rendering Changes
 
 Mock backend tests are necessary but insufficient.  They test logic (scene

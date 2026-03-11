@@ -1412,10 +1412,10 @@ class TestDataTable:
     def test_theme_integration(self) -> None:
         """Theme has all datatable properties."""
         theme = Theme()
-        assert theme.datatable_header_bg_color == (42, 50, 72, 255)
-        assert theme.datatable_header_text_color == (240, 242, 250, 255)
-        assert theme.datatable_row_bg_color == (32, 38, 54, 180)
-        assert theme.datatable_alt_row_bg_color == (38, 44, 60, 180)
+        assert theme.datatable_header_bg_color == (51, 65, 85, 255)
+        assert theme.datatable_header_text_color == (248, 250, 252, 255)
+        assert theme.datatable_row_bg_color == (30, 41, 59, 180)
+        assert theme.datatable_alt_row_bg_color == (15, 23, 42, 180)
 
     def test_resolve_datatable_style(self) -> None:
         """resolve_datatable_style returns correct defaults."""
