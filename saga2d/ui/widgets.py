@@ -94,7 +94,8 @@ class ImageBox(Component):
 class ProgressBar(Component):
     """Horizontal bar showing value/max_value as a filled proportion.
 
-    Draws a background track and a filled bar. Uses ``draw_rect`` only.
+    Draws a background track and a filled bar. Supports rounded ends
+    using ``draw_circle`` when ``rounded=True``.
 
     Parameters:
         value:     Current value (0 to max_value).
@@ -103,6 +104,7 @@ class ProgressBar(Component):
         height:    Bar height in pixels.
         bar_color: Fill color. ``None`` uses theme default.
         bg_color:  Background/track color. ``None`` uses theme default.
+        rounded:   If ``True``, draw circular ends for a pill shape.
         style:     Explicit :class:`Style` overrides.
         **kwargs:  Forwarded to :class:`Component`.
     """
@@ -116,6 +118,7 @@ class ProgressBar(Component):
         height: int = 24,
         bar_color: Color | None = None,
         bg_color: Color | None = None,
+        rounded: bool = True,
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
@@ -124,6 +127,7 @@ class ProgressBar(Component):
         self._max_value = max_value
         self._bar_color = bar_color
         self._bg_color = bg_color
+        self._rounded = rounded
 
     @property
     def value(self) -> float:
@@ -160,6 +164,15 @@ class ProgressBar(Component):
             self._bar_color if self._bar_color is not None else theme.progressbar_color
         )
 
+        if self._rounded:
+            # Draw rounded progress bar (pill shape)
+            self._draw_rounded(bg, bar)
+        else:
+            # Draw rectangular progress bar (legacy)
+            self._draw_rectangular(bg, bar)
+
+    def _draw_rectangular(self, bg: Color, bar: Color) -> None:
+        """Draw rectangular progress bar without rounded ends."""
         # Background track (full width)
         self._game._backend.draw_rect(
             self._computed_x,
@@ -179,6 +192,82 @@ class ProgressBar(Component):
                 self._computed_h,
                 bar,
             )
+
+    def _draw_rounded(self, bg: Color, bar: Color) -> None:
+        """Draw rounded progress bar with circular ends (pill shape)."""
+        radius = self._computed_h // 2
+        backend = self._game._backend
+
+        # Background track: center rect + two end circles
+        # Center rectangle (excluding circular ends)
+        if self._computed_w > self._computed_h:
+            backend.draw_rect(
+                self._computed_x + radius,
+                self._computed_y,
+                self._computed_w - self._computed_h,
+                self._computed_h,
+                bg,
+            )
+            # Left end circle
+            backend.draw_circle(
+                self._computed_x + radius,
+                self._computed_y + radius,
+                radius,
+                bg,
+            )
+            # Right end circle
+            backend.draw_circle(
+                self._computed_x + self._computed_w - radius,
+                self._computed_y + radius,
+                radius,
+                bg,
+            )
+        else:
+            # Very narrow bar, just draw circle
+            backend.draw_circle(
+                self._computed_x + radius,
+                self._computed_y + radius,
+                radius,
+                bg,
+            )
+
+        # Filled bar (width * fraction)
+        fill_w = int(self._computed_w * self.fraction)
+        if fill_w > 0:
+            # Clamp fill width to ensure we have room for rounded ends
+            fill_w = max(self._computed_h, fill_w)  # At least height for circle
+
+            # Center rectangle of fill
+            if fill_w > self._computed_h:
+                backend.draw_rect(
+                    self._computed_x + radius,
+                    self._computed_y,
+                    fill_w - self._computed_h,
+                    self._computed_h,
+                    bar,
+                )
+                # Left end circle (always present)
+                backend.draw_circle(
+                    self._computed_x + radius,
+                    self._computed_y + radius,
+                    radius,
+                    bar,
+                )
+                # Right end circle
+                backend.draw_circle(
+                    self._computed_x + fill_w - radius,
+                    self._computed_y + radius,
+                    radius,
+                    bar,
+                )
+            else:
+                # Very narrow fill, just draw circle
+                backend.draw_circle(
+                    self._computed_x + radius,
+                    self._computed_y + radius,
+                    radius,
+                    bar,
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -364,11 +453,55 @@ class TextBox(Component):
     # -- Drawing -----------------------------------------------------------
 
     def on_draw(self) -> None:
-        """Draw the visible (revealed) portion of wrapped text lines."""
-        if self._game is None or not self._text:
+        """Draw background, border, and the visible (revealed) portion of wrapped text lines."""
+        if self._game is None:
             return
 
         resolved = self._resolve_style()
+
+        # Draw background rectangle
+        if resolved.background_color[3] > 0:  # Only if not fully transparent
+            self._game._backend.draw_rect(
+                self._computed_x,
+                self._computed_y,
+                self._computed_w,
+                self._computed_h,
+                resolved.background_color,
+            )
+
+        # Draw border if specified
+        if resolved.border_width > 0 and resolved.border_color is not None and resolved.border_color[3] > 0:
+            bw = resolved.border_width
+            bc = resolved.border_color
+            # Top
+            self._game._backend.draw_rect(
+                self._computed_x, self._computed_y, self._computed_w, bw, bc
+            )
+            # Bottom
+            self._game._backend.draw_rect(
+                self._computed_x,
+                self._computed_y + self._computed_h - bw,
+                self._computed_w,
+                bw,
+                bc,
+            )
+            # Left
+            self._game._backend.draw_rect(
+                self._computed_x, self._computed_y, bw, self._computed_h, bc
+            )
+            # Right
+            self._game._backend.draw_rect(
+                self._computed_x + self._computed_w - bw,
+                self._computed_y,
+                bw,
+                self._computed_h,
+                bc,
+            )
+
+        # Draw text if present
+        if not self._text:
+            return
+
         font_size = resolved.font_size
         padding = resolved.padding
         content_w = self._computed_w - 2 * padding
@@ -485,6 +618,7 @@ class List(Component):
         self.on_select = on_select
         self._item_height = item_height
         self._selected_index: int | None = None
+        self._hover_index: int | None = None
         self._scroll_offset: int = 0
         self._font_handle: Any = None
 
@@ -586,6 +720,20 @@ class List(Component):
                 self._clamp_scroll()
                 return True
 
+        # Mouse motion — update hover index.
+        if event.type == "motion":
+            if self.hit_test(event.x, event.y):
+                relative_y = event.y - self._computed_y
+                row = self._scroll_offset + int(relative_y // self._item_height)
+                if 0 <= row < len(self._items):
+                    self._hover_index = row
+                else:
+                    self._hover_index = None
+                return True
+            else:
+                # Mouse left the widget, clear hover
+                self._hover_index = None
+
         return False
 
     # -- Drawing -----------------------------------------------------------
@@ -629,7 +777,18 @@ class List(Component):
                     theme.list_alt_row_bg_color,
                 )
 
-            # Highlight selected row (drawn on top of alternating bg).
+            # Hover highlighting (drawn over alternating bg, under selection).
+            if i == self._hover_index and i != self._selected_index:
+                hover_color = self._lighten_color(resolved.background_color, 1.3)
+                self._game._backend.draw_rect(
+                    self._computed_x,
+                    row_y,
+                    self._computed_w,
+                    self._item_height,
+                    hover_color,
+                )
+
+            # Highlight selected row (drawn on top of everything).
             if i == self._selected_index:
                 self._game._backend.draw_rect(
                     self._computed_x,
@@ -700,6 +859,14 @@ class List(Component):
         if self.on_select is not None:
             self.on_select(self._selected_index)
 
+    def _lighten_color(self, color: Color, factor: float) -> Color:
+        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
+        r, g, b, a = color
+        r = min(255, int(r * factor))
+        g = min(255, int(g * factor))
+        b = min(255, int(b * factor))
+        return (r, g, b, a)
+
 
 # ---------------------------------------------------------------------------
 # Grid
@@ -750,6 +917,7 @@ class Grid(Component):
         self._spacing = spacing
         self.on_select = on_select
         self._selected: tuple[int, int] | None = None
+        self._hover_cell: tuple[int, int] | None = None
         self._cells: dict[tuple[int, int], Component] = {}
 
     # -- Properties --------------------------------------------------------
@@ -857,7 +1025,7 @@ class Grid(Component):
     # -- Input dispatch ----------------------------------------------------
 
     def on_event(self, event: InputEvent) -> bool:
-        """Handle mouse click to select a cell.
+        """Handle mouse click to select a cell and motion for hover.
 
         Child components receive events via the standard
         :meth:`Component.handle_event` tree walk *before* this method
@@ -872,6 +1040,15 @@ class Grid(Component):
                     if self.on_select is not None:
                         self.on_select(cell[0], cell[1])
                 return True
+
+        # Mouse motion — update hover cell.
+        if event.type == "motion":
+            if self.hit_test(event.x, event.y):
+                self._hover_cell = self._cell_at(event.x, event.y)
+                return True
+            else:
+                # Mouse left the widget, clear hover
+                self._hover_cell = None
 
         return False
 
@@ -901,7 +1078,7 @@ class Grid(Component):
         )
 
         # Draw each cell slot (empty cells get a subtle background).
-        cell_bg: Color = (40, 48, 68, 180)
+        cell_bg = theme.grid_cell_bg_color
         for row in range(self._rows):
             for col in range(self._columns):
                 cx = self._computed_x + padding + col * (self._cell_w + self._spacing)
@@ -916,7 +1093,18 @@ class Grid(Component):
                     cell_bg,
                 )
 
-                # Highlight selected cell.
+                # Hover highlighting (drawn over cell bg, under selection).
+                if self._hover_cell == (col, row) and self._selected != (col, row):
+                    hover_color = self._lighten_color(cell_bg, 1.4)
+                    self._game._backend.draw_rect(
+                        cx,
+                        cy,
+                        self._cell_w,
+                        self._cell_h,
+                        hover_color,
+                    )
+
+                # Highlight selected cell (drawn on top).
                 if self._selected == (col, row):
                     self._game._backend.draw_rect(
                         cx,
@@ -970,6 +1158,14 @@ class Grid(Component):
         if 0 <= col < self._columns and 0 <= row < self._rows:
             return (col, row)
         return None
+
+    def _lighten_color(self, color: Color, factor: float) -> Color:
+        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
+        r, g, b, a = color
+        r = min(255, int(r * factor))
+        g = min(255, int(g * factor))
+        b = min(255, int(b * factor))
+        return (r, g, b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -1141,6 +1337,22 @@ class Tooltip(Component):
             resolved.background_color,
         )
 
+        # Border for depth (1px lighter border)
+        border_color = self._lighten_color(resolved.background_color, 1.5)
+        border_width = 1
+        # Top border
+        self._game._backend.draw_rect(draw_x, draw_y, box_w, border_width, border_color)
+        # Bottom border
+        self._game._backend.draw_rect(
+            draw_x, draw_y + box_h - border_width, box_w, border_width, border_color
+        )
+        # Left border
+        self._game._backend.draw_rect(draw_x, draw_y, border_width, box_h, border_color)
+        # Right border
+        self._game._backend.draw_rect(
+            draw_x + box_w - border_width, draw_y, border_width, box_h, border_color
+        )
+
         # Text.
         self._game._backend.draw_text(
             self._text,
@@ -1160,6 +1372,14 @@ class Tooltip(Component):
         from saga2d.ui.theme import Theme
 
         return Theme().resolve_tooltip_style(self.style)
+
+    def _lighten_color(self, color: Color, factor: float) -> Color:
+        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
+        r, g, b, a = color
+        r = min(255, int(r * factor))
+        g = min(255, int(g * factor))
+        b = min(255, int(b * factor))
+        return (r, g, b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -1334,7 +1554,7 @@ class TabGroup(Component):
             tw = tab_widths[i]
             is_active = label == self._active_tab
 
-            # Tab header background.
+            # Tab header background
             bg = theme.tab_active_color if is_active else theme.tab_inactive_color
             self._game._backend.draw_rect(
                 x,
@@ -1344,14 +1564,35 @@ class TabGroup(Component):
                 bg,
             )
 
-            # Tab label text, vertically centred.
+            # Active tab: draw bottom accent bar
+            if is_active:
+                accent_height = 3
+                # Use a brighter accent color (e.g., sky-400 from theme)
+                # For now, brighten the active color
+                accent_color = self._brighten_color(theme.tab_active_color, 1.3)
+                self._game._backend.draw_rect(
+                    x,
+                    y + self._tab_height - accent_height,
+                    tw,
+                    accent_height,
+                    accent_color,
+                )
+
+            # Tab label text (dimmer for inactive tabs)
+            if is_active:
+                text_color = resolved.text_color
+            else:
+                # Dim inactive tab text (reduce RGB by 40%)
+                r, g, b, a = resolved.text_color
+                text_color = (int(r * 0.6), int(g * 0.6), int(b * 0.6), a)
+
             text_y = y + (self._tab_height - font_size) // 2
             self._game._backend.draw_text(
                 label,
                 x + padding,
                 text_y,
                 font_size,
-                resolved.text_color,
+                text_color,
                 font=self._font_handle,
             )
 
@@ -1421,6 +1662,15 @@ class TabGroup(Component):
                 return self._tab_labels[i]
             cumulative += tw
         return None
+
+    def _brighten_color(self, color: Color, factor: float) -> Color:
+        """Brighten a color by the given factor (1.0 = no change, >1.0 = brighter)."""
+        r, g, b, a = color
+        # Brighten by moving towards white
+        r = min(255, int(r * factor))
+        g = min(255, int(g * factor))
+        b = min(255, int(b * factor))
+        return (r, g, b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -1631,6 +1881,17 @@ class DataTable(Component):
             )
             hx += cw
 
+        # Header separator line (bottom border of header)
+        separator_height = 2
+        separator_color = self._lighten_color(theme.datatable_header_bg_color, 1.3)
+        self._game._backend.draw_rect(
+            x0,
+            y0 + self._header_height - separator_height,
+            self._computed_w,
+            separator_height,
+            separator_color,
+        )
+
         # -- Data rows -----------------------------------------------------
         if not self._rows:
             return
@@ -1750,3 +2011,11 @@ class DataTable(Component):
                 min(self._selected_row + delta, len(self._rows) - 1),
             )
         self._ensure_selected_visible()
+
+    def _lighten_color(self, color: Color, factor: float) -> Color:
+        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
+        r, g, b, a = color
+        r = min(255, int(r * factor))
+        g = min(255, int(g * factor))
+        b = min(255, int(b * factor))
+        return (r, g, b, a)

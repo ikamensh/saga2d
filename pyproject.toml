@@ -20,6 +20,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=9.0.2"]
+ai-verify = ["anthropic>=0.39.0"]
 
 [tool.setuptools.packages.find]
 include = ["saga2d*"]

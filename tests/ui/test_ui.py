@@ -865,6 +865,7 @@ class TestProgressBar:
             max_value=100,
             width=200,
             height=24,
+            rounded=False,
             anchor=Anchor.TOP_LEFT,
         )
         root.add(bar)
@@ -894,6 +895,7 @@ class TestProgressBar:
             height=20,
             bar_color=(255, 0, 0, 255),
             bg_color=(0, 0, 0, 255),
+            rounded=False,
             anchor=Anchor.TOP_LEFT,
         )
         root.add(bar)
@@ -910,7 +912,7 @@ class TestProgressBar:
         backend: MockBackend,
     ) -> None:
         """ProgressBar at 0% draws only background."""
-        bar = ProgressBar(value=0, max_value=100, width=100, height=20, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(value=0, max_value=100, width=100, height=20, rounded=False, anchor=Anchor.TOP_LEFT)
         root.add(bar)
         root._ensure_layout()
         root.draw()

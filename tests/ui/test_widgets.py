@@ -194,7 +194,7 @@ class TestProgressBar:
         self, root: _UIRoot, backend: MockBackend, game: Game,
     ) -> None:
         """50% ProgressBar draws background + half-width fill rect."""
-        bar = ProgressBar(value=50, max_value=100, width=200, height=24, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(value=50, max_value=100, width=200, height=24, rounded=False, anchor=Anchor.TOP_LEFT)
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -211,7 +211,7 @@ class TestProgressBar:
         self, root: _UIRoot, backend: MockBackend,
     ) -> None:
         """0% ProgressBar draws only background, no fill."""
-        bar = ProgressBar(value=0, max_value=100, width=200, height=24, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(value=0, max_value=100, width=200, height=24, rounded=False, anchor=Anchor.TOP_LEFT)
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -222,7 +222,7 @@ class TestProgressBar:
         self, root: _UIRoot, backend: MockBackend,
     ) -> None:
         """100% ProgressBar has fill == full width."""
-        bar = ProgressBar(value=100, max_value=100, width=200, height=24, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(value=100, max_value=100, width=200, height=24, rounded=False, anchor=Anchor.TOP_LEFT)
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -914,7 +914,8 @@ class TestTooltip:
         tip.show(100, 100)
         root.draw()
 
-        assert len(backend.rects) == 1
+        # Tooltip draws 5 rects: 1 background + 4 border edges
+        assert len(backend.rects) == 5
         assert len(backend.texts) == 1
         assert backend.texts[0]["text"] == "Help"
 
@@ -1345,11 +1346,11 @@ class TestDataTable:
         root._ensure_layout()
         root.draw()
 
-        # Header rect (index 0) + 3 row rects (indices 1,2,3)
-        assert len(backend.rects) >= 4
-        assert backend.rects[1]["color"] == game.theme.datatable_row_bg_color  # even
-        assert backend.rects[2]["color"] == game.theme.datatable_alt_row_bg_color  # odd
-        assert backend.rects[3]["color"] == game.theme.datatable_row_bg_color  # even
+        # Header rect (index 0) + header separator (index 1) + 3 row rects (indices 2,3,4)
+        assert len(backend.rects) >= 5
+        assert backend.rects[2]["color"] == game.theme.datatable_row_bg_color  # even
+        assert backend.rects[3]["color"] == game.theme.datatable_alt_row_bg_color  # odd
+        assert backend.rects[4]["color"] == game.theme.datatable_row_bg_color  # even
 
     def test_draw_selection_highlight(
         self, root: _UIRoot, backend: MockBackend, game: Game,
@@ -1362,8 +1363,8 @@ class TestDataTable:
         root._ensure_layout()
         root.draw()
 
-        # Header + 2 row bg + 1 highlight = 4
-        assert len(backend.rects) == 4
+        # Header + header separator + 2 row bg + 1 highlight = 5
+        assert len(backend.rects) == 5
         sel_rects = [r for r in backend.rects if r["color"] == game.theme.selected_color]
         assert len(sel_rects) == 1
 
@@ -1395,8 +1396,8 @@ class TestDataTable:
         root._ensure_layout()
         root.draw()
 
-        # Only header rect + header texts
-        assert len(backend.rects) == 1
+        # Header rect + header separator + header texts
+        assert len(backend.rects) == 2
         assert len(backend.texts) == 2
 
     def test_scroll_event(self) -> None:
