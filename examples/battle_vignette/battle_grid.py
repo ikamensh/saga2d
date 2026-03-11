@@ -64,12 +64,12 @@ _TERRAIN_ASSETS: dict[str, str] = {
     "dirt": "tiles/tile_dirt",
 }
 
-# Highlight colours  (R, G, B, A)
-HIGHLIGHT_MOVE: tuple[int, int, int, int] = (0, 180, 255, 80)
-"""Semi-transparent blue overlay for reachable movement cells."""
+# Highlight colours  (R, G, B, A)  — Tailwind CSS palette
+HIGHLIGHT_MOVE: tuple[int, int, int, int] = (56, 189, 248, 80)
+"""Semi-transparent Sky-400 blue overlay for reachable movement cells."""
 
-HIGHLIGHT_ATTACK: tuple[int, int, int, int] = (255, 60, 60, 80)
-"""Semi-transparent red overlay for cells in attack range."""
+HIGHLIGHT_ATTACK: tuple[int, int, int, int] = (244, 63, 94, 80)
+"""Semi-transparent Rose-500 red overlay for cells in attack range."""
 
 
 # ---------------------------------------------------------------------------

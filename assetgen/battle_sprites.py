@@ -5,14 +5,14 @@ Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
 
 Filenames and sizes match the architecture contract::
 
-    warrior_idle_01.png          64x64
-    warrior_walk_{01..04}.png    64x64
-    warrior_attack_{01..03}.png  64x64
-    skeleton_idle_01.png         64x64
-    skeleton_walk_{01..04}.png   64x64
-    skeleton_hit_{01..03}.png    64x64
-    skeleton_death_{01..03}.png  64x64
-    select_ring.png              72x72
+    warrior_idle_01.png          128x128
+    warrior_walk_{01..04}.png    128x128
+    warrior_attack_{01..03}.png  128x128
+    skeleton_idle_01.png         128x128
+    skeleton_walk_{01..04}.png   128x128
+    skeleton_hit_{01..03}.png    128x128
+    skeleton_death_{01..03}.png  128x128
+    select_ring.png              144x144
 
 Run from project root::
 
@@ -99,25 +99,34 @@ EYE_RED_CORE = (255, 60, 30, 255)   # bright centre
 EYE_RED_MID = (220, 20, 0, 255)     # mid glow
 EYE_RED_OUTER = (120, 0, 0, 200)    # dark edge
 
-SIZE = (64, 64)  # all battle sprites are 64x64
-CX, CY = 32, 32  # centre
+SIZE = (128, 128)  # all battle sprites are 128x128
+CX, CY = 64, 64  # centre
 
-# Supersampling factor — all warrior rendering is done at SS×
+# Supersampling factor — all rendering is done at SS×
 _SS = 4
 
+# Content scale factor — coordinates authored at 1× map to _SCALE pixels
+# in output space.  With SIZE 128 and coordinates authored for 64, _SCALE=2.
+_SCALE = 2
+
 
 # ===================================================================
-# Warrior internal drawing helpers (operate at supersampled scale)
+# Internal drawing helpers (operate at supersampled scale)
 # ===================================================================
+
+def _valid_bbox(bbox: tuple[int, int, int, int]) -> bool:
+    """Return True if *bbox* has positive width and height."""
+    return bbox[2] > bbox[0] and bbox[3] > bbox[1]
+
 
 def _s(v: float) -> float:
-    """Scale a 1× coordinate to supersampled space."""
-    return v * _SS
+    """Scale a 1× coordinate to supersampled space (accounting for 2× content scale)."""
+    return v * _SS * _SCALE
 
 
 def _si(v: float) -> int:
-    """Scale a 1× coordinate to supersampled space (integer)."""
-    return int(v * _SS)
+    """Scale a 1× coordinate to supersampled space (integer, accounting for 2× content scale)."""
+    return int(v * _SS * _SCALE)
 
 
 # -------------------------------------------------------------------
@@ -252,15 +261,55 @@ def _draw_arm(
     hand: Tuple[float, float],
     color: Tuple[int, int, int, int],
     width: int = 0,
+    elbow_bend: float = 0.0,
 ) -> None:
-    """Draw a single arm as a thick line segment with rounded ends."""
+    """Draw a two-segment arm (upper arm + forearm) with an elbow joint.
+
+    *elbow_bend* controls the lateral elbow offset: positive bends
+    outward (away from body), negative bends inward.  The elbow is
+    placed at the midpoint of shoulder→hand plus this lateral offset.
+    If *elbow_bend* is 0 the midpoint falls straight between
+    shoulder and hand (still two segments, giving a subtle kink from
+    the joint circle).
+    """
     draw = ImageDraw.Draw(img, "RGBA")
     w = width if width > 0 else max(2, _si(3))
+
+    # Compute elbow at midpoint with lateral bend
+    mx = (shoulder[0] + hand[0]) / 2.0
+    my = (shoulder[1] + hand[1]) / 2.0
+    # Perpendicular direction for bend
+    dx = hand[0] - shoulder[0]
+    dy = hand[1] - shoulder[1]
+    length = max(1.0, (dx * dx + dy * dy) ** 0.5)
+    # Perpendicular unit vector (rotated 90°)
+    px = -dy / length
+    py = dx / length
+    elbow_x = mx + px * elbow_bend
+    elbow_y = my + py * elbow_bend
+
+    # Upper arm (shoulder → elbow)
     draw.line(
-        [(shoulder[0], shoulder[1]), (hand[0], hand[1])],
+        [(shoulder[0], shoulder[1]), (elbow_x, elbow_y)],
         fill=color,
         width=w,
     )
+    # Forearm (elbow → hand)
+    draw.line(
+        [(elbow_x, elbow_y), (hand[0], hand[1])],
+        fill=darken(color, 0.1),
+        width=w,
+    )
+
+    # Elbow joint circle
+    jr = _s(2.0)
+    filled_ellipse(
+        img,
+        (int(elbow_x - jr), int(elbow_y - jr),
+         int(elbow_x + jr), int(elbow_y + jr)),
+        fill=darken(color, 0.05),
+    )
+
     # Small round pauldron at shoulder
     r = _s(2.5)
     filled_ellipse(
@@ -380,22 +429,23 @@ def _draw_shield(
         min(img.width, int(gem_cx + halo_r) + 2),
         min(img.height, int(gem_cy + halo_r) + 2),
     )
-    halo_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    radial_gradient(
-        halo_layer,
-        (gem_cx, gem_cy),
-        halo_r,
-        stops=[
-            (0.0, adjust_alpha(GEM_CYAN, min(255, halo_alpha + 100))),
-            (0.5, adjust_alpha(GEM_CYAN, halo_alpha)),
-            (1.0, (0, 0, 0, 0)),
-        ],
-        bbox=halo_bbox,
-    )
-    img.paste(Image.alpha_composite(
-        img.crop(halo_bbox).copy(),
-        halo_layer.crop(halo_bbox),
-    ), (halo_bbox[0], halo_bbox[1]))
+    if _valid_bbox(halo_bbox):
+        halo_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        radial_gradient(
+            halo_layer,
+            (gem_cx, gem_cy),
+            halo_r,
+            stops=[
+                (0.0, adjust_alpha(GEM_CYAN, min(255, halo_alpha + 100))),
+                (0.5, adjust_alpha(GEM_CYAN, halo_alpha)),
+                (1.0, (0, 0, 0, 0)),
+            ],
+            bbox=halo_bbox,
+        )
+        img.paste(Image.alpha_composite(
+            img.crop(halo_bbox).copy(),
+            halo_layer.crop(halo_bbox),
+        ), (halo_bbox[0], halo_bbox[1]))
 
     # Gem body — radial gradient (tight bbox)
     gem_bbox = (
@@ -540,7 +590,7 @@ def _draw_warrior(
     l_shoulder = (_s(CX) - _s(10), torso_top + _s(2))
     l_hand_y = _s(32) + _s(shield_arm_angle) + bob
     l_hand = (_s(CX) - _s(17), l_hand_y)
-    _draw_arm(img, l_shoulder, l_hand, BLUE)
+    _draw_arm(img, l_shoulder, l_hand, BLUE, elbow_bend=_s(4))
 
     # --- Shield + gem ---
     shield_cx = _s(CX) - _s(17)
@@ -551,7 +601,7 @@ def _draw_warrior(
     r_shoulder = (_s(CX) + _s(10), torso_top + _s(2))
     r_hand_y = _s(30) + _s(sword_arm_angle) + bob
     r_hand = (_s(CX) + _s(17), r_hand_y)
-    _draw_arm(img, r_shoulder, r_hand, BLUE)
+    _draw_arm(img, r_shoulder, r_hand, BLUE, elbow_bend=_s(4))
 
     # --- Sword ---
     _draw_sword(
@@ -571,7 +621,7 @@ def _draw_warrior(
 # -------------------------------------------------------------------
 
 def _post_process(sprite: Image.Image) -> Image.Image:
-    """Apply rim lighting and a soft drop shadow, cropped back to 64×64.
+    """Apply rim lighting and a soft drop shadow, cropped back to 128×128.
 
     Rim lighting is a faint glow composited behind the sprite.
     The drop shadow is subtle — just enough to ground the character.
@@ -584,17 +634,18 @@ def _post_process(sprite: Image.Image) -> Image.Image:
         intensity=0.25,
     )
 
-    # Soft drop shadow — rendered with expansion then cropped back to 64×64
-    # so the shadow doesn't overwhelm the small canvas.
+    # Soft drop shadow — rendered with expansion then cropped back to 128×128
+    # so the shadow doesn't overwhelm the canvas.
+    _expand = 8
     padded = apply_drop_shadow(
         result,
-        offset=(2, 2),
-        blur_radius=2.5,
+        offset=(4, 4),
+        blur_radius=5.0,
         shadow_color=(0, 0, 0, 70),
-        expand=4,
+        expand=_expand,
     )
-    # Crop the expanded image back to 64×64, centred.
-    return padded.crop((4, 4, 4 + SIZE[0], 4 + SIZE[1]))
+    # Crop the expanded image back to 128×128, centred.
+    return padded.crop((_expand, _expand, _expand + SIZE[0], _expand + SIZE[1]))
 
 
 # ===================================================================
@@ -604,7 +655,7 @@ def _post_process(sprite: Image.Image) -> Image.Image:
 def make_warrior_idle() -> Image.Image:
     """Warrior idle frame — standing at rest with shield and sword.
 
-    All rendering is 4× supersampled and LANCZOS-downsampled to 64×64.
+    All rendering is 4× supersampled and LANCZOS-downsampled to 128×128.
     Includes metallic gradient armour, a pulsing gem, rim lighting,
     and a soft drop shadow.
     """
@@ -734,7 +785,7 @@ def make_warrior_frame(pose: str, frame_idx: int = 1) -> Image.Image:
         frame_idx: 1-based frame index (ignored for idle).
 
     Returns:
-        64×64 RGBA ``Image``.
+        128×128 RGBA ``Image``.
 
     Raises:
         ValueError: If *pose* is not recognised.
@@ -827,23 +878,24 @@ def _draw_skull(
                 min(img.width, int(ex + halo_r) + 2),
                 min(img.height, int(eye_y + halo_r) + 2),
             )
-            halo_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
-            glow_a = int(body_alpha * 0.4)
-            radial_gradient(
-                halo_layer,
-                (ex, eye_y),
-                halo_r,
-                stops=[
-                    (0.0, adjust_alpha(EYE_RED_CORE, min(255, glow_a + 60))),
-                    (0.5, adjust_alpha(EYE_RED_MID, glow_a)),
-                    (1.0, (0, 0, 0, 0)),
-                ],
-                bbox=halo_bbox,
-            )
-            img.paste(Image.alpha_composite(
-                img.crop(halo_bbox).copy(),
-                halo_layer.crop(halo_bbox),
-            ), (halo_bbox[0], halo_bbox[1]))
+            if _valid_bbox(halo_bbox):
+                halo_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+                glow_a = int(body_alpha * 0.4)
+                radial_gradient(
+                    halo_layer,
+                    (ex, eye_y),
+                    halo_r,
+                    stops=[
+                        (0.0, adjust_alpha(EYE_RED_CORE, min(255, glow_a + 60))),
+                        (0.5, adjust_alpha(EYE_RED_MID, glow_a)),
+                        (1.0, (0, 0, 0, 0)),
+                    ],
+                    bbox=halo_bbox,
+                )
+                img.paste(Image.alpha_composite(
+                    img.crop(halo_bbox).copy(),
+                    halo_layer.crop(halo_bbox),
+                ), (halo_bbox[0], halo_bbox[1]))
 
             # Eye socket core — small radial gradient
             core_bbox = (
@@ -852,17 +904,18 @@ def _draw_skull(
                 min(img.width, int(ex + eye_r) + 2),
                 min(img.height, int(eye_y + eye_r) + 2),
             )
-            radial_gradient(
-                img,
-                (ex, eye_y),
-                eye_r,
-                stops=[
-                    (0.0, adjust_alpha(EYE_RED_CORE, body_alpha)),
-                    (0.6, adjust_alpha(EYE_RED_MID, body_alpha)),
-                    (1.0, adjust_alpha(EYE_RED_OUTER, int(body_alpha * 0.7))),
-                ],
-                bbox=core_bbox,
-            )
+            if _valid_bbox(core_bbox):
+                radial_gradient(
+                    img,
+                    (ex, eye_y),
+                    eye_r,
+                    stops=[
+                        (0.0, adjust_alpha(EYE_RED_CORE, body_alpha)),
+                        (0.6, adjust_alpha(EYE_RED_MID, body_alpha)),
+                        (1.0, adjust_alpha(EYE_RED_OUTER, int(body_alpha * 0.7))),
+                    ],
+                    bbox=core_bbox,
+                )
 
     # --- Jaw line ---
     if body_alpha > 80:
@@ -968,34 +1021,61 @@ def _draw_bone_limb(
     end: Tuple[float, float],
     body_alpha: int = 255,
     width_scale: float = 1.0,
+    joint_bend: float = 0.0,
 ) -> None:
-    """Draw a single bone limb segment with small joint circles at each end.
+    """Draw a two-segment bone limb with a knee/elbow joint in the middle.
 
-    Much thinner than the warrior's armoured limbs to emphasise the
-    skeletal nature.
+    *joint_bend* controls the lateral offset of the joint from the
+    midpoint (positive = perpendicular offset away from the midline).
     """
     draw = ImageDraw.Draw(img, "RGBA")
     limb_color = adjust_alpha(BONE, body_alpha)
     limb_dark = adjust_alpha(BONE_DARK, body_alpha)
     w = max(1, _si(1.8 * width_scale))
 
-    # Main bone shaft
+    # Compute joint (knee/elbow) position at midpoint with bend offset
+    mx = (start[0] + end[0]) / 2.0
+    my = (start[1] + end[1]) / 2.0
+    if joint_bend != 0.0:
+        dx = end[0] - start[0]
+        dy = end[1] - start[1]
+        length = max(1.0, (dx * dx + dy * dy) ** 0.5)
+        px = -dy / length
+        py = dx / length
+        mx += px * joint_bend
+        my += py * joint_bend
+
+    # Upper segment (start → joint)
     draw.line(
-        [(start[0], start[1]), (end[0], end[1])],
+        [(start[0], start[1]), (mx, my)],
         fill=limb_color,
         width=w,
     )
-    # Dark edge for depth
+    # Dark edge for upper segment
     draw.line(
         [(start[0] + _s(0.3), start[1] + _s(0.3)),
+         (mx + _s(0.3), my + _s(0.3))],
+        fill=limb_dark,
+        width=max(1, w - 1),
+    )
+
+    # Lower segment (joint → end)
+    draw.line(
+        [(mx, my), (end[0], end[1])],
+        fill=limb_color,
+        width=w,
+    )
+    # Dark edge for lower segment
+    draw.line(
+        [(mx + _s(0.3), my + _s(0.3)),
          (end[0] + _s(0.3), end[1] + _s(0.3))],
         fill=limb_dark,
         width=max(1, w - 1),
     )
 
-    # Joint circles at start and end
+    # Joint circles at start, middle (knee/elbow), and end
     jr = _s(1.8 * width_scale)
-    for jx, jy in [start, end]:
+    for jx, jy in [start, (mx, my), end]:
         filled_ellipse(
             img,
             (int(jx - jr), int(jy - jr), int(jx + jr), int(jy + jr)),
@@ -1049,8 +1129,10 @@ def _draw_skeleton(
     left_hip = (_s(CX) - _s(5) + sdx, hip_y)
     right_hip = (_s(CX) + _s(5) + sdx, hip_y)
 
-    _draw_bone_limb(img, left_hip, left_foot, body_alpha=body_alpha)
-    _draw_bone_limb(img, right_hip, right_foot, body_alpha=body_alpha)
+    _draw_bone_limb(img, left_hip, left_foot, body_alpha=body_alpha,
+                    joint_bend=_s(3))
+    _draw_bone_limb(img, right_hip, right_foot, body_alpha=body_alpha,
+                    joint_bend=_s(3))
 
     # --- Ribcage ---
     ribcage_cx = _s(CX) + sdx
@@ -1069,9 +1151,9 @@ def _draw_skeleton(
         _s(38) + bob + sdy,
     )
     _draw_bone_limb(img, l_shoulder, l_hand, body_alpha=body_alpha,
-                    width_scale=0.85)
+                    width_scale=0.85, joint_bend=_s(3))
     _draw_bone_limb(img, r_shoulder, r_hand, body_alpha=body_alpha,
-                    width_scale=0.85)
+                    width_scale=0.85, joint_bend=_s(3))
 
     # --- Skull (drawn last — in front) ---
     _draw_skull(img, head_cx, head_y, body_alpha=body_alpha)
@@ -1105,14 +1187,15 @@ def _skeleton_post_process(
     )
 
     # Soft drop shadow
+    _expand = 8
     padded = apply_drop_shadow(
         sprite,
-        offset=(2, 2),
-        blur_radius=2.5,
+        offset=(4, 4),
+        blur_radius=5.0,
         shadow_color=(0, 0, 0, 60),
-        expand=4,
+        expand=_expand,
     )
-    return padded.crop((4, 4, 4 + SIZE[0], 4 + SIZE[1]))
+    return padded.crop((_expand, _expand, _expand + SIZE[0], _expand + SIZE[1]))
 
 
 # -------------------------------------------------------------------
@@ -1297,7 +1380,7 @@ def make_skeleton_frame(pose: str, frame_idx: int = 1) -> Image.Image:
         frame_idx: 1-based frame index (ignored for idle).
 
     Returns:
-        64×64 RGBA ``Image``.
+        128×128 RGBA ``Image``.
 
     Raises:
         ValueError: If *pose* is not recognised.
@@ -1318,11 +1401,12 @@ def make_skeleton_frame(pose: str, frame_idx: int = 1) -> Image.Image:
 # Select ring
 # ===================================================================
 
-RING_SIZE = (72, 72)
+RING_SIZE = (144, 144)
 
 # The ring ellipse in 1× space: (x0, y0, x1, y1)
 # Wider than tall to suggest a ground-plane perspective.
-_RING_BBOX_1X = (4, 16, 67, 55)
+# Coordinates are in 144×144 output space (doubled from original 72×72).
+_RING_BBOX_1X = (8, 32, 134, 110)
 
 
 def _draw_select_ring(img: Image.Image) -> None:
@@ -1454,7 +1538,7 @@ def _draw_select_ring(img: Image.Image) -> None:
 
 
 def make_select_ring() -> Image.Image:
-    """Magical golden selection ring — 72×72 transparent.
+    """Magical golden selection ring — 144×144 transparent.
 
     The ring is elliptical (wider than tall) to suggest a ground-plane
     perspective.  Rendered at 4× supersampling for smooth anti-aliased
@@ -1467,7 +1551,7 @@ def make_select_ring() -> Image.Image:
     - Specular highlight for reflected light
 
     Returns:
-        72×72 RGBA ``Image``.
+        144×144 RGBA ``Image``.
     """
     sprite = supersample_draw(
         RING_SIZE[0], RING_SIZE[1], _draw_select_ring, factor=_SS,

@@ -22,6 +22,7 @@ Usage (inside a Scene)::
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any, Callable
 
 from saga2d import (
@@ -55,27 +56,34 @@ if TYPE_CHECKING:
 # Constants
 # ======================================================================
 
-SPRITE_SIZE: int = 64
-"""All battle sprites are 64×64."""
+SPRITE_SIZE: int = 128
+"""All battle sprites are 128×128."""
 
 MOVE_SPEED: float = 400.0
 """Walk speed in pixels per second."""
 
 # Health bar geometry (drawn via Scene.draw_rect / draw_world_rect)
-HEALTH_BAR_WIDTH: int = 48
-HEALTH_BAR_HEIGHT: int = 6
-HEALTH_BAR_Y_OFFSET: int = -8
+HEALTH_BAR_WIDTH: int = 96
+HEALTH_BAR_HEIGHT: int = 10
+HEALTH_BAR_Y_OFFSET: int = -12
 """Y offset above the sprite's position for the health bar."""
 
 HEALTH_BAR_BG: tuple[int, int, int, int] = (40, 40, 40, 200)
-HEALTH_BAR_FG: tuple[int, int, int, int] = (50, 200, 50, 220)
-HEALTH_BAR_LOW: tuple[int, int, int, int] = (220, 60, 40, 220)
-"""Foreground colour when HP drops below 30%."""
+HEALTH_BAR_FG: tuple[int, int, int, int] = (16, 185, 129, 220)
+"""Emerald-500 foreground colour for healthy HP."""
+HEALTH_BAR_LOW: tuple[int, int, int, int] = (244, 63, 94, 220)
+"""Rose-500 foreground colour when HP drops below 30%."""
 
 # Floating damage number settings
 FLOAT_RISE: float = 60.0
 """How many pixels damage numbers float upward."""
 FLOAT_DURATION: float = 0.8
+
+# Idle bobbing
+IDLE_BOB_AMPLITUDE: float = 3.0
+"""Peak pixel displacement of idle bob (up and down)."""
+IDLE_BOB_SPEED: float = 2.0
+"""Cycles per second for idle bobbing."""
 
 
 # ======================================================================
@@ -161,6 +169,11 @@ class BaseUnit:
         # State
         self.alive = True
         self.selected = False
+
+        # Idle bob state
+        self._bob_time: float = 0.0
+        self._base_y: float = self.sprite.position[1]
+        """The resting y position (bottom-center anchor); bob oscillates around this."""
 
         # Visual children
         self._select_ring: Sprite | None = None
@@ -258,11 +271,38 @@ class BaseUnit:
         world_x, _ = self.grid.grid_to_world_center(col, row)
         sprite_y = self.grid.origin_y + (row + 1) * TILE_SIZE
         self.sprite.position = (world_x, sprite_y)
+        self._base_y = sprite_y
 
     @property
     def world_pos(self) -> tuple[float, float]:
         """Current world-pixel position of the sprite."""
         return self.sprite.position
+
+    # ------------------------------------------------------------------
+    # Per-frame update (idle bob)
+    # ------------------------------------------------------------------
+
+    def update(self, dt: float) -> None:
+        """Advance idle bobbing animation.
+
+        Applies a gentle sine-wave vertical offset to the sprite each
+        frame.  The bob is relative to ``_base_y`` so it doesn't drift.
+        Bobbing is paused while the sprite is executing a composable
+        action (e.g. MoveTo, attack choreography) to avoid conflicts.
+        """
+        if not self.alive:
+            return
+
+        # Skip bobbing while a MoveTo / attack action is running
+        if self.sprite._current_action is not None:
+            return
+
+        self._bob_time += dt
+        bob_offset = IDLE_BOB_AMPLITUDE * math.sin(
+            2.0 * math.pi * IDLE_BOB_SPEED * self._bob_time
+        )
+        sx, _ = self.sprite.position
+        self.sprite.position = (sx, self._base_y + bob_offset)
 
     # ------------------------------------------------------------------
     # Selection ring

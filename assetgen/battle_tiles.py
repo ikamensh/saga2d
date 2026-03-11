@@ -5,14 +5,15 @@ Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
 
 Filenames and sizes match the architecture contract::
 
-    tile_grass.png           64x64  -- textured grass ground tile
-    tile_dirt.png            64x64  -- brown earth/mud tile
-    tile_stone.png           64x64  -- grey cobblestone tile
-    tile_obstacle.png        64x64  -- grey rock obstacle on grass base
-    tile_move.png            64x64  -- semi-transparent blue movement indicator
-    tile_attack.png          64x64  -- semi-transparent red attack indicator
-    health_bar_bg.png        40x6   -- dark health bar background
-    health_bar_fill.png      40x6   -- green health bar fill with gradient
+    tile_grass.png           128x128  -- textured grass ground tile
+    tile_dirt.png            128x128  -- brown earth/mud tile
+    tile_stone.png           128x128  -- grey cobblestone tile
+    tile_obstacle.png        128x128  -- grey rock obstacle on grass base
+    tile_move.png            128x128  -- semi-transparent blue movement indicator
+    tile_attack.png          128x128  -- semi-transparent red attack indicator
+    health_bar_bg.png        96x10    -- dark health bar background
+    health_bar_fill.png      96x10    -- green health bar fill with gradient
+    battle_bg.png            1920x1080 -- textured battle background
 
 Run from project root::
 
@@ -89,11 +90,16 @@ ROCK_LIGHT = (120, 125, 130, 255)
 ROCK_BRIGHT = (150, 155, 160, 255)
 
 # Tile size
-TILE_SIZE = (64, 64)
-HEALTH_BAR_SIZE = (40, 6)
+TILE_SIZE = (128, 128)
+HEALTH_BAR_SIZE = (96, 10)
 
 # Supersampling factor — all rendering is done at SS×
 _SS = 4
+
+# Content scale factor — coordinates authored at 1× map to _SCALE pixels
+# in output space.  With TILE_SIZE 128 and coordinates authored for 64,
+# _SCALE=2.  Matches battle_sprites.py pattern.
+_SCALE = 2
 
 
 # ===================================================================
@@ -101,17 +107,17 @@ _SS = 4
 # ===================================================================
 
 def _s(v: float) -> float:
-    """Scale a 1× coordinate to supersampled space."""
-    return v * _SS
+    """Scale a 1× coordinate to supersampled space (accounting for 2× content scale)."""
+    return v * _SS * _SCALE
 
 
 def _si(v: float) -> int:
-    """Scale a 1× coordinate to supersampled space (integer)."""
-    return int(v * _SS)
+    """Scale a 1× coordinate to supersampled space (integer, accounting for 2× content scale)."""
+    return int(v * _SS * _SCALE)
 
 
 # ===================================================================
-# Grass tile (64×64)
+# Grass tile (128×128)
 # ===================================================================
 
 def make_tile_grass() -> Image.Image:
@@ -176,7 +182,7 @@ def make_tile_grass() -> Image.Image:
 
 
 # ===================================================================
-# Dirt tile (64×64)
+# Dirt tile (128×128)
 # ===================================================================
 
 def make_tile_dirt() -> Image.Image:
@@ -252,7 +258,7 @@ def make_tile_dirt() -> Image.Image:
 
 
 # ===================================================================
-# Stone tile (64×64)
+# Stone tile (128×128)
 # ===================================================================
 
 def make_tile_stone() -> Image.Image:
@@ -349,7 +355,7 @@ def make_tile_stone() -> Image.Image:
 
 
 # ===================================================================
-# Obstacle tile (64×64, grey rock on grass base)
+# Obstacle tile (128×128, grey rock on grass base)
 # ===================================================================
 
 def make_tile_obstacle() -> Image.Image:
@@ -501,7 +507,7 @@ def make_tile_obstacle() -> Image.Image:
 
 
 # ===================================================================
-# Movement indicator tile (64×64, semi-transparent blue)
+# Movement indicator tile (128×128, semi-transparent blue)
 # ===================================================================
 
 def make_tile_move() -> Image.Image:
@@ -571,7 +577,7 @@ def make_tile_move() -> Image.Image:
 
 
 # ===================================================================
-# Attack indicator tile (64×64, semi-transparent red)
+# Attack indicator tile (128×128, semi-transparent red)
 # ===================================================================
 
 def make_tile_attack() -> Image.Image:
@@ -640,7 +646,7 @@ def make_tile_attack() -> Image.Image:
 
 
 # ===================================================================
-# Health bar background (40×6)
+# Health bar background (96×10)
 # ===================================================================
 
 def make_health_bar_bg() -> Image.Image:
@@ -665,7 +671,7 @@ def make_health_bar_bg() -> Image.Image:
 
 
 # ===================================================================
-# Health bar fill (40×6, green gradient)
+# Health bar fill (96×10, green gradient)
 # ===================================================================
 
 def make_health_bar_fill() -> Image.Image:
@@ -711,6 +717,61 @@ def make_health_bar_fill() -> Image.Image:
 
 
 # ===================================================================
+# Full-screen battle background (1920×1080)
+# ===================================================================
+
+BATTLE_BG_SIZE = (1920, 1080)
+
+def make_battle_bg() -> Image.Image:
+    """Generate a 1920×1080 textured background for the battle scene.
+
+    Creates a dark Slate-900 base with:
+    - A subtle radial vignette (darker edges, slightly lighter centre)
+    - Fine noise grain for texture
+    - A faint horizontal gradient band in the lower third (floor feel)
+
+    No supersampling — drawn directly at 1920×1080 for efficiency.
+    """
+    w, h = BATTLE_BG_SIZE
+    img = Image.new("RGBA", (w, h), (15, 23, 42, 255))  # Slate-900
+
+    # --- Radial vignette: lighter center, darker edges ---
+    radial_gradient(
+        img,
+        (w / 2, h / 2),
+        max(w, h) * 0.7,
+        stops=[
+            (0.0, (25, 35, 55, 255)),    # slightly lighter centre
+            (0.5, (18, 28, 46, 255)),     # mid-transition
+            (1.0, (8, 12, 24, 255)),      # dark edge
+        ],
+    )
+
+    # --- Faint horizontal band in lower third (floor ambiance) ---
+    floor_band = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    band_top = int(h * 0.55)
+    band_bottom = int(h * 0.85)
+    linear_gradient(
+        floor_band,
+        stops=[
+            (0.0, (0, 0, 0, 0)),
+            (0.3, (30, 45, 60, 40)),
+            (0.6, (25, 38, 52, 30)),
+            (1.0, (0, 0, 0, 0)),
+        ],
+        start=(0.0, 0.0),
+        end=(0.0, 1.0),
+        bbox=(0, band_top, w, band_bottom),
+    )
+    img = Image.alpha_composite(img, floor_band)
+
+    # --- Subtle noise for texture ---
+    img = apply_noise(img, amount=0.04, monochrome=True, seed=300)
+
+    return img
+
+
+# ===================================================================
 # generate() — save all PNGs
 # ===================================================================
 
@@ -741,6 +802,9 @@ def generate(output_dir: Path) -> List[Path]:
     # Health bar
     _save(make_health_bar_bg(), "health_bar_bg.png")
     _save(make_health_bar_fill(), "health_bar_fill.png")
+
+    # Full-screen battle background
+    _save(make_battle_bg(), "battle_bg.png")
 
     return written
 

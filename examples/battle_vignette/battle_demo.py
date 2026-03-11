@@ -117,7 +117,7 @@ E_CANCEL = "cancel"
 class BattleScene(Scene):
     """Playable tactical battle with FSM-driven turn flow."""
 
-    background_color = (50, 60, 40, 255)
+    background_color = (15, 23, 42, 255)  # Tailwind Slate-900
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -148,6 +148,15 @@ class BattleScene(Scene):
             viewport_size=(SCREEN_W, SCREEN_H),
         )
 
+        # Full-screen textured background (added first → drawn behind terrain)
+        self._bg_sprite = Sprite(
+            "tiles/battle_bg",
+            position=(0, 0),
+            layer=RenderLayer.BACKGROUND,
+            anchor=SpriteAnchor.TOP_LEFT,
+        )
+        self.add_sprite(self._bg_sprite)
+
         # Grid
         self.grid = SquareGrid(
             self,
@@ -175,6 +184,16 @@ class BattleScene(Scene):
     def on_exit(self) -> None:
         # Deselect to clean up ring tweens
         self._deselect()
+
+    # ------------------------------------------------------------------
+    # Per-frame update
+    # ------------------------------------------------------------------
+
+    def update(self, dt: float) -> None:
+        """Advance per-frame logic: idle bobbing for all living units."""
+        super().update(dt)
+        for unit in self.all_units:
+            unit.update(dt)
 
     # ------------------------------------------------------------------
     # Obstacle placement
