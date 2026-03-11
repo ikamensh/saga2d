@@ -3,46 +3,54 @@
 Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
 ``generate(output_dir)`` saves all files and returns the list of paths.
 
+All visual assets use 4x supersampling with 2x content scale for crisp,
+professional-quality output.  Coordinates are authored in 32-unit space
+and scaled via ``_s()``/``_si()`` helpers.
+
 Assets generated::
 
-    Terrain (32x32):
-        grass.png            -- green grass tile with subtle texture
-        path_straight.png    -- tan/brown walkable path
+    Terrain (64x64):
+        grass.png            -- emerald grass tile (= grass_0)
+        grass_0.png          -- grass variant 0 (tufts + pebbles)
+        grass_1.png          -- grass variant 1 (dense tufts + flower)
+        grass_2.png          -- grass variant 2 (rocky, warm tint)
+        grass_3.png          -- grass variant 3 (sparse, dead patch)
+        path_straight.png    -- slate walkable path with border
         path_turn.png        -- path corner piece
 
-    Towers (32x32):
-        tower_basic.png      -- simple turret (grey base + barrel)
-        tower_sniper.png     -- long-range tower (narrow barrel, blue tint)
-        tower_splash.png     -- area-of-effect tower (wide barrel, red tint)
+    Towers (64x64):
+        tower_basic.png      -- slate turret with sky-blue accent
+        tower_sniper.png     -- long-range tower (indigo tint)
+        tower_splash.png     -- area-of-effect cannon (red tint)
         tower_slot.png       -- empty buildable slot marker
 
-    Enemies (24x24):
-        enemy_basic.png      -- red foot soldier
-        enemy_fast.png       -- orange scout (smaller, triangular)
-        enemy_tank.png       -- dark-red heavy (armoured look)
+    Enemies (48x48):
+        enemy_basic.png      -- rose foot soldier
+        enemy_fast.png       -- orange scout (diamond shape)
+        enemy_tank.png       -- dark-rose heavy (armoured)
 
-    Projectiles (8x8):
-        projectile_basic.png -- yellow dot
+    Projectiles (16x16):
+        projectile_basic.png -- yellow glow dot
         projectile_sniper.png -- cyan bolt
         projectile_splash.png -- orange ball
 
     Effects (various):
-        explosion.png        -- 16x16 orange/yellow burst
-        range_indicator.png  -- 64x64 semi-transparent circle
+        explosion.png        -- 32x32 orange/yellow burst
+        range_indicator.png  -- 128x128 semi-transparent circle
 
     UI elements:
-        btn_normal.png       -- 80x32 dark button
-        btn_hover.png        -- 80x32 lighter button
-        btn_pressed.png      -- 80x32 darker pressed button
-        panel_bg.png         -- 120x200 dark UI panel
-        health_bar_bg.png    -- 24x4 dark health bar background
-        health_bar_fill.png  -- 24x4 green health bar fill
-        coin_icon.png        -- 16x16 gold coin
-        heart_icon.png       -- 16x16 red heart
-        wave_banner.png      -- 160x40 wave announcement banner
+        btn_normal.png       -- 160x64 dark button
+        btn_hover.png        -- 160x64 lighter button
+        btn_pressed.png      -- 160x64 darker pressed button
+        panel_bg.png         -- 240x400 dark UI panel
+        health_bar_bg.png    -- 48x8 dark health bar background
+        health_bar_fill.png  -- 48x8 green health bar fill
+        coin_icon.png        -- 32x32 gold coin
+        heart_icon.png       -- 32x32 red heart
+        wave_banner.png      -- 320x80 wave announcement banner
 
     HUD:
-        hud_top_bar.png      -- 320x24 top HUD bar background
+        hud_top_bar.png      -- 640x48 top HUD bar background
 
     Sound effects (WAV, assets/sounds/):
         sfx_shoot.wav        -- short click/pop for tower firing
@@ -78,10 +86,17 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 from assetgen.primitives import (  # noqa: E402
+    adjust_alpha,
+    apply_noise,
+    darken,
     filled_ellipse,
     filled_polygon,
+    lighten,
+    linear_gradient,
     outlined_ellipse,
     outlined_polygon,
+    radial_gradient,
+    supersample_draw,
     vertical_gradient,
 )
 
@@ -91,275 +106,889 @@ from assetgen.primitives import (  # noqa: E402
 Color = Tuple[int, int, int, int]  # RGBA
 
 # ---------------------------------------------------------------------------
-# Colour palette
+# Supersampling & scaling (match battle_tiles.py pattern)
+# ---------------------------------------------------------------------------
+_SS = 4       # supersampling factor
+_SCALE = 2    # content scale (author at 32, output at 64)
+
+
+def _s(v: float) -> float:
+    """Scale a 1x coordinate to supersampled space."""
+    return v * _SS * _SCALE
+
+
+def _si(v: float) -> int:
+    """Scale a 1x coordinate to supersampled space (integer)."""
+    return int(v * _SS * _SCALE)
+
+
+# ---------------------------------------------------------------------------
+# Colour palette — Tailwind CSS inspired
 # ---------------------------------------------------------------------------
 
-# Terrain
-GRASS_GREEN = (60, 140, 50, 255)
-GRASS_LIGHT = (75, 160, 65, 255)
-GRASS_DARK = (45, 110, 35, 255)
-PATH_TAN = (180, 155, 110, 255)
-PATH_DARK = (145, 120, 85, 255)
-PATH_LIGHT = (200, 175, 135, 255)
+# Grass — Emerald variants
+GRASS_DARK = (4, 120, 87, 255)         # Emerald 800
+GRASS_MID = (16, 185, 129, 255)        # Emerald 500
+GRASS_LIGHT = (52, 211, 153, 255)      # Emerald 400
+GRASS_BRIGHT = (110, 231, 183, 255)    # Emerald 300
 
-# Towers
-TOWER_GREY = (120, 120, 130, 255)
-TOWER_DARK = (80, 80, 90, 255)
-TOWER_LIGHT = (160, 160, 170, 255)
-TOWER_SNIPER_TINT = (100, 130, 180, 255)
-TOWER_SPLASH_TINT = (180, 100, 90, 255)
-SLOT_GREEN = (80, 180, 80, 100)
-SLOT_BORDER = (100, 200, 100, 180)
+# Path — Slate variants
+PATH_DARK = (51, 65, 85, 255)          # Slate 700
+PATH_MID = (100, 116, 139, 255)        # Slate 500
+PATH_LIGHT = (148, 163, 184, 255)      # Slate 400
+PATH_BRIGHT = (203, 213, 225, 255)     # Slate 300
 
-# Enemies
-ENEMY_RED = (200, 50, 50, 255)
-ENEMY_RED_DARK = (150, 30, 30, 255)
-ENEMY_ORANGE = (220, 140, 40, 255)
-ENEMY_ORANGE_DARK = (180, 100, 20, 255)
-ENEMY_TANK_RED = (140, 30, 30, 255)
-ENEMY_TANK_DARK = (100, 20, 20, 255)
+# Towers — Slate base + Sky accent
+TOWER_BASE = (71, 85, 105, 255)        # Slate 600
+TOWER_DARK = (51, 65, 85, 255)         # Slate 700
+TOWER_LIGHT = (100, 116, 139, 255)     # Slate 500
+TOWER_ACCENT = (56, 189, 248, 255)     # Sky 400
+TOWER_ACCENT_LIGHT = (125, 211, 252, 255)  # Sky 300
+TOWER_SNIPER_ACCENT = (99, 102, 241, 255)  # Indigo 500
+TOWER_SPLASH_ACCENT = (239, 68, 68, 255)   # Red 500
+
+# Slot
+SLOT_GREEN = (52, 211, 153, 100)       # Emerald 400 translucent
+SLOT_BORDER = (110, 231, 183, 180)     # Emerald 300 translucent
+
+# Enemies — Rose variants
+ENEMY_PRIMARY = (244, 63, 94, 255)     # Rose 500
+ENEMY_DARK = (190, 18, 60, 255)        # Rose 700
+ENEMY_LIGHT = (251, 113, 133, 255)     # Rose 400
+ENEMY_FAST = (251, 146, 60, 255)       # Orange 400
+ENEMY_FAST_DARK = (234, 88, 12, 255)   # Orange 600
+ENEMY_TANK = (159, 18, 57, 255)        # Rose 800
+ENEMY_TANK_DARK = (136, 19, 55, 255)   # Rose 900
 
 # Projectiles
-PROJ_YELLOW = (255, 230, 50, 255)
-PROJ_CYAN = (80, 220, 255, 255)
-PROJ_ORANGE = (255, 160, 40, 255)
+PROJ_YELLOW = (253, 224, 71, 255)      # Yellow 300
+PROJ_CYAN = (34, 211, 238, 255)        # Cyan 400
+PROJ_ORANGE = (251, 146, 60, 255)      # Orange 400
 
 # Effects
-EXPLOSION_ORANGE = (255, 160, 30, 220)
-EXPLOSION_YELLOW = (255, 230, 80, 200)
-RANGE_INDICATOR_COLOR = (100, 200, 255, 50)
-RANGE_BORDER = (100, 200, 255, 100)
+EXPLOSION_ORANGE = (251, 146, 60, 220)   # Orange 400
+EXPLOSION_YELLOW = (253, 224, 71, 200)   # Yellow 300
+RANGE_COLOR = (56, 189, 248, 50)         # Sky 400 translucent
+RANGE_BORDER_COLOR = (56, 189, 248, 100) # Sky 400
 
-# UI
-UI_DARK = (30, 30, 40, 230)
-UI_MID = (50, 50, 65, 230)
-UI_LIGHT = (70, 70, 90, 230)
-UI_BORDER = (90, 90, 110, 255)
-GOLD = (255, 210, 50, 255)
-GOLD_DARK = (200, 160, 30, 255)
-HEALTH_GREEN = (60, 200, 60, 255)
-HEALTH_BG = (40, 40, 40, 200)
-HEART_RED = (220, 40, 60, 255)
-HEART_DARK = (170, 20, 40, 255)
-BANNER_BORDER = (180, 150, 60, 255)
-HUD_BG = (20, 20, 30, 220)
+# UI — Slate 800 backgrounds, Sky 400 accents
+UI_DARK = (30, 41, 59, 230)            # Slate 800
+UI_MID = (51, 65, 85, 230)             # Slate 700
+UI_LIGHT = (71, 85, 105, 230)          # Slate 600
+UI_BORDER = (100, 116, 139, 255)       # Slate 500
+GOLD = (253, 224, 71, 255)             # Yellow 300
+GOLD_DARK = (202, 138, 4, 255)         # Yellow 600
+HEALTH_GREEN = (34, 197, 94, 255)      # Green 500
+HEALTH_BG = (30, 41, 59, 200)          # Slate 800
+HEART_RED = (244, 63, 94, 255)         # Rose 500
+HEART_DARK = (190, 18, 60, 255)        # Rose 700
+BANNER_BORDER = (253, 224, 71, 255)    # Yellow 300
+HUD_BG = (15, 23, 42, 220)            # Slate 900
 
 
 # ===================================================================
-# Terrain tiles (32x32)
+# Grass helpers
 # ===================================================================
 
-def make_grass() -> Image.Image:
-    """32x32 grass tile with subtle texture variation."""
-    img = Image.new("RGBA", (32, 32), GRASS_GREEN)
-    draw = ImageDraw.Draw(img, "RGBA")
+def _paint_grass(big: Image.Image, tuft_positions: list[tuple[int, int]],
+                 pebble_positions: list[tuple[int, int]],
+                 dark_positions: list[tuple[int, int]],
+                 extra_fn=None) -> None:
+    """Shared grass-painting logic for all 4 variants."""
+    # Base gradient — lighter top, darker bottom for depth
+    linear_gradient(
+        big,
+        stops=[
+            (0.0, GRASS_LIGHT),
+            (0.4, GRASS_MID),
+            (1.0, GRASS_DARK),
+        ],
+        start=(0.0, 0.0),
+        end=(0.0, 1.0),
+    )
 
+    draw = ImageDraw.Draw(big, "RGBA")
+
+    # Grass blade tufts
+    for tx, ty in tuft_positions:
+        sx, sy = _s(tx), _s(ty)
+        blade_h = _s(3 + (tx % 3))
+        draw.line(
+            [(sx, sy), (sx, sy - blade_h)],
+            fill=GRASS_BRIGHT,
+            width=max(1, _si(0.8)),
+        )
+        if tx % 2 == 0:
+            draw.line(
+                [(sx - _s(1), sy), (sx - _s(1), sy - blade_h + _s(1))],
+                fill=GRASS_LIGHT,
+                width=max(1, _si(0.6)),
+            )
+
+    # Pebble details
+    for px, py in pebble_positions:
+        cx, cy = _si(px), _si(py)
+        r = _si(1.2)
+        filled_ellipse(
+            big,
+            (cx - r, cy - r, cx + r, cy + int(r * 0.8)),
+            fill=darken(GRASS_DARK, 0.15),
+        )
+
+    # Dark accent spots
+    for dx, dy in dark_positions:
+        sx, sy = _si(dx), _si(dy)
+        r = _si(1.5)
+        filled_ellipse(
+            big,
+            (sx - r, sy - r, sx + r, sy + r),
+            fill=darken(GRASS_DARK, 0.25),
+        )
+
+    # Per-variant extras
+    if extra_fn is not None:
+        extra_fn(big, draw)
+
+
+# ===================================================================
+# Terrain tiles (64x64 output)
+# ===================================================================
+
+def make_grass_0() -> Image.Image:
+    """64x64 grass variant 0 — standard tufts and pebbles."""
     tufts = [
         (4, 6), (18, 3), (26, 12), (8, 20), (22, 24),
         (14, 14), (2, 28), (28, 28), (12, 8), (24, 18),
     ]
-    for tx, ty in tufts:
-        draw.line([(tx, ty), (tx, ty - 3)], fill=GRASS_LIGHT, width=1)
-        draw.line([(tx - 1, ty), (tx - 1, ty - 2)], fill=GRASS_LIGHT, width=1)
+    pebbles = [(10, 25), (25, 7)]
+    darks = [(6, 14), (20, 20), (30, 10)]
 
-    dark_spots = [(10, 25), (25, 7), (6, 14), (20, 20)]
-    for dx, dy in dark_spots:
-        draw.point((dx, dy), fill=GRASS_DARK)
-        draw.point((dx + 1, dy), fill=GRASS_DARK)
+    def paint(big):
+        _paint_grass(big, tufts, pebbles, darks)
 
-    return img
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.08, monochrome=True, seed=100)
+
+
+def make_grass_1() -> Image.Image:
+    """64x64 grass variant 1 — denser tufts with small flower dots."""
+    tufts = [
+        (3, 8), (9, 4), (16, 10), (24, 6), (30, 14),
+        (6, 18), (14, 22), (22, 16), (28, 24), (10, 28),
+        (18, 30), (4, 14), (20, 8), (26, 28),
+    ]
+    pebbles = [(12, 20)]
+    darks = [(8, 26), (24, 12)]
+
+    def _flowers(big, draw):
+        # Small bright flower dots
+        for fx, fy, color in [(7, 12, (253, 224, 71, 200)),
+                               (21, 22, (251, 113, 133, 200)),
+                               (28, 8, (253, 224, 71, 180))]:
+            cx, cy = _si(fx), _si(fy)
+            r = _si(1)
+            filled_ellipse(big, (cx - r, cy - r, cx + r, cy + r), fill=color)
+
+    def paint(big):
+        _paint_grass(big, tufts, pebbles, darks, extra_fn=_flowers)
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.07, monochrome=True, seed=101)
+
+
+def make_grass_2() -> Image.Image:
+    """64x64 grass variant 2 — more pebbles, slightly warm tint."""
+    tufts = [
+        (5, 10), (15, 5), (25, 15), (10, 25), (20, 28),
+        (30, 6), (8, 16),
+    ]
+    pebbles = [
+        (6, 8), (18, 14), (28, 22), (12, 28), (24, 4),
+        (4, 22), (22, 10),
+    ]
+    darks = [(14, 18), (26, 26), (8, 4)]
+
+    def _warm_tint(big, draw):
+        # Subtle warm overlay in patches
+        for wx, wy in [(10, 12), (24, 20)]:
+            cx, cy = _si(wx), _si(wy)
+            r = _si(5)
+            filled_ellipse(
+                big,
+                (cx - r, cy - r, cx + r, cy + r),
+                fill=(180, 160, 60, 25),
+            )
+
+    def paint(big):
+        _paint_grass(big, tufts, pebbles, darks, extra_fn=_warm_tint)
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.10, monochrome=True, seed=102)
+
+
+def make_grass_3() -> Image.Image:
+    """64x64 grass variant 3 — sparse tufts with dead patch."""
+    tufts = [
+        (6, 8), (20, 4), (28, 18), (14, 26), (4, 20),
+    ]
+    pebbles = [(10, 14), (24, 24)]
+    darks = [(16, 10), (8, 28), (26, 6)]
+
+    def _dead_patch(big, draw):
+        # Brown dead-grass patch
+        cx, cy = _si(18), _si(16)
+        rx, ry = _si(6), _si(4)
+        filled_ellipse(
+            big,
+            (cx - rx, cy - ry, cx + rx, cy + ry),
+            fill=(120, 100, 60, 100),
+        )
+        # A couple short dead blades
+        for dx, dy in [(16, 15), (20, 17)]:
+            sx, sy = _s(dx), _s(dy)
+            draw.line(
+                [(sx, sy), (sx, sy - _s(2))],
+                fill=(140, 120, 70, 180),
+                width=max(1, _si(0.7)),
+            )
+
+    def paint(big):
+        _paint_grass(big, tufts, pebbles, darks, extra_fn=_dead_patch)
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.09, monochrome=True, seed=103)
+
+
+def make_grass() -> Image.Image:
+    """64x64 default grass tile (backward compat — delegates to variant 0)."""
+    return make_grass_0()
 
 
 def make_path_straight() -> Image.Image:
-    """32x32 straight path tile -- tan with darker edges."""
-    img = Image.new("RGBA", (32, 32), PATH_TAN)
-    draw = ImageDraw.Draw(img, "RGBA")
+    """64x64 straight path tile — slate with 4px border and texture."""
+    def paint(big: Image.Image) -> None:
+        # Base gradient — slate tones
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, PATH_LIGHT),
+                (0.5, PATH_MID),
+                (1.0, PATH_DARK),
+            ],
+            start=(0.0, 0.0),
+            end=(0.0, 1.0),
+        )
 
-    for y in range(3):
-        draw.line([(0, y), (31, y)], fill=PATH_DARK, width=1)
-        draw.line([(0, 31 - y), (31, 31 - y)], fill=PATH_DARK, width=1)
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    for y in range(14, 18):
-        draw.line([(2, y), (29, y)], fill=PATH_LIGHT, width=1)
+        # 4px border (Slate 700) on top and bottom edges
+        border_h = _si(4)
+        draw.rectangle((0, 0, big.width - 1, border_h - 1), fill=PATH_DARK)
+        draw.rectangle(
+            (0, big.height - border_h, big.width - 1, big.height - 1),
+            fill=PATH_DARK,
+        )
 
-    pebbles = [(6, 8), (20, 12), (12, 22), (26, 26)]
-    for px, py in pebbles:
-        draw.point((px, py), fill=PATH_DARK)
+        # Inner highlight stripe (centre band)
+        stripe_y0 = _si(14)
+        stripe_y1 = _si(18)
+        draw.rectangle(
+            (_si(2), stripe_y0, big.width - _si(2), stripe_y1),
+            fill=PATH_BRIGHT,
+        )
 
-    return img
+        # Pebble details
+        pebble_data = [
+            (6, 8, 1.5), (20, 12, 1.2), (12, 22, 1.8),
+            (26, 26, 1.3), (8, 28, 1.0), (18, 6, 1.4),
+        ]
+        for px, py, pr in pebble_data:
+            cx, cy = _si(px), _si(py)
+            r = _si(pr)
+            filled_ellipse(
+                big,
+                (cx - r, cy - int(r * 0.7), cx + r, cy + int(r * 0.7)),
+                fill=darken(PATH_DARK, 0.15),
+            )
+
+        # Worn crack lines
+        crack_color = darken(PATH_DARK, 0.3)
+        cracks = [
+            [(8, 10), (16, 9)],
+            [(22, 20), (28, 18)],
+        ]
+        for start, end in cracks:
+            draw.line(
+                [(_s(start[0]), _s(start[1])), (_s(end[0]), _s(end[1]))],
+                fill=crack_color,
+                width=max(1, _si(0.8)),
+            )
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.10, monochrome=True, seed=110)
 
 
 def make_path_turn() -> Image.Image:
-    """32x32 path corner tile -- top-to-right turn."""
-    img = Image.new("RGBA", (32, 32), GRASS_GREEN)
-    draw = ImageDraw.Draw(img, "RGBA")
+    """64x64 path corner tile — top-to-right turn on grass base."""
+    def paint(big: Image.Image) -> None:
+        # Grass base
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, GRASS_LIGHT),
+                (0.4, GRASS_MID),
+                (1.0, GRASS_DARK),
+            ],
+            start=(0.0, 0.0),
+            end=(0.0, 1.0),
+        )
 
-    draw.rectangle((6, 0, 25, 18), fill=PATH_TAN)
-    draw.rectangle((14, 6, 31, 25), fill=PATH_TAN)
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    draw.line([(6, 0), (6, 18)], fill=PATH_DARK, width=1)
-    draw.line([(6, 18), (14, 18)], fill=PATH_DARK, width=1)
-    draw.line([(14, 18), (14, 25)], fill=PATH_DARK, width=1)
-    draw.line([(14, 25), (31, 25)], fill=PATH_DARK, width=1)
-    draw.line([(25, 0), (25, 6)], fill=PATH_DARK, width=1)
-    draw.line([(25, 6), (31, 6)], fill=PATH_DARK, width=1)
+        # L-shaped path region (vertical top + horizontal right)
+        # Vertical leg: x=[6..25], y=[0..18]
+        draw.rectangle(
+            (_si(6), 0, _si(25), _si(18)),
+            fill=PATH_MID,
+        )
+        # Horizontal leg: x=[14..32], y=[6..25]
+        draw.rectangle(
+            (_si(14), _si(6), big.width - 1, _si(25)),
+            fill=PATH_MID,
+        )
 
-    return img
+        # 4px border lines (Slate 700) on outer edges of the path
+        bw = max(1, _si(1.5))
+        border = PATH_DARK
+        # Left edge of vertical leg
+        draw.line([(_si(6), 0), (_si(6), _si(18))], fill=border, width=bw)
+        # Bottom edge of vertical leg into horizontal junction
+        draw.line([(_si(6), _si(18)), (_si(14), _si(18))], fill=border, width=bw)
+        # Left edge of horizontal leg
+        draw.line([(_si(14), _si(18)), (_si(14), _si(25))], fill=border, width=bw)
+        # Bottom edge of horizontal leg
+        draw.line([(_si(14), _si(25)), (big.width - 1, _si(25))], fill=border, width=bw)
+        # Right edge of vertical leg into horizontal junction
+        draw.line([(_si(25), 0), (_si(25), _si(6))], fill=border, width=bw)
+        # Top edge of horizontal leg
+        draw.line([(_si(25), _si(6)), (big.width - 1, _si(6))], fill=border, width=bw)
+
+        # Pebble texture in the path area
+        for px, py in [(12, 8), (20, 14), (24, 20)]:
+            cx, cy = _si(px), _si(py)
+            r = _si(1.2)
+            filled_ellipse(
+                big,
+                (cx - r, cy - int(r * 0.7), cx + r, cy + int(r * 0.7)),
+                fill=darken(PATH_DARK, 0.15),
+            )
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.08, monochrome=True, seed=111)
 
 
 # ===================================================================
-# Tower sprites (32x32)
+# Tower sprites (64x64 output)
 # ===================================================================
 
-def _draw_tower_base(img: Image.Image, base_color: Color, accent: Color) -> None:
-    """Draw a common tower platform/base onto *img*."""
-    draw = ImageDraw.Draw(img, "RGBA")
+def _draw_tower_base(big: Image.Image, base_color: Color,
+                     accent: Color) -> None:
+    """Draw a common tower platform/base with gradient fill."""
+    draw = ImageDraw.Draw(big, "RGBA")
 
-    draw.rectangle((6, 18, 25, 30), fill=base_color)
-    draw.line([(6, 18), (25, 18)], fill=accent, width=1)
-    r, g, b, a = base_color
-    dark = (max(0, r - 40), max(0, g - 40), max(0, b - 40), a)
-    draw.line([(6, 30), (25, 30)], fill=dark, width=1)
+    # Platform rectangle with vertical gradient
+    px0, py0 = _si(6), _si(18)
+    px1, py1 = _si(25), _si(30)
+    linear_gradient(
+        big,
+        stops=[
+            (0.0, lighten(base_color, 0.15)),
+            (0.5, base_color),
+            (1.0, darken(base_color, 0.2)),
+        ],
+        start=(0.0, 0.0),
+        end=(0.0, 1.0),
+        bbox=(px0, py0, px1, py1),
+    )
 
+    # Top edge highlight
+    draw.line(
+        [(px0, py0), (px1, py0)],
+        fill=accent,
+        width=max(1, _si(1)),
+    )
+    # Bottom shadow
+    draw.line(
+        [(px0, py1), (px1, py1)],
+        fill=darken(base_color, 0.35),
+        width=max(1, _si(1)),
+    )
+
+    # Crenellations (3 blocks with gradient)
     for bx in (7, 13, 19):
-        draw.rectangle((bx, 15, bx + 4, 18), fill=base_color)
-        draw.line([(bx, 15), (bx + 4, 15)], fill=accent, width=1)
+        bx0, by0 = _si(bx), _si(15)
+        bx1, by1 = _si(bx + 4), _si(18)
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, lighten(base_color, 0.1)),
+                (1.0, base_color),
+            ],
+            start=(0.0, 0.0),
+            end=(0.0, 1.0),
+            bbox=(bx0, by0, bx1, by1),
+        )
+        draw.line(
+            [(bx0, by0), (bx1, by0)],
+            fill=accent,
+            width=max(1, _si(0.8)),
+        )
 
 
 def make_tower_basic() -> Image.Image:
-    """32x32 basic tower -- grey base with simple barrel pointing up."""
-    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """64x64 basic tower — slate base with barrel and sky-blue accent."""
+    def paint(big: Image.Image) -> None:
+        _draw_tower_base(big, TOWER_BASE, TOWER_ACCENT)
 
-    _draw_tower_base(img, TOWER_GREY, TOWER_LIGHT)
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    draw.rectangle((13, 4, 18, 17), fill=TOWER_DARK)
-    draw.line([(13, 4), (18, 4)], fill=TOWER_LIGHT, width=1)
-    draw.rectangle((12, 2, 19, 5), fill=TOWER_GREY)
+        # Barrel — vertical gradient (metallic look)
+        bx0, by0 = _si(13), _si(4)
+        bx1, by1 = _si(18), _si(17)
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, TOWER_LIGHT),
+                (0.5, TOWER_BASE),
+                (1.0, TOWER_DARK),
+            ],
+            start=(0.0, 0.0),
+            end=(1.0, 0.0),
+            bbox=(bx0, by0, bx1, by1),
+        )
+        # Barrel highlight
+        draw.line(
+            [(bx0, by0), (bx1, by0)],
+            fill=TOWER_ACCENT_LIGHT,
+            width=max(1, _si(1)),
+        )
 
-    return img
+        # Muzzle block
+        mx0, my0 = _si(12), _si(2)
+        mx1, my1 = _si(19), _si(5)
+        draw.rectangle((mx0, my0, mx1, my1), fill=TOWER_BASE)
+        draw.line(
+            [(mx0, my0), (mx1, my0)],
+            fill=TOWER_ACCENT,
+            width=max(1, _si(0.8)),
+        )
+
+        # Muzzle flash dot
+        cx = (_si(12) + _si(19)) // 2
+        r = _si(1)
+        filled_ellipse(
+            big,
+            (cx - r, _si(1), cx + r, _si(3)),
+            fill=TOWER_ACCENT_LIGHT,
+        )
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.06, monochrome=True, seed=120)
 
 
 def make_tower_sniper() -> Image.Image:
-    """32x32 sniper tower -- blue-tinted, long narrow barrel."""
-    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """64x64 sniper tower — indigo-tinted, long narrow barrel with scope."""
+    sniper_base = (79, 70, 129, 255)     # indigo-ish
+    sniper_light = (129, 120, 179, 255)
+    sniper_accent = TOWER_SNIPER_ACCENT
 
-    _draw_tower_base(img, TOWER_SNIPER_TINT, (140, 170, 220, 255))
+    def paint(big: Image.Image) -> None:
+        _draw_tower_base(big, sniper_base, sniper_accent)
 
-    draw.rectangle((14, 1, 17, 17), fill=(60, 90, 140, 255))
-    draw.line([(14, 1), (17, 1)], fill=(120, 160, 220, 255), width=1)
-    draw.point((15, 1), fill=PROJ_CYAN)
-    draw.point((16, 1), fill=PROJ_CYAN)
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    return img
+        # Long narrow barrel
+        bx0, by0 = _si(14), _si(1)
+        bx1, by1 = _si(17), _si(17)
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, sniper_light),
+                (0.5, sniper_base),
+                (1.0, darken(sniper_base, 0.2)),
+            ],
+            start=(0.0, 0.0),
+            end=(1.0, 0.0),
+            bbox=(bx0, by0, bx1, by1),
+        )
+
+        # Barrel tip highlight
+        draw.line(
+            [(bx0, by0), (bx1, by0)],
+            fill=sniper_accent,
+            width=max(1, _si(1)),
+        )
+
+        # Scope lens — small circle on barrel
+        scope_cx = _si(15.5)
+        scope_cy = _si(6)
+        scope_r = _si(2)
+        filled_ellipse(
+            big,
+            (scope_cx - scope_r, scope_cy - scope_r,
+             scope_cx + scope_r, scope_cy + scope_r),
+            fill=darken(sniper_base, 0.3),
+        )
+        # Cyan glow dot in scope
+        gr = _si(1)
+        filled_ellipse(
+            big,
+            (scope_cx - gr, scope_cy - gr,
+             scope_cx + gr, scope_cy + gr),
+            fill=PROJ_CYAN,
+        )
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.06, monochrome=True, seed=121)
 
 
 def make_tower_splash() -> Image.Image:
-    """32x32 splash tower -- red-tinted, wide barrel (cannon look)."""
-    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """64x64 splash tower — red-tinted wide cannon."""
+    splash_base = (159, 70, 60, 255)     # warm red-brown
+    splash_light = (200, 120, 110, 255)
+    splash_accent = TOWER_SPLASH_ACCENT
 
-    _draw_tower_base(img, TOWER_SPLASH_TINT, (220, 140, 130, 255))
+    def paint(big: Image.Image) -> None:
+        _draw_tower_base(big, splash_base, splash_accent)
 
-    draw.rectangle((11, 6, 20, 17), fill=(140, 60, 50, 255))
-    draw.line([(11, 6), (20, 6)], fill=(200, 120, 110, 255), width=1)
-    draw.rectangle((9, 4, 22, 7), fill=(160, 80, 70, 255))
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    return img
+        # Wide cannon barrel
+        bx0, by0 = _si(11), _si(6)
+        bx1, by1 = _si(20), _si(17)
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, splash_light),
+                (0.5, splash_base),
+                (1.0, darken(splash_base, 0.25)),
+            ],
+            start=(0.0, 0.0),
+            end=(1.0, 0.0),
+            bbox=(bx0, by0, bx1, by1),
+        )
+
+        # Barrel top highlight
+        draw.line(
+            [(bx0, by0), (bx1, by0)],
+            fill=splash_accent,
+            width=max(1, _si(1)),
+        )
+
+        # Wide muzzle opening
+        mx0, my0 = _si(9), _si(4)
+        mx1, my1 = _si(22), _si(7)
+        draw.rectangle((mx0, my0, mx1, my1), fill=splash_base)
+        draw.line(
+            [(mx0, my0), (mx1, my0)],
+            fill=splash_light,
+            width=max(1, _si(0.8)),
+        )
+
+        # Dark muzzle hole
+        cx = (_si(9) + _si(22)) // 2
+        cy = _si(3)
+        rx, ry = _si(3), _si(1.5)
+        filled_ellipse(
+            big,
+            (cx - rx, cy - ry, cx + rx, cy + ry),
+            fill=darken(splash_base, 0.5),
+        )
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.06, monochrome=True, seed=122)
 
 
 def make_tower_slot() -> Image.Image:
-    """32x32 empty tower slot -- semi-transparent green marker."""
-    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """64x64 empty tower slot — translucent emerald marker with sky cross."""
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    draw.rectangle((2, 2, 29, 29), fill=SLOT_GREEN)
-    outlined_polygon(
-        img,
-        [(2, 2), (29, 2), (29, 29), (2, 29)],
-        outline=SLOT_BORDER,
-        width=1,
-    )
+        # Translucent fill
+        inset = _si(2)
+        draw.rectangle(
+            (inset, inset, big.width - inset - 1, big.height - inset - 1),
+            fill=SLOT_GREEN,
+        )
 
-    draw.line([(12, 16), (20, 16)], fill=SLOT_BORDER, width=2)
-    draw.line([(16, 12), (16, 20)], fill=SLOT_BORDER, width=2)
+        # Border outline
+        outlined_polygon(
+            big,
+            [
+                (inset, inset),
+                (big.width - inset - 1, inset),
+                (big.width - inset - 1, big.height - inset - 1),
+                (inset, big.height - inset - 1),
+            ],
+            outline=SLOT_BORDER,
+            width=max(1, _si(1)),
+        )
 
-    return img
+        # Centre cross — Sky 400 accent
+        cx, cy = big.width // 2, big.height // 2
+        cross_len = _si(4)
+        cross_w = max(2, _si(1.5))
+        cross_color = TOWER_ACCENT
+        draw.line(
+            [(cx - cross_len, cy), (cx + cross_len, cy)],
+            fill=cross_color,
+            width=cross_w,
+        )
+        draw.line(
+            [(cx, cy - cross_len), (cx, cy + cross_len)],
+            fill=cross_color,
+            width=cross_w,
+        )
+
+    sprite = supersample_draw(64, 64, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.04, monochrome=True, seed=123)
 
 
 # ===================================================================
-# Enemy sprites (24x24)
+# Enemy sprites (48x48 output)
 # ===================================================================
 
 def make_enemy_basic() -> Image.Image:
-    """24x24 basic enemy -- red circle with darker core."""
-    img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """48x48 basic enemy — rose circle with gradient body."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
 
-    filled_ellipse(img, (2, 2, 21, 21), fill=ENEMY_RED)
-    filled_ellipse(img, (6, 6, 17, 17), fill=ENEMY_RED_DARK)
-    draw.point((9, 9), fill=(255, 255, 255, 255))
-    draw.point((14, 9), fill=(255, 255, 255, 255))
+        # Outer body: radial gradient
+        body_r = _si(10)
+        radial_gradient(
+            big,
+            (cx, cy),
+            body_r,
+            stops=[
+                (0.0, ENEMY_LIGHT),
+                (0.5, ENEMY_PRIMARY),
+                (1.0, ENEMY_DARK),
+            ],
+        )
 
-    return img
+        # Mask to ellipse
+        mask = Image.new("L", big.size, 0)
+        md = ImageDraw.Draw(mask)
+        md.ellipse(
+            (cx - body_r, cy - body_r, cx + body_r, cy + body_r),
+            fill=255,
+        )
+        bg = Image.new("RGBA", big.size, (0, 0, 0, 0))
+        result = Image.composite(big, bg, mask)
+        big.paste(result, (0, 0))
+
+        # Darker inner core
+        inner_r = _si(5)
+        filled_ellipse(
+            big,
+            (cx - inner_r, cy - inner_r, cx + inner_r, cy + inner_r),
+            fill=ENEMY_DARK,
+        )
+
+        # Eyes
+        draw = ImageDraw.Draw(big, "RGBA")
+        eye_r = _si(1.2)
+        for ex in (cx - _si(2.5), cx + _si(2.5)):
+            ey = cy - _si(2)
+            filled_ellipse(
+                big,
+                (int(ex - eye_r), int(ey - eye_r),
+                 int(ex + eye_r), int(ey + eye_r)),
+                fill=(255, 255, 255, 255),
+            )
+
+        # Bottom shadow
+        shadow_y = cy + body_r - _si(2)
+        shadow_rx = _si(8)
+        shadow_ry = _si(2)
+        filled_ellipse(
+            big,
+            (cx - shadow_rx, shadow_y, cx + shadow_rx, shadow_y + shadow_ry),
+            fill=(0, 0, 0, 40),
+        )
+
+    sprite = supersample_draw(48, 48, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.06, monochrome=True, seed=130)
 
 
 def make_enemy_fast() -> Image.Image:
-    """24x24 fast enemy -- orange diamond/arrow shape."""
-    img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
+    """48x48 fast enemy — orange diamond with gradient and speed lines."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
 
-    points = [(2, 12), (10, 3), (22, 12), (10, 21)]
-    filled_polygon(img, points, fill=ENEMY_ORANGE)
-    inner = [(6, 12), (11, 6), (18, 12), (11, 18)]
-    filled_polygon(img, inner, fill=ENEMY_ORANGE_DARK)
+        # Outer diamond
+        outer = [
+            (cx - _si(10), cy),
+            (cx, cy - _si(10)),
+            (cx + _si(10), cy),
+            (cx, cy + _si(10)),
+        ]
+        filled_polygon(big, outer, fill=ENEMY_FAST)
 
-    return img
+        # Inner diamond (darker)
+        inner = [
+            (cx - _si(5), cy),
+            (cx, cy - _si(5)),
+            (cx + _si(5), cy),
+            (cx, cy + _si(5)),
+        ]
+        filled_polygon(big, inner, fill=ENEMY_FAST_DARK)
+
+        # Speed lines behind (left side)
+        draw = ImageDraw.Draw(big, "RGBA")
+        for sy_off in (-_si(3), 0, _si(3)):
+            y = cy + sy_off
+            draw.line(
+                [(cx - _si(13), int(y)), (cx - _si(10), int(y))],
+                fill=adjust_alpha(ENEMY_FAST, 120),
+                width=max(1, _si(0.8)),
+            )
+
+    sprite = supersample_draw(48, 48, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.05, monochrome=True, seed=131)
 
 
 def make_enemy_tank() -> Image.Image:
-    """24x24 tank enemy -- dark red armoured square."""
-    img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """48x48 tank enemy — dark rose armoured square with rivets."""
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    draw.rectangle((2, 2, 21, 21), fill=ENEMY_TANK_RED)
-    draw.rectangle((4, 4, 19, 19), fill=ENEMY_TANK_DARK)
-    draw.line([(4, 12), (19, 12)], fill=ENEMY_TANK_RED, width=2)
-    draw.line([(12, 4), (12, 19)], fill=ENEMY_TANK_RED, width=2)
-    for rx, ry in [(5, 5), (18, 5), (5, 18), (18, 18)]:
-        draw.point((rx, ry), fill=(180, 60, 60, 255))
+        # Outer square
+        inset = _si(2)
+        draw.rectangle(
+            (inset, inset, big.width - inset - 1, big.height - inset - 1),
+            fill=ENEMY_TANK,
+        )
 
-    return img
+        # Inner square
+        inner_inset = _si(4)
+        draw.rectangle(
+            (inner_inset, inner_inset,
+             big.width - inner_inset - 1, big.height - inner_inset - 1),
+            fill=ENEMY_TANK_DARK,
+        )
+
+        # Cross armour pattern
+        cx, cy = big.width // 2, big.height // 2
+        cross_w = max(2, _si(1.5))
+        draw.line(
+            [(inner_inset, cy), (big.width - inner_inset, cy)],
+            fill=ENEMY_TANK,
+            width=cross_w,
+        )
+        draw.line(
+            [(cx, inner_inset), (cx, big.height - inner_inset)],
+            fill=ENEMY_TANK,
+            width=cross_w,
+        )
+
+        # Corner rivets
+        rivet_r = _si(1.2)
+        rivet_color = lighten(ENEMY_TANK, 0.3)
+        for rx, ry in [(inset + _si(2), inset + _si(2)),
+                       (big.width - inset - _si(2), inset + _si(2)),
+                       (inset + _si(2), big.height - inset - _si(2)),
+                       (big.width - inset - _si(2), big.height - inset - _si(2))]:
+            filled_ellipse(
+                big,
+                (int(rx - rivet_r), int(ry - rivet_r),
+                 int(rx + rivet_r), int(ry + rivet_r)),
+                fill=rivet_color,
+            )
+
+    sprite = supersample_draw(48, 48, paint, factor=_SS)
+    return apply_noise(sprite, amount=0.07, monochrome=True, seed=132)
 
 
 # ===================================================================
-# Projectiles (8x8)
+# Projectiles (16x16 output)
 # ===================================================================
 
 def make_projectile_basic() -> Image.Image:
-    """8x8 basic projectile -- bright yellow dot with glow."""
-    img = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
-    filled_ellipse(img, (0, 0, 7, 7), fill=(255, 230, 50, 120))
-    filled_ellipse(img, (2, 2, 5, 5), fill=PROJ_YELLOW)
-    return img
+    """16x16 basic projectile — bright yellow glow dot."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
+        # Outer glow
+        outer_r = _si(3.5)
+        filled_ellipse(
+            big,
+            (cx - outer_r, cy - outer_r, cx + outer_r, cy + outer_r),
+            fill=(253, 224, 71, 100),
+        )
+        # Core
+        inner_r = _si(2)
+        filled_ellipse(
+            big,
+            (cx - inner_r, cy - inner_r, cx + inner_r, cy + inner_r),
+            fill=PROJ_YELLOW,
+        )
+
+    return supersample_draw(16, 16, paint, factor=_SS)
 
 
 def make_projectile_sniper() -> Image.Image:
-    """8x8 sniper projectile -- cyan bolt."""
-    img = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
-    draw.line([(1, 4), (6, 4)], fill=PROJ_CYAN, width=2)
-    draw.point((7, 4), fill=(200, 255, 255, 255))
-    draw.line([(0, 4), (2, 4)], fill=(80, 220, 255, 100), width=1)
-    return img
+    """16x16 sniper projectile — cyan bolt with trail."""
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
+        cy = big.height // 2
+
+        # Trail (fading left)
+        trail_w = max(1, _si(1))
+        draw.line(
+            [(_si(0), cy), (_si(2), cy)],
+            fill=adjust_alpha(PROJ_CYAN, 80),
+            width=trail_w,
+        )
+
+        # Main bolt body
+        bolt_w = max(2, _si(1.5))
+        draw.line(
+            [(_si(1), cy), (_si(6), cy)],
+            fill=PROJ_CYAN,
+            width=bolt_w,
+        )
+
+        # Bright tip
+        tip_r = _si(1)
+        filled_ellipse(
+            big,
+            (_si(6), cy - tip_r, _si(8), cy + tip_r),
+            fill=(200, 255, 255, 255),
+        )
+
+    return supersample_draw(16, 16, paint, factor=_SS)
 
 
 def make_projectile_splash() -> Image.Image:
-    """8x8 splash projectile -- orange ball."""
-    img = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
-    filled_ellipse(img, (0, 0, 7, 7), fill=(255, 160, 40, 100))
-    filled_ellipse(img, (1, 1, 6, 6), fill=PROJ_ORANGE)
-    return img
+    """16x16 splash projectile — orange ball with glow."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
+        # Outer glow
+        outer_r = _si(3.5)
+        filled_ellipse(
+            big,
+            (cx - outer_r, cy - outer_r, cx + outer_r, cy + outer_r),
+            fill=(251, 146, 60, 80),
+        )
+        # Core
+        inner_r = _si(2.5)
+        filled_ellipse(
+            big,
+            (cx - inner_r, cy - inner_r, cx + inner_r, cy + inner_r),
+            fill=PROJ_ORANGE,
+        )
+
+    return supersample_draw(16, 16, paint, factor=_SS)
 
 
 # ===================================================================
@@ -367,157 +996,325 @@ def make_projectile_splash() -> Image.Image:
 # ===================================================================
 
 def make_explosion() -> Image.Image:
-    """16x16 explosion burst -- orange/yellow radial effect."""
-    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """32x32 explosion burst — orange/yellow radial with spikes."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
 
-    filled_ellipse(img, (0, 0, 15, 15), fill=EXPLOSION_ORANGE)
-    filled_ellipse(img, (3, 3, 12, 12), fill=EXPLOSION_YELLOW)
-    filled_ellipse(img, (5, 5, 10, 10), fill=(255, 255, 200, 255))
+        # Outer orange ring
+        outer_r = _si(7)
+        filled_ellipse(
+            big,
+            (cx - outer_r, cy - outer_r, cx + outer_r, cy + outer_r),
+            fill=EXPLOSION_ORANGE,
+        )
+        # Mid yellow ring
+        mid_r = _si(4.5)
+        filled_ellipse(
+            big,
+            (cx - mid_r, cy - mid_r, cx + mid_r, cy + mid_r),
+            fill=EXPLOSION_YELLOW,
+        )
+        # White core
+        core_r = _si(2.5)
+        filled_ellipse(
+            big,
+            (cx - core_r, cy - core_r, cx + core_r, cy + core_r),
+            fill=(255, 255, 200, 255),
+        )
 
-    cx, cy = 8, 8
-    spike_color = (255, 200, 60, 180)
-    for angle_deg in range(0, 360, 45):
-        angle = math.radians(angle_deg)
-        ex = cx + int(7 * math.cos(angle))
-        ey = cy + int(7 * math.sin(angle))
-        draw.line([(cx, cy), (ex, ey)], fill=spike_color, width=1)
+        # Spike rays
+        draw = ImageDraw.Draw(big, "RGBA")
+        spike_color = (255, 200, 60, 160)
+        for angle_deg in range(0, 360, 45):
+            angle = math.radians(angle_deg)
+            ex = cx + int(_s(7) * math.cos(angle))
+            ey = cy + int(_s(7) * math.sin(angle))
+            draw.line(
+                [(cx, cy), (ex, ey)],
+                fill=spike_color,
+                width=max(1, _si(0.8)),
+            )
 
-    return img
+    return supersample_draw(32, 32, paint, factor=_SS)
 
 
 def make_range_indicator() -> Image.Image:
-    """64x64 semi-transparent range circle for tower placement preview."""
-    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    filled_ellipse(img, (1, 1, 62, 62), fill=RANGE_INDICATOR_COLOR)
-    outlined_ellipse(img, (1, 1, 62, 62), outline=RANGE_BORDER, width=1)
-    return img
+    """128x128 semi-transparent range circle — Sky 400 tones."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
+        r = _si(30)
+
+        # Filled circle
+        filled_ellipse(
+            big,
+            (cx - r, cy - r, cx + r, cy + r),
+            fill=RANGE_COLOR,
+        )
+        # Border ring
+        outlined_ellipse(
+            big,
+            (cx - r, cy - r, cx + r, cy + r),
+            outline=RANGE_BORDER_COLOR,
+            width=max(1, _si(1)),
+        )
+
+    return supersample_draw(128, 128, paint, factor=_SS)
 
 
 # ===================================================================
 # UI elements
 # ===================================================================
 
-def _make_button(w: int, h: int, base: Color, lighter: Color, darker: Color) -> Image.Image:
-    """Internal helper: create a beveled button image."""
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+def _make_button(w: int, h: int, base: Color, lighter: Color,
+                 darker: Color) -> Image.Image:
+    """Create a beveled button with gradient fill."""
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
 
-    draw.rectangle((0, 0, w - 1, h - 1), fill=base)
-    draw.line([(0, 0), (w - 1, 0)], fill=lighter, width=1)
-    draw.line([(0, 0), (0, h - 1)], fill=lighter, width=1)
-    draw.line([(0, h - 1), (w - 1, h - 1)], fill=darker, width=1)
-    draw.line([(w - 1, 0), (w - 1, h - 1)], fill=darker, width=1)
+        # Gradient fill
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, lighter),
+                (0.5, base),
+                (1.0, darker),
+            ],
+            start=(0.0, 0.0),
+            end=(0.0, 1.0),
+        )
 
-    return img
+        # Bevel edges
+        bw = max(1, _si(0.5))
+        draw.line([(0, 0), (big.width - 1, 0)], fill=lighter, width=bw)
+        draw.line([(0, 0), (0, big.height - 1)], fill=lighter, width=bw)
+        draw.line(
+            [(0, big.height - 1), (big.width - 1, big.height - 1)],
+            fill=darker,
+            width=bw,
+        )
+        draw.line(
+            [(big.width - 1, 0), (big.width - 1, big.height - 1)],
+            fill=darker,
+            width=bw,
+        )
+
+    return supersample_draw(w, h, paint, factor=_SS)
 
 
 def make_btn_normal() -> Image.Image:
-    """80x32 button in normal/idle state."""
-    return _make_button(80, 32, base=UI_MID, lighter=UI_LIGHT, darker=(25, 25, 35, 230))
+    """160x64 button in normal/idle state."""
+    return _make_button(160, 64, base=UI_MID, lighter=UI_LIGHT,
+                        darker=(20, 30, 45, 230))
 
 
 def make_btn_hover() -> Image.Image:
-    """80x32 button in hover state."""
-    return _make_button(80, 32, base=UI_LIGHT, lighter=(100, 100, 120, 230), darker=UI_MID)
+    """160x64 button in hover state."""
+    return _make_button(160, 64, base=UI_LIGHT,
+                        lighter=(85, 100, 120, 230), darker=UI_MID)
 
 
 def make_btn_pressed() -> Image.Image:
-    """80x32 button in pressed state."""
-    return _make_button(80, 32, base=UI_DARK, lighter=(20, 20, 30, 230), darker=UI_LIGHT)
+    """160x64 button in pressed state."""
+    return _make_button(160, 64, base=UI_DARK,
+                        lighter=(20, 30, 45, 230), darker=UI_LIGHT)
 
 
 def make_panel_bg() -> Image.Image:
-    """120x200 dark UI panel with subtle border."""
-    w, h = 120, 200
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """240x400 dark UI panel with Slate border."""
+    w, h = 240, 400
 
-    draw.rectangle((0, 0, w - 1, h - 1), fill=UI_DARK)
-    outlined_polygon(
-        img,
-        [(0, 0), (w - 1, 0), (w - 1, h - 1), (0, h - 1)],
-        outline=UI_BORDER, width=1,
-    )
-    draw.line([(1, 1), (w - 2, 1)], fill=UI_MID, width=1)
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
+        draw.rectangle((0, 0, big.width - 1, big.height - 1), fill=UI_DARK)
+        outlined_polygon(
+            big,
+            [(0, 0), (big.width - 1, 0),
+             (big.width - 1, big.height - 1), (0, big.height - 1)],
+            outline=UI_BORDER,
+            width=max(1, _si(0.5)),
+        )
+        # Top highlight
+        draw.line(
+            [(_si(0.5), _si(0.5)), (big.width - _si(1), _si(0.5))],
+            fill=UI_MID,
+            width=max(1, _si(0.5)),
+        )
 
-    return img
+    return supersample_draw(w, h, paint, factor=_SS)
 
 
 def make_health_bar_bg() -> Image.Image:
-    """24x4 dark health bar background."""
-    return Image.new("RGBA", (24, 4), HEALTH_BG)
+    """48x8 dark health bar background."""
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
+        draw.rectangle((0, 0, big.width - 1, big.height - 1), fill=HEALTH_BG)
+        draw.rectangle(
+            (0, 0, big.width - 1, big.height - 1),
+            outline=darken(HEALTH_BG, 0.3),
+        )
+
+    return supersample_draw(48, 8, paint, factor=_SS)
 
 
 def make_health_bar_fill() -> Image.Image:
-    """24x4 green health bar fill."""
-    img = Image.new("RGBA", (24, 4), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
-    draw.rectangle((0, 0, 23, 3), fill=HEALTH_GREEN)
-    draw.line([(0, 0), (23, 0)], fill=(100, 240, 100, 255), width=1)
-    return img
+    """48x8 green health bar fill with gradient."""
+    def paint(big: Image.Image) -> None:
+        linear_gradient(
+            big,
+            stops=[
+                (0.0, lighten(HEALTH_GREEN, 0.3)),
+                (0.4, HEALTH_GREEN),
+                (1.0, darken(HEALTH_GREEN, 0.2)),
+            ],
+            start=(0.0, 0.0),
+            end=(0.0, 1.0),
+        )
+        # Top highlight
+        draw = ImageDraw.Draw(big, "RGBA")
+        draw.line(
+            [(0, 0), (big.width - 1, 0)],
+            fill=lighten(HEALTH_GREEN, 0.5),
+            width=max(1, _si(0.5)),
+        )
+
+    return supersample_draw(48, 8, paint, factor=_SS)
 
 
 def make_coin_icon() -> Image.Image:
-    """16x16 gold coin icon."""
-    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """32x32 gold coin icon."""
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
+        cx, cy = big.width // 2, big.height // 2
+        r = _si(7)
 
-    filled_ellipse(img, (1, 1, 14, 14), fill=GOLD)
-    outlined_ellipse(img, (3, 3, 12, 12), outline=GOLD_DARK, width=1)
-    draw.line([(8, 5), (8, 11)], fill=GOLD_DARK, width=1)
-    draw.line([(6, 7), (10, 7)], fill=GOLD_DARK, width=1)
-    draw.line([(6, 9), (10, 9)], fill=GOLD_DARK, width=1)
+        # Coin body
+        filled_ellipse(
+            big,
+            (cx - r, cy - r, cx + r, cy + r),
+            fill=GOLD,
+        )
+        # Inner ring
+        inner_r = _si(5)
+        outlined_ellipse(
+            big,
+            (cx - inner_r, cy - inner_r, cx + inner_r, cy + inner_r),
+            outline=GOLD_DARK,
+            width=max(1, _si(0.8)),
+        )
+        # Dollar sign
+        lw = max(1, _si(0.8))
+        draw.line([(_si(8), _si(5)), (_si(8), _si(11))], fill=GOLD_DARK, width=lw)
+        draw.line([(_si(6), _si(7)), (_si(10), _si(7))], fill=GOLD_DARK, width=lw)
+        draw.line([(_si(6), _si(9)), (_si(10), _si(9))], fill=GOLD_DARK, width=lw)
 
-    return img
+    return supersample_draw(32, 32, paint, factor=_SS)
 
 
 def make_heart_icon() -> Image.Image:
-    """16x16 red heart icon."""
-    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    """32x32 red heart icon."""
+    def paint(big: Image.Image) -> None:
+        cx, cy = big.width // 2, big.height // 2
 
-    filled_ellipse(img, (1, 2, 9, 9), fill=HEART_RED)
-    filled_ellipse(img, (7, 2, 15, 9), fill=HEART_RED)
-    filled_polygon(img, [(1, 6), (15, 6), (8, 14)], fill=HEART_RED)
-    filled_polygon(img, [(3, 8), (13, 8), (8, 14)], fill=HEART_DARK)
+        # Heart shape from two ellipses + triangle
+        lobe_r = _si(4)
+        left_cx = cx - _si(2.5)
+        right_cx = cx + _si(2.5)
+        lobe_y = cy - _si(2)
 
-    draw = ImageDraw.Draw(img, "RGBA")
-    draw.point((4, 4), fill=(255, 120, 140, 255))
-    draw.point((5, 3), fill=(255, 120, 140, 255))
+        filled_ellipse(
+            big,
+            (left_cx - lobe_r, lobe_y - lobe_r,
+             left_cx + lobe_r, lobe_y + lobe_r),
+            fill=HEART_RED,
+        )
+        filled_ellipse(
+            big,
+            (right_cx - lobe_r, lobe_y - lobe_r,
+             right_cx + lobe_r, lobe_y + lobe_r),
+            fill=HEART_RED,
+        )
+        # Bottom triangle
+        filled_polygon(
+            big,
+            [
+                (cx - _si(6.5), cy - _si(1)),
+                (cx + _si(6.5), cy - _si(1)),
+                (cx, cy + _si(6)),
+            ],
+            fill=HEART_RED,
+        )
+        # Darker lower portion
+        filled_polygon(
+            big,
+            [
+                (cx - _si(4), cy + _si(1)),
+                (cx + _si(4), cy + _si(1)),
+                (cx, cy + _si(6)),
+            ],
+            fill=HEART_DARK,
+        )
 
-    return img
+        # Highlight gleam
+        draw = ImageDraw.Draw(big, "RGBA")
+        gleam_r = _si(1)
+        filled_ellipse(
+            big,
+            (left_cx - gleam_r, lobe_y - _si(1) - gleam_r,
+             left_cx + gleam_r, lobe_y - _si(1) + gleam_r),
+            fill=(255, 150, 170, 200),
+        )
+
+    return supersample_draw(32, 32, paint, factor=_SS)
 
 
 def make_wave_banner() -> Image.Image:
-    """160x40 wave announcement banner background."""
-    w, h = 160, 40
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    """320x80 wave announcement banner background."""
+    w, h = 320, 80
 
-    vertical_gradient(img, (50, 40, 70, 220), (30, 20, 50, 220))
-    outlined_polygon(
-        img,
-        [(0, 0), (w - 1, 0), (w - 1, h - 1), (0, h - 1)],
-        outline=BANNER_BORDER, width=2,
-    )
-    outlined_polygon(
-        img,
-        [(3, 3), (w - 4, 3), (w - 4, h - 4), (3, h - 4)],
-        outline=(120, 100, 40, 180), width=1,
-    )
+    def paint(big: Image.Image) -> None:
+        # Gradient fill
+        vertical_gradient(
+            big,
+            (40, 30, 60, 220),
+            (20, 15, 40, 220),
+        )
 
-    return img
+        # Outer border
+        outlined_polygon(
+            big,
+            [(0, 0), (big.width - 1, 0),
+             (big.width - 1, big.height - 1), (0, big.height - 1)],
+            outline=BANNER_BORDER,
+            width=max(2, _si(1)),
+        )
+        # Inner border
+        inset = _si(1.5)
+        outlined_polygon(
+            big,
+            [(inset, inset), (big.width - inset - 1, inset),
+             (big.width - inset - 1, big.height - inset - 1),
+             (inset, big.height - inset - 1)],
+            outline=(180, 150, 40, 160),
+            width=max(1, _si(0.5)),
+        )
+
+    return supersample_draw(w, h, paint, factor=_SS)
 
 
 def make_hud_top_bar() -> Image.Image:
-    """320x24 top HUD bar background."""
-    w, h = 320, 24
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img, "RGBA")
+    """640x48 top HUD bar background."""
+    w, h = 640, 48
 
-    draw.rectangle((0, 0, w - 1, h - 1), fill=HUD_BG)
-    draw.line([(0, h - 1), (w - 1, h - 1)], fill=UI_BORDER, width=1)
+    def paint(big: Image.Image) -> None:
+        draw = ImageDraw.Draw(big, "RGBA")
+        draw.rectangle((0, 0, big.width - 1, big.height - 1), fill=HUD_BG)
+        draw.line(
+            [(0, big.height - 1), (big.width - 1, big.height - 1)],
+            fill=UI_BORDER,
+            width=max(1, _si(0.5)),
+        )
 
-    return img
+    return supersample_draw(w, h, paint, factor=_SS)
 
 
 # ===================================================================
@@ -645,6 +1442,10 @@ AUDIO_MANIFEST: list[tuple[str, str, callable]] = [
 MANIFEST: list[tuple[str, callable]] = [
     # Terrain
     ("grass.png", make_grass),
+    ("grass_0.png", make_grass_0),
+    ("grass_1.png", make_grass_1),
+    ("grass_2.png", make_grass_2),
+    ("grass_3.png", make_grass_3),
     ("path_straight.png", make_path_straight),
     ("path_turn.png", make_path_turn),
     # Towers

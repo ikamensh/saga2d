@@ -40,6 +40,7 @@ Controls:
 from __future__ import annotations
 
 import math
+import random
 import sys
 from pathlib import Path
 from typing import Any
@@ -96,31 +97,34 @@ from saga2d import (  # noqa: E402
 # ======================================================================
 
 SCREEN_W, SCREEN_H = 960, 540
-TILE_SIZE = 32
-CAMERA_SCROLL_SPEED = 200.0
+TILE_SIZE = 64
+CAMERA_SCROLL_SPEED = 400.0
 
-# Colour palette
-BG_COLOR = (25, 30, 40, 255)
-TITLE_COLOR = (255, 220, 80, 255)
-SUBTITLE_COLOR = (180, 180, 190, 255)
-HUD_TEXT_COLOR = (220, 220, 230, 255)
-GOLD_COLOR = (255, 210, 50, 255)
-LIVES_COLOR = (255, 100, 100, 255)
-SCORE_COLOR = (120, 220, 255, 255)
+# Colour palette — Tailwind-inspired dark theme
+BG_COLOR = (15, 23, 42, 255)               # Slate 900
+TITLE_COLOR = (253, 224, 71, 255)           # Yellow 300
+SUBTITLE_COLOR = (148, 163, 184, 255)       # Slate 400
+HUD_TEXT_COLOR = (226, 232, 240, 255)       # Slate 200
+GOLD_COLOR = (253, 224, 71, 255)            # Yellow 300
+LIVES_COLOR = (251, 113, 133, 255)          # Rose 400
+SCORE_COLOR = (56, 189, 248, 255)           # Sky 400
 
 # Health bar
-HEALTH_BAR_BG_COLOR = (80, 20, 20, 200)
-HEALTH_BAR_FG_COLOR = (40, 200, 40, 220)
-HEALTH_BAR_WIDTH = 22
-HEALTH_BAR_HEIGHT = 3
-HEALTH_BAR_Y_OFFSET = -14
+HEALTH_BAR_BG_COLOR = (30, 41, 59, 200)    # Slate 800
+HEALTH_BAR_FG_COLOR = (34, 197, 94, 220)   # Green 500
+HEALTH_BAR_WIDTH = 44
+HEALTH_BAR_HEIGHT = 6
+HEALTH_BAR_Y_OFFSET = -28
 
 # Starting resources
 STARTING_GOLD = 200
 STARTING_LIVES = 20
 
 # Projectile speed
-PROJECTILE_SPEED = 300.0
+PROJECTILE_SPEED = 600.0
+
+# Grass tile variants for visual variety
+GRASS_VARIANTS = ["grass_0", "grass_1", "grass_2", "grass_3"]
 
 
 # ======================================================================
@@ -132,7 +136,7 @@ TOWER_DEFS: list[dict[str, Any]] = [
         "name": "Basic",
         "image": "tower_basic",
         "cost": 50,
-        "range_px": 96,
+        "range_px": 192,
         "damage": 15,
         "fire_rate": 1.5,
         "splash_radius": 0,
@@ -142,7 +146,7 @@ TOWER_DEFS: list[dict[str, Any]] = [
         "name": "Sniper",
         "image": "tower_sniper",
         "cost": 100,
-        "range_px": 160,
+        "range_px": 320,
         "damage": 50,
         "fire_rate": 0.5,
         "splash_radius": 0,
@@ -152,10 +156,10 @@ TOWER_DEFS: list[dict[str, Any]] = [
         "name": "Splash",
         "image": "tower_splash",
         "cost": 75,
-        "range_px": 80,
+        "range_px": 160,
         "damage": 10,
         "fire_rate": 1.0,
-        "splash_radius": 48,
+        "splash_radius": 96,
         "projectile": "projectile_splash",
     },
 ]
@@ -170,21 +174,21 @@ ENEMY_DEFS: list[dict[str, Any]] = [
         "name": "Soldier",
         "image": "enemy_basic",
         "hp": 80,
-        "speed": 40,
+        "speed": 80,
         "gold_reward": 10,
     },
     {
         "name": "Scout",
         "image": "enemy_fast",
         "hp": 40,
-        "speed": 80,
+        "speed": 160,
         "gold_reward": 15,
     },
     {
         "name": "Tank",
         "image": "enemy_tank",
         "hp": 200,
-        "speed": 25,
+        "speed": 50,
         "gold_reward": 30,
     },
 ]
@@ -337,7 +341,7 @@ class TitleScene(Scene):
             layout=Layout.VERTICAL,
             spacing=20,
             anchor=Anchor.CENTER,
-            style=Style(background_color=(30, 35, 50, 220), padding=40),
+            style=Style(background_color=(30, 41, 59, 220), padding=40),
             children=[title_label, subtitle_label, play_button, quit_button],
         )
         self.ui.add(menu_panel)
@@ -464,12 +468,17 @@ class GameScene(Scene):
     # ------------------------------------------------------------------
 
     def _create_tile_map(self) -> None:
-        tile_images = {GRASS: "grass", PATH: "path_straight"}
         for row in range(MAP_ROWS):
             for col in range(MAP_COLS):
                 tile_type = MAP_DATA[row][col]
+                if tile_type == PATH:
+                    image_name = "path_straight"
+                else:
+                    # Deterministic grass variant based on position
+                    rng = random.Random(row * 100 + col)
+                    image_name = rng.choice(GRASS_VARIANTS)
                 sprite = Sprite(
-                    tile_images[tile_type],
+                    image_name,
                     position=(col * TILE_SIZE, row * TILE_SIZE),
                     anchor=SpriteAnchor.TOP_LEFT,
                     layer=RenderLayer.BACKGROUND,
@@ -519,12 +528,12 @@ class GameScene(Scene):
         self._hint_label = Label(
             "Wave starting soon...",
             font_size=14,
-            text_color=(140, 140, 150, 255),
+            text_color=(148, 163, 184, 255),
         )
         self._speed_label = Label(
             "",
             font_size=14,
-            text_color=(200, 200, 100, 255),
+            text_color=(253, 224, 71, 255),
         )
         hud_panel = Panel(
             layout=Layout.HORIZONTAL,
@@ -532,7 +541,7 @@ class GameScene(Scene):
             anchor=Anchor.TOP,
             margin=8,
             style=Style(
-                background_color=(20, 22, 35, 200),
+                background_color=(15, 23, 42, 200),
                 padding=10,
             ),
             children=[
@@ -577,7 +586,7 @@ class GameScene(Scene):
                 layout=Layout.HORIZONTAL,
                 spacing=12,
                 style=Style(
-                    background_color=(35, 40, 55, 180),
+                    background_color=(30, 41, 59, 180),
                     padding=8,
                 ),
                 children=[info_label, buy_button],
@@ -587,12 +596,12 @@ class GameScene(Scene):
         cancel_label = Label(
             "Right-click: cancel",
             font_size=12,
-            text_color=(120, 120, 130, 255),
+            text_color=(100, 116, 139, 255),
         )
         speed_hint = Label(
             "Space: toggle 2\u00d7 speed",
             font_size=12,
-            text_color=(120, 120, 130, 255),
+            text_color=(100, 116, 139, 255),
         )
 
         build_panel = Panel(
@@ -601,7 +610,7 @@ class GameScene(Scene):
             anchor=Anchor.RIGHT,
             margin=8,
             style=Style(
-                background_color=(20, 22, 35, 220),
+                background_color=(15, 23, 42, 220),
                 padding=14,
             ),
             children=[menu_title, *tower_rows, cancel_label, speed_hint],
@@ -1240,13 +1249,13 @@ def main() -> None:
     game.theme = Theme(
         font="serif",
         font_size=24,
-        text_color=(220, 220, 230, 255),
-        panel_background_color=(30, 35, 50, 220),
+        text_color=(226, 232, 240, 255),            # Slate 200
+        panel_background_color=(30, 41, 59, 220),    # Slate 800
         panel_padding=16,
-        button_background_color=(50, 55, 80, 255),
-        button_hover_color=(70, 80, 120, 255),
-        button_press_color=(35, 40, 60, 255),
-        button_text_color=(220, 220, 230, 255),
+        button_background_color=(51, 65, 85, 255),   # Slate 700
+        button_hover_color=(71, 85, 105, 255),       # Slate 600
+        button_press_color=(30, 41, 59, 255),        # Slate 800
+        button_text_color=(226, 232, 240, 255),      # Slate 200
         button_padding=14,
         button_font_size=26,
         button_min_width=220,
