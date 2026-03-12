@@ -5,14 +5,14 @@ Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
 
 Filenames and sizes match the architecture contract::
 
-    warrior_idle_01.png          128x128
-    warrior_walk_{01..04}.png    128x128
-    warrior_attack_{01..03}.png  128x128
-    skeleton_idle_01.png         128x128
-    skeleton_walk_{01..04}.png   128x128
-    skeleton_hit_{01..03}.png    128x128
-    skeleton_death_{01..03}.png  128x128
-    select_ring.png              144x144
+    warrior_idle_01.png          160x160
+    warrior_walk_{01..04}.png    160x160
+    warrior_attack_{01..03}.png  160x160
+    skeleton_idle_01.png         160x160
+    skeleton_walk_{01..04}.png   160x160
+    skeleton_hit_{01..03}.png    160x160
+    skeleton_death_{01..03}.png  160x160
+    select_ring.png              180x180
 
 Run from project root::
 
@@ -99,15 +99,15 @@ EYE_RED_CORE = (255, 60, 30, 255)   # bright centre
 EYE_RED_MID = (220, 20, 0, 255)     # mid glow
 EYE_RED_OUTER = (120, 0, 0, 200)    # dark edge
 
-SIZE = (128, 128)  # all battle sprites are 128x128
-CX, CY = 64, 64  # centre
+SIZE = (160, 160)  # all battle sprites are 160x160
+CX, CY = 80, 80  # centre
 
 # Supersampling factor — all rendering is done at SS×
 _SS = 4
 
 # Content scale factor — coordinates authored at 1× map to _SCALE pixels
-# in output space.  With SIZE 128 and coordinates authored for 64, _SCALE=2.
-_SCALE = 2
+# in output space.  With SIZE 160 and coordinates authored for 64, _SCALE=2.5.
+_SCALE = 2.5
 
 
 # ===================================================================
@@ -1401,7 +1401,7 @@ def make_skeleton_frame(pose: str, frame_idx: int = 1) -> Image.Image:
 # Select ring
 # ===================================================================
 
-RING_SIZE = (144, 144)
+RING_SIZE = (180, 180)
 
 # The ring ellipse in 1× space: (x0, y0, x1, y1)
 # Wider than tall to suggest a ground-plane perspective.

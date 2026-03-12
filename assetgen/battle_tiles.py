@@ -127,13 +127,13 @@ def make_tile_grass() -> Image.Image:
     for texture, and subtle noise for organic feel.
     """
     def paint(big: Image.Image) -> None:
-        # Base gradient — darker at bottom, lighter at top for depth
+        # Mirrored gradient — MID at edges, LIGHT in centre → seamless tiling
         linear_gradient(
             big,
             stops=[
-                (0.0, GRASS_LIGHT),
-                (0.4, GRASS_MID),
-                (1.0, GRASS_DARK),
+                (0.0, GRASS_MID),
+                (0.5, GRASS_LIGHT),
+                (1.0, GRASS_MID),
             ],
             start=(0.0, 0.0),
             end=(0.0, 1.0),
@@ -192,13 +192,13 @@ def make_tile_dirt() -> Image.Image:
     and moderate noise for a rough, natural surface.
     """
     def paint(big: Image.Image) -> None:
-        # Base gradient — brown earth tones
+        # Mirrored gradient — MID at edges, LIGHT in centre → seamless tiling
         linear_gradient(
             big,
             stops=[
-                (0.0, DIRT_LIGHT),
-                (0.5, DIRT_MID),
-                (1.0, DIRT_DARK),
+                (0.0, DIRT_MID),
+                (0.5, DIRT_LIGHT),
+                (1.0, DIRT_MID),
             ],
             start=(0.0, 0.0),
             end=(0.0, 1.0),
@@ -365,13 +365,13 @@ def make_tile_obstacle() -> Image.Image:
     and drop shadow. Placed on a grass background for integration.
     """
     def paint(big: Image.Image) -> None:
-        # Base layer — grass background (reuse grass gradient)
+        # Base layer — grass background (mirrored to match seamless grass tile)
         linear_gradient(
             big,
             stops=[
-                (0.0, GRASS_LIGHT),
-                (0.4, GRASS_MID),
-                (1.0, GRASS_DARK),
+                (0.0, GRASS_MID),
+                (0.5, GRASS_LIGHT),
+                (1.0, GRASS_MID),
             ],
             start=(0.0, 0.0),
             end=(0.0, 1.0),
