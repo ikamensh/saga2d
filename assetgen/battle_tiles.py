@@ -359,10 +359,10 @@ def make_tile_stone() -> Image.Image:
 # ===================================================================
 
 def make_tile_obstacle() -> Image.Image:
-    """Generate an obstacle tile with a large grey rock on grass base.
+    """Generate an obstacle tile with a small grey rock on grass base.
 
-    Creates a 3D-looking boulder with gradient shading, rim lighting,
-    and drop shadow. Placed on a grass background for integration.
+    Creates a 3D-looking pebble with gradient shading, rim lighting,
+    and drop shadow. Deliberately small so battle units dominate visually.
     """
     def paint(big: Image.Image) -> None:
         # Base layer — grass background (mirrored to match seamless grass tile)
@@ -377,14 +377,14 @@ def make_tile_obstacle() -> Image.Image:
             end=(0.0, 1.0),
         )
 
-        # Rock — large irregular boulder in center
+        # Rock — small pebble in center (units must be more prominent)
         # Main rock body (roughly elliptical)
         rock_cx, rock_cy = _s(32), _s(36)  # slightly lower than center
-        rock_rx, rock_ry = _s(22), _s(18)  # wide ellipse
+        rock_rx, rock_ry = _s(12), _s(10)  # small rock — units dominate
 
         # Drop shadow beneath rock (elongated dark ellipse)
         shadow_offset_x, shadow_offset_y = _s(2), _s(3)
-        shadow_rx, shadow_ry = _s(20), _s(8)
+        shadow_rx, shadow_ry = _s(10), _s(4)
         filled_ellipse(
             big,
             (
@@ -453,10 +453,10 @@ def make_tile_obstacle() -> Image.Image:
         # Rim lighting — bright highlight on top-left edge
         draw = ImageDraw.Draw(big, "RGBA")
         highlight_points = [
-            (rock_cx - _s(18), rock_cy - _s(14)),
-            (rock_cx - _s(10), rock_cy - _s(16)),
-            (rock_cx, rock_cy - _s(17)),
-            (rock_cx + _s(8), rock_cy - _s(15)),
+            (rock_cx - _s(10), rock_cy - _s(8)),
+            (rock_cx - _s(5.5), rock_cy - _s(9)),
+            (rock_cx, rock_cy - _s(9.5)),
+            (rock_cx + _s(4.5), rock_cy - _s(8.5)),
         ]
         for i in range(len(highlight_points) - 1):
             draw.line(
@@ -468,9 +468,9 @@ def make_tile_obstacle() -> Image.Image:
         # Surface cracks/texture on rock
         crack_color = darken(ROCK_DARK, 0.3)
         cracks = [
-            [(rock_cx - _s(8), rock_cy - _s(4)), (rock_cx + _s(2), rock_cy + _s(2))],
-            [(rock_cx + _s(6), rock_cy - _s(8)), (rock_cx + _s(12), rock_cy - _s(2))],
-            [(rock_cx - _s(14), rock_cy + _s(4)), (rock_cx - _s(8), rock_cy + _s(10))],
+            [(rock_cx - _s(4), rock_cy - _s(2)), (rock_cx + _s(1), rock_cy + _s(1))],
+            [(rock_cx + _s(3), rock_cy - _s(4)), (rock_cx + _s(7), rock_cy - _s(1))],
+            [(rock_cx - _s(8), rock_cy + _s(2)), (rock_cx - _s(4), rock_cy + _s(5.5))],
         ]
         for start, end in cracks:
             draw.line(
@@ -481,10 +481,10 @@ def make_tile_obstacle() -> Image.Image:
 
         # Small pebbles around base for scatter
         pebbles = [
-            (rock_cx - _s(26), rock_cy + _s(12), _s(2.5)),
-            (rock_cx + _s(24), rock_cy + _s(10), _s(3)),
-            (rock_cx - _s(16), rock_cy + _s(18), _s(2)),
-            (rock_cx + _s(18), rock_cy + _s(16), _s(2.8)),
+            (rock_cx - _s(14), rock_cy + _s(7), _s(1.5)),
+            (rock_cx + _s(13), rock_cy + _s(6), _s(1.8)),
+            (rock_cx - _s(9), rock_cy + _s(10), _s(1.2)),
+            (rock_cx + _s(10), rock_cy + _s(9), _s(1.5)),
         ]
         for px, py, pr in pebbles:
             filled_ellipse(

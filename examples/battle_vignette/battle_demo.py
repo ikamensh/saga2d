@@ -85,7 +85,7 @@ ATTACK_DAMAGE = 20
 # Grid placement — centred on screen with some vertical padding
 GRID_COLS, GRID_ROWS = 10, 6
 GRID_ORIGIN_X = (SCREEN_W - GRID_COLS * TILE_SIZE) / 2
-GRID_ORIGIN_Y = (SCREEN_H - GRID_ROWS * TILE_SIZE) / 2
+GRID_ORIGIN_Y = (SCREEN_H - GRID_ROWS * TILE_SIZE) / 2 + 70
 
 # FSM states
 S_PLAYER_SELECT = "player_select"
@@ -1003,25 +1003,23 @@ class TitleScene(Scene):
     background_color = (15, 18, 30, 255)
 
     def on_enter(self) -> None:
-        # Decorative warrior sprites (left side) — wider spread, staggered, more sprites
-        for i, row_y in enumerate([250, 400, 550, 700]):
-            s = Sprite(
-                "sprites/warrior_idle_01",
-                position=(SCREEN_W // 2 - 600 - i * 30, row_y),
-                layer=RenderLayer.UNITS,
-                anchor=SpriteAnchor.BOTTOM_CENTER,
-            )
-            self.add_sprite(s)
+        # Decorative warrior sprite (left side) — one large sprite
+        s = Sprite(
+            "sprites/warrior_idle_01_large",
+            position=(260, 700),
+            layer=RenderLayer.UNITS,
+            anchor=SpriteAnchor.BOTTOM_CENTER,
+        )
+        self.add_sprite(s)
 
-        # Decorative skeleton sprites (right side) — mirrored, more sprites
-        for i, row_y in enumerate([250, 400, 550, 700]):
-            s = Sprite(
-                "sprites/skeleton_idle_01",
-                position=(SCREEN_W // 2 + 600 + i * 30, row_y),
-                layer=RenderLayer.UNITS,
-                anchor=SpriteAnchor.BOTTOM_CENTER,
-            )
-            self.add_sprite(s)
+        # Decorative skeleton sprite (right side) — one large sprite
+        s = Sprite(
+            "sprites/skeleton_idle_01_large",
+            position=(SCREEN_W - 260, 700),
+            layer=RenderLayer.UNITS,
+            anchor=SpriteAnchor.BOTTOM_CENTER,
+        )
+        self.add_sprite(s)
 
         # Title — large and prominent
         self.ui.add(Label(

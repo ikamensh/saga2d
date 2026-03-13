@@ -5,14 +5,14 @@ Each public ``make_*`` function returns a ``PIL.Image.Image`` (RGBA mode).
 
 Filenames and sizes match the architecture contract::
 
-    warrior_idle_01.png          160x160
-    warrior_walk_{01..04}.png    160x160
-    warrior_attack_{01..03}.png  160x160
-    skeleton_idle_01.png         160x160
-    skeleton_walk_{01..04}.png   160x160
-    skeleton_hit_{01..03}.png    160x160
-    skeleton_death_{01..03}.png  160x160
-    select_ring.png              180x180
+    warrior_idle_01.png          480x480
+    warrior_walk_{01..04}.png    480x480
+    warrior_attack_{01..03}.png  480x480
+    skeleton_idle_01.png         480x480
+    skeleton_walk_{01..04}.png   480x480
+    skeleton_hit_{01..03}.png    480x480
+    skeleton_death_{01..03}.png  480x480
+    select_ring.png              540x540
 
 Run from project root::
 
@@ -99,15 +99,15 @@ EYE_RED_CORE = (255, 60, 30, 255)   # bright centre
 EYE_RED_MID = (220, 20, 0, 255)     # mid glow
 EYE_RED_OUTER = (120, 0, 0, 200)    # dark edge
 
-SIZE = (160, 160)  # all battle sprites are 160x160
-CX, CY = 80, 80  # centre
+SIZE = (480, 480)  # all battle sprites are 480x480
+CX, CY = 32, 32  # centre of the 64-unit authored coordinate space
 
 # Supersampling factor — all rendering is done at SS×
 _SS = 4
 
 # Content scale factor — coordinates authored at 1× map to _SCALE pixels
-# in output space.  With SIZE 160 and coordinates authored for 64, _SCALE=2.5.
-_SCALE = 2.5
+# in output space.  With SIZE 480 and coordinates authored for 64, _SCALE=7.5.
+_SCALE = 7.5
 
 
 # ===================================================================
@@ -621,7 +621,7 @@ def _draw_warrior(
 # -------------------------------------------------------------------
 
 def _post_process(sprite: Image.Image) -> Image.Image:
-    """Apply rim lighting and a soft drop shadow, cropped back to 128×128.
+    """Apply rim lighting and a soft drop shadow, cropped back to 480×480.
 
     Rim lighting is a faint glow composited behind the sprite.
     The drop shadow is subtle — just enough to ground the character.
@@ -634,7 +634,7 @@ def _post_process(sprite: Image.Image) -> Image.Image:
         intensity=0.25,
     )
 
-    # Soft drop shadow — rendered with expansion then cropped back to 128×128
+    # Soft drop shadow — rendered with expansion then cropped back to 480×480
     # so the shadow doesn't overwhelm the canvas.
     _expand = 8
     padded = apply_drop_shadow(
@@ -644,7 +644,7 @@ def _post_process(sprite: Image.Image) -> Image.Image:
         shadow_color=(0, 0, 0, 70),
         expand=_expand,
     )
-    # Crop the expanded image back to 128×128, centred.
+    # Crop the expanded image back to 480×480, centred.
     return padded.crop((_expand, _expand, _expand + SIZE[0], _expand + SIZE[1]))
 
 
@@ -655,7 +655,7 @@ def _post_process(sprite: Image.Image) -> Image.Image:
 def make_warrior_idle() -> Image.Image:
     """Warrior idle frame — standing at rest with shield and sword.
 
-    All rendering is 4× supersampled and LANCZOS-downsampled to 128×128.
+    All rendering is 4× supersampled and LANCZOS-downsampled to 480×480.
     Includes metallic gradient armour, a pulsing gem, rim lighting,
     and a soft drop shadow.
     """
@@ -785,7 +785,7 @@ def make_warrior_frame(pose: str, frame_idx: int = 1) -> Image.Image:
         frame_idx: 1-based frame index (ignored for idle).
 
     Returns:
-        128×128 RGBA ``Image``.
+        480×480 RGBA ``Image``.
 
     Raises:
         ValueError: If *pose* is not recognised.
@@ -1380,7 +1380,7 @@ def make_skeleton_frame(pose: str, frame_idx: int = 1) -> Image.Image:
         frame_idx: 1-based frame index (ignored for idle).
 
     Returns:
-        128×128 RGBA ``Image``.
+        480×480 RGBA ``Image``.
 
     Raises:
         ValueError: If *pose* is not recognised.
@@ -1401,12 +1401,12 @@ def make_skeleton_frame(pose: str, frame_idx: int = 1) -> Image.Image:
 # Select ring
 # ===================================================================
 
-RING_SIZE = (180, 180)
+RING_SIZE = (540, 540)
 
 # The ring ellipse in 1× space: (x0, y0, x1, y1)
 # Wider than tall to suggest a ground-plane perspective.
-# Coordinates are in 144×144 output space (doubled from original 72×72).
-_RING_BBOX_1X = (8, 32, 134, 110)
+# Coordinates are in 540×540 output space (scaled from original 72×72).
+_RING_BBOX_1X = (24, 96, 402, 330)
 
 
 def _draw_select_ring(img: Image.Image) -> None:
@@ -1538,7 +1538,7 @@ def _draw_select_ring(img: Image.Image) -> None:
 
 
 def make_select_ring() -> Image.Image:
-    """Magical golden selection ring — 144×144 transparent.
+    """Magical golden selection ring — 540×540 transparent.
 
     The ring is elliptical (wider than tall) to suggest a ground-plane
     perspective.  Rendered at 4× supersampling for smooth anti-aliased
@@ -1551,7 +1551,7 @@ def make_select_ring() -> Image.Image:
     - Specular highlight for reflected light
 
     Returns:
-        144×144 RGBA ``Image``.
+        540×540 RGBA ``Image``.
     """
     sprite = supersample_draw(
         RING_SIZE[0], RING_SIZE[1], _draw_select_ring, factor=_SS,

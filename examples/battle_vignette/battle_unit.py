@@ -56,16 +56,16 @@ if TYPE_CHECKING:
 # Constants
 # ======================================================================
 
-SPRITE_SIZE: int = 160
-"""All battle sprites are 160×160."""
+SPRITE_SIZE: int = 480
+"""All battle sprites are 480×480."""
 
 MOVE_SPEED: float = 400.0
 """Walk speed in pixels per second."""
 
 # Health bar geometry (drawn via Scene.draw_rect / draw_world_rect)
-HEALTH_BAR_WIDTH: int = 120
-HEALTH_BAR_HEIGHT: int = 14
-HEALTH_BAR_Y_OFFSET: int = -16
+HEALTH_BAR_WIDTH: int = 280
+HEALTH_BAR_HEIGHT: int = 24
+HEALTH_BAR_Y_OFFSET: int = -36
 """Y offset above the sprite's position for the health bar."""
 
 HEALTH_BAR_BG: tuple[int, int, int, int] = (40, 40, 40, 200)
