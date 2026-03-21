@@ -53,16 +53,16 @@ if not _asset_dir.exists():
 # Saga2D imports — everything comes from the top-level ``saga2d`` package.
 # ---------------------------------------------------------------------------
 from saga2d import (  # noqa: E402
-    Anchor,        # Where a UI component sits within its parent
-    Button,        # Clickable button with hover/press states
-    Game,          # Top-level object: owns the window, scene stack, and loop
-    InputEvent,    # Unified input (keyboard/mouse) event
-    Label,         # Static text display
-    Layout,        # VERTICAL / HORIZONTAL / NONE — child arrangement
-    Panel,         # Container with background and flow layout
-    Scene,         # A self-contained game state (title, gameplay, pause…)
-    Style,         # Per-component visual overrides (color, font, padding…)
-    Theme,         # Global UI defaults (applied when Style fields are None)
+    Anchor,  # Where a UI component sits within its parent
+    Button,  # Clickable button with hover/press states
+    Game,  # Top-level object: owns the window, scene stack, and loop
+    InputEvent,  # Unified input (keyboard/mouse) event
+    Label,  # Static text display
+    Layout,  # VERTICAL / HORIZONTAL / NONE — child arrangement
+    Panel,  # Container with background and flow layout
+    Scene,  # A self-contained game state (title, gameplay, pause…)
+    Style,  # Per-component visual overrides (color, font, padding…)
+    Theme,  # Global UI defaults (applied when Style fields are None)
 )
 
 
@@ -76,14 +76,15 @@ from saga2d import (  # noqa: E402
 SCREEN_W, SCREEN_H = 960, 540
 
 # Colour palette (RGBA tuples, 0–255 per channel)
-BG_COLOR = (25, 30, 40, 255)         # Dark blue-grey background
-TITLE_COLOR = (255, 220, 80, 255)    # Gold — for the game title
+BG_COLOR = (25, 30, 40, 255)  # Dark blue-grey background
+TITLE_COLOR = (255, 220, 80, 255)  # Gold — for the game title
 SUBTITLE_COLOR = (180, 180, 190, 255)  # Muted grey — for the subtitle
 
 
 # ======================================================================
 # TitleScene
 # ======================================================================
+
 
 class TitleScene(Scene):
     """The title screen — shown when the game starts.
@@ -237,6 +238,7 @@ class TitleScene(Scene):
 # ======================================================================
 # Main — entry point
 # ======================================================================
+
 
 def main() -> None:
     """Create the Game and run the title screen.

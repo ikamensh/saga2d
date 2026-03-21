@@ -46,8 +46,8 @@ from saga2d import (  # noqa: E402
 # Colour palette
 # ======================================================================
 
-BG_TITLE = (20, 24, 35, 255)       # dark blue-grey (title screen)
-BG_GAME = (10, 60, 10, 255)        # dark green (game world)
+BG_TITLE = (20, 24, 35, 255)  # dark blue-grey (title screen)
+BG_GAME = (10, 60, 10, 255)  # dark green (game world)
 TITLE_COLOR = (255, 220, 80, 255)  # gold
 HINT_COLOR = (180, 180, 190, 255)  # muted grey
 
@@ -55,6 +55,7 @@ HINT_COLOR = (180, 180, 190, 255)  # muted grey
 # ======================================================================
 # TitleScreen
 # ======================================================================
+
 
 class TitleScreen(Scene):
     """Title screen — entry point of the game."""
@@ -100,6 +101,7 @@ class TitleScreen(Scene):
 # SettingsOverlay
 # ======================================================================
 
+
 class SettingsOverlay(Scene):
     """Settings panel — transparent overlay on top of the title screen."""
 
@@ -126,6 +128,7 @@ class SettingsOverlay(Scene):
 # GameScreen
 # ======================================================================
 
+
 class GameScreen(Scene):
     """The main game screen with hotkey bindings."""
 
@@ -146,18 +149,21 @@ class GameScreen(Scene):
         )
         self.ui.add(panel)
 
-        self.ui.add(Label(
-            "I = Inventory   ESC = Pause",
-            font_size=16,
-            anchor=Anchor.BOTTOM_LEFT,
-            margin=12,
-            text_color=HINT_COLOR,
-        ))
+        self.ui.add(
+            Label(
+                "I = Inventory   ESC = Pause",
+                font_size=16,
+                anchor=Anchor.BOTTOM_LEFT,
+                margin=12,
+                text_color=HINT_COLOR,
+            )
+        )
 
 
 # ======================================================================
 # PauseMenu
 # ======================================================================
+
 
 class PauseMenu(Scene):
     """Pause overlay — transparent, pauses the game below."""
@@ -188,6 +194,7 @@ class PauseMenu(Scene):
 # InventoryScreen
 # ======================================================================
 
+
 class InventoryScreen(Scene):
     """Inventory overlay — transparent, pauses below."""
 
@@ -213,6 +220,7 @@ class InventoryScreen(Scene):
 # ======================================================================
 # Main
 # ======================================================================
+
 
 def main() -> None:
     """Create the game and run the title screen."""

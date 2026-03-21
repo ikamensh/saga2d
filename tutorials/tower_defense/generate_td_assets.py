@@ -155,6 +155,7 @@ HUD_BG = (20, 20, 30, 220)
 # Terrain tiles (32x32)
 # ===================================================================
 
+
 def make_grass() -> Image.Image:
     """32x32 grass tile with subtle texture variation."""
     img = Image.new("RGBA", (32, 32), GRASS_GREEN)
@@ -162,8 +163,16 @@ def make_grass() -> Image.Image:
 
     # Scattered lighter grass tufts for visual interest
     tufts = [
-        (4, 6), (18, 3), (26, 12), (8, 20), (22, 24),
-        (14, 14), (2, 28), (28, 28), (12, 8), (24, 18),
+        (4, 6),
+        (18, 3),
+        (26, 12),
+        (8, 20),
+        (22, 24),
+        (14, 14),
+        (2, 28),
+        (28, 28),
+        (12, 8),
+        (24, 18),
     ]
     for tx, ty in tufts:
         draw.line([(tx, ty), (tx, ty - 3)], fill=GRASS_LIGHT, width=1)
@@ -228,6 +237,7 @@ def make_path_turn() -> Image.Image:
 # ===================================================================
 # Tower sprites (32x32)
 # ===================================================================
+
 
 def _draw_tower_base(img: Image.Image, base_color: Color, accent: Color) -> None:
     """Draw a common tower platform/base onto *img*."""
@@ -322,6 +332,7 @@ def make_tower_slot() -> Image.Image:
 # Enemy sprites (24x24)
 # ===================================================================
 
+
 def make_enemy_basic() -> Image.Image:
     """24x24 basic enemy — red circle with darker core, simple foot soldier."""
     img = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
@@ -344,8 +355,8 @@ def make_enemy_fast() -> Image.Image:
 
     # Arrow-like diamond pointing right (direction of travel)
     points = [
-        (2, 12),   # left
-        (10, 3),   # top
+        (2, 12),  # left
+        (10, 3),  # top
         (22, 12),  # right tip
         (10, 21),  # bottom
     ]
@@ -384,6 +395,7 @@ def make_enemy_tank() -> Image.Image:
 # ===================================================================
 # Projectiles (8x8)
 # ===================================================================
+
 
 def make_projectile_basic() -> Image.Image:
     """8x8 basic projectile — bright yellow dot with glow."""
@@ -428,6 +440,7 @@ def make_projectile_splash() -> Image.Image:
 # Effects
 # ===================================================================
 
+
 def make_explosion() -> Image.Image:
     """16x16 explosion burst — orange/yellow radial effect."""
     img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
@@ -468,7 +481,10 @@ def make_range_indicator() -> Image.Image:
 # UI elements
 # ===================================================================
 
-def _make_button(w: int, h: int, base: Color, lighter: Color, darker: Color) -> Image.Image:
+
+def _make_button(
+    w: int, h: int, base: Color, lighter: Color, darker: Color
+) -> Image.Image:
     """Internal helper: create a beveled button image."""
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img, "RGBA")
@@ -488,7 +504,8 @@ def _make_button(w: int, h: int, base: Color, lighter: Color, darker: Color) -> 
 def make_btn_normal() -> Image.Image:
     """80x32 button in normal/idle state."""
     return _make_button(
-        80, 32,
+        80,
+        32,
         base=UI_MID,
         lighter=UI_LIGHT,
         darker=(25, 25, 35, 230),
@@ -498,7 +515,8 @@ def make_btn_normal() -> Image.Image:
 def make_btn_hover() -> Image.Image:
     """80x32 button in hover state — lighter tint."""
     return _make_button(
-        80, 32,
+        80,
+        32,
         base=UI_LIGHT,
         lighter=(100, 100, 120, 230),
         darker=UI_MID,
@@ -508,7 +526,8 @@ def make_btn_hover() -> Image.Image:
 def make_btn_pressed() -> Image.Image:
     """80x32 button in pressed state — inverted bevel."""
     return _make_button(
-        80, 32,
+        80,
+        32,
         base=UI_DARK,
         lighter=(20, 20, 30, 230),
         darker=UI_LIGHT,
