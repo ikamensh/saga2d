@@ -9,8 +9,8 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 | 1 | Install & import | conftest.py (implicit) | — | 2026-03-21 | pass | uv pip install OK |
 | 2 | Game lifecycle (create/tick/teardown) | core/test_game.py | 7 | 2026-03-21 | pass (4/7) | 3 game.run() tests fail under SAGA2D_HEADLESS=1 |
 | 3 | Game.run() main loop | core/test_game.py | 3 | 2026-03-21 | env-fail | RuntimeError when SAGA2D_HEADLESS=1; passes when unset |
-| 4 | Scene stack (push/pop/replace/clear_and_push) | core/test_scene.py | 36 | 2026-03-21 | pass | F1 cursor crash fixed |
-| 5 | Scene lifecycle hooks (on_enter/on_exit/on_reveal) | core/test_scene.py | (in #4) | 2026-03-21 | pass | |
+| 4 | Scene stack (push/pop/replace/clear_and_push) | core/test_scene.py, kodo_test_scene_lifecycle.py | 36+73 | 2026-03-21 | pass | F1 cursor crash fixed; hook ordering, mutations during hooks, empty-stack ops all verified |
+| 5 | Scene lifecycle hooks (on_enter/on_exit/on_reveal) | core/test_scene.py, kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | Exact hook ordering verified for all operations; game property lifetime tested |
 | 6 | Scene drawing (draw_rect/draw_world_rect/bg color) | core/test_scene_draw.py | 12 | 2026-03-21 | pass | |
 | 7 | Scene-owned sprites | core/test_scene_sprites.py | 19 | 2026-03-21 | pass | add/remove/cleanup verified |
 | 8 | Scene-owned timers | core/test_scene_timers.py | 19 | 2026-03-21 | pass | timer cleanup on scene exit |
@@ -38,8 +38,13 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 | 30 | Cursor (register/set/visibility) | systems/test_cursor.py | 6 | 2026-03-21 | pass | |
 | 31 | Assets (image/sound/music/frames/@2x) | systems/test_assets.py | 17 | 2026-03-21 | pass | |
 | 32 | Mock Backend (event injection/tracking) | conftest.py + all | — | 2026-03-21 | pass | |
-| 33 | Integration: adversarial reentrancy | integration/test_adversarial.py | 18 | 2026-03-21 | pass | 7 FakeGame tests pass (F1 fixed) |
+| 33 | Integration: adversarial reentrancy | integration/test_adversarial.py, kodo_test_scene_lifecycle.py | 18+73 | 2026-03-21 | pass | 7 FakeGame tests pass (F1 fixed); mutations in on_enter/on_exit/on_reveal/update tested |
 | 34 | Integration: resource leaks | integration/test_resource_leaks.py | 9 | 2026-03-21 | pass | |
+| 35 | Transparent/pause_below semantics | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | 8 tests: opaque hides below, transparent shows both, chain blocking, independence |
+| 36 | Scene.game property lifetime | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | 6 tests: set before on_enter, cleared after pop/replace/clear_and_push, kept when pushed over |
+| 37 | on_enter exception rollback | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | push/replace/clear_and_push all roll back on on_enter crash |
+| 38 | Cleanup ordering (sprites/timers/UI) | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | Sprites+timers cleaned on push-over; UI kept on push-over, cleared on pop |
+| 39 | on_exit exception handling | kodo_test_scene_lifecycle.py | 1 | 2026-03-21 | known-issue | F5: on_exit exception leaves scene stuck on stack (confirmed) |
 
 ## Example / Tutorial Tests
 
@@ -62,9 +67,11 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 
 ## Totals
 
-- **34 feature areas** identified in source
-- **32 fully passing** in baseline
+- **39 feature areas** identified in source
+- **36 fully passing** in baseline
 - **1 environment-dependent** (Game.run() with SAGA2D_HEADLESS)
+- **1 known-issue** (F5: on_exit exception leaves scene stuck)
 - **1 area (visual) blocked** by display requirement
 - **1404 unit tests** collected, 1401 pass with SAGA2D_HEADLESS=1, 1404 pass without
 - **348 kodo regression tests** all pass
+- **73 exploratory scene lifecycle tests** all pass (kodo_test_scene_lifecycle.py)

@@ -35,3 +35,9 @@ desired_examples/        # API design sketches
 
 - Main suite (ignore `visual_verify`, `visual`, `screenshot`): **1404** collected — **`SAGA2D_HEADLESS=1`** → **3** fails in `tests/core/test_game.py` (`game.run()` headless guard); **unset** → **1404** pass.
 - FakeGame + cursor: `hasattr(scene.game, "cursor")` in `saga2d/scene.py` (~526) — no cursor regression; adversarial + kodo FakeGame tests pass.
+
+## Scene lifecycle (kodo Stage 2, 2026-03-21)
+
+- Exploratory suite: `tests/kodo_test_scene_lifecycle.py` (73 tests). With core scene tests: `pytest tests/core/test_scene.py tests/kodo_test_scene_lifecycle.py`.
+- Ordering harness: `python -m tests.harness.lifecycle_tester -v` (do not `pytest tests/harness/lifecycle_tester.py` — not pytest tests).
+- **F5 (known issue, not fixed):** if `on_exit` raises, `SceneStack.pop()` does not remove the scene — stack unchanged. Covered by `test_on_exit_exception_leaves_scene_on_stack`.

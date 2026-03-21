@@ -9,6 +9,67 @@
 - **Timing**: full run ~33s here vs ~29s in report — normal machine variance.
 - **Doc nit**: live `RuntimeError` from `game.run()` includes an extra sentence (use `tick` / screenshot harness); report truncates the message.
 
+## E2E: core engine + scene stack (2026-03-21)
+
+**Scope:** Mock backend only (`backend="mock"`), `game.tick(dt)` — no `game.run()` (headless-safe). **Note:** Saga2D has **no `on_hide` hook**; coverage is `on_enter` / `on_exit` / `on_reveal` only.
+
+### Commands run (all PASS)
+
+```bash
+cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
+
+# Broad: lifecycle hooks, transparency draw chain, pause_below, deferred ops,
+# empty stack, replace/clear edge cases, hook-time stack mutation
+.venv/bin/python -m pytest tests/core/test_scene.py tests/integration/test_adversarial.py -v --tb=no
+# → 130 passed (36 + 94)
+
+# Lifecycle harness (push/pop/replace/clear_and_push ordering + deferred flush)
+.venv/bin/python -m tests.harness.lifecycle_tester -v
+# → US4, US10, US11, US12, US13 — 5/5
+
+# Fuzz: invalid Game args + scene stack edge ops (pop/replace empty, etc.)
+.venv/bin/python -m tests.harness.fuzz_harness
+# → exit 0; stderr may show Game.__del__ teardown noise on partially-built Game instances
+
+# Focused: clear_and_push resource cleanup, empty stack, FakeGame cursor
+.venv/bin/python -m pytest tests/core/test_scene.py tests/core/test_scene_timers.py -k clear_and_push \
+  tests/core/test_scene_sprites.py -k clear_and_push tests/integration/test_resource_leaks.py \
+  tests/ui/test_hud.py -k "clear_and_push or empty_stack" \
+  tests/kodo_test_core.py::TestSceneStackBasic tests/kodo_test_core.py::TestFakeGameCursorBug -v --tb=no
+# → 16 passed (subset via -k)
+
+# Transparent overlay + HUD ordering + tick-based game tests (excludes game.run())
+.venv/bin/python -m pytest tests/ui/test_ui.py::TestSceneIntegration::test_ui_for_transparent_scene_stack \
+  tests/ui/test_hud.py::TestHUDDrawOrder::test_hud_draws_before_overlay \
+  tests/ui/test_hud.py::TestHUDDrawOrder::test_hud_hidden_by_overlay_show_hud_false \
+  tests/ui/test_hud.py::TestHUDDrawOrder::test_hud_visible_with_show_hud_true_overlay \
+  tests/core/test_game.py -k "not run and not window_close" -v --tb=no
+# → 6 passed
+
+# One-liner smoke (editable package from .venv)
+.venv/bin/python -c "from saga2d import Game, Scene; g=Game('e2e', backend='mock'); g.push(Scene()); g.tick(0.016); g._teardown(); print('OK')"
+```
+
+### Coverage map (what the suite proves)
+
+| Area | Where |
+|------|--------|
+| Hook order (push/pop/replace/clear) | `tests/core/test_scene.py`, `lifecycle_tester.py` |
+| `on_reveal` after pop | `test_pop_calls_on_exit_and_on_reveal`, US4/US10/US11 |
+| Deferred stack ops during `update` | `test_deferred_*`, US11 |
+| Hooks mutating stack (`on_enter`/`on_exit`) | `test_push_during_on_enter_*`, `test_pop_during_on_exit_*`, `test_push_during_on_exit_*`, adversarial tests |
+| Empty stack | `test_*empty*`, `TestSceneStackBasic`, fuzz harness |
+| Transparency + draw chain | `test_draw_transparent_*`, `test_background_color_uses_base_scene_when_transparent_overlay` |
+| `pause_below=False` updates below | `test_pause_below_false_updates_scenes_below` |
+| `clear_and_push` teardown | on_exit all cleared scenes; timers/sprites tests; resource leak test |
+| Re-entrancy / adversarial | `tests/integration/test_adversarial.py` (18 tests) |
+
+### F5 — `on_exit` exception (re-verified)
+
+- **Exploratory file:** `tests/kodo_test_scene_lifecycle.py` (73 tests) — includes `TestComplexReentrancy::test_on_exit_exception_leaves_scene_on_stack` documenting F5.
+- **Repro still valid:** `SceneStack.pop()` after `on_exit` raises → **`len(_stack) == 1`**, scene remains top (manual repro + that test both confirm).
+- **Do not** `pytest tests/harness/lifecycle_tester.py` — those are script functions, not pytest tests; use `python -m tests.harness.lifecycle_tester`.
+
 ## Last Session: Harness & User Story Coverage (2026-03-18)
 
 ### Harness Verification — All Run Successfully Except One
