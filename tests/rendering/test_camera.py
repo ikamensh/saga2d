@@ -2072,3 +2072,163 @@ class TestCameraFollowEdgeCases:
         cam = Camera((800, 600))
         # Duration of 0 -- tween system handles it.
         cam.pan_to(500, 400, 0.0)
+
+
+# ==================================================================
+# 26. F12 — screen_to_world includes shake offset (regression)
+# ==================================================================
+
+
+class TestShakePickingRegression:
+    """F12: screen_to_world / world_to_screen must include camera shake
+    offsets, otherwise mouse picking disagrees with rendered sprite
+    positions during active shake.
+
+    Before the fix, screen_to_world used only camera._x/_y while
+    rendering used camera._x + shake_offset_x.  A user clicking on a
+    visually rendered sprite during shake would get wrong world coords.
+    """
+
+    def test_screen_to_world_includes_shake_offset(self) -> None:
+        """screen_to_world accounts for shake offset so clicks match pixels."""
+        cam = Camera((800, 600))
+        cam.scroll(100, 50)  # camera at (100, 50)
+
+        # Apply a known shake offset via internal state.
+        cam._shake_offset_x = 10.0
+        cam._shake_offset_y = -5.0
+
+        wx, wy = cam.screen_to_world(400, 300)
+        # Rendering draws at screen_x = world_x - (cam._x + shake_x)
+        # so world_x = screen_x + cam._x + shake_x
+        assert wx == 400 + 100 + 10.0  # 510
+        assert wy == 300 + 50 + (-5.0)  # 345
+
+    def test_world_to_screen_includes_shake_offset(self) -> None:
+        """world_to_screen is the exact inverse of screen_to_world."""
+        cam = Camera((800, 600))
+        cam.scroll(100, 50)
+        cam._shake_offset_x = 10.0
+        cam._shake_offset_y = -5.0
+
+        sx, sy = cam.world_to_screen(510, 345)
+        assert sx == 510 - 100 - 10.0  # 400
+        assert sy == 345 - 50 - (-5.0)  # 300
+
+    def test_screen_world_roundtrip_during_shake(self) -> None:
+        """screen→world→screen roundtrip is exact during active shake."""
+        cam = Camera((800, 600))
+        cam.scroll(200, 150)
+        cam._shake_offset_x = 7.5
+        cam._shake_offset_y = -3.2
+
+        sx, sy = 400.0, 300.0
+        wx, wy = cam.screen_to_world(sx, sy)
+        sx2, sy2 = cam.world_to_screen(wx, wy)
+        assert abs(sx2 - sx) < 1e-9
+        assert abs(sy2 - sy) < 1e-9
+
+    def test_no_shake_unchanged(self) -> None:
+        """Without shake, screen_to_world still works as before."""
+        cam = Camera((800, 600))
+        cam.scroll(100, 50)
+
+        wx, wy = cam.screen_to_world(400, 300)
+        assert wx == 500.0
+        assert wy == 350.0
+
+    def test_shake_expired_offset_zero(self) -> None:
+        """After shake expires, offsets return to zero."""
+        cam = Camera((800, 600))
+        cam.shake(intensity=20.0, duration=0.1, decay=1.0)
+        cam.update(0.5)  # well past duration
+
+        assert cam.shake_offset_x == 0.0
+        assert cam.shake_offset_y == 0.0
+
+        wx, wy = cam.screen_to_world(400, 300)
+        assert wx == 400.0
+        assert wy == 300.0
+
+    def test_click_world_coords_match_rendered_sprite_during_shake(
+        self,
+        game: Game,
+        backend: MockBackend,
+    ) -> None:
+        """E2E: during active shake, world_x/y from a click matches
+        where sprites are actually drawn — proving picking works."""
+        sprite = Sprite(
+            "sprites/knight",
+            position=(500, 400),
+            anchor=SpriteAnchor.TOP_LEFT,
+        )
+        results: dict = {}
+
+        class ShakeScene(Scene):
+            def __init__(self) -> None:
+                self.events: list[InputEvent] = []
+
+            def on_enter(self) -> None:
+                self.camera = Camera((800, 600))
+                self.camera.center_on(400, 300)  # _x=0, _y=0
+                self.camera.shake(intensity=50.0, duration=2.0, decay=1.0)
+                self.add_sprite(sprite)
+
+            def handle_input(self, event: InputEvent) -> bool:
+                self.events.append(event)
+                return False
+
+            def draw(self) -> None:
+                rec = backend.sprites[sprite.sprite_id]
+                results["draw_x"] = rec["x"]
+                results["draw_y"] = rec["y"]
+                results["shake_x"] = self.camera.shake_offset_x
+                results["shake_y"] = self.camera.shake_offset_y
+
+        scene = ShakeScene()
+        game.push(scene)
+
+        # First tick: starts shake, renders sprite at shaken position.
+        game.tick(dt=0.016)
+        shake_x = results["shake_x"]
+        shake_y = results["shake_y"]
+
+        # Sprite at world (500,400) is drawn at screen position:
+        #   screen_x = int(500 - (0 + shake_x))
+        drawn_screen_x = int(500 - shake_x)
+        drawn_screen_y = int(400 - shake_y)
+        assert results["draw_x"] == drawn_screen_x
+        assert results["draw_y"] == drawn_screen_y
+
+        # Now "click" exactly where the sprite was rendered.
+        # Freeze the shake offset so it doesn't change between inject
+        # and tick by using a very large duration and known offset.
+        scene.camera._shake_duration = 0.0  # stop shake updates
+        scene.camera._shake_offset_x = shake_x  # keep current offset
+        scene.camera._shake_offset_y = shake_y
+
+        backend.inject_click(drawn_screen_x, drawn_screen_y)
+        game.tick(dt=0.016)
+
+        assert len(scene.events) >= 1
+        click_ev = [e for e in scene.events if e.type == "click"][0]
+        # The world coords from the click should point to the sprite's
+        # world position (within ±1 for int truncation in draw).
+        assert abs(click_ev.world_x - 500) <= 1.0
+        assert abs(click_ev.world_y - 400) <= 1.0
+
+    def test_with_world_coords_includes_shake(self) -> None:
+        """_with_world_coords helper uses screen_to_world which now
+        includes shake offset."""
+        cam = Camera((800, 600))
+        cam.scroll(100, 50)
+        cam._shake_offset_x = 15.0
+        cam._shake_offset_y = -8.0
+
+        event = InputEvent(type="click", x=400, y=300, button="left")
+        result = _with_world_coords(event, cam)
+
+        # 400 + 100 + 15 = 515
+        assert result.world_x == 515.0
+        # 300 + 50 + (-8) = 342
+        assert result.world_y == 342.0

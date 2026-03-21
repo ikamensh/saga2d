@@ -15,12 +15,13 @@
 - Persistence/resources: `.venv/bin/python -m pytest tests/kodo_test_persistence_resources.py -v`
 - All kodo tests: `.venv/bin/python -m pytest tests/kodo_test_core.py tests/kodo_test_rendering.py tests/kodo_test_systems.py tests/kodo_test_scene_lifecycle.py tests/kodo_test_sprite_actions.py tests/kodo_test_persistence_resources.py -v`
 
-## Test Results (updated 2026-03-22)
-- 1404 existing tests: all pass (SAGA2D_HEADLESS unset)
-- 589 kodo tests: all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 48 persistence/resources + 37 persistence/resources ext)
+## Test Results (updated 2026-03-22, Stage 6C)
+- 1411 existing tests: all pass (SAGA2D_HEADLESS unset)
+- 598 kodo tests: all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 50 persistence/resources + 37 persistence/resources ext + 7 shake picking)
 - 383 UI tests: all pass across 6 files
 - Stage 4: F5/F6/F7 fixed, 0 known-issues remaining, 0 new UI findings
 - Stage 5 (final pass): persistence + resource lifecycle (48+37=85 tests), 1 new finding (F8)
+- Stage 6C: F12 shake vs picking fixed (7 tests), F10 partial init fixed (2 tests), F11 deferred
 
 ## Confirmed Findings
 - F1: cursor crash on FakeGame → fixed (commit 477220f)
@@ -45,6 +46,14 @@
   - 6 regression tests: array, string, null, number, boolean non-objects + list_slots with array
   - Updated 3 existing tests that expected old buggy pass-through behavior
 
+- F10: Game.__del__ crashes on partial init → **fixed 2026-03-22**
+  - game.py _teardown(): hasattr guards for _timer_manager, _tween_manager, _scene_stack
+  - 2 regression tests: test_teardown_safe_after_partial_init_f10, test_del_safe_after_partial_init_f10
+- F11: Game.__del__ stderr on normal exit → **not fixed** (low value, try/except already catches)
+- F12: Camera shake vs mouse picking → **fixed 2026-03-22**
+  - camera.py: screen_to_world/world_to_screen now include _shake_offset_x/_y
+  - 7 regression tests in TestShakePickingRegression (unit + E2E)
+
 ## Sharp Edges (design-intent, verified by execution)
 - SE1: list_slots() aborts on first corrupt slot — no partial results
 - SE2: game.save() saves top scene only — bottom scene state invisible
@@ -56,6 +65,34 @@
 - SE8: SaveManager.load() now validates top-level is dict (F9 fix) — but doesn't validate envelope keys; wrong-typed "state" still loads fine
 - SE9: Game.load() passes data["state"] to load_save_state without type-checking (list/None/string all passed through)
 - SE10: Future version numbers (version=99) load without error — no version gating in load()
+
+## Stage 6C: Shake vs Picking + F10/F11 (2026-03-22)
+- **F12**: Camera shake vs mouse picking — `screen_to_world`/`world_to_screen` now include shake offsets
+  - camera.py: both methods add `_shake_offset_x/_y` to match rendering in `_sync_sprites_to_camera`
+  - 7 regression tests in `tests/rendering/test_camera.py::TestShakePickingRegression`
+  - E2E test proves click at rendered sprite position → correct world coords during shake
+- **F10**: Game.__del__ crash on partial init — `_teardown()` now uses `hasattr` guards
+  - game.py: guards `_timer_manager`, `_tween_manager`, `_scene_stack` with hasattr checks
+  - 2 regression tests in `tests/kodo_test_persistence_resources.py::TestTeardownCompleteness`
+- **F11**: Game.__del__ stderr on normal exit — NOT FIXED (low value)
+  - Only fires if user forgets `_teardown()` + script exit with scenes on stack
+  - `game.run()` always calls `_teardown()` in finally block, so production code unaffected
+  - Existing `try/except` in `__del__` prevents propagation; just stderr noise
+
+## Stage 6A: Clean-Room Install Findings (2026-03-22)
+- `pip install .` works cleanly, installs saga2d + numpy + Pillow + pyglet
+- `pip install -e ".[dev]"` also works, 1401/1404 tests pass (3 SAGA2D_HEADLESS failures)
+- **F10**: Game.__del__ crashes on partial init — if Game() throws (e.g. wrong kwargs), `_teardown()` in `__del__` hits `AttributeError: 'Game' object has no attribute '_timer_manager'`. Repro: `Game('x', width=320)` → stderr noise.
+- **F11**: Game.__del__ stderr noise on normal script exit — if user forgets `_teardown()` and script ends with scene on stack, `__del__` → `_teardown()` → `_cleanup_exiting_scene` → `ImportError: sys.meta_path is None` during Python shutdown. Repro: push a scene, don't teardown, exit script.
+- Game is a singleton — second `Game()` without teardown raises RuntimeError
+- No public `top()` on Game — must use `g._scene_stack.top()` (private API)
+- No `camera` on Game — camera is per-scene (accessed via `getattr(scene, 'camera', None)`)
+- No `tween` on Game — `tween()` is a module-level function
+- `SaveManager(save_dir)` requires `Path`, not `str`
+- `MoveTo((x,y), speed=n)` — position is a tuple, not two args
+- `Panel()` doesn't take `x=`/`y=` kwargs — use `layout=`/`anchor=` based construction
+- `Scene.add_sprite()` not `Scene.add()` for sprites; `scene.ui.add()` for UI
+- `StateMachine(states_list, initial, transitions=dict)` not `StateMachine(initial)`
 
 ## Key Architecture & API Notes
 - Sprite("sprites/knight", position=(x,y)) — needs real asset in assets/images/sprites/

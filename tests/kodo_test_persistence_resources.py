@@ -383,6 +383,32 @@ class TestTeardownCompleteness:
         g._teardown()
         assert log == ["exit", "exit"]  # Both scenes get on_exit during teardown
 
+    def test_teardown_safe_after_partial_init_f10(self) -> None:
+        """F10: __del__ → _teardown() must not crash if __init__ failed
+        before _timer_manager / _scene_stack were created.
+
+        Regression: previously, _teardown() accessed self._timer_manager
+        unconditionally, causing AttributeError on partial init.
+        """
+        import io
+        import logging
+
+        # Trigger partial init by exploiting singleton guard.
+        # Instead we directly test _teardown on a half-built object.
+        g = object.__new__(Game)
+        # Simulate partial __init__: only _title set, nothing else.
+        g._title = "partial"
+
+        # _teardown() should exit early (hasattr guard) without error.
+        g._teardown()  # Should not raise
+
+    def test_del_safe_after_partial_init_f10(self) -> None:
+        """F10: Game.__del__ must not raise when __init__ was incomplete."""
+        g = object.__new__(Game)
+        g._title = "partial"
+        # __del__ wraps _teardown in try/except — should be silent.
+        g.__del__()  # Should not raise
+
 
 # ═════════════════════════════════════════════════════════════
 # 8. RESOURCE CLEANUP ACROSS SCENE TRANSITIONS

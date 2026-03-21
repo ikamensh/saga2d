@@ -2,6 +2,131 @@
 
 Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21. Stage 4 fixes: 2026-03-22.
 
+## Stage 6A — Clean-Room Install & Smoke Tests (2026-03-22)
+
+### Install Tests
+
+| Check | Command | Result |
+|-------|---------|--------|
+| Wheel install (fresh venv) | `pip install /path/to/saga2d` | **pass** — installs saga2d 0.1.0 + numpy + Pillow + pyglet |
+| Editable install + dev deps | `pip install -e ".[dev]"` | **pass** — pytest 9.0.2 included |
+| Test suite from editable install | `python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q` | **pass** — 1401/1404 (3 SAGA2D_HEADLESS expected) |
+
+### Smoke Tests (14 tests, all pass)
+
+All run from fresh venv with `backend='mock'`, no SAGA2D_HEADLESS, in `/tmp/saga2d-cleanroom/`.
+Required creating `assets/images/sprites/test.png` (16x16 red RGBA) for Sprite tests.
+
+| # | What | Imports / API exercised | Result |
+|---|------|------------------------|--------|
+| 1 | Top-level imports | `from saga2d import Game, Scene, Sprite, Panel, Label, Button, ...` (30+ symbols) | pass |
+| 2 | Game(mock) creation | `Game('Test', resolution=(320,240), backend='mock')` | pass |
+| 3 | Scene push + on_enter | `g.push(TestScene())`, assert `entered` flag | pass |
+| 4 | Sprite creation | `Sprite('sprites/test', position=(100,100))`, `scene.add_sprite(sp)` | pass |
+| 5 | Action: Sequence/Delay/Do | `sp.do(Sequence(Delay(0.1), Do(cb)))`, tick twice | pass |
+| 6 | Timer | `scene.after(0.1, cb)`, tick twice | pass |
+| 7 | UI Panel+Label+Button | `Panel(layout=VERTICAL, children=[Label, Button])`, `scene.ui.add()` | pass |
+| 8 | Save/Load roundtrip | `SaveManager(Path(td)).save(1, {...}, 'TestScene')` → `.load(1)` | pass |
+| 9 | Scene pop | `g.pop()`, assert stack empty | pass |
+| 10 | StateMachine | `StateMachine(['idle','walk'], 'idle', transitions={...})` | pass |
+| 11 | README quick-start | Panel+Layout+Anchor+Label+Button in on_enter | pass |
+| 12 | Tween | `tween(obj, 'x', 0, 100, 1.0, ease=LINEAR)` | pass |
+| 13 | MoveTo action | `MoveTo((100,100), speed=200)` | pass |
+| 14 | Scene stack depth | push 3 scenes, pop 3, verify top at each step | pass |
+
+### Findings
+
+| ID | Severity | Description | Repro |
+|----|----------|-------------|-------|
+| **F10** | Low | `Game.__del__` crashes with `AttributeError: '_timer_manager'` when `__init__` failed partway | `Game('x', width=320)` → catches TypeError, `__del__` prints traceback to stderr |
+| **F11** | Low | `Game.__del__` prints `ImportError: sys.meta_path is None` on normal script exit with scene on stack | Push scene, don't call `_teardown()`, let script exit → stderr noise during Python shutdown |
+
+### Usability Issues (not bugs, but friction for new users)
+
+| Issue | Detail |
+|-------|--------|
+| Sprite requires real asset file | `Sprite('foo')` immediately hits `AssetNotFoundError` — no "placeholder" mode for mock backend. New users must create `assets/images/` structure first. |
+| No public `game.top()` | Must use `game._scene_stack.top()` (private API) to inspect current scene |
+| Game is a strict singleton | Second `Game()` without `_teardown()` raises RuntimeError — unfriendly for REPL/notebook exploration |
+| `SaveManager` requires `Path` not `str` | `SaveManager('/tmp/saves')` → `AttributeError: 'str' object has no attribute 'mkdir'` |
+| API discoverability | `Scene.add_sprite()` not `Scene.add()`, `scene.ui.add()` not `scene.add_ui()`, `MoveTo((x,y), speed)` not `MoveTo(x, y, speed=)` — requires reading source or docs |
+
+## Stage 6 part B — Input, camera picking, physics (2026-03-22)
+
+| Check | Command / location | Result |
+|-------|-------------------|--------|
+| Input manager + Game dispatch | `pytest tests/systems/test_input.py -v` (33 tests) | pass |
+| Camera + mouse world coords + shake + follow + bounds | `pytest tests/rendering/test_camera.py -v` (134 tests) | pass |
+| Kodo camera regression | `pytest tests/kodo_test_rendering.py -k "Camera or screen_to_world or world" -v` | pass (17) |
+| World coords helpers | `pytest tests/kodo_test_systems.py -k "world_coords or _with_world" -v` | pass (2) |
+| Drag-drop (mouse paths) | `pytest tests/ui/test_drag_drop.py -q` | pass (49) |
+| Integration A/B/C (incl. camera scroll + UI fixed in screen space) | `python -m tests.harness.integration_harness all -v` | pass |
+| Systems scenario O (inject key + click → scene) | `python -m tests.harness.systems_util_harness O -v` | pass |
+| UI harness I (camera bounds + `world_to_screen` / `screen_to_world`) | `python -m tests.harness.ui_rendering_harness I -v` | pass |
+
+**Out of engine scope:** `Camera` has **no zoom or rotation**; there is **no** built-in physics/collision API (tunneling, filter groups, collision callbacks).
+
+## Stage 6 part C — Shake vs picking fix + F10 cleanup (2026-03-22)
+
+### F12: Camera shake vs mouse picking (confirmed bug, fixed)
+
+**Bug:** During active camera shake, `screen_to_world()` and `InputEvent.world_x/y` used only `camera._x/_y`, while rendering used `camera._x + shake_offset_x`. Clicking on a visually rendered sprite during shake would give incorrect world coordinates — the click would "miss" by the shake offset.
+
+**Fix:** `Camera.screen_to_world()` and `Camera.world_to_screen()` now include `_shake_offset_x/_y` in their calculations, matching what `_sync_sprites_to_camera()` uses for rendering.
+
+**Files changed:** `saga2d/rendering/camera.py` (screen_to_world, world_to_screen)
+
+**Regression tests (7):** `tests/rendering/test_camera.py::TestShakePickingRegression`
+
+| Test | What it proves |
+|------|---------------|
+| `test_screen_to_world_includes_shake_offset` | screen→world adds shake offset |
+| `test_world_to_screen_includes_shake_offset` | world→screen subtracts shake offset |
+| `test_screen_world_roundtrip_during_shake` | roundtrip is exact during shake |
+| `test_no_shake_unchanged` | no regression when shake inactive |
+| `test_shake_expired_offset_zero` | offsets zero after shake expires |
+| `test_click_world_coords_match_rendered_sprite_during_shake` | E2E: click at rendered position → correct world coords |
+| `test_with_world_coords_includes_shake` | _with_world_coords helper propagates shake |
+
+### F10: Game.__del__ crash on partial init (fixed)
+
+**Bug:** If `Game.__init__` failed partway (e.g. invalid args), `__del__` → `_teardown()` would crash with `AttributeError: '_timer_manager'` because `_teardown()` accessed attributes unconditionally.
+
+**Fix:** `Game._teardown()` now guards `_timer_manager`, `_tween_manager`, and `_scene_stack` with `hasattr()` checks, returning early if init was incomplete.
+
+**Files changed:** `saga2d/game.py` (_teardown)
+
+**Regression tests (2):** `tests/kodo_test_persistence_resources.py::TestTeardownCompleteness`
+
+| Test | What it proves |
+|------|---------------|
+| `test_teardown_safe_after_partial_init_f10` | `_teardown()` on half-built Game doesn't raise |
+| `test_del_safe_after_partial_init_f10` | `__del__()` on half-built Game doesn't raise |
+
+### F11: Game.__del__ stderr on normal exit (not fixed — low value)
+
+**Assessment:** F11 only fires when a user forgets `_teardown()` and lets the script exit with scenes on the stack. The existing `try/except` in `__del__` catches the error. The `sys.meta_path is None` guard in `_teardown()` already handles the module import path. The stderr noise is only visible in development. Not worth adding complexity for this edge case — `game.run()` calls `_teardown()` in its `finally` block, so production code is unaffected.
+
+### Test counts
+
+| Suite | Command | Count | Result |
+|-------|---------|-------|--------|
+| Full suite | `pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q` | **1411** | pass |
+| Camera (all) | `pytest tests/rendering/test_camera.py -v` | **134** (was 123+4=127, now +7) | pass |
+| Persistence | `pytest tests/kodo_test_persistence_resources.py -v` | **50** (was 48, now +2) | pass |
+| Kodo camera | `pytest tests/kodo_test_rendering.py -k "Camera or screen_to_world or world" -v` | **17** | pass |
+| UI harness I | `python -m tests.harness.ui_rendering_harness I -v` | 1 | pass |
+
+### Tester re-verification (2026-03-22)
+
+End-to-end check (mock backend only): **1411** passed with `env -u SAGA2D_HEADLESS`. Focused bundle in one command:
+
+`pytest tests/rendering/test_camera.py::TestShakePickingRegression tests/systems/test_input.py tests/rendering/test_camera.py tests/kodo_test_persistence_resources.py::TestTeardownCompleteness -v` → **173** passed.
+
+**Shake + picking:** Confirmed in code (`camera.py` `screen_to_world` / `world_to_screen`; `game.py` sprite sync uses same offsets) and by `TestShakePickingRegression` (unit + `test_click_world_coords_match_rendered_sprite_during_shake`). **No remaining mismatch** between rendered sprite position and mouse world coords during shake.
+
+Also re-ran: kodo camera filter (17), kodo `world_coords` (2), `tests/ui/test_drag_drop.py` (49), `integration_harness all`, `systems_util_harness O`, `ui_rendering_harness I` — all pass.
+
 ## Feature Map (50 areas)
 
 | # | Feature / Workflow | Test File(s) | Test Count | Last Tested | Status | Findings |
@@ -18,7 +143,7 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21. Stage 4 f
 | 10 | Sprites (create/position/remove/anchor/y-sort) | rendering/test_sprite.py, kodo_test_sprite_actions.py | 64+16 | 2026-03-21 | pass | F3 speed validation fixed; z-order, layer separation, removal lifecycle tested |
 | 11 | Sprite tinting | rendering/test_tint.py | 11 | 2026-03-21 | pass | |
 | 12 | Actions (Sequence/Parallel/Delay/Do/MoveTo/Fade/Remove/Repeat) | actions/test_actions.py, kodo_test_sprite_actions.py | 50+40 | 2026-03-21 | pass | F2 Repeat design-intent; F6 action replacement bug found |
-| 13 | Camera (center_on/follow/pan_to/shake/bounds) | rendering/test_camera.py | 27 | 2026-03-21 | pass | |
+| 13 | Camera (center_on/follow/pan_to/shake/bounds; screen/world + input) | rendering/test_camera.py, kodo_test_rendering.py | 134+17 | 2026-03-22 | pass | Translation only (no zoom/rotation). **F12 fixed**: shake vs picking mismatch (screen_to_world now includes shake offset) |
 | 14 | Animation (play/queue/stop/loop/frames) | rendering/test_animation.py | 27 | 2026-03-21 | pass | |
 | 15 | Particles (burst/continuous/stop/remove) | rendering/test_particles.py | 15 | 2026-03-21 | pass | |
 | 16 | Color Swap (palette registration/apply) | rendering/test_color_swap.py | 6 | 2026-03-21 | pass | |
@@ -30,7 +155,7 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21. Stage 4 f
 | 22 | Modal Screens (Message/Choice/Confirm/SaveLoad) | ui/test_screens.py | 42 | 2026-03-22 | pass | SequenceRunner, status/help modals |
 | 23 | Drag & Drop | ui/test_drag_drop.py | 49 | 2026-03-22 | pass | DragManager, ghost tracking, drop targets, visual feedback |
 | 24 | Audio (channels/music/sfx/crossfade/pools) | systems/test_audio.py | 8 | 2026-03-21 | pass | |
-| 25 | Input (action mapping/key stealing/mouse events) | systems/test_input.py | 6 | 2026-03-21 | pass | |
+| 25 | Input (action mapping/key stealing/mouse events, world_x/y dispatch) | systems/test_input.py, test_camera.py (§21) | 33+ | 2026-03-22 | pass | E2E world coords on click/move/drag; multi-event tick |
 | 26 | Save/Load (save/load/delete/list/corrupt) | systems/test_save.py, kodo_test_persistence_resources.py | 51+25 | 2026-03-22 | pass | SE1: list_slots aborts on first corrupt slot (design-intent); SE2: saves top scene only; SE7: atomic write protects against partial save; F9: non-object JSON now raises SaveError |
 | 27 | Tweening (tween/ease/cancel) | actions/test_tween.py | 22 | 2026-03-21 | pass | |
 | 28 | Timers (after/every/cancel/chaining) | actions/test_timer.py | 24 | 2026-03-21 | pass | |
@@ -84,6 +209,7 @@ Discovered via Stage 5 exploratory testing. All verified by execution.
 
 | Feature | Directory | Reason |
 |---------|-----------|--------|
+| Engine physics (continuous collision, tunneling, layers, callbacks) | — | Not part of Saga2D; no `pymunk`/Box2D-style API in framework |
 | Visual rendering verification | tests/visual/ | Requires display + pyglet |
 | Screenshot golden-image comparison | tests/screenshot/ | Requires display + pyglet |
 | AI-powered visual verification | tests/visual_verify/ | Requires Anthropic API key |
@@ -98,6 +224,6 @@ Discovered via Stage 5 exploratory testing. All verified by execution.
 - **0 known-issues** remaining
 - **F9 fixed**: non-object JSON in save slot crashes list_slots/SaveLoadScreen (2026-03-22)
 - **1 area (visual) blocked** by display requirement
-- **1404 unit tests** collected, all pass
-- **552 kodo tests** all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 48 persistence/resources)
+- **1411 unit tests** collected, all pass
+- **561 kodo tests** all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 50 persistence/resources + 7 shake picking regression)
 - **383 UI tests** across 6 test files

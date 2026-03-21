@@ -58,3 +58,11 @@ desired_examples/        # API design sketches
 - Suites: `tests/kodo_test_persistence_resources.py`, `tests/kodo_test_persistence_resources_ext.py` (malformed saves, version/envelope edge cases, stacked save/load, emitters, camera pan, `on_exit` resources, rapid deferred transitions).
 - **F8:** Binary/invalid UTF-8 in slot files — `read_text` could raise `UnicodeDecodeError`; `SaveManager.load` now maps it to `SaveError` like other corruption.
 - **F9:** Valid JSON that is not an object (`[]`, string, etc.) — previously crashed `list_slots` / `SaveLoadScreen` with `TypeError`; `load()` now requires `isinstance(data, dict)` and raises `SaveError` with a clear message.
+
+## Input / camera / install (kodo Stage 6, 2026-03-22)
+
+- Physics/collision as a full engine subsystem: **out of scope** — no built-in physics/group-filtering API in Saga2D.
+- **F12 (fixed):** Camera shake offsets applied in rendering but not in `screen_to_world` / `world_to_screen` caused picking drift — camera methods now account for shake; tests in `tests/rendering/test_camera.py` (incl. e2e click at shaken sprite position).
+- **F10 (fixed):** `Game.__del__` could crash after partial init failure — `_teardown()` guards missing attrs; tests in `tests/kodo_test_persistence_resources.py`.
+- **F11:** `__del__` stderr noise on shutdown if user skips cleanup — documented low-value; not fixed.
+- Clean-room: `pip install .` and `pip install -e ".[dev]"` in fresh venvs; import/smoke OK (details in `.kodo/worker_smart-notes.md` / `test-coverage.md`).

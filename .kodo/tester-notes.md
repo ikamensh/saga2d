@@ -1,5 +1,15 @@
 # Tester Notes - Saga2D
 
+## Stage 6 — Input / Camera / shake+picking (verified / re-verified 2026-03-22)
+
+- **No interactive `game.run()`** — all checks via `backend="mock"`, `inject_*`, `game.tick()`, harnesses (AGENTS.md).
+- **Shake vs picking (F12 — fixed):** `Camera.screen_to_world` / `world_to_screen` include `_shake_offset_x/_y`, matching `_sync_sprites_to_camera` (`game.py`). Regression: `tests/rendering/test_camera.py::TestShakePickingRegression` (7 tests), including E2E click at drawn sprite pixel → correct `world_x`/`world_y` during shake.
+- **Suites (re-run, all PASS):** `pytest tests/rendering/test_camera.py::TestShakePickingRegression tests/systems/test_input.py tests/rendering/test_camera.py tests/kodo_test_persistence_resources.py::TestTeardownCompleteness -v` → **173**; `pytest tests/kodo_test_rendering.py -k "Camera or screen_to_world or world" -v` → **17**; `pytest tests/kodo_test_systems.py -k "world_coords or _with_world" -v` → **2**; `pytest tests/ui/test_drag_drop.py -q` → **49**; `python -m tests.harness.integration_harness all -v`; `python -m tests.harness.systems_util_harness O -v`; `python -m tests.harness.ui_rendering_harness I -v`; full non-visual `pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q` (`env -u SAGA2D_HEADLESS`) → **1411**.
+- **Camera model:** Translation only; **no zoom or rotation**. `screen_to_world` = `sx + camera.x + shake_x` (and symmetric `world_to_screen`) while shake is active.
+- **Mouse ↔ world E2E:** `Game.tick` applies `_with_world_coords` before HUD/UI/camera key-scroll/scene `handle_input`; tests cover clicks/moves/drags with scroll, `center_on`, multi-event ticks, no-camera scenes (world = screen).
+- **Teardown (F10):** `TestTeardownCompleteness` includes `_teardown()` / `__del__` safe after partial `Game` init — part of the same regression run above.
+- **Framework “physics”:** No collision engine in `saga2d/` — Stage 6B physics scope = **N/A** at engine level.
+
 ## Persistence / save-load / resources (verified 2026-03-22)
 
 - **Environment:** `.venv` present; `backend="mock"`, `game.tick()` + `_teardown()` only (no `game.run()`).
