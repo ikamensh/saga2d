@@ -470,7 +470,11 @@ class TextBox(Component):
             )
 
         # Draw border if specified
-        if resolved.border_width > 0 and resolved.border_color is not None and resolved.border_color[3] > 0:
+        if (
+            resolved.border_width > 0
+            and resolved.border_color is not None
+            and resolved.border_color[3] > 0
+        ):
             bw = resolved.border_width
             bc = resolved.border_color
             # Top
