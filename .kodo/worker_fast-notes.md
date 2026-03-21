@@ -52,3 +52,9 @@ desired_examples/        # API design sketches
 ## UI / Stage 4 coverage (2026-03-22)
 
 - No global focus manager — keyboard handling is widget-local; overlap/layout exercised via `tests/ui/` and tutorials; 0 new UI findings reported for this pass.
+
+## Persistence & resources (kodo Stage 5, 2026-03-22)
+
+- Suites: `tests/kodo_test_persistence_resources.py`, `tests/kodo_test_persistence_resources_ext.py` (malformed saves, version/envelope edge cases, stacked save/load, emitters, camera pan, `on_exit` resources, rapid deferred transitions).
+- **F8:** Binary/invalid UTF-8 in slot files — `read_text` could raise `UnicodeDecodeError`; `SaveManager.load` now maps it to `SaveError` like other corruption.
+- **F9:** Valid JSON that is not an object (`[]`, string, etc.) — previously crashed `list_slots` / `SaveLoadScreen` with `TypeError`; `load()` now requires `isinstance(data, dict)` and raises `SaveError` with a clear message.

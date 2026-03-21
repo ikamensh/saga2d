@@ -1,5 +1,18 @@
 # Tester Notes - Saga2D
 
+## Persistence / save-load / resources (verified 2026-03-22)
+
+- **Environment:** `.venv` present; `backend="mock"`, `game.tick()` + `_teardown()` only (no `game.run()`).
+- **Imports:** `from saga2d import Game, Scene, SaveManager, SaveError` — OK.
+- **Suites run (all PASS):**
+  - `pytest tests/kodo_test_persistence_resources.py tests/integration/test_resource_leaks.py -v` → **70** passed
+  - `pytest tests/systems/test_save.py -v` → **48** passed
+  - `pytest tests/ui/test_screens.py -k "SaveLoad or save_mgr" -v` → **9** passed (SaveLoadScreen)
+  - `pytest tests/integration/test_adversarial.py::TestSaveSystemEdgeCases -v` → **10** passed
+  - `python -m tests.harness.systems_util_harness J -v` → Scenario **J** PASS
+- **F9 non-object JSON (verified 2026-03-22):** `SaveManager.load()` rejects top-level JSON that is not an object (`list`, `str`, `null`, number, bool) with **`SaveError`** (message includes slot path and type). `list_slots()` propagates that `SaveError` (no `TypeError`). **`SaveLoadScreen`:** `on_enter` calls `list_slots` uncaught → pushing the screen with a bad `save_1.json` raises **`SaveError`** at push time (screen does not mount); not an in-UI corruption banner. Regression: `pytest tests/kodo_test_persistence_resources_ext.py::TestMalformedSaveFiles -v` (10 passed).
+- **Other manual checks:** Truncated/invalid JSON → `SaveError` with slot hint. JSON object **without** `"state"` → `Game.load` returns data, does **not** call `load_save_state` (documented).
+
 ## Stage 1 baseline (verified 2026-03-21)
 
 - **Commit** `477220f` — matches external run `~/.kodo/runs/20260321_213413/test-report.md`.
