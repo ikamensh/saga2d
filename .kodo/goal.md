@@ -1,72 +1,109 @@
-# Goal: Make games built with saga2d look beautiful
+# Goal: Fix specific visual defects — verified one-by-one by Gemini
 
-## The Problem
+## Approach
 
-Saga2d is a feature-complete 2D game framework with 1400+ unit tests and screenshot regression testing. But nobody has ever critically evaluated whether the visual output actually looks good. The AI agents that built it tested code correctness — they never stepped back and asked "would a player enjoy looking at this?"
+There is a numbered list of visual defects below. Work through them **one at a time**. For each defect:
 
-I rendered the main menu scene (Panel with Label + 3 Buttons, centered at 480x360) and here's what I saw:
-- **Title "Main Menu" is CLIPPED** — the top of the text is cut off by the panel boundary. The label doesn't have enough vertical space.
-- **Gray on gray on gray** — panel is medium gray (#6a6a7a), buttons are slightly darker gray (#3e3e4b), text is light gray/white. Zero visual hierarchy. It looks like a Windows 3.1 dialog.
-- **No visual depth** — everything is flat rectangles. No borders, no shadows, no rounded corners. It's technically functional but visually dead.
-- **White background** outside the panel — a real game would never have a plain white bg behind its menu.
-- **Buttons are oversized** relative to their text — they stretch to fill the panel width with enormous padding.
-- All sprite assets are tiny pixel art blobs (warrior is a 64x64 blue stick figure, skeleton is a red diamond with legs). These are adequate as placeholder programmer art but set a very low quality bar for example games.
-- The screenshot test framework auto-generates golden images on first run, so "tests pass" just means "it renders the same as last time" — not "it looks good"
+1. Fix it
+2. Render the relevant screenshot
+3. Submit to Gemini asking: "Is this defect FIXED: [description]? Answer FIXED or NOT FIXED and explain what you see."
+4. If Gemini says **NOT FIXED**: fix again and re-submit. Do NOT move on.
+5. If Gemini says **FIXED**: move to the next defect.
 
-## What Success Looks Like
+**Rules:**
+- Do NOT skip defects. Do NOT bundle multiple fixes and hope they work.
+- Do NOT argue with Gemini's assessment. If Gemini says it's still broken, it's still broken.
+- Each defect must get its own Gemini verification before moving on.
+- After all defects are fixed, do a final full review (all 4 screenshots) and verify Gemini says no new defects were introduced.
 
-A new user clones saga2d, runs an example game, and thinks "this looks polished for a 2D framework." Specifically:
-
-1. **The battle vignette example looks like a real game** — characters are readable, the background isn't blank, the selection ring is visible, attack animations feel impactful
-2. **The tower defense example looks playable** — grass tiles tile seamlessly, towers look distinct, UI panels have visual depth, the HUD bar is readable
-3. **UI widgets have visual polish** — buttons have hover/press feedback that looks good, panels have subtle borders or shadows, progress bars have rounded ends, labels have readable contrast
-4. **The default theme is attractive** — good color palette, readable fonts, sufficient padding/spacing
-
-## Mandatory: Visual Verification Protocol
-
-**This is the critical constraint.** Every visual change MUST be verified by actually rendering it and examining the result. The verification process is:
-
-1. Use `tests/screenshot/harness.py` — `render_scene()` to render to a PIL Image
-2. Save the image to disk as PNG
-3. **Open the PNG file and LOOK at it** — use your vision capabilities to examine the rendered output
-4. Ask yourself: "Would a game developer be happy with this?" If no, iterate.
-5. Only after visual inspection confirms quality, update the golden screenshot
-
-DO NOT rely on "tests pass" as proof of visual quality. A screenshot test passing only means pixels match the golden — it says nothing about whether the golden itself looks good.
-
-### How to actually look at rendered output
+## How to render screenshots
 
 ```python
-# In any test or script:
 from tests.screenshot.harness import render_scene
-from saga2d import Game, Scene, Label, Sprite
+from pathlib import Path
+import sys
 
+# Battle vignette (1920x1080)
+sys.path.insert(0, 'examples/battle_vignette')
 def setup(game):
-    # ... create your scene ...
-    pass
+    from saga2d.assets import AssetManager
+    game.assets = AssetManager(game.backend, base_path=Path('examples/battle_vignette/assets'))
+    from battle_demo import BattleScene  # or TitleScene
+    game.push(BattleScene())
+image = render_scene(setup, tick_count=5, resolution=(1920, 1080))
+image.save('/tmp/battle_gameplay.png')
 
-image = render_scene(setup, tick_count=2, resolution=(800, 600))
-image.save("/tmp/my_test_render.png")
-# NOW OPEN /tmp/my_test_render.png AND LOOK AT IT
+# Tower defense (1280x960)
+sys.path.insert(0, 'examples/tower_defense')
+def setup(game):
+    from saga2d.assets import AssetManager
+    game.assets = AssetManager(game.backend, base_path=Path('examples/tower_defense/assets'))
+    from main import GameScene  # or TitleScene
+    game.push(GameScene())
+image = render_scene(setup, tick_count=10, resolution=(1280, 960))
+image.save('/tmp/td_gameplay.png')
 ```
 
-## Scope
+## How to verify with Gemini
 
-### Must do:
-- Improve the default `Theme` colors and styling so widgets look polished out of the box
-- Fix any tile seam/gap rendering issues in the tile/background system
-- Ensure text is readable (right size, good contrast, no overlap)
-- Update the battle vignette example to look like a presentable demo (add background, improve sprite scale, ensure UI is readable)
-- Update the tower defense example's visual quality (tile seams, HUD readability, tower/enemy visual distinction)
-- Render a "visual gallery" showing every UI widget type with the improved theme, save as PNGs, and verify they all look good
+```python
+import base64, json, os
+from urllib.request import Request, urlopen
 
-### May do:
-- Add a simple gradient or pattern to button backgrounds (via the backend's draw capabilities)
-- Improve particle effects visibility
-- Add subtle visual feedback for interactive elements (hover glow, press darken)
+api_key = os.environ["GOOGLE_API_KEY"]
+with open("/tmp/screenshot.png", "rb") as f:
+    b64 = base64.b64encode(f.read()).decode()
 
-### Must NOT do:
+parts = [
+    {"text": "DEFECT CHECK: [paste specific defect description here]. Is this defect FIXED in this screenshot? Answer FIXED or NOT FIXED, then explain what you see."},
+    {"inline_data": {"mime_type": "image/png", "data": b64}},
+]
+url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+body = json.dumps({"contents": [{"parts": parts}]}).encode()
+req = Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+resp = urlopen(req, timeout=60)
+result = json.loads(resp.read())
+print(result["candidates"][0]["content"]["parts"][0]["text"])
+```
+
+## Defect List
+
+### Battle Gameplay (HIGHEST PRIORITY — do these first)
+
+**DEFECT 1: Units are nearly invisible on the battle grid.**
+The warrior and skeleton sprites are tiny colored specks on the green grass. The gray rock obstacles are far more prominent than the actual playable units. Units should be the most visually prominent elements on the grid. Screenshot: battle_gameplay.png.
+
+**DEFECT 2: Health bars overflow their side panel containers.**
+In the WARRIORS and SKELETONS side panels, the health bar graphics extend beyond the panel boundaries. Screenshot: battle_gameplay.png.
+
+### Battle Title
+
+**DEFECT 3: Decorative sprites on the title screen are too small to be recognizable.**
+The warrior and skeleton sprites flanking the title text are tiny — barely visible specks. They should be large enough to clearly show what the game is about. Screenshot: battle_title.png.
+
+### Tower Defense Title
+
+**DEFECT 4: Decorative sprites overlap and obscure the subtitle text.**
+A row of green bush sprites is rendered on top of the "An Saga2D Example" subtitle, making the text unreadable. The subtitle should be fully visible with no sprites overlapping it. Screenshot: td_title.png.
+
+**DEFECT 5: Enemy sprites in the top-left corner overlap each other randomly.**
+Pink/magenta enemy sprites are piled on top of each other in the top-left, looking broken rather than decorative. They should either be removed or arranged with proper spacing. Screenshot: td_title.png.
+
+**DEFECT 6: Tower sprites overlap into the title text area.**
+Tower sprites are rendered on top of or too close to the "Tower Defense" title text, creating visual clutter. Text and decorative elements should not overlap. Screenshot: td_title.png.
+
+### Tower Defense Gameplay
+
+**DEFECT 7: Map does not fill the viewport.**
+The tile map is cut off at the top (HUD/top bar not visible) and there is a large empty dark gap at the bottom and right side of the screen. The game content should fill the entire viewport. Screenshot: td_gameplay.png.
+
+**DEFECT 8: "Starting soon..." text is clipped at the viewport edge.**
+The wave announcement text is cut off on the right side of the screen. It should be fully visible. Screenshot: td_gameplay.png.
+
+## Constraints
 - Don't change the framework's public API
-- Don't break existing tests
-- Don't add new dependencies (work within pyglet + pillow)
-- Don't rewrite the rendering pipeline — improve within the existing architecture
+- Don't break existing tests (`uv run python -m pytest tests/ -x -q`)
+- Don't add new dependencies
+- Don't call `game.run()` — use `game.tick()` and the screenshot harness only
+- All Python script executions must have `timeout: 30000` in the Bash tool
+- Gemini's YES/NO answer is the source of truth — do not override it with your own judgment

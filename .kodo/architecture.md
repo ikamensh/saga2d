@@ -1042,3 +1042,97 @@ The visual test script `assetgen/test_battle_tiles.py` still checked for 64×64 
 
 ### Architectural note: `sprite._current_action` access
 `battle_unit.py:297` accesses `sprite._current_action` (private attribute) to skip idle bob during composable actions. This is acceptable for example/game code (not framework code). The framework's Sprite intentionally keeps `_current_action` private — game code that needs to query it accepts the underscore coupling.
+
+---
+
+## `draw_circle` Backend Primitive + UI Widget Polish (2026-03-11)
+
+### New backend primitive: `draw_circle(x, y, radius, color, *, opacity, segments)`
+
+Added to the Backend protocol (`base.py:317`), MockBackend (`mock_backend.py:302`), and PygletBackend (`pyglet_backend.py:586`).
+
+**Design decisions:**
+- `(x, y)` is the **center** in logical space (not top-left like `draw_rect`)
+- `segments` controls tessellation quality; `None` uses backend-specific default (pyglet auto-picks)
+- `opacity` multiplies with the alpha channel, matching `draw_rect`'s pattern
+- PygletBackend uses `pyglet.shapes.Circle`, appended to `_rect_shapes` for lifecycle management
+- MockBackend records to `self.circles` list, cleared each `begin_frame()`
+
+**Motivation:** Required by `ProgressBar(rounded=True)` for pill-shaped ends. May be used for future circle-based UI elements (radial menus, pie charts, status indicators).
+
+### ProgressBar: `rounded=True` default
+
+`ProgressBar` (`widgets.py:94`) now defaults to `rounded=True`, drawing pill-shaped bars using `draw_circle` for end caps plus `draw_rect` for the center section.
+
+**Pill rendering approach:**
+- Background track: left circle + center rect + right circle (all with bg color)
+- Filled bar: same three-part composition scaled to `fill_w`
+- When bar is narrower than its height, degrades to a single circle
+
+**Fill-width clamping:** `fill_w = max(self._computed_h, fill_w)` ensures the fill is always at least one circle-diameter wide. This prevents sub-circle slivers at low percentages but means the visual minimum fill is `height/width` of the bar (e.g., 12% for a 200×24 bar). Acceptable trade-off for pill aesthetics.
+
+**Backward compatibility:** Existing tests updated to pass `rounded=False` where they assert exact rect counts. New code gets the polished default.
+
+**Headless preview gap:** `_paint_draw_calls()` in `generate_previews.py` does NOT replay `backend.circles`. Rounded ProgressBars will appear as just the center rectangle in headless previews. Not blocking — headless previews are approximate by design.
+
+### TextBox: background and border rendering
+
+`TextBox.on_draw()` (`widgets.py:455`) now draws a background rect and 4-rect border before text, matching Panel/Button patterns. Uses `resolve_label_style()` (border defaults to `None`/0 for labels), so the background and border only appear when explicitly styled.
+
+**Latent bug fixed:** `resolved.border_color[3]` would crash with `TypeError` when `border_color is None`. Added `None` guard: `resolved.border_color is not None and resolved.border_color[3] > 0`.
+
+### List hover behavior
+
+`List` widget (`widgets.py:618+`) now tracks `_hover_index` on mouse motion events:
+- Hover highlight: `_lighten_color(bg, 1.3)` — a 30% lightened version of the background
+- Draw order: alternating row bg → hover highlight → selection highlight → text
+- Hover clears when mouse leaves widget bounds
+- Hover does not consume motion events when outside hit area (returns `False`)
+
+### Grid hover behavior
+
+`Grid` widget (`widgets.py:919+`) now tracks `_hover_cell` on mouse motion events:
+- Hover highlight: `_lighten_color(cell_bg, 1.4)` — 40% lightened version of `grid_cell_bg_color`
+- Draw order: cell bg → hover highlight → selection highlight → child components
+- New theme property: `grid_cell_bg_color` (`theme.py:95`) — previously hardcoded as `(40, 48, 68, 180)`
+
+### TabGroup active/inactive state design
+
+`TabGroup` (`widgets.py:1553+`) now visually distinguishes active vs. inactive tabs more strongly:
+- **Active tab:** bright accent bar (3px) at bottom edge, using `_brighten_color(tab_active_color, 1.3)`. Full-brightness text color.
+- **Inactive tab:** dimmed text at 60% RGB. No accent bar.
+- Both states use their respective `theme.tab_active_color` / `theme.tab_inactive_color` for backgrounds.
+
+### Tooltip auto-border
+
+`Tooltip.on_draw()` (`widgets.py:1340`) now draws a 1px border computed as `_lighten_color(bg, 1.5)` — 50% brighter than background. This is not theme-configurable; it's an auto-derived depth cue.
+
+### DataTable header separator
+
+`DataTable.on_draw()` (`widgets.py:1883+`) draws a 2px separator line below the header row using `_lighten_color(header_bg, 1.3)`.
+
+### `_lighten_color` / `_brighten_color` duplication
+
+The same 4-line color-lightening helper is duplicated as a method on 5 classes: `List`, `Grid`, `Tooltip`, `TabGroup` (`_brighten_color`), `DataTable`. All identical logic. Candidate for extraction to a module-level function in a future cleanup. **Not blocking.**
+
+### Bug fixed: `List._lighten_color()` dead code
+
+`widgets.py:869–870` had unreachable code after `return` — two lines `if self.on_select is not None: self.on_select(...)` copy-pasted from `_change_selection()`. Removed.
+
+### Test updates
+
+- ProgressBar tests pass `rounded=False` to preserve exact rect-count assertions
+- Tooltip test expects 5 rects (1 bg + 4 border) instead of 1
+- DataTable tests adjusted for header separator (index offsets shifted by 1)
+- `visual_ai` marker registered in `tests/conftest.py` (eliminates warning)
+
+### Headless screenshot testing strategy (`tests/screenshot/generate_previews.py`)
+
+The existing `_render_mock()` / `_paint_draw_calls()` approach renders UI scenes via MockBackend, then replays draw calls onto PIL Images:
+
+1. Scene is built and ticked using `MockBackend` (no GPU/display needed)
+2. `_paint_draw_calls()` iterates `backend.sprites`, `backend.rects`, `backend.images`, `backend.texts` in that order
+3. Each draw call is composited onto a PIL Image with alpha blending
+4. Output is an approximate but layout-accurate preview
+
+**Limitation:** `backend.circles` is NOT replayed — rounded ProgressBars and any future `draw_circle` usage will be missing from headless previews. This should be added when the circle primitive is used more broadly.

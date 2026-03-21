@@ -1,8 +1,8 @@
 {
-  "team": "solo",
+  "team": "full",
   "orchestrator": "api",
-  "orchestrator_model": "gemini-flash",
-  "max_exchanges": 1,
-  "max_cycles": 1,
+  "orchestrator_model": "opus",
+  "max_exchanges": 30,
+  "max_cycles": 5,
   "auto_commit": true
 }
