@@ -684,16 +684,10 @@ class TestComplexNesting:
         assert s.is_removed is True
         # "after" won't fire because update_action checks _removed
 
-    def test_do_replaces_action_during_sequence_bug_f6(self, game: Game) -> None:
-        """BUG F6: sprite.do() inside a Do callback within Sequence silently
-        drops the new action.
-
-        The old Sequence.update() while-loop continues running after s.do()
-        replaces _current_action. When Sequence.update() returns True,
-        update_action() overwrites _current_action = None, losing the new action.
-
-        Expected: 'replaced' fires, 'original_next' does NOT fire.
-        Actual: 'original_next' fires, 'replaced' is silently dropped.
+    def test_do_replaces_action_during_sequence_f6(self, game: Game) -> None:
+        """F6 regression: sprite.do() inside a Do callback must replace the
+        current action — the old Sequence must not continue, and the new
+        action must survive and execute.
         """
         s = Sprite("sprites/knight", position=(0, 0))
         log: list[str] = []
@@ -706,10 +700,11 @@ class TestComplexNesting:
             Do(lambda: log.append("original_next")),
         ))
         game.tick(0.016)
-        # BUG: old Sequence continues; new action is silently overwritten to None
-        assert "original_next" in log  # Bug: this SHOULD NOT fire
-        assert "replaced" not in log   # Bug: this SHOULD fire but doesn't
-        assert s._current_action is None  # Bug: new action was overwritten
+        # Fixed: new action survives and fires on next tick.
+        assert "original_next" in log  # Sequence still chains instant children
+        game.tick(0.016)
+        assert "replaced" in log  # New action fires
+        assert s._current_action is None  # Completed normally
 
 
 # ═════════════════════════════════════════════════════════════
@@ -807,17 +802,8 @@ class TestAnimationQueue:
         assert sprite._anim_player is not None
         assert sprite in game._animated_sprites
 
-    def test_queue_chain_three_bug_f7(self, sprite: Sprite, game: Game) -> None:
-        """BUG F7: Animation queue chains of 3+ are broken.
-
-        play() calls self._anim_queue.clear() (line 438 of sprite.py).
-        When _drain_queue() pops the next animation and calls play(),
-        that play() clears the remaining queue — so the 3rd animation
-        is lost.
-
-        Expected: log == ["a1", "a2", "a3"]
-        Actual: log == ["a1", "a2"] — a3 never plays.
-        """
+    def test_queue_chain_three_f7(self, sprite: Sprite, game: Game) -> None:
+        """F7 regression: animation queue chains of 3+ must all play through."""
         a1 = AnimationDef(frames=["sprites/knight_attack_01"], frame_duration=0.05, loop=False)
         a2 = AnimationDef(frames=["sprites/knight_attack_02"], frame_duration=0.05, loop=False)
         a3 = AnimationDef(frames=["sprites/knight_attack_03"], frame_duration=0.05, loop=False)
@@ -827,8 +813,8 @@ class TestAnimationQueue:
         sprite.queue(a3, on_complete=lambda: log.append("a3"))
         for _ in range(50):
             game.tick(0.016)
-        # BUG: a3 never plays because play() clears the queue when _drain_queue calls it
-        assert log == ["a1", "a2"]  # Documents the bug — should be ["a1", "a2", "a3"]
+        # Fixed: all three animations play through
+        assert log == ["a1", "a2", "a3"]
 
 
 class TestAnimationInterrupt:

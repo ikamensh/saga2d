@@ -1,6 +1,6 @@
 # Feature Coverage
 
-Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
+Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21. Stage 4 fixes: 2026-03-22.
 
 ## Feature Map (45 areas)
 
@@ -22,13 +22,13 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 | 14 | Animation (play/queue/stop/loop/frames) | rendering/test_animation.py | 27 | 2026-03-21 | pass | |
 | 15 | Particles (burst/continuous/stop/remove) | rendering/test_particles.py | 15 | 2026-03-21 | pass | |
 | 16 | Color Swap (palette registration/apply) | rendering/test_color_swap.py | 6 | 2026-03-21 | pass | |
-| 17 | UI Panel/Label/Button | ui/test_ui.py, ui/test_widgets.py | 21 | 2026-03-21 | pass | F4 right-click bug fixed |
-| 18 | UI Widgets (ProgressBar/List/Grid/DataTable/TextBox/TabGroup/Tooltip) | ui/test_widgets.py | (in #17) | 2026-03-21 | pass | |
-| 19 | UI Layout (anchoring/flow) | ui/test_ui.py | (in #17) | 2026-03-21 | pass | All 9 anchors + flow |
-| 20 | Theme & Style | ui/test_theme.py | 2 | 2026-03-21 | pass | |
-| 21 | HUD | ui/test_hud.py | 8 | 2026-03-21 | pass | |
-| 22 | Modal Screens (Message/Choice/Confirm/SaveLoad) | ui/test_screens.py | 5 | 2026-03-21 | pass | |
-| 23 | Drag & Drop | ui/test_drag_drop.py | 14 | 2026-03-21 | pass | |
+| 17 | UI Panel/Label/Button | ui/test_ui.py | 92 | 2026-03-22 | pass | F4 right-click fixed; layout math, anchoring, scene integration |
+| 18 | UI Widgets (ProgressBar/List/Grid/DataTable/TextBox/TabGroup/Tooltip) | ui/test_widgets.py | 149 | 2026-03-22 | pass | DataTable 44 tests; PanelSpacing 14 |
+| 19 | UI Layout (anchoring/flow) | ui/test_ui.py | (in #17) | 2026-03-22 | pass | All 9 anchors + flow |
+| 20 | Theme & Style | ui/test_theme.py | 13 | 2026-03-22 | pass | Defaults, resolution, button states, overrides |
+| 21 | HUD | ui/test_hud.py | 38 | 2026-03-22 | pass | Creation, visibility, input/update dispatch, scene transitions |
+| 22 | Modal Screens (Message/Choice/Confirm/SaveLoad) | ui/test_screens.py | 42 | 2026-03-22 | pass | SequenceRunner, status/help modals |
+| 23 | Drag & Drop | ui/test_drag_drop.py | 49 | 2026-03-22 | pass | DragManager, ghost tracking, drop targets, visual feedback |
 | 24 | Audio (channels/music/sfx/crossfade/pools) | systems/test_audio.py | 8 | 2026-03-21 | pass | |
 | 25 | Input (action mapping/key stealing/mouse events) | systems/test_input.py | 6 | 2026-03-21 | pass | |
 | 26 | Save/Load (save/load/delete/list/corrupt) | systems/test_save.py | 10 | 2026-03-21 | pass | |
@@ -44,13 +44,13 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 | 36 | Scene.game property lifetime | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | 6 tests: set before on_enter, cleared after pop/replace/clear_and_push, kept when pushed over |
 | 37 | on_enter exception rollback | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | push/replace/clear_and_push all roll back on on_enter crash |
 | 38 | Cleanup ordering (sprites/timers/UI) | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | Sprites+timers cleaned on push-over; UI kept on push-over, cleared on pop |
-| 39 | on_exit exception handling | kodo_test_scene_lifecycle.py | 1 | 2026-03-21 | known-issue | F5: on_exit exception leaves scene stuck on stack (confirmed) |
+| 39 | on_exit exception handling | kodo_test_scene_lifecycle.py | 3 | 2026-03-22 | **fixed** | F5: on_exit exception now pops scene (pop/replace/clear_and_push paths) |
 | 40 | Active-action removal | kodo_test_sprite_actions.py | 7 | 2026-03-21 | pass | Remove mid-MoveTo/Sequence/Parallel, self-remove in Do, action tracking cleanup |
 | 41 | Orphaned sprites | kodo_test_sprite_actions.py | 3 | 2026-03-21 | pass | No scene owner, survives scene pop, teardown with active actions |
 | 42 | Deep action nesting | kodo_test_sprite_actions.py | 18 | 2026-03-21 | pass | 5-deep Seq, 10-wide Par, Repeat(Seq), Seq(Par(Seq)), battle sequence |
-| 43 | Action replacement mid-callback | kodo_test_sprite_actions.py | 1 | 2026-03-21 | known-issue | F6: sprite.do() inside Do callback silently drops new action |
-| 44 | Animation queue/state transitions | kodo_test_sprite_actions.py | 12 | 2026-03-21 | pass (with bug) | Play, queue, interrupt, stop, PlayAnim action; F7: queue chain 3+ broken |
-| 45 | Animation queue chain 3+ | kodo_test_sprite_actions.py | 1 | 2026-03-21 | known-issue | F7: play() clears queue — _drain_queue loses remaining items |
+| 43 | Action replacement mid-callback | kodo_test_sprite_actions.py | 1 | 2026-03-22 | **fixed** | F6: update_action() now preserves action set by callback |
+| 44 | Animation queue/state transitions | kodo_test_sprite_actions.py | 12 | 2026-03-22 | pass | Play, queue, interrupt, stop, PlayAnim action |
+| 45 | Animation queue chain 3+ | kodo_test_sprite_actions.py | 1 | 2026-03-22 | **fixed** | F7: play() no longer clears queue when called from _drain_queue |
 
 ## Example / Tutorial Tests
 
@@ -74,11 +74,11 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 ## Totals
 
 - **45 feature areas** identified and tested
-- **40 fully passing** in baseline
+- **43 fully passing** (including 3 fixed: F5, F6, F7)
 - **1 environment-dependent** (Game.run() with SAGA2D_HEADLESS)
-- **3 known-issues** (F5: on_exit stuck, F6: action replacement dropped, F7: queue chain broken)
+- **0 known-issues** remaining (F5/F6/F7 all fixed 2026-03-22)
+- **0 new UI findings** — all 383 UI tests pass, no bugs discovered
 - **1 area (visual) blocked** by display requirement
-- **1404 unit tests** collected, 1401 pass with SAGA2D_HEADLESS=1, 1404 pass without
-- **348 kodo regression tests** all pass
-- **73 exploratory scene lifecycle tests** all pass (kodo_test_scene_lifecycle.py)
-- **81 sprite/action/animation tests** all pass (kodo_test_sprite_actions.py)
+- **1404 unit tests** collected, all pass
+- **504 kodo tests** all pass (348 regression + 75 scene lifecycle + 81 sprite/action)
+- **383 UI tests** across 6 test files (test_ui, test_widgets, test_screens, test_hud, test_drag_drop, test_theme)

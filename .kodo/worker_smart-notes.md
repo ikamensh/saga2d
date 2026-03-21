@@ -14,29 +14,27 @@
 - Sprite/action/animation: `.venv/bin/python -m pytest tests/kodo_test_sprite_actions.py -v`
 - All kodo tests: `.venv/bin/python -m pytest tests/kodo_test_core.py tests/kodo_test_rendering.py tests/kodo_test_systems.py tests/kodo_test_scene_lifecycle.py tests/kodo_test_sprite_actions.py -v`
 
-## Test Results (2026-03-21)
+## Test Results (updated 2026-03-22)
 - 1404 existing tests: all pass (SAGA2D_HEADLESS unset)
-- 348 kodo regression tests: all pass
-- 73 scene lifecycle exploratory tests: all pass
-- 81 sprite/action/animation tests: all pass
-- Total kodo exploratory: 73 + 81 = 154
+- 504 kodo tests: all pass (348 regression + 75 scene lifecycle + 81 sprite/action)
+- 383 UI tests: all pass across 6 files (test_ui 92, test_widgets 149, test_screens 42, test_hud 38, test_drag_drop 49, test_theme 13)
+- Stage 4: F5/F6/F7 fixed, 0 known-issues remaining, 0 new UI findings
 
 ## Confirmed Findings
 - F1: cursor crash on FakeGame → fixed (commit 477220f)
 - F2: Repeat action yields 1/tick → design intent
 - F3: Sprite.move_to() speed=0/negative → fixed (commit 477220f)
 - F4: Button fires on right-click → fixed (commit 477220f)
-- F5: on_exit exception leaves scene stuck on stack (KNOWN ISSUE)
-- **F6: sprite.do() inside Do callback silently drops new action (BUG)**
-  - In update_action(): old Sequence.update() continues after s.do() replaces _current_action
-  - When Sequence returns True, update_action() overwrites _current_action=None
-  - Repro: `.venv/bin/python -m pytest tests/kodo_test_sprite_actions.py::TestComplexNesting::test_do_replaces_action_during_sequence_bug_f6 -v`
-  - Fix direction: update_action() should save ref before calling update(), check if _current_action changed
-- **F7: Animation queue chains of 3+ broken (BUG)**
-  - play() calls self._anim_queue.clear() (sprite.py line 438)
-  - When _drain_queue() pops next and calls play(), remaining queue items are cleared
-  - Repro: `.venv/bin/python -m pytest tests/kodo_test_sprite_actions.py::TestAnimationQueue::test_queue_chain_three_bug_f7 -v`
-  - Fix direction: _drain_queue should save queue, or play() should not clear queue when called from _drain_queue
+- F5: on_exit exception leaves scene stuck → **fixed 2026-03-22**
+  - scene.py: _apply_pop/replace use try/finally to pop before exception propagates
+  - scene.py: _apply_clear_and_push catches on_exit errors, cleans all scenes, re-raises first error
+  - 3 regression tests: pop, replace, clear_and_push paths
+- F6: sprite.do() inside Do callback drops new action → **fixed 2026-03-22**
+  - sprite.py update_action(): saves ref before update(dt), only clears if action unchanged
+  - Regression test: test_do_replaces_action_during_sequence_f6
+- F7: Animation queue chains of 3+ broken → **fixed 2026-03-22**
+  - sprite.py play(): added `_from_drain` param, skips queue.clear() when called from _drain_queue
+  - Regression test: test_queue_chain_three_f7
 
 ## Key Architecture & API Notes
 - Sprite("sprites/knight", position=(x,y)) — needs real asset in assets/images/sprites/

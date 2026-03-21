@@ -802,9 +802,8 @@ class TestComplexReentrancy:
         assert st.top().name == "D"  # type: ignore[union-attr]
         assert len(st._stack) == 4
 
-    def test_on_exit_exception_leaves_scene_on_stack(self) -> None:
-        """If on_exit raises, the scene may remain stuck on the stack.
-        This is a KNOWN ISSUE (F5 candidate)."""
+    def test_on_exit_exception_pops_scene(self) -> None:
+        """F5 regression: on_exit exception must still remove scene from stack."""
         st = make_stack()
         log: list[str] = []
 
@@ -816,17 +815,46 @@ class TestComplexReentrancy:
         st.push(CrashOnExit("A", log))
         with pytest.raises(RuntimeError, match="exit crash"):
             st.pop()
-        # OBSERVATION: Does the scene remain or get cleaned up?
-        # In current impl, _apply_pop wraps on_exit in try but the exception
-        # propagates up. The scene may or may not be removed depending on
-        # where the exception is caught.
-        # Let's document what actually happens:
-        # _apply_pop: on_exit() raises → the finally block clears _in_on_exit
-        # but self._stack.pop() never executes → scene STAYS on stack
-        stack_len = len(st._stack)
-        # This is the known bug from prior test-report (F5/US28):
-        # The crashing scene stays on the stack
-        assert stack_len == 1, f"Expected scene to stay (known issue), got {stack_len}"
+        # Fixed: scene is removed even though on_exit raised.
+        assert len(st._stack) == 0, "Scene must be popped despite on_exit crash"
+
+    def test_on_exit_exception_during_replace_removes_old(self) -> None:
+        """F5 regression (replace path): on_exit crash must still remove old scene."""
+        st = make_stack()
+        log: list[str] = []
+
+        class CrashOnExit(Tracker):
+            def on_exit(self) -> None:
+                super().on_exit()
+                raise RuntimeError("exit crash")
+
+        st.push(CrashOnExit("A", log))
+        replacement = Tracker("B", log)
+        with pytest.raises(RuntimeError, match="exit crash"):
+            st.replace(replacement)
+        # Old scene must be gone. Exception propagates before replacement is
+        # pushed, so the stack is empty — but the broken scene is NOT stuck.
+        assert len(st._stack) == 0
+
+    def test_on_exit_exception_during_clear_and_push_still_clears(self) -> None:
+        """F5 regression (clear_and_push path): on_exit crash must not prevent clearing."""
+        st = make_stack()
+        log: list[str] = []
+
+        class CrashOnExit(Tracker):
+            def on_exit(self) -> None:
+                super().on_exit()
+                raise RuntimeError("exit crash")
+
+        st.push(Tracker("A", log))
+        st.push(CrashOnExit("B", log))
+        replacement = Tracker("C", log)
+        with pytest.raises(RuntimeError, match="exit crash"):
+            st.clear_and_push(replacement)
+        # CrashOnExit (B) is iterated first (reversed). It crashes, but
+        # all scenes still get cleaned up and the stack is cleared.
+        # Exception propagates before replacement is pushed.
+        assert len(st._stack) == 0
 
     def test_deferred_ops_flushed_in_order(self) -> None:
         """Multiple deferred ops during tick are flushed in FIFO order."""

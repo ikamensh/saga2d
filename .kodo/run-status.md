@@ -10,14 +10,14 @@ Saga2D is a Python 2D game framework with 23+ feature areas. Existing tests pass
 Stage 1 baseline verification completed for /Users/ikamen/ai-workspace/experiments/by_ko...
 
 ## Progress
-- Stage: 2/2: core_engine_and_scenes
-- Cycle: 1/49
-- Elapsed: 1h04m
+- Stage: 4/4: fix_core_bugs_and_ui_layout
+- Cycle: 1/47
+- Elapsed: 1h28m
 
 ## Agent Stats
 | Agent | Calls | Errors | Tokens | Time |
 |-------|-------|--------|--------|------|
-| tester | 2 | 1 | 0 | 1m21s |
+| tester | 6 | 1 | 0 | 4m40s |
 | worker_fast | 1 | 1 | 0 | 5s |
-| worker_fast_auto_commit | 1 | 0 | 0 | 53s |
-| worker_smart | 1 | 0 | 12k | 6m33s |
+| worker_fast_auto_commit | 3 | 0 | 0 | 2m13s |
+| worker_smart | 3 | 0 | 65k | 26m48s |
