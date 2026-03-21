@@ -2,7 +2,7 @@
 
 Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 
-## Feature Map (34 areas)
+## Feature Map (45 areas)
 
 | # | Feature / Workflow | Test File(s) | Test Count | Last Tested | Status | Findings |
 |---|-------------------|-------------|-----------|-------------|--------|----------|
@@ -15,9 +15,9 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 | 7 | Scene-owned sprites | core/test_scene_sprites.py | 19 | 2026-03-21 | pass | add/remove/cleanup verified |
 | 8 | Scene-owned timers | core/test_scene_timers.py | 19 | 2026-03-21 | pass | timer cleanup on scene exit |
 | 9 | Settings / configuration | core/test_settings.py | 7 | 2026-03-21 | pass | |
-| 10 | Sprites (create/position/remove/anchor/y-sort) | rendering/test_sprite.py | 64 | 2026-03-21 | pass | F3 speed validation fixed |
+| 10 | Sprites (create/position/remove/anchor/y-sort) | rendering/test_sprite.py, kodo_test_sprite_actions.py | 64+16 | 2026-03-21 | pass | F3 speed validation fixed; z-order, layer separation, removal lifecycle tested |
 | 11 | Sprite tinting | rendering/test_tint.py | 11 | 2026-03-21 | pass | |
-| 12 | Actions (Sequence/Parallel/Delay/Do/MoveTo/Fade/Remove/Repeat) | actions/test_actions.py | 50 | 2026-03-21 | pass | F2 Repeat design-intent documented |
+| 12 | Actions (Sequence/Parallel/Delay/Do/MoveTo/Fade/Remove/Repeat) | actions/test_actions.py, kodo_test_sprite_actions.py | 50+40 | 2026-03-21 | pass | F2 Repeat design-intent; F6 action replacement bug found |
 | 13 | Camera (center_on/follow/pan_to/shake/bounds) | rendering/test_camera.py | 27 | 2026-03-21 | pass | |
 | 14 | Animation (play/queue/stop/loop/frames) | rendering/test_animation.py | 27 | 2026-03-21 | pass | |
 | 15 | Particles (burst/continuous/stop/remove) | rendering/test_particles.py | 15 | 2026-03-21 | pass | |
@@ -45,6 +45,12 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 | 37 | on_enter exception rollback | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | push/replace/clear_and_push all roll back on on_enter crash |
 | 38 | Cleanup ordering (sprites/timers/UI) | kodo_test_scene_lifecycle.py | (in #4) | 2026-03-21 | pass | Sprites+timers cleaned on push-over; UI kept on push-over, cleared on pop |
 | 39 | on_exit exception handling | kodo_test_scene_lifecycle.py | 1 | 2026-03-21 | known-issue | F5: on_exit exception leaves scene stuck on stack (confirmed) |
+| 40 | Active-action removal | kodo_test_sprite_actions.py | 7 | 2026-03-21 | pass | Remove mid-MoveTo/Sequence/Parallel, self-remove in Do, action tracking cleanup |
+| 41 | Orphaned sprites | kodo_test_sprite_actions.py | 3 | 2026-03-21 | pass | No scene owner, survives scene pop, teardown with active actions |
+| 42 | Deep action nesting | kodo_test_sprite_actions.py | 18 | 2026-03-21 | pass | 5-deep Seq, 10-wide Par, Repeat(Seq), Seq(Par(Seq)), battle sequence |
+| 43 | Action replacement mid-callback | kodo_test_sprite_actions.py | 1 | 2026-03-21 | known-issue | F6: sprite.do() inside Do callback silently drops new action |
+| 44 | Animation queue/state transitions | kodo_test_sprite_actions.py | 12 | 2026-03-21 | pass (with bug) | Play, queue, interrupt, stop, PlayAnim action; F7: queue chain 3+ broken |
+| 45 | Animation queue chain 3+ | kodo_test_sprite_actions.py | 1 | 2026-03-21 | known-issue | F7: play() clears queue — _drain_queue loses remaining items |
 
 ## Example / Tutorial Tests
 
@@ -67,11 +73,12 @@ Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21.
 
 ## Totals
 
-- **39 feature areas** identified in source
-- **36 fully passing** in baseline
+- **45 feature areas** identified and tested
+- **40 fully passing** in baseline
 - **1 environment-dependent** (Game.run() with SAGA2D_HEADLESS)
-- **1 known-issue** (F5: on_exit exception leaves scene stuck)
+- **3 known-issues** (F5: on_exit stuck, F6: action replacement dropped, F7: queue chain broken)
 - **1 area (visual) blocked** by display requirement
 - **1404 unit tests** collected, 1401 pass with SAGA2D_HEADLESS=1, 1404 pass without
 - **348 kodo regression tests** all pass
 - **73 exploratory scene lifecycle tests** all pass (kodo_test_scene_lifecycle.py)
+- **81 sprite/action/animation tests** all pass (kodo_test_sprite_actions.py)

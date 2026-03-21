@@ -41,3 +41,10 @@ desired_examples/        # API design sketches
 - Exploratory suite: `tests/kodo_test_scene_lifecycle.py` (73 tests). With core scene tests: `pytest tests/core/test_scene.py tests/kodo_test_scene_lifecycle.py`.
 - Ordering harness: `python -m tests.harness.lifecycle_tester -v` (do not `pytest tests/harness/lifecycle_tester.py` — not pytest tests).
 - **F5 (known issue, not fixed):** if `on_exit` raises, `SceneStack.pop()` does not remove the scene — stack unchanged. Covered by `test_on_exit_exception_leaves_scene_on_stack`.
+
+## Sprites, actions, animations (kodo Stage 3, 2026-03-21)
+
+- Exploratory suite: `tests/kodo_test_sprite_actions.py` (81 tests, mock backend). Covers lifecycle/z-order, active-action removal, orphaned sprites, deep nesting, animation queue; **F6**/**F7** are regression-documenting tests that assert current buggy behavior (see docstrings for expected fix).
+- **F6:** `sprite.do()` inside a `Do` callback can be dropped when outer `Sequence` cleanup runs — repro: `pytest tests/kodo_test_sprite_actions.py::TestComplexNesting::test_do_replaces_action_during_sequence_bug_f6`.
+- **F7:** animation queue chains of 3+ break (`play()` clears queue during `_drain_queue`) — repro: `pytest tests/kodo_test_sprite_actions.py::TestAnimationQueue::test_queue_chain_three_bug_f7`.
+- Action stress harness: `python -m tests.harness.action_stress_tester` (not a pytest module).

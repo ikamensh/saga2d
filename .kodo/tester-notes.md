@@ -64,6 +64,12 @@ cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
 | `clear_and_push` teardown | on_exit all cleared scenes; timers/sprites tests; resource leak test |
 | Re-entrancy / adversarial | `tests/integration/test_adversarial.py` (18 tests) |
 
+### Sprite / Action / Animation (verified 2026-03-21)
+
+- **pytest:** `tests/rendering/test_sprite.py` + `tests/actions/test_actions.py` + `tests/rendering/test_animation.py` → **209 passed**; `tests/integration/test_adversarial.py::TestSpriteLifecycleAdversarial` → **3 passed**; `tests/kodo_test_rendering.py` → **127 passed**.
+- **Harness:** `python -m tests.harness.action_stress_tester` → **8/8** (US6–US9, US22–US23, NoHang, NaN). **Known behavior:** US22 documents `Parallel(only infinite children)` finishing in one tick (vacuous `all_finite_done`).
+- **Manual:** Sprite never `scene.add_sprite` (`_owning_scene is None`) still runs `do(Sequence(MoveTo, Do))` + nested `Parallel(Sequence(Delay, Do), Do)` + layer order `BACKGROUND < EFFECTS` — all OK with explicit `game._teardown()`.
+
 ### F5 — `on_exit` exception (re-verified)
 
 - **Exploratory file:** `tests/kodo_test_scene_lifecycle.py` (73 tests) — includes `TestComplexReentrancy::test_on_exit_exception_leaves_scene_on_stack` documenting F5.
