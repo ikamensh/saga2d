@@ -1,5 +1,14 @@
 # Tester Notes - Saga2D
 
+## Stage 1 baseline (verified 2026-03-21)
+
+- **Commit** `477220f` — matches external run `~/.kodo/runs/20260321_213413/test-report.md`.
+- **Main suite** (ignores `visual_verify`, `visual`, `screenshot`): **1404** collected; **`SAGA2D_HEADLESS=1`** → **3 failed** (`tests/core/test_game.py` — all `game.run()` blocked by headless guard); **`env -u SAGA2D_HEADLESS`** → **1404 passed**. Failures are **only** those three when headless is set.
+- **FakeGame / cursor**: `hasattr(scene.game, "cursor")` guard at `saga2d/scene.py` ~526 — **no** FakeGame-related failures. Adversarial 7-test subset and `kodo_test_core -k "FakeGame or cursor"` (5 tests) pass.
+- **Kodo regression**: `kodo_test_{core,rendering,systems}.py` — **348 passed**.
+- **Timing**: full run ~33s here vs ~29s in report — normal machine variance.
+- **Doc nit**: live `RuntimeError` from `game.run()` includes an extra sentence (use `tick` / screenshot harness); report truncates the message.
+
 ## Last Session: Harness & User Story Coverage (2026-03-18)
 
 ### Harness Verification — All Run Successfully Except One

@@ -1,19 +1,18 @@
 # Worker Fast Notes — Saga2D
 
-## Project structure
+## Project structure (repo root)
 
 ```
-easy_game/
-├── saga2d/              # Framework (public API in __init__.py)
+saga2d/                  # Python package (public API in __init__.py)
 │   ├── backends/        # Internal: base, mock, pyglet
 │   ├── rendering/      # Camera, Sprite, layers, particles, color_swap
 │   ├── ui/              # Components, layout, theme, screens, widgets
 │   └── util/            # fsm, timer, tween
-├── examples/            # battle_vignette, tower_defense, menugame
-├── tutorials/           # menus, tower_defense (ch1–ch6)
-├── assetgen/            # Asset generation (battle_tiles, sprites)
-├── tests/               # pytest, screenshot harness, visual_verify
-└── desired_examples/    # API design sketches
+examples/                # battle_vignette, tower_defense, menugame
+tutorials/               # menus, tower_defense (ch1–ch6)
+assetgen/                # Asset generation (battle_tiles, sprites)
+tests/                   # pytest, screenshot harness, visual_verify
+desired_examples/        # API design sketches
 ```
 
 ## Public API (import from `saga2d`)
@@ -31,3 +30,8 @@ easy_game/
 - Visual changes require render-and-look: `render_scene()` → save PNG → inspect
 - Pyglet event handlers must `return True` to prevent fallthrough (e.g. ESC closing window)
 - Screenshot capture: between `batch.draw()` and `window.flip()` (double-buffering)
+
+## Baseline (477220f, 2026-03-21)
+
+- Main suite (ignore `visual_verify`, `visual`, `screenshot`): **1404** collected — **`SAGA2D_HEADLESS=1`** → **3** fails in `tests/core/test_game.py` (`game.run()` headless guard); **unset** → **1404** pass.
+- FakeGame + cursor: `hasattr(scene.game, "cursor")` in `saga2d/scene.py` (~526) — no cursor regression; adversarial + kodo FakeGame tests pass.
