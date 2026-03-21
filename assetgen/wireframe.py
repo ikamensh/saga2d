@@ -34,6 +34,7 @@ Mesh = Tuple[List[Vec3], List[Edge]]  # (vertices, edges)
 # Platonic solids — vertices + edge lists
 # ---------------------------------------------------------------------------
 
+
 def tetrahedron() -> Mesh:
     """Return (vertices, edges) for a regular tetrahedron centred at origin.
 
@@ -42,14 +43,18 @@ def tetrahedron() -> Mesh:
     # Place vertices so the centroid is at origin.
     a = 1.0
     verts: List[Vec3] = [
-        ( a,  a,  a),
-        ( a, -a, -a),
-        (-a,  a, -a),
-        (-a, -a,  a),
+        (a, a, a),
+        (a, -a, -a),
+        (-a, a, -a),
+        (-a, -a, a),
     ]
     edges: List[Edge] = [
-        (0, 1), (0, 2), (0, 3),
-        (1, 2), (1, 3), (2, 3),
+        (0, 1),
+        (0, 2),
+        (0, 3),
+        (1, 2),
+        (1, 3),
+        (2, 3),
     ]
     return verts, edges
 
@@ -60,18 +65,27 @@ def octahedron() -> Mesh:
     Vertices lie on the coordinate axes at distance 1.
     """
     verts: List[Vec3] = [
-        ( 1,  0,  0),
-        (-1,  0,  0),
-        ( 0,  1,  0),
-        ( 0, -1,  0),
-        ( 0,  0,  1),
-        ( 0,  0, -1),
+        (1, 0, 0),
+        (-1, 0, 0),
+        (0, 1, 0),
+        (0, -1, 0),
+        (0, 0, 1),
+        (0, 0, -1),
     ]
     # Each vertex connects to all others except its antipodal vertex.
     edges: List[Edge] = [
-        (0, 2), (0, 3), (0, 4), (0, 5),
-        (1, 2), (1, 3), (1, 4), (1, 5),
-        (2, 4), (2, 5), (3, 4), (3, 5),
+        (0, 2),
+        (0, 3),
+        (0, 4),
+        (0, 5),
+        (1, 2),
+        (1, 3),
+        (1, 4),
+        (1, 5),
+        (2, 4),
+        (2, 5),
+        (3, 4),
+        (3, 5),
     ]
     return verts, edges
 
@@ -83,21 +97,30 @@ def cube() -> Mesh:
     """
     verts: List[Vec3] = [
         (-1, -1, -1),
-        (-1, -1,  1),
-        (-1,  1, -1),
-        (-1,  1,  1),
-        ( 1, -1, -1),
-        ( 1, -1,  1),
-        ( 1,  1, -1),
-        ( 1,  1,  1),
+        (-1, -1, 1),
+        (-1, 1, -1),
+        (-1, 1, 1),
+        (1, -1, -1),
+        (1, -1, 1),
+        (1, 1, -1),
+        (1, 1, 1),
     ]
     edges: List[Edge] = [
         # bottom face
-        (0, 1), (0, 2), (1, 3), (2, 3),
+        (0, 1),
+        (0, 2),
+        (1, 3),
+        (2, 3),
         # top face
-        (4, 5), (4, 6), (5, 7), (6, 7),
+        (4, 5),
+        (4, 6),
+        (5, 7),
+        (6, 7),
         # vertical pillars
-        (0, 4), (1, 5), (2, 6), (3, 7),
+        (0, 4),
+        (1, 5),
+        (2, 6),
+        (3, 7),
     ]
     return verts, edges
 
@@ -105,6 +128,7 @@ def cube() -> Mesh:
 # ---------------------------------------------------------------------------
 # Rotation matrices (applied per-vertex)
 # ---------------------------------------------------------------------------
+
 
 def rotate_x(v: Vec3, angle: float) -> Vec3:
     """Rotate *v* around the X axis by *angle* radians."""
@@ -133,6 +157,7 @@ def rotate_z(v: Vec3, angle: float) -> Vec3:
 # ---------------------------------------------------------------------------
 # Projection helpers
 # ---------------------------------------------------------------------------
+
 
 def project_perspective(
     v: Vec3,
@@ -183,6 +208,7 @@ def project_orthographic(
 # Rendering
 # ---------------------------------------------------------------------------
 
+
 def render_wireframe(
     img: Image.Image,
     vertices: Sequence[Vec3],
@@ -223,24 +249,17 @@ def render_wireframe(
     # Project all vertices to 2D.
     if projection == "perspective":
         pts_2d = [
-            project_perspective(v, fov_degrees, viewer_distance)
-            for v in vertices
+            project_perspective(v, fov_degrees, viewer_distance) for v in vertices
         ]
     elif projection == "orthographic":
-        pts_2d = [
-            project_orthographic(v, ortho_scale)
-            for v in vertices
-        ]
+        pts_2d = [project_orthographic(v, ortho_scale) for v in vertices]
     else:
         raise ValueError(f"Unknown projection {projection!r}")
 
     # Map normalised coords to pixel space.
     # Y is flipped: positive Y in world = upward, but pixel Y grows downward.
     cx, cy = center
-    pixel_pts = [
-        (cx + px * scale, cy - py * scale)
-        for px, py in pts_2d
-    ]
+    pixel_pts = [(cx + px * scale, cy - py * scale) for px, py in pts_2d]
 
     # Draw edges.
     draw = ImageDraw.Draw(img, "RGBA")

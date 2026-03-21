@@ -39,35 +39,36 @@ from assetgen.wireframe import (
 # ---------------------------------------------------------------------------
 # Colour constants (RGBA)
 # ---------------------------------------------------------------------------
-FOREST_GREEN  = (34, 139, 34, 255)
-DODGER_BLUE   = (30, 144, 255, 255)
-CRIMSON       = (220, 20, 60, 255)
-SADDLE_BROWN  = (139, 90, 43, 255)
+FOREST_GREEN = (34, 139, 34, 255)
+DODGER_BLUE = (30, 144, 255, 255)
+CRIMSON = (220, 20, 60, 255)
+SADDLE_BROWN = (139, 90, 43, 255)
 
 # Tree foliage gradient (lighter at top, darker at base)
-TREE_GREEN_TOP    = (80, 180, 80, 255)
-TREE_GREEN_BASE   = (25, 100, 25, 255)
-TREE_TRUNK_BROWN  = (101, 67, 33, 255)
+TREE_GREEN_TOP = (80, 180, 80, 255)
+TREE_GREEN_BASE = (25, 100, 25, 255)
+TREE_TRUNK_BROWN = (101, 67, 33, 255)
 
 # Knight walk frame colours (per-frame tint variation)
 KNIGHT_WALK_COLORS = [
-    (30, 144, 255, 255),   # frame 01
-    (50, 164, 255, 255),   # frame 02
-    (30, 144, 255, 255),   # frame 03
-    (10, 124, 235, 255),   # frame 04
+    (30, 144, 255, 255),  # frame 01
+    (50, 164, 255, 255),  # frame 02
+    (30, 144, 255, 255),  # frame 03
+    (10, 124, 235, 255),  # frame 04
 ]
 
 # Knight attack frame colours
 KNIGHT_ATTACK_COLORS = [
-    (20, 80, 180, 255),    # frame 01
-    (40, 100, 200, 255),   # frame 02
-    (20, 80, 180, 255),    # frame 03
+    (20, 80, 180, 255),  # frame 01
+    (40, 100, 200, 255),  # frame 02
+    (20, 80, 180, 255),  # frame 03
 ]
 
 
 # ---------------------------------------------------------------------------
 # Individual sprite generators — each returns a Pillow Image
 # ---------------------------------------------------------------------------
+
 
 def make_tree() -> Image.Image:
     """64x96 tree: layered foliage triangles with gradient, brown trunk.
@@ -108,7 +109,9 @@ def make_tree() -> Image.Image:
     verts, edges = cube()
     rotated = [rotate_y(rotate_x(v, 0.6), 0.8) for v in verts]
     render_wireframe(
-        img, rotated, edges,
+        img,
+        rotated,
+        edges,
         color=(24, 100, 24, 80),
         width=1,
         center=(32.0, 40.0),
@@ -153,7 +156,9 @@ def make_crate() -> Image.Image:
     verts, edges = cube()
     rotated = [rotate_y(rotate_x(v, 0.5), 0.7) for v in verts]
     render_wireframe(
-        img, rotated, edges,
+        img,
+        rotated,
+        edges,
         color=(90, 55, 20, 120),
         width=1,
         center=(16.0, 16.0),
@@ -205,15 +210,15 @@ def make_knight_attack_frame(frame_number: int) -> Image.Image:
 
 # Complete manifest: (filename, factory_callable)
 MANIFEST: list[tuple[str, callable]] = [
-    ("background.png",       make_background),
-    ("tree.png",             make_tree),
-    ("knight.png",           make_knight),
-    ("enemy.png",            make_enemy),
-    ("crate.png",            make_crate),
-    ("knight_walk_01.png",   lambda: make_knight_walk_frame(1)),
-    ("knight_walk_02.png",   lambda: make_knight_walk_frame(2)),
-    ("knight_walk_03.png",   lambda: make_knight_walk_frame(3)),
-    ("knight_walk_04.png",   lambda: make_knight_walk_frame(4)),
+    ("background.png", make_background),
+    ("tree.png", make_tree),
+    ("knight.png", make_knight),
+    ("enemy.png", make_enemy),
+    ("crate.png", make_crate),
+    ("knight_walk_01.png", lambda: make_knight_walk_frame(1)),
+    ("knight_walk_02.png", lambda: make_knight_walk_frame(2)),
+    ("knight_walk_03.png", lambda: make_knight_walk_frame(3)),
+    ("knight_walk_04.png", lambda: make_knight_walk_frame(4)),
     ("knight_attack_01.png", lambda: make_knight_attack_frame(1)),
     ("knight_attack_02.png", lambda: make_knight_attack_frame(2)),
     ("knight_attack_03.png", lambda: make_knight_attack_frame(3)),

@@ -55,8 +55,8 @@ from assetgen.wireframe import (
 # Colour palette
 # ---------------------------------------------------------------------------
 # Warrior — steel-blue armour tones
-BLUE = (30, 144, 255, 255)        # warrior primary (armour)
-BLUE_DARK = (15, 80, 160, 255)    # warrior shadow / shield
+BLUE = (30, 144, 255, 255)  # warrior primary (armour)
+BLUE_DARK = (15, 80, 160, 255)  # warrior shadow / shield
 BLUE_LIGHT = (80, 180, 255, 255)  # warrior highlight / rim light
 
 # Metallic shades for armour gradients
@@ -75,29 +75,29 @@ GEM_CORE = (180, 255, 245, 255)
 GEM_DARK = (0, 120, 100, 255)
 
 # Skeleton — bone tones and undead accents
-RED = (220, 20, 60, 255)          # skeleton body / ribcage fill
-RED_DARK = (140, 10, 30, 255)     # skeleton deep shadow
-RED_LIGHT = (255, 80, 100, 255)   # skeleton highlight / hit flash tint
+RED = (220, 20, 60, 255)  # skeleton body / ribcage fill
+RED_DARK = (140, 10, 30, 255)  # skeleton deep shadow
+RED_LIGHT = (255, 80, 100, 255)  # skeleton highlight / hit flash tint
 WHITE = (255, 255, 255, 255)
-YELLOW = (255, 255, 0, 255)       # select ring
+YELLOW = (255, 255, 0, 255)  # select ring
 GOLD_BRIGHT = (255, 230, 80, 255)  # ring highlight (inner edge)
-GOLD_MID = (255, 200, 0, 255)     # ring body mid-tone
-GOLD_DARK = (200, 150, 0, 255)    # ring shadow (outer edge)
+GOLD_MID = (255, 200, 0, 255)  # ring body mid-tone
+GOLD_DARK = (200, 150, 0, 255)  # ring shadow (outer edge)
 GOLD_GLOW = (255, 240, 120, 100)  # radial glow around ring
 
 # Bone palette — gradient-ready
 BONE_LIGHT = (245, 238, 220, 255)  # bone highlight (top of skull)
-BONE = (230, 220, 200, 255)        # bone mid-tone
-BONE_MID = (210, 198, 175, 255)    # bone mid-dark
-BONE_DARK = (180, 170, 150, 255)   # bone shadow
-BONE_DEEP = (130, 120, 100, 255)   # deep bone crevice
+BONE = (230, 220, 200, 255)  # bone mid-tone
+BONE_MID = (210, 198, 175, 255)  # bone mid-dark
+BONE_DARK = (180, 170, 150, 255)  # bone shadow
+BONE_DEEP = (130, 120, 100, 255)  # deep bone crevice
 
 SKULL_WHITE = (240, 235, 225, 255)
 
 # Eye sockets — glowing red
-EYE_RED_CORE = (255, 60, 30, 255)   # bright centre
-EYE_RED_MID = (220, 20, 0, 255)     # mid glow
-EYE_RED_OUTER = (120, 0, 0, 200)    # dark edge
+EYE_RED_CORE = (255, 60, 30, 255)  # bright centre
+EYE_RED_MID = (220, 20, 0, 255)  # mid glow
+EYE_RED_OUTER = (120, 0, 0, 200)  # dark edge
 
 SIZE = (480, 480)  # all battle sprites are 480x480
 CX, CY = 32, 32  # centre of the 64-unit authored coordinate space
@@ -113,6 +113,7 @@ _SCALE = 7.5
 # ===================================================================
 # Internal drawing helpers (operate at supersampled scale)
 # ===================================================================
+
 
 def _valid_bbox(bbox: tuple[int, int, int, int]) -> bool:
     """Return True if *bbox* has positive width and height."""
@@ -133,6 +134,7 @@ def _si(v: float) -> int:
 # Helmet
 # -------------------------------------------------------------------
 
+
 def _draw_helmet(
     img: Image.Image,
     cx: float,
@@ -144,8 +146,8 @@ def _draw_helmet(
     top, dark at base) to suggest a curved metal surface.  A rim-light
     highlight is drawn along the upper-left edge.
     """
-    hw = _s(7.5)   # half-width
-    hh = _s(8.0)   # half-height
+    hw = _s(7.5)  # half-width
+    hh = _s(8.0)  # half-height
     x0 = cx - hw
     y0 = head_y - hh
     x1 = cx + hw
@@ -186,9 +188,9 @@ def _draw_helmet(
     # Rim light — bright crescent on upper-left
     rim = adjust_alpha(BLUE_LIGHT, 140)
     draw.arc(
-        (int(x0 + _s(1)), int(y0 + _s(0.5)),
-         int(x1 - _s(1)), int(y1 - _s(1))),
-        start=200, end=320,
+        (int(x0 + _s(1)), int(y0 + _s(0.5)), int(x1 - _s(1)), int(y1 - _s(1))),
+        start=200,
+        end=320,
         fill=rim,
         width=max(1, _si(1)),
     )
@@ -197,6 +199,7 @@ def _draw_helmet(
 # -------------------------------------------------------------------
 # Torso (chestplate)
 # -------------------------------------------------------------------
+
 
 def _draw_torso(
     img: Image.Image,
@@ -218,10 +221,10 @@ def _draw_torso(
     bot = torso_bottom
 
     torso_pts = [
-        (cx - sh, top),   # left shoulder
-        (cx + sh, top),   # right shoulder
-        (cx + hh, bot),   # right hip
-        (cx - hh, bot),   # left hip
+        (cx - sh, top),  # left shoulder
+        (cx + sh, top),  # right shoulder
+        (cx + hh, bot),  # right hip
+        (cx - hh, bot),  # left hip
     ]
 
     # Flat fill first (polygon baseline)
@@ -254,6 +257,7 @@ def _draw_torso(
 # -------------------------------------------------------------------
 # Arms
 # -------------------------------------------------------------------
+
 
 def _draw_arm(
     img: Image.Image,
@@ -305,8 +309,7 @@ def _draw_arm(
     jr = _s(2.0)
     filled_ellipse(
         img,
-        (int(elbow_x - jr), int(elbow_y - jr),
-         int(elbow_x + jr), int(elbow_y + jr)),
+        (int(elbow_x - jr), int(elbow_y - jr), int(elbow_x + jr), int(elbow_y + jr)),
         fill=darken(color, 0.05),
     )
 
@@ -314,8 +317,12 @@ def _draw_arm(
     r = _s(2.5)
     filled_ellipse(
         img,
-        (int(shoulder[0] - r), int(shoulder[1] - r),
-         int(shoulder[0] + r), int(shoulder[1] + r)),
+        (
+            int(shoulder[0] - r),
+            int(shoulder[1] - r),
+            int(shoulder[0] + r),
+            int(shoulder[1] + r),
+        ),
         fill=lighten(color, 0.15),
     )
 
@@ -323,6 +330,7 @@ def _draw_arm(
 # -------------------------------------------------------------------
 # Legs
 # -------------------------------------------------------------------
+
 
 def _draw_legs(
     img: Image.Image,
@@ -364,6 +372,7 @@ def _draw_legs(
 # Shield (kite shape with gradient + glowing gem)
 # -------------------------------------------------------------------
 
+
 def _draw_shield(
     img: Image.Image,
     cx: float,
@@ -390,8 +399,12 @@ def _draw_shield(
     filled_polygon(img, pts, fill=BLUE_DARK)
 
     # Gradient overlay masked to shield polygon
-    bbox = (int(cx - s * 0.6), int(cy - s - 1),
-            int(cx + s * 0.6), int(cy + s * 0.6 + 1))
+    bbox = (
+        int(cx - s * 0.6),
+        int(cy - s - 1),
+        int(cx + s * 0.6),
+        int(cy + s * 0.6 + 1),
+    )
     grad = Image.new("RGBA", img.size, (0, 0, 0, 0))
     linear_gradient(
         grad,
@@ -442,10 +455,13 @@ def _draw_shield(
             ],
             bbox=halo_bbox,
         )
-        img.paste(Image.alpha_composite(
-            img.crop(halo_bbox).copy(),
-            halo_layer.crop(halo_bbox),
-        ), (halo_bbox[0], halo_bbox[1]))
+        img.paste(
+            Image.alpha_composite(
+                img.crop(halo_bbox).copy(),
+                halo_layer.crop(halo_bbox),
+            ),
+            (halo_bbox[0], halo_bbox[1]),
+        )
 
     # Gem body — radial gradient (tight bbox)
     gem_bbox = (
@@ -495,6 +511,7 @@ def _draw_shield(
 # Sword
 # -------------------------------------------------------------------
 
+
 def _draw_sword(
     img: Image.Image,
     hand_x: float,
@@ -517,14 +534,15 @@ def _draw_sword(
     blade_w = max(2, _si(2.5))
     draw.line([(hand_x, hand_y), (tip_x, tip_y)], fill=BLADE_SILVER, width=blade_w)
     # Edge highlight (thin bright centre line)
-    draw.line([(hand_x, hand_y), (tip_x, tip_y)], fill=BLADE_SHINE, width=max(1, _si(0.8)))
+    draw.line(
+        [(hand_x, hand_y), (tip_x, tip_y)], fill=BLADE_SHINE, width=max(1, _si(0.8))
+    )
 
     # Crossguard
     perp_x = -math.sin(angle) * _s(3.5)
     perp_y = -math.cos(angle) * _s(3.5)
     draw.line(
-        [(hand_x - perp_x, hand_y - perp_y),
-         (hand_x + perp_x, hand_y + perp_y)],
+        [(hand_x - perp_x, hand_y - perp_y), (hand_x + perp_x, hand_y + perp_y)],
         fill=BLUE_DARK,
         width=max(2, _si(2)),
     )
@@ -535,8 +553,12 @@ def _draw_sword(
     pr = _s(1.5)
     filled_ellipse(
         img,
-        (int(pommel_x - pr), int(pommel_y - pr),
-         int(pommel_x + pr), int(pommel_y + pr)),
+        (
+            int(pommel_x - pr),
+            int(pommel_y - pr),
+            int(pommel_x + pr),
+            int(pommel_y + pr),
+        ),
         fill=BLUE_DARK,
     )
 
@@ -544,6 +566,7 @@ def _draw_sword(
 # -------------------------------------------------------------------
 # Unified warrior renderer
 # -------------------------------------------------------------------
+
 
 def _draw_warrior(
     img: Image.Image,
@@ -620,6 +643,7 @@ def _draw_warrior(
 # Post-processing: rim light + drop shadow
 # -------------------------------------------------------------------
 
+
 def _post_process(sprite: Image.Image) -> Image.Image:
     """Apply rim lighting and a soft drop shadow, cropped back to 480×480.
 
@@ -652,6 +676,7 @@ def _post_process(sprite: Image.Image) -> Image.Image:
 # Warrior sprites (8 images) — public API
 # ===================================================================
 
+
 def make_warrior_idle() -> Image.Image:
     """Warrior idle frame — standing at rest with shield and sword.
 
@@ -659,6 +684,7 @@ def make_warrior_idle() -> Image.Image:
     Includes metallic gradient armour, a pulsing gem, rim lighting,
     and a soft drop shadow.
     """
+
     def paint(big: Image.Image) -> None:
         _draw_warrior(
             big,
@@ -689,10 +715,10 @@ def make_warrior_walk(frame: int) -> Image.Image:
     # between the two "contact" frames (1 and 3).
     #                       leg_off  bob    gem
     cycle = {
-        1: (  7.0,  1.5,  1),  # left foot forward, deep dip
-        2: (  2.0, -0.5,  2),  # passing, slight rise
-        3: ( -5.0,  2.5,  3),  # right foot forward, deeper dip
-        4: ( -2.0, -1.0,  4),  # passing, rise
+        1: (7.0, 1.5, 1),  # left foot forward, deep dip
+        2: (2.0, -0.5, 2),  # passing, slight rise
+        3: (-5.0, 2.5, 3),  # right foot forward, deeper dip
+        4: (-2.0, -1.0, 4),  # passing, rise
     }
     leg_off, bob, gem = cycle[frame]
 
@@ -723,9 +749,9 @@ def make_warrior_attack(frame: int) -> Image.Image:
     """
     #                   arm_off  blade_angle  blade_len  gem
     phases = {
-        1: (-5.0,   80.0,  13.0,  5),  # wind-up
-        2: (-2.0,   35.0,  16.0,  6),  # mid-swing
-        3: ( 3.0,   10.0,  20.0,  7),  # thrust
+        1: (-5.0, 80.0, 13.0, 5),  # wind-up
+        2: (-2.0, 35.0, 16.0, 6),  # mid-swing
+        3: (3.0, 10.0, 20.0, 7),  # thrust
     }
     arm_off, b_angle, b_len, gem = phases[frame]
 
@@ -777,6 +803,7 @@ def make_warrior_attack(frame: int) -> Image.Image:
 # Unified entry point (optional convenience)
 # ===================================================================
 
+
 def make_warrior_frame(pose: str, frame_idx: int = 1) -> Image.Image:
     """Unified factory for any warrior pose.
 
@@ -808,6 +835,7 @@ def make_warrior_frame(pose: str, frame_idx: int = 1) -> Image.Image:
 # Skull
 # -------------------------------------------------------------------
 
+
 def _draw_skull(
     img: Image.Image,
     cx: float,
@@ -820,7 +848,7 @@ def _draw_skull(
     rather than armoured.  A vertical gradient runs from pale highlight
     at the crown to a darker shadow at the jaw line.
     """
-    hw = _s(8.5)   # slightly wider than warrior helmet
+    hw = _s(8.5)  # slightly wider than warrior helmet
     hh = _s(8.0)
     x0 = cx - hw
     y0 = head_y - hh
@@ -856,9 +884,9 @@ def _draw_skull(
         draw = ImageDraw.Draw(img, "RGBA")
         rim = adjust_alpha(BONE_LIGHT, min(255, int(body_alpha * 0.6)))
         draw.arc(
-            (int(x0 + _s(1.5)), int(y0 + _s(0.5)),
-             int(x1 - _s(1.5)), int(y1 - _s(2))),
-            start=200, end=320,
+            (int(x0 + _s(1.5)), int(y0 + _s(0.5)), int(x1 - _s(1.5)), int(y1 - _s(2))),
+            start=200,
+            end=320,
             fill=rim,
             width=max(1, _si(1)),
         )
@@ -892,10 +920,13 @@ def _draw_skull(
                     ],
                     bbox=halo_bbox,
                 )
-                img.paste(Image.alpha_composite(
-                    img.crop(halo_bbox).copy(),
-                    halo_layer.crop(halo_bbox),
-                ), (halo_bbox[0], halo_bbox[1]))
+                img.paste(
+                    Image.alpha_composite(
+                        img.crop(halo_bbox).copy(),
+                        halo_layer.crop(halo_bbox),
+                    ),
+                    (halo_bbox[0], halo_bbox[1]),
+                )
 
             # Eye socket core — small radial gradient
             core_bbox = (
@@ -940,6 +971,7 @@ def _draw_skull(
 # Ribcage
 # -------------------------------------------------------------------
 
+
 def _draw_ribcage(
     img: Image.Image,
     cx: float,
@@ -956,10 +988,10 @@ def _draw_ribcage(
     mid_y = (top_y + bottom_y) / 2.0
 
     pts = [
-        (cx, top_y),             # top
-        (cx + half_w, mid_y),    # right
-        (cx, bottom_y),          # bottom
-        (cx - half_w, mid_y),    # left
+        (cx, top_y),  # top
+        (cx + half_w, mid_y),  # right
+        (cx, bottom_y),  # bottom
+        (cx - half_w, mid_y),  # left
     ]
 
     # Base fill — dark red
@@ -967,8 +999,12 @@ def _draw_ribcage(
     filled_polygon(img, pts, fill=base_color)
 
     # Gradient overlay — masked to diamond
-    bbox = (int(cx - half_w) - 1, int(top_y) - 1,
-            int(cx + half_w) + 1, int(bottom_y) + 1)
+    bbox = (
+        int(cx - half_w) - 1,
+        int(top_y) - 1,
+        int(cx + half_w) + 1,
+        int(bottom_y) + 1,
+    )
     grad = Image.new("RGBA", img.size, (0, 0, 0, 0))
     linear_gradient(
         grad,
@@ -1005,7 +1041,8 @@ def _draw_ribcage(
     # Outline
     if body_alpha > 80:
         outlined_polygon(
-            img, pts,
+            img,
+            pts,
             outline=adjust_alpha(BONE_DARK, int(body_alpha * 0.5)),
             width=max(1, _si(0.6)),
         )
@@ -1014,6 +1051,7 @@ def _draw_ribcage(
 # -------------------------------------------------------------------
 # Bone limbs (arms / legs)
 # -------------------------------------------------------------------
+
 
 def _draw_bone_limb(
     img: Image.Image,
@@ -1053,8 +1091,7 @@ def _draw_bone_limb(
     )
     # Dark edge for upper segment
     draw.line(
-        [(start[0] + _s(0.3), start[1] + _s(0.3)),
-         (mx + _s(0.3), my + _s(0.3))],
+        [(start[0] + _s(0.3), start[1] + _s(0.3)), (mx + _s(0.3), my + _s(0.3))],
         fill=limb_dark,
         width=max(1, w - 1),
     )
@@ -1067,8 +1104,7 @@ def _draw_bone_limb(
     )
     # Dark edge for lower segment
     draw.line(
-        [(mx + _s(0.3), my + _s(0.3)),
-         (end[0] + _s(0.3), end[1] + _s(0.3))],
+        [(mx + _s(0.3), my + _s(0.3)), (end[0] + _s(0.3), end[1] + _s(0.3))],
         fill=limb_dark,
         width=max(1, w - 1),
     )
@@ -1086,6 +1122,7 @@ def _draw_bone_limb(
 # -------------------------------------------------------------------
 # Unified skeleton renderer
 # -------------------------------------------------------------------
+
 
 def _draw_skeleton(
     img: Image.Image,
@@ -1106,8 +1143,8 @@ def _draw_skeleton(
         scatter:     Decomposition factor (0.0=intact, 1.0=fully scattered).
     """
     bob = _s(body_bob)
-    sdx = _s(scatter * 6)   # scatter horizontal drift
-    sdy = _s(scatter * 4)   # scatter vertical drift
+    sdx = _s(scatter * 6)  # scatter horizontal drift
+    sdy = _s(scatter * 4)  # scatter vertical drift
 
     # Key anchor positions
     head_y = _s(15) + bob + _s(scatter * -8)
@@ -1129,15 +1166,12 @@ def _draw_skeleton(
     left_hip = (_s(CX) - _s(5) + sdx, hip_y)
     right_hip = (_s(CX) + _s(5) + sdx, hip_y)
 
-    _draw_bone_limb(img, left_hip, left_foot, body_alpha=body_alpha,
-                    joint_bend=_s(3))
-    _draw_bone_limb(img, right_hip, right_foot, body_alpha=body_alpha,
-                    joint_bend=_s(3))
+    _draw_bone_limb(img, left_hip, left_foot, body_alpha=body_alpha, joint_bend=_s(3))
+    _draw_bone_limb(img, right_hip, right_foot, body_alpha=body_alpha, joint_bend=_s(3))
 
     # --- Ribcage ---
     ribcage_cx = _s(CX) + sdx
-    _draw_ribcage(img, ribcage_cx, torso_top, torso_bottom,
-                  body_alpha=body_alpha)
+    _draw_ribcage(img, ribcage_cx, torso_top, torso_bottom, body_alpha=body_alpha)
 
     # --- Arms ---
     l_shoulder = (ribcage_cx - _s(12), torso_top + _s(3))
@@ -1150,10 +1184,22 @@ def _draw_skeleton(
         ribcage_cx + _s(20) + _s(scatter * 10),
         _s(38) + bob + sdy,
     )
-    _draw_bone_limb(img, l_shoulder, l_hand, body_alpha=body_alpha,
-                    width_scale=0.85, joint_bend=_s(3))
-    _draw_bone_limb(img, r_shoulder, r_hand, body_alpha=body_alpha,
-                    width_scale=0.85, joint_bend=_s(3))
+    _draw_bone_limb(
+        img,
+        l_shoulder,
+        l_hand,
+        body_alpha=body_alpha,
+        width_scale=0.85,
+        joint_bend=_s(3),
+    )
+    _draw_bone_limb(
+        img,
+        r_shoulder,
+        r_hand,
+        body_alpha=body_alpha,
+        width_scale=0.85,
+        joint_bend=_s(3),
+    )
 
     # --- Skull (drawn last — in front) ---
     _draw_skull(img, head_cx, head_y, body_alpha=body_alpha)
@@ -1162,6 +1208,7 @@ def _draw_skeleton(
 # -------------------------------------------------------------------
 # Skeleton post-processing
 # -------------------------------------------------------------------
+
 
 def _skeleton_post_process(
     sprite: Image.Image,
@@ -1175,8 +1222,9 @@ def _skeleton_post_process(
     """
     # Subtle bone-texture noise
     if noise_amount > 0:
-        sprite = apply_noise(sprite, amount=noise_amount, monochrome=True,
-                             seed=noise_seed)
+        sprite = apply_noise(
+            sprite, amount=noise_amount, monochrome=True, seed=noise_seed
+        )
 
     # Faint warm glow (from the eyes — red-ish)
     sprite = apply_glow(
@@ -1202,6 +1250,7 @@ def _skeleton_post_process(
 # Flash helper for hit effect (at supersampled scale)
 # -------------------------------------------------------------------
 
+
 def _draw_skeleton_flash(
     img: Image.Image,
     flash_color: Tuple[int, int, int, int] = WHITE,
@@ -1221,8 +1270,7 @@ def _draw_skeleton_flash(
     hw, hh = _s(8.5), _s(8.0)
     filled_ellipse(
         img,
-        (int(cx - hw), int(_s(15) - hh + dy),
-         int(cx + hw), int(_s(15) + hh + dy)),
+        (int(cx - hw), int(_s(15) - hh + dy), int(cx + hw), int(_s(15) + hh + dy)),
         fill=fc,
     )
 
@@ -1233,28 +1281,32 @@ def _draw_skeleton_flash(
     mid_y = (top_y + bot_y) / 2
     filled_polygon(
         img,
-        [(cx, top_y), (cx + half_w, mid_y),
-         (cx, bot_y), (cx - half_w, mid_y)],
+        [(cx, top_y), (cx + half_w, mid_y), (cx, bot_y), (cx - half_w, mid_y)],
         fill=fc,
     )
 
     # Arms
     limb_w = max(2, _si(2.5))
-    draw.line([(cx - _s(12), _s(25) + dy),
-               (cx - _s(20), _s(38) + dy)], fill=fc, width=limb_w)
-    draw.line([(cx + _s(12), _s(25) + dy),
-               (cx + _s(20), _s(38) + dy)], fill=fc, width=limb_w)
+    draw.line(
+        [(cx - _s(12), _s(25) + dy), (cx - _s(20), _s(38) + dy)], fill=fc, width=limb_w
+    )
+    draw.line(
+        [(cx + _s(12), _s(25) + dy), (cx + _s(20), _s(38) + dy)], fill=fc, width=limb_w
+    )
 
     # Legs
-    draw.line([(cx - _s(5), _s(44) + dy),
-               (cx - _s(7), _s(59) + dy)], fill=fc, width=limb_w)
-    draw.line([(cx + _s(5), _s(44) + dy),
-               (cx + _s(7), _s(59) + dy)], fill=fc, width=limb_w)
+    draw.line(
+        [(cx - _s(5), _s(44) + dy), (cx - _s(7), _s(59) + dy)], fill=fc, width=limb_w
+    )
+    draw.line(
+        [(cx + _s(5), _s(44) + dy), (cx + _s(7), _s(59) + dy)], fill=fc, width=limb_w
+    )
 
 
 # ===================================================================
 # Skeleton sprites (12 images) — public API
 # ===================================================================
+
 
 def make_skeleton_idle() -> Image.Image:
     """Skeleton idle frame — standing at rest.
@@ -1262,6 +1314,7 @@ def make_skeleton_idle() -> Image.Image:
     4× supersampled with bone-gradient skull, glowing red eyes,
     diamond ribcage, and thin bony limbs.
     """
+
     def paint(big: Image.Image) -> None:
         _draw_skeleton(big, leg_offset=0.0, body_bob=0.0)
 
@@ -1278,10 +1331,10 @@ def make_skeleton_walk(frame: int) -> Image.Image:
     """
     #                      leg_off  bob   seed
     cycle = {
-        1: ( 5.0,  1.0,  101),  # left forward, dip
-        2: ( 1.5, -0.5,  102),  # passing
-        3: (-4.0,  1.5,  103),  # right forward, dip
-        4: (-1.5, -0.8,  104),  # passing
+        1: (5.0, 1.0, 101),  # left forward, dip
+        2: (1.5, -0.5, 102),  # passing
+        3: (-4.0, 1.5, 103),  # right forward, dip
+        4: (-1.5, -0.8, 104),  # passing
     }
     leg_off, bob, seed = cycle[frame]
 
@@ -1324,8 +1377,7 @@ def make_skeleton_hit(frame: int) -> Image.Image:
     else:
         # Recovery flash — shifted
         def paint(big: Image.Image) -> None:
-            _draw_skeleton_flash(big, flash_color=WHITE,
-                                 x_shift=3.0, y_shift=2.0)
+            _draw_skeleton_flash(big, flash_color=WHITE, x_shift=3.0, y_shift=2.0)
 
         sprite = supersample_draw(SIZE[0], SIZE[1], paint, factor=_SS)
         return _skeleton_post_process(sprite, noise_amount=0.0)
@@ -1344,21 +1396,21 @@ def make_skeleton_death(frame: int) -> Image.Image:
     """
     #                       alpha  scatter  noise_amt  seed
     phases = {
-        1: (255,  0.0,  0.08,  120),
-        2: (170,  0.4,  0.18,  121),
-        3: ( 85,  1.0,  0.35,  122),
+        1: (255, 0.0, 0.08, 120),
+        2: (170, 0.4, 0.18, 121),
+        3: (85, 1.0, 0.35, 122),
     }
     alpha, scatter, noise_amt, seed = phases[frame]
 
     def paint(big: Image.Image) -> None:
-        _draw_skeleton(big, leg_offset=0.0, body_bob=0.0,
-                       body_alpha=alpha, scatter=scatter)
+        _draw_skeleton(
+            big, leg_offset=0.0, body_bob=0.0, body_alpha=alpha, scatter=scatter
+        )
 
     sprite = supersample_draw(SIZE[0], SIZE[1], paint, factor=_SS)
 
     # Apply heavier noise for disintegration effect
-    sprite = _skeleton_post_process(sprite, noise_amount=noise_amt,
-                                    noise_seed=seed)
+    sprite = _skeleton_post_process(sprite, noise_amount=noise_amt, noise_seed=seed)
 
     # Additional blur on later frames for a dissolving look
     if frame >= 2:
@@ -1371,6 +1423,7 @@ def make_skeleton_death(frame: int) -> Image.Image:
 # ===================================================================
 # Unified skeleton entry point
 # ===================================================================
+
 
 def make_skeleton_frame(pose: str, frame_idx: int = 1) -> Image.Image:
     """Unified factory for any skeleton pose.
@@ -1447,25 +1500,28 @@ def _draw_select_ring(img: Image.Image) -> None:
         (ecx, ecy),
         glow_radius,
         stops=[
-            (0.0, (0, 0, 0, 0)),               # transparent at centre
-            (0.45, (0, 0, 0, 0)),               # transparent until ring zone
-            (0.6, GOLD_GLOW),                   # gold glow at ring area
+            (0.0, (0, 0, 0, 0)),  # transparent at centre
+            (0.45, (0, 0, 0, 0)),  # transparent until ring zone
+            (0.6, GOLD_GLOW),  # gold glow at ring area
             (0.75, adjust_alpha(GOLD_GLOW, 60)),
-            (1.0, (0, 0, 0, 0)),               # fade out
+            (1.0, (0, 0, 0, 0)),  # fade out
         ],
         bbox=glow_bbox,
     )
-    img.paste(Image.alpha_composite(
-        img.crop(glow_bbox).copy(),
-        glow_layer.crop(glow_bbox),
-    ), (glow_bbox[0], glow_bbox[1]))
+    img.paste(
+        Image.alpha_composite(
+            img.crop(glow_bbox).copy(),
+            glow_layer.crop(glow_bbox),
+        ),
+        (glow_bbox[0], glow_bbox[1]),
+    )
 
     # --- 2. Outer accent ring (thin, darker gold) ---
     outer_pad = _si(2.0)
-    outer_bbox = (bx0 - outer_pad, by0 - outer_pad,
-                  bx1 + outer_pad, by1 + outer_pad)
+    outer_bbox = (bx0 - outer_pad, by0 - outer_pad, bx1 + outer_pad, by1 + outer_pad)
     outlined_ellipse(
-        img, outer_bbox,
+        img,
+        outer_bbox,
         outline=adjust_alpha(GOLD_DARK, 140),
         width=max(2, _si(1.5)),
     )
@@ -1482,8 +1538,12 @@ def _draw_select_ring(img: Image.Image) -> None:
     # Gradient overlay — vertical gradient from bright top to dark bottom,
     # masked to the ring pixels.
     grad_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    grad_region = (bx0 - main_width, by0 - main_width,
-                   bx1 + main_width, by1 + main_width)
+    grad_region = (
+        bx0 - main_width,
+        by0 - main_width,
+        bx1 + main_width,
+        by1 + main_width,
+    )
     linear_gradient(
         grad_layer,
         stops=[
@@ -1515,10 +1575,10 @@ def _draw_select_ring(img: Image.Image) -> None:
 
     # --- 4. Inner accent ring (thin, bright highlight) ---
     inner_pad = _si(2.0)
-    inner_bbox = (bx0 + inner_pad, by0 + inner_pad,
-                  bx1 - inner_pad, by1 - inner_pad)
+    inner_bbox = (bx0 + inner_pad, by0 + inner_pad, bx1 - inner_pad, by1 - inner_pad)
     outlined_ellipse(
-        img, inner_bbox,
+        img,
+        inner_bbox,
         outline=adjust_alpha(GOLD_BRIGHT, 180),
         width=max(1, _si(1.0)),
     )
@@ -1531,8 +1591,12 @@ def _draw_select_ring(img: Image.Image) -> None:
     spec_r = _s(2.5)
     filled_ellipse(
         img,
-        (int(spec_x - spec_r), int(spec_y - spec_r),
-         int(spec_x + spec_r), int(spec_y + spec_r)),
+        (
+            int(spec_x - spec_r),
+            int(spec_y - spec_r),
+            int(spec_x + spec_r),
+            int(spec_y + spec_r),
+        ),
         fill=adjust_alpha(WHITE, 120),
     )
 
@@ -1554,7 +1618,10 @@ def make_select_ring() -> Image.Image:
         540×540 RGBA ``Image``.
     """
     sprite = supersample_draw(
-        RING_SIZE[0], RING_SIZE[1], _draw_select_ring, factor=_SS,
+        RING_SIZE[0],
+        RING_SIZE[1],
+        _draw_select_ring,
+        factor=_SS,
     )
 
     # Subtle noise for texture
@@ -1574,6 +1641,7 @@ def make_select_ring() -> Image.Image:
 # ===================================================================
 # generate() — save all 20 PNGs
 # ===================================================================
+
 
 def generate(output_dir: Path) -> List[Path]:
     """Create all 20 battle-vignette sprite PNGs in *output_dir*.

@@ -35,13 +35,14 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 # Type aliases
 # ---------------------------------------------------------------------------
 Color = Tuple[int, int, int, int]  # RGBA
-Point = Tuple[float, float]        # (x, y)
-ColorStop = Tuple[float, Color]    # (position 0..1, RGBA)
+Point = Tuple[float, float]  # (x, y)
+ColorStop = Tuple[float, Color]  # (position 0..1, RGBA)
 
 
 # ===================================================================
 # Color utilities
 # ===================================================================
+
 
 def lighten(color: Color, amount: float = 0.2) -> Color:
     """Return *color* lightened toward white by *amount* (0.0–1.0).
@@ -112,6 +113,7 @@ def adjust_alpha(color: Color, alpha: int) -> Color:
 # ===================================================================
 # Supersampling
 # ===================================================================
+
 
 @contextlib.contextmanager
 def supersample(
@@ -187,6 +189,7 @@ def supersample_draw(
 # Polygons
 # ===================================================================
 
+
 def filled_polygon(
     img: Image.Image,
     points: Sequence[Point],
@@ -228,6 +231,7 @@ def outlined_polygon(
 # ===================================================================
 # Gradient fills
 # ===================================================================
+
 
 def vertical_gradient(
     img: Image.Image,
@@ -417,6 +421,7 @@ def radial_gradient(
 # Hatching / patterns
 # ===================================================================
 
+
 def crosshatch(
     img: Image.Image,
     spacing: int = 6,
@@ -490,6 +495,7 @@ def crosshatch(
 # Ellipses
 # ===================================================================
 
+
 def filled_ellipse(
     img: Image.Image,
     bbox: Tuple[int, int, int, int],
@@ -527,6 +533,7 @@ def outlined_ellipse(
 # ===================================================================
 # Effects
 # ===================================================================
+
 
 def apply_blur(
     img: Image.Image,
@@ -638,6 +645,7 @@ def apply_glow(
 # Texture
 # ===================================================================
 
+
 def apply_noise(
     img: Image.Image,
     amount: float = 0.1,
@@ -682,6 +690,7 @@ def apply_noise(
 # ===================================================================
 # High-level shape factories — each returns a new RGBA Image
 # ===================================================================
+
 
 def solid_rect(w: int, h: int, color: Color) -> Image.Image:
     """Create a filled rectangle on a transparent background.
@@ -777,6 +786,7 @@ def ring(diameter: int, outline_color: Color, width: int = 2) -> Image.Image:
         New RGBA ``Image`` of size (diameter, diameter).
     """
     img = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
-    outlined_ellipse(img, (0, 0, diameter - 1, diameter - 1),
-                     outline=outline_color, width=width)
+    outlined_ellipse(
+        img, (0, 0, diameter - 1, diameter - 1), outline=outline_color, width=width
+    )
     return img

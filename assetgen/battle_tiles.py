@@ -106,6 +106,7 @@ _SCALE = 2
 # Scaling helpers (match battle_sprites.py pattern)
 # ===================================================================
 
+
 def _s(v: float) -> float:
     """Scale a 1× coordinate to supersampled space (accounting for 2× content scale)."""
     return v * _SS * _SCALE
@@ -120,12 +121,14 @@ def _si(v: float) -> int:
 # Grass tile (128×128)
 # ===================================================================
 
+
 def make_tile_grass() -> Image.Image:
     """Generate a grass tile with varied green tones and blade details.
 
     Uses a multi-stop vertical gradient for depth, random grass tufts
     for texture, and subtle noise for organic feel.
     """
+
     def paint(big: Image.Image) -> None:
         # Mirrored gradient — MID at edges, LIGHT in centre → seamless tiling
         linear_gradient(
@@ -142,9 +145,21 @@ def make_tile_grass() -> Image.Image:
         # Grass blade tufts — thin vertical lines with slight variation
         draw = ImageDraw.Draw(big, "RGBA")
         tuft_positions = [
-            (8, 48), (18, 12), (26, 56), (38, 22), (48, 44),
-            (12, 32), (32, 8), (52, 36), (6, 18), (42, 52),
-            (22, 40), (56, 14), (14, 58), (44, 26), (28, 50),
+            (8, 48),
+            (18, 12),
+            (26, 56),
+            (38, 22),
+            (48, 44),
+            (12, 32),
+            (32, 8),
+            (52, 36),
+            (6, 18),
+            (42, 52),
+            (22, 40),
+            (56, 14),
+            (14, 58),
+            (44, 26),
+            (28, 50),
         ]
 
         for tx, ty in tuft_positions:
@@ -185,12 +200,14 @@ def make_tile_grass() -> Image.Image:
 # Dirt tile (128×128)
 # ===================================================================
 
+
 def make_tile_dirt() -> Image.Image:
     """Generate a dirt/earth tile with brown tones and pebble details.
 
     Uses a gradient for earthen depth, small pebbles/rocks for texture,
     and moderate noise for a rough, natural surface.
     """
+
     def paint(big: Image.Image) -> None:
         # Mirrored gradient — MID at edges, LIGHT in centre → seamless tiling
         linear_gradient(
@@ -224,15 +241,18 @@ def make_tile_dirt() -> Image.Image:
             # Slightly elongated ellipse for natural look
             filled_ellipse(
                 big,
-                (int(cx - r), int(cy - r * 0.8),
-                 int(cx + r), int(cy + r * 0.8)),
+                (int(cx - r), int(cy - r * 0.8), int(cx + r), int(cy + r * 0.8)),
                 fill=color,
             )
             # Highlight on top-left for depth
             filled_ellipse(
                 big,
-                (int(cx - r * 0.4), int(cy - r * 0.5),
-                 int(cx + r * 0.2), int(cy + r * 0.1)),
+                (
+                    int(cx - r * 0.4),
+                    int(cy - r * 0.5),
+                    int(cx + r * 0.2),
+                    int(cy + r * 0.1),
+                ),
                 fill=lighten(color, 0.2),
             )
 
@@ -261,12 +281,14 @@ def make_tile_dirt() -> Image.Image:
 # Stone tile (128×128)
 # ===================================================================
 
+
 def make_tile_stone() -> Image.Image:
     """Generate a cobblestone tile with grey tones and mortar lines.
 
     Creates 4 stone blocks with gradient fills separated by dark mortar,
     with subtle highlights and noise for a weathered stone appearance.
     """
+
     def paint(big: Image.Image) -> None:
         # Base fill — mid-grey
         draw = ImageDraw.Draw(big, "RGBA")
@@ -278,10 +300,10 @@ def make_tile_stone() -> Image.Image:
         #   [0-30, 34-64] [34-64, 34-64]
 
         blocks = [
-            (0, 0, 30, 30),      # top-left
-            (34, 0, 64, 30),     # top-right
-            (0, 34, 30, 64),     # bottom-left
-            (34, 34, 64, 64),    # bottom-right
+            (0, 0, 30, 30),  # top-left
+            (34, 0, 64, 30),  # top-right
+            (0, 34, 30, 64),  # bottom-left
+            (34, 34, 64, 64),  # bottom-right
         ]
 
         for i, (x0, y0, x1, y1) in enumerate(blocks):
@@ -358,12 +380,14 @@ def make_tile_stone() -> Image.Image:
 # Obstacle tile (128×128, grey rock on grass base)
 # ===================================================================
 
+
 def make_tile_obstacle() -> Image.Image:
     """Generate an obstacle tile with a small grey rock on grass base.
 
     Creates a 3D-looking pebble with gradient shading, rim lighting,
     and drop shadow. Deliberately small so battle units dominate visually.
     """
+
     def paint(big: Image.Image) -> None:
         # Base layer — grass background (mirrored to match seamless grass tile)
         linear_gradient(
@@ -421,13 +445,14 @@ def make_tile_obstacle() -> Image.Image:
 
         # Irregular 12-point polygon approximating a boulder
         import math
+
         points = []
         for i in range(12):
             angle = (i / 12) * 2 * math.pi
             # Vary radius for irregular shape
             radius_variance = 0.85 + 0.15 * ((i % 3) / 2)
             rx_var = rock_rx * radius_variance
-            ry_var = rock_ry * radius_variance * (0.9 + 0.1 * ((i % 2)))
+            ry_var = rock_ry * radius_variance * (0.9 + 0.1 * (i % 2))
 
             px = rock_cx + rx_var * math.cos(angle)
             py = rock_cy + ry_var * math.sin(angle)
@@ -495,8 +520,12 @@ def make_tile_obstacle() -> Image.Image:
             # Tiny highlight
             filled_ellipse(
                 big,
-                (int(px - pr * 0.4), int(py - pr * 0.4),
-                 int(px + pr * 0.2), int(py + pr * 0.2)),
+                (
+                    int(px - pr * 0.4),
+                    int(py - pr * 0.4),
+                    int(px + pr * 0.2),
+                    int(py + pr * 0.2),
+                ),
                 fill=lighten(ROCK_MID, 0.15),
             )
 
@@ -510,12 +539,14 @@ def make_tile_obstacle() -> Image.Image:
 # Movement indicator tile (128×128, semi-transparent blue)
 # ===================================================================
 
+
 def make_tile_move() -> Image.Image:
     """Generate a semi-transparent blue movement indicator tile.
 
     Shows a subtle radial gradient from bright centre to darker edges,
     with a border outline. Used for showing valid movement squares.
     """
+
     def paint(big: Image.Image) -> None:
         # Radial gradient from center — bright blue fading to darker edges
         cx, cy = _s(32), _s(32)
@@ -536,8 +567,12 @@ def make_tile_move() -> Image.Image:
         draw = ImageDraw.Draw(big, "RGBA")
         border_inset = _si(2)
         draw.rectangle(
-            (border_inset, border_inset,
-             big.width - border_inset - 1, big.height - border_inset - 1),
+            (
+                border_inset,
+                border_inset,
+                big.width - border_inset - 1,
+                big.height - border_inset - 1,
+            ),
             outline=MOVE_BORDER,
             width=max(1, _si(1.5)),
         )
@@ -558,14 +593,18 @@ def make_tile_move() -> Image.Image:
         )
         # Bottom-right corner
         draw.line(
-            [(big.width - _si(4) - accent_len, big.height - _si(4)),
-             (big.width - _si(4), big.height - _si(4))],
+            [
+                (big.width - _si(4) - accent_len, big.height - _si(4)),
+                (big.width - _si(4), big.height - _si(4)),
+            ],
             fill=accent_color,
             width=max(1, _si(1.2)),
         )
         draw.line(
-            [(big.width - _si(4), big.height - _si(4) - accent_len),
-             (big.width - _si(4), big.height - _si(4))],
+            [
+                (big.width - _si(4), big.height - _si(4) - accent_len),
+                (big.width - _si(4), big.height - _si(4)),
+            ],
             fill=accent_color,
             width=max(1, _si(1.2)),
         )
@@ -580,12 +619,14 @@ def make_tile_move() -> Image.Image:
 # Attack indicator tile (128×128, semi-transparent red)
 # ===================================================================
 
+
 def make_tile_attack() -> Image.Image:
     """Generate a semi-transparent red attack indicator tile.
 
     Similar to move indicator but with red tones and a more aggressive
     crosshair pattern. Used for showing valid attack targets.
     """
+
     def paint(big: Image.Image) -> None:
         # Radial gradient from center — bright red fading to darker edges
         cx, cy = _s(32), _s(32)
@@ -606,8 +647,12 @@ def make_tile_attack() -> Image.Image:
         draw = ImageDraw.Draw(big, "RGBA")
         border_inset = _si(2)
         draw.rectangle(
-            (border_inset, border_inset,
-             big.width - border_inset - 1, big.height - border_inset - 1),
+            (
+                border_inset,
+                border_inset,
+                big.width - border_inset - 1,
+                big.height - border_inset - 1,
+            ),
             outline=ATTACK_BORDER,
             width=max(1, _si(1.5)),
         )
@@ -634,8 +679,7 @@ def make_tile_attack() -> Image.Image:
         dot_r = _si(2)
         filled_ellipse(
             big,
-            (int(cx - dot_r), int(cy - dot_r),
-             int(cx + dot_r), int(cy + dot_r)),
+            (int(cx - dot_r), int(cy - dot_r), int(cx + dot_r), int(cy + dot_r)),
             fill=adjust_alpha(ATTACK_BORDER, 255),
         )
 
@@ -649,11 +693,13 @@ def make_tile_attack() -> Image.Image:
 # Health bar background (96×10)
 # ===================================================================
 
+
 def make_health_bar_bg() -> Image.Image:
     """Generate a dark health bar background with subtle border.
 
     Simple dark rectangle with a darker border for depth.
     """
+
     def paint(big: Image.Image) -> None:
         # Fill with background color
         draw = ImageDraw.Draw(big, "RGBA")
@@ -674,12 +720,14 @@ def make_health_bar_bg() -> Image.Image:
 # Health bar fill (96×10, green gradient)
 # ===================================================================
 
+
 def make_health_bar_fill() -> Image.Image:
     """Generate a green health bar fill with vertical gradient and highlight.
 
     Uses a multi-stop gradient for a glossy, modern health bar appearance,
     with a bright highlight line on top.
     """
+
     def paint(big: Image.Image) -> None:
         # Vertical gradient — bright at top, darker at bottom
         linear_gradient(
@@ -722,6 +770,7 @@ def make_health_bar_fill() -> Image.Image:
 
 BATTLE_BG_SIZE = (1920, 1080)
 
+
 def make_battle_bg() -> Image.Image:
     """Generate a 1920×1080 textured background for the battle scene.
 
@@ -741,9 +790,9 @@ def make_battle_bg() -> Image.Image:
         (w / 2, h / 2),
         max(w, h) * 0.7,
         stops=[
-            (0.0, (25, 35, 55, 255)),    # slightly lighter centre
-            (0.5, (18, 28, 46, 255)),     # mid-transition
-            (1.0, (8, 12, 24, 255)),      # dark edge
+            (0.0, (25, 35, 55, 255)),  # slightly lighter centre
+            (0.5, (18, 28, 46, 255)),  # mid-transition
+            (1.0, (8, 12, 24, 255)),  # dark edge
         ],
     )
 
@@ -774,6 +823,7 @@ def make_battle_bg() -> Image.Image:
 # ===================================================================
 # generate() — save all PNGs
 # ===================================================================
+
 
 def generate(output_dir: Path) -> List[Path]:
     """Create all battle tile assets in *output_dir*.
@@ -812,6 +862,7 @@ def generate(output_dir: Path) -> List[Path]:
 # ===================================================================
 # Main entry point
 # ===================================================================
+
 
 def main() -> None:
     """Entry point for standalone execution."""
