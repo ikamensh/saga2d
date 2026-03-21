@@ -114,6 +114,7 @@ E_CANCEL = "cancel"
 # BattleScene
 # ======================================================================
 
+
 class BattleScene(Scene):
     """Playable tactical battle with FSM-driven turn flow."""
 
@@ -207,6 +208,7 @@ class BattleScene(Scene):
         unit spawn positions on the edges.
         """
         import random
+
         rng = random.Random(42)  # Fixed seed for reproducible layout
 
         # Reserved positions for units
@@ -236,7 +238,9 @@ class BattleScene(Scene):
         """Place 4 warriors on the left and 4 skeletons on the right."""
         warrior_positions = [(1, 1), (1, 2), (1, 3), (1, 4)]
         for col, row in warrior_positions:
-            w = WarriorUnit.spawn(self, col=col, row=row, grid=self.grid, team="friendly")
+            w = WarriorUnit.spawn(
+                self, col=col, row=row, grid=self.grid, team="friendly"
+            )
             self.warriors.append(w)
             self.all_units.append(w)
 
@@ -244,7 +248,7 @@ class BattleScene(Scene):
         for col, row in skeleton_positions:
             s = SkeletonUnit.spawn(self, col=col, row=row, grid=self.grid, team="enemy")
             self.skeletons.append(s)
-            self.all_units.append(s)
+            self.all_units.append(w)
 
     # ------------------------------------------------------------------
     # UI
@@ -322,8 +326,12 @@ class BattleScene(Scene):
 
     def _build_fsm(self) -> StateMachine:
         states = [
-            S_PLAYER_SELECT, S_PLAYER_MOVE, S_PLAYER_ATTACK,
-            S_UNIT_ACTING, S_AI_TURN, S_GAME_OVER,
+            S_PLAYER_SELECT,
+            S_PLAYER_MOVE,
+            S_PLAYER_ATTACK,
+            S_UNIT_ACTING,
+            S_AI_TURN,
+            S_GAME_OVER,
         ]
         transitions = {
             S_PLAYER_SELECT: {
@@ -403,13 +411,16 @@ class BattleScene(Scene):
         atk_cells = self.grid.attack_range(u.col, u.row, u.rng)
         # Only highlight cells occupied by living enemies
         self._attack_cells = {
-            (c, r) for c, r in atk_cells
+            (c, r)
+            for c, r in atk_cells
             if self.grid.unit_at(c, r) is not None
             and self.grid.unit_at(c, r).team == "enemy"
             and self.grid.unit_at(c, r).alive
         }
         if self._attack_cells:
-            self._hint_label.text = "Click a red cell to attack (click elsewhere to skip)"
+            self._hint_label.text = (
+                "Click a red cell to attack (click elsewhere to skip)"
+            )
         else:
             self._hint_label.text = "No targets in range — click anywhere to skip"
 
@@ -476,7 +487,9 @@ class BattleScene(Scene):
     def _update_turn_label(self) -> None:
         acted = len(self.acted_this_turn)
         total = sum(1 for w in self.warriors if w.alive)
-        self._turn_label.text = f"Player Turn {self._turn_number}  ({acted}/{total} acted)"
+        self._turn_label.text = (
+            f"Player Turn {self._turn_number}  ({acted}/{total} acted)"
+        )
 
     # ------------------------------------------------------------------
     # Player click handling
@@ -530,14 +543,16 @@ class BattleScene(Scene):
             self.fsm.trigger(E_MOVE)
 
         self.fsm.trigger(E_ACTION_START)
-        u.sprite.do(Sequence(
-            Parallel(
-                PlayAnim(u.anim_walk),
-                MoveTo((target_x, target_y), speed=MOVE_SPEED),
-            ),
-            Do(lambda: u.sprite.play(u.anim_idle)),
-            Do(on_arrive),
-        ))
+        u.sprite.do(
+            Sequence(
+                Parallel(
+                    PlayAnim(u.anim_walk),
+                    MoveTo((target_x, target_y), speed=MOVE_SPEED),
+                ),
+                Do(lambda: u.sprite.play(u.anim_idle)),
+                Do(on_arrive),
+            )
+        )
 
     def _handle_player_attack_click(self, col: int, row: int) -> None:
         """PLAYER_ATTACK: click a red cell to attack an enemy."""
@@ -613,6 +628,7 @@ class BattleScene(Scene):
 
     def _ai_execute_attack(self, ai_unit: BaseUnit, target: BaseUnit) -> None:
         """AI attacks a target from current position."""
+
         def on_done() -> None:
             ai_unit.deselect()
             if not self._check_game_over():
@@ -644,14 +660,16 @@ class BattleScene(Scene):
                 if not self._check_game_over():
                     self.after(0.3, self._process_next_ai)
 
-        ai_unit.sprite.do(Sequence(
-            Parallel(
-                PlayAnim(ai_unit.anim_walk),
-                MoveTo((target_x, target_y), speed=MOVE_SPEED),
-            ),
-            Do(lambda: ai_unit.sprite.play(ai_unit.anim_idle)),
-            Do(on_arrive),
-        ))
+        ai_unit.sprite.do(
+            Sequence(
+                Parallel(
+                    PlayAnim(ai_unit.anim_walk),
+                    MoveTo((target_x, target_y), speed=MOVE_SPEED),
+                ),
+                Do(lambda: ai_unit.sprite.play(ai_unit.anim_idle)),
+                Do(on_arrive),
+            )
+        )
 
     def _ai_execute_move(self, ai_unit: BaseUnit, cell: tuple[int, int]) -> None:
         """AI moves toward enemies (no attack possible)."""
@@ -667,14 +685,16 @@ class BattleScene(Scene):
             ai_unit.deselect()
             self.after(0.3, self._process_next_ai)
 
-        ai_unit.sprite.do(Sequence(
-            Parallel(
-                PlayAnim(ai_unit.anim_walk),
-                MoveTo((target_x, target_y), speed=MOVE_SPEED),
-            ),
-            Do(lambda: ai_unit.sprite.play(ai_unit.anim_idle)),
-            Do(on_arrive),
-        ))
+        ai_unit.sprite.do(
+            Sequence(
+                Parallel(
+                    PlayAnim(ai_unit.anim_walk),
+                    MoveTo((target_x, target_y), speed=MOVE_SPEED),
+                ),
+                Do(lambda: ai_unit.sprite.play(ai_unit.anim_idle)),
+                Do(on_arrive),
+            )
+        )
 
     def _finish_ai_turn(self) -> None:
         """All AI units have acted — start a new player turn."""
@@ -793,14 +813,18 @@ class BattleScene(Scene):
             flash_color = (255, 60, 40, max(0, min(255, alpha)))
             if self.camera is not None:
                 self.draw_world_rect(
-                    GRID_ORIGIN_X, GRID_ORIGIN_Y,
-                    GRID_COLS * TILE_SIZE, GRID_ROWS * TILE_SIZE,
+                    GRID_ORIGIN_X,
+                    GRID_ORIGIN_Y,
+                    GRID_COLS * TILE_SIZE,
+                    GRID_ROWS * TILE_SIZE,
                     flash_color,
                 )
             else:
                 self.draw_rect(
-                    GRID_ORIGIN_X, GRID_ORIGIN_Y,
-                    GRID_COLS * TILE_SIZE, GRID_ROWS * TILE_SIZE,
+                    GRID_ORIGIN_X,
+                    GRID_ORIGIN_Y,
+                    GRID_COLS * TILE_SIZE,
+                    GRID_ROWS * TILE_SIZE,
                     flash_color,
                 )
 
@@ -821,41 +845,59 @@ class BattleScene(Scene):
 
         # Unit type
         unit_type = "Warrior" if u.team == "friendly" else "Skeleton"
-        name_color = (100, 180, 255, 255) if u.team == "friendly" else (255, 120, 100, 255)
+        name_color = (
+            (100, 180, 255, 255) if u.team == "friendly" else (255, 120, 100, 255)
+        )
         backend.draw_text(
-            unit_type, 30, bar_y + 14, 26,
-            name_color, font="Arial",
+            unit_type,
+            30,
+            bar_y + 14,
+            26,
+            name_color,
+            font="Arial",
         )
 
         # HP bar
         hp_label_x = 220
         max_hp = 120 if u.team == "friendly" else 80
         backend.draw_text(
-            f"HP: {u.hp}/{max_hp}", hp_label_x, bar_y + 16, 20,
-            (200, 200, 200, 255), font="Arial",
+            f"HP: {u.hp}/{max_hp}",
+            hp_label_x,
+            bar_y + 16,
+            20,
+            (200, 200, 200, 255),
+            font="Arial",
         )
         bar_x = hp_label_x + 130
         bar_w = 180
         frac = u.hp / max_hp
         self.draw_rect(bar_x, bar_y + 16, bar_w, 14, (40, 40, 40, 200))
         fill = max(1, int(bar_w * frac))
-        bar_color = (60, 200, 60, 255) if frac > 0.5 else (
-            (220, 180, 40, 255) if frac > 0.25 else (220, 60, 60, 255)
+        bar_color = (
+            (60, 200, 60, 255)
+            if frac > 0.5
+            else ((220, 180, 40, 255) if frac > 0.25 else (220, 60, 60, 255))
         )
         self.draw_rect(bar_x, bar_y + 16, fill, 14, bar_color)
 
         # Stats
         backend.draw_text(
             f"ATK {u.atk}  |  DEF {u.def_}  |  MOV {u.mov}  |  RNG {u.rng}",
-            600, bar_y + 16, 20,
-            (180, 180, 190, 220), font="Arial",
+            600,
+            bar_y + 16,
+            20,
+            (180, 180, 190, 220),
+            font="Arial",
         )
 
         # Grid position
         backend.draw_text(
             f"Position: ({u.col}, {u.row})",
-            960, bar_y + 16, 18,
-            (140, 140, 150, 200), font="Arial",
+            960,
+            bar_y + 16,
+            18,
+            (140, 140, 150, 200),
+            font="Arial",
         )
 
     def _draw_side_panels(self) -> None:
@@ -873,40 +915,68 @@ class BattleScene(Scene):
         self.draw_rect(lx, ly, panel_w, 300, (30, 40, 60, 180))
 
         backend.draw_text(
-            "WARRIORS", lx + panel_w // 2, ly + 16, 32,
-            (100, 180, 255, 255), font="Arial", anchor_x=cx,
+            "WARRIORS",
+            lx + panel_w // 2,
+            ly + 16,
+            32,
+            (100, 180, 255, 255),
+            font="Arial",
+            anchor_x=cx,
         )
         alive_w = sum(1 for w in self.warriors if w.alive)
         backend.draw_text(
             f"{alive_w} / {len(self.warriors)} alive",
-            lx + panel_w // 2, ly + 58, 20,
-            (180, 200, 220, 200), font="Arial", anchor_x=cx,
+            lx + panel_w // 2,
+            ly + 58,
+            20,
+            (180, 200, 220, 200),
+            font="Arial",
+            anchor_x=cx,
         )
 
-        # Unit status pips
+        # Unit status pips — centered with proper padding
         w_max_hp = self.warriors[0]._default_hp() if self.warriors else 120
-        pip_w = min(90, (panel_w - 40) // max(1, len(self.warriors)))
+        n_w = max(1, len(self.warriors))
+        pip_pad = 30  # horizontal padding on each side
+        pip_gap = 6  # gap between pips
+        usable_w = panel_w - 2 * pip_pad
+        pip_w = min(80, (usable_w - pip_gap * (n_w - 1)) // n_w)
+        bar_pixel_w = pip_w
+        total_pips_w = n_w * pip_w + pip_gap * (n_w - 1)
+        pip_x0 = lx + pip_pad + (usable_w - total_pips_w) // 2
+        hp_font = 12 if pip_w < 30 else 14
         for i, w in enumerate(self.warriors):
-            pip_x = lx + 20 + i * pip_w
-            pip_y = ly + 94
-            bar_pixel_w = pip_w - 8
+            pip_x = pip_x0 + i * (pip_w + pip_gap)
+            pip_y = ly + 90
             if w.alive:
                 frac = w.hp / w_max_hp
                 self.draw_rect(pip_x, pip_y, bar_pixel_w, 10, (40, 40, 40, 200))
-                fill_w = max(1, int(bar_pixel_w * frac))
-                color = (60, 200, 60, 255) if frac > 0.5 else (
-                    (220, 180, 40, 255) if frac > 0.25 else (220, 60, 60, 255)
+                fill_w = min(bar_pixel_w, max(1, int(bar_pixel_w * frac)))
+                color = (
+                    (60, 200, 60, 255)
+                    if frac > 0.5
+                    else ((220, 180, 40, 255) if frac > 0.25 else (220, 60, 60, 255))
                 )
                 self.draw_rect(pip_x, pip_y, fill_w, 10, color)
                 backend.draw_text(
-                    f"{w.hp}", pip_x + bar_pixel_w // 2, pip_y + 18, 14,
-                    (200, 200, 200, 200), font="Arial", anchor_x=cx,
+                    f"{w.hp}",
+                    pip_x + bar_pixel_w // 2,
+                    pip_y + 16,
+                    hp_font,
+                    (200, 200, 200, 200),
+                    font="Arial",
+                    anchor_x=cx,
                 )
             else:
                 self.draw_rect(pip_x, pip_y, bar_pixel_w, 10, (80, 30, 30, 180))
                 backend.draw_text(
-                    "KO", pip_x + bar_pixel_w // 2, pip_y + 18, 14,
-                    (160, 60, 60, 200), font="Arial", anchor_x=cx,
+                    "KO",
+                    pip_x + bar_pixel_w // 2,
+                    pip_y + 16,
+                    hp_font,
+                    (160, 60, 60, 200),
+                    font="Arial",
+                    anchor_x=cx,
                 )
 
         # Stats summary (from first living warrior)
@@ -914,68 +984,115 @@ class BattleScene(Scene):
         if w_ref:
             backend.draw_text(
                 f"ATK {w_ref.atk}  DEF {w_ref.def_}  MOV {w_ref.mov}",
-                lx + panel_w // 2, ly + 150, 18,
-                (160, 170, 180, 180), font="Arial", anchor_x=cx,
+                lx + panel_w // 2,
+                ly + 140,
+                18,
+                (160, 170, 180, 180),
+                font="Arial",
+                anchor_x=cx,
             )
             rng_text = "Melee" if w_ref.rng <= 1 else f"{w_ref.rng} cells"
             backend.draw_text(
-                f"Range: {rng_text}", lx + panel_w // 2, ly + 178, 18,
-                (160, 170, 180, 180), font="Arial", anchor_x=cx,
+                f"Range: {rng_text}",
+                lx + panel_w // 2,
+                ly + 166,
+                18,
+                (160, 170, 180, 180),
+                font="Arial",
+                anchor_x=cx,
             )
 
         # Turn info
         backend.draw_text(
-            f"Turn {self._turn_number}", lx + panel_w // 2, ly + 220, 22,
-            (255, 220, 80, 230), font="Arial", anchor_x=cx,
+            f"Turn {self._turn_number}",
+            lx + panel_w // 2,
+            ly + 210,
+            22,
+            (255, 220, 80, 230),
+            font="Arial",
+            anchor_x=cx,
         )
         acted = len(self.acted_this_turn)
         backend.draw_text(
-            f"{acted}/{alive_w} acted", lx + panel_w // 2, ly + 252, 18,
-            (180, 180, 180, 200), font="Arial", anchor_x=cx,
+            f"{acted}/{alive_w} acted",
+            lx + panel_w // 2,
+            ly + 240,
+            18,
+            (180, 180, 180, 200),
+            font="Arial",
+            anchor_x=cx,
         )
 
         # --- Right panel (Skeletons) ---
         # Center the narrower panel in the available space on the right
         available_space = SCREEN_W - (GRID_ORIGIN_X + GRID_COLS * TILE_SIZE)
-        rx = int(GRID_ORIGIN_X + GRID_COLS * TILE_SIZE + (available_space - panel_w) / 2)
+        rx = int(
+            GRID_ORIGIN_X + GRID_COLS * TILE_SIZE + (available_space - panel_w) / 2
+        )
         ry = int(GRID_ORIGIN_Y)
         self.draw_rect(rx, ry, panel_w, 300, (50, 30, 30, 180))
 
         backend.draw_text(
-            "SKELETONS", rx + panel_w // 2, ry + 16, 32,
-            (255, 120, 100, 255), font="Arial", anchor_x=cx,
+            "SKELETONS",
+            rx + panel_w // 2,
+            ry + 16,
+            32,
+            (255, 120, 100, 255),
+            font="Arial",
+            anchor_x=cx,
         )
         alive_s = sum(1 for s in self.skeletons if s.alive)
         backend.draw_text(
             f"{alive_s} / {len(self.skeletons)} alive",
-            rx + panel_w // 2, ry + 58, 20,
-            (220, 180, 180, 200), font="Arial", anchor_x=cx,
+            rx + panel_w // 2,
+            ry + 58,
+            20,
+            (220, 180, 180, 200),
+            font="Arial",
+            anchor_x=cx,
         )
 
-        # Unit status pips
+        # Unit status pips — centered with proper padding
         s_max_hp = self.skeletons[0]._default_hp() if self.skeletons else 80
-        pip_w_s = min(90, (panel_w - 40) // max(1, len(self.skeletons)))
+        n_s = max(1, len(self.skeletons))
+        usable_s = panel_w - 2 * pip_pad
+        pip_w_s = min(80, (usable_s - pip_gap * (n_s - 1)) // n_s)
+        bar_pw_s = pip_w_s
+        total_s = n_s * pip_w_s + pip_gap * (n_s - 1)
+        pip_x0_s = rx + pip_pad + (usable_s - total_s) // 2
+        hp_font_s = 12 if pip_w_s < 30 else 14
         for i, s in enumerate(self.skeletons):
-            pip_x = rx + 20 + i * pip_w_s
-            pip_y = ry + 94
-            bar_pixel_w = pip_w_s - 8
+            pip_x = pip_x0_s + i * (pip_w_s + pip_gap)
+            pip_y = ry + 90
             if s.alive:
                 frac = s.hp / s_max_hp
-                self.draw_rect(pip_x, pip_y, bar_pixel_w, 10, (40, 40, 40, 200))
-                fill_w = max(1, int(bar_pixel_w * frac))
-                color = (60, 200, 60, 255) if frac > 0.5 else (
-                    (220, 180, 40, 255) if frac > 0.25 else (220, 60, 60, 255)
+                self.draw_rect(pip_x, pip_y, bar_pw_s, 10, (40, 40, 40, 200))
+                fill_w = min(bar_pw_s, max(1, int(bar_pw_s * frac)))
+                color = (
+                    (60, 200, 60, 255)
+                    if frac > 0.5
+                    else ((220, 180, 40, 255) if frac > 0.25 else (220, 60, 60, 255))
                 )
                 self.draw_rect(pip_x, pip_y, fill_w, 10, color)
                 backend.draw_text(
-                    f"{s.hp}", pip_x + bar_pixel_w // 2, pip_y + 18, 14,
-                    (200, 200, 200, 200), font="Arial", anchor_x=cx,
+                    f"{s.hp}",
+                    pip_x + bar_pw_s // 2,
+                    pip_y + 16,
+                    hp_font_s,
+                    (200, 200, 200, 200),
+                    font="Arial",
+                    anchor_x=cx,
                 )
             else:
-                self.draw_rect(pip_x, pip_y, bar_pixel_w, 10, (80, 30, 30, 180))
+                self.draw_rect(pip_x, pip_y, bar_pw_s, 10, (80, 30, 30, 180))
                 backend.draw_text(
-                    "KO", pip_x + bar_pixel_w // 2, pip_y + 18, 14,
-                    (160, 60, 60, 200), font="Arial", anchor_x=cx,
+                    "KO",
+                    pip_x + bar_pw_s // 2,
+                    pip_y + 16,
+                    hp_font_s,
+                    (160, 60, 60, 200),
+                    font="Arial",
+                    anchor_x=cx,
                 )
 
         # Stats summary (from first living skeleton)
@@ -983,19 +1100,29 @@ class BattleScene(Scene):
         if s_ref:
             backend.draw_text(
                 f"ATK {s_ref.atk}  DEF {s_ref.def_}  MOV {s_ref.mov}",
-                rx + panel_w // 2, ry + 150, 18,
-                (180, 160, 160, 180), font="Arial", anchor_x=cx,
+                rx + panel_w // 2,
+                ry + 140,
+                18,
+                (180, 160, 160, 180),
+                font="Arial",
+                anchor_x=cx,
             )
             rng_text = "Melee" if s_ref.rng <= 1 else f"{s_ref.rng} cells"
             backend.draw_text(
-                f"Range: {rng_text}", rx + panel_w // 2, ry + 178, 18,
-                (180, 160, 160, 180), font="Arial", anchor_x=cx,
+                f"Range: {rng_text}",
+                rx + panel_w // 2,
+                ry + 166,
+                18,
+                (180, 160, 160, 180),
+                font="Arial",
+                anchor_x=cx,
             )
 
 
 # ======================================================================
 # TitleScene
 # ======================================================================
+
 
 class TitleScene(Scene):
     """Title screen with decorative sprites and game info."""
@@ -1022,66 +1149,78 @@ class TitleScene(Scene):
         self.add_sprite(s)
 
         # Title — large and prominent
-        self.ui.add(Label(
-            "TACTICAL BATTLE",
-            font_size=120,
-            font="Arial",
-            text_color=(255, 220, 80, 255),
-            anchor=Anchor.TOP,
-            margin=120,
-        ))
+        self.ui.add(
+            Label(
+                "TACTICAL BATTLE",
+                font_size=120,
+                font="Arial",
+                text_color=(255, 220, 80, 255),
+                anchor=Anchor.TOP,
+                margin=120,
+            )
+        )
 
         # Subtitle
-        self.ui.add(Label(
-            "Warriors vs Skeletons",
-            font_size=54,
-            font="Arial",
-            text_color=(180, 170, 140, 255),
-            anchor=Anchor.TOP,
-            margin=260,
-        ))
+        self.ui.add(
+            Label(
+                "Warriors vs Skeletons",
+                font_size=54,
+                font="Arial",
+                text_color=(180, 170, 140, 255),
+                anchor=Anchor.TOP,
+                margin=260,
+            )
+        )
 
         # Controls info panel
-        self.ui.add(Panel(
-            layout=Layout.VERTICAL,
-            spacing=10,
-            anchor=Anchor.CENTER,
-            margin=40,
-            style=Style(
-                background_color=(25, 25, 40, 180),
-                padding=36,
-            ),
-            children=[
-                Label(
-                    "Click to select, move, and attack",
-                    font_size=32, font="Arial",
-                    text_color=(180, 180, 180, 255),
+        self.ui.add(
+            Panel(
+                layout=Layout.VERTICAL,
+                spacing=10,
+                anchor=Anchor.CENTER,
+                margin=40,
+                style=Style(
+                    background_color=(25, 25, 40, 180),
+                    padding=36,
                 ),
-                Label(
-                    "Right-click or ESC to cancel  |  E to end turn",
-                    font_size=28, font="Arial",
-                    text_color=(150, 150, 160, 220),
-                ),
-            ],
-        ))
+                children=[
+                    Label(
+                        "Click to select, move, and attack",
+                        font_size=32,
+                        font="Arial",
+                        text_color=(180, 180, 180, 255),
+                    ),
+                    Label(
+                        "Right-click or ESC to cancel  |  E to end turn",
+                        font_size=28,
+                        font="Arial",
+                        text_color=(150, 150, 160, 220),
+                    ),
+                ],
+            )
+        )
 
         # Start prompt — pushed down for better vertical spread
-        self.ui.add(Label(
-            "Press ENTER to start",
-            font_size=36,
-            font="Arial",
-            text_color=(200, 200, 200, 255),
-            anchor=Anchor.TOP,
-            margin=680,
-        ))
-        self.ui.add(Label(
-            "ESC to quit",
-            font_size=22,
-            font="Arial",
-            text_color=(120, 120, 130, 200),
-            anchor=Anchor.TOP,
-            margin=730,
-        ))
+        self.ui.add(
+            Label(
+                "Press ENTER to start",
+                font_size=36,
+                font="Arial",
+                text_color=(200, 200, 200, 255),
+                anchor=Anchor.TOP,
+                margin=680,
+            )
+        )
+        self.ui.add(
+            Label(
+                "ESC to quit",
+                font_size=22,
+                font="Arial",
+                text_color=(120, 120, 130, 200),
+                anchor=Anchor.TOP,
+                margin=730,
+            )
+        )
 
     def handle_input(self, event: InputEvent) -> bool:
         if event.action == "confirm":
@@ -1096,6 +1235,7 @@ class TitleScene(Scene):
 # ======================================================================
 # Main
 # ======================================================================
+
 
 def main() -> None:
     asset_path = Path(__file__).resolve().parent / "assets"

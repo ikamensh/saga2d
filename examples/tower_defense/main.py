@@ -96,25 +96,25 @@ from saga2d import (  # noqa: E402
 # Constants
 # ======================================================================
 
-SCREEN_W, SCREEN_H = 960, 540
+SCREEN_W, SCREEN_H = 1280, 960
 TILE_SIZE = 64
 CAMERA_SCROLL_SPEED = 400.0
 
 # Colour palette — Tailwind-inspired dark theme
-BG_COLOR = (15, 23, 42, 255)               # Slate 900
-TITLE_COLOR = (253, 224, 71, 255)           # Yellow 300
-SUBTITLE_COLOR = (148, 163, 184, 255)       # Slate 400
-HUD_TEXT_COLOR = (226, 232, 240, 255)       # Slate 200
-GOLD_COLOR = (253, 224, 71, 255)            # Yellow 300
-LIVES_COLOR = (251, 113, 133, 255)          # Rose 400
-SCORE_COLOR = (56, 189, 248, 255)           # Sky 400
+BG_COLOR = (15, 23, 42, 255)  # Slate 900
+TITLE_COLOR = (253, 224, 71, 255)  # Yellow 300
+SUBTITLE_COLOR = (148, 163, 184, 255)  # Slate 400
+HUD_TEXT_COLOR = (226, 232, 240, 255)  # Slate 200
+GOLD_COLOR = (253, 224, 71, 255)  # Yellow 300
+LIVES_COLOR = (251, 113, 133, 255)  # Rose 400
+SCORE_COLOR = (56, 189, 248, 255)  # Sky 400
 
 # Health bar
-HEALTH_BAR_BG_COLOR = (30, 41, 59, 200)    # Slate 800
-HEALTH_BAR_FG_COLOR = (34, 197, 94, 220)   # Green 500
-HEALTH_BAR_WIDTH = 44
-HEALTH_BAR_HEIGHT = 6
-HEALTH_BAR_Y_OFFSET = -28
+HEALTH_BAR_BG_COLOR = (30, 41, 59, 200)  # Slate 800
+HEALTH_BAR_FG_COLOR = (34, 197, 94, 220)  # Green 500
+HEALTH_BAR_WIDTH = 64
+HEALTH_BAR_HEIGHT = 10
+HEALTH_BAR_Y_OFFSET = -40
 
 # Starting resources
 STARTING_GOLD = 200
@@ -253,25 +253,114 @@ MAP_HEIGHT_PX = MAP_ROWS * TILE_SIZE
 
 # Enemy path -- tile coordinates (col, row) from spawn to exit.
 ENEMY_PATH: list[tuple[int, int]] = [
-    (0, 5), (1, 5), (2, 5), (3, 5), (4, 5), (5, 5), (6, 5),
-    (6, 4), (6, 3),
-    (7, 3), (8, 3), (9, 3), (10, 3), (11, 3), (12, 3), (13, 3),
-    (14, 3), (15, 3), (16, 3), (17, 3), (18, 3),
-    (18, 4), (18, 5), (18, 6), (18, 7), (18, 8),
-    (19, 8), (20, 8), (21, 8), (22, 8), (23, 8), (24, 8), (25, 8),
-    (26, 8), (27, 8), (28, 8), (29, 8), (30, 8), (31, 8), (32, 8),
-    (32, 9), (32, 10), (32, 11),
-    (31, 11), (30, 11), (29, 11), (28, 11), (27, 11), (26, 11), (25, 11),
-    (24, 11), (23, 11), (22, 11), (21, 11), (20, 11), (19, 11), (18, 11),
-    (17, 11), (16, 11), (15, 11), (14, 11), (13, 11), (12, 11), (11, 11),
-    (10, 11), (9, 11), (8, 11), (7, 11), (6, 11),
-    (6, 12), (6, 13), (6, 14),
-    (7, 14), (8, 14), (9, 14), (10, 14), (11, 14), (12, 14), (13, 14),
-    (14, 14), (15, 14), (16, 14), (17, 14), (18, 14), (19, 14), (20, 14),
-    (21, 14), (22, 14), (23, 14), (24, 14), (25, 14), (26, 14), (27, 14),
-    (28, 14), (29, 14), (30, 14), (31, 14), (32, 14),
-    (32, 15), (32, 16), (32, 17),
-    (33, 17), (34, 17), (35, 17), (36, 17), (37, 17), (38, 17), (39, 17),
+    (0, 5),
+    (1, 5),
+    (2, 5),
+    (3, 5),
+    (4, 5),
+    (5, 5),
+    (6, 5),
+    (6, 4),
+    (6, 3),
+    (7, 3),
+    (8, 3),
+    (9, 3),
+    (10, 3),
+    (11, 3),
+    (12, 3),
+    (13, 3),
+    (14, 3),
+    (15, 3),
+    (16, 3),
+    (17, 3),
+    (18, 3),
+    (18, 4),
+    (18, 5),
+    (18, 6),
+    (18, 7),
+    (18, 8),
+    (19, 8),
+    (20, 8),
+    (21, 8),
+    (22, 8),
+    (23, 8),
+    (24, 8),
+    (25, 8),
+    (26, 8),
+    (27, 8),
+    (28, 8),
+    (29, 8),
+    (30, 8),
+    (31, 8),
+    (32, 8),
+    (32, 9),
+    (32, 10),
+    (32, 11),
+    (31, 11),
+    (30, 11),
+    (29, 11),
+    (28, 11),
+    (27, 11),
+    (26, 11),
+    (25, 11),
+    (24, 11),
+    (23, 11),
+    (22, 11),
+    (21, 11),
+    (20, 11),
+    (19, 11),
+    (18, 11),
+    (17, 11),
+    (16, 11),
+    (15, 11),
+    (14, 11),
+    (13, 11),
+    (12, 11),
+    (11, 11),
+    (10, 11),
+    (9, 11),
+    (8, 11),
+    (7, 11),
+    (6, 11),
+    (6, 12),
+    (6, 13),
+    (6, 14),
+    (7, 14),
+    (8, 14),
+    (9, 14),
+    (10, 14),
+    (11, 14),
+    (12, 14),
+    (13, 14),
+    (14, 14),
+    (15, 14),
+    (16, 14),
+    (17, 14),
+    (18, 14),
+    (19, 14),
+    (20, 14),
+    (21, 14),
+    (22, 14),
+    (23, 14),
+    (24, 14),
+    (25, 14),
+    (26, 14),
+    (27, 14),
+    (28, 14),
+    (29, 14),
+    (30, 14),
+    (31, 14),
+    (32, 14),
+    (32, 15),
+    (32, 16),
+    (32, 17),
+    (33, 17),
+    (34, 17),
+    (35, 17),
+    (36, 17),
+    (37, 17),
+    (38, 17),
+    (39, 17),
 ]
 
 # Pre-compute pixel-centre positions for each waypoint.
@@ -282,15 +371,26 @@ ENEMY_PATH_PX: list[tuple[float, float]] = [
 
 # Tower build slots -- (col, row) positions adjacent to the enemy path.
 TOWER_SLOTS: list[tuple[int, int]] = [
-    (4, 4), (8, 2), (14, 2), (17, 6), (22, 7),
-    (28, 7), (33, 10), (10, 12), (20, 12), (8, 13),
-    (20, 15), (28, 15), (31, 16),
+    (4, 4),
+    (8, 2),
+    (14, 2),
+    (17, 6),
+    (22, 7),
+    (28, 7),
+    (33, 10),
+    (10, 12),
+    (20, 12),
+    (8, 13),
+    (20, 15),
+    (28, 15),
+    (31, 16),
 ]
 
 
 # ======================================================================
 # Audio helpers -- safe sound playback using optional=True
 # ======================================================================
+
 
 def _play_sfx(game: Game, name: str) -> None:
     """Play a sound effect, silently ignoring missing assets."""
@@ -311,6 +411,7 @@ def _stop_music(game: Game) -> None:
 # TitleScene
 # ======================================================================
 
+
 class TitleScene(Scene):
     """Title screen with Play / Quit buttons.
 
@@ -324,27 +425,80 @@ class TitleScene(Scene):
     background_color = BG_COLOR
 
     def on_enter(self) -> None:
+        # Add decorative background sprites to make title less empty
+        self._add_title_decorations()
+
         title_label = Label(
             "Tower Defense",
-            font_size=48,
+            font_size=72,
             text_color=TITLE_COLOR,
         )
         subtitle_label = Label(
             "An Saga2D Example",
-            font_size=18,
+            font_size=28,
             text_color=SUBTITLE_COLOR,
         )
-        play_button = Button("Play", on_click=self._on_play)
-        quit_button = Button("Quit", on_click=self._on_quit)
+        play_button = Button(
+            "Play",
+            on_click=self._on_play,
+            style=Style(font_size=32, padding=12),
+        )
+        quit_button = Button(
+            "Quit",
+            on_click=self._on_quit,
+            style=Style(font_size=32, padding=12),
+        )
 
         menu_panel = Panel(
             layout=Layout.VERTICAL,
             spacing=20,
             anchor=Anchor.CENTER,
-            style=Style(background_color=(30, 41, 59, 220), padding=40),
+            style=Style(
+                background_color=(30, 41, 59, 255),  # Fully opaque
+                padding=30,
+                border_color=TITLE_COLOR,  # Yellow 300 border
+                border_width=4,
+            ),
             children=[title_label, subtitle_label, play_button, quit_button],
         )
         self.ui.add(menu_panel)
+
+    def _add_title_decorations(self) -> None:
+        """Add decorative sprites to title screen background — no overlap with text."""
+        w, h = SCREEN_W, SCREEN_H
+        # Bottom corners: small clusters of trees
+        for tree_x in [40, 110]:
+            self.add_sprite(
+                Sprite("tree", position=(tree_x, h - 50), anchor=SpriteAnchor.CENTER)
+            )
+        for tree_x in [w - 110, w - 40]:
+            self.add_sprite(
+                Sprite("tree", position=(tree_x, h - 50), anchor=SpriteAnchor.CENTER)
+            )
+
+        # Left side: Enemy formation — evenly spaced vertically, clear of center panel
+        ex = 80
+        self.add_sprite(
+            Sprite("enemy_basic", position=(ex, h * 0.28), anchor=SpriteAnchor.CENTER)
+        )
+        self.add_sprite(
+            Sprite("enemy_fast", position=(ex, h * 0.42), anchor=SpriteAnchor.CENTER)
+        )
+        self.add_sprite(
+            Sprite("enemy_tank", position=(ex, h * 0.56), anchor=SpriteAnchor.CENTER)
+        )
+
+        # Right side: Tower defense line — evenly spaced vertically, clear of center panel
+        tx = w - 80
+        self.add_sprite(
+            Sprite("tower_basic", position=(tx, h * 0.28), anchor=SpriteAnchor.CENTER)
+        )
+        self.add_sprite(
+            Sprite("tower_sniper", position=(tx, h * 0.42), anchor=SpriteAnchor.CENTER)
+        )
+        self.add_sprite(
+            Sprite("tower_splash", position=(tx, h * 0.56), anchor=SpriteAnchor.CENTER)
+        )
 
     def on_exit(self) -> None:
         _stop_music(self.game)
@@ -369,6 +523,7 @@ class TitleScene(Scene):
 # GameScene -- the complete game
 # ======================================================================
 
+
 class GameScene(Scene):
     """Gameplay scene: tower placement, enemy waves, combat, win/lose.
 
@@ -388,6 +543,8 @@ class GameScene(Scene):
     - **InputEvent** for mouse clicks (placement) and keyboard (speed toggle)
     """
 
+    # Match grass color so no dark gaps show at map edges
+    background_color = (76, 140, 60, 255)
     show_hud = True
 
     # ------------------------------------------------------------------
@@ -428,7 +585,7 @@ class GameScene(Scene):
             (SCREEN_W, SCREEN_H),
             world_bounds=(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX),
         )
-        self.camera.center_on(MAP_WIDTH_PX / 2, MAP_HEIGHT_PX / 2)
+        self.camera.center_on(SCREEN_W / 2, SCREEN_H / 2)
         self.camera.enable_key_scroll(speed=CAMERA_SCROLL_SPEED)
 
         # --- Tile map (subsystem #2: Sprite, #12: add_sprite) ---
@@ -436,6 +593,9 @@ class GameScene(Scene):
 
         # --- Tower slot markers ---
         self._create_tower_slots()
+
+        # --- Decorative trees ---
+        self._add_decorations()
 
         # --- UI (subsystem #6) ---
         self._build_hud()
@@ -501,6 +661,44 @@ class GameScene(Scene):
             self._slot_sprites[(col, row)] = sprite
 
     # ------------------------------------------------------------------
+    # Decorative trees
+    # ------------------------------------------------------------------
+
+    def _add_decorations(self) -> None:
+        """Scatter trees on grass tiles, avoiding path and tower slots."""
+        # Build sets of occupied positions
+        path_tiles = set()
+        for row_idx, row_data in enumerate(MAP_DATA):
+            for col_idx, tile_type in enumerate(row_data):
+                if tile_type == PATH:
+                    path_tiles.add((col_idx, row_idx))
+
+        slot_tiles = set(TOWER_SLOTS)
+
+        # Collect valid grass positions for trees
+        valid_positions = []
+        for row in range(MAP_ROWS):
+            for col in range(MAP_COLS):
+                if (col, row) not in path_tiles and (col, row) not in slot_tiles:
+                    valid_positions.append((col, row))
+
+        # Scatter 30 trees randomly across valid grass tiles
+        rng = random.Random(42)  # Deterministic seed for consistent layout
+        tree_positions = rng.sample(valid_positions, min(30, len(valid_positions)))
+
+        for col, row in tree_positions:
+            # Place tree at tile center
+            tree_x = col * TILE_SIZE + TILE_SIZE // 2
+            tree_y = row * TILE_SIZE + TILE_SIZE // 2
+            sprite = Sprite(
+                "tree",
+                position=(tree_x, tree_y),
+                anchor=SpriteAnchor.CENTER,
+                layer=RenderLayer.OBJECTS,
+            )
+            self.add_sprite(sprite)
+
+    # ------------------------------------------------------------------
     # HUD -- wave, gold, lives, score, hint, speed indicator
     # ------------------------------------------------------------------
 
@@ -508,7 +706,7 @@ class GameScene(Scene):
         self._wave_label = Label(
             f"Wave: {self._current_wave + 1}/{len(WAVE_DEFS)}",
             font_size=20,
-            text_color=HUD_TEXT_COLOR,
+            text_color=(255, 255, 255, 255),
         )
         self._gold_label = Label(
             f"Gold: {self._gold}",
@@ -525,33 +723,42 @@ class GameScene(Scene):
             font_size=20,
             text_color=SCORE_COLOR,
         )
-        self._hint_label = Label(
-            "Wave starting soon...",
-            font_size=14,
-            text_color=(148, 163, 184, 255),
-        )
         self._speed_label = Label(
             "",
-            font_size=14,
+            font_size=18,
             text_color=(253, 224, 71, 255),
         )
-        hud_panel = Panel(
+        # Stats row — compact, fits within screen width
+        stats_row = Panel(
             layout=Layout.HORIZONTAL,
-            spacing=24,
-            anchor=Anchor.TOP,
-            margin=8,
-            style=Style(
-                background_color=(15, 23, 42, 200),
-                padding=10,
-            ),
+            spacing=16,
+            style=Style(background_color=(0, 0, 0, 0), padding=0),
             children=[
                 self._wave_label,
                 self._gold_label,
                 self._lives_label,
                 self._score_label,
-                self._hint_label,
                 self._speed_label,
             ],
+        )
+        # Hint label — separate row below stats, centered
+        self._hint_label = Label(
+            "Prepare for the first wave!",
+            font_size=16,
+            text_color=(200, 200, 200, 220),
+        )
+        hud_panel = Panel(
+            layout=Layout.VERTICAL,
+            spacing=4,
+            anchor=Anchor.TOP,
+            margin=4,
+            style=Style(
+                background_color=(30, 41, 59, 240),
+                padding=8,
+                border_color=TITLE_COLOR,
+                border_width=2,
+            ),
+            children=[stats_row, self._hint_label],
         )
         self.ui.add(hud_panel)
 
@@ -564,21 +771,21 @@ class GameScene(Scene):
 
         menu_title = Label(
             "Build Tower",
-            font_size=22,
-            text_color=TITLE_COLOR,
+            font_size=24,  # Larger title
+            text_color=(255, 255, 255, 255),  # Pure white
         )
 
         tower_rows: list[Panel] = []
         for i, tdef in enumerate(TOWER_DEFS):
             info_label = Label(
                 f"{tdef['name']}  {tdef['cost']}g",
-                font_size=16,
-                text_color=HUD_TEXT_COLOR,
+                font_size=18,  # Larger font
+                text_color=(255, 255, 255, 255),  # Pure white
             )
             buy_button = Button(
                 "Buy",
                 on_click=lambda td=tdef: self._on_buy_clicked(td),
-                style=Style(font_size=16, padding=6),
+                style=Style(font_size=18, padding=8),  # Larger button
             )
             self._buy_buttons.append(buy_button)
 
@@ -586,8 +793,10 @@ class GameScene(Scene):
                 layout=Layout.HORIZONTAL,
                 spacing=12,
                 style=Style(
-                    background_color=(30, 41, 59, 180),
-                    padding=8,
+                    background_color=(30, 41, 59, 255),  # Fully opaque
+                    padding=10,
+                    border_color=(100, 116, 139, 255),  # Slate 500 border
+                    border_width=1,
                 ),
                 children=[info_label, buy_button],
             )
@@ -595,23 +804,25 @@ class GameScene(Scene):
 
         cancel_label = Label(
             "Right-click: cancel",
-            font_size=12,
-            text_color=(100, 116, 139, 255),
+            font_size=14,  # Larger hints
+            text_color=(255, 255, 255, 255),  # Pure white
         )
         speed_hint = Label(
             "Space: toggle 2\u00d7 speed",
-            font_size=12,
-            text_color=(100, 116, 139, 255),
+            font_size=14,  # Larger hints
+            text_color=(255, 255, 255, 255),  # Pure white
         )
 
         build_panel = Panel(
             layout=Layout.VERTICAL,
-            spacing=10,
+            spacing=12,
             anchor=Anchor.RIGHT,
             margin=8,
             style=Style(
-                background_color=(15, 23, 42, 220),
-                padding=14,
+                background_color=(30, 41, 59, 255),  # Fully opaque Slate 800
+                padding=16,
+                border_color=TITLE_COLOR,  # Yellow 300 border
+                border_width=2,
             ),
             children=[menu_title, *tower_rows, cancel_label, speed_hint],
         )
@@ -691,7 +902,9 @@ class GameScene(Scene):
             self._buy_buttons[i].enabled = can_afford
 
     def _snap_to_nearest_slot(
-        self, world_x: float, world_y: float,
+        self,
+        world_x: float,
+        world_y: float,
     ) -> tuple[float, float] | None:
         snap_range = TILE_SIZE * 1.5
         best_dist = snap_range
@@ -736,9 +949,7 @@ class GameScene(Scene):
         self._wave_spawned = 0
         wave = WAVE_DEFS[self._current_wave]
 
-        self._wave_label.text = (
-            f"Wave: {self._current_wave + 1}/{len(WAVE_DEFS)}"
-        )
+        self._wave_label.text = f"Wave: {self._current_wave + 1}/{len(WAVE_DEFS)}"
         self._update_hint_text()
 
         _play_sfx(self.game, "sfx_wave")
@@ -892,10 +1103,7 @@ class GameScene(Scene):
         if self._wave_spawned < wave["count"]:
             return
 
-        alive = [
-            e for e in self._enemies
-            if e["fsm"].state in ("walking", "dying")
-        ]
+        alive = [e for e in self._enemies if e["fsm"].state in ("walking", "dying")]
         if alive:
             return
 
@@ -919,10 +1127,7 @@ class GameScene(Scene):
         if self._game_over or self._game_won:
             return
 
-        alive = [
-            e for e in self._enemies
-            if e["fsm"].state in ("walking", "dying")
-        ]
+        alive = [e for e in self._enemies if e["fsm"].state in ("walking", "dying")]
         if alive:
             return
 
@@ -932,10 +1137,12 @@ class GameScene(Scene):
 
         print(f"Victory! Final score: {self._score}")
 
-        self.game.push(MessageScreen(
-            f"Victory!  Score: {self._score}",
-            on_dismiss=lambda: self.game.pop(),
-        ))
+        self.game.push(
+            MessageScreen(
+                f"Victory!  Score: {self._score}",
+                on_dismiss=lambda: self.game.pop(),
+            )
+        )
 
     # ==================================================================
     # Game Over / Win
@@ -951,11 +1158,13 @@ class GameScene(Scene):
         print(f"Game Over! Score: {self._score}")
 
         # Push a ChoiceScreen overlay (subsystem #1: Scene stack).
-        self.game.push(ChoiceScreen(
-            f"Game Over!  Score: {self._score}",
-            ["Retry", "Quit to Title"],
-            on_choice=self._on_game_over_choice,
-        ))
+        self.game.push(
+            ChoiceScreen(
+                f"Game Over!  Score: {self._score}",
+                ["Retry", "Quit to Title"],
+                on_choice=self._on_game_over_choice,
+            )
+        )
 
     def _on_game_over_choice(self, index: int) -> None:
         """Handle the player's choice on the game-over screen.
@@ -986,7 +1195,11 @@ class GameScene(Scene):
         )
 
     def _distance(
-        self, x1: float, y1: float, x2: float, y2: float,
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
     ) -> float:
         dx = x2 - x1
         dy = y2 - y1
@@ -1074,14 +1287,14 @@ class GameScene(Scene):
 
         if proj["splash_radius"] > 0:
             self._apply_splash_damage(
-                impact_x, impact_y,
+                impact_x,
+                impact_y,
                 proj["splash_radius"],
                 proj["damage"],
             )
         else:
             target = proj["target_enemy"]
-            if (target["fsm"].state == "walking"
-                    and not target["sprite"].is_removed):
+            if target["fsm"].state == "walking" and not target["sprite"].is_removed:
                 self._deal_damage(target, proj["damage"])
 
         _play_sfx(self.game, "sfx_hit")
@@ -1099,7 +1312,11 @@ class GameScene(Scene):
         sprite.remove()
 
     def _apply_splash_damage(
-        self, x: float, y: float, radius: float, damage: int,
+        self,
+        x: float,
+        y: float,
+        radius: float,
+        damage: int,
     ) -> None:
         for enemy in list(self._enemies):
             if enemy["fsm"].state != "walking":
@@ -1120,9 +1337,7 @@ class GameScene(Scene):
             self._kill_enemy(enemy)
 
     def _cleanup_orphan_projectiles(self) -> None:
-        self._projectiles = [
-            p for p in self._projectiles if not p["sprite"].is_removed
-        ]
+        self._projectiles = [p for p in self._projectiles if not p["sprite"].is_removed]
 
     # ==================================================================
     # Update
@@ -1160,8 +1375,10 @@ class GameScene(Scene):
             bar_y = esp._y + HEALTH_BAR_Y_OFFSET
 
             self.draw_world_rect(
-                bar_x, bar_y,
-                HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT,
+                bar_x,
+                bar_y,
+                HEALTH_BAR_WIDTH,
+                HEALTH_BAR_HEIGHT,
                 HEALTH_BAR_BG_COLOR,
             )
 
@@ -1169,8 +1386,10 @@ class GameScene(Scene):
             fill_width = max(1, int(HEALTH_BAR_WIDTH * hp_ratio))
 
             self.draw_world_rect(
-                bar_x, bar_y,
-                fill_width, HEALTH_BAR_HEIGHT,
+                bar_x,
+                bar_y,
+                fill_width,
+                HEALTH_BAR_HEIGHT,
                 HEALTH_BAR_FG_COLOR,
             )
 
@@ -1196,19 +1415,23 @@ class GameScene(Scene):
 
         # Left-click -- tower placement.
         if event.type == "click" and event.button == "left":
-            if (self._placing_tower_def is not None
-                    and event.world_x is not None
-                    and event.world_y is not None):
+            if (
+                self._placing_tower_def is not None
+                and event.world_x is not None
+                and event.world_y is not None
+            ):
                 self._try_place_tower(event.world_x, event.world_y)
                 return True
             return False
 
         # Mouse movement -- range indicator.
         if event.type in ("move", "drag"):
-            if (self._placing_tower_def is not None
-                    and self._range_indicator is not None
-                    and event.world_x is not None
-                    and event.world_y is not None):
+            if (
+                self._placing_tower_def is not None
+                and self._range_indicator is not None
+                and event.world_x is not None
+                and event.world_y is not None
+            ):
                 wx, wy = event.world_x, event.world_y
                 snap = self._snap_to_nearest_slot(wx, wy)
                 if snap is not None:
@@ -1235,6 +1458,7 @@ class GameScene(Scene):
 # Main -- entry point
 # ======================================================================
 
+
 def main() -> None:
     """Create the Game and run with the title screen."""
     game = Game(
@@ -1249,13 +1473,13 @@ def main() -> None:
     game.theme = Theme(
         font="serif",
         font_size=24,
-        text_color=(226, 232, 240, 255),            # Slate 200
-        panel_background_color=(30, 41, 59, 220),    # Slate 800
+        text_color=(226, 232, 240, 255),  # Slate 200
+        panel_background_color=(30, 41, 59, 220),  # Slate 800
         panel_padding=16,
-        button_background_color=(51, 65, 85, 255),   # Slate 700
-        button_hover_color=(71, 85, 105, 255),       # Slate 600
-        button_press_color=(30, 41, 59, 255),        # Slate 800
-        button_text_color=(226, 232, 240, 255),      # Slate 200
+        button_background_color=(51, 65, 85, 255),  # Slate 700
+        button_hover_color=(71, 85, 105, 255),  # Slate 600
+        button_press_color=(30, 41, 59, 255),  # Slate 800
+        button_text_color=(226, 232, 240, 255),  # Slate 200
         button_padding=14,
         button_font_size=26,
         button_min_width=220,

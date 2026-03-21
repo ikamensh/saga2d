@@ -53,6 +53,7 @@ from examples.battle_vignette.battle_unit import (  # noqa: E402
 # Battle configuration
 # ======================================================================
 
+
 class BattleConfig:
     """Describes one battle's unit layout."""
 
@@ -71,15 +72,18 @@ class BattleConfig:
 
 
 CAMPAIGN_BATTLES: list[BattleConfig] = [
-    BattleConfig(num_warriors=4, num_skeletons=3),                             # Easy
-    BattleConfig(num_warriors=4, num_skeletons=5),                             # Medium
-    BattleConfig(num_warriors=4, num_skeletons=6, skeleton_atk=30, skeleton_def=8),  # Hard
+    BattleConfig(num_warriors=4, num_skeletons=3),  # Easy
+    BattleConfig(num_warriors=4, num_skeletons=5),  # Medium
+    BattleConfig(
+        num_warriors=4, num_skeletons=6, skeleton_atk=30, skeleton_def=8
+    ),  # Hard
 ]
 
 
 # ======================================================================
 # CampaignBattleScene — BattleScene with configurable unit counts/stats
 # ======================================================================
+
 
 class CampaignBattleScene(BattleScene):
     """A BattleScene whose unit spawning is driven by a :class:`BattleConfig`.
@@ -135,6 +139,7 @@ class CampaignBattleScene(BattleScene):
     def _place_obstacles(self) -> None:
         """Place obstacles, reserving positions for the configured unit counts."""
         import random
+
         rng = random.Random(42 + self._battle_number)
 
         cfg = self._config
@@ -179,7 +184,10 @@ class CampaignBattleScene(BattleScene):
 
         if self.fsm.state == S_GAME_OVER:
             if event.action == "confirm":
-                if hasattr(self, "_game_over_result") and self._game_over_result == "victory":
+                if (
+                    hasattr(self, "_game_over_result")
+                    and self._game_over_result == "victory"
+                ):
                     if self._on_victory:
                         self._on_victory()
                 else:
@@ -197,6 +205,7 @@ class CampaignBattleScene(BattleScene):
 # Interstitial Scene — "Battle X Complete!"
 # ======================================================================
 
+
 class InterstitialScene(Scene):
     """Brief screen shown between campaign battles."""
 
@@ -210,29 +219,31 @@ class InterstitialScene(Scene):
         self._on_continue = on_continue
 
     def on_enter(self) -> None:
-        self.ui.add(Panel(
-            layout=Layout.VERTICAL,
-            spacing=30,
-            anchor=Anchor.CENTER,
-            style=Style(
-                background_color=(20, 20, 30, 220),
-                padding=80,
-            ),
-            children=[
-                Label(
-                    self._title_text,
-                    font_size=72,
-                    font="Arial",
-                    text_color=(255, 220, 80, 255),
+        self.ui.add(
+            Panel(
+                layout=Layout.VERTICAL,
+                spacing=30,
+                anchor=Anchor.CENTER,
+                style=Style(
+                    background_color=(20, 20, 30, 220),
+                    padding=80,
                 ),
-                Label(
-                    self._subtitle_text,
-                    font_size=28,
-                    font="Arial",
-                    text_color=(200, 200, 200, 255),
-                ),
-            ],
-        ))
+                children=[
+                    Label(
+                        self._title_text,
+                        font_size=72,
+                        font="Arial",
+                        text_color=(255, 220, 80, 255),
+                    ),
+                    Label(
+                        self._subtitle_text,
+                        font_size=28,
+                        font="Arial",
+                        text_color=(200, 200, 200, 255),
+                    ),
+                ],
+            )
+        )
 
     def handle_input(self, event: InputEvent) -> bool:
         if event.action == "confirm":
@@ -248,6 +259,7 @@ class InterstitialScene(Scene):
 # ======================================================================
 # CampaignScene — manages the 3-battle sequence
 # ======================================================================
+
 
 class CampaignScene(Scene):
     """Orchestrates a 3-battle campaign.
@@ -313,77 +325,80 @@ class CampaignScene(Scene):
 # Campaign Title Scene
 # ======================================================================
 
+
 class CampaignTitleScene(Scene):
     """Title screen for the campaign mode."""
 
     background_color = (15, 18, 30, 255)
 
     def on_enter(self) -> None:
-        self.ui.add(Panel(
-            layout=Layout.VERTICAL,
-            spacing=20,
-            anchor=Anchor.CENTER,
-            style=Style(
-                background_color=(20, 20, 30, 220),
-                padding=60,
-            ),
-            children=[
-                Label(
-                    "TACTICAL CAMPAIGN",
-                    font_size=80,
-                    font="Arial",
-                    text_color=(255, 220, 80, 255),
+        self.ui.add(
+            Panel(
+                layout=Layout.VERTICAL,
+                spacing=20,
+                anchor=Anchor.CENTER,
+                style=Style(
+                    background_color=(20, 20, 30, 220),
+                    padding=60,
                 ),
-                Label(
-                    "3 Battles  --  Warriors vs Skeletons",
-                    font_size=32,
-                    font="Arial",
-                    text_color=(180, 170, 140, 255),
-                ),
-                Label(
-                    "",
-                    font_size=16,
-                    font="Arial",
-                    text_color=(0, 0, 0, 0),
-                ),
-                Label(
-                    "Battle 1:  4 warriors vs 3 skeletons (easy)",
-                    font_size=22,
-                    font="Arial",
-                    text_color=(160, 180, 160, 255),
-                ),
-                Label(
-                    "Battle 2:  4 warriors vs 5 skeletons (medium)",
-                    font_size=22,
-                    font="Arial",
-                    text_color=(180, 180, 140, 255),
-                ),
-                Label(
-                    "Battle 3:  4 warriors vs 6 boosted skeletons (hard)",
-                    font_size=22,
-                    font="Arial",
-                    text_color=(200, 140, 140, 255),
-                ),
-                Label(
-                    "",
-                    font_size=16,
-                    font="Arial",
-                    text_color=(0, 0, 0, 0),
-                ),
-                Label(
-                    "Press ENTER to begin campaign",
-                    font_size=28,
-                    font="Arial",
-                    text_color=(200, 200, 200, 255),
-                ),
-                Label(
-                    "ESC to quit",
-                    font_size=20,
-                    font="Arial",
-                    text_color=(120, 120, 130, 255),
-                ),
-            ],
-        ))
+                children=[
+                    Label(
+                        "TACTICAL CAMPAIGN",
+                        font_size=80,
+                        font="Arial",
+                        text_color=(255, 220, 80, 255),
+                    ),
+                    Label(
+                        "3 Battles  --  Warriors vs Skeletons",
+                        font_size=32,
+                        font="Arial",
+                        text_color=(180, 170, 140, 255),
+                    ),
+                    Label(
+                        "",
+                        font_size=16,
+                        font="Arial",
+                        text_color=(0, 0, 0, 0),
+                    ),
+                    Label(
+                        "Battle 1:  4 warriors vs 3 skeletons (easy)",
+                        font_size=22,
+                        font="Arial",
+                        text_color=(160, 180, 160, 255),
+                    ),
+                    Label(
+                        "Battle 2:  4 warriors vs 5 skeletons (medium)",
+                        font_size=22,
+                        font="Arial",
+                        text_color=(180, 180, 140, 255),
+                    ),
+                    Label(
+                        "Battle 3:  4 warriors vs 6 boosted skeletons (hard)",
+                        font_size=22,
+                        font="Arial",
+                        text_color=(200, 140, 140, 255),
+                    ),
+                    Label(
+                        "",
+                        font_size=16,
+                        font="Arial",
+                        text_color=(0, 0, 0, 0),
+                    ),
+                    Label(
+                        "Press ENTER to begin campaign",
+                        font_size=28,
+                        font="Arial",
+                        text_color=(200, 200, 200, 255),
+                    ),
+                    Label(
+                        "ESC to quit",
+                        font_size=20,
+                        font="Arial",
+                        text_color=(120, 120, 130, 255),
+                    ),
+                ],
+            )
+        )
 
     def handle_input(self, event: InputEvent) -> bool:
         if event.action == "confirm":
@@ -398,6 +413,7 @@ class CampaignTitleScene(Scene):
 # ======================================================================
 # Helpers
 # ======================================================================
+
 
 def _centered_rows(count: int, total_rows: int = 6) -> list[int]:
     """Return *count* row indices centred within 0..total_rows-1.
@@ -415,6 +431,7 @@ def _centered_rows(count: int, total_rows: int = 6) -> list[int]:
 # ======================================================================
 # Main
 # ======================================================================
+
 
 def main() -> None:
     asset_path = Path(__file__).resolve().parent / "assets"

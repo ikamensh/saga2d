@@ -56,10 +56,10 @@ def make_sword_hit() -> np.ndarray:
 
     # Mix of metallic frequencies
     signal = (
-        0.5 * np.sin(2 * np.pi * 800 * t) +
-        0.3 * np.sin(2 * np.pi * 1200 * t) +
-        0.2 * np.sin(2 * np.pi * 2400 * t) +
-        0.15 * np.sin(2 * np.pi * 3600 * t)
+        0.5 * np.sin(2 * np.pi * 800 * t)
+        + 0.3 * np.sin(2 * np.pi * 1200 * t)
+        + 0.2 * np.sin(2 * np.pi * 2400 * t)
+        + 0.15 * np.sin(2 * np.pi * 3600 * t)
     )
 
     # Add noise burst at start
@@ -103,10 +103,7 @@ def make_select() -> np.ndarray:
     t = np.linspace(0, duration, n)
 
     # High-pitched blip
-    signal = (
-        0.6 * np.sin(2 * np.pi * 1000 * t) +
-        0.4 * np.sin(2 * np.pi * 1500 * t)
-    )
+    signal = 0.6 * np.sin(2 * np.pi * 1000 * t) + 0.4 * np.sin(2 * np.pi * 1500 * t)
 
     env = np.exp(-t * 40) * _envelope(n, attack=0.002, decay=0.02)
     return signal * env

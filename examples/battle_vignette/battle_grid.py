@@ -76,6 +76,7 @@ HIGHLIGHT_ATTACK: tuple[int, int, int, int] = (244, 63, 94, 80)
 # SquareGrid
 # ---------------------------------------------------------------------------
 
+
 class SquareGrid:
     """An 8x6 (by default) square-tile grid for tactical battles.
 
@@ -107,9 +108,7 @@ class SquareGrid:
         self.terrain: list[list[str]] = self._generate_terrain(seed)
 
         # occupancy[row][col] → unit reference or None
-        self.occupancy: list[list[Any | None]] = [
-            [None] * cols for _ in range(rows)
-        ]
+        self.occupancy: list[list[Any | None]] = [[None] * cols for _ in range(rows)]
 
         # obstacles: set of (col, row) tuples for impassable cells
         self.obstacles: set[tuple[int, int]] = set()
@@ -129,8 +128,7 @@ class SquareGrid:
         weights = [w for _, w in _TERRAIN_WEIGHTS]
 
         return [
-            rng.choices(types, weights=weights, k=self.cols)
-            for _ in range(self.rows)
+            rng.choices(types, weights=weights, k=self.cols) for _ in range(self.rows)
         ]
 
     # ------------------------------------------------------------------

@@ -90,6 +90,7 @@ IDLE_BOB_SPEED: float = 2.0
 # FloatingNumber (ephemeral world-positioned text)
 # ======================================================================
 
+
 class FloatingNumber:
     """A damage/heal number that floats up and fades out.
 
@@ -97,7 +98,9 @@ class FloatingNumber:
     The owning scene draws these each frame via ``backend.draw_text()``.
     """
 
-    def __init__(self, text: str, x: float, y: float, color: tuple[int, int, int, int]) -> None:
+    def __init__(
+        self, text: str, x: float, y: float, color: tuple[int, int, int, int]
+    ) -> None:
         self.text = text
         self.x = x
         self.y = y
@@ -109,6 +112,7 @@ class FloatingNumber:
 # ======================================================================
 # BaseUnit
 # ======================================================================
+
 
 class BaseUnit:
     """Rich game-logic wrapper around a Saga2D :class:`Sprite`.
@@ -214,7 +218,12 @@ class BaseUnit:
         )
         scene.add_sprite(sprite)
         unit = cls(
-            sprite, scene, grid, team, col, row,
+            sprite,
+            scene,
+            grid,
+            team,
+            col,
+            row,
             hp=cls._default_hp(),
             atk=cls._default_atk(),
             def_=cls._default_def(),
@@ -342,23 +351,44 @@ class BaseUnit:
         def pulse_up() -> None:
             if ring.is_removed:
                 return
-            self._ring_tween_ids.append(tween(
-                ring, "opacity", 120.0, 255.0, 0.6,
-                ease=Ease.EASE_IN_OUT, on_complete=pulse_down,
-            ))
+            self._ring_tween_ids.append(
+                tween(
+                    ring,
+                    "opacity",
+                    120.0,
+                    255.0,
+                    0.6,
+                    ease=Ease.EASE_IN_OUT,
+                    on_complete=pulse_down,
+                )
+            )
 
         def pulse_down() -> None:
             if ring.is_removed:
                 return
-            self._ring_tween_ids.append(tween(
-                ring, "opacity", 255.0, 120.0, 0.6,
-                ease=Ease.EASE_IN_OUT, on_complete=pulse_up,
-            ))
+            self._ring_tween_ids.append(
+                tween(
+                    ring,
+                    "opacity",
+                    255.0,
+                    120.0,
+                    0.6,
+                    ease=Ease.EASE_IN_OUT,
+                    on_complete=pulse_up,
+                )
+            )
 
-        self._ring_tween_ids.append(tween(
-            ring, "opacity", 255.0, 120.0, 0.6,
-            ease=Ease.EASE_IN_OUT, on_complete=pulse_up,
-        ))
+        self._ring_tween_ids.append(
+            tween(
+                ring,
+                "opacity",
+                255.0,
+                120.0,
+                0.6,
+                ease=Ease.EASE_IN_OUT,
+                on_complete=pulse_up,
+            )
+        )
 
     def _stop_ring_pulse(self) -> None:
         for tid in self._ring_tween_ids:
@@ -406,7 +436,10 @@ class BaseUnit:
             alpha = max(0, min(255, int(f.opacity)))
             r, g, b, _ = f.color
             backend.draw_text(
-                f.text, int(f.x), int(f.y), 24,
+                f.text,
+                int(f.x),
+                int(f.y),
+                24,
                 (r, g, b, alpha),
                 font="Arial",
             )
@@ -448,15 +481,17 @@ class BaseUnit:
 
         # Hit sparkle particles
         sx, sy = self.sprite.position
-        self.scene.add_emitter(ParticleEmitter(
-            ["particles/spark", "particles/blood"],
-            position=(sx, sy - SPRITE_SIZE // 2),
-            count=8,
-            speed=(40, 150),
-            direction=(0, 360),
-            lifetime=(0.15, 0.4),
-            fade_out=True,
-        )).burst()
+        self.scene.add_emitter(
+            ParticleEmitter(
+                ["particles/spark", "particles/blood"],
+                position=(sx, sy - SPRITE_SIZE // 2),
+                count=8,
+                speed=(40, 150),
+                direction=(0, 360),
+                lifetime=(0.15, 0.4),
+                fade_out=True,
+            )
+        ).burst()
 
         # Spawn floating damage number
         floater = FloatingNumber(
@@ -466,19 +501,33 @@ class BaseUnit:
             color=(255, 80, 80, 255),
         )
         self.floaters.append(floater)
-        tween(floater, "y", floater.y, floater.y - FLOAT_RISE, FLOAT_DURATION,
-              ease=Ease.EASE_OUT)
-        tween(floater, "opacity", 255.0, 0.0, FLOAT_DURATION,
-              ease=Ease.EASE_IN,
-              on_complete=lambda: setattr(floater, "alive", False))
+        tween(
+            floater,
+            "y",
+            floater.y,
+            floater.y - FLOAT_RISE,
+            FLOAT_DURATION,
+            ease=Ease.EASE_OUT,
+        )
+        tween(
+            floater,
+            "opacity",
+            255.0,
+            0.0,
+            FLOAT_DURATION,
+            ease=Ease.EASE_IN,
+            on_complete=lambda: setattr(floater, "alive", False),
+        )
 
         if self.hp <= 0:
             self._die(on_death)
         else:
-            self.sprite.do(Sequence(
-                PlayAnim(self.anim_hit),
-                Do(lambda: self.sprite.play(self.anim_idle)),
-            ))
+            self.sprite.do(
+                Sequence(
+                    PlayAnim(self.anim_hit),
+                    Do(lambda: self.sprite.play(self.anim_idle)),
+                )
+            )
 
     def _die(self, on_death: Callable[[], Any] | None = None) -> None:
         """Play death animation, fade out, and remove the sprite."""
@@ -488,15 +537,17 @@ class BaseUnit:
 
         # Death dust burst
         sx, sy = self.sprite.position
-        self.scene.add_emitter(ParticleEmitter(
-            "particles/dust",
-            position=(sx, sy - SPRITE_SIZE // 2),
-            count=15,
-            speed=(20, 100),
-            direction=(180, 360),  # upward fan
-            lifetime=(0.3, 0.8),
-            fade_out=True,
-        )).burst()
+        self.scene.add_emitter(
+            ParticleEmitter(
+                "particles/dust",
+                position=(sx, sy - SPRITE_SIZE // 2),
+                count=15,
+                speed=(20, 100),
+                direction=(180, 360),  # upward fan
+                lifetime=(0.3, 0.8),
+                fade_out=True,
+            )
+        ).burst()
 
         # Clear occupancy
         if self.grid.in_bounds(self.col, self.row):
@@ -551,14 +602,16 @@ class BaseUnit:
 
         def apply_hit() -> None:
             def walk_home() -> None:
-                attacker.sprite.do(Sequence(
-                    Parallel(
-                        PlayAnim(attacker.anim_walk),
-                        MoveTo(home_pos, speed=MOVE_SPEED),
-                    ),
-                    Do(lambda: attacker.sprite.play(attacker.anim_idle)),
-                    *([] if on_complete is None else [Do(on_complete)]),
-                ))
+                attacker.sprite.do(
+                    Sequence(
+                        Parallel(
+                            PlayAnim(attacker.anim_walk),
+                            MoveTo(home_pos, speed=MOVE_SPEED),
+                        ),
+                        Do(lambda: attacker.sprite.play(attacker.anim_idle)),
+                        *([] if on_complete is None else [Do(on_complete)]),
+                    )
+                )
 
             target.take_damage(attacker.atk, on_death=walk_home)
 
@@ -598,6 +651,7 @@ class BaseUnit:
 # ======================================================================
 # WarriorUnit
 # ======================================================================
+
 
 class WarriorUnit(BaseUnit):
     """Armoured melee warrior.  120 HP / 25 ATK / 10 DEF / 3 MOV / 1 RNG."""
@@ -658,6 +712,7 @@ class WarriorUnit(BaseUnit):
 # ======================================================================
 # SkeletonUnit
 # ======================================================================
+
 
 class SkeletonUnit(BaseUnit):
     """Undead ranged skeleton.  80 HP / 20 ATK / 5 DEF / 4 MOV / 2 RNG."""

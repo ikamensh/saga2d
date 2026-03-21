@@ -50,6 +50,7 @@ type Decision = (
 # BFS distance helper
 # ======================================================================
 
+
 def _bfs_distance(
     grid: SquareGrid,
     start_col: int,
@@ -91,6 +92,7 @@ def _chebyshev(c1: int, r1: int, c2: int, r2: int) -> int:
 # ======================================================================
 # BattleAI
 # ======================================================================
+
 
 class BattleAI:
     """Greedy tactical AI for a single unit.
@@ -222,7 +224,11 @@ class BattleAI:
                 continue
             cheb = _chebyshev(mc, mr, nearest_enemy.col, nearest_enemy.row)
             # Primary: BFS distance.  Secondary: Chebyshev.  Tertiary: grid order.
-            if (d, cheb, (mr, mc)) < (best_bfs, best_cheb, (best[1], best[0]) if best else (float("inf"), float("inf"))):
+            if (d, cheb, (mr, mc)) < (
+                best_bfs,
+                best_cheb,
+                (best[1], best[0]) if best else (float("inf"), float("inf")),
+            ):
                 best_bfs = d
                 best_cheb = cheb
                 best = (mc, mr)
