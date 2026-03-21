@@ -23,6 +23,7 @@ from saga2d.save import SaveManager
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def save_dir(tmp_path: Path) -> Path:
     """Return a temporary directory for save files."""
@@ -50,11 +51,14 @@ def game_with_saves(tmp_path: Path) -> Game:
 # SaveManager — basic I/O
 # ---------------------------------------------------------------------------
 
+
 class TestSaveManagerSave:
     """Test SaveManager.save() file writing."""
 
     def test_save_creates_directory(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """save() creates the save directory if it doesn't exist."""
         assert not save_dir.exists()
@@ -63,14 +67,18 @@ class TestSaveManagerSave:
         assert save_dir.is_dir()
 
     def test_save_creates_file(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """save() creates a save_N.json file in the save directory."""
         manager.save(1, {"gold": 100}, "WorldScene")
         assert (save_dir / "save_1.json").exists()
 
     def test_save_file_is_valid_json(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """The save file is valid, human-readable JSON."""
         manager.save(1, {"gold": 100}, "WorldScene")
@@ -79,7 +87,9 @@ class TestSaveManagerSave:
         assert isinstance(data, dict)
 
     def test_save_file_format(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """The save file contains version, timestamp, scene_class, state."""
         manager.save(1, {"gold": 100}, "WorldScene")
@@ -92,7 +102,9 @@ class TestSaveManagerSave:
         assert data["state"] == {"gold": 100}
 
     def test_save_timestamp_is_iso_format(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """The timestamp is a valid ISO 8601 datetime string."""
         from datetime import datetime
@@ -106,7 +118,9 @@ class TestSaveManagerSave:
         assert dt.year >= 2024
 
     def test_save_different_slots(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """Saving to different slots creates separate files."""
         manager.save(1, {"slot": 1}, "Scene1")
@@ -117,7 +131,9 @@ class TestSaveManagerSave:
         assert (save_dir / "save_3.json").exists()
 
     def test_save_overwrites_existing(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """Saving to an existing slot overwrites the old data."""
         manager.save(1, {"gold": 100}, "WorldScene")
@@ -132,17 +148,20 @@ class TestSaveManagerSave:
 # SaveManager — load
 # ---------------------------------------------------------------------------
 
+
 class TestSaveManagerLoad:
     """Test SaveManager.load() file reading."""
 
     def test_load_empty_slot_returns_none(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Loading from a non-existent slot returns None."""
         assert manager.load(1) is None
 
     def test_load_returns_saved_data(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """load() returns the full dict written by save()."""
         manager.save(1, {"gold": 500, "units": ["knight"]}, "MapScene")
@@ -154,7 +173,8 @@ class TestSaveManagerLoad:
         assert data["state"]["units"] == ["knight"]
 
     def test_save_load_round_trip(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Data survives a save → load round-trip intact."""
         original_state = {
@@ -172,7 +192,8 @@ class TestSaveManagerLoad:
         assert loaded["state"] == original_state
 
     def test_load_different_slot_is_independent(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Loading from one slot doesn't affect another."""
         manager.save(1, {"slot": 1}, "Scene1")
@@ -185,11 +206,13 @@ class TestSaveManagerLoad:
 # SaveManager — list_slots
 # ---------------------------------------------------------------------------
 
+
 class TestSaveManagerListSlots:
     """Test SaveManager.list_slots() slot listing."""
 
     def test_list_slots_all_empty(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """list_slots returns all None for empty save directory."""
         slots = manager.list_slots(count=5)
@@ -197,7 +220,8 @@ class TestSaveManagerListSlots:
         assert all(s is None for s in slots)
 
     def test_list_slots_with_some_saves(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """list_slots returns data for occupied slots, None for empty."""
         manager.save(1, {"gold": 100}, "Scene1")
@@ -205,13 +229,14 @@ class TestSaveManagerListSlots:
         slots = manager.list_slots(count=5)
         assert len(slots) == 5
         assert slots[0] is not None  # slot 1
-        assert slots[1] is None      # slot 2
+        assert slots[1] is None  # slot 2
         assert slots[2] is not None  # slot 3
-        assert slots[3] is None      # slot 4
-        assert slots[4] is None      # slot 5
+        assert slots[3] is None  # slot 4
+        assert slots[4] is None  # slot 5
 
     def test_list_slots_includes_slot_number(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """list_slots adds a 'slot' key to each non-None entry."""
         manager.save(2, {"x": 1}, "S")
@@ -220,14 +245,16 @@ class TestSaveManagerListSlots:
         assert slots[1]["slot"] == 2  # type: ignore[index]
 
     def test_list_slots_default_count(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """list_slots defaults to 10 slots."""
         slots = manager.list_slots()
         assert len(slots) == 10
 
     def test_list_slots_contains_metadata(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """list_slots entries contain version, timestamp, scene_class."""
         manager.save(1, {"gold": 100}, "MyScene")
@@ -244,11 +271,14 @@ class TestSaveManagerListSlots:
 # SaveManager — delete
 # ---------------------------------------------------------------------------
 
+
 class TestSaveManagerDelete:
     """Test SaveManager.delete() slot deletion."""
 
     def test_delete_removes_save_file(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """delete() removes the save file for the slot."""
         manager.save(1, {"gold": 100}, "Scene")
@@ -257,7 +287,8 @@ class TestSaveManagerDelete:
         assert not (save_dir / "save_1.json").exists()
 
     def test_delete_makes_load_return_none(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """After delete(), load() returns None for that slot."""
         manager.save(1, {"gold": 100}, "Scene")
@@ -265,13 +296,15 @@ class TestSaveManagerDelete:
         assert manager.load(1) is None
 
     def test_delete_empty_slot_is_noop(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Deleting an empty slot does not raise."""
         manager.delete(99)  # Should not raise.
 
     def test_delete_does_not_affect_other_slots(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Deleting one slot doesn't affect others."""
         manager.save(1, {"slot": 1}, "S")
@@ -285,11 +318,14 @@ class TestSaveManagerDelete:
 # SaveManager — slot_path
 # ---------------------------------------------------------------------------
 
+
 class TestSlotPath:
     """Test SaveManager._slot_path() internal helper."""
 
     def test_slot_path_format(
-        self, manager: SaveManager, save_dir: Path,
+        self,
+        manager: SaveManager,
+        save_dir: Path,
     ) -> None:
         """_slot_path returns save_dir / save_N.json."""
         assert manager._slot_path(1) == save_dir / "save_1.json"
@@ -299,6 +335,7 @@ class TestSlotPath:
 # ---------------------------------------------------------------------------
 # Scene — get_save_state / load_save_state stubs
 # ---------------------------------------------------------------------------
+
 
 class TestSceneSaveStubs:
     """Test Scene base class save/load methods."""
@@ -349,11 +386,14 @@ class TestSceneSaveStubs:
 # Game — save / load integration
 # ---------------------------------------------------------------------------
 
+
 class TestGameSave:
     """Test Game.save() integration."""
 
     def test_game_save_writes_to_disk(
-        self, game_with_saves: Game, tmp_path: Path,
+        self,
+        game_with_saves: Game,
+        tmp_path: Path,
     ) -> None:
         """game.save() creates a save file on disk."""
 
@@ -367,7 +407,9 @@ class TestGameSave:
         assert path.exists()
 
     def test_game_save_includes_scene_class_name(
-        self, game_with_saves: Game, tmp_path: Path,
+        self,
+        game_with_saves: Game,
+        tmp_path: Path,
     ) -> None:
         """game.save() records the scene's class name."""
 
@@ -383,7 +425,9 @@ class TestGameSave:
         assert data["scene_class"] == "WorldMapScene"
 
     def test_game_save_stores_state(
-        self, game_with_saves: Game, tmp_path: Path,
+        self,
+        game_with_saves: Game,
+        tmp_path: Path,
     ) -> None:
         """game.save() stores the result of get_save_state()."""
 
@@ -399,14 +443,18 @@ class TestGameSave:
         assert data["state"] == {"hp": 100, "mp": 50}
 
     def test_game_save_empty_stack_is_noop(
-        self, game_with_saves: Game, tmp_path: Path,
+        self,
+        game_with_saves: Game,
+        tmp_path: Path,
     ) -> None:
         """game.save() does nothing if no scene is on the stack."""
         game_with_saves.save(1)
         assert not (tmp_path / "saves" / "save_1.json").exists()
 
     def test_game_save_base_scene_stores_empty_dict(
-        self, game_with_saves: Game, tmp_path: Path,
+        self,
+        game_with_saves: Game,
+        tmp_path: Path,
     ) -> None:
         """A base Scene (no override) saves an empty state dict."""
         game_with_saves.push(Scene())
@@ -421,7 +469,8 @@ class TestGameLoad:
     """Test Game.load() integration."""
 
     def test_game_load_returns_save_data(
-        self, game_with_saves: Game,
+        self,
+        game_with_saves: Game,
     ) -> None:
         """game.load() returns the full save dict after game.save()."""
 
@@ -437,13 +486,15 @@ class TestGameLoad:
         assert data["scene_class"] == "MyScene"
 
     def test_game_load_empty_slot_returns_none(
-        self, game_with_saves: Game,
+        self,
+        game_with_saves: Game,
     ) -> None:
         """game.load() returns None for an empty slot."""
         assert game_with_saves.load(99) is None
 
     def test_game_save_load_round_trip(
-        self, game_with_saves: Game,
+        self,
+        game_with_saves: Game,
     ) -> None:
         """Full round-trip: save scene state, load it, restore."""
 
@@ -479,25 +530,31 @@ class TestGameLoad:
 # Game — save_manager property
 # ---------------------------------------------------------------------------
 
+
 class TestGameSaveManager:
     """Test Game.save_manager lazy property."""
 
     def test_save_manager_is_lazy(self, tmp_path: Path) -> None:
         """save_manager is not created until first access."""
         game = Game(
-            "Test", backend="mock", save_dir=tmp_path / "s",
+            "Test",
+            backend="mock",
+            save_dir=tmp_path / "s",
         )
         assert game._save_manager is None
         _ = game.save_manager
         assert game._save_manager is not None
 
     def test_save_manager_uses_explicit_save_dir(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """save_manager uses the save_dir passed to Game()."""
         custom_dir = tmp_path / "custom_saves"
         game = Game(
-            "Test", backend="mock", save_dir=custom_dir,
+            "Test",
+            backend="mock",
+            save_dir=custom_dir,
         )
         sm = game.save_manager
         assert sm._save_dir == custom_dir
@@ -517,11 +574,14 @@ class TestGameSaveManager:
         assert sm._save_dir == expected
 
     def test_save_manager_same_instance_on_repeated_access(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Repeated access returns the same SaveManager instance."""
         game = Game(
-            "Test", backend="mock", save_dir=tmp_path,
+            "Test",
+            backend="mock",
+            save_dir=tmp_path,
         )
         sm1 = game.save_manager
         sm2 = game.save_manager
@@ -530,7 +590,9 @@ class TestGameSaveManager:
     def test_save_dir_accepts_string(self, tmp_path: Path) -> None:
         """save_dir parameter accepts a string path."""
         game = Game(
-            "Test", backend="mock", save_dir=str(tmp_path / "saves"),
+            "Test",
+            backend="mock",
+            save_dir=str(tmp_path / "saves"),
         )
         sm = game.save_manager
         assert sm._save_dir == tmp_path / "saves"
@@ -540,11 +602,13 @@ class TestGameSaveManager:
 # Edge cases
 # ---------------------------------------------------------------------------
 
+
 class TestEdgeCases:
     """Edge cases and robustness tests."""
 
     def test_save_complex_nested_state(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Complex nested dicts and lists round-trip correctly."""
         state = {
@@ -567,7 +631,8 @@ class TestEdgeCases:
         assert loaded["state"] == state
 
     def test_save_empty_state(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Saving an empty state dict works."""
         manager.save(1, {}, "EmptyScene")
@@ -576,7 +641,8 @@ class TestEdgeCases:
         assert loaded["state"] == {}
 
     def test_save_state_with_unicode(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Unicode characters in state survive round-trip."""
         state = {"name": "Héro", "quest": "Aller à la montagne 🏔️"}
@@ -587,7 +653,8 @@ class TestEdgeCases:
         assert "🏔️" in loaded["state"]["quest"]
 
     def test_save_large_slot_number(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Large slot numbers work fine."""
         manager.save(999, {"x": 1}, "S")
@@ -596,7 +663,8 @@ class TestEdgeCases:
         assert loaded["state"]["x"] == 1
 
     def test_save_numeric_values_preserved(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Integer and float values are preserved through JSON."""
         state = {"int_val": 42, "float_val": 3.14, "neg": -100}
@@ -608,7 +676,8 @@ class TestEdgeCases:
         assert loaded["state"]["neg"] == -100
 
     def test_overwrite_updates_timestamp(
-        self, manager: SaveManager,
+        self,
+        manager: SaveManager,
     ) -> None:
         """Overwriting a slot updates the timestamp."""
         import time
@@ -624,7 +693,8 @@ class TestEdgeCases:
         assert loaded["state"]["v"] == 2
 
     def test_multiple_managers_same_directory(
-        self, save_dir: Path,
+        self,
+        save_dir: Path,
     ) -> None:
         """Two SaveManagers pointing at the same dir see the same files."""
         m1 = SaveManager(save_dir)
@@ -635,7 +705,8 @@ class TestEdgeCases:
         assert loaded["state"]["from"] == "m1"
 
     def test_corrupted_save_error_includes_recovery_hint(
-        self, save_dir: Path,
+        self,
+        save_dir: Path,
     ) -> None:
         """SaveError message includes a recovery hint about deleting the file."""
         from saga2d.save import SaveError
@@ -649,7 +720,8 @@ class TestEdgeCases:
             manager.load(1)
 
     def test_corrupted_save_error_includes_slot_and_path(
-        self, save_dir: Path,
+        self,
+        save_dir: Path,
     ) -> None:
         """SaveError message includes slot number and file path."""
         from saga2d.save import SaveError

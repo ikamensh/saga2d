@@ -13,6 +13,7 @@ from saga2d.backends.mock_backend import MockBackend
 # Fixtures
 # ------------------------------------------------------------------
 
+
 @pytest.fixture
 def asset_dir(tmp_path: Path) -> Path:
     """Create a temporary asset directory with test images."""
@@ -42,6 +43,7 @@ def backend(game: Game) -> MockBackend:
 # ------------------------------------------------------------------
 # add_sprite registers ownership
 # ------------------------------------------------------------------
+
 
 def test_add_sprite_returns_the_sprite(game: Game) -> None:
     """add_sprite returns the same sprite for chaining."""
@@ -91,6 +93,7 @@ def test_add_sprite_ignores_removed_sprite(game: Game) -> None:
 # ------------------------------------------------------------------
 # remove_sprite explicit removal
 # ------------------------------------------------------------------
+
 
 def test_remove_sprite_removes_from_backend(game: Game, backend: MockBackend) -> None:
     """remove_sprite destroys the sprite in the backend."""
@@ -144,16 +147,14 @@ def test_remove_sprite_safe_on_unowned(game: Game) -> None:
 # Auto-cleanup on scene exit (pop)
 # ------------------------------------------------------------------
 
+
 def test_pop_removes_owned_sprites(game: Game, backend: MockBackend) -> None:
     """Popping a scene auto-removes all owned sprites."""
+
     class GameScene(Scene):
         def on_enter(self) -> None:
-            self.s1 = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
-            self.s2 = self.add_sprite(
-                Sprite("sprites/tree", position=(200, 200))
-            )
+            self.s1 = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
+            self.s2 = self.add_sprite(Sprite("sprites/tree", position=(200, 200)))
 
     scene = GameScene()
     game.push(scene)
@@ -176,9 +177,7 @@ def test_pop_calls_on_exit_before_cleanup(game: Game) -> None:
 
     class GameScene(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.s = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
 
         def on_exit(self) -> None:
             # Sprite should still be alive during on_exit
@@ -197,9 +196,7 @@ def test_unowned_sprites_survive_scene_exit(game: Game, backend: MockBackend) ->
     class GameScene(Scene):
         def on_enter(self) -> None:
             nonlocal unowned_sprite
-            self.owned = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.owned = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
             unowned_sprite = Sprite("sprites/tree", position=(200, 200))
 
     scene = GameScene()
@@ -220,13 +217,13 @@ def test_unowned_sprites_survive_scene_exit(game: Game, backend: MockBackend) ->
 # Auto-cleanup on push (old scene exits)
 # ------------------------------------------------------------------
 
+
 def test_push_cleans_up_old_scene_sprites(game: Game, backend: MockBackend) -> None:
     """Pushing a new scene cleans up the old scene's owned sprites."""
+
     class SceneA(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.s = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
 
     scene_a = SceneA()
     game.push(scene_a)
@@ -243,13 +240,13 @@ def test_push_cleans_up_old_scene_sprites(game: Game, backend: MockBackend) -> N
 # Auto-cleanup on replace
 # ------------------------------------------------------------------
 
+
 def test_replace_cleans_up_old_scene_sprites(game: Game, backend: MockBackend) -> None:
     """Replacing a scene cleans up the old scene's owned sprites."""
+
     class SceneA(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.s = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
 
     scene_a = SceneA()
     game.push(scene_a)
@@ -265,21 +262,20 @@ def test_replace_cleans_up_old_scene_sprites(game: Game, backend: MockBackend) -
 # Auto-cleanup on clear_and_push
 # ------------------------------------------------------------------
 
+
 def test_clear_and_push_cleans_up_all_scene_sprites(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """clear_and_push cleans up sprites from ALL cleared scenes."""
+
     class SceneA(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.s = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
 
     class SceneB(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/tree", position=(200, 200))
-            )
+            self.s = self.add_sprite(Sprite("sprites/tree", position=(200, 200)))
 
     scene_a = SceneA()
     scene_b = SceneB()
@@ -298,6 +294,7 @@ def test_clear_and_push_cleans_up_all_scene_sprites(
 # Early removal via sprite.remove() deregisters from scene
 # ------------------------------------------------------------------
 
+
 def test_sprite_remove_deregisters_from_scene(game: Game) -> None:
     """Calling sprite.remove() directly deregisters from owning scene."""
     scene = Scene()
@@ -312,15 +309,14 @@ def test_sprite_remove_deregisters_from_scene(game: Game) -> None:
 
 
 def test_early_remove_then_scene_exit_no_double_remove(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Sprite removed early is not double-removed when scene exits."""
 
     class GameScene(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.s = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
 
     scene = GameScene()
     game.push(scene)
@@ -336,19 +332,15 @@ def test_early_remove_then_scene_exit_no_double_remove(
 # Multiple sprites: partial early removal
 # ------------------------------------------------------------------
 
+
 def test_partial_early_removal(game: Game, backend: MockBackend) -> None:
     """Some sprites removed early, rest cleaned up on scene exit."""
+
     class GameScene(Scene):
         def on_enter(self) -> None:
-            self.s1 = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
-            self.s2 = self.add_sprite(
-                Sprite("sprites/tree", position=(200, 200))
-            )
-            self.s3 = self.add_sprite(
-                Sprite("sprites/arrow", position=(300, 300))
-            )
+            self.s1 = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
+            self.s2 = self.add_sprite(Sprite("sprites/tree", position=(200, 200)))
+            self.s3 = self.add_sprite(Sprite("sprites/arrow", position=(300, 300)))
 
     scene = GameScene()
     game.push(scene)
@@ -373,6 +365,7 @@ def test_partial_early_removal(game: Game, backend: MockBackend) -> None:
 # Scene with no owned sprites: cleanup is harmless
 # ------------------------------------------------------------------
 
+
 def test_scene_without_owned_sprites_exits_cleanly(game: Game) -> None:
     """A scene that never calls add_sprite exits without error."""
     game.push(Scene())
@@ -383,13 +376,13 @@ def test_scene_without_owned_sprites_exits_cleanly(game: Game) -> None:
 # Deferred operations preserve cleanup semantics
 # ------------------------------------------------------------------
 
+
 def test_deferred_pop_cleans_up_sprites(game: Game, backend: MockBackend) -> None:
     """Deferred pop (during tick) still cleans up owned sprites."""
+
     class GameScene(Scene):
         def on_enter(self) -> None:
-            self.s = self.add_sprite(
-                Sprite("sprites/knight", position=(100, 100))
-            )
+            self.s = self.add_sprite(Sprite("sprites/knight", position=(100, 100)))
 
         def update(self, dt: float) -> None:
             self.game.pop()

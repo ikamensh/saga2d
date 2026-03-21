@@ -39,6 +39,7 @@ def asset_dir(tmp_path: Path) -> Path:
 # Basic loading
 # ------------------------------------------------------------------
 
+
 def test_image_loads_png_by_name(backend: MockBackend, asset_dir: Path) -> None:
     """image('sprites/knight') loads <base>/images/sprites/knight.png."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -51,7 +52,8 @@ def test_image_loads_png_by_name(backend: MockBackend, asset_dir: Path) -> None:
 
 
 def test_image_loads_with_explicit_extension(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """image('backgrounds/forest.jpg') loads the .jpg directly."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -66,6 +68,7 @@ def test_image_loads_with_explicit_extension(
 # Caching
 # ------------------------------------------------------------------
 
+
 def test_image_caches_by_name(backend: MockBackend, asset_dir: Path) -> None:
     """Calling image() twice with the same name returns the same handle."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -77,7 +80,8 @@ def test_image_caches_by_name(backend: MockBackend, asset_dir: Path) -> None:
 
 
 def test_image_cache_keyed_by_name_not_path(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """Different names produce different handles even if they could resolve similarly."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -92,8 +96,10 @@ def test_image_cache_keyed_by_name_not_path(
 # @2x variant loading
 # ------------------------------------------------------------------
 
+
 def test_prefers_2x_variant_when_scale_high(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """With scale_factor >= 1.5, loads knight@2x.png instead of knight.png."""
     mgr = AssetManager(backend, base_path=asset_dir, scale_factor=2.0)
@@ -104,7 +110,8 @@ def test_prefers_2x_variant_when_scale_high(
 
 
 def test_falls_back_to_1x_when_no_2x(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """With high scale_factor but no @2x file, falls back to base image."""
     mgr = AssetManager(backend, base_path=asset_dir, scale_factor=2.0)
@@ -118,7 +125,8 @@ def test_falls_back_to_1x_when_no_2x(
 
 
 def test_loads_1x_when_scale_low(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """With scale_factor < 1.5, always loads base file even if @2x exists."""
     mgr = AssetManager(backend, base_path=asset_dir, scale_factor=1.0)
@@ -135,8 +143,10 @@ def test_loads_1x_when_scale_low(
 # Error handling
 # ------------------------------------------------------------------
 
+
 def test_missing_asset_raises_with_clear_message(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """Loading a nonexistent asset raises AssetNotFoundError."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -151,7 +161,8 @@ def test_asset_not_found_error_is_file_not_found() -> None:
 
 
 def test_missing_asset_message_includes_tried_paths(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """Error message lists all paths that were tried."""
     mgr = AssetManager(backend, base_path=asset_dir, scale_factor=2.0)
@@ -168,8 +179,10 @@ def test_missing_asset_message_includes_tried_paths(
 # frames() — animation frame discovery
 # ------------------------------------------------------------------
 
+
 def test_frames_discovers_numbered_files(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """frames('sprites/knight_walk') returns sorted list of asset names."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -193,7 +206,8 @@ def test_frames_caches_result(backend: MockBackend, asset_dir: Path) -> None:
 
 
 def test_frames_missing_prefix_raises(
-    backend: MockBackend, asset_dir: Path,
+    backend: MockBackend,
+    asset_dir: Path,
 ) -> None:
     """frames() with no matching files raises AssetNotFoundError."""
     mgr = AssetManager(backend, base_path=asset_dir)
@@ -205,6 +219,7 @@ def test_frames_missing_prefix_raises(
 # ------------------------------------------------------------------
 # Game.assets integration
 # ------------------------------------------------------------------
+
 
 def test_game_asset_path_parameter_uses_custom_path(
     asset_dir: Path,

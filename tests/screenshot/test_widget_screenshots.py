@@ -43,6 +43,7 @@ _RESOLUTION = (480, 360)
 # 1. ProgressBar at 75%
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_progress_bar() -> None:
     """A ProgressBar at 75% value centered on screen.
@@ -59,12 +60,14 @@ def test_progress_bar() -> None:
                 spacing=8,
             )
             panel.add(Label("Health", style=Style(font_size=20)))
-            panel.add(ProgressBar(
-                value=75,
-                max_value=100,
-                width=300,
-                height=28,
-            ))
+            panel.add(
+                ProgressBar(
+                    value=75,
+                    max_value=100,
+                    width=300,
+                    height=28,
+                )
+            )
             self.ui.add(panel)
 
     def setup(game: Game) -> None:
@@ -77,6 +80,7 @@ def test_progress_bar() -> None:
 # ---------------------------------------------------------------------------
 # 2. TextBox with wrapped multi-line text (instant reveal)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_textbox_instant() -> None:
@@ -95,13 +99,15 @@ def test_textbox_instant() -> None:
                 style=Style(padding=12),
             )
             panel.add(Label("Journal Entry", style=Style(font_size=22)))
-            panel.add(TextBox(
-                "The ancient fortress loomed ahead, its crumbling towers "
-                "silhouetted against the crimson sky. Our party pressed "
-                "forward through the overgrown courtyard, weapons drawn.",
-                width=350,
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                TextBox(
+                    "The ancient fortress loomed ahead, its crumbling towers "
+                    "silhouetted against the crimson sky. Our party pressed "
+                    "forward through the overgrown courtyard, weapons drawn.",
+                    width=350,
+                    style=Style(font_size=16),
+                )
+            )
             self.ui.add(panel)
 
     def setup(game: Game) -> None:
@@ -114,6 +120,7 @@ def test_textbox_instant() -> None:
 # ---------------------------------------------------------------------------
 # 3. List with 5 items and selection at index 2
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_list_with_selection() -> None:
@@ -132,8 +139,13 @@ def test_list_with_selection() -> None:
             )
             panel.add(Label("Save Files", style=Style(font_size=20)))
             lst = List(
-                ["Slot 1 - Castle", "Slot 2 - Forest", "Slot 3 - Dungeon",
-                 "Slot 4 - Village", "Slot 5 - Empty"],
+                [
+                    "Slot 1 - Castle",
+                    "Slot 2 - Forest",
+                    "Slot 3 - Dungeon",
+                    "Slot 4 - Village",
+                    "Slot 5 - Empty",
+                ],
                 width=280,
                 item_height=28,
             )
@@ -152,6 +164,7 @@ def test_list_with_selection() -> None:
 # 4. Grid with cells containing Labels and a selection
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_grid_with_cells() -> None:
     """3x3 Grid with Labels in several cells, cell (1,1) selected.
@@ -169,7 +182,8 @@ def test_grid_with_cells() -> None:
             )
             panel.add(Label("Inventory", style=Style(font_size=20)))
             grid = Grid(
-                3, 3,
+                3,
+                3,
                 cell_size=(64, 64),
                 spacing=4,
                 style=Style(padding=6),
@@ -196,6 +210,7 @@ def test_grid_with_cells() -> None:
 # 5. Tooltip visible (past its delay)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_tooltip_visible() -> None:
     """Tooltip that has passed its delay and is now visible.
@@ -209,12 +224,14 @@ def test_tooltip_visible() -> None:
     class TipScene(Scene):
         def on_enter(self) -> None:
             # Add a label so the scene is not completely empty.
-            self.ui.add(Label(
-                "Hover over items for details",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=16),
-            ))
+            self.ui.add(
+                Label(
+                    "Hover over items for details",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=16),
+                )
+            )
             self._tooltip = Tooltip(
                 "Sword of Flames (+12 ATK)",
                 delay=0.3,
@@ -239,6 +256,7 @@ def test_tooltip_visible() -> None:
 # ---------------------------------------------------------------------------
 # 6. TabGroup with 3 tabs
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_tabgroup() -> None:
@@ -301,6 +319,7 @@ def test_tabgroup() -> None:
 # 7. DataTable with 3 columns and 5 rows
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_datatable() -> None:
     """DataTable with 3 columns and 5 data rows, row 1 selected.
@@ -337,6 +356,7 @@ def test_datatable() -> None:
 # ---------------------------------------------------------------------------
 # 8. Combined dialog — RPG-style dialog box
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_combined_dialog() -> None:
@@ -406,14 +426,18 @@ def test_combined_dialog() -> None:
                 spacing=12,
                 style=Style(padding=0, background_color=(0, 0, 0, 0)),
             )
-            button_row.add(Button(
-                "Accept",
-                style=Style(font_size=16, padding=8),
-            ))
-            button_row.add(Button(
-                "Decline",
-                style=Style(font_size=16, padding=8),
-            ))
+            button_row.add(
+                Button(
+                    "Accept",
+                    style=Style(font_size=16, padding=8),
+                )
+            )
+            button_row.add(
+                Button(
+                    "Decline",
+                    style=Style(font_size=16, padding=8),
+                )
+            )
             dialog.add(button_row)
 
             self.ui.add(dialog)

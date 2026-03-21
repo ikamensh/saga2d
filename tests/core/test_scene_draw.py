@@ -107,7 +107,8 @@ def test_draw_rect_multiple_calls(game: Game, backend: MockBackend) -> None:
 
 
 def test_draw_world_rect_applies_camera_offset(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """draw_world_rect() transforms world coords to screen via camera."""
     color = (255, 0, 0, 255)
@@ -154,7 +155,8 @@ def test_draw_world_rect_no_scroll(game: Game, backend: MockBackend) -> None:
 
 
 def test_draw_world_rect_with_opacity(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """draw_world_rect() passes opacity to the backend."""
     color = (0, 255, 0, 128)
@@ -187,7 +189,8 @@ def test_draw_world_rect_without_camera_raises(game: Game) -> None:
 
 
 def test_draw_world_rect_negative_camera_offset(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """draw_world_rect() works correctly with negative camera offsets."""
     color = (255, 255, 0, 255)
@@ -212,7 +215,8 @@ def test_draw_world_rect_negative_camera_offset(
 
 
 def test_draw_world_rect_converts_floats_to_int(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """draw_world_rect() truncates float results to int."""
     color = (255, 255, 255, 255)
@@ -239,7 +243,8 @@ def test_draw_world_rect_converts_floats_to_int(
 
 
 def test_draw_world_rect_multiple_rects(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Multiple draw_world_rect() calls produce correct screen positions."""
     color_bg = (50, 50, 50, 255)

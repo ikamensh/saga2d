@@ -35,6 +35,7 @@ def _load_title_scene_class():
         added = True
     try:
         from battle_demo import TitleScene  # type: ignore[import-not-found]
+
         return TitleScene
     finally:
         if added:
@@ -44,6 +45,7 @@ def _load_title_scene_class():
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_title_scene() -> None:

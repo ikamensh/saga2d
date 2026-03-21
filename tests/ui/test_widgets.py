@@ -104,7 +104,11 @@ class TestImageBox:
         assert box._layout_dirty is False
 
     def test_draw_calls_draw_image(
-        self, root: _UIRoot, backend: MockBackend, game: Game, asset_dir: Path,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
+        asset_dir: Path,
     ) -> None:
         """ImageBox draws via backend.draw_image with correct bounds."""
         game.assets = AssetManager(game.backend, base_path=asset_dir)
@@ -126,7 +130,8 @@ class TestImageBox:
         box.on_draw()  # should be a no-op
 
     def test_anchor_positioning(
-        self, root: _UIRoot,
+        self,
+        root: _UIRoot,
     ) -> None:
         """ImageBox respects anchor positioning."""
         box = ImageBox("icon", width=64, height=64, anchor=Anchor.CENTER)
@@ -136,11 +141,17 @@ class TestImageBox:
         assert box._computed_y == (600 - 64) // 2
 
     def test_visible_false_no_draw(
-        self, root: _UIRoot, backend: MockBackend, game: Game, asset_dir: Path,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
+        asset_dir: Path,
     ) -> None:
         """Invisible ImageBox produces no draw calls."""
         game.assets = AssetManager(game.backend, base_path=asset_dir)
-        box = ImageBox("sprites/icon", width=64, height=64, anchor=Anchor.TOP_LEFT, visible=False)
+        box = ImageBox(
+            "sprites/icon", width=64, height=64, anchor=Anchor.TOP_LEFT, visible=False
+        )
         root.add(box)
         root._ensure_layout()
         root.draw()
@@ -191,10 +202,20 @@ class TestProgressBar:
         assert bar.fraction == pytest.approx(0.75)
 
     def test_draw_bg_and_fill(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """50% ProgressBar draws background + half-width fill rect."""
-        bar = ProgressBar(value=50, max_value=100, width=200, height=24, rounded=False, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(
+            value=50,
+            max_value=100,
+            width=200,
+            height=24,
+            rounded=False,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -208,10 +229,19 @@ class TestProgressBar:
         assert backend.rects[1]["color"] == game.theme.progressbar_color
 
     def test_draw_empty_bar(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """0% ProgressBar draws only background, no fill."""
-        bar = ProgressBar(value=0, max_value=100, width=200, height=24, rounded=False, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(
+            value=0,
+            max_value=100,
+            width=200,
+            height=24,
+            rounded=False,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -219,10 +249,19 @@ class TestProgressBar:
         assert len(backend.rects) == 1  # background only
 
     def test_draw_full_bar(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """100% ProgressBar has fill == full width."""
-        bar = ProgressBar(value=100, max_value=100, width=200, height=24, rounded=False, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(
+            value=100,
+            max_value=100,
+            width=200,
+            height=24,
+            rounded=False,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -231,12 +270,18 @@ class TestProgressBar:
         assert backend.rects[1]["width"] == 200
 
     def test_explicit_colors(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """Explicit bar_color/bg_color override theme defaults."""
         bar = ProgressBar(
-            value=50, max_value=100, width=100, height=20,
-            bar_color=(255, 0, 0, 255), bg_color=(0, 0, 0, 255),
+            value=50,
+            max_value=100,
+            width=100,
+            height=20,
+            bar_color=(255, 0, 0, 255),
+            bg_color=(0, 0, 0, 255),
             anchor=Anchor.TOP_LEFT,
         )
         root.add(bar)
@@ -373,7 +418,9 @@ class TestTextBox:
         assert h > 0
 
     def test_draw_produces_text_calls(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """TextBox with text draws at least one draw_text call."""
         tb = TextBox("Hello", width=300, anchor=Anchor.TOP_LEFT)
@@ -384,7 +431,9 @@ class TestTextBox:
         assert backend.texts[0]["text"] == "Hello"
 
     def test_draw_empty_text_no_calls(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """Empty text TextBox produces no draw calls."""
         tb = TextBox("", width=300, anchor=Anchor.TOP_LEFT)
@@ -564,7 +613,9 @@ class TestList:
         assert h == 50
 
     def test_draw_background_and_items(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """List draws background rect and text for each visible item."""
         lst = List(["Alpha", "Beta"], width=200, height=60, anchor=Anchor.TOP_LEFT)
@@ -581,7 +632,10 @@ class TestList:
         assert "Beta" in texts
 
     def test_draw_with_selection_highlight(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """Selected item draws a highlight rect."""
         lst = List(["Alpha", "Beta"], width=200, height=60, anchor=Anchor.TOP_LEFT)
@@ -691,8 +745,9 @@ class TestGrid:
     def test_on_select_callback(self) -> None:
         """on_select fires with (col, row) on click."""
         received = []
-        grid = Grid(3, 2, on_select=lambda c, r: received.append((c, r)),
-                     style=Style(padding=4))
+        grid = Grid(
+            3, 2, on_select=lambda c, r: received.append((c, r)), style=Style(padding=4)
+        )
         grid.compute_layout(0, 0, 300, 200)
         event = InputEvent(type="click", button="left", x=10, y=10)
         grid.on_event(event)
@@ -713,11 +768,20 @@ class TestGrid:
         assert grid.get_preferred_size() == (500, 400)
 
     def test_draw_produces_rects(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """Grid draws background + cell backgrounds."""
-        grid = Grid(2, 2, cell_size=(64, 64), spacing=4,
-                     width=200, height=200, anchor=Anchor.TOP_LEFT)
+        grid = Grid(
+            2,
+            2,
+            cell_size=(64, 64),
+            spacing=4,
+            width=200,
+            height=200,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(grid)
         root._ensure_layout()
         root.draw()
@@ -726,11 +790,21 @@ class TestGrid:
         assert len(backend.rects) == 5
 
     def test_draw_with_selection(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """Selected cell draws an additional highlight rect."""
-        grid = Grid(2, 2, cell_size=(64, 64), spacing=4,
-                     width=200, height=200, anchor=Anchor.TOP_LEFT)
+        grid = Grid(
+            2,
+            2,
+            cell_size=(64, 64),
+            spacing=4,
+            width=200,
+            height=200,
+            anchor=Anchor.TOP_LEFT,
+        )
         grid._selected = (0, 0)
         root.add(grid)
         root._ensure_layout()
@@ -739,7 +813,9 @@ class TestGrid:
         # 1 bg + 4 cells + 1 highlight = 6
         assert len(backend.rects) == 6
         # Last rect should be the selection color
-        sel_rects = [r for r in backend.rects if r["color"] == game.theme.selected_color]
+        sel_rects = [
+            r for r in backend.rects if r["color"] == game.theme.selected_color
+        ]
         assert len(sel_rects) == 1
 
     # -- Bug-fix tests -------------------------------------------------
@@ -894,7 +970,9 @@ class TestTooltip:
         assert tip._visible_now is False
 
     def test_draw_not_visible_no_calls(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """Tooltip that's not visible produces no draw calls."""
         tip = Tooltip("Help", anchor=Anchor.TOP_LEFT)
@@ -905,7 +983,9 @@ class TestTooltip:
         assert len(backend.texts) == 0
 
     def test_draw_visible_produces_calls(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """Visible tooltip draws rect + text."""
         tip = Tooltip("Help", delay=0)
@@ -929,7 +1009,8 @@ class TestTooltip:
         assert tip.visible is True
 
     def test_game_tick_update_advances_timer(
-        self, root: _UIRoot,
+        self,
+        root: _UIRoot,
     ) -> None:
         """_UIRoot._update_tree advances tooltip timer correctly."""
         tip = Tooltip("Help", delay=0.5)
@@ -1044,13 +1125,15 @@ class TestTabGroup:
         assert h == 32 + 150
 
     def test_click_tab_header_switches(
-        self, root: _UIRoot,
+        self,
+        root: _UIRoot,
     ) -> None:
         """Clicking a tab header switches the active tab."""
         c1 = Panel(width=200, height=100)
         c2 = Panel(width=200, height=100)
-        tg = TabGroup({"TabA": c1, "TabB": c2},
-                       width=400, height=200, anchor=Anchor.TOP_LEFT)
+        tg = TabGroup(
+            {"TabA": c1, "TabB": c2}, width=400, height=200, anchor=Anchor.TOP_LEFT
+        )
         root.add(tg)
         root._ensure_layout()
         assert tg.active_tab == "TabA"
@@ -1070,13 +1153,14 @@ class TestTabGroup:
         assert tg.active_tab == "TabB"
 
     def test_draw_produces_rects_and_texts(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """TabGroup draws tab header rects and text labels."""
         c1 = Panel(width=200, height=100)
         c2 = Panel(width=200, height=100)
-        tg = TabGroup({"A": c1, "B": c2},
-                       width=400, height=200, anchor=Anchor.TOP_LEFT)
+        tg = TabGroup({"A": c1, "B": c2}, width=400, height=200, anchor=Anchor.TOP_LEFT)
         root.add(tg)
         root._ensure_layout()
         root.draw()
@@ -1306,7 +1390,10 @@ class TestDataTable:
         assert dt.selected_row == 0
 
     def test_draw_header(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """DataTable draws header rect with correct color."""
         dt = DataTable(["Name", "Level"], width=400, height=200, anchor=Anchor.TOP_LEFT)
@@ -1320,7 +1407,10 @@ class TestDataTable:
         assert backend.rects[0]["height"] == 32
 
     def test_draw_header_text(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """DataTable draws header column text."""
         dt = DataTable(["Name", "Level"], width=400, height=200, anchor=Anchor.TOP_LEFT)
@@ -1337,11 +1427,19 @@ class TestDataTable:
                 assert t["color"] == game.theme.datatable_header_text_color
 
     def test_draw_alternating_rows(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """DataTable draws alternating row background colors."""
-        dt = DataTable(["A"], [["r0"], ["r1"], ["r2"]],
-                        width=400, height=200, anchor=Anchor.TOP_LEFT)
+        dt = DataTable(
+            ["A"],
+            [["r0"], ["r1"], ["r2"]],
+            width=400,
+            height=200,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(dt)
         root._ensure_layout()
         root.draw()
@@ -1353,11 +1451,15 @@ class TestDataTable:
         assert backend.rects[4]["color"] == game.theme.datatable_row_bg_color  # even
 
     def test_draw_selection_highlight(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """Selected row gets a highlight rect."""
-        dt = DataTable(["A"], [["r0"], ["r1"]],
-                        width=400, height=200, anchor=Anchor.TOP_LEFT)
+        dt = DataTable(
+            ["A"], [["r0"], ["r1"]], width=400, height=200, anchor=Anchor.TOP_LEFT
+        )
         dt._selected_row = 0
         root.add(dt)
         root._ensure_layout()
@@ -1365,15 +1467,24 @@ class TestDataTable:
 
         # Header + header separator + 2 row bg + 1 highlight = 5
         assert len(backend.rects) == 5
-        sel_rects = [r for r in backend.rects if r["color"] == game.theme.selected_color]
+        sel_rects = [
+            r for r in backend.rects if r["color"] == game.theme.selected_color
+        ]
         assert len(sel_rects) == 1
 
     def test_draw_cell_text(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """DataTable draws cell text for each visible row."""
-        dt = DataTable(["A", "B"], [["x", "y"], ["1", "2"]],
-                        width=400, height=200, anchor=Anchor.TOP_LEFT)
+        dt = DataTable(
+            ["A", "B"],
+            [["x", "y"], ["1", "2"]],
+            width=400,
+            height=200,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(dt)
         root._ensure_layout()
         root.draw()
@@ -1388,7 +1499,9 @@ class TestDataTable:
         assert "2" in texts
 
     def test_draw_empty_table(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """DataTable with no rows draws only header."""
         dt = DataTable(["A", "B"], width=400, height=200, anchor=Anchor.TOP_LEFT)
@@ -1403,7 +1516,9 @@ class TestDataTable:
     def test_scroll_event(self) -> None:
         """Scroll adjusts _scroll_offset."""
         # 10 rows, only space for ~3 visible
-        dt = DataTable(["A"], [[f"r{i}"] for i in range(10)], width=200, height=32 + 3 * 28)
+        dt = DataTable(
+            ["A"], [[f"r{i}"] for i in range(10)], width=200, height=32 + 3 * 28
+        )
         dt.compute_layout(0, 0, 200, 32 + 3 * 28)
         event = InputEvent(type="scroll", x=100, y=50, dy=-1)
         consumed = dt.on_event(event)

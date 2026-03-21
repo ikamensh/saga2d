@@ -35,6 +35,7 @@ from tutorials.menus.menu_demo import (  # noqa: E402
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def game() -> Game:
     """Game with mock backend and menu-tutorial theme."""
@@ -74,6 +75,7 @@ def _stack_names(game: Game) -> list[str]:
 # ---------------------------------------------------------------------------
 # TitleScreen
 # ---------------------------------------------------------------------------
+
 
 class TestTitleScreen:
     def test_renders_title_and_buttons(self, game: Game) -> None:
@@ -132,6 +134,7 @@ class TestTitleScreen:
 # SettingsOverlay
 # ---------------------------------------------------------------------------
 
+
 class TestSettingsOverlay:
     def test_settings_is_transparent_overlay(self, game: Game) -> None:
         """SettingsOverlay has transparent and pause_below flags set."""
@@ -168,6 +171,7 @@ class TestSettingsOverlay:
 # GameScreen
 # ---------------------------------------------------------------------------
 
+
 class TestGameScreen:
     def test_game_screen_renders(self, game: Game) -> None:
         """GameScreen shows the game world label and hint text."""
@@ -202,6 +206,7 @@ class TestGameScreen:
 # ---------------------------------------------------------------------------
 # PauseMenu
 # ---------------------------------------------------------------------------
+
 
 class TestPauseMenu:
     def test_pause_is_transparent_overlay(self, game: Game) -> None:
@@ -239,6 +244,7 @@ class TestPauseMenu:
 # InventoryScreen
 # ---------------------------------------------------------------------------
 
+
 class TestInventoryScreen:
     def test_inventory_is_transparent_overlay(self, game: Game) -> None:
         """InventoryScreen has correct overlay flags."""
@@ -274,6 +280,7 @@ class TestInventoryScreen:
 # ---------------------------------------------------------------------------
 # Full navigation flows
 # ---------------------------------------------------------------------------
+
 
 class TestNavigationFlows:
     def test_title_play_pause_resume(self, game: Game) -> None:
@@ -392,6 +399,7 @@ class TestNavigationFlows:
 # ---------------------------------------------------------------------------
 # Detailed ESC and Inventory verification
 # ---------------------------------------------------------------------------
+
 
 class TestEscFromGame:
     """Step-by-step verification of pressing ESC during gameplay."""

@@ -495,9 +495,7 @@ class TestSpriteLifecycleAdversarial:
         # Framework must not crash. New action behavior is implementation-defined.
         assert not s.is_removed
 
-    def test_sprite_do_on_other_sprite_during_update_action(
-        self, game: Game
-    ) -> None:
+    def test_sprite_do_on_other_sprite_during_update_action(self, game: Game) -> None:
         """sprite_b.do() called from sprite_a's action callback — adds B to
         action set; iteration is over a copy so no mutation during iter.
         B's Do completes in one update but B is processed same frame."""
@@ -552,7 +550,9 @@ class TestActionDeepcopy:
         assert cloned._index == 0
 
     def test_repeat_deepcopy_preserves_lambda_behavior(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Repeat deep-copies its template each iteration; lambdas still work."""
         counter = [0]
@@ -627,7 +627,9 @@ class TestParallelMixedActions:
         assert sprite not in game._action_sprites
 
     def test_parallel_multiple_do_and_delay(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Parallel(Do, Do, Delay): both Do fire on first tick, Delay continues."""
         log: list[str] = []
@@ -676,7 +678,9 @@ class TestParallelMixedActions:
         assert sprite not in game._action_sprites
 
     def test_parallel_do_sequence_and_delay(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Parallel(Sequence(Do, Do), Delay(0.1)): sequence fires instantly,
         Delay keeps Parallel alive."""
@@ -742,7 +746,9 @@ class TestSequenceChildStartRaises:
             sprite.do(Sequence(_ExplodingAction()))
 
     def test_second_child_start_raises_after_first_completes(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """First child (Do) completes -> Sequence starts second child ->
         second child's start() raises during update()."""
@@ -763,7 +769,9 @@ class TestSequenceChildStartRaises:
         assert "first" in log
 
     def test_exploding_start_does_not_run_subsequent_children(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """After start() raises on child N, child N+1 is never started."""
         third = _TrackingAction()
@@ -810,7 +818,9 @@ class TestStopDuringUpdate:
     """Calling stop_actions() or do(new_action) while an action is mid-update."""
 
     def test_stop_actions_after_partial_update(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """stop_actions() after a few ticks cancels action cleanly."""
         action = _StopDuringUpdateAction()
@@ -830,7 +840,9 @@ class TestStopDuringUpdate:
         assert action.update_count == 2
 
     def test_do_replaces_action_during_sequence_update(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Calling sprite.do(new) replaces the old action; old gets stop()."""
         old_action = _StopDuringUpdateAction()
@@ -867,7 +879,9 @@ class TestStopDuringUpdate:
         assert sprite not in game._action_sprites
 
     def test_parallel_stop_during_running(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Stopping Parallel mid-flight stops all children."""
         a = _StopDuringUpdateAction()
@@ -883,7 +897,9 @@ class TestStopDuringUpdate:
         assert b.stopped
 
     def test_sequence_stop_only_stops_current_child(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Stopping a Sequence only calls stop() on the current child."""
         first = _StopDuringUpdateAction()
@@ -941,6 +957,7 @@ class TestTimerChainAdversarial:
 
     def test_then_callback_throws_is_caught_and_removed(self, game: Game) -> None:
         """then() callback that raises is caught, logged, and the timer removed."""
+
         def parent_cb() -> None:
             pass
 
@@ -1036,7 +1053,8 @@ class TestTimerTweenInteraction:
         assert fired == []  # All timers cancelled
 
     def test_cancel_all_tweens_from_within_tween_callback(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """cancel_all() on the tween manager from inside an on_complete."""
         obj_a = type("ObjA", (), {"val": 0.0})()
@@ -1085,9 +1103,7 @@ class TestTweenAdversarial:
     """Tween edge cases: duration=0, missing property, cancel_by_target,
     overlapping tweens on same property."""
 
-    def test_tween_duration_zero_completes_immediately(
-        self, game: Game
-    ) -> None:
+    def test_tween_duration_zero_completes_immediately(self, game: Game) -> None:
         """duration=0 completes on first update; sets to_val, fires on_complete."""
         obj = type("Obj", (), {"val": 0.0})()
         fired = []
@@ -1100,8 +1116,10 @@ class TestTweenAdversarial:
 
     def test_tween_property_does_not_exist_raises(self, game: Game) -> None:
         """Tweening a property that doesn't exist on target raises AttributeError at creation."""
+
         class Slotted:
             __slots__ = ("x",)
+
             def __init__(self) -> None:
                 self.x = 0.0
 
@@ -1109,9 +1127,7 @@ class TestTweenAdversarial:
         with pytest.raises(AttributeError, match="has no attribute 'y'"):
             tween(obj, "y", 0.0, 1.0, 0.5)
 
-    def test_cancel_by_target_when_no_tweens_no_crash(
-        self, game: Game
-    ) -> None:
+    def test_cancel_by_target_when_no_tweens_no_crash(self, game: Game) -> None:
         """cancel_by_target() on object with no active tweens is a no-op."""
         obj = type("Obj", (), {"val": 0.0})()
         game._tween_manager.cancel_by_target(obj)  # should not raise
@@ -1120,8 +1136,8 @@ class TestTweenAdversarial:
         """Two tweens on same target+property: both run; last in iteration wins.
         Second tween (created later) overwrites first each frame."""
         obj = type("Obj", (), {"val": 0.0})()
-        tween(obj, "val", 0.0, 100.0, 1.0)   # first: 0 -> 100
-        tween(obj, "val", 0.0, 200.0, 1.0)   # second: 0 -> 200
+        tween(obj, "val", 0.0, 100.0, 1.0)  # first: 0 -> 100
+        tween(obj, "val", 0.0, 200.0, 1.0)  # second: 0 -> 200
 
         game.tick(dt=0.5)
 
@@ -1147,30 +1163,22 @@ class TestAudioAdversarial:
     """Audio edge cases: unknown channel, unregistered pool, empty pool,
     optional missing asset, crossfade during crossfade."""
 
-    def test_set_volume_unknown_channel_raises(
-        self, game_with_audio: Game
-    ) -> None:
+    def test_set_volume_unknown_channel_raises(self, game_with_audio: Game) -> None:
         """set_volume with unknown channel raises KeyError."""
         with pytest.raises(KeyError, match="Unknown audio channel"):
             game_with_audio.audio.set_volume("nonexistent", 0.5)
 
-    def test_get_volume_unknown_channel_raises(
-        self, game_with_audio: Game
-    ) -> None:
+    def test_get_volume_unknown_channel_raises(self, game_with_audio: Game) -> None:
         """get_volume with unknown channel raises KeyError."""
         with pytest.raises(KeyError, match="Unknown audio channel"):
             game_with_audio.audio.get_volume("invalid")
 
-    def test_play_pool_unregistered_raises(
-        self, game_with_audio: Game
-    ) -> None:
+    def test_play_pool_unregistered_raises(self, game_with_audio: Game) -> None:
         """play_pool with unregistered pool raises KeyError."""
         with pytest.raises(KeyError):
             game_with_audio.audio.play_pool("never_registered")
 
-    def test_play_pool_empty_pool_no_crash(
-        self, game_with_audio: Game
-    ) -> None:
+    def test_play_pool_empty_pool_no_crash(self, game_with_audio: Game) -> None:
         """play_pool with empty registered pool returns without playing."""
         game_with_audio.audio.register_pool("empty", [])
         game_with_audio.audio.play_pool("empty")  # should not raise
@@ -1179,14 +1187,10 @@ class TestAudioAdversarial:
         self, game_with_audio: Game
     ) -> None:
         """play_sound with optional=True and missing asset returns None."""
-        result = game_with_audio.audio.play_sound(
-            "nonexistent_sound", optional=True
-        )
+        result = game_with_audio.audio.play_sound("nonexistent_sound", optional=True)
         assert result is None
 
-    def test_crossfade_during_crossfade_no_crash(
-        self, game_with_audio: Game
-    ) -> None:
+    def test_crossfade_during_crossfade_no_crash(self, game_with_audio: Game) -> None:
         """crossfade_music during an active crossfade cancels previous, starts new."""
         game_with_audio.audio.play_music("exploration")
         game_with_audio.audio.crossfade_music("battle", duration=1.0)
@@ -1240,7 +1244,8 @@ class TestAudioEdgeCases:
         assert audio._current_music_name == "battle"
 
     def test_play_sound_non_optional_missing_asset_raises(
-        self, audio_game: Game,
+        self,
+        audio_game: Game,
     ) -> None:
         """play_sound(optional=False) with missing asset raises."""
         audio = audio_game.audio
@@ -1509,9 +1514,7 @@ class TestUIComponentAdversarial:
         comp.compute_layout(0, 0, 0, 0)
         assert comp._layout_dirty is False
 
-    def test_handle_event_draggable_no_game_skips_drag(
-        self, game: Game
-    ) -> None:
+    def test_handle_event_draggable_no_game_skips_drag(self, game: Game) -> None:
         """Draggable component with _game=None does not crash on click."""
         comp = Component(width=100, height=100, draggable=True)
         comp._game = None
@@ -1565,7 +1568,9 @@ class TestUIComponentTree:
         assert depth >= 12
 
     def test_deeply_nested_panel_draw(
-        self, ui_game: Game, root: _UIRoot,
+        self,
+        ui_game: Game,
+        root: _UIRoot,
     ) -> None:
         """Drawing a deeply nested panel tree should not crash."""
         current: Panel | Label = Label("Leaf", width=40, height=20)  # type: ignore[assignment]
@@ -1608,7 +1613,9 @@ class TestUIComponentTree:
         assert tooltip._showing is False
 
     def test_remove_component_during_own_on_click(
-        self, ui_game: Game, root: _UIRoot,
+        self,
+        ui_game: Game,
+        root: _UIRoot,
     ) -> None:
         """Button removes itself from parent during its own on_click."""
         panel = Panel(
@@ -1655,10 +1662,7 @@ class TestUIComponentTree:
 
         assert len(panel._children) == 50
         for i in range(1, len(panel._children)):
-            assert (
-                panel._children[i]._computed_y
-                >= panel._children[i - 1]._computed_y
-            )
+            assert panel._children[i]._computed_y >= panel._children[i - 1]._computed_y
 
 
 # ==================================================================
@@ -1674,7 +1678,8 @@ class TestSaveSystemEdgeCases:
         return SaveManager(tmp_path / "saves")
 
     def test_save_deeply_nested_state_100_levels(
-        self, save_mgr: SaveManager,
+        self,
+        save_mgr: SaveManager,
     ) -> None:
         """Save state nested 100 levels deep — JSON handles it fine."""
         state: dict[str, Any] = {"leaf": True}
@@ -1807,6 +1812,7 @@ class TestFSMAdversarial:
 
     def test_on_enter_raises_propagates(self) -> None:
         """on_enter callback that raises propagates the exception."""
+
         def raise_boom() -> None:
             raise ValueError("boom")
 

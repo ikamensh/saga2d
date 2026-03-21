@@ -22,8 +22,12 @@ class MainScene(Scene):
         print("[MainScene] on_enter")
         backend = self.game.backend
         img = backend.create_solid_color_image(
-            30, 80, 100, 255,
-            backend.logical_width, backend.logical_height,
+            30,
+            80,
+            100,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(img, 0)
         backend.update_sprite(self._bg_sprite, 0, 0)
@@ -37,8 +41,12 @@ class MainScene(Scene):
         # Recreate background sprite (was removed in on_exit when covered)
         backend = self.game.backend
         img = backend.create_solid_color_image(
-            30, 80, 100, 255,
-            backend.logical_width, backend.logical_height,
+            30,
+            80,
+            100,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(img, 0)
 
@@ -47,14 +55,16 @@ class MainScene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "Scene: Main",
-            100, 500,
+            100,
+            500,
             36,
             (255, 255, 255, 255),
             font="Arial",
         )
         backend.draw_text(
             "SPACE = push overlay  |  ESC = pop  |  Close window = quit",
-            100, 440,
+            100,
+            440,
             36,
             (200, 200, 200, 255),
             font="Arial",
@@ -75,8 +85,12 @@ class OverlayScene(Scene):
         print("[OverlayScene] on_enter")
         backend = self.game.backend
         img = backend.create_solid_color_image(
-            180, 90, 100, 255,
-            backend.logical_width, backend.logical_height,
+            180,
+            90,
+            100,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(img, 0)
         backend.update_sprite(self._bg_sprite, 0, 0)
@@ -93,14 +107,16 @@ class OverlayScene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "Scene: Overlay",
-            100, 500,
+            100,
+            500,
             36,
             (255, 255, 255, 255),
             font="Arial",
         )
         backend.draw_text(
             "ESC = pop back to Main",
-            100, 440,
+            100,
+            440,
             36,
             (255, 255, 220, 255),
             font="Arial",

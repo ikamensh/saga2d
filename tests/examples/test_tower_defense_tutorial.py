@@ -29,7 +29,9 @@ if str(_project_root) not in sys.path:
 # Fixtures
 # ---------------------------------------------------------------------------
 
-_asset_dir = Path(__file__).resolve().parents[2] / "tutorials" / "tower_defense" / "assets"
+_asset_dir = (
+    Path(__file__).resolve().parents[2] / "tutorials" / "tower_defense" / "assets"
+)
 
 
 @pytest.fixture
@@ -62,6 +64,7 @@ def td_game() -> Game:
 # ---------------------------------------------------------------------------
 # Chapter 1 — Title Screen
 # ---------------------------------------------------------------------------
+
 
 def test_ch1_title_screen_loads_and_renders(td_game: Game) -> None:
     """ch1: TitleScene builds UI and renders without error."""
@@ -96,6 +99,7 @@ def test_ch1_quit_button_exits(td_game: Game) -> None:
 # ---------------------------------------------------------------------------
 # Chapter 2 — Game Map
 # ---------------------------------------------------------------------------
+
 
 def test_ch2_play_transitions_to_game_scene(td_game: Game) -> None:
     """ch2: Play button pushes GameScene with map and HUD."""
@@ -144,6 +148,7 @@ def test_ch2_escape_pops_to_title(td_game: Game) -> None:
 # Chapter 3 — Tower Placement
 # ---------------------------------------------------------------------------
 
+
 def test_ch3_build_menu_and_placement(td_game: Game) -> None:
     """ch3: Buy button enters placement mode; click on slot places tower."""
     from tutorials.tower_defense.ch3_tower_placement import TitleScene
@@ -190,6 +195,7 @@ def test_ch3_build_menu_and_placement(td_game: Game) -> None:
 # Chapter 4 — Enemy Waves
 # ---------------------------------------------------------------------------
 
+
 def test_ch4_enemy_spawning(td_game: Game) -> None:
     """ch4: Enemies spawn after the wave delay and follow the path."""
     from tutorials.tower_defense.ch4_enemies import GameScene
@@ -201,7 +207,7 @@ def test_ch4_enemy_spawning(td_game: Game) -> None:
     assert len(gs._enemies) == 0
 
     # Run past the 2-second wave delay + first spawn interval (1.2s).
-    for _ in range(220):   # ~3.5 seconds
+    for _ in range(220):  # ~3.5 seconds
         td_game.tick(dt=0.016)
 
     assert gs._wave_active is True
@@ -257,6 +263,7 @@ def test_ch4_escape_pops_to_title(td_game: Game) -> None:
 # Chapter 5 — Tower Combat
 # ---------------------------------------------------------------------------
 
+
 def test_ch5_scene_loads(td_game: Game) -> None:
     """ch5: GameScene with combat initialises without error."""
     from tutorials.tower_defense.ch5_combat import GameScene
@@ -277,7 +284,9 @@ def test_ch5_scene_loads(td_game: Game) -> None:
 def test_ch5_tower_fires_projectile(td_game: Game) -> None:
     """ch5: A placed tower fires at a nearby enemy."""
     from tutorials.tower_defense.ch5_combat import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(GameScene())
@@ -313,7 +322,9 @@ def test_ch5_tower_fires_projectile(td_game: Game) -> None:
 def test_ch5_enemy_killed_awards_gold(td_game: Game) -> None:
     """ch5: Killing an enemy awards gold and refreshes buy buttons."""
     from tutorials.tower_defense.ch5_combat import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(GameScene())
@@ -342,8 +353,11 @@ def test_ch5_enemy_killed_awards_gold(td_game: Game) -> None:
 def test_ch5_health_bars_drawn(td_game: Game) -> None:
     """ch5: Damaged enemies get health bars drawn via draw_rect."""
     from tutorials.tower_defense.ch5_combat import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
-        HEALTH_BAR_BG_COLOR, HEALTH_BAR_FG_COLOR,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
+        HEALTH_BAR_BG_COLOR,
+        HEALTH_BAR_FG_COLOR,
     )
 
     td_game.push(GameScene())
@@ -371,7 +385,9 @@ def test_ch5_health_bars_drawn(td_game: Game) -> None:
 def test_ch5_splash_tower_damages_multiple(td_game: Game) -> None:
     """ch5: Splash tower deals area damage to multiple enemies."""
     from tutorials.tower_defense.ch5_combat import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(GameScene())
@@ -401,7 +417,9 @@ def test_ch5_splash_tower_damages_multiple(td_game: Game) -> None:
 def test_ch5_projectile_cleanup_on_scene_exit(td_game: Game) -> None:
     """ch5: Projectiles are cleaned up when the scene exits."""
     from tutorials.tower_defense.ch5_combat import (
-        TitleScene, TOWER_DEFS, TILE_SIZE,
+        TitleScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(TitleScene())
@@ -433,6 +451,7 @@ def test_ch5_projectile_cleanup_on_scene_exit(td_game: Game) -> None:
 # Chapter 6 — Complete Game Loop
 # ---------------------------------------------------------------------------
 
+
 def test_ch6_scene_loads_with_audio(td_game: Game) -> None:
     """ch6: GameScene loads, starts music, shows score in HUD."""
     from tutorials.tower_defense.ch6_game_loop import GameScene
@@ -455,7 +474,9 @@ def test_ch6_scene_loads_with_audio(td_game: Game) -> None:
 def test_ch6_score_increases_on_kill(td_game: Game) -> None:
     """ch6: Killing enemies increases score."""
     from tutorials.tower_defense.ch6_game_loop import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(GameScene())
@@ -479,7 +500,9 @@ def test_ch6_score_increases_on_kill(td_game: Game) -> None:
 def test_ch6_sfx_on_combat(td_game: Game) -> None:
     """ch6: Sound effects fire during combat."""
     from tutorials.tower_defense.ch6_game_loop import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(GameScene())
@@ -502,7 +525,9 @@ def test_ch6_sfx_on_combat(td_game: Game) -> None:
 def test_ch6_victory_pushes_message(td_game: Game) -> None:
     """ch6: Winning all waves pushes MessageScreen."""
     from tutorials.tower_defense.ch6_game_loop import (
-        GameScene, TOWER_DEFS, TILE_SIZE,
+        GameScene,
+        TOWER_DEFS,
+        TILE_SIZE,
     )
 
     td_game.push(GameScene())

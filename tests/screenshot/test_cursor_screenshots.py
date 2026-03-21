@@ -35,12 +35,14 @@ _RESOLUTION = (320, 240)
 
 class EmptyScene(Scene):
     """Minimal scene that keeps the scene stack non-empty."""
+
     pass
 
 
 # ---------------------------------------------------------------------------
 # 1. Default cursor — scene renders normally, cursor is default
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_cursor_default_state() -> None:
@@ -76,6 +78,7 @@ def test_cursor_default_state() -> None:
 # ---------------------------------------------------------------------------
 # 2. Custom cursor registered and set
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_cursor_custom_set() -> None:
@@ -116,6 +119,7 @@ def test_cursor_custom_set() -> None:
 # 3. Cursor switched back to default
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_cursor_restore_default() -> None:
     """Register a custom cursor, switch to it, then restore default.
@@ -151,6 +155,7 @@ def test_cursor_restore_default() -> None:
 # ---------------------------------------------------------------------------
 # 4. Cursor visibility toggle
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_cursor_visibility() -> None:

@@ -40,7 +40,7 @@ def asset_dir(tmp_path: Path) -> Path:
     pixels[1, 0] = (200, 0, 0, 200)
     pixels[2, 0] = (150, 0, 0, 128)
     pixels[0, 1] = (100, 50, 50, 255)  # not in source — unchanged
-    pixels[1, 1] = (255, 0, 0, 100)   # red with low alpha
+    pixels[1, 1] = (255, 0, 0, 100)  # red with low alpha
     img.save(images / "knight.png")
     return tmp_path
 
@@ -220,7 +220,9 @@ class TestColorSwapSprite:
         assert record["image"] != plain_handle
 
     def test_sprite_with_team_palette(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         swap = ColorSwap([(255, 0, 0)], [(0, 255, 0)])
         register_palette("green", swap)
@@ -230,7 +232,9 @@ class TestColorSwapSprite:
         assert record["image"] == swapped_handle
 
     def test_color_swap_takes_precedence_over_team_palette(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         swap_direct = ColorSwap([(255, 0, 0)], [(0, 0, 255)])
         swap_palette = ColorSwap([(255, 0, 0)], [(0, 255, 0)])
@@ -249,7 +253,9 @@ class TestColorSwapSprite:
             Sprite("sprites/knight", team_palette="nonexistent")
 
     def test_sprite_without_swap_uses_plain_image(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         sprite = Sprite("sprites/knight")
         plain_handle = game.assets.image("sprites/knight")
@@ -264,15 +270,21 @@ class TestColorSwapSprite:
 
 class TestColorSwapIntegration:
     def test_two_sprites_same_swap_same_handle(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         swap = ColorSwap([(255, 0, 0)], [(0, 0, 255)])
         s1 = Sprite("sprites/knight", position=(100, 300), color_swap=swap)
         s2 = Sprite("sprites/knight", position=(200, 300), color_swap=swap)
-        assert backend.sprites[s1.sprite_id]["image"] == backend.sprites[s2.sprite_id]["image"]
+        assert (
+            backend.sprites[s1.sprite_id]["image"]
+            == backend.sprites[s2.sprite_id]["image"]
+        )
 
     def test_sprite_dimensions_correct_after_swap(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         swap = ColorSwap([(255, 0, 0)], [(0, 0, 255)])
         sprite = Sprite("sprites/knight", color_swap=swap)

@@ -24,8 +24,12 @@ class MainMenuScene(Scene):
         backend = self.game.backend
         # Background
         img = backend.create_solid_color_image(
-            25, 25, 35, 255,
-            backend.logical_width, backend.logical_height,
+            25,
+            25,
+            35,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(img, 0)
         backend.update_sprite(self._bg_sprite, 0, 0)

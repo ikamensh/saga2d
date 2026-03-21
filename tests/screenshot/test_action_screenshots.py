@@ -45,6 +45,7 @@ _RESOLUTION = (320, 240)
 
 class EmptyScene(Scene):
     """Minimal scene that keeps the scene stack non-empty."""
+
     pass
 
 
@@ -76,6 +77,7 @@ _WARRIOR_WALK = AnimationDef(
 # 1. Parallel walk + animate — start position
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_action_walk_start() -> None:
     """Knight with Parallel(PlayAnim(walk), MoveTo) captured at the start.
@@ -96,10 +98,12 @@ def test_action_walk_start() -> None:
             anchor=SpriteAnchor.TOP_LEFT,
             layer=RenderLayer.UNITS,
         )
-        knight.do(Parallel(
-            PlayAnim(_KNIGHT_WALK),
-            MoveTo((280, 120), speed=200),
-        ))
+        knight.do(
+            Parallel(
+                PlayAnim(_KNIGHT_WALK),
+                MoveTo((280, 120), speed=200),
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "action_walk_start")
@@ -108,6 +112,7 @@ def test_action_walk_start() -> None:
 # ---------------------------------------------------------------------------
 # 2. Parallel walk + animate — mid-walk
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_action_walk_mid() -> None:
@@ -131,10 +136,12 @@ def test_action_walk_mid() -> None:
             anchor=SpriteAnchor.TOP_LEFT,
             layer=RenderLayer.UNITS,
         )
-        knight.do(Parallel(
-            PlayAnim(_KNIGHT_WALK),
-            MoveTo((280, 120), speed=200),
-        ))
+        knight.do(
+            Parallel(
+                PlayAnim(_KNIGHT_WALK),
+                MoveTo((280, 120), speed=200),
+            )
+        )
 
     # 39 ticks × (1/60) ≈ 0.65s — roughly half of the 1.3s walk
     image = render_scene(setup, tick_count=39, resolution=_RESOLUTION)
@@ -144,6 +151,7 @@ def test_action_walk_mid() -> None:
 # ---------------------------------------------------------------------------
 # 3. FadeOut — before and after
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_action_fadeout_before() -> None:
@@ -199,6 +207,7 @@ def test_action_fadeout_after() -> None:
 # 4. Battle sequence — walk right, delay, walk back
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_action_battle_start() -> None:
     """Battle sequence: warrior at start position before the attack run.
@@ -221,11 +230,13 @@ def test_action_battle_start() -> None:
             anchor=SpriteAnchor.TOP_LEFT,
             layer=RenderLayer.UNITS,
         )
-        warrior.do(Sequence(
-            Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((260, 100), speed=300)),
-            Delay(0.3),
-            Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((20, 100), speed=300)),
-        ))
+        warrior.do(
+            Sequence(
+                Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((260, 100), speed=300)),
+                Delay(0.3),
+                Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((20, 100), speed=300)),
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "action_battle_start")
@@ -251,11 +262,13 @@ def test_action_battle_at_target() -> None:
             anchor=SpriteAnchor.TOP_LEFT,
             layer=RenderLayer.UNITS,
         )
-        warrior.do(Sequence(
-            Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((260, 100), speed=300)),
-            Delay(0.3),
-            Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((20, 100), speed=300)),
-        ))
+        warrior.do(
+            Sequence(
+                Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((260, 100), speed=300)),
+                Delay(0.3),
+                Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((20, 100), speed=300)),
+            )
+        )
 
     # 50 ticks × (1/60) ≈ 0.833s — past 0.8s forward walk, in the delay
     image = render_scene(setup, tick_count=50, resolution=_RESOLUTION)
@@ -285,11 +298,13 @@ def test_action_battle_returning() -> None:
             anchor=SpriteAnchor.TOP_LEFT,
             layer=RenderLayer.UNITS,
         )
-        warrior.do(Sequence(
-            Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((260, 100), speed=300)),
-            Delay(0.3),
-            Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((20, 100), speed=300)),
-        ))
+        warrior.do(
+            Sequence(
+                Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((260, 100), speed=300)),
+                Delay(0.3),
+                Parallel(PlayAnim(_WARRIOR_WALK), MoveTo((20, 100), speed=300)),
+            )
+        )
 
     # 84 ticks × (1/60) = 1.4s — in the return walk
     image = render_scene(setup, tick_count=84, resolution=_RESOLUTION)

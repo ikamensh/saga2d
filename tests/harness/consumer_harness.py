@@ -123,9 +123,7 @@ def run_harness(verbose: bool = False) -> bool:
 
     # ── US3: Game(mock), push Scene, tick ──
     try:
-        game = saga2d.Game(
-            "ConsumerHarness", resolution=(800, 600), backend="mock"
-        )
+        game = saga2d.Game("ConsumerHarness", resolution=(800, 600), backend="mock")
     except Exception as e:
         if verbose:
             print(f"  US3: Game init failed — {e}")

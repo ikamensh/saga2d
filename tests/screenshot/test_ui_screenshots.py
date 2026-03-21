@@ -33,6 +33,7 @@ _RESOLUTION = (480, 360)
 # 1. Main menu — centered panel with title + 3 vertical buttons
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_ui_main_menu() -> None:
     """Centered panel with a title Label and 3 Buttons arranged vertically.
@@ -70,6 +71,7 @@ def test_ui_main_menu() -> None:
 # 2. Horizontal button bar
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_ui_horizontal_buttons() -> None:
     """Panel with horizontal layout containing 3 buttons.
@@ -104,6 +106,7 @@ def test_ui_horizontal_buttons() -> None:
 # 3. Styled label — large font, custom colour
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_ui_styled_label() -> None:
     """A label with custom style: large font and distinct colour.
@@ -115,14 +118,16 @@ def test_ui_styled_label() -> None:
 
     class LabelScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "GAME OVER",
-                anchor=Anchor.CENTER,
-                style=Style(
-                    font_size=40,
-                    text_color=(255, 60, 60, 255),
-                ),
-            ))
+            self.ui.add(
+                Label(
+                    "GAME OVER",
+                    anchor=Anchor.CENTER,
+                    style=Style(
+                        font_size=40,
+                        text_color=(255, 60, 60, 255),
+                    ),
+                )
+            )
 
     def setup(game):
         game.push(LabelScene())
@@ -134,6 +139,7 @@ def test_ui_styled_label() -> None:
 # ---------------------------------------------------------------------------
 # 4. Nested panels
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_ui_nested_panels() -> None:
@@ -156,14 +162,16 @@ def test_ui_nested_panels() -> None:
             )
 
             top_row = Panel(
-                layout=Layout.HORIZONTAL, spacing=20,
+                layout=Layout.HORIZONTAL,
+                spacing=20,
                 style=inner_style,
             )
             top_row.add(Label("HP: 100", style=Style(font_size=18)))
             top_row.add(Label("MP: 50", style=Style(font_size=18)))
 
             bottom_row = Panel(
-                layout=Layout.HORIZONTAL, spacing=20,
+                layout=Layout.HORIZONTAL,
+                spacing=20,
                 style=inner_style,
             )
             bottom_row.add(Label("ATK: 25", style=Style(font_size=18)))

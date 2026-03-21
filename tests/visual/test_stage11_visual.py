@@ -73,8 +73,12 @@ class Stage11Scene(Scene):
 
         # Background
         bg = backend.create_solid_color_image(
-            30, 35, 45, 255,
-            backend.logical_width, backend.logical_height,
+            30,
+            35,
+            45,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(bg, -1)
         backend.update_sprite(self._bg_sprite, 0, 0)
@@ -128,14 +132,16 @@ class Stage11Scene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "B = particle burst  |  C = custom cursor  |  D = default cursor  |  ESC = quit",
-            20, backend.logical_height - 25,
+            20,
+            backend.logical_height - 25,
             20,
             (255, 255, 255, 255),
             font="Arial",
         )
         backend.draw_text(
             "Red team (left) | Blue team (right) | Sparks burst at center",
-            20, backend.logical_height - 48,
+            20,
+            backend.logical_height - 48,
             20,
             (200, 200, 200, 255),
             font="Arial",

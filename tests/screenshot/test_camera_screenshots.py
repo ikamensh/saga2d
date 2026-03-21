@@ -38,9 +38,9 @@ _ASSETS_DIR = Path(__file__).resolve().parents[2] / "assets" / "images" / "sprit
 
 # (filename, RGBA colour)
 _CAMERA_SPRITES = [
-    ("cam_red.png",    (220, 40, 40, 255)),
-    ("cam_blue.png",   (40, 80, 220, 255)),
-    ("cam_green.png",  (40, 180, 40, 255)),
+    ("cam_red.png", (220, 40, 40, 255)),
+    ("cam_blue.png", (40, 80, 220, 255)),
+    ("cam_green.png", (40, 180, 40, 255)),
     ("cam_yellow.png", (220, 200, 40, 255)),
 ]
 
@@ -94,20 +94,28 @@ class CameraWorldScene(Scene):
         )
 
         Sprite(
-            "sprites/cam_red", position=(30, 20),
-            anchor=SpriteAnchor.TOP_LEFT, layer=RenderLayer.UNITS,
+            "sprites/cam_red",
+            position=(30, 20),
+            anchor=SpriteAnchor.TOP_LEFT,
+            layer=RenderLayer.UNITS,
         )
         Sprite(
-            "sprites/cam_green", position=(140, 80),
-            anchor=SpriteAnchor.TOP_LEFT, layer=RenderLayer.UNITS,
+            "sprites/cam_green",
+            position=(140, 80),
+            anchor=SpriteAnchor.TOP_LEFT,
+            layer=RenderLayer.UNITS,
         )
         Sprite(
-            "sprites/cam_blue", position=(200, 140),
-            anchor=SpriteAnchor.TOP_LEFT, layer=RenderLayer.UNITS,
+            "sprites/cam_blue",
+            position=(200, 140),
+            anchor=SpriteAnchor.TOP_LEFT,
+            layer=RenderLayer.UNITS,
         )
         Sprite(
-            "sprites/cam_yellow", position=(280, 30),
-            anchor=SpriteAnchor.TOP_LEFT, layer=RenderLayer.UNITS,
+            "sprites/cam_yellow",
+            position=(280, 30),
+            anchor=SpriteAnchor.TOP_LEFT,
+            layer=RenderLayer.UNITS,
         )
 
         if self._camera_setup is not None:
@@ -117,6 +125,7 @@ class CameraWorldScene(Scene):
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_camera_at_origin() -> None:
@@ -128,9 +137,11 @@ def test_camera_at_origin() -> None:
     _ensure_camera_sprites()
 
     def setup(game):
-        game.push(CameraWorldScene(
-            camera_setup=lambda cam: None,  # keep at (0, 0)
-        ))
+        game.push(
+            CameraWorldScene(
+                camera_setup=lambda cam: None,  # keep at (0, 0)
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "camera_at_origin")
@@ -149,9 +160,11 @@ def test_camera_centered_on_world() -> None:
     _ensure_camera_sprites()
 
     def setup(game):
-        game.push(CameraWorldScene(
-            camera_setup=lambda cam: cam.center_on(200, 150),
-        ))
+        game.push(
+            CameraWorldScene(
+                camera_setup=lambda cam: cam.center_on(200, 150),
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "camera_centered_on_world")
@@ -172,9 +185,11 @@ def test_camera_scrolled_right() -> None:
     _ensure_camera_sprites()
 
     def setup(game):
-        game.push(CameraWorldScene(
-            camera_setup=lambda cam: cam.scroll(250, 0),
-        ))
+        game.push(
+            CameraWorldScene(
+                camera_setup=lambda cam: cam.scroll(250, 0),
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "camera_scrolled_right")
@@ -195,9 +210,11 @@ def test_camera_scrolled_down() -> None:
     _ensure_camera_sprites()
 
     def setup(game):
-        game.push(CameraWorldScene(
-            camera_setup=lambda cam: cam.scroll(0, 120),
-        ))
+        game.push(
+            CameraWorldScene(
+                camera_setup=lambda cam: cam.scroll(0, 120),
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "camera_scrolled_down")

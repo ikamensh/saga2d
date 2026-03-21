@@ -30,6 +30,7 @@ from saga2d.ui.screens import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def game() -> Game:
     """Return a mock game instance."""
@@ -52,6 +53,7 @@ def save_mgr(tmp_path: Path) -> SaveManager:
 # MessageScreen
 # ---------------------------------------------------------------------------
 
+
 class TestMessageScreen:
     """Test MessageScreen creation and behaviour."""
 
@@ -64,7 +66,9 @@ class TestMessageScreen:
         assert MessageScreen.show_hud is False
 
     def test_dismiss_on_key_press(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Pressing any key dismisses the MessageScreen."""
         game.push(Scene())
@@ -78,7 +82,9 @@ class TestMessageScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_dismiss_on_click(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Clicking dismisses the MessageScreen."""
         game.push(Scene())
@@ -90,7 +96,9 @@ class TestMessageScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_on_dismiss_callback(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """on_dismiss callback fires before pop."""
         called = []
@@ -103,7 +111,9 @@ class TestMessageScreen:
         assert called == [True]
 
     def test_no_callback_if_none(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Works fine without on_dismiss callback."""
         game.push(Scene())
@@ -115,7 +125,9 @@ class TestMessageScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_consumes_all_events(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """MessageScreen consumes all events (modal)."""
         scene_events = []
@@ -138,7 +150,9 @@ class TestMessageScreen:
         assert len(game._scene_stack._stack) == 2
 
     def test_builds_ui_on_enter(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """MessageScreen builds UI components in on_enter."""
         game.push(Scene())
@@ -150,7 +164,9 @@ class TestMessageScreen:
         assert len(msg._ui._children) > 0
 
     def test_draws_without_error(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """MessageScreen can render a frame without error."""
         game.push(Scene())
@@ -162,6 +178,7 @@ class TestMessageScreen:
 # ChoiceScreen
 # ---------------------------------------------------------------------------
 
+
 class TestChoiceScreen:
     """Test ChoiceScreen creation and behaviour."""
 
@@ -172,15 +189,20 @@ class TestChoiceScreen:
         assert ChoiceScreen.show_hud is False
 
     def test_escape_cancels_without_callback(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Pressing Escape pops without calling on_choice."""
         called = []
         game.push(Scene())
-        game.push(ChoiceScreen(
-            "Pick:", ["A", "B"],
-            on_choice=lambda i: called.append(i),
-        ))
+        game.push(
+            ChoiceScreen(
+                "Pick:",
+                ["A", "B"],
+                on_choice=lambda i: called.append(i),
+            )
+        )
 
         backend.inject_key("escape")
         game.tick(dt=0.016)
@@ -189,13 +211,16 @@ class TestChoiceScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_button_click_calls_on_choice(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Clicking a choice button fires on_choice(index)."""
         called = []
         game.push(Scene())
         screen = ChoiceScreen(
-            "Pick:", ["Warrior", "Mage", "Rogue"],
+            "Pick:",
+            ["Warrior", "Mage", "Rogue"],
             on_choice=lambda i: called.append(i),
         )
         game.push(screen)
@@ -216,15 +241,20 @@ class TestChoiceScreen:
         assert called == [1]
 
     def test_number_key_selects_choice(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Pressing a number key (1-based) selects the choice."""
         called = []
         game.push(Scene())
-        game.push(ChoiceScreen(
-            "Pick:", ["A", "B", "C"],
-            on_choice=lambda i: called.append(i),
-        ))
+        game.push(
+            ChoiceScreen(
+                "Pick:",
+                ["A", "B", "C"],
+                on_choice=lambda i: called.append(i),
+            )
+        )
 
         backend.inject_key("2")
         game.tick(dt=0.016)
@@ -233,15 +263,20 @@ class TestChoiceScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_invalid_number_key_ignored(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Number keys out of range don't trigger selection."""
         called = []
         game.push(Scene())
-        game.push(ChoiceScreen(
-            "Pick:", ["A", "B"],
-            on_choice=lambda i: called.append(i),
-        ))
+        game.push(
+            ChoiceScreen(
+                "Pick:",
+                ["A", "B"],
+                on_choice=lambda i: called.append(i),
+            )
+        )
 
         backend.inject_key("5")  # Only 2 choices.
         game.tick(dt=0.016)
@@ -250,7 +285,9 @@ class TestChoiceScreen:
         assert len(game._scene_stack._stack) == 2  # Still on stack.
 
     def test_consumes_all_events(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """ChoiceScreen consumes all events (modal)."""
         scene_events = []
@@ -269,7 +306,9 @@ class TestChoiceScreen:
         assert len(scene_events) == 0
 
     def test_no_callback_works(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """ChoiceScreen works without on_choice callback."""
         game.push(Scene())
@@ -281,7 +320,9 @@ class TestChoiceScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_builds_ui_with_prompt_and_buttons(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """ChoiceScreen creates prompt label and choice buttons."""
         game.push(Scene())
@@ -297,6 +338,7 @@ class TestChoiceScreen:
 # ConfirmDialog
 # ---------------------------------------------------------------------------
 
+
 class TestConfirmDialog:
     """Test ConfirmDialog creation and behaviour."""
 
@@ -307,7 +349,9 @@ class TestConfirmDialog:
         assert ConfirmDialog.show_hud is False
 
     def test_yes_button_calls_on_confirm(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Clicking Yes fires on_confirm and pops."""
         called = []
@@ -330,7 +374,9 @@ class TestConfirmDialog:
         assert called == ["yes"]
 
     def test_no_button_calls_on_cancel(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Clicking No fires on_cancel and pops."""
         called = []
@@ -352,15 +398,19 @@ class TestConfirmDialog:
         assert called == ["no"]
 
     def test_enter_key_confirms(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Pressing Enter/Return fires on_confirm."""
         called = []
         game.push(Scene())
-        game.push(ConfirmDialog(
-            "Sure?",
-            on_confirm=lambda: called.append("yes"),
-        ))
+        game.push(
+            ConfirmDialog(
+                "Sure?",
+                on_confirm=lambda: called.append("yes"),
+            )
+        )
 
         backend.inject_key("return")
         game.tick(dt=0.016)
@@ -369,15 +419,19 @@ class TestConfirmDialog:
         assert len(game._scene_stack._stack) == 1
 
     def test_escape_key_cancels(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Pressing Escape fires on_cancel."""
         called = []
         game.push(Scene())
-        game.push(ConfirmDialog(
-            "Sure?",
-            on_cancel=lambda: called.append("no"),
-        ))
+        game.push(
+            ConfirmDialog(
+                "Sure?",
+                on_cancel=lambda: called.append("no"),
+            )
+        )
 
         backend.inject_key("escape")
         game.tick(dt=0.016)
@@ -386,7 +440,9 @@ class TestConfirmDialog:
         assert len(game._scene_stack._stack) == 1
 
     def test_consumes_all_events(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """ConfirmDialog consumes all events (modal)."""
         scene_events = []
@@ -405,7 +461,9 @@ class TestConfirmDialog:
         assert len(scene_events) == 0
 
     def test_no_callbacks_works(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """ConfirmDialog works with no callbacks."""
         game.push(Scene())
@@ -417,7 +475,9 @@ class TestConfirmDialog:
         assert len(game._scene_stack._stack) == 1
 
     def test_builds_ui_with_buttons(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """ConfirmDialog creates Yes and No buttons."""
         game.push(Scene())
@@ -434,6 +494,7 @@ class TestConfirmDialog:
 # ---------------------------------------------------------------------------
 # SaveLoadScreen
 # ---------------------------------------------------------------------------
+
 
 class TestSaveLoadScreen:
     """Test SaveLoadScreen creation and behaviour."""
@@ -452,13 +513,18 @@ class TestSaveLoadScreen:
             SaveLoadScreen("invalid", save_manager=save_mgr)
 
     def test_load_screen_shows_slots(
-        self, game: Game, backend: MockBackend, save_mgr: SaveManager,
+        self,
+        game: Game,
+        backend: MockBackend,
+        save_mgr: SaveManager,
     ) -> None:
         """SaveLoadScreen in load mode shows slot buttons."""
         save_mgr.save(1, {"gold": 100}, "MapScene")
         game.push(Scene())
         screen = SaveLoadScreen(
-            "load", save_manager=save_mgr, slot_count=3,
+            "load",
+            save_manager=save_mgr,
+            slot_count=3,
         )
         game.push(screen)
 
@@ -474,7 +540,10 @@ class TestSaveLoadScreen:
         assert "Empty" in buttons[1]._text
 
     def test_save_mode_saves_on_slot_click(
-        self, game: Game, backend: MockBackend, save_mgr: SaveManager,
+        self,
+        game: Game,
+        backend: MockBackend,
+        save_mgr: SaveManager,
     ) -> None:
         """In save mode, clicking a slot calls game.save() and on_save."""
         saved_slots = []
@@ -509,7 +578,10 @@ class TestSaveLoadScreen:
         assert data["state"]["gold"] == 999
 
     def test_load_mode_loads_on_filled_slot(
-        self, game: Game, backend: MockBackend, save_mgr: SaveManager,
+        self,
+        game: Game,
+        backend: MockBackend,
+        save_mgr: SaveManager,
     ) -> None:
         """In load mode, clicking a filled slot fires on_load."""
         loaded_data = []
@@ -536,7 +608,10 @@ class TestSaveLoadScreen:
         assert loaded_data[0][1]["state"]["level"] == 5
 
     def test_load_mode_ignores_empty_slot(
-        self, game: Game, backend: MockBackend, save_mgr: SaveManager,
+        self,
+        game: Game,
+        backend: MockBackend,
+        save_mgr: SaveManager,
     ) -> None:
         """In load mode, clicking an empty slot does nothing."""
         loaded_data = []
@@ -562,12 +637,17 @@ class TestSaveLoadScreen:
         assert len(game._scene_stack._stack) == 2
 
     def test_back_button_pops(
-        self, game: Game, backend: MockBackend, save_mgr: SaveManager,
+        self,
+        game: Game,
+        backend: MockBackend,
+        save_mgr: SaveManager,
     ) -> None:
         """Clicking Back pops the SaveLoadScreen."""
         game.push(Scene())
         screen = SaveLoadScreen(
-            "load", save_manager=save_mgr, slot_count=2,
+            "load",
+            save_manager=save_mgr,
+            slot_count=2,
         )
         game.push(screen)
         game.tick(dt=0.016)
@@ -583,13 +663,20 @@ class TestSaveLoadScreen:
         assert len(game._scene_stack._stack) == 1
 
     def test_escape_pops(
-        self, game: Game, backend: MockBackend, save_mgr: SaveManager,
+        self,
+        game: Game,
+        backend: MockBackend,
+        save_mgr: SaveManager,
     ) -> None:
         """Pressing Escape pops the SaveLoadScreen."""
         game.push(Scene())
-        game.push(SaveLoadScreen(
-            "load", save_manager=save_mgr, slot_count=2,
-        ))
+        game.push(
+            SaveLoadScreen(
+                "load",
+                save_manager=save_mgr,
+                slot_count=2,
+            )
+        )
 
         backend.inject_key("escape")
         game.tick(dt=0.016)
@@ -601,11 +688,14 @@ class TestSaveLoadScreen:
 # show_sequence
 # ---------------------------------------------------------------------------
 
+
 class TestShowSequence:
     """Test game.show_sequence() chaining behaviour."""
 
     def test_sequence_pushes_first_screen(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """show_sequence pushes _SequenceRunner + first MessageScreen."""
         game.push(Scene())
@@ -621,7 +711,9 @@ class TestShowSequence:
         assert isinstance(game._scene_stack._stack[2], MessageScreen)
 
     def test_sequence_chains_on_dismiss(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Dismissing one screen pushes the next."""
         game.push(Scene())
@@ -659,7 +751,9 @@ class TestShowSequence:
         assert len(game._scene_stack._stack) == 1
 
     def test_sequence_fires_on_complete(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """on_complete callback fires after last screen is dismissed."""
         completed = []
@@ -676,7 +770,9 @@ class TestShowSequence:
         assert completed == [True]
 
     def test_empty_sequence_fires_on_complete_immediately(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Empty screen list fires on_complete immediately."""
         completed = []
@@ -691,7 +787,9 @@ class TestShowSequence:
         assert len(game._scene_stack._stack) == 1
 
     def test_sequence_no_callback_works(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """show_sequence works without on_complete callback."""
         game.push(Scene())
@@ -711,9 +809,11 @@ class TestShowSequence:
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _find_buttons(component, result: list) -> None:
     """Recursively find all Button instances in a component tree."""
     from saga2d.ui.components import Button
+
     if isinstance(component, Button):
         result.append(component)
     for child in component._children:

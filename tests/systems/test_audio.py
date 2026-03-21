@@ -122,7 +122,9 @@ class TestChannelVolume:
             audio.get_volume("nope")
 
     def test_effective_volume_sfx(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Effective SFX volume = master * sfx."""
         audio.set_volume("master", 0.8)
@@ -133,7 +135,9 @@ class TestChannelVolume:
         assert backend.sounds_played[0]["volume"] == pytest.approx(0.4)
 
     def test_effective_volume_ui(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Effective UI volume = master * ui."""
         audio.set_volume("master", 0.5)
@@ -143,7 +147,9 @@ class TestChannelVolume:
         assert backend.sounds_played[0]["volume"] == pytest.approx(0.3)
 
     def test_effective_volume_music(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Effective music volume = master * music."""
         audio.set_volume("master", 0.5)
@@ -153,7 +159,9 @@ class TestChannelVolume:
         assert backend.music_volume == pytest.approx(0.4)
 
     def test_changing_master_reapplies_to_music(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Changing master volume immediately adjusts the current music player."""
         audio.play_music("exploration")
@@ -163,7 +171,9 @@ class TestChannelVolume:
         assert backend.music_volume == pytest.approx(0.5)
 
     def test_changing_music_channel_reapplies_to_music(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Changing music channel volume immediately adjusts the current music player."""
         audio.play_music("exploration")
@@ -171,7 +181,9 @@ class TestChannelVolume:
         assert backend.music_volume == pytest.approx(0.3)
 
     def test_changing_sfx_does_not_reapply_to_music(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Changing sfx volume does not affect the music player."""
         audio.play_music("exploration")
@@ -180,7 +192,8 @@ class TestChannelVolume:
         assert backend.music_volume == pytest.approx(1.0)
 
     def test_set_volume_no_music_playing_no_crash(
-        self, audio: AudioManager,
+        self,
+        audio: AudioManager,
     ) -> None:
         """Changing master/music volume when no music is playing doesn't crash."""
         audio.set_volume("master", 0.5)
@@ -196,14 +209,18 @@ class TestPlaySound:
     """play_sound records the correct handle and volume."""
 
     def test_play_sound_records_in_backend(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_sound is recorded in backend.sounds_played."""
         audio.play_sound("sword_hit")
         assert len(backend.sounds_played) == 1
 
     def test_play_sound_correct_handle(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Handle from backend.load_sound is passed to backend.play_sound."""
         audio.play_sound("sword_hit")
@@ -212,14 +229,18 @@ class TestPlaySound:
         assert entry["handle"].startswith("sound_")
 
     def test_play_sound_default_volume_is_one(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Default volume (master=1, sfx=1) → effective = 1.0."""
         audio.play_sound("sword_hit")
         assert backend.sounds_played[0]["volume"] == pytest.approx(1.0)
 
     def test_play_sound_sfx_channel(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_sound uses the sfx channel by default."""
         audio.set_volume("sfx", 0.5)
@@ -227,7 +248,9 @@ class TestPlaySound:
         assert backend.sounds_played[0]["volume"] == pytest.approx(0.5)
 
     def test_play_sound_ui_channel(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_sound with channel='ui' uses the ui channel."""
         audio.set_volume("ui", 0.4)
@@ -235,7 +258,9 @@ class TestPlaySound:
         assert backend.sounds_played[0]["volume"] == pytest.approx(0.4)
 
     def test_volume_change_affects_subsequent_plays(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Changing volume after the first play affects the next play."""
         audio.play_sound("sword_hit")
@@ -246,7 +271,9 @@ class TestPlaySound:
         assert backend.sounds_played[1]["volume"] == pytest.approx(0.5)
 
     def test_multiple_sounds_accumulate(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Playing multiple sounds appends to the list."""
         audio.play_sound("sword_hit")
@@ -254,7 +281,9 @@ class TestPlaySound:
         assert len(backend.sounds_played) == 2
 
     def test_master_times_sfx(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Effective volume is master * sfx."""
         audio.set_volume("master", 0.6)
@@ -268,7 +297,9 @@ class TestPlaySound:
             audio.play_sound("nonexistent")
 
     def test_play_sound_missing_optional_returns_none(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Missing sound with optional=True returns None, no backend call."""
         result = audio.play_sound("nonexistent", optional=True)
@@ -285,14 +316,18 @@ class TestPlayMusic:
     """play_music starts a music player with the correct parameters."""
 
     def test_play_music_starts_player(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_music creates a player in the backend."""
         audio.play_music("exploration")
         assert backend.music_playing is not None
 
     def test_play_music_volume(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Music player volume = master * music channel."""
         audio.set_volume("master", 0.8)
@@ -301,7 +336,9 @@ class TestPlayMusic:
         assert backend.music_volume == pytest.approx(0.4)
 
     def test_play_music_loop_default_true(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_music loops by default."""
         audio.play_music("exploration")
@@ -310,7 +347,9 @@ class TestPlayMusic:
         assert player["loop"] is True
 
     def test_play_music_loop_false(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_music with loop=False."""
         audio.play_music("exploration", loop=False)
@@ -318,7 +357,9 @@ class TestPlayMusic:
         assert player["loop"] is False
 
     def test_play_music_stops_old(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Playing new music stops the previous track."""
         audio.play_music("exploration")
@@ -332,7 +373,8 @@ class TestPlayMusic:
         assert audio._current_player_id != old_player_id
 
     def test_play_music_tracks_name(
-        self, audio: AudioManager,
+        self,
+        audio: AudioManager,
     ) -> None:
         """_current_music_name tracks the active music name."""
         audio.play_music("exploration")
@@ -346,7 +388,9 @@ class TestPlayMusic:
             audio.play_music("nonexistent")
 
     def test_play_music_missing_optional_returns_none(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Missing music with optional=True returns None, no backend call."""
         result = audio.play_music("nonexistent", optional=True)
@@ -363,7 +407,9 @@ class TestStopMusic:
     """stop_music stops the current player and clears state."""
 
     def test_stop_music_stops_player(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """stop_music stops the backend player."""
         audio.play_music("exploration")
@@ -373,7 +419,8 @@ class TestStopMusic:
         assert player_id not in backend._music_players
 
     def test_stop_music_clears_state(
-        self, audio: AudioManager,
+        self,
+        audio: AudioManager,
     ) -> None:
         """stop_music clears current_player_id and current_music_name."""
         audio.play_music("exploration")
@@ -383,13 +430,16 @@ class TestStopMusic:
         assert audio._current_music_name is None
 
     def test_stop_music_when_nothing_playing(
-        self, audio: AudioManager,
+        self,
+        audio: AudioManager,
     ) -> None:
         """stop_music when nothing playing is a no-op."""
         audio.stop_music()  # Should not raise
 
     def test_stop_music_updates_backend_convenience(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """stop_music updates backend.music_playing to None."""
         audio.play_music("exploration")
@@ -406,7 +456,8 @@ class TestCrossfadeMusic:
     """crossfade_music transitions between tracks using tweens."""
 
     def test_crossfade_creates_two_players(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Crossfade creates a new player while old is still active."""
         backend = game.backend
@@ -423,7 +474,8 @@ class TestCrossfadeMusic:
         assert backend._music_players[new_player_id]["playing"] is True
 
     def test_crossfade_new_player_starts_at_zero(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """New player starts at volume 0 during crossfade."""
         game.audio.play_music("exploration")
@@ -435,7 +487,8 @@ class TestCrossfadeMusic:
         assert game.audio._current_music_name == "battle"
 
     def test_crossfade_completes_after_duration(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """After duration, old player is stopped and new player at full volume."""
         backend = game.backend
@@ -455,7 +508,8 @@ class TestCrossfadeMusic:
         assert backend._music_players[new_player_id]["volume"] == pytest.approx(1.0)
 
     def test_crossfade_midpoint_volumes(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """At halfway through crossfade, both players have intermediate volume."""
         backend = game.backend
@@ -478,7 +532,8 @@ class TestCrossfadeMusic:
         assert 0.3 < new_vol < 0.7
 
     def test_crossfade_same_track_is_noop(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Crossfade to the same track is a no-op."""
         backend = game.backend
@@ -494,7 +549,8 @@ class TestCrossfadeMusic:
         assert game.audio._current_player_id == player_id
 
     def test_crossfade_when_nothing_playing(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Crossfade when nothing playing falls through to play_music."""
         backend = game.backend
@@ -506,7 +562,8 @@ class TestCrossfadeMusic:
         assert backend.music_volume == pytest.approx(1.0)
 
     def test_crossfade_interruption(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Interrupting a crossfade stops the old fading-out player."""
         backend = game.backend
@@ -530,7 +587,8 @@ class TestCrossfadeMusic:
         assert game.audio._current_music_name == "victory"
 
     def test_crossfade_tween_ids_cleared_after_completion(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Crossfade tween IDs are cleared after the crossfade completes."""
         game.audio.play_music("exploration")
@@ -546,7 +604,8 @@ class TestCrossfadeMusic:
         assert game.audio._crossfade_old_player is None
 
     def test_crossfade_respects_channel_volume(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Crossfade volumes are multiplied by master * music channel."""
         backend = game.backend
@@ -565,7 +624,8 @@ class TestCrossfadeMusic:
         assert backend._music_players[new_player_id]["volume"] == pytest.approx(0.4)
 
     def test_crossfade_base_volume_updates(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """_current_player_base_volume updates to 1.0 after crossfade."""
         game.audio.play_music("exploration")
@@ -581,7 +641,8 @@ class TestCrossfadeMusic:
         assert game.audio._current_player_base_volume == pytest.approx(1.0)
 
     def test_crossfade_with_loop_false(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """Crossfade with loop=False creates non-looping player."""
         backend = game.backend
@@ -592,7 +653,8 @@ class TestCrossfadeMusic:
         assert backend._music_players[new_player_id]["loop"] is False
 
     def test_stop_music_cancels_crossfade(
-        self, game: Game,
+        self,
+        game: Game,
     ) -> None:
         """stop_music during a crossfade cancels the crossfade tweens."""
         backend = game.backend
@@ -627,7 +689,9 @@ class TestSoundPools:
         assert len(audio._pools["hit"]) == 3
 
     def test_play_pool_plays_a_sound(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """play_pool plays exactly one sound from the pool."""
         audio.register_pool("hit", ["hit_01", "hit_02", "hit_03"])
@@ -635,7 +699,9 @@ class TestSoundPools:
         assert len(backend.sounds_played) == 1
 
     def test_play_pool_no_immediate_repeat(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Same sound never plays twice in a row (pool size > 1)."""
         audio.register_pool("hit", ["hit_01", "hit_02", "hit_03"])
@@ -651,7 +717,9 @@ class TestSoundPools:
             )
 
     def test_play_pool_single_sound_always_plays(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Pool with one sound always plays that sound."""
         audio.register_pool("lone", ["lone"])
@@ -665,7 +733,9 @@ class TestSoundPools:
         assert len(handles) == 1
 
     def test_play_pool_empty_is_noop(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Playing from an empty pool is a silent no-op."""
         audio.register_pool("empty", [])
@@ -673,14 +743,17 @@ class TestSoundPools:
         assert len(backend.sounds_played) == 0
 
     def test_play_pool_unregistered_raises(
-        self, audio: AudioManager,
+        self,
+        audio: AudioManager,
     ) -> None:
         """Playing from an unregistered pool raises KeyError."""
         with pytest.raises(KeyError):
             audio.play_pool("nonexistent")
 
     def test_play_pool_uses_sfx_channel(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Pool sounds use the sfx channel volume."""
         audio.set_volume("sfx", 0.5)
@@ -690,7 +763,9 @@ class TestSoundPools:
         assert backend.sounds_played[0]["volume"] == pytest.approx(0.5)
 
     def test_play_pool_two_sounds_alternates(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """Pool with exactly 2 sounds alternates between them."""
         audio.register_pool("duo", ["hit_01", "hit_02"])
@@ -710,7 +785,8 @@ class TestSoundPools:
         assert len(audio._pools["hit"]) == 2
 
     def test_register_pool_replaces_existing(
-        self, audio: AudioManager,
+        self,
+        audio: AudioManager,
     ) -> None:
         """Re-registering a pool replaces the previous one."""
         audio.register_pool("hit", ["hit_01", "hit_02"])
@@ -720,7 +796,9 @@ class TestSoundPools:
         assert audio._pool_last["hit"] == -1
 
     def test_play_pool_covers_all_sounds(
-        self, audio: AudioManager, backend: MockBackend,
+        self,
+        audio: AudioManager,
+        backend: MockBackend,
     ) -> None:
         """All sounds in a pool are eventually played."""
         audio.register_pool("hit", ["hit_01", "hit_02", "hit_03"])
@@ -741,7 +819,10 @@ class TestAssetManagerAudio:
     """sound() and music() methods on AssetManager."""
 
     def test_sound_loads_wav(
-        self, assets: AssetManager, backend: MockBackend, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        backend: MockBackend,
+        asset_dir: Path,
     ) -> None:
         """sound('sword_hit') loads assets/sounds/sword_hit.wav."""
         handle = assets.sound("sword_hit")
@@ -750,7 +831,9 @@ class TestAssetManagerAudio:
         assert expected in backend._loaded_sounds
 
     def test_sound_prefers_wav_over_ogg(
-        self, backend: MockBackend, tmp_path: Path,
+        self,
+        backend: MockBackend,
+        tmp_path: Path,
     ) -> None:
         """sound() prefers .wav over .ogg when both exist."""
         sounds = tmp_path / "sounds"
@@ -767,7 +850,10 @@ class TestAssetManagerAudio:
         assert ogg_path not in backend._loaded_sounds
 
     def test_sound_falls_back_to_ogg(
-        self, assets: AssetManager, backend: MockBackend, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        backend: MockBackend,
+        asset_dir: Path,
     ) -> None:
         """sound('hover') finds the .ogg when no .wav exists."""
         handle = assets.sound("hover")
@@ -776,7 +862,10 @@ class TestAssetManagerAudio:
         assert expected in backend._loaded_sounds
 
     def test_sound_falls_back_to_mp3(
-        self, assets: AssetManager, backend: MockBackend, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        backend: MockBackend,
+        asset_dir: Path,
     ) -> None:
         """sound('beep') finds the .mp3 when no .wav or .ogg exist."""
         handle = assets.sound("beep")
@@ -785,7 +874,8 @@ class TestAssetManagerAudio:
         assert expected in backend._loaded_sounds
 
     def test_sound_cached(
-        self, assets: AssetManager,
+        self,
+        assets: AssetManager,
     ) -> None:
         """Calling sound() twice returns the same handle (cached)."""
         h1 = assets.sound("sword_hit")
@@ -793,14 +883,18 @@ class TestAssetManagerAudio:
         assert h1 is h2
 
     def test_sound_missing_raises(
-        self, assets: AssetManager,
+        self,
+        assets: AssetManager,
     ) -> None:
         """Missing sound raises AssetNotFoundError."""
         with pytest.raises(AssetNotFoundError, match="Sound"):
             assets.sound("nonexistent")
 
     def test_sound_with_explicit_extension(
-        self, assets: AssetManager, backend: MockBackend, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        backend: MockBackend,
+        asset_dir: Path,
     ) -> None:
         """sound('sword_hit.wav') with explicit extension."""
         handle = assets.sound("sword_hit.wav")
@@ -809,7 +903,10 @@ class TestAssetManagerAudio:
         assert expected in backend._loaded_sounds
 
     def test_music_loads_ogg(
-        self, assets: AssetManager, backend: MockBackend, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        backend: MockBackend,
+        asset_dir: Path,
     ) -> None:
         """music('exploration') loads assets/music/exploration.ogg."""
         handle = assets.music("exploration")
@@ -818,7 +915,9 @@ class TestAssetManagerAudio:
         assert expected in backend._loaded_music
 
     def test_music_prefers_ogg_over_wav(
-        self, backend: MockBackend, tmp_path: Path,
+        self,
+        backend: MockBackend,
+        tmp_path: Path,
     ) -> None:
         """music() prefers .ogg over .wav when both exist."""
         music = tmp_path / "music"
@@ -835,7 +934,10 @@ class TestAssetManagerAudio:
         assert wav_path not in backend._loaded_music
 
     def test_music_falls_back_to_wav(
-        self, assets: AssetManager, backend: MockBackend, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        backend: MockBackend,
+        asset_dir: Path,
     ) -> None:
         """music('menu') finds the .wav when no .ogg exists."""
         handle = assets.music("menu")
@@ -844,7 +946,8 @@ class TestAssetManagerAudio:
         assert expected in backend._loaded_music
 
     def test_music_not_cached_handle(
-        self, assets: AssetManager,
+        self,
+        assets: AssetManager,
     ) -> None:
         """music() returns fresh handle each time (streaming limitation).
 
@@ -857,14 +960,17 @@ class TestAssetManagerAudio:
         assert "exploration" in assets._music_path_cache
 
     def test_music_missing_raises(
-        self, assets: AssetManager,
+        self,
+        assets: AssetManager,
     ) -> None:
         """Missing music raises AssetNotFoundError."""
         with pytest.raises(AssetNotFoundError, match="Music"):
             assets.music("nonexistent")
 
     def test_sound_error_lists_tried_paths(
-        self, assets: AssetManager, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        asset_dir: Path,
     ) -> None:
         """Missing sound error message lists all tried paths."""
         with pytest.raises(AssetNotFoundError) as exc_info:
@@ -876,7 +982,9 @@ class TestAssetManagerAudio:
         assert "missing_fx.mp3" in msg
 
     def test_music_error_lists_tried_paths(
-        self, assets: AssetManager, asset_dir: Path,
+        self,
+        assets: AssetManager,
+        asset_dir: Path,
     ) -> None:
         """Missing music error message lists all tried paths."""
         with pytest.raises(AssetNotFoundError) as exc_info:
@@ -924,6 +1032,7 @@ class TestGameIntegration:
     def test_game_audio_importable_from_saga2d(self) -> None:
         """AudioManager is importable from the top-level package."""
         from saga2d import AudioManager as AM
+
         assert AM is AudioManager
 
     def test_game_audio_play_sound_end_to_end(self, game: Game) -> None:

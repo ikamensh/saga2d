@@ -26,6 +26,7 @@ from saga2d.rendering.layers import SpriteAnchor
 # Fixtures
 # ------------------------------------------------------------------
 
+
 @pytest.fixture
 def asset_dir(tmp_path: Path) -> Path:
     """Temp asset dir with knight.png."""
@@ -52,8 +53,8 @@ def backend(game: Game) -> MockBackend:
 # 1. center_on
 # ==================================================================
 
-class TestCenterOn:
 
+class TestCenterOn:
     def test_center_on_sets_top_left(self) -> None:
         """center_on(500, 400) with 800x600 viewport -> _x=100, _y=100."""
         cam = Camera((800, 600))
@@ -111,13 +112,14 @@ class TestCenterOn:
 # 2. follow
 # ==================================================================
 
-class TestFollow:
 
+class TestFollow:
     def test_follow_tracks_sprite_position(self, game: Game) -> None:
         """update() centers camera on followed sprite."""
         cam = Camera((800, 600))
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         cam.follow(sprite)
@@ -130,7 +132,8 @@ class TestFollow:
         """Camera re-centers each update() as sprite moves."""
         cam = Camera((800, 600))
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         cam.follow(sprite)
@@ -146,7 +149,8 @@ class TestFollow:
         """follow(None) stops tracking."""
         cam = Camera((800, 600))
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         cam.follow(sprite)
@@ -164,7 +168,8 @@ class TestFollow:
         """Following a removed sprite gracefully clears follow mode."""
         cam = Camera((800, 600))
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         cam.follow(sprite)
@@ -183,7 +188,8 @@ class TestFollow:
         """Follow respects world_bounds clamping."""
         cam = Camera((800, 600), world_bounds=(0, 0, 2000, 2000))
         sprite = Sprite(
-            "sprites/knight", position=(100, 100),
+            "sprites/knight",
+            position=(100, 100),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         cam.follow(sprite)
@@ -198,8 +204,8 @@ class TestFollow:
 # 3. scroll
 # ==================================================================
 
-class TestScroll:
 
+class TestScroll:
     def test_scroll_moves_camera(self) -> None:
         """scroll(dx, dy) offsets camera position."""
         cam = Camera((800, 600))
@@ -258,8 +264,8 @@ class TestScroll:
 # 4. screen_to_world / world_to_screen
 # ==================================================================
 
-class TestCoordinateConversion:
 
+class TestCoordinateConversion:
     def test_roundtrip(self) -> None:
         """screen_to_world -> world_to_screen roundtrips exactly."""
         cam = Camera((800, 600))
@@ -331,14 +337,17 @@ class TestCoordinateConversion:
 # 5. Frustum culling
 # ==================================================================
 
-class TestFrustumCulling:
 
+class TestFrustumCulling:
     def test_offscreen_sprite_hidden_during_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Sprite far outside viewport is hidden during draw."""
         sprite = Sprite(
-            "sprites/knight", position=(5000, 5000),
+            "sprites/knight",
+            position=(5000, 5000),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         visible_during_draw = {}
@@ -358,11 +367,14 @@ class TestFrustumCulling:
         assert visible_during_draw["v"] is False
 
     def test_onscreen_sprite_visible_during_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Sprite within viewport is visible during draw."""
         sprite = Sprite(
-            "sprites/knight", position=(400, 300),
+            "sprites/knight",
+            position=(400, 300),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         visible_during_draw = {}
@@ -382,11 +394,14 @@ class TestFrustumCulling:
         assert visible_during_draw["v"] is True
 
     def test_visibility_restored_after_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Off-screen sprite has visibility restored after the draw phase."""
         sprite = Sprite(
-            "sprites/knight", position=(5000, 5000),
+            "sprites/knight",
+            position=(5000, 5000),
             anchor=SpriteAnchor.TOP_LEFT,
         )
 
@@ -403,12 +418,16 @@ class TestFrustumCulling:
         assert rec["visible"] is True
 
     def test_user_hidden_sprite_stays_hidden(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Sprite with visible=False stays hidden even if in viewport."""
         sprite = Sprite(
-            "sprites/knight", position=(400, 300),
-            anchor=SpriteAnchor.TOP_LEFT, visible=False,
+            "sprites/knight",
+            position=(400, 300),
+            anchor=SpriteAnchor.TOP_LEFT,
+            visible=False,
         )
         visible_during_draw = {}
 
@@ -427,14 +446,17 @@ class TestFrustumCulling:
         assert visible_during_draw["v"] is False
 
     def test_sprite_partially_onscreen_is_visible(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Sprite whose bounding box overlaps the viewport edge is visible."""
         # Camera at (0, 0), viewport 800x600.
         # Sprite at (-30, 300) with 64x64 image -> draw corner (-30, 300).
         # Right edge at -30 + 64 = 34 > 0, so it overlaps.
         sprite = Sprite(
-            "sprites/knight", position=(-30, 300),
+            "sprites/knight",
+            position=(-30, 300),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         visible_during_draw = {}
@@ -454,14 +476,17 @@ class TestFrustumCulling:
         assert visible_during_draw["v"] is True
 
     def test_sprite_just_off_left_edge_is_hidden(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Sprite entirely off the left edge is hidden."""
         # Camera at (0, 0), viewport 800x600.
         # Sprite at (-100, 300) with 64x64 -> draw corner (-100, 300).
         # Right edge at -100 + 64 = -36 <= 0, entirely off-screen.
         sprite = Sprite(
-            "sprites/knight", position=(-100, 300),
+            "sprites/knight",
+            position=(-100, 300),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         visible_during_draw = {}
@@ -484,8 +509,8 @@ class TestFrustumCulling:
 # 6. Edge scroll
 # ==================================================================
 
-class TestEdgeScroll:
 
+class TestEdgeScroll:
     def test_edge_scroll_left(self) -> None:
         """Mouse near left edge scrolls camera left."""
         cam = Camera((800, 600))
@@ -593,7 +618,9 @@ class TestEdgeScroll:
         assert cam.y == 0.0
 
     def test_edge_scroll_via_game_tick(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Edge scroll works through the full Game.tick() pipeline."""
 
@@ -617,8 +644,8 @@ class TestEdgeScroll:
 # 6b. Key scroll
 # ==================================================================
 
-class TestKeyScroll:
 
+class TestKeyScroll:
     def test_key_scroll_left(self) -> None:
         """Holding left arrow scrolls camera left."""
         cam = Camera((800, 600))
@@ -743,7 +770,9 @@ class TestKeyScroll:
         assert cam.y == 0.0
 
     def test_key_scroll_via_game_tick(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Key scroll works through the full Game.tick() pipeline."""
 
@@ -768,8 +797,8 @@ class TestKeyScroll:
 # 7. pan_to
 # ==================================================================
 
-class TestPanTo:
 
+class TestPanTo:
     def test_pan_to_animates_toward_target(self, game: Game) -> None:
         """pan_to creates tweens that move camera over time."""
         cam = Camera((800, 600))
@@ -869,14 +898,17 @@ class TestPanTo:
 # 8. Integration with rendering (camera offset in backend)
 # ==================================================================
 
-class TestRenderIntegration:
 
+class TestRenderIntegration:
     def test_camera_offset_applied_during_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """During draw, sprite backend position = world pos - camera offset."""
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         draw_positions = {}
@@ -901,11 +933,14 @@ class TestRenderIntegration:
         assert draw_positions["y"] == 300
 
     def test_positions_restored_after_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """After tick completes, sprite backend positions are restored."""
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
 
@@ -922,11 +957,14 @@ class TestRenderIntegration:
         assert rec["y"] == 400
 
     def test_world_position_unchanged_by_camera(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Camera never modifies the sprite's world position."""
         sprite = Sprite(
-            "sprites/knight", position=(500, 400),
+            "sprites/knight",
+            position=(500, 400),
             anchor=SpriteAnchor.TOP_LEFT,
         )
 
@@ -941,7 +979,9 @@ class TestRenderIntegration:
         assert sprite.position == (500.0, 400.0)
 
     def test_camera_with_bottom_center_anchor(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Camera offset works correctly with BOTTOM_CENTER anchor."""
         # Default image size is 64x64.
@@ -969,15 +1009,19 @@ class TestRenderIntegration:
         assert draw_positions["y"] == 236
 
     def test_multiple_sprites_offset_correctly(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """All sprites in _all_sprites are offset by the camera."""
         s1 = Sprite(
-            "sprites/knight", position=(200, 100),
+            "sprites/knight",
+            position=(200, 100),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         s2 = Sprite(
-            "sprites/knight", position=(600, 500),
+            "sprites/knight",
+            position=(600, 500),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         draw_positions = {}
@@ -1004,11 +1048,14 @@ class TestRenderIntegration:
         assert draw_positions["s2_y"] == 500
 
     def test_no_camera_scene_draws_at_world_positions(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Without a camera, sprites draw at their world positions (no offset)."""
         sprite = Sprite(
-            "sprites/knight", position=(300, 200),
+            "sprites/knight",
+            position=(300, 200),
             anchor=SpriteAnchor.TOP_LEFT,
         )
 
@@ -1023,15 +1070,19 @@ class TestRenderIntegration:
         assert rec["y"] == 200
 
     def test_camera_follow_offset_during_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Follow-mode camera applies correct offset during draw."""
         hero = Sprite(
-            "sprites/knight", position=(1000, 800),
+            "sprites/knight",
+            position=(1000, 800),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         other = Sprite(
-            "sprites/knight", position=(1100, 850),
+            "sprites/knight",
+            position=(1100, 850),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         draw_positions = {}
@@ -1058,8 +1109,8 @@ class TestRenderIntegration:
 # 9. Mouse coordinate conversion (via camera.screen_to_world)
 # ==================================================================
 
-class TestMouseCoordinateConversion:
 
+class TestMouseCoordinateConversion:
     def test_screen_to_world_after_center_on(self) -> None:
         """Click at screen center maps to the world center point."""
         cam = Camera((800, 600))
@@ -1102,8 +1153,8 @@ class TestMouseCoordinateConversion:
 # 10. Sprite registry (_all_sprites)
 # ==================================================================
 
-class TestSpriteRegistry:
 
+class TestSpriteRegistry:
     def test_sprite_registered_on_creation(self, game: Game) -> None:
         """New sprites are added to game._all_sprites."""
         sprite = Sprite("sprites/knight", position=(100, 100))
@@ -1136,10 +1187,12 @@ class TestSpriteRegistry:
 # 11. Mouse tracking in Game
 # ==================================================================
 
-class TestMouseTracking:
 
+class TestMouseTracking:
     def test_mouse_move_updates_game_position(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Mouse move events update game._mouse_x/y."""
         game.push(Scene())
@@ -1150,7 +1203,9 @@ class TestMouseTracking:
         assert game._mouse_y == 300.0
 
     def test_mouse_drag_updates_game_position(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Mouse drag events also update game._mouse_x/y."""
         game.push(Scene())
@@ -1161,7 +1216,9 @@ class TestMouseTracking:
         assert game._mouse_y == 250.0
 
     def test_click_does_not_update_mouse_position(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Click events do NOT update the tracked mouse position."""
         game.push(Scene())
@@ -1175,7 +1232,9 @@ class TestMouseTracking:
         assert game._mouse_y is None
 
     def test_latest_mouse_position_wins(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Multiple mouse moves in one tick: last one wins."""
         game.push(Scene())
@@ -1192,8 +1251,8 @@ class TestMouseTracking:
 # 12. Scene.camera attribute
 # ==================================================================
 
-class TestSceneCameraAttribute:
 
+class TestSceneCameraAttribute:
     def test_scene_camera_defaults_to_none(self) -> None:
         """Scene.camera is None by default."""
         scene = Scene()
@@ -1207,7 +1266,9 @@ class TestSceneCameraAttribute:
         assert scene.camera is cam
 
     def test_scene_camera_set_in_on_enter(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Camera set in on_enter() is used during tick."""
         draw_called = []
@@ -1230,8 +1291,8 @@ class TestSceneCameraAttribute:
 # 13. world_bounds property
 # ==================================================================
 
-class TestWorldBounds:
 
+class TestWorldBounds:
     def test_world_bounds_setter_clamps_immediately(self) -> None:
         """Setting world_bounds clamps the current position."""
         cam = Camera((100, 100))
@@ -1267,7 +1328,6 @@ class TestWorldBounds:
 
 
 class TestHandleInputTypeHint:
-
     def test_handle_input_accepts_input_event(self, game: Game) -> None:
         """Camera.handle_input works with InputEvent objects."""
         cam = Camera((800, 600))
@@ -1284,7 +1344,6 @@ class TestHandleInputTypeHint:
 
 
 class TestPanToEaseRename:
-
     def test_pan_to_ease_keyword_works(self, game: Game) -> None:
         """pan_to accepts 'ease' keyword (renamed from 'easing')."""
         from saga2d.util.tween import Ease
@@ -1310,7 +1369,6 @@ class TestPanToEaseRename:
 
 
 class TestCancelPanInstanceManager:
-
     def test_cancel_pan_uses_instance_tween_manager(self, game: Game) -> None:
         """_cancel_pan uses the tween manager captured at pan_to time."""
         cam = Camera((800, 600))
@@ -1348,8 +1406,8 @@ class TestCancelPanInstanceManager:
 # 14. Camera shake — lifecycle
 # ==================================================================
 
-class TestCameraShakeLifecycle:
 
+class TestCameraShakeLifecycle:
     def test_shake_starts_with_nonzero_offset_in_update(self) -> None:
         """shake(intensity, duration, decay) produces nonzero offset after update()."""
         cam = Camera((800, 600))
@@ -1387,14 +1445,17 @@ class TestCameraShakeLifecycle:
 # 15. Camera shake — composition with center_on
 # ==================================================================
 
-class TestCameraShakeComposition:
 
+class TestCameraShakeComposition:
     def test_shake_composes_with_center_on(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Shake offsets are added to _x/_y during sprite sync (draw phase)."""
         sprite = Sprite(
-            "sprites/knight", position=(400, 300),
+            "sprites/knight",
+            position=(400, 300),
             anchor=SpriteAnchor.TOP_LEFT,
         )
         draw_positions = {}
@@ -1428,8 +1489,8 @@ class TestCameraShakeComposition:
 # 16. Camera shake — no-op for duration <= 0
 # ==================================================================
 
-class TestCameraShakeNoOp:
 
+class TestCameraShakeNoOp:
     def test_shake_duration_zero_resets(self) -> None:
         """shake with duration 0 resets any active shake."""
         cam = Camera((800, 600))
@@ -1461,8 +1522,8 @@ class TestCameraShakeNoOp:
 # 17. Camera shake — multiple calls replace previous
 # ==================================================================
 
-class TestCameraShakeReplacement:
 
+class TestCameraShakeReplacement:
     def test_multiple_shake_calls_replace_previous(self) -> None:
         """A new shake() call replaces the previous shake (new params, reset elapsed)."""
         cam = Camera((800, 600))
@@ -1487,8 +1548,8 @@ class TestCameraShakeReplacement:
 # 18. Camera shake — randomness
 # ==================================================================
 
-class TestCameraShakeRandomness:
 
+class TestCameraShakeRandomness:
     def test_shake_offsets_change_across_updates(self) -> None:
         """Shake offsets are random -- multiple updates produce different values."""
         cam = Camera((800, 600))
@@ -1524,8 +1585,9 @@ class TestInputEventWorldFields:
         assert e.world_y is None
 
     def test_can_be_set_explicitly(self) -> None:
-        e = InputEvent(type="click", x=400, y=300, button="left",
-                       world_x=500.0, world_y=400.0)
+        e = InputEvent(
+            type="click", x=400, y=300, button="left", world_x=500.0, world_y=400.0
+        )
         assert e.world_x == 500.0
         assert e.world_y == 400.0
 
@@ -1669,9 +1731,12 @@ class TestGameWorldCoordsIntegration:
     """End-to-end: scenes receive InputEvents with world_x/world_y populated."""
 
     def test_click_with_camera_scene(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Scene with camera receives click with correct world coords."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1697,9 +1762,12 @@ class TestGameWorldCoordsIntegration:
         assert e.world_y == 350.0  # 300 + 50
 
     def test_click_without_camera_scene(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Scene without camera receives click with world == screen."""
+
         class UIScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1718,9 +1786,12 @@ class TestGameWorldCoordsIntegration:
         assert e.world_y == 300.0
 
     def test_key_event_has_no_world_coords(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Keyboard events arrive with world_x/world_y = None."""
+
         class Tracker(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1739,9 +1810,12 @@ class TestGameWorldCoordsIntegration:
         assert e.world_y is None
 
     def test_mouse_move_with_camera(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Mouse move events get world coords via camera."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1765,9 +1839,12 @@ class TestGameWorldCoordsIntegration:
         assert e.world_y == 350.0  # 250 + 100
 
     def test_world_coords_update_after_camera_scroll(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """After camera scrolls, subsequent events have new world coords."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1800,9 +1877,12 @@ class TestGameWorldCoordsIntegration:
         assert e2.world_y == 350.0
 
     def test_world_coords_with_centered_camera(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Click at screen center maps to the camera center_on target."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1826,9 +1906,12 @@ class TestGameWorldCoordsIntegration:
         assert abs(e.world_y - 1500.0) < 1e-9
 
     def test_drag_event_has_world_coords(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Drag events also get world coordinates."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1852,9 +1935,12 @@ class TestGameWorldCoordsIntegration:
         assert e.world_y == 175.0
 
     def test_multiple_events_in_one_tick(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Mixed key + mouse events: only mouse events get world coords."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []
@@ -1888,9 +1974,12 @@ class TestGameWorldCoordsIntegration:
         assert scene.events[2].world_x is None
 
     def test_screen_coords_preserved(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Adding world coords does not alter the original x/y fields."""
+
         class WorldScene(Scene):
             def __init__(self) -> None:
                 self.events: list[InputEvent] = []

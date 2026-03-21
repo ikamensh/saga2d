@@ -35,12 +35,14 @@ _RESOLUTION = (320, 240)
 
 class EmptyScene(Scene):
     """Minimal scene that keeps the scene stack non-empty."""
+
     pass
 
 
 # ---------------------------------------------------------------------------
 # 1. Particle burst captured mid-flight
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_particle_burst_mid_flight() -> None:
@@ -77,6 +79,7 @@ def test_particle_burst_mid_flight() -> None:
 # 2. Particle burst at start (just spawned)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_particle_burst_start() -> None:
     """Burst of 15 particles captured immediately after spawning.
@@ -108,6 +111,7 @@ def test_particle_burst_start() -> None:
 # ---------------------------------------------------------------------------
 # 3. Particle burst late — most particles faded or dead
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_particle_burst_late() -> None:
@@ -142,6 +146,7 @@ def test_particle_burst_late() -> None:
 # 4. Directional burst (upward fan)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_particle_burst_directional() -> None:
     """Directional burst — particles firing upward in a 60-degree fan.
@@ -174,6 +179,7 @@ def test_particle_burst_directional() -> None:
 # ---------------------------------------------------------------------------
 # 5. Multi-image variety burst
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_particle_burst_multi_image() -> None:

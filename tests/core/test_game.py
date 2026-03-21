@@ -15,7 +15,9 @@ class InputTrackingScene(Scene):
         return False
 
 
-def test_inject_key_reaches_handle_input(mock_game: Game, mock_backend: MockBackend) -> None:
+def test_inject_key_reaches_handle_input(
+    mock_game: Game, mock_backend: MockBackend
+) -> None:
     """inject_key → poll_events → handle_input receives the event."""
     scene = InputTrackingScene()
     mock_game.push(scene)
@@ -35,7 +37,9 @@ def test_quit_sets_running_false(mock_game: Game) -> None:
     assert mock_game.running is False
 
 
-def test_tick_runs_exactly_one_frame(mock_game: Game, mock_backend: MockBackend) -> None:
+def test_tick_runs_exactly_one_frame(
+    mock_game: Game, mock_backend: MockBackend
+) -> None:
     """game.tick(dt) runs exactly one frame (begin_frame, draw, end_frame)."""
     scene = Scene()
     mock_game.push(scene)
@@ -47,7 +51,9 @@ def test_tick_runs_exactly_one_frame(mock_game: Game, mock_backend: MockBackend)
     assert mock_backend.frame_count == 2
 
 
-def test_mock_backend_records_sprite_text_sound(mock_game: Game, mock_backend: MockBackend) -> None:
+def test_mock_backend_records_sprite_text_sound(
+    mock_game: Game, mock_backend: MockBackend
+) -> None:
     """Mock backend records sprite, text, and sound operations from a scene."""
 
     class RecordingScene(Scene):

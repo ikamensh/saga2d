@@ -33,7 +33,9 @@ from examples.battle_vignette.battle_demo import (
 # Fixtures
 # ======================================================================
 
-ASSET_DIR = Path(__file__).resolve().parents[2] / "examples" / "battle_vignette" / "assets"
+ASSET_DIR = (
+    Path(__file__).resolve().parents[2] / "examples" / "battle_vignette" / "assets"
+)
 
 
 @pytest.fixture
@@ -62,14 +64,16 @@ def scene(game: Game) -> BattleScene:
 # Helpers
 # ======================================================================
 
+
 def _tick_many(game: Game, n: int, dt: float = 1 / 60) -> None:
     """Tick the game *n* times at *dt* seconds each."""
     for _ in range(n):
         game.tick(dt=dt)
 
 
-def _click_grid_cell(backend: MockBackend, game: Game, scene: BattleScene,
-                     col: int, row: int) -> None:
+def _click_grid_cell(
+    backend: MockBackend, game: Game, scene: BattleScene, col: int, row: int
+) -> None:
     """Inject a left-click at the center of grid cell (col, row)."""
     wx, wy = scene.grid.grid_to_world_center(col, row)
     backend.inject_click(int(wx), int(wy))
@@ -81,8 +85,9 @@ def _click_unit(backend: MockBackend, game: Game, scene: BattleScene, unit) -> N
     _click_grid_cell(backend, game, scene, unit.col, unit.row)
 
 
-def _select_and_stay(backend: MockBackend, game: Game, scene: BattleScene,
-                     unit) -> None:
+def _select_and_stay(
+    backend: MockBackend, game: Game, scene: BattleScene, unit
+) -> None:
     """Select a warrior and stay in place (skip move phase).
 
     Leaves the FSM in PLAYER_ATTACK state.
@@ -99,8 +104,9 @@ def _teleport_adjacent(scene: BattleScene, attacker, defender) -> None:
     attacker.set_grid_pos(target_col, target_row)
 
 
-def _run_full_attack(game: Game, backend: MockBackend, scene: BattleScene,
-                     attacker, defender) -> None:
+def _run_full_attack(
+    game: Game, backend: MockBackend, scene: BattleScene, attacker, defender
+) -> None:
     """Teleport attacker adjacent, select, stay, attack, tick until done."""
     # Ensure attacker is adjacent to defender
     if abs(attacker.col - defender.col) > 1 or abs(attacker.row - defender.row) > 1:
@@ -123,6 +129,7 @@ def _run_full_attack(game: Game, backend: MockBackend, scene: BattleScene,
 # ======================================================================
 # 1. Scene initializes with correct number of units
 # ======================================================================
+
 
 class TestSceneInit:
     def test_eight_units_spawned(self, scene: BattleScene) -> None:
@@ -152,7 +159,9 @@ class TestSceneInit:
         assert scene.fsm.state == S_PLAYER_SELECT
 
     def test_sprites_registered_in_backend(
-        self, scene: BattleScene, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        backend: MockBackend,
     ) -> None:
         for u in scene.all_units:
             assert u.sprite.sprite_id in backend.sprites
@@ -162,16 +171,23 @@ class TestSceneInit:
 # 2. Clicking a warrior selects it
 # ======================================================================
 
+
 class TestSelection:
     def test_click_warrior_selects(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         _click_unit(backend, game, scene, warrior)
         assert scene.selected_unit is warrior
 
     def test_fsm_moves_to_player_move(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         _click_unit(backend, game, scene, warrior)
@@ -182,9 +198,13 @@ class TestSelection:
 # 3. Clicking a different warrior changes selection
 # ======================================================================
 
+
 class TestSelectionChange:
     def test_reselect_via_cancel_and_pick(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Cancel current selection with right-click, then pick another."""
         w1, w2 = scene.warriors[:2]
@@ -204,9 +224,13 @@ class TestSelectionChange:
 # 4. Stay-in-place transitions to attack phase
 # ======================================================================
 
+
 class TestStayInPlace:
     def test_click_own_cell_goes_to_attack(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         _select_and_stay(backend, game, scene, warrior)
@@ -217,9 +241,13 @@ class TestStayInPlace:
 # 5. Full attack sequence completes without errors
 # ======================================================================
 
+
 class TestFullAttackSequence:
     def test_attack_completes(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         skeleton = scene.skeletons[0]
@@ -227,7 +255,10 @@ class TestFullAttackSequence:
         assert scene.fsm.state == S_PLAYER_SELECT
 
     def test_defender_takes_damage(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         skeleton = scene.skeletons[0]
@@ -237,7 +268,10 @@ class TestFullAttackSequence:
         assert skeleton.hp == original_hp - ATTACK_DAMAGE
 
     def test_no_crash_on_idle_ticks(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         skeleton = scene.skeletons[0]
@@ -250,9 +284,13 @@ class TestFullAttackSequence:
 # 6. After enough attacks, a skeleton dies
 # ======================================================================
 
+
 class TestSkeletonDeath:
     def test_skeleton_dies(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         skeleton = scene.skeletons[0]
@@ -265,7 +303,10 @@ class TestSkeletonDeath:
         assert skeleton.alive is False
 
     def test_alive_count_decreases(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         skeleton = scene.skeletons[0]
@@ -282,9 +323,13 @@ class TestSkeletonDeath:
 # 7. Multiple attack rounds work without state corruption
 # ======================================================================
 
+
 class TestMultipleAttackRounds:
     def test_two_attacks_same_target(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         skeleton = scene.skeletons[0]
@@ -296,7 +341,10 @@ class TestMultipleAttackRounds:
         assert skeleton.hp == 80 - 2 * ATTACK_DAMAGE
 
     def test_attack_different_targets(
-        self, scene: BattleScene, game: Game, backend: MockBackend,
+        self,
+        scene: BattleScene,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         warrior = scene.warriors[0]
         s1, s2 = scene.skeletons[:2]

@@ -32,6 +32,7 @@ _RESOLUTION = (480, 360)
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _color_panel(
     color: tuple[int, int, int, int],
     w: int = 80,
@@ -50,6 +51,7 @@ def _color_panel(
 # ---------------------------------------------------------------------------
 # 1. Drag ghost visible at a different position from original
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_drag_ghost_visible() -> None:
@@ -121,6 +123,7 @@ def test_drag_ghost_visible() -> None:
 # 2. Drag hovering over valid drop target (green highlight)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_drag_valid_target_highlight() -> None:
     """Drag hovering over a panel that accepts the drop — green highlight.
@@ -139,7 +142,8 @@ def test_drag_valid_target_highlight() -> None:
             # Source box on the left.
             source = _color_panel(
                 (230, 130, 30, 255),
-                w=100, h=100,
+                w=100,
+                h=100,
                 draggable=True,
                 drag_data="valid_item",
             )
@@ -147,7 +151,8 @@ def test_drag_valid_target_highlight() -> None:
             # Target box on the right.
             target = _color_panel(
                 (50, 50, 70, 255),
-                w=120, h=120,
+                w=120,
+                h=120,
                 drop_accept=lambda data: True,
                 on_drop=lambda c, d: None,
             )
@@ -195,6 +200,7 @@ def test_drag_valid_target_highlight() -> None:
 # 3. Drag hovering over invalid drop target (red highlight)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_drag_invalid_target_highlight() -> None:
     """Drag hovering over a panel that rejects the drop — red highlight.
@@ -212,14 +218,16 @@ def test_drag_invalid_target_highlight() -> None:
         def on_enter(self) -> None:
             source = _color_panel(
                 (230, 130, 30, 255),
-                w=100, h=100,
+                w=100,
+                h=100,
                 draggable=True,
                 drag_data="wrong_item",
             )
 
             target = _color_panel(
                 (50, 50, 70, 255),
-                w=120, h=120,
+                w=120,
+                h=120,
                 drop_accept=lambda data: False,
             )
 

@@ -61,7 +61,9 @@ class TestCursorRegister:
         assert backend.cursor_hotspot == (0, 0)
 
     def test_register_with_hotspot(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         cursor.register("attack", "ui/cursor_attack", hotspot=(8, 8))
         cursor.set("attack")
@@ -69,7 +71,9 @@ class TestCursorRegister:
         assert backend.cursor_hotspot == (8, 8)
 
     def test_register_overwrites(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         """Re-registering same name overwrites."""
         cursor.register("attack", "ui/cursor_attack", hotspot=(0, 0))
@@ -85,7 +89,9 @@ class TestCursorRegister:
 
 class TestCursorSet:
     def test_set_default_restores_system(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         cursor.register("attack", "ui/cursor_attack")
         cursor.set("attack")
@@ -96,7 +102,9 @@ class TestCursorSet:
         assert cursor.current == "default"
 
     def test_set_custom_cursor(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         cursor.register("attack", "ui/cursor_attack", hotspot=(4, 4))
         cursor.set("attack")
@@ -109,7 +117,9 @@ class TestCursorSet:
             cursor.set("nonexistent")
 
     def test_set_default_does_not_require_register(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         cursor.set("default")
         assert backend.cursor_image is None
@@ -143,16 +153,22 @@ class TestCursorCurrent:
 
 
 class TestCursorVisible:
-    def test_set_cursor_visible_true(self, cursor: CursorManager, backend: MockBackend) -> None:
+    def test_set_cursor_visible_true(
+        self, cursor: CursorManager, backend: MockBackend
+    ) -> None:
         cursor.set_visible(True)
         assert backend.cursor_visible is True
 
-    def test_set_cursor_visible_false(self, cursor: CursorManager, backend: MockBackend) -> None:
+    def test_set_cursor_visible_false(
+        self, cursor: CursorManager, backend: MockBackend
+    ) -> None:
         cursor.set_visible(False)
         assert backend.cursor_visible is False
 
     def test_set_cursor_visible_toggle(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         assert backend.cursor_visible is True
         cursor.set_visible(False)
@@ -168,7 +184,10 @@ class TestCursorVisible:
 
 class TestCursorBackendCalls:
     def test_backend_receives_correct_handle(
-        self, cursor: CursorManager, backend: MockBackend, game: Game,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         cursor.register("attack", "ui/cursor_attack")
         cursor.set("attack")
@@ -176,14 +195,18 @@ class TestCursorBackendCalls:
         assert backend.cursor_image == expected_handle
 
     def test_backend_receives_correct_hotspot(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         cursor.register("move", "ui/cursor_move", hotspot=(12, 12))
         cursor.set("move")
         assert backend.cursor_hotspot == (12, 12)
 
     def test_backend_receives_none_for_default(
-        self, cursor: CursorManager, backend: MockBackend,
+        self,
+        cursor: CursorManager,
+        backend: MockBackend,
     ) -> None:
         cursor.register("attack", "ui/cursor_attack")
         cursor.set("attack")
@@ -206,7 +229,9 @@ class TestCursorGameIntegration:
         assert game.cursor is cm
 
     def test_cursor_mock_backend_tracking(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Backend cursor_image updated when set."""
         game.cursor.register("attack", "ui/cursor_attack")

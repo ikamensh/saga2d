@@ -271,7 +271,8 @@ def test_y_sort_order_at_creation(game: Game, backend: MockBackend) -> None:
 
 
 def test_y_sort_order_changes_with_position(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Changing position updates the draw order."""
     sprite = Sprite(
@@ -288,7 +289,8 @@ def test_y_sort_order_changes_with_position(
 
 
 def test_y_sort_same_layer_higher_y_in_front(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Two sprites in the same layer: higher y = larger order = drawn in front."""
     s1 = Sprite(
@@ -315,7 +317,8 @@ def test_y_sort_same_layer_higher_y_in_front(
 
 
 def test_different_layers_have_different_orders(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Sprites in different layers have clearly separated draw orders."""
     bg = Sprite(
@@ -713,9 +716,7 @@ def test_tint_nan_clamped_by_min_max(game: Game, backend: MockBackend) -> None:
     sprite.tint = (float("nan"), 0.5, float("nan"))
 
     # min(1, nan) and max(0, ...) behavior: NaN channel becomes 1.0 or 0.0
-    assert all(
-        isinstance(c, float) and 0.0 <= c <= 1.0 for c in sprite.tint
-    )
+    assert all(isinstance(c, float) and 0.0 <= c <= 1.0 for c in sprite.tint)
     assert backend.sprites[sprite.sprite_id]["tint"] == sprite.tint
 
 
@@ -797,9 +798,7 @@ class TestSpriteOpacity:
     """Sprite.opacity should accept any numeric value; the framework
     should clamp it to the valid 0-255 range before syncing to backend."""
 
-    def test_opacity_out_of_range_high(
-        self, game: Game, backend: MockBackend
-    ) -> None:
+    def test_opacity_out_of_range_high(self, game: Game, backend: MockBackend) -> None:
         """Setting opacity > 255 clamps to 255."""
         game.push(Scene())
         s = Sprite("sprites/knight", position=(0, 0))

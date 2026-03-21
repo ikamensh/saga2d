@@ -114,7 +114,9 @@ def test_tween_ease_out_at_half(game: Game) -> None:
 def test_tween_sprite_x_updates_backend(game: Game) -> None:
     """Tweening sprite.x updates backend position."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 200), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 200),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     tween(sprite, "x", 100.0, 300.0, 0.5)
 
@@ -146,7 +148,9 @@ def test_tween_no_game_raises(game: Game) -> None:
 def test_move_to_reaches_target(game: Game) -> None:
     """Sprite reaches target position after distance/speed seconds."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     # Distance = 300, speed = 100 -> duration = 3s
     sprite.move_to((400, 100), speed=100.0)
@@ -163,7 +167,9 @@ def test_move_to_reaches_target(game: Game) -> None:
 def test_move_to_on_arrive_fires(game: Game) -> None:
     """on_arrive fires when movement completes."""
     sprite = Sprite(
-        "sprites/knight", position=(0, 0), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(0, 0),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     arrived = []
     sprite.move_to((100, 0), speed=100.0, on_arrive=lambda: arrived.append(True))
@@ -177,7 +183,9 @@ def test_move_to_on_arrive_fires(game: Game) -> None:
 def test_move_to_zero_distance_fires_immediately(game: Game) -> None:
     """Zero distance fires on_arrive immediately."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     arrived = []
     sprite.move_to((100, 100), speed=100.0, on_arrive=lambda: arrived.append(True))
@@ -190,7 +198,9 @@ def test_move_to_zero_distance_fires_immediately(game: Game) -> None:
 def test_move_to_cancels_previous(game: Game) -> None:
     """New move_to cancels previous movement."""
     sprite = Sprite(
-        "sprites/knight", position=(0, 0), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(0, 0),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     arrived_first = []
     arrived_second = []
@@ -209,7 +219,9 @@ def test_move_to_cancels_previous(game: Game) -> None:
 def test_move_to_on_removed_sprite_is_noop(game: Game) -> None:
     """move_to on removed sprite is no-op."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.remove()
     sprite.move_to((200, 200), speed=100.0)  # Should not raise
@@ -218,7 +230,9 @@ def test_move_to_on_removed_sprite_is_noop(game: Game) -> None:
 def test_remove_cancels_move_tweens(game: Game) -> None:
     """Sprite.remove() cancels active move tweens."""
     sprite = Sprite(
-        "sprites/knight", position=(0, 0), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(0, 0),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     arrived = []
     sprite.move_to((100, 0), speed=10.0, on_arrive=lambda: arrived.append(1))
@@ -275,7 +289,9 @@ def test_tween_on_complete_creates_new_tween(game: Game) -> None:
 
     def first_done() -> None:
         completed.append("first")
-        tween(box, "x", 100.0, 200.0, 0.0, on_complete=lambda: completed.append("second"))
+        tween(
+            box, "x", 100.0, 200.0, 0.0, on_complete=lambda: completed.append("second")
+        )
 
     tween(box, "x", 0.0, 100.0, 0.0, on_complete=first_done)
 

@@ -24,10 +24,10 @@ from tests.screenshot.harness import assert_screenshot, render_scene
 _RESOLUTION = (480, 360)
 
 # Distinct colors per state for visual differentiation
-_IDLE_COLOR = (60, 180, 80, 240)      # green
+_IDLE_COLOR = (60, 180, 80, 240)  # green
 _WALKING_COLOR = (60, 100, 200, 240)  # blue
 _ATTACKING_COLOR = (200, 80, 60, 240)  # red
-_DEAD_COLOR = (80, 80, 80, 240)       # dark grey
+_DEAD_COLOR = (80, 80, 80, 240)  # dark grey
 
 
 class FsmStateScene(Scene):
@@ -78,6 +78,7 @@ class FsmStateScene(Scene):
 # 1. Initial state — idle (green panel)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_fsm_initial_state() -> None:
     """FSM starts in initial state; green IDLE panel displayed.
@@ -97,6 +98,7 @@ def test_fsm_initial_state() -> None:
 # 2. After transition: idle → walking (blue panel)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_fsm_idle_to_walking() -> None:
     """Trigger 'move' from idle; blue WALKING panel displayed."""
@@ -113,6 +115,7 @@ def test_fsm_idle_to_walking() -> None:
 # ---------------------------------------------------------------------------
 # 3. After transition: walking → attacking (red panel)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_fsm_walking_to_attacking() -> None:
@@ -131,6 +134,7 @@ def test_fsm_walking_to_attacking() -> None:
 # ---------------------------------------------------------------------------
 # 4. Absorbing state: dead (grey panel, no way out)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_fsm_absorbing_dead() -> None:
@@ -152,6 +156,7 @@ def test_fsm_absorbing_dead() -> None:
 # ---------------------------------------------------------------------------
 # 5. Self-transition: idle → idle (green panel, callbacks fired)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_fsm_self_transition_idle() -> None:

@@ -70,7 +70,9 @@ def _ensure_dirs() -> None:
         _GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _save(image: Image.Image, preview_name: str, golden_name: str | None = None) -> None:
+def _save(
+    image: Image.Image, preview_name: str, golden_name: str | None = None
+) -> None:
     """Save *image* to previews/ and optionally to golden/.
 
     Args:
@@ -317,6 +319,7 @@ _RES_TD = (960, 540)
 # 1. Main Menu (from test_ui_screenshots)
 # ---------------------------------------------------------------------------
 
+
 def preview_main_menu() -> None:
     """Centered panel with title + 3 buttons."""
 
@@ -344,6 +347,7 @@ def preview_main_menu() -> None:
 # 2. Widget Gallery: Panel + Button states
 # ---------------------------------------------------------------------------
 
+
 def preview_button_states() -> None:
     """Four buttons: normal, hovered, pressed, disabled."""
 
@@ -355,10 +359,12 @@ def preview_button_states() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Button States",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "Button States",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
             row = Panel(
                 layout=Layout.HORIZONTAL,
@@ -396,6 +402,7 @@ def preview_button_states() -> None:
 # 3. Widget Gallery: ProgressBar (0%, 50%, 100%)
 # ---------------------------------------------------------------------------
 
+
 def preview_progress_bars() -> None:
     """Three progress bars at different fill levels."""
 
@@ -407,10 +414,12 @@ def preview_progress_bars() -> None:
                 spacing=12,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Progress Bars",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "Progress Bars",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
             for pct in (0, 50, 100):
                 row = Panel(
@@ -419,10 +428,14 @@ def preview_progress_bars() -> None:
                     style=Style(padding=0, background_color=(0, 0, 0, 0)),
                 )
                 row.add(Label(f"{pct:>3d}%", style=Style(font_size=18)))
-                row.add(ProgressBar(
-                    value=pct, max_value=100,
-                    width=350, height=28,
-                ))
+                row.add(
+                    ProgressBar(
+                        value=pct,
+                        max_value=100,
+                        width=350,
+                        height=28,
+                    )
+                )
                 panel.add(row)
 
             self.ui.add(panel)
@@ -438,6 +451,7 @@ def preview_progress_bars() -> None:
 # 4. Widget Gallery: List with selection
 # ---------------------------------------------------------------------------
 
+
 def preview_list() -> None:
     """List widget with 6 items, item 3 selected."""
 
@@ -449,10 +463,12 @@ def preview_list() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "List Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "List Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
             lst = List(
                 [
@@ -481,6 +497,7 @@ def preview_list() -> None:
 # 5. Widget Gallery: Grid with selection
 # ---------------------------------------------------------------------------
 
+
 def preview_grid() -> None:
     """3x3 Grid with labels in cells, cell (1,1) selected."""
 
@@ -492,13 +509,16 @@ def preview_grid() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Grid Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "Grid Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
             grid = Grid(
-                3, 3,
+                3,
+                3,
                 cell_size=(64, 64),
                 spacing=4,
                 style=Style(padding=6),
@@ -523,6 +543,7 @@ def preview_grid() -> None:
 # 6. Widget Gallery: TextBox
 # ---------------------------------------------------------------------------
 
+
 def preview_textbox() -> None:
     """TextBox with wrapped multi-line text."""
 
@@ -534,18 +555,22 @@ def preview_textbox() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "TextBox Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "TextBox Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
-            panel.add(TextBox(
-                "The ancient fortress loomed ahead, its crumbling towers "
-                "silhouetted against the crimson sky. Our party pressed "
-                "forward through the overgrown courtyard, weapons drawn.",
-                width=400,
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                TextBox(
+                    "The ancient fortress loomed ahead, its crumbling towers "
+                    "silhouetted against the crimson sky. Our party pressed "
+                    "forward through the overgrown courtyard, weapons drawn.",
+                    width=400,
+                    style=Style(font_size=16),
+                )
+            )
             self.ui.add(panel)
 
     def setup(game: Game) -> None:
@@ -559,34 +584,46 @@ def preview_textbox() -> None:
 # 7. Widget Gallery: TabGroup
 # ---------------------------------------------------------------------------
 
+
 def preview_tabgroup() -> None:
     """TabGroup with 3 tabs, Stats tab active."""
 
     class TabScene(Scene):
         def on_enter(self) -> None:
             stats_panel = Panel(
-                layout=Layout.VERTICAL, spacing=6,
-                width=300, height=120, style=Style(padding=10),
+                layout=Layout.VERTICAL,
+                spacing=6,
+                width=300,
+                height=120,
+                style=Style(padding=10),
             )
             stats_panel.add(Label("STR: 18", style=Style(font_size=16)))
             stats_panel.add(Label("DEX: 14", style=Style(font_size=16)))
             stats_panel.add(Label("INT: 12", style=Style(font_size=16)))
 
             skills_panel = Panel(
-                layout=Layout.VERTICAL, spacing=6,
-                width=300, height=120, style=Style(padding=10),
+                layout=Layout.VERTICAL,
+                spacing=6,
+                width=300,
+                height=120,
+                style=Style(padding=10),
             )
             skills_panel.add(Label("Fireball Lv.3", style=Style(font_size=16)))
 
             items_panel = Panel(
-                layout=Layout.VERTICAL, spacing=6,
-                width=300, height=120, style=Style(padding=10),
+                layout=Layout.VERTICAL,
+                spacing=6,
+                width=300,
+                height=120,
+                style=Style(padding=10),
             )
             items_panel.add(Label("Potion x5", style=Style(font_size=16)))
 
             tabs = TabGroup(
                 {"Stats": stats_panel, "Skills": skills_panel, "Items": items_panel},
-                width=320, height=160, anchor=Anchor.CENTER,
+                width=320,
+                height=160,
+                anchor=Anchor.CENTER,
             )
             self.ui.add(tabs)
 
@@ -601,6 +638,7 @@ def preview_tabgroup() -> None:
 # 8. Widget Gallery: DataTable
 # ---------------------------------------------------------------------------
 
+
 def preview_datatable() -> None:
     """DataTable with header, alternating rows, and selection."""
 
@@ -612,10 +650,12 @@ def preview_datatable() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "DataTable Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "DataTable Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
             dt = DataTable(
                 ["Unit", "Class", "Level"],
@@ -643,17 +683,20 @@ def preview_datatable() -> None:
 # 9. Widget Gallery: Tooltip
 # ---------------------------------------------------------------------------
 
+
 def preview_tooltip() -> None:
     """Tooltip past its delay, visible on screen."""
 
     class TipScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Hover over items for details",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=16),
-            ))
+            self.ui.add(
+                Label(
+                    "Hover over items for details",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=16),
+                )
+            )
             self._tooltip = Tooltip(
                 "Sword of Flames (+12 ATK)",
                 delay=0.3,
@@ -675,6 +718,7 @@ def preview_tooltip() -> None:
 # ---------------------------------------------------------------------------
 # 10. Battle Demo: Title Scene
 # ---------------------------------------------------------------------------
+
 
 def preview_battle_title() -> None:
     """Battle Vignette title screen (if importable)."""
@@ -707,6 +751,7 @@ def preview_battle_title() -> None:
 # ---------------------------------------------------------------------------
 # 11. Tower Defense: Title Scene
 # ---------------------------------------------------------------------------
+
 
 def preview_td_title() -> None:
     """Tower Defense title screen (if importable)."""
@@ -748,6 +793,7 @@ def preview_td_title() -> None:
 # ---------------------------------------------------------------------------
 # 12. Tower Defense: GameScene (initial map)
 # ---------------------------------------------------------------------------
+
 
 def preview_td_game() -> None:
     """Tower Defense game scene — initial map with slots and HUD."""
@@ -799,6 +845,7 @@ def preview_td_game() -> None:
 # test_ui_screenshots.py goldens
 # ---------------------------------------------------------------------------
 
+
 def golden_ui_main_menu() -> None:
     """Exact scene from test_ui_main_menu (480x360)."""
 
@@ -842,7 +889,9 @@ def golden_ui_horizontal_buttons() -> None:
         game.push(HBarScene())
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_ui_horizontal_buttons.png", golden_name="ui_horizontal_buttons")
+    _save(
+        image, "golden_ui_horizontal_buttons.png", golden_name="ui_horizontal_buttons"
+    )
 
 
 def golden_ui_styled_label() -> None:
@@ -850,14 +899,16 @@ def golden_ui_styled_label() -> None:
 
     class LabelScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "GAME OVER",
-                anchor=Anchor.CENTER,
-                style=Style(
-                    font_size=40,
-                    text_color=(255, 60, 60, 255),
-                ),
-            ))
+            self.ui.add(
+                Label(
+                    "GAME OVER",
+                    anchor=Anchor.CENTER,
+                    style=Style(
+                        font_size=40,
+                        text_color=(255, 60, 60, 255),
+                    ),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(LabelScene())
@@ -877,14 +928,16 @@ def golden_ui_nested_panels() -> None:
             )
 
             top_row = Panel(
-                layout=Layout.HORIZONTAL, spacing=20,
+                layout=Layout.HORIZONTAL,
+                spacing=20,
                 style=inner_style,
             )
             top_row.add(Label("HP: 100", style=Style(font_size=18)))
             top_row.add(Label("MP: 50", style=Style(font_size=18)))
 
             bottom_row = Panel(
-                layout=Layout.HORIZONTAL, spacing=20,
+                layout=Layout.HORIZONTAL,
+                spacing=20,
                 style=inner_style,
             )
             bottom_row.add(Label("ATK: 25", style=Style(font_size=18)))
@@ -914,6 +967,7 @@ def golden_ui_nested_panels() -> None:
 # test_widget_screenshots.py goldens
 # ---------------------------------------------------------------------------
 
+
 def golden_widget_progress_bar() -> None:
     """Exact scene from test_progress_bar (480x360)."""
 
@@ -925,12 +979,14 @@ def golden_widget_progress_bar() -> None:
                 spacing=8,
             )
             panel.add(Label("Health", style=Style(font_size=20)))
-            panel.add(ProgressBar(
-                value=75,
-                max_value=100,
-                width=300,
-                height=28,
-            ))
+            panel.add(
+                ProgressBar(
+                    value=75,
+                    max_value=100,
+                    width=300,
+                    height=28,
+                )
+            )
             self.ui.add(panel)
 
     def setup(game: Game) -> None:
@@ -952,20 +1008,24 @@ def golden_widget_textbox_instant() -> None:
                 style=Style(padding=12),
             )
             panel.add(Label("Journal Entry", style=Style(font_size=22)))
-            panel.add(TextBox(
-                "The ancient fortress loomed ahead, its crumbling towers "
-                "silhouetted against the crimson sky. Our party pressed "
-                "forward through the overgrown courtyard, weapons drawn.",
-                width=350,
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                TextBox(
+                    "The ancient fortress loomed ahead, its crumbling towers "
+                    "silhouetted against the crimson sky. Our party pressed "
+                    "forward through the overgrown courtyard, weapons drawn.",
+                    width=350,
+                    style=Style(font_size=16),
+                )
+            )
             self.ui.add(panel)
 
     def setup(game: Game) -> None:
         game.push(TextScene())
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_widget_textbox_instant.png", golden_name="widget_textbox_instant")
+    _save(
+        image, "golden_widget_textbox_instant.png", golden_name="widget_textbox_instant"
+    )
 
 
 def golden_widget_list_with_selection() -> None:
@@ -980,8 +1040,13 @@ def golden_widget_list_with_selection() -> None:
             )
             panel.add(Label("Save Files", style=Style(font_size=20)))
             lst = List(
-                ["Slot 1 - Castle", "Slot 2 - Forest", "Slot 3 - Dungeon",
-                 "Slot 4 - Village", "Slot 5 - Empty"],
+                [
+                    "Slot 1 - Castle",
+                    "Slot 2 - Forest",
+                    "Slot 3 - Dungeon",
+                    "Slot 4 - Village",
+                    "Slot 5 - Empty",
+                ],
                 width=280,
                 item_height=28,
             )
@@ -993,7 +1058,11 @@ def golden_widget_list_with_selection() -> None:
         game.push(ListScene())
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_widget_list_with_selection.png", golden_name="widget_list_with_selection")
+    _save(
+        image,
+        "golden_widget_list_with_selection.png",
+        golden_name="widget_list_with_selection",
+    )
 
 
 def golden_widget_grid_with_cells() -> None:
@@ -1008,7 +1077,8 @@ def golden_widget_grid_with_cells() -> None:
             )
             panel.add(Label("Inventory", style=Style(font_size=20)))
             grid = Grid(
-                3, 3,
+                3,
+                3,
                 cell_size=(64, 64),
                 spacing=4,
                 style=Style(padding=6),
@@ -1026,7 +1096,9 @@ def golden_widget_grid_with_cells() -> None:
         game.push(GridScene())
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_widget_grid_with_cells.png", golden_name="widget_grid_with_cells")
+    _save(
+        image, "golden_widget_grid_with_cells.png", golden_name="widget_grid_with_cells"
+    )
 
 
 def golden_widget_tooltip_visible() -> None:
@@ -1034,12 +1106,14 @@ def golden_widget_tooltip_visible() -> None:
 
     class TipScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Hover over items for details",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=16),
-            ))
+            self.ui.add(
+                Label(
+                    "Hover over items for details",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=16),
+                )
+            )
             self._tooltip = Tooltip(
                 "Sword of Flames (+12 ATK)",
                 delay=0.3,
@@ -1055,7 +1129,9 @@ def golden_widget_tooltip_visible() -> None:
             game.tick(dt=1.0 / 60.0)
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_widget_tooltip_visible.png", golden_name="widget_tooltip_visible")
+    _save(
+        image, "golden_widget_tooltip_visible.png", golden_name="widget_tooltip_visible"
+    )
 
 
 def golden_widget_tabgroup() -> None:
@@ -1188,14 +1264,18 @@ def golden_widget_combined_dialog() -> None:
                 spacing=12,
                 style=Style(padding=0, background_color=(0, 0, 0, 0)),
             )
-            button_row.add(Button(
-                "Accept",
-                style=Style(font_size=16, padding=8),
-            ))
-            button_row.add(Button(
-                "Decline",
-                style=Style(font_size=16, padding=8),
-            ))
+            button_row.add(
+                Button(
+                    "Accept",
+                    style=Style(font_size=16, padding=8),
+                )
+            )
+            button_row.add(
+                Button(
+                    "Decline",
+                    style=Style(font_size=16, padding=8),
+                )
+            )
             dialog.add(button_row)
 
             self.ui.add(dialog)
@@ -1204,31 +1284,38 @@ def golden_widget_combined_dialog() -> None:
         game.push(DialogScene())
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_widget_combined_dialog.png", golden_name="widget_combined_dialog")
+    _save(
+        image, "golden_widget_combined_dialog.png", golden_name="widget_combined_dialog"
+    )
 
 
 # ---------------------------------------------------------------------------
 # test_stage13_screenshots.py goldens
 # ---------------------------------------------------------------------------
 
+
 def golden_stage13_message_screen() -> None:
     """Exact scene from test_message_screen (480x360)."""
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Game World",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Game World",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
         game.push(MessageScreen("You found a legendary sword!"))
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_stage13_message_screen.png", golden_name="stage13_message_screen")
+    _save(
+        image, "golden_stage13_message_screen.png", golden_name="stage13_message_screen"
+    )
 
 
 def golden_stage13_choice_screen() -> None:
@@ -1236,22 +1323,28 @@ def golden_stage13_choice_screen() -> None:
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Character Creation",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Character Creation",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
-        game.push(ChoiceScreen(
-            "Choose your class:",
-            ["Warrior", "Mage", "Rogue"],
-        ))
+        game.push(
+            ChoiceScreen(
+                "Choose your class:",
+                ["Warrior", "Mage", "Rogue"],
+            )
+        )
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_stage13_choice_screen.png", golden_name="stage13_choice_screen")
+    _save(
+        image, "golden_stage13_choice_screen.png", golden_name="stage13_choice_screen"
+    )
 
 
 def golden_stage13_confirm_dialog() -> None:
@@ -1259,19 +1352,23 @@ def golden_stage13_confirm_dialog() -> None:
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Inventory",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Inventory",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
         game.push(ConfirmDialog("Overwrite existing save?"))
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-    _save(image, "golden_stage13_confirm_dialog.png", golden_name="stage13_confirm_dialog")
+    _save(
+        image, "golden_stage13_confirm_dialog.png", golden_name="stage13_confirm_dialog"
+    )
 
 
 def golden_stage13_save_load_screen() -> None:
@@ -1287,23 +1384,31 @@ def golden_stage13_save_load_screen() -> None:
 
         class BaseScene(Scene):
             def on_enter(self) -> None:
-                self.ui.add(Label(
-                    "Main Menu",
-                    anchor=Anchor.TOP,
-                    margin=20,
-                    style=Style(font_size=20),
-                ))
+                self.ui.add(
+                    Label(
+                        "Main Menu",
+                        anchor=Anchor.TOP,
+                        margin=20,
+                        style=Style(font_size=20),
+                    )
+                )
 
         def setup(game: Game) -> None:
             game.push(BaseScene())
-            game.push(SaveLoadScreen(
-                "load",
-                save_manager=mgr,
-                slot_count=5,
-            ))
+            game.push(
+                SaveLoadScreen(
+                    "load",
+                    save_manager=mgr,
+                    slot_count=5,
+                )
+            )
 
         image = _render_mock(setup, tick_count=1, resolution=(480, 360))
-        _save(image, "golden_stage13_save_load_screen.png", golden_name="stage13_save_load_screen")
+        _save(
+            image,
+            "golden_stage13_save_load_screen.png",
+            golden_name="stage13_save_load_screen",
+        )
 
 
 def golden_stage13_hud_bar() -> None:
@@ -1313,11 +1418,13 @@ def golden_stage13_hud_bar() -> None:
         show_hud = True
 
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Explore the Dungeon",
-                anchor=Anchor.CENTER,
-                style=Style(font_size=22, text_color=(180, 180, 180, 255)),
-            ))
+            self.ui.add(
+                Label(
+                    "Explore the Dungeon",
+                    anchor=Anchor.CENTER,
+                    style=Style(font_size=22, text_color=(180, 180, 180, 255)),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(GameScene())
@@ -1328,26 +1435,32 @@ def golden_stage13_hud_bar() -> None:
             layout=Layout.HORIZONTAL,
             spacing=6,
         )
-        hp_panel.add(Label(
-            "HP",
-            style=Style(font_size=16, text_color=(255, 80, 80, 255)),
-        ))
-        hp_panel.add(ProgressBar(
-            value=72,
-            max_value=100,
-            width=120,
-            height=18,
-            bar_color=(200, 40, 40, 255),
-            bg_color=(60, 20, 20, 200),
-        ))
+        hp_panel.add(
+            Label(
+                "HP",
+                style=Style(font_size=16, text_color=(255, 80, 80, 255)),
+            )
+        )
+        hp_panel.add(
+            ProgressBar(
+                value=72,
+                max_value=100,
+                width=120,
+                height=18,
+                bar_color=(200, 40, 40, 255),
+                bg_color=(60, 20, 20, 200),
+            )
+        )
         game.hud.add(hp_panel)
 
-        game.hud.add(Label(
-            "Gold: 500",
-            anchor=Anchor.TOP_RIGHT,
-            margin=10,
-            style=Style(font_size=16, text_color=(255, 215, 0, 255)),
-        ))
+        game.hud.add(
+            Label(
+                "Gold: 500",
+                anchor=Anchor.TOP_RIGHT,
+                margin=10,
+                style=Style(font_size=16, text_color=(255, 215, 0, 255)),
+            )
+        )
 
     image = _render_mock(setup, tick_count=1, resolution=(480, 360))
     _save(image, "golden_stage13_hud_bar.png", golden_name="stage13_hud_bar")
@@ -1369,13 +1482,15 @@ def golden_stage13_menu_scene() -> None:
                     padding=40,
                 ),
             )
-            panel.add(Label(
-                "Chronicles of the Realm",
-                style=Style(
-                    font_size=36,
-                    text_color=(220, 200, 140, 255),
-                ),
-            ))
+            panel.add(
+                Label(
+                    "Chronicles of the Realm",
+                    style=Style(
+                        font_size=36,
+                        text_color=(220, 200, 140, 255),
+                    ),
+                )
+            )
             panel.add(Button("New Game", style=Style(font_size=20, padding=10)))
             panel.add(Button("Load Game", style=Style(font_size=20, padding=10)))
             panel.add(Button("Settings", style=Style(font_size=20, padding=10)))
@@ -1392,6 +1507,7 @@ def golden_stage13_menu_scene() -> None:
 # ---------------------------------------------------------------------------
 # test_tower_defense_screenshots.py goldens
 # ---------------------------------------------------------------------------
+
 
 def _td_theme() -> Theme:
     """Return the tower defense theme (shared by all TD goldens)."""
@@ -1420,6 +1536,7 @@ def _load_td_module() -> Any:
         added = True
     try:
         import main as td_main  # type: ignore[import-not-found]
+
         return td_main
     except ImportError:
         return None

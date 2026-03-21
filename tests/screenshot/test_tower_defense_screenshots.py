@@ -78,6 +78,7 @@ def _configure_game(game) -> None:
 # 1. Title screen
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_td_title() -> None:
     """Title screen: centered panel with "Tower Defense" title, subtitle,
@@ -99,6 +100,7 @@ def test_td_title() -> None:
 # ---------------------------------------------------------------------------
 # 2. Game scene — initial map (no towers, no enemies yet)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_td_game_initial() -> None:
@@ -125,6 +127,7 @@ def test_td_game_initial() -> None:
 # ---------------------------------------------------------------------------
 # 3. Game scene — tower placed
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_td_game_tower_placed() -> None:

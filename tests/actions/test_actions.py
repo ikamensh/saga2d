@@ -71,7 +71,12 @@ def sprite(game: Game) -> Sprite:
 
 def _walk_anim() -> AnimationDef:
     return AnimationDef(
-        frames=["sprites/walk_01", "sprites/walk_02", "sprites/walk_03", "sprites/walk_04"],
+        frames=[
+            "sprites/walk_01",
+            "sprites/walk_02",
+            "sprites/walk_03",
+            "sprites/walk_04",
+        ],
         frame_duration=0.1,
         loop=True,
     )
@@ -107,13 +112,17 @@ class TestDelay:
         game.tick(dt=0.25)
         assert len(done) == 1
 
-    def test_delay_zero_duration_completes_immediately(self, sprite: Sprite, game: Game) -> None:
+    def test_delay_zero_duration_completes_immediately(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         done = []
         sprite.do(Sequence(Delay(0), Do(lambda: done.append(True))))
         game.tick(dt=0.016)
         assert len(done) == 1
 
-    def test_delay_exact_duration_completes_on_tick(self, sprite: Sprite, game: Game) -> None:
+    def test_delay_exact_duration_completes_on_tick(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         done = []
         sprite.do(Sequence(Delay(0.1), Do(lambda: done.append(True))))
         game.tick(dt=0.1)
@@ -131,12 +140,14 @@ class TestDelay:
     def test_delay_overflows_into_next_action(self, sprite: Sprite, game: Game) -> None:
         """Delay(0.05) + Delay(0.05): first completes, second gets dt=0 so needs another tick."""
         count = []
-        sprite.do(Sequence(
-            Delay(0.05),
-            Do(lambda: count.append(1)),
-            Delay(0.05),
-            Do(lambda: count.append(2)),
-        ))
+        sprite.do(
+            Sequence(
+                Delay(0.05),
+                Do(lambda: count.append(1)),
+                Delay(0.05),
+                Do(lambda: count.append(2)),
+            )
+        )
         game.tick(dt=0.1)  # first Delay done, second starts with dt=0
         assert count == [1]
         game.tick(dt=0.1)  # second Delay gets dt, completes
@@ -171,11 +182,13 @@ class TestDo:
 
     def test_do_chained_in_sequence(self, sprite: Sprite, game: Game) -> None:
         order = []
-        sprite.do(Sequence(
-            Do(lambda: order.append(1)),
-            Do(lambda: order.append(2)),
-            Do(lambda: order.append(3)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: order.append(1)),
+                Do(lambda: order.append(2)),
+                Do(lambda: order.append(3)),
+            )
+        )
         game.tick(dt=0.016)
         assert order == [1, 2, 3]
 
@@ -194,13 +207,15 @@ class TestDo:
 class TestSequence:
     def test_sequence_executes_in_order(self, sprite: Sprite, game: Game) -> None:
         order = []
-        sprite.do(Sequence(
-            Do(lambda: order.append(1)),
-            Delay(0.05),
-            Do(lambda: order.append(2)),
-            Delay(0.05),
-            Do(lambda: order.append(3)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: order.append(1)),
+                Delay(0.05),
+                Do(lambda: order.append(2)),
+                Delay(0.05),
+                Do(lambda: order.append(3)),
+            )
+        )
         game.tick(dt=0.016)
         assert order == [1]
         game.tick(dt=0.05)
@@ -208,7 +223,9 @@ class TestSequence:
         game.tick(dt=0.05)
         assert order == [1, 2, 3]
 
-    def test_sequence_empty_completes_immediately(self, sprite: Sprite, game: Game) -> None:
+    def test_sequence_empty_completes_immediately(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         sprite.do(Sequence())
         game.tick(dt=0.016)
         assert sprite not in game._action_sprites
@@ -219,39 +236,51 @@ class TestSequence:
         game.tick(dt=0.016)
         assert fired == [True]
 
-    def test_sequence_instant_chain_same_frame(self, sprite: Sprite, game: Game) -> None:
+    def test_sequence_instant_chain_same_frame(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         """Sequence(Do, Do, Do) executes all in one tick."""
         count = [0]
-        sprite.do(Sequence(
-            Do(lambda: count.__setitem__(0, count[0] + 1)),
-            Do(lambda: count.__setitem__(0, count[0] + 1)),
-            Do(lambda: count.__setitem__(0, count[0] + 1)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: count.__setitem__(0, count[0] + 1)),
+                Do(lambda: count.__setitem__(0, count[0] + 1)),
+                Do(lambda: count.__setitem__(0, count[0] + 1)),
+            )
+        )
         game.tick(dt=0.016)
         assert count[0] == 3
 
-    def test_sequence_remove_then_do_same_tick(self, sprite: Sprite, game: Game, backend: MockBackend) -> None:
+    def test_sequence_remove_then_do_same_tick(
+        self, sprite: Sprite, game: Game, backend: MockBackend
+    ) -> None:
         """Sequence(Do, Remove, Do) — Remove runs, sprite gone; Do(2) may run in same tick."""
         order = []
-        sprite.do(Sequence(
-            Do(lambda: order.append(1)),
-            Remove(),
-            Do(lambda: order.append(2)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: order.append(1)),
+                Remove(),
+                Do(lambda: order.append(2)),
+            )
+        )
         game.tick(dt=0.016)
         assert sprite.is_removed
         assert sprite.sprite_id not in backend.sprites
 
-    def test_sequence_correct_timing_between_delays(self, sprite: Sprite, game: Game) -> None:
+    def test_sequence_correct_timing_between_delays(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         """Subsequent children get dt=0 when chained, so delays need full ticks."""
         times = []
-        sprite.do(Sequence(
-            Do(lambda: times.append(0)),
-            Delay(0.2),
-            Do(lambda: times.append(1)),
-            Delay(0.3),
-            Do(lambda: times.append(2)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: times.append(0)),
+                Delay(0.2),
+                Do(lambda: times.append(1)),
+                Delay(0.3),
+                Do(lambda: times.append(2)),
+            )
+        )
         game.tick(dt=0.1)  # Do(0), Delay(0.2) starts with dt=0
         assert times == [0]
         game.tick(dt=0.1)  # Delay has 0.1
@@ -272,10 +301,12 @@ class TestSequence:
 class TestParallel:
     def test_parallel_runs_all_children(self, sprite: Sprite, game: Game) -> None:
         a_done, b_done = [], []
-        sprite.do(Parallel(
-            Sequence(Delay(0.1), Do(lambda: a_done.append(True))),
-            Sequence(Delay(0.2), Do(lambda: b_done.append(True))),
-        ))
+        sprite.do(
+            Parallel(
+                Sequence(Delay(0.1), Do(lambda: a_done.append(True))),
+                Sequence(Delay(0.2), Do(lambda: b_done.append(True))),
+            )
+        )
         game.tick(dt=0.1)
         assert a_done == [True]
         assert b_done == []
@@ -289,16 +320,20 @@ class TestParallel:
         game.tick(dt=0.1)
         assert sprite not in game._action_sprites
 
-    def test_parallel_two_move_to_waits_slower(self, sprite: Sprite, game: Game) -> None:
+    def test_parallel_two_move_to_waits_slower(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         """Parallel(MoveTo fast, MoveTo slow) completes when slow one arrives.
 
         Both update the same sprite; last update wins per frame. Final pos is
         from the slower MoveTo when it finishes.
         """
-        sprite.do(Parallel(
-            MoveTo((200, 300), speed=1000),  # arrives in ~0.1s
-            MoveTo((150, 300), speed=100),   # arrives in ~0.5s
-        ))
+        sprite.do(
+            Parallel(
+                MoveTo((200, 300), speed=1000),  # arrives in ~0.1s
+                MoveTo((150, 300), speed=100),  # arrives in ~0.5s
+            )
+        )
         game.tick(dt=0.2)
         assert sprite in game._action_sprites
         game.tick(dt=0.4)
@@ -306,7 +341,9 @@ class TestParallel:
         assert abs(sprite._x - 150) < 2
 
     def test_parallel_stops_infinite_child_when_finite_done(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Parallel(PlayAnim loop, MoveTo) stops PlayAnim when MoveTo finishes."""
         sprite.do(Parallel(PlayAnim(_walk_anim()), MoveTo((200, 300), speed=500)))
@@ -314,7 +351,9 @@ class TestParallel:
         assert sprite not in game._action_sprites
         assert sprite._anim_player is None  # PlayAnim.stop_animation was called
 
-    def test_parallel_empty_completes_immediately(self, sprite: Sprite, game: Game) -> None:
+    def test_parallel_empty_completes_immediately(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         sprite.do(Parallel())
         game.tick(dt=0.016)
         assert sprite not in game._action_sprites
@@ -351,7 +390,9 @@ class TestMoveTo:
         assert abs(sprite._x - 200) < 2
 
     def test_move_to_already_at_target_completes_immediately(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         sprite.do(MoveTo((100, 300), speed=200))
         game.tick(dt=0.016)
@@ -410,7 +451,9 @@ class TestFadeOut:
         assert sprite.opacity == 0
 
     def test_fade_out_completes_in_one_tick_if_dt_exceeds_duration(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         sprite.do(FadeOut(0.1))
         game.tick(dt=0.5)
@@ -459,7 +502,9 @@ class TestFadeIn:
 
 
 class TestRemove:
-    def test_remove_calls_sprite_remove(self, sprite: Sprite, game: Game, backend: MockBackend) -> None:
+    def test_remove_calls_sprite_remove(
+        self, sprite: Sprite, game: Game, backend: MockBackend
+    ) -> None:
         sprite.do(Remove())
         game.tick(dt=0.016)
         assert sprite.is_removed
@@ -470,7 +515,9 @@ class TestRemove:
         game.tick(dt=0.016)
         assert sprite not in game._action_sprites
 
-    def test_remove_in_sequence_after_delay(self, sprite: Sprite, game: Game, backend: MockBackend) -> None:
+    def test_remove_in_sequence_after_delay(
+        self, sprite: Sprite, game: Game, backend: MockBackend
+    ) -> None:
         sprite.do(Sequence(Delay(0.1), Remove()))
         game.tick(dt=0.05)
         assert not sprite.is_removed
@@ -507,13 +554,17 @@ class TestPlayAnim:
         game.tick(dt=0.016)
         assert sprite._anim_player is not None
 
-    def test_play_anim_stop_calls_stop_animation(self, sprite: Sprite, game: Game) -> None:
+    def test_play_anim_stop_calls_stop_animation(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         sprite.do(PlayAnim(_walk_anim()))
         game.tick(dt=0.05)
         sprite.stop_actions()
         assert sprite._anim_player is None
 
-    def test_play_anim_removed_from_animated_sprites_on_stop(self, sprite: Sprite, game: Game) -> None:
+    def test_play_anim_removed_from_animated_sprites_on_stop(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         sprite.do(PlayAnim(_walk_anim()))
         assert sprite in game._animated_sprites
         sprite.stop_actions()
@@ -539,10 +590,12 @@ class TestRepeat:
 
     def test_repeat_twice_with_delay(self, sprite: Sprite, game: Game) -> None:
         count = [0]
-        sprite.do(Repeat(
-            Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
-            times=2,
-        ))
+        sprite.do(
+            Repeat(
+                Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
+                times=2,
+            )
+        )
         game.tick(dt=0.05)
         assert count[0] == 1
         game.tick(dt=0.05)
@@ -555,7 +608,9 @@ class TestRepeat:
     def test_repeat_finite_times_has_is_finite_true(self) -> None:
         assert Repeat(Do(lambda: None), times=5).is_finite is True
 
-    def test_repeat_infinite_runs_until_stopped(self, sprite: Sprite, game: Game) -> None:
+    def test_repeat_infinite_runs_until_stopped(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         count = [0]
         sprite.do(Repeat(Do(lambda: count.__setitem__(0, count[0] + 1)), times=None))
         for _ in range(5):
@@ -565,7 +620,9 @@ class TestRepeat:
         sprite.stop_actions()
         assert sprite not in game._action_sprites
 
-    def test_repeat_zero_times_completes_immediately(self, sprite: Sprite, game: Game) -> None:
+    def test_repeat_zero_times_completes_immediately(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         """Repeat(times=0): implementation runs once then stops (count>=0)."""
         count = [0]
         sprite.do(Repeat(Do(lambda: count.__setitem__(0, count[0] + 1)), times=0))
@@ -577,10 +634,12 @@ class TestRepeat:
     def test_repeat_deep_copies_action_state(self, sprite: Sprite, game: Game) -> None:
         """Each Repeat iteration gets fresh Delay state."""
         count = [0]
-        sprite.do(Repeat(
-            Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
-            times=2,
-        ))
+        sprite.do(
+            Repeat(
+                Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
+                times=2,
+            )
+        )
         game.tick(dt=0.03)
         assert count[0] == 0
         game.tick(dt=0.03)
@@ -588,7 +647,9 @@ class TestRepeat:
         game.tick(dt=0.05)
         assert count[0] == 2
 
-    def test_repeat_once_equivalent_to_single_action(self, sprite: Sprite, game: Game) -> None:
+    def test_repeat_once_equivalent_to_single_action(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         count = [0]
         sprite.do(Repeat(Do(lambda: count.__setitem__(0, count[0] + 1)), times=1))
         game.tick(dt=0.016)
@@ -602,13 +663,17 @@ class TestRepeat:
 
 
 class TestStopActions:
-    def test_stop_actions_cancels_mid_sequence(self, sprite: Sprite, game: Game) -> None:
+    def test_stop_actions_cancels_mid_sequence(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         order = []
-        sprite.do(Sequence(
-            Do(lambda: order.append(1)),
-            Delay(0.5),
-            Do(lambda: order.append(2)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: order.append(1)),
+                Delay(0.5),
+                Do(lambda: order.append(2)),
+            )
+        )
         game.tick(dt=0.016)
         assert order == [1]
         sprite.stop_actions()
@@ -634,7 +699,9 @@ class TestStopActions:
         game.tick(dt=0.5)
         assert sprite._x == x_at_stop
 
-    def test_stop_actions_cancels_mid_fade_out(self, sprite: Sprite, game: Game) -> None:
+    def test_stop_actions_cancels_mid_fade_out(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         sprite.do(FadeOut(0.5))
         game.tick(dt=0.25)
         opacity_at_stop = sprite.opacity
@@ -645,10 +712,12 @@ class TestStopActions:
     def test_stop_actions_cancels_mid_repeat(self, sprite: Sprite, game: Game) -> None:
         """Stop during Repeat before all iterations complete."""
         count = [0]
-        sprite.do(Repeat(
-            Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
-            times=10,
-        ))
+        sprite.do(
+            Repeat(
+                Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
+                times=10,
+            )
+        )
         game.tick(dt=0.05)
         assert count[0] == 1
         sprite.stop_actions()
@@ -656,17 +725,23 @@ class TestStopActions:
         game.tick(dt=0.5)
         assert count[0] == 1
 
-    def test_stop_actions_cancels_parallel_children(self, sprite: Sprite, game: Game) -> None:
-        sprite.do(Parallel(
-            PlayAnim(_walk_anim()),
-            MoveTo((500, 300), speed=100),
-        ))
+    def test_stop_actions_cancels_parallel_children(
+        self, sprite: Sprite, game: Game
+    ) -> None:
+        sprite.do(
+            Parallel(
+                PlayAnim(_walk_anim()),
+                MoveTo((500, 300), speed=100),
+            )
+        )
         game.tick(dt=0.1)
         sprite.stop_actions()
         assert sprite._anim_player is None
         assert sprite not in game._action_sprites
 
-    def test_stop_actions_when_no_action_is_safe(self, sprite: Sprite, game: Game) -> None:
+    def test_stop_actions_when_no_action_is_safe(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         sprite.stop_actions()
         sprite.stop_actions()
 
@@ -716,10 +791,12 @@ class TestDoReplaces:
 class TestNestedCompositions:
     def test_sequence_in_parallel(self, sprite: Sprite, game: Game) -> None:
         a, b = [], []
-        sprite.do(Parallel(
-            Sequence(Delay(0.1), Do(lambda: a.append(1))),
-            Sequence(Delay(0.2), Do(lambda: b.append(2))),
-        ))
+        sprite.do(
+            Parallel(
+                Sequence(Delay(0.1), Do(lambda: a.append(1))),
+                Sequence(Delay(0.2), Do(lambda: b.append(2))),
+            )
+        )
         game.tick(dt=0.1)
         assert a == [1]
         assert b == []
@@ -728,26 +805,30 @@ class TestNestedCompositions:
 
     def test_parallel_in_sequence(self, sprite: Sprite, game: Game) -> None:
         order = []
-        sprite.do(Sequence(
-            Parallel(
-                Do(lambda: order.append(1)),
-                Do(lambda: order.append(2)),
-            ),
-            Do(lambda: order.append(3)),
-        ))
+        sprite.do(
+            Sequence(
+                Parallel(
+                    Do(lambda: order.append(1)),
+                    Do(lambda: order.append(2)),
+                ),
+                Do(lambda: order.append(3)),
+            )
+        )
         game.tick(dt=0.016)
         assert order == [1, 2, 3]
 
     def test_parallel_in_repeat(self, sprite: Sprite, game: Game) -> None:
         """Repeat(Parallel(Do, Delay(0)), times=3) — one iter per tick."""
         count = [0]
-        sprite.do(Repeat(
-            Parallel(
-                Do(lambda: count.__setitem__(0, count[0] + 1)),
-                Delay(0.0),
-            ),
-            times=3,
-        ))
+        sprite.do(
+            Repeat(
+                Parallel(
+                    Do(lambda: count.__setitem__(0, count[0] + 1)),
+                    Delay(0.0),
+                ),
+                times=3,
+            )
+        )
         for _ in range(5):
             game.tick(dt=0.016)
             if count[0] >= 3:
@@ -756,10 +837,12 @@ class TestNestedCompositions:
 
     def test_sequence_in_repeat(self, sprite: Sprite, game: Game) -> None:
         count = [0]
-        sprite.do(Repeat(
-            Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
-            times=3,
-        ))
+        sprite.do(
+            Repeat(
+                Sequence(Delay(0.05), Do(lambda: count.__setitem__(0, count[0] + 1))),
+                times=3,
+            )
+        )
         game.tick(dt=0.05)
         assert count[0] == 1
         game.tick(dt=0.05)
@@ -770,10 +853,12 @@ class TestNestedCompositions:
     def test_repeat_in_sequence(self, sprite: Sprite, game: Game) -> None:
         """Repeat(times=2) runs 2 iterations (one per tick), then Sequence continues."""
         order = []
-        sprite.do(Sequence(
-            Repeat(Do(lambda: order.append(1)), times=2),
-            Do(lambda: order.append(2)),
-        ))
+        sprite.do(
+            Sequence(
+                Repeat(Do(lambda: order.append(1)), times=2),
+                Do(lambda: order.append(2)),
+            )
+        )
         game.tick(dt=0.016)
         assert order == [1]
         game.tick(dt=0.016)
@@ -781,13 +866,15 @@ class TestNestedCompositions:
 
     def test_deeply_nested(self, sprite: Sprite, game: Game) -> None:
         order = []
-        sprite.do(Sequence(
-            Parallel(
-                Sequence(Delay(0.05), Do(lambda: order.append(1))),
-                Sequence(Delay(0.1), Do(lambda: order.append(2))),
-            ),
-            Do(lambda: order.append(3)),
-        ))
+        sprite.do(
+            Sequence(
+                Parallel(
+                    Sequence(Delay(0.05), Do(lambda: order.append(1))),
+                    Sequence(Delay(0.1), Do(lambda: order.append(2))),
+                ),
+                Do(lambda: order.append(3)),
+            )
+        )
         game.tick(dt=0.05)
         assert order == [1]
         game.tick(dt=0.05)
@@ -801,18 +888,22 @@ class TestNestedCompositions:
 
 class TestBattleSequence:
     def test_attack_sequence_walk_attack_delay_walk_back(
-        self, sprite: Sprite, game: Game,
+        self,
+        sprite: Sprite,
+        game: Game,
     ) -> None:
         """Walk right, attack, delay, walk back — battle pattern."""
         order = []
         start_x = sprite._x
-        sprite.do(Sequence(
-            Parallel(PlayAnim(_walk_anim()), MoveTo((400, 300), speed=300)),
-            PlayAnim(_attack_anim()),
-            Delay(0.1),
-            Parallel(PlayAnim(_walk_anim()), MoveTo((start_x, 300), speed=300)),
-            Do(lambda: order.append("done")),
-        ))
+        sprite.do(
+            Sequence(
+                Parallel(PlayAnim(_walk_anim()), MoveTo((400, 300), speed=300)),
+                PlayAnim(_attack_anim()),
+                Delay(0.1),
+                Parallel(PlayAnim(_walk_anim()), MoveTo((start_x, 300), speed=300)),
+                Do(lambda: order.append("done")),
+            )
+        )
         # Walk to 400: 300px at 300px/s = 1s
         for _ in range(80):
             game.tick(dt=0.016)
@@ -835,13 +926,15 @@ class TestBattleSequence:
     def test_battle_pattern_with_do_callback(self, sprite: Sprite, game: Game) -> None:
         """Simplified: Do, Delay, Do, MoveTo, Do."""
         order = []
-        sprite.do(Sequence(
-            Do(lambda: order.append("start")),
-            Delay(0.1),
-            Do(lambda: order.append("mid")),
-            MoveTo((200, 300), speed=500),
-            Do(lambda: order.append("end")),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: order.append("start")),
+                Delay(0.1),
+                Do(lambda: order.append("mid")),
+                MoveTo((200, 300), speed=500),
+                Do(lambda: order.append("end")),
+            )
+        )
         game.tick(dt=0.016)
         assert order == ["start"]
         game.tick(dt=0.1)
@@ -868,21 +961,28 @@ class TestEdgeCases:
         assert sprite not in game._action_sprites
 
     def test_remove_in_sequence_prevents_further_actions(
-        self, sprite: Sprite, game: Game, backend: MockBackend,
+        self,
+        sprite: Sprite,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """After Remove, sprite is gone — no crash from further updates."""
         order = []
-        sprite.do(Sequence(
-            Do(lambda: order.append(1)),
-            Remove(),
-            Do(lambda: order.append(2)),
-        ))
+        sprite.do(
+            Sequence(
+                Do(lambda: order.append(1)),
+                Remove(),
+                Do(lambda: order.append(2)),
+            )
+        )
         game.tick(dt=0.016)
         assert 1 in order
         assert sprite.is_removed
         assert sprite.sprite_id not in backend.sprites
 
-    def test_do_on_removed_sprite_can_still_call_stop(self, sprite: Sprite, game: Game) -> None:
+    def test_do_on_removed_sprite_can_still_call_stop(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         """stop_actions when sprite removed — should not crash."""
         sprite.do(Delay(0.5))
         sprite.remove()
@@ -902,11 +1002,13 @@ class TestEdgeCases:
 
     def test_parallel_three_children(self, sprite: Sprite, game: Game) -> None:
         a, b, c = [], [], []
-        sprite.do(Parallel(
-            Sequence(Delay(0.1), Do(lambda: a.append(1))),
-            Sequence(Delay(0.2), Do(lambda: b.append(2))),
-            Sequence(Delay(0.3), Do(lambda: c.append(3))),
-        ))
+        sprite.do(
+            Parallel(
+                Sequence(Delay(0.1), Do(lambda: a.append(1))),
+                Sequence(Delay(0.2), Do(lambda: b.append(2))),
+                Sequence(Delay(0.3), Do(lambda: c.append(3))),
+            )
+        )
         game.tick(dt=0.1)
         assert a == [1]
         game.tick(dt=0.1)
@@ -918,12 +1020,14 @@ class TestEdgeCases:
     def test_sequence_three_delays(self, sprite: Sprite, game: Game) -> None:
         """Three 0.05s delays chain; each gets dt=0 when started, so 3 ticks of 0.05."""
         done = []
-        sprite.do(Sequence(
-            Delay(0.05),
-            Delay(0.05),
-            Delay(0.05),
-            Do(lambda: done.append(True)),
-        ))
+        sprite.do(
+            Sequence(
+                Delay(0.05),
+                Delay(0.05),
+                Delay(0.05),
+                Do(lambda: done.append(True)),
+            )
+        )
         game.tick(dt=0.05)
         assert not done
         game.tick(dt=0.05)
@@ -1011,7 +1115,9 @@ class TestRepeatTimesZero:
         assert result is True
         assert len(count) == 0, "times=0 should never run the child action"
 
-    def test_repeat_once_runs_child_exactly_once(self, sprite: Sprite, game: Game) -> None:
+    def test_repeat_once_runs_child_exactly_once(
+        self, sprite: Sprite, game: Game
+    ) -> None:
         """Repeat(Do(...), times=1) runs the child exactly once."""
         count: list[int] = []
         action = Repeat(Do(lambda: count.append(1)), times=1)
@@ -1045,6 +1151,7 @@ class TestActionEdgeCasesUnique:
 
     def test_do_callback_exception_propagates(self, sprite: Sprite, game: Game) -> None:
         """Do() callback that raises propagates the exception."""
+
         def bad_callback() -> None:
             raise RuntimeError("boom")
 
@@ -1064,5 +1171,6 @@ def test_actions_importable_from_saga2d() -> None:
         Delay,
         Sequence,
     )
+
     assert Delay is not None
     assert Sequence is not None

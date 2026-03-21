@@ -50,6 +50,7 @@ _RESOLUTION = (480, 360)
 # 1. MessageScreen — dark overlay with centred text
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_message_screen() -> None:
     """MessageScreen overlay on top of a simple base scene.
@@ -62,12 +63,14 @@ def test_message_screen() -> None:
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Game World",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Game World",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
@@ -81,6 +84,7 @@ def test_message_screen() -> None:
 # 2. ChoiceScreen — prompt with 3 choices
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_choice_screen() -> None:
     """ChoiceScreen overlay with a prompt and 3 choice buttons.
@@ -92,19 +96,23 @@ def test_choice_screen() -> None:
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Character Creation",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Character Creation",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
-        game.push(ChoiceScreen(
-            "Choose your class:",
-            ["Warrior", "Mage", "Rogue"],
-        ))
+        game.push(
+            ChoiceScreen(
+                "Choose your class:",
+                ["Warrior", "Mage", "Rogue"],
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "stage13_choice_screen")
@@ -113,6 +121,7 @@ def test_choice_screen() -> None:
 # ---------------------------------------------------------------------------
 # 3. ConfirmDialog — question with Yes / No
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_confirm_dialog() -> None:
@@ -124,12 +133,14 @@ def test_confirm_dialog() -> None:
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Inventory",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Inventory",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
@@ -142,6 +153,7 @@ def test_confirm_dialog() -> None:
 # ---------------------------------------------------------------------------
 # 4. SaveLoadScreen — slot list in load mode
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_save_load_screen(tmp_path: Path) -> None:
@@ -159,20 +171,24 @@ def test_save_load_screen(tmp_path: Path) -> None:
 
     class BaseScene(Scene):
         def on_enter(self) -> None:
-            self.ui.add(Label(
-                "Main Menu",
-                anchor=Anchor.TOP,
-                margin=20,
-                style=Style(font_size=20),
-            ))
+            self.ui.add(
+                Label(
+                    "Main Menu",
+                    anchor=Anchor.TOP,
+                    margin=20,
+                    style=Style(font_size=20),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(BaseScene())
-        game.push(SaveLoadScreen(
-            "load",
-            save_manager=mgr,
-            slot_count=5,
-        ))
+        game.push(
+            SaveLoadScreen(
+                "load",
+                save_manager=mgr,
+                slot_count=5,
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "stage13_save_load_screen")
@@ -181,6 +197,7 @@ def test_save_load_screen(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # 5. HUD bar — persistent label + progress bar over a game scene
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_hud_bar() -> None:
@@ -193,15 +210,18 @@ def test_hud_bar() -> None:
 
     class GameScene(Scene):
         """Simple base scene representing an in-game view."""
+
         show_hud = True
 
         def on_enter(self) -> None:
             # Something in the scene's own UI.
-            self.ui.add(Label(
-                "Explore the Dungeon",
-                anchor=Anchor.CENTER,
-                style=Style(font_size=22, text_color=(180, 180, 180, 255)),
-            ))
+            self.ui.add(
+                Label(
+                    "Explore the Dungeon",
+                    anchor=Anchor.CENTER,
+                    style=Style(font_size=22, text_color=(180, 180, 180, 255)),
+                )
+            )
 
     def setup(game: Game) -> None:
         game.push(GameScene())
@@ -214,27 +234,33 @@ def test_hud_bar() -> None:
             layout=Layout.HORIZONTAL,
             spacing=6,
         )
-        hp_panel.add(Label(
-            "HP",
-            style=Style(font_size=16, text_color=(255, 80, 80, 255)),
-        ))
-        hp_panel.add(ProgressBar(
-            value=72,
-            max_value=100,
-            width=120,
-            height=18,
-            bar_color=(200, 40, 40, 255),
-            bg_color=(60, 20, 20, 200),
-        ))
+        hp_panel.add(
+            Label(
+                "HP",
+                style=Style(font_size=16, text_color=(255, 80, 80, 255)),
+            )
+        )
+        hp_panel.add(
+            ProgressBar(
+                value=72,
+                max_value=100,
+                width=120,
+                height=18,
+                bar_color=(200, 40, 40, 255),
+                bg_color=(60, 20, 20, 200),
+            )
+        )
         game.hud.add(hp_panel)
 
         # Top-right: gold counter.
-        game.hud.add(Label(
-            "Gold: 500",
-            anchor=Anchor.TOP_RIGHT,
-            margin=10,
-            style=Style(font_size=16, text_color=(255, 215, 0, 255)),
-        ))
+        game.hud.add(
+            Label(
+                "Gold: 500",
+                anchor=Anchor.TOP_RIGHT,
+                margin=10,
+                style=Style(font_size=16, text_color=(255, 215, 0, 255)),
+            )
+        )
 
     image = render_scene(setup, tick_count=1, resolution=_RESOLUTION)
     assert_screenshot(image, "stage13_hud_bar")
@@ -243,6 +269,7 @@ def test_hud_bar() -> None:
 # ---------------------------------------------------------------------------
 # 6. Menu scene — full menu matching desired_examples/menu_desired.py
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_menu_scene() -> None:
@@ -268,13 +295,15 @@ def test_menu_scene() -> None:
                     padding=40,
                 ),
             )
-            panel.add(Label(
-                "Chronicles of the Realm",
-                style=Style(
-                    font_size=36,
-                    text_color=(220, 200, 140, 255),
-                ),
-            ))
+            panel.add(
+                Label(
+                    "Chronicles of the Realm",
+                    style=Style(
+                        font_size=36,
+                        text_color=(220, 200, 140, 255),
+                    ),
+                )
+            )
             panel.add(Button("New Game", style=Style(font_size=20, padding=10)))
             panel.add(Button("Load Game", style=Style(font_size=20, padding=10)))
             panel.add(Button("Settings", style=Style(font_size=20, padding=10)))

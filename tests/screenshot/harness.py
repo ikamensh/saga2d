@@ -42,6 +42,7 @@ OUTPUT_DIR = _HARNESS_DIR / "output"
 # render_scene
 # ---------------------------------------------------------------------------
 
+
 def render_scene(
     setup_fn: Callable[[Game], None],
     *,
@@ -110,6 +111,7 @@ def render_scene(
 # ---------------------------------------------------------------------------
 # assert_screenshot
 # ---------------------------------------------------------------------------
+
 
 def assert_screenshot(
     image: Image.Image,
@@ -212,6 +214,7 @@ def assert_screenshot(
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _save_failure_artifacts(
     actual: Image.Image,

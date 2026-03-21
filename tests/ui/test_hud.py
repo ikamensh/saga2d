@@ -26,6 +26,7 @@ from saga2d.ui.hud import HUD
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def game() -> Game:
     """Return a mock game instance."""
@@ -41,6 +42,7 @@ def backend(game: Game) -> MockBackend:
 # ---------------------------------------------------------------------------
 # HUD creation and lazy property
 # ---------------------------------------------------------------------------
+
 
 class TestHUDCreation:
     """Test HUD construction and lazy access."""
@@ -80,6 +82,7 @@ class TestHUDCreation:
 # ---------------------------------------------------------------------------
 # Component management
 # ---------------------------------------------------------------------------
+
 
 class TestHUDComponentManagement:
     """Test add, remove, clear."""
@@ -134,6 +137,7 @@ class TestHUDComponentManagement:
 # Visibility logic
 # ---------------------------------------------------------------------------
 
+
 class TestHUDVisibility:
     """Test HUD visibility based on hud.visible and scene.show_hud."""
 
@@ -176,11 +180,14 @@ class TestHUDVisibility:
 # Input dispatch order
 # ---------------------------------------------------------------------------
 
+
 class TestHUDInputOrder:
     """Test that HUD receives input before scene UI and handle_input."""
 
     def test_hud_consumes_event_before_scene_ui(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """When HUD consumes an event, scene UI doesn't see it."""
         scene_ui_hit = []
@@ -189,7 +196,8 @@ class TestHUDInputOrder:
         class CatchScene(Scene):
             def on_enter(self) -> None:
                 btn = Panel(
-                    width=800, height=600,
+                    width=800,
+                    height=600,
                     anchor=Anchor.CENTER,
                     style=Style(background_color=(0, 0, 0, 255)),
                 )
@@ -206,7 +214,8 @@ class TestHUDInputOrder:
 
         # Add a consuming button to the HUD that covers the same area.
         hud_btn = Panel(
-            width=800, height=600,
+            width=800,
+            height=600,
             anchor=Anchor.CENTER,
             style=Style(background_color=(0, 0, 0, 0)),
         )
@@ -225,7 +234,9 @@ class TestHUDInputOrder:
         assert len(scene_ui_hit) == 0  # Scene UI never saw the event.
 
     def test_hud_passes_event_to_scene_when_not_consumed(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """When HUD doesn't consume, scene handle_input() receives it."""
         scene_events = []
@@ -246,7 +257,9 @@ class TestHUDInputOrder:
         assert len(scene_events) == 1
 
     def test_hud_hidden_by_show_hud_does_not_intercept(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """When scene.show_hud=False, HUD doesn't intercept input."""
         hud_events = []
@@ -263,7 +276,8 @@ class TestHUDInputOrder:
 
         # Add a consuming button to the HUD.
         hud_btn = Panel(
-            width=800, height=600,
+            width=800,
+            height=600,
             anchor=Anchor.CENTER,
         )
 
@@ -281,7 +295,9 @@ class TestHUDInputOrder:
         assert len(scene_events) == 1
 
     def test_hud_invisible_does_not_intercept(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """When hud.visible=False, HUD doesn't intercept input."""
         hud_events = []
@@ -310,11 +326,14 @@ class TestHUDInputOrder:
 # Update dispatch
 # ---------------------------------------------------------------------------
 
+
 class TestHUDUpdate:
     """Test that HUD components receive per-frame updates."""
 
     def test_hud_components_receive_update(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Components in the HUD receive update(dt) each tick."""
         update_calls = []
@@ -338,7 +357,9 @@ class TestHUDUpdate:
         assert update_calls[1] == pytest.approx(0.032)
 
     def test_hud_update_skipped_when_hidden(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD components don't update when show_hud=False."""
         update_calls = []
@@ -361,7 +382,9 @@ class TestHUDUpdate:
         assert len(update_calls) == 0
 
     def test_hud_update_skipped_when_invisible(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD components don't update when hud.visible=False."""
         update_calls = []
@@ -386,11 +409,14 @@ class TestHUDUpdate:
 # Draw order
 # ---------------------------------------------------------------------------
 
+
 class TestHUDDrawOrder:
     """Test that HUD draws between base scene and overlays."""
 
     def test_hud_draws_after_base_scene(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD components are drawn after the base scene's UI."""
         draw_order = []
@@ -403,7 +429,8 @@ class TestHUDDrawOrder:
 
         # Add a panel to HUD that will draw a rect.
         hud_panel = Panel(
-            width=50, height=50,
+            width=50,
+            height=50,
             anchor=Anchor.TOP_LEFT,
             style=Style(background_color=(255, 0, 0, 255)),
         )
@@ -417,7 +444,9 @@ class TestHUDDrawOrder:
         assert len(backend.rects) > 0
 
     def test_hud_draws_before_overlay(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD draws between base scene and transparent overlay."""
         draw_order = []
@@ -445,7 +474,9 @@ class TestHUDDrawOrder:
         assert draw_order == ["base", "overlay"]
 
     def test_hud_hidden_by_overlay_show_hud_false(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD doesn't draw when the top scene has show_hud=False."""
 
@@ -461,7 +492,8 @@ class TestHUDDrawOrder:
 
         # Add a visible panel to HUD.
         hud_panel = Panel(
-            width=50, height=50,
+            width=50,
+            height=50,
             anchor=Anchor.TOP_LEFT,
             style=Style(background_color=(255, 0, 0, 255)),
         )
@@ -477,7 +509,9 @@ class TestHUDDrawOrder:
         assert len(backend.rects) == 0
 
     def test_hud_visible_with_show_hud_true_overlay(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD draws when overlay has show_hud=True (default)."""
 
@@ -492,7 +526,8 @@ class TestHUDDrawOrder:
         game.push(Overlay())
 
         hud_panel = Panel(
-            width=50, height=50,
+            width=50,
+            height=50,
             anchor=Anchor.TOP_LEFT,
             style=Style(background_color=(255, 0, 0, 255)),
         )
@@ -508,11 +543,14 @@ class TestHUDDrawOrder:
 # Persistence across scene transitions
 # ---------------------------------------------------------------------------
 
+
 class TestHUDPersistence:
     """Test that HUD persists across scene push/pop/replace."""
 
     def test_hud_survives_push_pop(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD components remain after push and pop."""
         game.push(Scene())
@@ -527,7 +565,9 @@ class TestHUDPersistence:
         assert len(game.hud._root._children) == 1
 
     def test_hud_survives_replace(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD components remain after scene replacement."""
         game.push(Scene())
@@ -537,7 +577,9 @@ class TestHUDPersistence:
         assert len(game.hud._root._children) == 1
 
     def test_hud_survives_clear_and_push(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD components remain after clear_and_push."""
         game.push(Scene())
@@ -547,12 +589,15 @@ class TestHUDPersistence:
         assert len(game.hud._root._children) == 1
 
     def test_hud_draws_with_new_scene(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD still draws its components after scene transition."""
         game.push(Scene())
         hud_panel = Panel(
-            width=50, height=50,
+            width=50,
+            height=50,
             anchor=Anchor.TOP_LEFT,
             style=Style(background_color=(255, 0, 0, 255)),
         )
@@ -569,11 +614,14 @@ class TestHUDPersistence:
 # Edge cases
 # ---------------------------------------------------------------------------
 
+
 class TestHUDEdgeCases:
     """Edge cases and robustness."""
 
     def test_no_hud_accessed_no_overhead(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """If game.hud is never accessed, no HUD overhead in tick."""
         game.push(Scene())
@@ -582,7 +630,9 @@ class TestHUDEdgeCases:
         assert game._hud is None
 
     def test_empty_hud_no_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """An empty HUD draws nothing."""
         game.push(Scene())
@@ -594,7 +644,9 @@ class TestHUDEdgeCases:
         assert len(backend.rects) == 0
 
     def test_hud_with_nested_components(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Nested Panel with children in HUD all get game ref."""
         parent = Panel(width=100, height=100, anchor=Anchor.TOP_LEFT)
@@ -606,12 +658,15 @@ class TestHUDEdgeCases:
         assert child._game is game
 
     def test_hud_toggle_visibility(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Toggling hud.visible works correctly across ticks."""
         game.push(Scene())
         hud_panel = Panel(
-            width=50, height=50,
+            width=50,
+            height=50,
             anchor=Anchor.TOP_LEFT,
             style=Style(background_color=(255, 0, 0, 255)),
         )
@@ -633,7 +688,9 @@ class TestHUDEdgeCases:
         assert len(backend.rects) > 0
 
     def test_hud_no_scene_stack_empty(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """HUD doesn't crash with an empty scene stack."""
         _ = game.hud

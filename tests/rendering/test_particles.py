@@ -22,6 +22,7 @@ from saga2d.rendering.particles import ParticleEmitter, _Particle
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def game() -> Game:
     """Fresh Game with mock backend."""
@@ -36,6 +37,7 @@ def backend(game: Game) -> MockBackend:
 # ---------------------------------------------------------------------------
 # Construction
 # ---------------------------------------------------------------------------
+
 
 class TestConstruction:
     """ParticleEmitter creation and default state."""
@@ -81,6 +83,7 @@ class TestConstruction:
     def test_no_game_raises(self) -> None:
         """Creating a ParticleEmitter without an active Game raises RuntimeError."""
         import saga2d.rendering.sprite as mod
+
         old = mod._current_game
         mod._current_game = None
         try:
@@ -93,6 +96,7 @@ class TestConstruction:
 # ---------------------------------------------------------------------------
 # Position property
 # ---------------------------------------------------------------------------
+
 
 class TestPosition:
     def test_get_position(self, game: Game) -> None:
@@ -120,6 +124,7 @@ class TestPosition:
 # Burst mode
 # ---------------------------------------------------------------------------
 
+
 class TestBurst:
     def test_burst_default_count(self, game: Game) -> None:
         em = ParticleEmitter("sprites/knight", position=(0, 0), count=5)
@@ -136,7 +141,9 @@ class TestBurst:
         em.burst(0)
         assert len(em._particles) == 0
 
-    def test_burst_creates_sprites_on_effects_layer(self, game: Game, backend: MockBackend) -> None:
+    def test_burst_creates_sprites_on_effects_layer(
+        self, game: Game, backend: MockBackend
+    ) -> None:
         em = ParticleEmitter("sprites/knight", position=(100, 100))
         em.burst(1)
         p = em._particles[0]
@@ -162,7 +169,9 @@ class TestBurst:
 
     def test_burst_custom_layer(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0), layer=RenderLayer.UNITS,
+            "sprites/knight",
+            position=(0, 0),
+            layer=RenderLayer.UNITS,
         )
         em.burst(1)
         assert em._particles[0].sprite.layer == RenderLayer.UNITS
@@ -190,13 +199,16 @@ class TestBurst:
 # Particle velocity & direction
 # ---------------------------------------------------------------------------
 
+
 class TestVelocity:
     def test_velocity_within_speed_range(self, game: Game) -> None:
         """Particle speed magnitude should be within the configured range."""
         random.seed(42)
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            speed=(100, 200), direction=(0, 360),
+            "sprites/knight",
+            position=(0, 0),
+            speed=(100, 200),
+            direction=(0, 360),
         )
         em.burst(20)
         for p in em._particles:
@@ -207,8 +219,10 @@ class TestVelocity:
         """Particles spawned with direction=(0, 0) should all move rightward."""
         random.seed(42)
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            speed=(100, 100), direction=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            speed=(100, 100),
+            direction=(0, 0),
         )
         em.burst(5)
         for p in em._particles:
@@ -220,8 +234,10 @@ class TestVelocity:
         """direction=(90, 90) with y-down means vy > 0."""
         random.seed(42)
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            speed=(100, 100), direction=(90, 90),
+            "sprites/knight",
+            position=(0, 0),
+            speed=(100, 100),
+            direction=(90, 90),
         )
         em.burst(1)
         p = em._particles[0]
@@ -233,11 +249,13 @@ class TestVelocity:
 # Particle lifetime
 # ---------------------------------------------------------------------------
 
+
 class TestLifetime:
     def test_lifetime_within_range(self, game: Game) -> None:
         random.seed(42)
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(0.5, 1.5),
         )
         em.burst(20)
@@ -245,10 +263,13 @@ class TestLifetime:
             assert 0.5 <= p.total_lifetime <= 1.5
             assert p.remaining == p.total_lifetime
 
-    def test_particles_die_after_lifetime(self, game: Game, backend: MockBackend) -> None:
+    def test_particles_die_after_lifetime(
+        self, game: Game, backend: MockBackend
+    ) -> None:
         """After enough time, particles should be removed."""
         em = ParticleEmitter(
-            "sprites/knight", position=(100, 100),
+            "sprites/knight",
+            position=(100, 100),
             lifetime=(0.1, 0.1),  # fixed 0.1s lifetime
             speed=(0, 0),  # stationary
         )
@@ -264,7 +285,8 @@ class TestLifetime:
 
     def test_particles_survive_before_lifetime(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(1.0, 1.0),
             speed=(0, 0),
         )
@@ -274,7 +296,8 @@ class TestLifetime:
 
     def test_is_active_false_after_all_dead(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(0.1, 0.1),
             speed=(0, 0),
         )
@@ -289,12 +312,15 @@ class TestLifetime:
 # Particle movement
 # ---------------------------------------------------------------------------
 
+
 class TestMovement:
     def test_particle_moves_each_update(self, game: Game) -> None:
         """Stationary particles at known velocity should move predictably."""
         em = ParticleEmitter(
-            "sprites/knight", position=(100, 100),
-            speed=(100, 100), direction=(0, 0),  # rightward at 100 px/s
+            "sprites/knight",
+            position=(100, 100),
+            speed=(100, 100),
+            direction=(0, 0),  # rightward at 100 px/s
             lifetime=(10.0, 10.0),
         )
         em.burst(1)
@@ -308,8 +334,10 @@ class TestMovement:
 
     def test_multiple_updates_accumulate(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            speed=(200, 200), direction=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            speed=(200, 200),
+            direction=(0, 0),
             lifetime=(10.0, 10.0),
         )
         em.burst(1)
@@ -323,8 +351,10 @@ class TestMovement:
     def test_diagonal_movement(self, game: Game) -> None:
         """45-degree direction at speed 100 should move ~70.7 on each axis."""
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            speed=(100, 100), direction=(45, 45),
+            "sprites/knight",
+            position=(0, 0),
+            speed=(100, 100),
+            direction=(45, 45),
             lifetime=(10.0, 10.0),
         )
         em.burst(1)
@@ -340,10 +370,12 @@ class TestMovement:
 # Fade-out opacity
 # ---------------------------------------------------------------------------
 
+
 class TestFadeOut:
     def test_fade_out_opacity_decreases(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(1.0, 1.0),
             fade_out=True,
             speed=(0, 0),
@@ -358,7 +390,8 @@ class TestFadeOut:
 
     def test_fade_out_reaches_zero_at_death(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(1.0, 1.0),
             fade_out=True,
             speed=(0, 0),
@@ -372,7 +405,8 @@ class TestFadeOut:
 
     def test_no_fade_out(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(1.0, 1.0),
             fade_out=False,
             speed=(0, 0),
@@ -385,7 +419,8 @@ class TestFadeOut:
 
     def test_fade_proportional_to_remaining(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(2.0, 2.0),
             fade_out=True,
             speed=(0, 0),
@@ -402,10 +437,12 @@ class TestFadeOut:
 # Continuous mode
 # ---------------------------------------------------------------------------
 
+
 class TestContinuous:
     def test_continuous_spawns_over_time(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),  # long-lived so they don't die
             speed=(0, 0),
         )
@@ -418,7 +455,8 @@ class TestContinuous:
     def test_continuous_accumulates_fractional(self, game: Game) -> None:
         """Fractional particle counts accumulate across updates."""
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -435,7 +473,8 @@ class TestContinuous:
 
     def test_continuous_high_rate(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -445,7 +484,8 @@ class TestContinuous:
 
     def test_stop_halts_continuous(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -461,7 +501,8 @@ class TestContinuous:
     def test_continuous_then_burst(self, game: Game) -> None:
         """Burst works after stop — particles accumulate."""
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -473,7 +514,8 @@ class TestContinuous:
 
     def test_continuous_rate_zero_no_spawn(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -486,10 +528,12 @@ class TestContinuous:
 # Stop
 # ---------------------------------------------------------------------------
 
+
 class TestStop:
     def test_stop_preserves_existing_particles(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -499,8 +543,10 @@ class TestStop:
 
     def test_stop_existing_particles_still_move(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            speed=(100, 100), direction=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            speed=(100, 100),
+            direction=(0, 0),
             lifetime=(10.0, 10.0),
         )
         em.burst(1)
@@ -513,7 +559,8 @@ class TestStop:
 
     def test_stop_existing_particles_eventually_die(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(0.1, 0.1),
             speed=(0, 0),
         )
@@ -525,7 +572,8 @@ class TestStop:
 
     def test_stop_then_burst_resumes(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -540,10 +588,12 @@ class TestStop:
 # Remove
 # ---------------------------------------------------------------------------
 
+
 class TestRemove:
     def test_remove_kills_all_particles(self, game: Game, backend: MockBackend) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -557,7 +607,8 @@ class TestRemove:
 
     def test_remove_stops_continuous(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -591,13 +642,16 @@ class TestRemove:
 # Game.tick() integration
 # ---------------------------------------------------------------------------
 
+
 class TestGameIntegration:
     def test_tick_updates_particles(self, game: Game) -> None:
         """game.tick() calls _update_particles which moves particles."""
         game.push(Scene())  # need a scene for tick to work
         em = ParticleEmitter(
-            "sprites/knight", position=(100, 100),
-            speed=(100, 100), direction=(0, 0),
+            "sprites/knight",
+            position=(100, 100),
+            speed=(100, 100),
+            direction=(0, 0),
             lifetime=(10.0, 10.0),
         )
         em.burst(1)
@@ -610,7 +664,8 @@ class TestGameIntegration:
     def test_tick_removes_dead_particles(self, game: Game) -> None:
         game.push(Scene())
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(0.01, 0.01),
             speed=(0, 0),
         )
@@ -623,7 +678,8 @@ class TestGameIntegration:
     def test_tick_deregisters_inactive_emitter(self, game: Game) -> None:
         game.push(Scene())
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(0.01, 0.01),
             speed=(0, 0),
         )
@@ -636,7 +692,8 @@ class TestGameIntegration:
     def test_tick_continuous_spawning(self, game: Game) -> None:
         game.push(Scene())
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -651,7 +708,8 @@ class TestGameIntegration:
     def test_tick_continuous_keeps_emitter_registered(self, game: Game) -> None:
         game.push(Scene())
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
             lifetime=(10.0, 10.0),
             speed=(0, 0),
         )
@@ -663,6 +721,7 @@ class TestGameIntegration:
 # ---------------------------------------------------------------------------
 # is_active edge cases
 # ---------------------------------------------------------------------------
+
 
 class TestIsActive:
     def test_new_emitter_not_active(self, game: Game) -> None:
@@ -681,8 +740,10 @@ class TestIsActive:
 
     def test_not_active_after_all_dead(self, game: Game) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            lifetime=(0.05, 0.05), speed=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            lifetime=(0.05, 0.05),
+            speed=(0, 0),
         )
         em.burst(3)
         em.update(0.1)
@@ -699,6 +760,7 @@ class TestIsActive:
 # ---------------------------------------------------------------------------
 # Particle dataclass
 # ---------------------------------------------------------------------------
+
 
 class TestParticleDataclass:
     def test_particle_fields(self, game: Game) -> None:
@@ -722,13 +784,16 @@ class TestParticleDataclass:
 # Re-registration after auto-removal
 # ---------------------------------------------------------------------------
 
+
 class TestReRegistration:
     def test_burst_after_auto_deregister(self, game: Game) -> None:
         """burst() re-registers an emitter that was auto-removed."""
         game.push(Scene())
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            lifetime=(0.01, 0.01), speed=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            lifetime=(0.01, 0.01),
+            speed=(0, 0),
         )
         em.burst(1)
         game.tick(dt=0.1)  # kills particle, deregisters
@@ -741,8 +806,10 @@ class TestReRegistration:
     def test_continuous_after_auto_deregister(self, game: Game) -> None:
         game.push(Scene())
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            lifetime=(0.01, 0.01), speed=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            lifetime=(0.01, 0.01),
+            speed=(0, 0),
         )
         em.burst(1)
         game.tick(dt=0.1)
@@ -756,11 +823,16 @@ class TestReRegistration:
 # Backend sprite state
 # ---------------------------------------------------------------------------
 
+
 class TestBackendState:
-    def test_particle_sprites_have_correct_position(self, game: Game, backend: MockBackend) -> None:
+    def test_particle_sprites_have_correct_position(
+        self, game: Game, backend: MockBackend
+    ) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(200, 300),
-            speed=(0, 0), lifetime=(10.0, 10.0),
+            "sprites/knight",
+            position=(200, 300),
+            speed=(0, 0),
+            lifetime=(10.0, 10.0),
         )
         em.burst(1)
         p = em._particles[0]
@@ -770,10 +842,14 @@ class TestBackendState:
         rec = backend.sprites[sid]
         assert rec["visible"] is True
 
-    def test_dead_particles_removed_from_backend(self, game: Game, backend: MockBackend) -> None:
+    def test_dead_particles_removed_from_backend(
+        self, game: Game, backend: MockBackend
+    ) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            lifetime=(0.05, 0.05), speed=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            lifetime=(0.05, 0.05),
+            speed=(0, 0),
         )
         em.burst(2)
         sids = [p.sprite.sprite_id for p in em._particles]
@@ -784,10 +860,15 @@ class TestBackendState:
         for sid in sids:
             assert sid not in backend.sprites
 
-    def test_fading_particle_opacity_in_backend(self, game: Game, backend: MockBackend) -> None:
+    def test_fading_particle_opacity_in_backend(
+        self, game: Game, backend: MockBackend
+    ) -> None:
         em = ParticleEmitter(
-            "sprites/knight", position=(0, 0),
-            lifetime=(1.0, 1.0), fade_out=True, speed=(0, 0),
+            "sprites/knight",
+            position=(0, 0),
+            lifetime=(1.0, 1.0),
+            fade_out=True,
+            speed=(0, 0),
         )
         em.burst(1)
         p = em._particles[0]

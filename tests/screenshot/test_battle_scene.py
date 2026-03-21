@@ -35,6 +35,7 @@ def _load_battle_demo():
         added = True
     try:
         from battle_demo import BattleScene  # type: ignore[import-not-found]
+
         return BattleScene
     finally:
         if added:
@@ -44,6 +45,7 @@ def _load_battle_demo():
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_battle_initial_formation() -> None:

@@ -28,6 +28,7 @@ from saga2d.ui.theme import Theme
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def mock_game() -> Game:
     """Return a Game instance with backend='mock' for headless testing."""
@@ -50,6 +51,7 @@ def scene_with_ui(mock_game: Game) -> Scene:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class _FixedBox(Component):
     """Component that pins its computed position regardless of layout.
@@ -104,7 +106,10 @@ def _make_box(
 ) -> _FixedBox:
     """Create a Component with fixed layout position for testing."""
     return _FixedBox(
-        x=x, y=y, w=w, h=h,
+        x=x,
+        y=y,
+        w=w,
+        h=h,
         draggable=draggable,
         drag_data=drag_data,
         drop_accept=drop_accept,
@@ -115,6 +120,7 @@ def _make_box(
 # ===========================================================================
 # TestDragManagerConstruction
 # ===========================================================================
+
 
 class TestDragManagerConstruction:
     """DragManager basic lifecycle."""
@@ -144,6 +150,7 @@ class TestDragManagerConstruction:
 # TestComponentDragAttributes
 # ===========================================================================
 
+
 class TestComponentDragAttributes:
     """Component drag-drop attribute defaults and settings."""
 
@@ -167,7 +174,8 @@ class TestComponentDragAttributes:
             pass
 
         c = Component(
-            width=10, height=10,
+            width=10,
+            height=10,
             drop_accept=accept_fn,
             on_drop=drop_fn,
         )
@@ -185,6 +193,7 @@ class TestComponentDragAttributes:
 # ===========================================================================
 # TestDragStart
 # ===========================================================================
+
 
 class TestDragStart:
     """Starting a drag session via click on draggable component."""
@@ -264,6 +273,7 @@ class TestDragStart:
 # TestGhostTracking
 # ===========================================================================
 
+
 class TestGhostTracking:
     """Ghost position tracking during drag."""
 
@@ -323,6 +333,7 @@ class TestGhostTracking:
 # TestDropOnValidTarget
 # ===========================================================================
 
+
 class TestDropOnValidTarget:
     """Dropping on a component that accepts the data."""
 
@@ -331,7 +342,8 @@ class TestDropOnValidTarget:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="potion")
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda data: data == "potion",
             on_drop=lambda comp, data: dropped.append((comp, data)),
         )
@@ -359,7 +371,8 @@ class TestDropOnValidTarget:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="sword")
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda data: data == "potion",  # rejects "sword"
             on_drop=lambda comp, data: dropped.append(data),
         )
@@ -408,6 +421,7 @@ class TestDropOnValidTarget:
 # TestCancelDrag
 # ===========================================================================
 
+
 class TestCancelDrag:
     """Cancelling a drag with Escape key."""
 
@@ -447,6 +461,7 @@ class TestCancelDrag:
 # TestDropTargetFeedback
 # ===========================================================================
 
+
 class TestDropTargetFeedback:
     """Drop target highlight state tracking during drag."""
 
@@ -454,7 +469,8 @@ class TestDropTargetFeedback:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="item")
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda data: True,
             on_drop=lambda c, d: None,
         )
@@ -473,7 +489,8 @@ class TestDropTargetFeedback:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="item")
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda data: False,
         )
         root.add(source)
@@ -507,12 +524,14 @@ class TestDropTargetFeedback:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="item")
         target_a = _make_box(
-            x=100, y=100,
+            x=100,
+            y=100,
             drop_accept=lambda data: True,
             on_drop=lambda c, d: None,
         )
         target_b = _make_box(
-            x=300, y=300,
+            x=300,
+            y=300,
             drop_accept=lambda data: False,
         )
         root.add(source)
@@ -537,7 +556,8 @@ class TestDropTargetFeedback:
         root = scene_with_ui.ui
         dropped = []
         source = _make_box(
-            x=100, y=100,
+            x=100,
+            y=100,
             draggable=True,
             drag_data="item",
             drop_accept=lambda data: True,
@@ -560,6 +580,7 @@ class TestDropTargetFeedback:
 # TestGhostRendering
 # ===========================================================================
 
+
 class TestGhostRendering:
     """Ghost and overlay rendering during draw phase."""
 
@@ -578,9 +599,12 @@ class TestGhostRendering:
 
         # Should find a rect for the ghost
         ghost_rects = [
-            r for r in mock_backend.rects
-            if r["x"] == 100 and r["y"] == 100
-            and r["width"] == 50 and r["height"] == 50
+            r
+            for r in mock_backend.rects
+            if r["x"] == 100
+            and r["y"] == 100
+            and r["width"] == 50
+            and r["height"] == 50
             and r["color"] == (180, 180, 180, 128)
         ]
         assert len(ghost_rects) == 1
@@ -590,7 +614,10 @@ class TestGhostRendering:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="item")
         target = _make_box(
-            x=200, y=200, w=80, h=80,
+            x=200,
+            y=200,
+            w=80,
+            h=80,
             drop_accept=lambda data: True,
         )
         root.add(source)
@@ -605,9 +632,12 @@ class TestGhostRendering:
 
         theme = scene_with_ui.game.theme
         highlight_rects = [
-            r for r in mock_backend.rects
-            if r["x"] == 200 and r["y"] == 200
-            and r["width"] == 80 and r["height"] == 80
+            r
+            for r in mock_backend.rects
+            if r["x"] == 200
+            and r["y"] == 200
+            and r["width"] == 80
+            and r["height"] == 80
             and r["color"] == theme.drop_accept_color
         ]
         assert len(highlight_rects) == 1
@@ -617,7 +647,10 @@ class TestGhostRendering:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="item")
         target = _make_box(
-            x=200, y=200, w=80, h=80,
+            x=200,
+            y=200,
+            w=80,
+            h=80,
             drop_accept=lambda data: False,
         )
         root.add(source)
@@ -632,9 +665,12 @@ class TestGhostRendering:
 
         theme = scene_with_ui.game.theme
         highlight_rects = [
-            r for r in mock_backend.rects
-            if r["x"] == 200 and r["y"] == 200
-            and r["width"] == 80 and r["height"] == 80
+            r
+            for r in mock_backend.rects
+            if r["x"] == 200
+            and r["y"] == 200
+            and r["width"] == 80
+            and r["height"] == 80
             and r["color"] == theme.drop_reject_color
         ]
         assert len(highlight_rects) == 1
@@ -656,6 +692,7 @@ class TestGhostRendering:
 # ===========================================================================
 # TestThemeDragProperties
 # ===========================================================================
+
 
 class TestThemeDragProperties:
     """Theme default values for drag-and-drop colors."""
@@ -687,6 +724,7 @@ class TestThemeDragProperties:
 # TestGameTickIntegration
 # ===========================================================================
 
+
 class TestGameTickIntegration:
     """Full integration with Game.tick() and event injection."""
 
@@ -698,7 +736,10 @@ class TestGameTickIntegration:
         dropped = []
         source = _make_box(x=10, y=10, draggable=True, drag_data="spell")
         target = _make_box(
-            x=200, y=200, w=80, h=80,
+            x=200,
+            y=200,
+            w=80,
+            h=80,
             drop_accept=lambda data: data == "spell",
             on_drop=lambda comp, data: dropped.append(data),
         )
@@ -758,8 +799,10 @@ class TestGameTickIntegration:
         # The tick renders a frame — check for ghost rect.
         # The ghost should be at source position since we haven't moved.
         ghost_rects = [
-            r for r in mock_backend.rects
-            if r["width"] == 40 and r["height"] == 40
+            r
+            for r in mock_backend.rects
+            if r["width"] == 40
+            and r["height"] == 40
             and r["color"] == (180, 180, 180, 128)
         ]
         assert len(ghost_rects) >= 1
@@ -768,6 +811,7 @@ class TestGameTickIntegration:
 # ===========================================================================
 # TestNestedComponents
 # ===========================================================================
+
 
 class TestNestedComponents:
     """Drag-drop with nested component trees."""
@@ -795,12 +839,18 @@ class TestNestedComponents:
         source = _make_box(x=10, y=10, draggable=True, drag_data="x")
 
         outer_target = _make_box(
-            x=200, y=200, w=200, h=200,
+            x=200,
+            y=200,
+            w=200,
+            h=200,
             drop_accept=lambda data: True,
             on_drop=lambda c, d: dropped_outer.append(d),
         )
         inner_target = _make_box(
-            x=210, y=210, w=50, h=50,
+            x=210,
+            y=210,
+            w=50,
+            h=50,
             drop_accept=lambda data: True,
             on_drop=lambda c, d: dropped_inner.append(d),
         )
@@ -826,6 +876,7 @@ class TestNestedComponents:
 # ===========================================================================
 # TestDragDataTypes
 # ===========================================================================
+
 
 class TestDragDataTypes:
     """Various data types as drag_data."""
@@ -858,7 +909,8 @@ class TestDragDataTypes:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data=item)
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda d: isinstance(d, Item),
             on_drop=lambda c, d: None,
         )
@@ -876,6 +928,7 @@ class TestDragDataTypes:
 # ===========================================================================
 # TestDragSessionDataclass
 # ===========================================================================
+
 
 class TestDragSessionDataclass:
     """Direct testing of _DragSession dataclass."""
@@ -905,6 +958,7 @@ class TestDragSessionDataclass:
 # TestEdgeCases
 # ===========================================================================
 
+
 class TestEdgeCases:
     """Edge cases for drag-and-drop."""
 
@@ -913,7 +967,8 @@ class TestEdgeCases:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="x")
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda data: True,
             on_drop=None,  # no callback
         )
@@ -934,7 +989,8 @@ class TestEdgeCases:
         root = scene_with_ui.ui
         source = _make_box(x=10, y=10, draggable=True, drag_data="a")
         target = _make_box(
-            x=200, y=200,
+            x=200,
+            y=200,
             drop_accept=lambda data: True,
             on_drop=lambda c, d: dropped.append(d),
         )
@@ -985,9 +1041,13 @@ class TestEdgeCases:
 
         # Various event types should all be consumed
         assert root.handle_event(InputEvent(type="move", x=50, y=50)) is True
-        assert root.handle_event(InputEvent(type="drag", x=60, y=60, dx=10, dy=10)) is True
+        assert (
+            root.handle_event(InputEvent(type="drag", x=60, y=60, dx=10, dy=10)) is True
+        )
         assert root.handle_event(InputEvent(type="key_press", key="a")) is True
-        assert root.handle_event(InputEvent(type="scroll", x=30, y=30, dx=0, dy=5)) is True
+        assert (
+            root.handle_event(InputEvent(type="scroll", x=30, y=30, dx=0, dy=5)) is True
+        )
 
     def test_drag_manager_handle_event_when_not_dragging(self, scene_with_ui) -> None:
         """DragManager.handle_event returns False when not dragging."""

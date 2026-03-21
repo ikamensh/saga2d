@@ -15,6 +15,7 @@ except ImportError:
         allow_module_level=True,
     )
 
+
 # ---------------------------------------------------------------------------
 # Skip when no display is available (e.g. IndexError from
 # CocoaDisplay.get_default_screen() in headless environments)
@@ -39,7 +40,9 @@ def pytest_configure(config: pytest.Config) -> None:
     )
 
 
-def pytest_collection_modifyitems(session: pytest.Session, config: pytest.Config, items: list) -> None:
+def pytest_collection_modifyitems(
+    session: pytest.Session, config: pytest.Config, items: list
+) -> None:
     """Skip all screenshot tests when no display is available."""
     if not _display_available():
         skip = pytest.mark.skip(reason="No display available for screenshot tests")

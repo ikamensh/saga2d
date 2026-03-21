@@ -29,11 +29,12 @@ def example_td_game() -> Game:
     # Ensure assets exist (main.py generates on first run)
     if not _example_asset_dir.exists() or not (_example_asset_dir / "images").exists():
         from examples.tower_defense.generate_assets import generate
+
         generate(_example_asset_dir)
 
     game = Game(
         "TD Example Test",
-        resolution=(960, 540),
+        resolution=(1280, 960),
         fullscreen=False,
         backend="mock",
         asset_path=_example_asset_dir,
@@ -76,7 +77,7 @@ def test_example_play_transitions_to_game(example_td_game: Game) -> None:
 
     example_td_game.push(TitleScene())
     example_td_game.tick(dt=0.016)
-    example_td_game.backend.inject_click(480, 300)
+    example_td_game.backend.inject_click(640, 530)
     example_td_game.tick(dt=0.016)
 
     stack = example_td_game._scene_stack._stack

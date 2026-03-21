@@ -74,6 +74,7 @@ def asset_dir(tmp_path: Path) -> Path:
 def test_version_attribute() -> None:
     """__version__ is exposed and non-empty."""
     import saga2d
+
     assert hasattr(saga2d, "__version__")
     assert isinstance(saga2d.__version__, str)
     assert len(saga2d.__version__) > 0
@@ -90,7 +91,13 @@ class TestLayoutMath:
     def test_anchor_center(self) -> None:
         """CENTER places child at the middle of the parent."""
         x, y = compute_anchor_position(
-            Anchor.CENTER, 0, 0, 800, 600, 200, 100,
+            Anchor.CENTER,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert x == 300
         assert y == 250
@@ -98,73 +105,140 @@ class TestLayoutMath:
     def test_anchor_top_left(self) -> None:
         """TOP_LEFT places child at parent origin (plus margin)."""
         x, y = compute_anchor_position(
-            Anchor.TOP_LEFT, 0, 0, 800, 600, 200, 100,
+            Anchor.TOP_LEFT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (0, 0)
 
     def test_anchor_top_right(self) -> None:
         """TOP_RIGHT places child flush-right at top."""
         x, y = compute_anchor_position(
-            Anchor.TOP_RIGHT, 0, 0, 800, 600, 200, 100,
+            Anchor.TOP_RIGHT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (600, 0)
 
     def test_anchor_bottom_left(self) -> None:
         x, y = compute_anchor_position(
-            Anchor.BOTTOM_LEFT, 0, 0, 800, 600, 200, 100,
+            Anchor.BOTTOM_LEFT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (0, 500)
 
     def test_anchor_bottom_right(self) -> None:
         x, y = compute_anchor_position(
-            Anchor.BOTTOM_RIGHT, 0, 0, 800, 600, 200, 100,
+            Anchor.BOTTOM_RIGHT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (600, 500)
 
     def test_anchor_top(self) -> None:
         """TOP centers horizontally and pins to top edge."""
         x, y = compute_anchor_position(
-            Anchor.TOP, 0, 0, 800, 600, 200, 100,
+            Anchor.TOP,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (300, 0)
 
     def test_anchor_bottom(self) -> None:
         x, y = compute_anchor_position(
-            Anchor.BOTTOM, 0, 0, 800, 600, 200, 100,
+            Anchor.BOTTOM,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (300, 500)
 
     def test_anchor_left(self) -> None:
         x, y = compute_anchor_position(
-            Anchor.LEFT, 0, 0, 800, 600, 200, 100,
+            Anchor.LEFT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (0, 250)
 
     def test_anchor_right(self) -> None:
         x, y = compute_anchor_position(
-            Anchor.RIGHT, 0, 0, 800, 600, 200, 100,
+            Anchor.RIGHT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (600, 250)
 
     def test_anchor_with_margin(self) -> None:
         """Margin pushes inward from the anchor edge."""
         x, y = compute_anchor_position(
-            Anchor.TOP_LEFT, 0, 0, 800, 600, 200, 100, margin=10,
+            Anchor.TOP_LEFT,
+            0,
+            0,
+            800,
+            600,
+            200,
+            100,
+            margin=10,
         )
         assert (x, y) == (10, 10)
 
     def test_anchor_with_parent_offset(self) -> None:
         """Parent offset shifts the result."""
         x, y = compute_anchor_position(
-            Anchor.TOP_LEFT, 50, 100, 800, 600, 200, 100,
+            Anchor.TOP_LEFT,
+            50,
+            100,
+            800,
+            600,
+            200,
+            100,
         )
         assert (x, y) == (50, 100)
 
     def test_vertical_flow_layout(self) -> None:
         """VERTICAL stacks children top-to-bottom, centered horizontally."""
         positions = compute_flow_layout(
-            Layout.VERTICAL, 0, 0, 200, 400,
-            [(100, 30), (100, 30)], spacing=10, padding=5,
+            Layout.VERTICAL,
+            0,
+            0,
+            200,
+            400,
+            [(100, 30), (100, 30)],
+            spacing=10,
+            padding=5,
         )
         # First child: centered x = (200 - 100) // 2 = 50, y = 0 + 5
         assert positions[0] == (50, 5)
@@ -174,8 +248,14 @@ class TestLayoutMath:
     def test_horizontal_flow_layout(self) -> None:
         """HORIZONTAL stacks children left-to-right, centered vertically."""
         positions = compute_flow_layout(
-            Layout.HORIZONTAL, 0, 0, 400, 100,
-            [(60, 40), (60, 40)], spacing=10, padding=5,
+            Layout.HORIZONTAL,
+            0,
+            0,
+            400,
+            100,
+            [(60, 40), (60, 40)],
+            spacing=10,
+            padding=5,
         )
         # First child: x = 0 + 5, y = (100 - 40) // 2 = 30
         assert positions[0] == (5, 30)
@@ -212,8 +292,13 @@ class TestLayoutMath:
     def test_flow_layout_none_returns_empty(self) -> None:
         """Layout.NONE returns empty positions list."""
         positions = compute_flow_layout(
-            Layout.NONE, 0, 0, 400, 400,
-            [(100, 50)], spacing=10,
+            Layout.NONE,
+            0,
+            0,
+            400,
+            400,
+            [(100, 50)],
+            spacing=10,
         )
         assert positions == []
 
@@ -282,7 +367,9 @@ class TestLabel:
 
         assert len(backend.texts) == 0
 
-    def test_style_override_font_size(self, root: _UIRoot, backend: MockBackend) -> None:
+    def test_style_override_font_size(
+        self, root: _UIRoot, backend: MockBackend
+    ) -> None:
         """Explicit style font_size is used instead of theme default."""
         label = Label("Big", style=Style(font_size=48))
         root.add(label)
@@ -298,7 +385,9 @@ class TestLabel:
         assert w == _estimate_text_width("Hi", 48)
         assert h == int(48 * 1.4)  # 67
 
-    def test_convenience_kwargs_font_size_text_color(self, root: _UIRoot, backend: MockBackend) -> None:
+    def test_convenience_kwargs_font_size_text_color(
+        self, root: _UIRoot, backend: MockBackend
+    ) -> None:
         """font_size and text_color as direct kwargs work without Style wrapper."""
         label = Label("Hello", font_size=24, text_color=(255, 255, 255, 255))
         root.add(label)
@@ -315,9 +404,13 @@ class TestLabel:
         assert w == _estimate_text_width("Hi", 36)
         assert h == int(36 * 1.4)
 
-    def test_style_overrides_convenience_kwargs_when_both(self, root: _UIRoot, backend: MockBackend) -> None:
+    def test_style_overrides_convenience_kwargs_when_both(
+        self, root: _UIRoot, backend: MockBackend
+    ) -> None:
         """Explicit style wins over convenience kwargs for overlapping fields."""
-        label = Label("Hi", font_size=24, style=Style(font_size=48, text_color=(255, 0, 0, 255)))
+        label = Label(
+            "Hi", font_size=24, style=Style(font_size=48, text_color=(255, 0, 0, 255))
+        )
         root.add(label)
         root._ensure_layout()
         root.draw()
@@ -325,7 +418,9 @@ class TestLabel:
         assert backend.texts[0]["font_size"] == 48  # style wins
         assert backend.texts[0]["color"] == (255, 0, 0, 255)  # style wins
 
-    def test_convenience_kwargs_merge_with_style(self, root: _UIRoot, backend: MockBackend) -> None:
+    def test_convenience_kwargs_merge_with_style(
+        self, root: _UIRoot, backend: MockBackend
+    ) -> None:
         """Convenience kwargs fill in fields not set by explicit style."""
         label = Label("Hi", font_size=32, style=Style(text_color=(0, 255, 0, 255)))
         root.add(label)
@@ -399,8 +494,13 @@ class TestButton:
     def test_click_fires_callback(self, root: _UIRoot) -> None:
         """Clicking a button fires on_click."""
         fired = []
-        btn = Button("Go", on_click=lambda: fired.append(True),
-                     width=100, height=40, anchor=Anchor.TOP_LEFT)
+        btn = Button(
+            "Go",
+            on_click=lambda: fired.append(True),
+            width=100,
+            height=40,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(btn)
         root._ensure_layout()
 
@@ -413,8 +513,13 @@ class TestButton:
     def test_click_outside_does_not_fire(self, root: _UIRoot) -> None:
         """Click outside bounds does not fire callback or change state."""
         fired = []
-        btn = Button("Go", on_click=lambda: fired.append(True),
-                     width=100, height=40, anchor=Anchor.TOP_LEFT)
+        btn = Button(
+            "Go",
+            on_click=lambda: fired.append(True),
+            width=100,
+            height=40,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(btn)
         root._ensure_layout()
 
@@ -453,8 +558,14 @@ class TestButton:
     def test_disabled_button_ignores_events(self, root: _UIRoot) -> None:
         """Disabled button does not respond to any events."""
         fired = []
-        btn = Button("Go", on_click=lambda: fired.append(True),
-                     width=100, height=40, anchor=Anchor.TOP_LEFT, enabled=False)
+        btn = Button(
+            "Go",
+            on_click=lambda: fired.append(True),
+            width=100,
+            height=40,
+            anchor=Anchor.TOP_LEFT,
+            enabled=False,
+        )
         root.add(btn)
         root._ensure_layout()
 
@@ -471,7 +582,9 @@ class TestButton:
         assert btn.on_click is not None
 
     def test_draw_calls_rect_and_text(
-        self, root: _UIRoot, backend: MockBackend,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
     ) -> None:
         """Drawing a button produces background + border rects and one text draw call."""
         btn = Button("Play", width=200, height=50, anchor=Anchor.TOP_LEFT)
@@ -494,7 +607,10 @@ class TestButton:
         assert t["anchor_y"] == "center"
 
     def test_hovered_uses_hover_color(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """Button in hovered state draws with hover_color."""
         btn = Button("Go", width=100, height=40, anchor=Anchor.TOP_LEFT)
@@ -511,7 +627,10 @@ class TestButton:
         assert backend.rects[0]["color"] == expected_bg
 
     def test_disabled_button_uses_disabled_style(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """Disabled button draws with distinct muted/grayed-out colors."""
         btn = Button("Buy", width=100, height=40, anchor=Anchor.TOP_LEFT, enabled=False)
@@ -568,9 +687,11 @@ class TestPanel:
         l1 = Label("A", width=80, height=30)
         l2 = Label("B", width=80, height=30)
         panel = Panel(
-            layout=Layout.VERTICAL, spacing=10,
+            layout=Layout.VERTICAL,
+            spacing=10,
             children=[l1, l2],
-            width=200, height=200,
+            width=200,
+            height=200,
             anchor=Anchor.TOP_LEFT,
         )
         root.add(panel)
@@ -589,9 +710,11 @@ class TestPanel:
         l1 = Label("A", width=60, height=30)
         l2 = Label("B", width=60, height=30)
         panel = Panel(
-            layout=Layout.HORIZONTAL, spacing=10,
+            layout=Layout.HORIZONTAL,
+            spacing=10,
             children=[l1, l2],
-            width=300, height=100,
+            width=300,
+            height=100,
             anchor=Anchor.TOP_LEFT,
         )
         root.add(panel)
@@ -633,7 +756,8 @@ class TestPanel:
             children=[Label("A", width=80, height=30)],
         )
         outer = Panel(
-            layout=Layout.VERTICAL, spacing=5,
+            layout=Layout.VERTICAL,
+            spacing=5,
             children=[inner],
             anchor=Anchor.TOP_LEFT,
         )
@@ -644,7 +768,10 @@ class TestPanel:
         assert inner._computed_y >= outer._computed_y
 
     def test_background_draw(
-        self, root: _UIRoot, backend: MockBackend, game: Game,
+        self,
+        root: _UIRoot,
+        backend: MockBackend,
+        game: Game,
     ) -> None:
         """Panel draws its background rect and border."""
         panel = Panel(width=200, height=100, anchor=Anchor.TOP_LEFT)
@@ -668,9 +795,11 @@ class TestPanel:
         l1 = Label("X", width=50, height=20)
         l2 = Label("Y", width=50, height=20)
         panel = Panel(
-            layout=Layout.VERTICAL, spacing=30,
+            layout=Layout.VERTICAL,
+            spacing=30,
             children=[l1, l2],
-            width=200, height=300,
+            width=200,
+            height=300,
             anchor=Anchor.TOP_LEFT,
             style=Style(padding=0),  # zero padding for clarity
         )
@@ -912,7 +1041,14 @@ class TestProgressBar:
         backend: MockBackend,
     ) -> None:
         """ProgressBar at 0% draws only background."""
-        bar = ProgressBar(value=0, max_value=100, width=100, height=20, rounded=False, anchor=Anchor.TOP_LEFT)
+        bar = ProgressBar(
+            value=0,
+            max_value=100,
+            width=100,
+            height=20,
+            rounded=False,
+            anchor=Anchor.TOP_LEFT,
+        )
         root.add(bar)
         root._ensure_layout()
         root.draw()
@@ -949,9 +1085,12 @@ class TestSceneIntegration:
         assert root._computed_h == 600
 
     def test_ui_draw_after_scene_draw(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """UI draw calls appear in mock backend after a tick."""
+
         class MyScene(Scene):
             def on_enter(self) -> None:
                 self.ui.add(Label("HUD"))
@@ -964,7 +1103,9 @@ class TestSceneIntegration:
         assert backend.texts[0]["text"] == "HUD"
 
     def test_ui_button_click_consumes_event(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Click consumed by UI button does NOT reach scene.handle_input."""
         scene_received = []
@@ -972,8 +1113,13 @@ class TestSceneIntegration:
         class MyScene(Scene):
             def on_enter(self) -> None:
                 self.ui.add(
-                    Button("Go", on_click=lambda: None,
-                           width=200, height=50, anchor=Anchor.TOP_LEFT),
+                    Button(
+                        "Go",
+                        on_click=lambda: None,
+                        width=200,
+                        height=50,
+                        anchor=Anchor.TOP_LEFT,
+                    ),
                 )
 
             def handle_input(self, event: InputEvent) -> bool:
@@ -991,7 +1137,9 @@ class TestSceneIntegration:
         assert len(scene_received) == 0  # scene never saw the click
 
     def test_non_consumed_event_reaches_scene(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Events not consumed by UI still reach scene.handle_input."""
         scene_received = []
@@ -1017,9 +1165,12 @@ class TestSceneIntegration:
         assert any(e.type == "click" for e in scene_received)
 
     def test_scene_without_ui_works(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """A scene that never touches self.ui works normally."""
+
         class PlainScene(Scene):
             pass
 
@@ -1030,7 +1181,9 @@ class TestSceneIntegration:
         assert scene._ui is None  # never created
 
     def test_full_menu_integration(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Full panel + label + button menu renders correctly."""
         clicked = []
@@ -1070,9 +1223,12 @@ class TestSceneIntegration:
         assert clicked == ["start"]
 
     def test_ui_for_transparent_scene_stack(
-        self, game: Game, backend: MockBackend,
+        self,
+        game: Game,
+        backend: MockBackend,
     ) -> None:
         """Both scenes' UIs draw when top scene is transparent."""
+
         class BottomScene(Scene):
             def on_enter(self) -> None:
                 self.ui.add(Label("Bottom"))
@@ -1098,7 +1254,6 @@ class TestSceneIntegration:
 
 
 class TestLayoutErrorMessages:
-
     def test_anchor_error_includes_valid_values(self) -> None:
         """compute_anchor_position error includes valid Anchor names."""
         with pytest.raises(ValueError, match="valid values.*CENTER.*TOP_LEFT"):
@@ -1106,12 +1261,16 @@ class TestLayoutErrorMessages:
 
     def test_flow_layout_error_includes_valid_values(self) -> None:
         """compute_flow_layout error includes valid Layout names."""
-        with pytest.raises(ValueError, match="valid values.*NONE.*VERTICAL.*HORIZONTAL"):
+        with pytest.raises(
+            ValueError, match="valid values.*NONE.*VERTICAL.*HORIZONTAL"
+        ):
             compute_flow_layout("bogus", 0, 0, 100, 100, [(50, 50)])
 
     def test_content_size_error_includes_valid_values(self) -> None:
         """compute_content_size error includes valid Layout names."""
-        with pytest.raises(ValueError, match="valid values.*NONE.*VERTICAL.*HORIZONTAL"):
+        with pytest.raises(
+            ValueError, match="valid values.*NONE.*VERTICAL.*HORIZONTAL"
+        ):
             compute_content_size("bogus", [(50, 50)])
 
 

@@ -179,7 +179,8 @@ def test_basic_then_fires_after_parent(tm: TimerManager) -> None:
     order: list[str] = []
 
     tm.after(0.1, lambda: order.append("A")).then(
-        lambda: order.append("B"), 0.1,
+        lambda: order.append("B"),
+        0.1,
     )
 
     tm.update(0.05)
@@ -200,9 +201,11 @@ def test_chained_thens_sequential(tm: TimerManager) -> None:
     order: list[str] = []
 
     tm.after(0.1, lambda: order.append("A")).then(
-        lambda: order.append("B"), 0.1,
+        lambda: order.append("B"),
+        0.1,
     ).then(
-        lambda: order.append("C"), 0.1,
+        lambda: order.append("C"),
+        0.1,
     )
 
     tm.update(0.1)  # A fires
@@ -225,7 +228,8 @@ def test_cancel_parent_prevents_chain(tm: TimerManager) -> None:
     order: list[str] = []
 
     handle = tm.after(0.1, lambda: order.append("A")).then(
-        lambda: order.append("B"), 0.1,
+        lambda: order.append("B"),
+        0.1,
     )
 
     tm.cancel(handle)
@@ -237,10 +241,16 @@ def test_cancel_handle_mid_chain(tm: TimerManager) -> None:
     """Cancelling after the first step prevents remaining steps."""
     order: list[str] = []
 
-    handle = tm.after(0.1, lambda: order.append("A")).then(
-        lambda: order.append("B"), 0.1,
-    ).then(
-        lambda: order.append("C"), 0.1,
+    handle = (
+        tm.after(0.1, lambda: order.append("A"))
+        .then(
+            lambda: order.append("B"),
+            0.1,
+        )
+        .then(
+            lambda: order.append("C"),
+            0.1,
+        )
     )
 
     tm.update(0.1)  # A fires, B scheduled
@@ -261,7 +271,8 @@ def test_repeating_timer_then_fires_after_each(tm: TimerManager) -> None:
     order: list[str] = []
 
     tm.every(0.5, lambda: order.append("A")).then(
-        lambda: order.append("B"), 0.1,
+        lambda: order.append("B"),
+        0.1,
     )
 
     tm.update(0.5)  # A fires
@@ -282,7 +293,8 @@ def test_cancel_repeating_timer_chain(tm: TimerManager) -> None:
     order: list[str] = []
 
     handle = tm.every(0.5, lambda: order.append("A")).then(
-        lambda: order.append("B"), 0.1,
+        lambda: order.append("B"),
+        0.1,
     )
 
     tm.update(0.5)  # A fires, B scheduled

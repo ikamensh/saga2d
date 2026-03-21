@@ -339,8 +339,11 @@ def test_scene_handle_input_default_returns_false() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_background_color_none_passes_no_clear_color(mock_game: Game, mock_backend) -> None:
+def test_background_color_none_passes_no_clear_color(
+    mock_game: Game, mock_backend
+) -> None:
     """Scene without background_color: begin_frame receives clear_color=None."""
+
     class PlainScene(Scene):
         pass
 
@@ -352,6 +355,7 @@ def test_background_color_none_passes_no_clear_color(mock_game: Game, mock_backe
 
 def test_background_color_rgb_passes_clear_color(mock_game: Game, mock_backend) -> None:
     """Scene with background_color=(R,G,B): begin_frame receives it (alpha=255 implied)."""
+
     class GreenScene(Scene):
         background_color = (34, 139, 34)
 
@@ -361,8 +365,11 @@ def test_background_color_rgb_passes_clear_color(mock_game: Game, mock_backend) 
     assert mock_backend.clear_color == (34, 139, 34)
 
 
-def test_background_color_rgba_passes_clear_color(mock_game: Game, mock_backend) -> None:
+def test_background_color_rgba_passes_clear_color(
+    mock_game: Game, mock_backend
+) -> None:
     """Scene with background_color=(R,G,B,A): begin_frame receives full tuple."""
+
     class SemiTransparentScene(Scene):
         background_color = (25, 30, 40, 200)
 
@@ -376,6 +383,7 @@ def test_background_color_uses_base_scene_when_transparent_overlay(
     mock_game: Game, mock_backend
 ) -> None:
     """When top scene is transparent, base (opaque) scene's background_color is used."""
+
     class BaseScene(Scene):
         background_color = (100, 50, 25, 255)
 
@@ -570,6 +578,7 @@ def test_replace_scene_raising_in_on_enter_rolls_back(mock_game: Game) -> None:
 
 def test_replace_on_empty_stack_raising_in_on_enter_rolls_back(mock_game: Game) -> None:
     """replace(scene) on empty stack when on_enter raises: stack stays empty."""
+
     class BadScene(Scene):
         def on_enter(self) -> None:
             raise RuntimeError("bad")

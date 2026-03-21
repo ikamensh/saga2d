@@ -55,6 +55,7 @@ class TestAnimationDef:
 
     def test_importable_from_saga2d(self) -> None:
         from saga2d import AnimationDef as AD
+
         assert AD is AnimationDef
 
 
@@ -151,7 +152,7 @@ class TestAnimationPlayerLooping:
             frame_duration=0.1,
             loop=True,
         )
-        player.update(0.1)   # -> h1
+        player.update(0.1)  # -> h1
         result = player.update(0.1)  # -> h0 (wrap)
         assert result == "h0"
         assert player.frame_index == 0
@@ -162,8 +163,8 @@ class TestAnimationPlayerLooping:
             frame_duration=0.1,
             loop=True,
         )
-        player.update(0.1)   # -> h1
-        player.update(0.1)   # -> h0
+        player.update(0.1)  # -> h1
+        player.update(0.1)  # -> h0
         assert player.is_playing is True
         assert player.is_complete is False
 
@@ -212,9 +213,9 @@ class TestAnimationPlayerOneShot:
             frame_duration=0.1,
             loop=False,
         )
-        player.update(0.1)   # -> h1
-        player.update(0.1)   # -> h2
-        player.update(0.1)   # stays on h2, finishes
+        player.update(0.1)  # -> h1
+        player.update(0.1)  # -> h2
+        player.update(0.1)  # stays on h2, finishes
 
         assert player.is_complete is True
         assert player.is_playing is False
@@ -227,8 +228,8 @@ class TestAnimationPlayerOneShot:
             frame_duration=0.1,
             loop=False,
         )
-        player.update(0.1)   # -> h1
-        player.update(0.1)   # finishes
+        player.update(0.1)  # -> h1
+        player.update(0.1)  # finishes
 
         result = player.update(0.1)
         assert result is None
@@ -247,10 +248,10 @@ class TestAnimationPlayerOneShot:
             loop=False,
             on_complete=on_done,
         )
-        player.update(0.1)   # -> h1
-        player.update(0.1)   # finishes, fires callback
-        player.update(0.1)   # no-op
-        player.update(0.1)   # no-op
+        player.update(0.1)  # -> h1
+        player.update(0.1)  # finishes, fires callback
+        player.update(0.1)  # no-op
+        player.update(0.1)  # no-op
 
         assert callback_count == 1
 
@@ -414,7 +415,9 @@ def _attack_anim() -> AnimationDef:
 def test_play_sets_first_frame_image(game: Game, backend: MockBackend) -> None:
     """play() immediately pushes the first frame's image to the backend."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     walk = _walk_anim()
     sprite.play(walk)
@@ -436,7 +439,9 @@ def test_play_registers_for_auto_update(game: Game) -> None:
 def test_play_with_prefix_string(game: Game, backend: MockBackend) -> None:
     """play() works with AnimationDef using a prefix string."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     anim = AnimationDef(frames="sprites/walk", frame_duration=0.1, loop=True)
     sprite.play(anim)
@@ -454,7 +459,9 @@ def test_play_with_prefix_string(game: Game, backend: MockBackend) -> None:
 def test_frame_advances_after_duration(game: Game, backend: MockBackend) -> None:
     """After frame_duration seconds, the displayed frame changes."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(_walk_anim())
 
@@ -468,7 +475,9 @@ def test_frame_advances_after_duration(game: Game, backend: MockBackend) -> None
 def test_no_advance_before_duration(game: Game, backend: MockBackend) -> None:
     """Frame stays the same when not enough time has elapsed."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(_walk_anim())
 
@@ -485,11 +494,14 @@ def test_no_advance_before_duration(game: Game, backend: MockBackend) -> None:
 
 
 def test_looping_cycles_back_to_first_frame(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """After the last frame, a looping animation wraps to frame 0."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     walk = _walk_anim()  # 4 frames x 0.1s
     sprite.play(walk)
@@ -511,14 +523,17 @@ def test_looping_cycles_back_to_first_frame(
 
 
 def test_oneshot_completes_after_correct_time(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """A 3-frame x 0.1s non-looping animation finishes at 0.3s."""
     attack = _attack_anim()  # 3 frames x 0.1s, loop=False
     completed = []
 
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(attack, on_complete=lambda: completed.append(True))
 
@@ -540,7 +555,9 @@ def test_oneshot_completes_after_correct_time(
 def test_oneshot_stays_on_last_frame(game: Game, backend: MockBackend) -> None:
     """After finishing, further updates don't change the frame."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(_attack_anim())
 
@@ -561,7 +578,9 @@ def test_oneshot_stays_on_last_frame(game: Game, backend: MockBackend) -> None:
 def test_play_interrupts_current(game: Game, backend: MockBackend) -> None:
     """Calling play() mid-animation replaces the current animation."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(_walk_anim())
     sprite.update_animation(0.1)  # advance walk to frame 1
@@ -592,11 +611,14 @@ def test_play_clears_queue(game: Game) -> None:
 
 
 def test_queue_plays_after_current_finishes(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Queued animation starts after the current one-shot finishes."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     attack = _attack_anim()  # 3 frames x 0.1s, loop=False
     idle = _idle_anim()
@@ -615,11 +637,14 @@ def test_queue_plays_after_current_finishes(
 
 
 def test_queue_when_nothing_playing_starts_immediately(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """queue() with no current animation starts immediately (like play)."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.queue(_walk_anim())
 
@@ -629,14 +654,17 @@ def test_queue_when_nothing_playing_starts_immediately(
 
 
 def test_queue_chain_three_animations(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Queue multiple animations: attack -> idle starts after attack completes."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     attack = _attack_anim()  # 3 frames, loop=False
-    idle = _idle_anim()      # loop=True
+    idle = _idle_anim()  # loop=True
 
     callback_fired = []
     sprite.play(attack, on_complete=lambda: callback_fired.append("attack"))
@@ -662,11 +690,14 @@ def test_queue_chain_three_animations(
 
 
 def test_stop_animation_stops_playback(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """stop_animation() stops the animation; frame stays as-is."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(_walk_anim())
     sprite.update_animation(0.1)  # -> walk_02
@@ -731,7 +762,9 @@ def test_play_on_removed_sprite_is_noop(game: Game) -> None:
 def test_game_tick_advances_animation(game: Game, backend: MockBackend) -> None:
     """game.tick(dt) automatically advances sprite animation."""
     sprite = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     sprite.play(_walk_anim())
 
@@ -746,10 +779,14 @@ def test_game_tick_advances_animation(game: Game, backend: MockBackend) -> None:
 def test_game_tick_multiple_sprites(game: Game, backend: MockBackend) -> None:
     """game.tick() updates all animated sprites."""
     s1 = Sprite(
-        "sprites/knight", position=(100, 100), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(100, 100),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     s2 = Sprite(
-        "sprites/knight", position=(200, 200), anchor=SpriteAnchor.TOP_LEFT,
+        "sprites/knight",
+        position=(200, 200),
+        anchor=SpriteAnchor.TOP_LEFT,
     )
     s1.play(_walk_anim())
     s2.play(_attack_anim())

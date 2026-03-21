@@ -24,14 +24,17 @@ from tests.screenshot.harness import assert_screenshot, render_scene
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 class EmptyScene(Scene):
     """Minimal scene that does nothing — just keeps the scene stack non-empty."""
+
     pass
 
 
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_static_sprites() -> None:
@@ -126,7 +129,8 @@ def test_tweened_sprite() -> None:
         )
 
         tween(
-            sprite, "x",
+            sprite,
+            "x",
             from_val=10.0,
             to_val=260.0,
             duration=1.0,

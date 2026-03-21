@@ -53,8 +53,14 @@ def test_trigger_valid_transition_fires_callbacks() -> None:
         states=["idle", "walking"],
         initial="idle",
         transitions={"idle": {"move": "walking"}, "walking": {"arrive": "idle"}},
-        on_enter={"idle": lambda: entered.append("idle"), "walking": lambda: entered.append("walking")},
-        on_exit={"idle": lambda: exited.append("idle"), "walking": lambda: exited.append("walking")},
+        on_enter={
+            "idle": lambda: entered.append("idle"),
+            "walking": lambda: entered.append("walking"),
+        },
+        on_exit={
+            "idle": lambda: exited.append("idle"),
+            "walking": lambda: exited.append("walking"),
+        },
     )
     assert entered == ["idle"]  # on_enter fires for initial state
     assert exited == []

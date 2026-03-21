@@ -36,12 +36,14 @@ _RESOLUTION = (320, 240)
 
 class EmptyScene(Scene):
     """Minimal scene that keeps the scene stack non-empty."""
+
     pass
 
 
 # ---------------------------------------------------------------------------
 # 1. Same sprite, original vs red color swap — side by side
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_color_swap_knight_original_vs_red() -> None:
@@ -85,6 +87,7 @@ def test_color_swap_knight_original_vs_red() -> None:
 # 2. Same sprite, original vs green color swap — side by side
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_color_swap_knight_original_vs_green() -> None:
     """Two knight sprites: original blue and swapped green.
@@ -124,6 +127,7 @@ def test_color_swap_knight_original_vs_green() -> None:
 # 3. Team palette via register_palette / team_palette param
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.screenshot
 def test_color_swap_team_palette() -> None:
     """Three knights using team palettes: blue (original), red, and green.
@@ -135,14 +139,20 @@ def test_color_swap_team_palette() -> None:
     Expected: three knight silhouettes in a row — blue, red, green.
     """
 
-    register_palette("red_team", ColorSwap(
-        source_colors=[(30, 144, 255)],
-        target_colors=[(220, 20, 60)],
-    ))
-    register_palette("green_team", ColorSwap(
-        source_colors=[(30, 144, 255)],
-        target_colors=[(34, 177, 76)],
-    ))
+    register_palette(
+        "red_team",
+        ColorSwap(
+            source_colors=[(30, 144, 255)],
+            target_colors=[(220, 20, 60)],
+        ),
+    )
+    register_palette(
+        "green_team",
+        ColorSwap(
+            source_colors=[(30, 144, 255)],
+            target_colors=[(34, 177, 76)],
+        ),
+    )
 
     def setup(game):
         game.push(EmptyScene())
@@ -177,6 +187,7 @@ def test_color_swap_team_palette() -> None:
 # ---------------------------------------------------------------------------
 # 4. Warrior multi-color swap (more complex sprite)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.screenshot
 def test_color_swap_warrior_red_vs_orange() -> None:

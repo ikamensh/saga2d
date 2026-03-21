@@ -1,6 +1,5 @@
 """Tests for saga2d.ui.theme."""
 
-
 from saga2d.ui.theme import Style, Theme
 
 

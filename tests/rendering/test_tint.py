@@ -14,6 +14,7 @@ from saga2d.rendering.layers import SpriteAnchor
 # Fixtures
 # ------------------------------------------------------------------
 
+
 @pytest.fixture
 def asset_dir(tmp_path: Path) -> Path:
     """Create a temporary asset directory with a test image."""
@@ -42,6 +43,7 @@ def backend(game: Game) -> MockBackend:
 # Default tint
 # ------------------------------------------------------------------
 
+
 def test_default_tint_is_white(game: Game) -> None:
     """A newly created sprite has tint (1.0, 1.0, 1.0) by default."""
     sprite = Sprite("sprites/knight", position=(100, 100))
@@ -59,6 +61,7 @@ def test_default_tint_synced_to_backend(game: Game, backend: MockBackend) -> Non
 # Tint getter / setter
 # ------------------------------------------------------------------
 
+
 def test_tint_getter_returns_current_value(game: Game) -> None:
     """sprite.tint returns the value that was set."""
     sprite = Sprite("sprites/knight", position=(100, 100))
@@ -69,6 +72,7 @@ def test_tint_getter_returns_current_value(game: Game) -> None:
 # ------------------------------------------------------------------
 # Backend sync on tint change
 # ------------------------------------------------------------------
+
 
 def test_set_tint_updates_backend(game: Game, backend: MockBackend) -> None:
     """Setting sprite.tint syncs the new value to the backend record."""
@@ -97,8 +101,10 @@ def test_set_tint_multiple_times(game: Game, backend: MockBackend) -> None:
 # Tint persists through position changes
 # ------------------------------------------------------------------
 
+
 def test_tint_persists_after_position_change(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Changing position does not reset the tint in the backend."""
     sprite = Sprite(
@@ -118,7 +124,8 @@ def test_tint_persists_after_position_change(
 
 
 def test_tint_persists_after_x_change(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Changing sprite.x alone does not reset the tint."""
     sprite = Sprite(
@@ -135,7 +142,8 @@ def test_tint_persists_after_x_change(
 
 
 def test_tint_persists_after_y_change(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Changing sprite.y alone does not reset the tint."""
     sprite = Sprite(
@@ -155,6 +163,7 @@ def test_tint_persists_after_y_change(
 # Constructor tint
 # ------------------------------------------------------------------
 
+
 def test_constructor_tint_sets_property(game: Game) -> None:
     """Passing tint= in the constructor sets the tint property."""
     sprite = Sprite(
@@ -166,7 +175,8 @@ def test_constructor_tint_sets_property(game: Game) -> None:
 
 
 def test_constructor_tint_synced_to_backend(
-    game: Game, backend: MockBackend,
+    game: Game,
+    backend: MockBackend,
 ) -> None:
     """Tint passed in the constructor is recorded in the backend."""
     sprite = Sprite(

@@ -78,6 +78,7 @@ _RES_WIDE = (800, 480)  # Extra-wide for DataTable
 # 1. Panel with Label + Buttons (normal, hover, pressed, disabled)
 # ---------------------------------------------------------------------------
 
+
 def gallery_panel_buttons() -> None:
     """Panel with a title Label and four Buttons in different states."""
 
@@ -89,14 +90,18 @@ def gallery_panel_buttons() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Button States",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
-            panel.add(Label(
-                "All four button visual states:",
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                Label(
+                    "Button States",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
+            panel.add(
+                Label(
+                    "All four button visual states:",
+                    style=Style(font_size=16),
+                )
+            )
 
             # Row of buttons in different states
             row = Panel(
@@ -137,6 +142,7 @@ def gallery_panel_buttons() -> None:
 # 2. ProgressBar (0%, 50%, 100%)
 # ---------------------------------------------------------------------------
 
+
 def gallery_progress_bars() -> None:
     """Three ProgressBars at 0%, 50%, and 100%.
 
@@ -154,14 +160,18 @@ def gallery_progress_bars() -> None:
                 spacing=12,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Progress Bars",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
-            panel.add(Label(
-                "Blue fill on dark blue track:",
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                Label(
+                    "Progress Bars",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
+            panel.add(
+                Label(
+                    "Blue fill on dark blue track:",
+                    style=Style(font_size=16),
+                )
+            )
 
             for pct in (0, 50, 100):
                 row = Panel(
@@ -170,12 +180,14 @@ def gallery_progress_bars() -> None:
                     style=Style(padding=0, background_color=(0, 0, 0, 0)),
                 )
                 row.add(Label(f"{pct:>3d}%", style=Style(font_size=18)))
-                row.add(ProgressBar(
-                    value=pct,
-                    max_value=100,
-                    width=350,
-                    height=28,
-                ))
+                row.add(
+                    ProgressBar(
+                        value=pct,
+                        max_value=100,
+                        width=350,
+                        height=28,
+                    )
+                )
                 panel.add(row)
 
             self.ui.add(panel)
@@ -191,6 +203,7 @@ def gallery_progress_bars() -> None:
 # ---------------------------------------------------------------------------
 # 3. List with items and selection highlight
 # ---------------------------------------------------------------------------
+
 
 def gallery_list() -> None:
     """List widget with several items and one selected.
@@ -209,14 +222,18 @@ def gallery_list() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "List Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
-            panel.add(Label(
-                "Alternating rows + selection (row 3):",
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                Label(
+                    "List Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
+            panel.add(
+                Label(
+                    "Alternating rows + selection (row 3):",
+                    style=Style(font_size=16),
+                )
+            )
 
             lst = List(
                 [
@@ -246,6 +263,7 @@ def gallery_list() -> None:
 # 4. Grid with cells and selection
 # ---------------------------------------------------------------------------
 
+
 def gallery_grid() -> None:
     """4x3 Grid with Labels in some cells and cell (2,1) selected."""
 
@@ -257,17 +275,22 @@ def gallery_grid() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Grid Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
-            panel.add(Label(
-                "Inventory grid — cell (2,1) selected:",
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                Label(
+                    "Grid Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
+            panel.add(
+                Label(
+                    "Inventory grid — cell (2,1) selected:",
+                    style=Style(font_size=16),
+                )
+            )
 
             grid = Grid(
-                4, 3,
+                4,
+                3,
                 cell_size=(72, 72),
                 spacing=4,
                 style=Style(padding=8),
@@ -303,6 +326,7 @@ def gallery_grid() -> None:
 # 5. TextBox with wrapped text
 # ---------------------------------------------------------------------------
 
+
 def gallery_textbox() -> None:
     """TextBox with a long paragraph, word-wrapped, fully revealed."""
 
@@ -314,10 +338,12 @@ def gallery_textbox() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "TextBox Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
+            panel.add(
+                Label(
+                    "TextBox Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
 
             text = TextBox(
                 "The ancient fortress loomed ahead, its crumbling towers "
@@ -342,6 +368,7 @@ def gallery_textbox() -> None:
 # ---------------------------------------------------------------------------
 # 6. TabGroup with multiple tabs
 # ---------------------------------------------------------------------------
+
 
 def gallery_tabgroup() -> None:
     """TabGroup with 3 tabs — Stats (active), Skills, and Items.
@@ -413,6 +440,7 @@ def gallery_tabgroup() -> None:
 # 7. DataTable with header and rows
 # ---------------------------------------------------------------------------
 
+
 def gallery_datatable() -> None:
     """DataTable with 4 columns, 6 rows, and row 2 selected.
 
@@ -431,14 +459,18 @@ def gallery_datatable() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "DataTable Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
-            panel.add(Label(
-                "Header + alternating rows + selection:",
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                Label(
+                    "DataTable Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
+            panel.add(
+                Label(
+                    "Header + alternating rows + selection:",
+                    style=Style(font_size=16),
+                )
+            )
 
             dt = DataTable(
                 ["Name", "Class", "Level", "HP"],
@@ -468,6 +500,7 @@ def gallery_datatable() -> None:
 # 8. Tooltip visible
 # ---------------------------------------------------------------------------
 
+
 def gallery_tooltip() -> None:
     """Tooltip that has passed its delay and is fully visible."""
 
@@ -480,14 +513,18 @@ def gallery_tooltip() -> None:
                 spacing=10,
                 style=Style(padding=20),
             )
-            panel.add(Label(
-                "Tooltip Widget",
-                style=Style(font_size=28, text_color=(255, 220, 100, 255)),
-            ))
-            panel.add(Label(
-                "Hover over items for details",
-                style=Style(font_size=16),
-            ))
+            panel.add(
+                Label(
+                    "Tooltip Widget",
+                    style=Style(font_size=28, text_color=(255, 220, 100, 255)),
+                )
+            )
+            panel.add(
+                Label(
+                    "Hover over items for details",
+                    style=Style(font_size=16),
+                )
+            )
 
             row = Panel(
                 layout=Layout.HORIZONTAL,

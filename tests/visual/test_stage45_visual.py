@@ -24,7 +24,9 @@ from saga2d import Game, Scene, Sprite, Ease, tween
 from saga2d.input import InputEvent
 from saga2d.backends.pyglet_backend import PygletBackend
 
-ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "assets" / "images" / "sprites"
+ASSETS_DIR = (
+    Path(__file__).resolve().parent.parent.parent / "assets" / "images" / "sprites"
+)
 
 
 class Stage45Scene(Scene):
@@ -35,8 +37,12 @@ class Stage45Scene(Scene):
 
         # Background
         bg = backend.create_solid_color_image(
-            40, 50, 60, 255,
-            backend.logical_width, backend.logical_height,
+            40,
+            50,
+            60,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(bg, -1)
         backend.update_sprite(self._bg_sprite, 0, 0)
@@ -56,31 +62,46 @@ class Stage45Scene(Scene):
         self._timer_sprite = Sprite("sprites/crate", position=(600, 100))
         self.game.every(2.0, self._on_timer)
 
-
     def _slide_right(self) -> None:
         tween(
-            self._slider, "x", self._slider.x, 700.0, 2.0,
+            self._slider,
+            "x",
+            self._slider.x,
+            700.0,
+            2.0,
             ease=Ease.EASE_IN_OUT,
             on_complete=self._slide_left,
         )
 
     def _slide_left(self) -> None:
         tween(
-            self._slider, "x", self._slider.x, 100.0, 2.0,
+            self._slider,
+            "x",
+            self._slider.x,
+            100.0,
+            2.0,
             ease=Ease.EASE_IN_OUT,
             on_complete=self._slide_right,
         )
 
     def _fade_down(self) -> None:
         tween(
-            self._fader, "opacity", self._fader.opacity, 128, 1.0,
+            self._fader,
+            "opacity",
+            self._fader.opacity,
+            128,
+            1.0,
             ease=Ease.LINEAR,
             on_complete=self._fade_up,
         )
 
     def _fade_up(self) -> None:
         tween(
-            self._fader, "opacity", self._fader.opacity, 255, 1.0,
+            self._fader,
+            "opacity",
+            self._fader.opacity,
+            255,
+            1.0,
             ease=Ease.LINEAR,
             on_complete=self._fade_down,
         )
@@ -103,14 +124,16 @@ class Stage45Scene(Scene):
         backend.update_sprite(self._bg_sprite, 0, 0)
         backend.draw_text(
             "Click = move knight  |  Keys = print action  |  ESC = quit",
-            20, backend.logical_height - 25,
+            20,
+            backend.logical_height - 25,
             20,
             (255, 255, 255, 255),
             font="Arial",
         )
         backend.draw_text(
             "Sliding crate (EASE_IN_OUT) | Fading enemy | Timer sprite teleports every 2s",
-            20, backend.logical_height - 48,
+            20,
+            backend.logical_height - 48,
             20,
             (200, 200, 200, 255),
             font="Arial",
@@ -138,8 +161,7 @@ class Stage45Scene(Scene):
 def main() -> None:
     if not ASSETS_DIR.exists():
         raise SystemExit(
-            f"Assets not found at {ASSETS_DIR}. "
-            "Run: python generate_assets.py"
+            f"Assets not found at {ASSETS_DIR}. Run: python generate_assets.py"
         )
 
     backend = PygletBackend()

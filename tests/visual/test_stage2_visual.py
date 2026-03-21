@@ -16,7 +16,9 @@ from saga2d import Game, Scene, RenderLayer
 from saga2d.backends.base import KeyEvent
 from saga2d.backends.pyglet_backend import PygletBackend
 
-ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "assets" / "images" / "sprites"
+ASSETS_DIR = (
+    Path(__file__).resolve().parent.parent.parent / "assets" / "images" / "sprites"
+)
 
 
 def _layer_order(layer: RenderLayer, y: int) -> int:
@@ -32,8 +34,12 @@ class SpriteScene(Scene):
 
         # Background
         bg = backend.create_solid_color_image(
-            40, 50, 60, 255,
-            backend.logical_width, backend.logical_height,
+            40,
+            50,
+            60,
+            255,
+            backend.logical_width,
+            backend.logical_height,
         )
         self._bg_sprite = backend.create_sprite(bg, -1)  # behind everything
         backend.update_sprite(self._bg_sprite, 0, 0)
@@ -45,30 +51,35 @@ class SpriteScene(Scene):
 
         # Trees on OBJECTS layer at different y (y-sort: higher y draws in front)
         self._tree1 = backend.create_sprite(
-            tree_img, _layer_order(RenderLayer.OBJECTS, 150),
+            tree_img,
+            _layer_order(RenderLayer.OBJECTS, 150),
         )
         backend.update_sprite(self._tree1, 150, 150)
 
         self._tree2 = backend.create_sprite(
-            tree_img, _layer_order(RenderLayer.OBJECTS, 350),
+            tree_img,
+            _layer_order(RenderLayer.OBJECTS, 350),
         )
         backend.update_sprite(self._tree2, 350, 350)
 
         self._tree3 = backend.create_sprite(
-            tree_img, _layer_order(RenderLayer.OBJECTS, 250),
+            tree_img,
+            _layer_order(RenderLayer.OBJECTS, 250),
         )
         backend.update_sprite(self._tree3, 500, 250)
 
         # Knight and enemy on UNITS layer (knight at y=400, enemy at y=300)
         # Enemy draws behind knight (lower y)
         self._knight = backend.create_sprite(
-            knight_img, _layer_order(RenderLayer.UNITS, 400),
+            knight_img,
+            _layer_order(RenderLayer.UNITS, 400),
         )
         self._knight_x, self._knight_y = 400, 400
         backend.update_sprite(self._knight, self._knight_x, self._knight_y)
 
         self._enemy = backend.create_sprite(
-            enemy_img, _layer_order(RenderLayer.UNITS, 300),
+            enemy_img,
+            _layer_order(RenderLayer.UNITS, 300),
         )
         backend.update_sprite(self._enemy, 550, 300)
 
@@ -90,19 +101,22 @@ class SpriteScene(Scene):
         if not self._knight_removed:
             backend.update_sprite(self._knight, self._knight_x, self._knight_y)
             backend.set_sprite_order(
-                self._knight, _layer_order(RenderLayer.UNITS, self._knight_y),
+                self._knight,
+                _layer_order(RenderLayer.UNITS, self._knight_y),
             )
 
         backend.draw_text(
             "Arrows = move knight  |  DELETE = remove knight  |  Close = quit",
-            20, backend.logical_height - 30,
+            20,
+            backend.logical_height - 30,
             24,
             (255, 255, 255, 255),
             font="Arial",
         )
         backend.draw_text(
             "Trees (OBJECTS) behind knight/enemy (UNITS). Y-sort: higher y = in front.",
-            20, backend.logical_height - 55,
+            20,
+            backend.logical_height - 55,
             24,
             (200, 200, 200, 255),
             font="Arial",
@@ -145,8 +159,7 @@ class SpriteScene(Scene):
 def main() -> None:
     if not ASSETS_DIR.exists():
         raise SystemExit(
-            f"Assets not found at {ASSETS_DIR}. "
-            "Run: python generate_assets.py"
+            f"Assets not found at {ASSETS_DIR}. Run: python generate_assets.py"
         )
 
     backend = PygletBackend()
