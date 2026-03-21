@@ -2,6 +2,7 @@
 Scene management: title screen → game world → inventory overlay → back.
 This is what you write TODAY with pygame. There is no scene stack.
 """
+
 import pygame
 import sys
 
@@ -52,8 +53,10 @@ world_items = []
 def init_game_world():
     global player_x, player_y, world_items
     player_x, player_y = 400, 300
-    world_items = [{"name": "Sword", "x": 200, "y": 200},
-                   {"name": "Shield", "x": 600, "y": 400}]
+    world_items = [
+        {"name": "Sword", "x": 200, "y": 200},
+        {"name": "Shield", "x": 600, "y": 400},
+    ]
 
 
 def draw_game():
@@ -62,8 +65,9 @@ def draw_game():
     pygame.draw.circle(screen, (200, 200, 50), (player_x, player_y), 20)
     # Draw items
     for item in world_items:
-        pygame.draw.rect(screen, (150, 150, 255),
-                         (item["x"] - 10, item["y"] - 10, 20, 20))
+        pygame.draw.rect(
+            screen, (150, 150, 255), (item["x"] - 10, item["y"] - 10, 20, 20)
+        )
     # HUD
     hud_text = menu_font.render("I=Inventory  ESC=Menu", True, (200, 200, 200))
     screen.blit(hud_text, (10, 10))

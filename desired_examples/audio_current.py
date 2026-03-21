@@ -2,6 +2,7 @@
 Audio: background music with crossfade, sound effects with channels, sound pools.
 This is what you write TODAY with pygame.
 """
+
 import pygame
 import random
 
@@ -27,6 +28,7 @@ pygame.mixer.music.set_endevent(MUSIC_END)
 
 class MusicManager:
     """Non-blocking crossfade. You build this yourself."""
+
     def __init__(self):
         self.pending_track = None
         self.target_volume = 0.5
@@ -106,8 +108,10 @@ def set_master_volume(vol):
 
 # === Sound pools — random selection without repeats ===
 
+
 class SoundPool:
     """Play one of N sounds without repeating the last one. You build this yourself."""
+
     def __init__(self, sounds):
         self.sounds = sounds
         self.last_played = -1
@@ -125,10 +129,12 @@ class SoundPool:
 
 # Load pool sounds
 try:
-    knight_acks = SoundPool([
-        pygame.mixer.Sound(f"assets/sounds/knight_ack_{i:02d}.wav")
-        for i in range(1, 4)
-    ])
+    knight_acks = SoundPool(
+        [
+            pygame.mixer.Sound(f"assets/sounds/knight_ack_{i:02d}.wav")
+            for i in range(1, 4)
+        ]
+    )
 except pygame.error:
     knight_acks = SoundPool([])
 

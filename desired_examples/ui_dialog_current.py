@@ -3,6 +3,7 @@ A styled dialog box with a character portrait, text, and choice buttons.
 Think: Baldur's Gate dialogue, or Heroes 2 event popup.
 This is what you write TODAY with pygame.
 """
+
 import pygame
 
 pygame.init()
@@ -13,6 +14,7 @@ font_large = pygame.font.SysFont("serif", 28)
 
 
 # === No UI component system — you draw rectangles ===
+
 
 class DialogBox:
     def __init__(self, speaker, portrait_path, text, choices):
@@ -76,8 +78,9 @@ class DialogBox:
         portrait_x = self.x + 15
         portrait_y = self.y + 15
         # Portrait border
-        pygame.draw.rect(surface, (120, 100, 60),
-                         (portrait_x - 2, portrait_y - 2, 100, 100), width=2)
+        pygame.draw.rect(
+            surface, (120, 100, 60), (portrait_x - 2, portrait_y - 2, 100, 100), width=2
+        )
         surface.blit(self.portrait, (portrait_x, portrait_y))
 
         # Speaker name — manual positioning
@@ -130,9 +133,13 @@ dialog = DialogBox(
     speaker="Elder Sage",
     portrait_path="assets/images/sprites/sage_portrait.png",
     text="The ancient prophecy speaks of a hero who will rise from the ashes. "
-         "The three kingdoms have fallen to darkness. Only you can restore the light. "
-         "But first, you must choose your path wisely.",
-    choices=["I will fight for honor.", "Tell me more about the prophecy.", "I'm not interested."],
+    "The three kingdoms have fallen to darkness. Only you can restore the light. "
+    "But first, you must choose your path wisely.",
+    choices=[
+        "I will fight for honor.",
+        "Tell me more about the prophecy.",
+        "I'm not interested.",
+    ],
 )
 dialog.on_choice = lambda i: print(f"Chose: {i}")
 

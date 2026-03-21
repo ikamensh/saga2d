@@ -2,6 +2,7 @@
 Animated unit: walks to a target, plays attack animation, then idles.
 This is what you write TODAY with pygame.
 """
+
 import pygame
 from pygame.math import Vector2
 
@@ -12,6 +13,7 @@ clock = pygame.time.Clock()
 
 # === Sprite sheet loading — you write this every time ===
 
+
 def load_spritesheet(path, frame_width, frame_height):
     """Cut a sprite sheet into frames. No standard way to do this."""
     sheet = pygame.image.load(path).convert_alpha()
@@ -20,8 +22,9 @@ def load_spritesheet(path, frame_width, frame_height):
     rows = sheet.get_height() // frame_height
     for row in range(rows):
         for col in range(cols):
-            rect = pygame.Rect(col * frame_width, row * frame_height,
-                               frame_width, frame_height)
+            rect = pygame.Rect(
+                col * frame_width, row * frame_height, frame_width, frame_height
+            )
             frame = sheet.subsurface(rect).copy()
             frames.append(frame)
     return frames
@@ -35,6 +38,7 @@ death_frames = load_spritesheet("assets/images/sprites/knight_death.png", 64, 64
 
 
 # === Animation state machine — you build this from scratch ===
+
 
 class AnimatedUnit:
     def __init__(self, x, y):

@@ -2,17 +2,20 @@
 Audio: background music with crossfade, sound effects with channels, sound pools.
 This is what we want it to look like with Saga2D.
 """
+
 from saga2d import Game
 
 game = Game("Audio Demo")
 
 # --- Music ---
-game.audio.play_music("exploration")                    # loops by default
+game.audio.play_music("exploration")  # loops by default
 game.audio.crossfade_music("battle_theme", duration=1.0)  # non-blocking crossfade
 
 # --- Sound effects ---
-game.audio.play_sound("sword_hit")     # plays on sfx channel
-game.audio.play_sound("ui_click")      # plays on ui channel (auto-detected by asset path? or explicit)
+game.audio.play_sound("sword_hit")  # plays on sfx channel
+game.audio.play_sound(
+    "ui_click"
+)  # plays on ui channel (auto-detected by asset path? or explicit)
 
 # --- Volume hierarchy ---
 # master: 1.0, music: 0.5, sfx: 0.8, ui: 0.6
@@ -26,7 +29,9 @@ game.audio.set_volume(channel="ui", level=0.6)
 # Settings screen uses these same calls — no wiring needed.
 
 # --- Sound pools ---
-game.audio.register_pool("knight_ack", ["knight_ack_01", "knight_ack_02", "knight_ack_03"])
+game.audio.register_pool(
+    "knight_ack", ["knight_ack_01", "knight_ack_02", "knight_ack_03"]
+)
 game.audio.play_pool("knight_ack")  # random from pool, no immediate repeat
 
 # That's it. ~15 lines for everything.

@@ -2,6 +2,7 @@
 Scene management: title screen → game world → inventory overlay → back.
 This is what we want it to look like with Saga2D.
 """
+
 from saga2d import Game, Scene, Sprite
 from saga2d.ui import Panel, Label, Button, List, Anchor, Layout, Style
 
@@ -20,6 +21,7 @@ class TitleScreen(Scene):
 class Item:
     def __init__(self, name):
         self.name = name
+
     def use(self):
         pass
 
@@ -43,20 +45,27 @@ class GameWorld(Scene):
 
 
 class PauseMenu(Scene):
-    transparent = True    # draw scene below (game world visible underneath)
-    pause_below = True    # game world stops updating
+    transparent = True  # draw scene below (game world visible underneath)
+    pause_below = True  # game world stops updating
 
     def on_enter(self):
         # Semi-transparent overlay + centered menu — that's it
-        self.ui.add(Panel(
-            anchor=Anchor.CENTER, layout=Layout.VERTICAL, spacing=16,
-            style=Style(background_color=(0, 0, 0, 128)),
-            children=[
-                Label("PAUSED", style=Style(font_size=48)),
-                Button("Resume", on_click=lambda: self.game.pop()),
-                Button("Quit to Title", on_click=lambda: self.game.clear_and_push(TitleScreen())),
-            ],
-        ))
+        self.ui.add(
+            Panel(
+                anchor=Anchor.CENTER,
+                layout=Layout.VERTICAL,
+                spacing=16,
+                style=Style(background_color=(0, 0, 0, 128)),
+                children=[
+                    Label("PAUSED", style=Style(font_size=48)),
+                    Button("Resume", on_click=lambda: self.game.pop()),
+                    Button(
+                        "Quit to Title",
+                        on_click=lambda: self.game.clear_and_push(TitleScreen()),
+                    ),
+                ],
+            )
+        )
 
     def handle_input(self, event):
         if event.action == "menu":
@@ -72,12 +81,16 @@ class InventoryScreen(Scene):
         self.inventory = inventory
 
     def on_enter(self):
-        panel = Panel(anchor=Anchor.CENTER, width=500, height=500, layout=Layout.VERTICAL)
+        panel = Panel(
+            anchor=Anchor.CENTER, width=500, height=500, layout=Layout.VERTICAL
+        )
         panel.add(Label("Inventory"))
-        panel.add(List(
-            items=[item.name for item in self.inventory],
-            on_select=self.select_item,
-        ))
+        panel.add(
+            List(
+                items=[item.name for item in self.inventory],
+                on_select=self.select_item,
+            )
+        )
         self.ui.add(panel)
 
     def select_item(self, index):

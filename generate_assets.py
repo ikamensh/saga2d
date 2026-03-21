@@ -17,6 +17,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from PIL import Image
+
 from assetgen import test_sprites, battle_sprites, battle_tiles
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -54,13 +56,32 @@ def main() -> None:
     tile_files = battle_tiles.generate(BATTLE_VIGNETTE_TILES)
     all_files.extend(tile_files)
 
+    # --- Large title-screen variants (3× base size) ---
+    print("\n=== Large title-screen sprites (battle_vignette example) ===")
+    large_files: list[Path] = []
+    _LARGE_SCALE = 2
+    for name in ("warrior_idle_01", "skeleton_idle_01"):
+        src = BATTLE_VIGNETTE_SPRITES / f"{name}.png"
+        dst = BATTLE_VIGNETTE_SPRITES / f"{name}_large.png"
+        img = Image.open(src)
+        large_w = img.width * _LARGE_SCALE
+        large_h = img.height * _LARGE_SCALE
+        large = img.resize((large_w, large_h), Image.LANCZOS)
+        large.save(dst)
+        large_files.append(dst)
+        print(f"Created {dst}")
+    all_files.extend(large_files)
+
     # --- Summary ---
     print(f"\n{'=' * 50}")
     print(f"Generated {len(all_files)} files total:")
     print(f"  {len(test_files)} test sprites      → {MAIN_SPRITES}")
     print(f"  {len(battle_files_main)} battle sprites    → {MAIN_SPRITES}")
-    print(f"  {len(battle_files_example)} battle sprites    → {BATTLE_VIGNETTE_SPRITES}")
+    print(
+        f"  {len(battle_files_example)} battle sprites    → {BATTLE_VIGNETTE_SPRITES}"
+    )
     print(f"  {len(tile_files)} battle tiles      → {BATTLE_VIGNETTE_TILES}")
+    print(f"  {len(large_files)} large sprites     → {BATTLE_VIGNETTE_SPRITES}")
     print(f"{'=' * 50}")
 
 

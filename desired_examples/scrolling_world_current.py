@@ -2,6 +2,7 @@
 Scrolling world: camera follows player, edge scrolling, 50 units with y-sorting.
 This is what you write TODAY with pygame.
 """
+
 import pygame
 import random
 
@@ -12,6 +13,7 @@ clock = pygame.time.Clock()
 
 
 # === Camera — you build from scratch ===
+
 
 class Camera:
     def __init__(self, world_w, world_h):
@@ -53,6 +55,7 @@ camera = Camera(4096, 4096)
 
 # === Sprite with y-sorting — no built-in support ===
 
+
 class GameSprite:
     def __init__(self, image_path, x, y):
         self.image = pygame.image.load(image_path).convert_alpha()
@@ -63,7 +66,7 @@ class GameSprite:
     def draw(self, surface, cam):
         screen_x, screen_y = cam.apply(self.x, self.y)
         # Frustum culling — manual. Without it, you draw 1000 sprites offscreen.
-        if (-64 < screen_x < SCREEN_W + 64 and -64 < screen_y < SCREEN_H + 64):
+        if -64 < screen_x < SCREEN_W + 64 and -64 < screen_y < SCREEN_H + 64:
             # Bottom-center anchor — manual offset
             rect = self.image.get_rect(midbottom=(screen_x, screen_y))
             surface.blit(self.image, rect)

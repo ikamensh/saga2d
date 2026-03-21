@@ -2,13 +2,16 @@
 Scrolling world: camera follows player, edge scrolling, 50 units with y-sorting.
 This is what we want it to look like with Saga2D.
 """
+
 from saga2d import Game, Scene, Sprite, Camera, RenderLayer
 import random
 
 
 class WorldScene(Scene):
     def on_enter(self):
-        self.camera = Camera(viewport_size=(1920, 1080), world_bounds=(0, 0, 4096, 4096))
+        self.camera = Camera(
+            viewport_size=(1920, 1080), world_bounds=(0, 0, 4096, 4096)
+        )
         self.camera.enable_edge_scroll(margin=50, speed=300)
 
         # Background — in a real game, use a pre-tiled background image.
@@ -17,21 +20,26 @@ class WorldScene(Scene):
 
         # Trees
         for _ in range(200):
-            Sprite("sprites/tree",
-                   position=(random.randint(0, 4096), random.randint(0, 4096)),
-                   layer=RenderLayer.OBJECTS)
+            Sprite(
+                "sprites/tree",
+                position=(random.randint(0, 4096), random.randint(0, 4096)),
+                layer=RenderLayer.OBJECTS,
+            )
 
         # Units
         self.units = []
         for _ in range(50):
-            unit = Sprite("sprites/knight",
-                          position=(random.randint(100, 3900), random.randint(100, 3900)),
-                          layer=RenderLayer.UNITS)
+            unit = Sprite(
+                "sprites/knight",
+                position=(random.randint(100, 3900), random.randint(100, 3900)),
+                layer=RenderLayer.UNITS,
+            )
             self.units.append(unit)
 
         # Player
-        self.player = Sprite("sprites/player", position=(2048, 2048),
-                             layer=RenderLayer.UNITS)
+        self.player = Sprite(
+            "sprites/player", position=(2048, 2048), layer=RenderLayer.UNITS
+        )
         self.camera.follow(self.player)
 
     def handle_input(self, event):

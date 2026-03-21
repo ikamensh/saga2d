@@ -3,12 +3,14 @@ A styled dialog box with a character portrait, text, and choice buttons.
 Think: Baldur's Gate dialogue, or Heroes 2 event popup.
 This is what we want it to look like with Saga2D.
 """
+
 from saga2d import Game, Scene
 from saga2d.ui import Panel, Label, ImageBox, TextBox, Button, Anchor, Layout, Style
 
 
 class DialogScene(Scene):
     """Push this over the game world — transparent=True keeps the world visible."""
+
     transparent = True
     pause_below = True
 
@@ -20,7 +22,9 @@ class DialogScene(Scene):
         self.on_choice = on_choice
 
     def on_enter(self):
-        dialog = Panel(anchor=Anchor.CENTER, width=600, height=300, layout=Layout.HORIZONTAL)
+        dialog = Panel(
+            anchor=Anchor.CENTER, width=600, height=300, layout=Layout.HORIZONTAL
+        )
 
         # Left: portrait
         dialog.add(ImageBox(self.portrait_img, width=96, height=96))
@@ -28,7 +32,9 @@ class DialogScene(Scene):
         # Right: text + choices
         right = Panel(layout=Layout.VERTICAL, spacing=8)
         right.add(Label(self.speaker_name, style=Style(font_size=28)))
-        right.add(TextBox(self.dialog_text, typewriter_speed=30))  # auto word-wrap, typewriter
+        right.add(
+            TextBox(self.dialog_text, typewriter_speed=30)
+        )  # auto word-wrap, typewriter
 
         for i, choice in enumerate(self.choices):
             right.add(Button(choice, on_click=lambda idx=i: self._choose(idx)))

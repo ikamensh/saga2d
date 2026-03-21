@@ -2,6 +2,7 @@
 Animated unit: walks to a target, plays attack animation, then idles.
 This is what we want it to look like with Saga2D.
 """
+
 from saga2d import Game, Scene, Sprite, AnimationDef
 
 

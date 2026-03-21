@@ -2,6 +2,7 @@
 Main menu with 4 buttons, background image, custom font, hover effects.
 This is what we want it to look like with Saga2D.
 """
+
 from saga2d import Game, Scene
 from saga2d.ui import Panel, Label, Button, Anchor, Layout, Style, Theme
 
@@ -32,7 +33,11 @@ class WorldMapScene(Scene):
     def on_enter(self):
         panel = Panel(anchor=Anchor.CENTER, layout=Layout.VERTICAL, spacing=20)
         panel.add(Label("World Map", style=Style(font_size=48)))
-        panel.add(Button("Back to Menu", on_click=lambda: self.game.clear_and_push(MainMenu())))
+        panel.add(
+            Button(
+                "Back to Menu", on_click=lambda: self.game.clear_and_push(MainMenu())
+            )
+        )
         self.ui.add(panel)
 
 
@@ -43,7 +48,9 @@ class MainMenu(Scene):
         panel = Panel(anchor=Anchor.CENTER, layout=Layout.VERTICAL, spacing=20)
         panel.add(Label("Chronicles of the Realm", style=Style(font_size=64)))
         panel.add(Button("New Game", on_click=self.new_game))
-        panel.add(Button("Load Game", on_click=lambda: self.game.push(SaveLoadScreen())))
+        panel.add(
+            Button("Load Game", on_click=lambda: self.game.push(SaveLoadScreen()))
+        )
         panel.add(Button("Settings", on_click=lambda: self.game.push(SettingsScene())))
         panel.add(Button("Quit", on_click=self.game.quit))
         self.ui.add(panel)

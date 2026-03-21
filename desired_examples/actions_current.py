@@ -3,6 +3,7 @@ Multi-step game sequence: Heroes 2-style battle attack turn.
 Attacker walks forward, attacks, defender reacts, attacker walks back.
 This is what you write TODAY with pygame — callback chains or state machines.
 """
+
 import pygame
 import math
 
@@ -17,6 +18,7 @@ clock = pygame.time.Clock()
 
 
 # === Approach 1: Named callbacks (the common approach) ===
+
 
 def execute_attack_turn(attacker, defender, on_complete):
     """
@@ -42,7 +44,9 @@ def execute_attack_turn(attacker, defender, on_complete):
         defender.play(hit_frames, loop=False, on_complete=step5_damage)
 
     def step5_damage():
-        show_damage_number(defender.x, defender.y - 40, damage=25, on_done=step6_walk_back)
+        show_damage_number(
+            defender.x, defender.y - 40, damage=25, on_done=step6_walk_back
+        )
 
     def step6_walk_back():
         attacker.play(walk_frames, loop=True)
@@ -66,8 +70,10 @@ def execute_attack_turn(attacker, defender, on_complete):
 
 # === Approach 2: State machine (the "structured" way) ===
 
+
 class AttackSequence:
     """State machine that advances through phases each frame."""
+
     def __init__(self, attacker, defender, on_complete):
         self.attacker = attacker
         self.defender = defender
@@ -98,7 +104,9 @@ class AttackSequence:
             if self._arrived_flag:
                 self.phase = "attack"
                 self._arrived_flag = False
-                self.attacker.play(attack_frames, loop=False, on_complete=self._anim_done)
+                self.attacker.play(
+                    attack_frames, loop=False, on_complete=self._anim_done
+                )
                 self._anim_done_flag = False
 
         elif self.phase == "attack":
@@ -119,8 +127,9 @@ class AttackSequence:
                 self.phase = "walk_back"
                 self._arrived_flag = False
                 self.attacker.play(walk_frames, loop=True)
-                self.attacker.move_to(self.original_x, self.attacker.y,
-                                      on_arrive=self._arrived)
+                self.attacker.move_to(
+                    self.original_x, self.attacker.y, on_arrive=self._arrived
+                )
 
         elif self.phase == "walk_back":
             if self._arrived_flag:

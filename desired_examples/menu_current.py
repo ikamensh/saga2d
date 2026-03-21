@@ -2,6 +2,7 @@
 Main menu with 4 buttons, background image, custom font, hover effects.
 This is what you write TODAY with pygame.
 """
+
 import pygame
 import sys
 
