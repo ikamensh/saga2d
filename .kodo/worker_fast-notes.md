@@ -66,3 +66,11 @@ desired_examples/        # API design sketches
 - **F10 (fixed):** `Game.__del__` could crash after partial init failure — `_teardown()` guards missing attrs; tests in `tests/kodo_test_persistence_resources.py`.
 - **F11:** `__del__` stderr noise on shutdown if user skips cleanup — documented low-value; not fixed.
 - Clean-room: `pip install .` and `pip install -e ".[dev]"` in fresh venvs; import/smoke OK (details in `.kodo/worker_smart-notes.md` / `test-coverage.md`).
+
+## Stage 7 — remaining areas + final report (2026-03-22)
+
+- Suite: `tests/kodo_test_stage7_e2e.py` — **70** tests (62 base E2E + 8 adversarial); audio, text/fonts, backend draw paths, util FSM/tween/timer, SettingsScreen, asset edges, “no tilemap module” checks.
+- **F13 (documented, not fixed):** non-finite `dt` in actions — `Delay.update(nan)` stuck; `FadeOut`/`FadeIn.update(nan)` → `ValueError`. Subclasses: `TestActionNaNEdgeCases`.
+- **F14 (documented, not fixed):** `play_sound` doc says `sfx`/`ui` only; code accepts any key in `_volumes` (`music`/`master`). Subclass: `TestPlaySoundChannelValidation`.
+- **Tilemaps:** not a first-class engine feature — grid/sprite workflows in examples/tutorials only.
+- Coverage narrative: `.kodo/test-coverage.md` Stage 7 block; commands also in `.kodo/tester-notes.md`.

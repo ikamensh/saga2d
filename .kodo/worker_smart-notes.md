@@ -13,15 +13,17 @@
 - Scene lifecycle: `.venv/bin/python -m pytest tests/kodo_test_scene_lifecycle.py -v`
 - Sprite/action/animation: `.venv/bin/python -m pytest tests/kodo_test_sprite_actions.py -v`
 - Persistence/resources: `.venv/bin/python -m pytest tests/kodo_test_persistence_resources.py -v`
-- All kodo tests: `.venv/bin/python -m pytest tests/kodo_test_core.py tests/kodo_test_rendering.py tests/kodo_test_systems.py tests/kodo_test_scene_lifecycle.py tests/kodo_test_sprite_actions.py tests/kodo_test_persistence_resources.py -v`
+- Stage 7 E2E: `.venv/bin/python -m pytest tests/kodo_test_stage7_e2e.py -v`
+- All kodo tests: `.venv/bin/python -m pytest tests/kodo_test_core.py tests/kodo_test_rendering.py tests/kodo_test_systems.py tests/kodo_test_scene_lifecycle.py tests/kodo_test_sprite_actions.py tests/kodo_test_persistence_resources.py tests/kodo_test_persistence_resources_ext.py tests/kodo_test_stage7_e2e.py -v`
 
-## Test Results (updated 2026-03-22, Stage 6C)
-- 1411 existing tests: all pass (SAGA2D_HEADLESS unset)
-- 598 kodo tests: all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 50 persistence/resources + 37 persistence/resources ext + 7 shake picking)
+## Test Results (updated 2026-03-22, Stage 7 + Adversarial)
+- 1411 main tests: all pass (SAGA2D_HEADLESS unset)
+- 664 kodo tests: all pass (8 files: core, rendering, systems, scene_lifecycle, sprite_actions, persistence, persistence_ext, stage7_e2e)
+- 78 example tests: all pass
 - 383 UI tests: all pass across 6 files
-- Stage 4: F5/F6/F7 fixed, 0 known-issues remaining, 0 new UI findings
-- Stage 5 (final pass): persistence + resource lifecycle (48+37=85 tests), 1 new finding (F8)
-- Stage 6C: F12 shake vs picking fixed (7 tests), F10 partial init fixed (2 tests), F11 deferred
+- Stage 7: 62 base E2E + 8 adversarial = 70 tests in kodo_test_stage7_e2e.py
+- F13: NaN dt in Delay/FadeOut/FadeIn — documented, not fixed (5 tests)
+- F14: play_sound channel='music'/'master' accepted — documented, not fixed (3 tests)
 
 ## Confirmed Findings
 - F1: cursor crash on FakeGame → fixed (commit 477220f)
@@ -53,6 +55,13 @@
 - F12: Camera shake vs mouse picking → **fixed 2026-03-22**
   - camera.py: screen_to_world/world_to_screen now include _shake_offset_x/_y
   - 7 regression tests in TestShakePickingRegression (unit + E2E)
+- F13: NaN dt in Delay/FadeOut/FadeIn → **not fixed** (documented with 5 tests)
+  - Delay.update(NaN): elapsed=NaN, action stuck forever (NaN >= seconds is False)
+  - FadeOut/FadeIn.update(NaN): ValueError from int(NaN)
+  - No known production path produces NaN dt; fix would be math.isfinite guard
+- F14: play_sound channel='music'/'master' accepted → **not fixed** (documented with 3 tests)
+  - Docstring says only sfx/ui, but validation uses `channel not in self._volumes` which includes all 4
+  - Functionally harmless — just applies different channel volume
 
 ## Sharp Edges (design-intent, verified by execution)
 - SE1: list_slots() aborts on first corrupt slot — no partial results

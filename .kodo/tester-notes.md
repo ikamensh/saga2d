@@ -1,5 +1,37 @@
 # Tester Notes - Saga2D
 
+## Stage 7 — F13/F14 adversarial + final report structure (verified 2026-03-22)
+
+- **Commands (all PASS):**
+  - `pytest tests/kodo_test_stage7_e2e.py::TestActionNaNEdgeCases tests/kodo_test_stage7_e2e.py::TestPlaySoundChannelValidation -v` → **8** passed (F13 + F14 regression tests).
+  - `pytest tests/kodo_test_stage7_e2e.py -q` → **70** passed (full Stage 7 file: 62 base E2E + 8 adversarial).
+
+- **F13 — NaN/Inf (and negative) `dt` in actions — reproduced; not “broken” tests, they document sharp edges:**
+  - **`Delay.update(nan)`:** `_elapsed` becomes NaN; `>= seconds` is always False → action **stuck**; further finite `dt` does not recover.
+  - **`FadeOut` / `FadeIn.update(nan)`:** raises **`ValueError`** (`cannot convert float NaN to integer` from opacity math).
+  - **`Delay.update(inf)`:** returns **True** immediately (`inf >= seconds`).
+  - **`Delay.update(negative)`:** subtracts from elapsed (documented in tests) — can delay completion.
+  - **Expected if `dt` is always finite and non-negative from `Game.tick`:** no production path; hardening would be `math.isfinite(dt)` / `dt >= 0` at action or tick boundary.
+
+- **F14 — `play_sound` channels — doc vs code:**
+  - **`audio.py` docstring** says `channel` is **`"sfx"` or `"ui"`** only.
+  - **Implementation** rejects only unknown keys: `channel not in self._volumes` where `_volumes` includes **`master`, `music`, `sfx`, `ui`** — so **`play_sound(..., channel="music"|"master")` succeeds** (uses that channel’s volume). **`bogus`** → **`KeyError`** with valid list in message.
+  - **Impact:** documentation mismatch; behavior is **harmless** (wrong channel name would still raise).
+
+- **Standalone repro (no pytest):** from repo root, run a **fresh** `Game` per step with `_teardown()` between (singleton). Temp dir: `images/sprites/knight.png`, `sounds/beep.wav`, `AssetManager` on that path — then exercise `Delay(1.0).update(nan)`, `FadeOut` + `update(nan)`, `play_sound` with `music`/`master`/`bogus`. Verified manually 2026-03-22 (stdout matches F13/F14 above).
+
+- **Final report = `.kodo/test-coverage.md` Stage 7 block — required subsections present:** `## Stage 7 — Remaining Feature Areas E2E` → test file + area table (20 rows) → **Corrected test counts** → **Confirmed absent features** → **Findings (Stage 7 base)** → **Stage 7 Adversarial Pass** (F13/F14 table) → **Totals after Stage 7 + Adversarial**.
+
+## Audio / Text·Fonts / Tilemaps / Util (independent pass, 2026-03-22)
+
+- **Audio (mock backend — no speaker output):** `pytest tests/systems/test_audio.py -v` → **83** passed. Workflows: channel volume hierarchy (`master` / `music` / `sfx`), `play_sound` / `play_music` / `stop_music`, crossfade + replace, sound pools (`play_sound_from_pool`), `AssetManager` sound/music loaders + extensions, `Game.audio` integration. Harnesses: `python -m tests.harness.systems_util_harness M -v`; `python -m tests.harness.final_verification_harness AB -v` (optional missing sound + `AssetNotFoundError` on image); `python -m tests.harness.integration_harness all -v` (music persists across scene push/pop). **Doc gap:** `play_sound` accepts `music`/`master` despite docstring — see **Stage 7 F14** above.
+
+- **Text / fonts:** There is **no standalone typography module** — text is UI `Label` / `Button` / `TextBox` / `DataTable` etc., resolved `Style` (`font`, `font_size`, `text_color`) → `backend.draw_text(...)`. Mock tests assert recorded `texts[]` payloads (size, color, string). Commands: `pytest tests/ui/test_theme.py tests/ui/test_ui.py -k "Label or font or Style or text" -q` → **41**; `pytest tests/ui/test_widgets.py -k "TextBox or font or Label" -q` → **14**; `pytest tests/kodo_test_systems.py -k "TabGroup or Label or text_width" -q` → **12** (uses `_estimate_text_width`). **Real GPU font rasterization** still untested here (blocked: visual/screenshot marks). **No bugs found** in exercised paths.
+
+- **Tilemaps:** **No engine `TileMap` API** in `saga2d/` — maps are **app-level** (sprites + logic). Battle vignette uses `SquareGrid` + terrain sprites; tower defense uses grid helpers. Commands: `pytest tests/examples/test_battle_vignette.py tests/examples/test_tower_defense_tutorial.py tests/examples/test_tower_defense_example.py -q` → **44** passed (~28s; loads real example assets under mock `Game`). `pytest assetgen/test_battle_tiles.py -v` → **1** passed — **gap:** `test_tiles()` only prints; it **does not assert** on missing files or wrong dimensions, so pytest can pass while tiles are broken (repro: delete a PNG under `examples/battle_vignette/assets/images/tiles/` and re-run — still green).
+
+- **Utility modules (`saga2d.util`):** Re-exports `Ease`, `StateMachine`, `TimerHandle`; `tween()` lives on **`saga2d`** (not `saga2d.util`) by design. `pytest tests/actions/test_tween.py tests/actions/test_timer.py tests/systems/test_fsm.py -q` → **63** passed. Smoke: `from saga2d.util import Ease, StateMachine; StateMachine(...).trigger(...)` — OK. **No bugs found.**
+
 ## Stage 6 — Input / Camera / shake+picking (verified / re-verified 2026-03-22)
 
 - **No interactive `game.run()`** — all checks via `backend="mock"`, `inject_*`, `game.tick()`, harnesses (AGENTS.md).

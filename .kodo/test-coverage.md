@@ -127,6 +127,76 @@ End-to-end check (mock backend only): **1411** passed with `env -u SAGA2D_HEADLE
 
 Also re-ran: kodo camera filter (17), kodo `world_coords` (2), `tests/ui/test_drag_drop.py` (49), `integration_harness all`, `systems_util_harness O`, `ui_rendering_harness I` — all pass.
 
+## Stage 7 — Remaining Feature Areas E2E (2026-03-22)
+
+### Test file: `tests/kodo_test_stage7_e2e.py` — 70 tests (62 base E2E + 8 adversarial), all pass
+
+| # | Area | Tests | What's exercised |
+|---|------|-------|-----------------|
+| 1 | Audio crossfade E2E | 4 | Tween-driven volume ramp, same-track noop, no-music fallback, stop cancels crossfade |
+| 2 | Audio sound pools | 4 | Single-element pool, empty pool, unregistered raises, no-immediate-repeat |
+| 3 | Audio volume edge cases | 5 | Clamp >1, clamp <0, invalid channel KeyError, ui channel |
+| 4 | Audio optional assets | 4 | play_sound/play_music optional=True for missing, required raises |
+| 5 | Audio _teardown | 2 | Stops music, idempotent double-call |
+| 6 | Backend draw_text + load_font | 4 | Text recording, anchors, font handles, font with path |
+| 7 | TextBox typewriter E2E | 6 | Gradual reveal, skip, reset, instant mode, text setter resets, draw emits text |
+| 8 | Word wrap edge cases | 5 | Explicit newlines, empty string, single long word, zero max_width, multiple newlines |
+| 9 | Backend draw_circle | 3 | Recording, segments param, opacity param |
+| 10 | Backend draw_image | 2 | Recording, opacity param |
+| 11 | Backend capture_frame | 1 | Returns PIL Image with correct size/mode |
+| 12 | Label draw E2E | 2 | Emits draw_text calls, empty string no crash |
+| 13 | Tween cancel + on_complete | 3 | on_complete fires, cancel stops, all 4 easing modes |
+| 14 | Timer chaining | 2 | .then() chain fires in order, cancel via manager |
+| 15 | FSM edge cases | 6 | Transition callbacks, unknown event returns False, valid_events property, self-transition, duplicate states, invalid initial raises |
+| 16 | ProgressBar draw | 1 | Emits rect draw calls |
+| 17 | SettingsScreen E2E | 1 | push_settings() + escape pops back |
+| 18 | Tilemap scope | 2 | No tilemap module, no tilemap exports |
+| 19 | Assets edge cases | 3 | frames() discovery, missing prefix raises, image caching |
+| 20 | Scene draw helpers | 2 | draw_rect emits, draw_world_rect uses camera |
+
+### Corrected test counts (previously under-counted in feature map)
+
+| Area | Old count | Actual count | Source |
+|------|-----------|-------------|--------|
+| Audio | 8 | 83 | `tests/systems/test_audio.py` (83 tests, not 8) |
+| Settings | 7 | 36 | `tests/core/test_settings.py` (36 tests) |
+| Assets | 17 | 17 | `tests/systems/test_assets.py` (correct) |
+| Cursor | 6 | 18 | `tests/systems/test_cursor.py` (18 tests) |
+| Input | 33 | 33 | `tests/systems/test_input.py` |
+| kodo_test_systems | — | 180 | Broad coverage: UI widgets, audio, save, input, FSM, cursor, drag-drop |
+
+### Confirmed absent features (not bugs)
+
+- **Tilemaps**: No `saga2d.tilemap` module, no tile-related exports. Saga2D is a sprite-based engine.
+- **Physics/collision**: No built-in collision detection, tunneling, or physics simulation.
+- **Pathfinding**: No A*, nav mesh, or grid pathfinding utilities.
+- **Dialog/narrative**: Only modal screens (MessageScreen, ChoiceScreen); no dialog tree or scripting system.
+- **Math/geometry**: No vector/matrix math utilities beyond coordinate conversion.
+
+### Findings (Stage 7 base)
+
+No new bugs found from base E2E pass. All 62 base tests pass.
+
+### Stage 7 Adversarial Pass — 8 additional tests (2026-03-22)
+
+| Area | Tests | Finding |
+|------|-------|---------|
+| NaN dt in Delay | 2 | **F13**: `Delay.update(NaN)` → stuck; negative dt delays completion |
+| NaN dt in FadeOut/FadeIn | 2 | **F13**: `FadeOut/FadeIn.update(NaN)` → ValueError |
+| Inf dt in Delay | 1 | +inf completes immediately (expected) |
+| play_sound channel gap | 3 | **F14**: `channel='music'/'master'` accepted despite docstring |
+
+F13/F14 documented with regression tests but not fixed (low risk).
+
+### Totals after Stage 7 + Adversarial
+
+| Suite | Count | Result |
+|-------|-------|--------|
+| Full main suite | **1411** | pass |
+| All kodo tests (8 files) | **664** | pass |
+| Example tests | **78** | pass |
+| Integration harness | 3/3 | pass |
+
 ## Feature Map (50 areas)
 
 | # | Feature / Workflow | Test File(s) | Test Count | Last Tested | Status | Findings |
@@ -139,7 +209,7 @@ Also re-ran: kodo camera filter (17), kodo `world_coords` (2), `tests/ui/test_dr
 | 6 | Scene drawing (draw_rect/draw_world_rect/bg color) | core/test_scene_draw.py | 12 | 2026-03-21 | pass | |
 | 7 | Scene-owned sprites | core/test_scene_sprites.py | 19 | 2026-03-21 | pass | add/remove/cleanup verified |
 | 8 | Scene-owned timers | core/test_scene_timers.py | 19 | 2026-03-21 | pass | timer cleanup on scene exit |
-| 9 | Settings / configuration | core/test_settings.py | 7 | 2026-03-21 | pass | |
+| 9 | Settings / configuration | core/test_settings.py | 36 | 2026-03-22 | pass | Volume sliders, key rebinding, escape-to-pop, push_settings() |
 | 10 | Sprites (create/position/remove/anchor/y-sort) | rendering/test_sprite.py, kodo_test_sprite_actions.py | 64+16 | 2026-03-21 | pass | F3 speed validation fixed; z-order, layer separation, removal lifecycle tested |
 | 11 | Sprite tinting | rendering/test_tint.py | 11 | 2026-03-21 | pass | |
 | 12 | Actions (Sequence/Parallel/Delay/Do/MoveTo/Fade/Remove/Repeat) | actions/test_actions.py, kodo_test_sprite_actions.py | 50+40 | 2026-03-21 | pass | F2 Repeat design-intent; F6 action replacement bug found |
@@ -154,13 +224,13 @@ Also re-ran: kodo camera filter (17), kodo `world_coords` (2), `tests/ui/test_dr
 | 21 | HUD | ui/test_hud.py | 38 | 2026-03-22 | pass | Creation, visibility, input/update dispatch, scene transitions |
 | 22 | Modal Screens (Message/Choice/Confirm/SaveLoad) | ui/test_screens.py | 42 | 2026-03-22 | pass | SequenceRunner, status/help modals |
 | 23 | Drag & Drop | ui/test_drag_drop.py | 49 | 2026-03-22 | pass | DragManager, ghost tracking, drop targets, visual feedback |
-| 24 | Audio (channels/music/sfx/crossfade/pools) | systems/test_audio.py | 8 | 2026-03-21 | pass | |
+| 24 | Audio (channels/music/sfx/crossfade/pools) | systems/test_audio.py, kodo_test_stage7_e2e.py | 83+19 | 2026-03-22 | pass | Crossfade E2E, sound pools, volume clamping, optional assets, _teardown |
 | 25 | Input (action mapping/key stealing/mouse events, world_x/y dispatch) | systems/test_input.py, test_camera.py (§21) | 33+ | 2026-03-22 | pass | E2E world coords on click/move/drag; multi-event tick |
 | 26 | Save/Load (save/load/delete/list/corrupt) | systems/test_save.py, kodo_test_persistence_resources.py | 51+25 | 2026-03-22 | pass | SE1: list_slots aborts on first corrupt slot (design-intent); SE2: saves top scene only; SE7: atomic write protects against partial save; F9: non-object JSON now raises SaveError |
 | 27 | Tweening (tween/ease/cancel) | actions/test_tween.py | 22 | 2026-03-21 | pass | |
 | 28 | Timers (after/every/cancel/chaining) | actions/test_timer.py | 24 | 2026-03-21 | pass | |
 | 29 | FSM (transitions/callbacks/validation) | systems/test_fsm.py | 13 | 2026-03-21 | pass | |
-| 30 | Cursor (register/set/visibility) | systems/test_cursor.py | 6 | 2026-03-21 | pass | |
+| 30 | Cursor (register/set/visibility) | systems/test_cursor.py | 18 | 2026-03-21 | pass | |
 | 31 | Assets (image/sound/music/frames/@2x) | systems/test_assets.py | 17 | 2026-03-21 | pass | |
 | 32 | Mock Backend (event injection/tracking) | conftest.py + all | — | 2026-03-21 | pass | |
 | 33 | Integration: adversarial reentrancy | integration/test_adversarial.py, kodo_test_scene_lifecycle.py | 18+73 | 2026-03-21 | pass | 7 FakeGame tests pass (F1 fixed); mutations in on_enter/on_exit/on_reveal/update tested |
@@ -225,5 +295,6 @@ Discovered via Stage 5 exploratory testing. All verified by execution.
 - **F9 fixed**: non-object JSON in save slot crashes list_slots/SaveLoadScreen (2026-03-22)
 - **1 area (visual) blocked** by display requirement
 - **1411 unit tests** collected, all pass
-- **561 kodo tests** all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 50 persistence/resources + 7 shake picking regression)
+- **664 kodo tests** all pass (348 regression + 75 scene lifecycle + 81 sprite/action + 50 persistence/resources + 40 persistence ext + 70 stage 7 E2E)
 - **383 UI tests** across 6 test files
+- **Findings**: 12 bugs fixed (F1, F3–F10, F12), 3 documented unfixed (F11, F13, F14), 1 design-intent (F2), 10 sharp edges (SE1–SE10)
