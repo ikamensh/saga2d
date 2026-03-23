@@ -21,6 +21,7 @@ theming via the Theme system.
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Any, Callable
 
 from saga2d.ui.component import Component
@@ -343,6 +344,10 @@ class TextBox(Component):
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
+        if not math.isfinite(typewriter_speed):
+            raise ValueError(
+                f"typewriter_speed must be a finite number, got {typewriter_speed}"
+            )
         super().__init__(width=width, height=height, style=style, **kwargs)
         self._text = text
         self._typewriter_speed = typewriter_speed
@@ -707,6 +712,8 @@ class List(Component):
         # Mouse click — hit-test to select an item row.
         if event.type == "click" and event.button == "left":
             if self.hit_test(event.x, event.y):
+                if self._item_height <= 0:
+                    return True
                 # Determine which item row was clicked.
                 relative_y = event.y - self._computed_y
                 row = self._scroll_offset + int(relative_y // self._item_height)
@@ -727,6 +734,8 @@ class List(Component):
         # Mouse motion — update hover index.
         if event.type == "motion":
             if self.hit_test(event.x, event.y):
+                if self._item_height <= 0:
+                    return True
                 relative_y = event.y - self._computed_y
                 row = self._scroll_offset + int(relative_y // self._item_height)
                 if 0 <= row < len(self._items):
