@@ -233,6 +233,165 @@ class TestComponentMutationDuringUpdate:
 
 
 # ===================================================================
+# EC3-EC5 regression: verify sibling NOT skipped after list() snapshot fix
+# ===================================================================
+
+
+class TestComponentMutationNoSkip:
+    """F30 regression: list() snapshot ensures no sibling is skipped when
+    another sibling mutates _children during draw/update/handle_event.
+
+    Before this fix, CPython silently skipped children because iterators
+    over a live list saw the mutation.  The fix snapshots with list().
+    """
+
+    def test_draw_sibling_not_skipped_when_other_removed(self, game):
+        """EC4: A child removing a later sibling during draw should
+        NOT cause the removed child to be skipped (it was in the snapshot)."""
+        parent = Component(width=200, height=200)
+        parent._game = game
+
+        class CountDrawComponent(Component):
+            def __init__(self):
+                super().__init__(width=50, height=50)
+                self.drawn = False
+
+            def on_draw(self):
+                self.drawn = True
+
+        class SiblingRemover(Component):
+            def __init__(self, target):
+                super().__init__(width=50, height=50)
+                self.target = target
+
+            def on_draw(self):
+                if self.target in self._parent._children:
+                    self._parent.remove(self.target)
+
+        child_c = CountDrawComponent()
+        child_b = SiblingRemover(child_c)
+        child_a = CountDrawComponent()
+
+        parent.add(child_a)
+        parent.add(child_b)
+        parent.add(child_c)
+
+        parent.draw()
+
+        assert child_a.drawn, "child_a should have been drawn"
+        assert child_c.drawn, "child_c should have been drawn (snapshot protects)"
+
+    def test_update_sibling_not_skipped_when_other_removed(self, game):
+        """EC3: A child removing a later sibling during update should
+        NOT cause the removed child to be skipped."""
+        root = _UIRoot(game)
+
+        class CountUpdateComponent(Component):
+            def __init__(self):
+                super().__init__(width=50, height=50)
+                self.updated = False
+
+            def update(self, dt):
+                self.updated = True
+
+        class SiblingRemoverOnUpdate(Component):
+            def __init__(self, target):
+                super().__init__(width=50, height=50)
+                self.target = target
+
+            def update(self, dt):
+                if self.target._parent is not None:
+                    self.target._parent.remove(self.target)
+
+        child_c = CountUpdateComponent()
+        child_b = SiblingRemoverOnUpdate(child_c)
+        child_a = CountUpdateComponent()
+
+        root.add(child_a)
+        root.add(child_b)
+        root.add(child_c)
+
+        root._update_tree(0.016)
+
+        assert child_a.updated, "child_a should have been updated"
+        assert child_c.updated, "child_c should have been updated (snapshot protects)"
+
+    def test_handle_event_sibling_not_skipped_when_other_removed(self, game):
+        """EC5: A child removing a sibling during handle_event should
+        NOT cause that sibling to be skipped from the reversed snapshot."""
+        parent = Component(width=400, height=100)
+        parent._game = game
+        parent._computed_x = 0
+        parent._computed_y = 0
+        parent._computed_w = 400
+        parent._computed_h = 100
+
+        class CountEventComponent(Component):
+            def __init__(self, name):
+                super().__init__(width=100, height=100)
+                self.name = name
+                self.event_received = False
+
+            def on_event(self, event):
+                self.event_received = True
+                return False  # don't consume
+
+        class EventRemover(Component):
+            def __init__(self, target):
+                super().__init__(width=100, height=100)
+                self.target = target
+
+            def on_event(self, event):
+                if self.target._parent is not None:
+                    self.target._parent.remove(self.target)
+                return False
+
+        # reversed order: [d, remover_of_d, g] → g, remover, d
+        # remover removes d, but snapshot should protect d
+        d = CountEventComponent("d")
+        d._computed_x, d._computed_y = 0, 0
+        d._computed_w, d._computed_h = 100, 100
+
+        remover = EventRemover(d)
+        remover._computed_x, remover._computed_y = 100, 0
+        remover._computed_w, remover._computed_h = 100, 100
+
+        g_child = CountEventComponent("g")
+        g_child._computed_x, g_child._computed_y = 200, 0
+        g_child._computed_w, g_child._computed_h = 100, 100
+
+        parent.add(d)
+        parent.add(remover)
+        parent.add(g_child)
+
+        event = FakeEvent(type="click", button="left", x=150, y=50)
+        parent.handle_event(event)
+
+        assert g_child.event_received, "g_child should have received event"
+        assert d.event_received, "d should have received event (snapshot protects)"
+
+    def test_draw_new_child_added_during_draw_not_drawn_twice(self, game):
+        """Adding a child during draw should not cause infinite iteration."""
+        parent = Component(width=200, height=200)
+        parent._game = game
+        add_count = 0
+
+        class AdderChild(Component):
+            def on_draw(self):
+                nonlocal add_count
+                if add_count < 1:
+                    add_count += 1
+                    self._parent.add(Component(width=10, height=10))
+
+        child = AdderChild(width=50, height=50)
+        parent.add(child)
+
+        parent.draw()  # Must terminate
+        assert len(parent._children) == 2
+        assert add_count == 1
+
+
+# ===================================================================
 # Gap 4: Grid(0,0) / TabGroup empty / DataTable click empty
 # ===================================================================
 

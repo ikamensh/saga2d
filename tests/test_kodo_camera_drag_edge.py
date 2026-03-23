@@ -177,6 +177,67 @@ class TestCameraScreenToWorldNaN:
 
 
 # ======================================================================
+# 3b. F29: Camera.scroll() NaN/Inf validation
+# ======================================================================
+
+
+class TestCameraScrollNaNInf:
+    """F29 regression: scroll() must reject NaN and Inf deltas.
+
+    Before this fix scroll() silently propagated NaN/Inf into the camera's
+    internal position, corrupting all subsequent coordinate conversions.
+    center_on() and pan_to() already validated; scroll() was the odd one out.
+    """
+
+    def test_scroll_nan_dx_raises(self):
+        cam = Camera((800, 600))
+        cam.center_on(100, 100)
+        with pytest.raises(ValueError, match="finite"):
+            cam.scroll(float("nan"), 0)
+
+    def test_scroll_nan_dy_raises(self):
+        cam = Camera((800, 600))
+        cam.center_on(100, 100)
+        with pytest.raises(ValueError, match="finite"):
+            cam.scroll(0, float("nan"))
+
+    def test_scroll_inf_dx_raises(self):
+        cam = Camera((800, 600))
+        cam.center_on(100, 100)
+        with pytest.raises(ValueError, match="finite"):
+            cam.scroll(float("inf"), 0)
+
+    def test_scroll_neg_inf_dy_raises(self):
+        cam = Camera((800, 600))
+        cam.center_on(100, 100)
+        with pytest.raises(ValueError, match="finite"):
+            cam.scroll(0, float("-inf"))
+
+    def test_scroll_both_nan_raises(self):
+        cam = Camera((800, 600))
+        with pytest.raises(ValueError, match="finite"):
+            cam.scroll(float("nan"), float("nan"))
+
+    def test_scroll_finite_values_still_work(self):
+        """Normal finite scroll should not be affected by the guard."""
+        cam = Camera((800, 600))
+        cam.center_on(500, 400)
+        old_x, old_y = cam.x, cam.y
+        cam.scroll(10, -20)
+        assert cam.x == old_x + 10
+        assert cam.y == old_y - 20
+
+    def test_scroll_zero_works(self):
+        """scroll(0, 0) is a valid no-op."""
+        cam = Camera((800, 600))
+        cam.center_on(100, 100)
+        old_x, old_y = cam.x, cam.y
+        cam.scroll(0, 0)
+        assert cam.x == old_x
+        assert cam.y == old_y
+
+
+# ======================================================================
 # 4. Camera: shake with very large dt
 # ======================================================================
 

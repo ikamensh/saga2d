@@ -86,6 +86,13 @@ desired_examples/        # API design sketches
 ## Stage 3 / Stage 17 — UI & particle edge regressions (2026-03-23)
 
 - **Focused (34):** `tests/test_kodo_stage3_regression.py` — Grid 0× dims, empty TabGroup / bad key, ProgressBar max≤0 & negative value, `lifetime=(0,0)` + `fade_out`, `AnimationPlayer`/`AnimationDef` reject `frame_duration<=0`/non-finite, `List` `item_height=0`. Run: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage3_regression.py -q`.
-- **Broad (87):** `tests/test_kodo_ui_particle_edge.py` — component mutation during draw/event/update, gaps 4–6, extra widget/particle/camera cases. See `.kodo/test-coverage.md` Stage 17.
+- **Broad (87+):** `tests/test_kodo_ui_particle_edge.py` — includes **F30** `TestComponentMutationNoSkip` (snapshot `list(_children)` in draw/update/handle_event — see `saga2d/ui/component.py`). See `.kodo/test-coverage.md` Stage 17 + Stage 4 blocks.
 - **Mock input:** use `inject_mouse_move()`, not `inject_motion()` (worker_smart-notes).
 - **Related repros:** `tests/test_kodo_crossfade_repro.py`, `tests/test_kodo_particle_nan_lifetime.py` (F26 / animation–list edges); referenced from `.kodo/tester-notes.md`.
+
+## Stage 4 — camera non-finite + UI traversal (2026-03-23)
+
+- **F29:** `Camera.scroll()` raises `ValueError` on NaN/Inf deltas (like `center_on` / `pan_to`). Tests: `TestCameraScrollNaNInf` in `tests/test_kodo_camera_drag_edge.py`.
+- **F30:** `Component.draw` / `handle_event` / `_UIRoot._update_recursive` iterate over `list(_children)` so sibling add/remove during traversal cannot skip children. Tests: `TestComponentMutationNoSkip` in `tests/test_kodo_ui_particle_edge.py`.
+- **F31–F33:** `Camera.shake()` rejects non-finite params; `Camera.update()` returns early on non-finite `dt`; follow mode skips frame when target `x,y` non-finite. Suite: `tests/test_kodo_camera_nan_edge.py` (30 tests). Run: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_camera_nan_edge.py -v`.
+- Narrative + commands: `.kodo/test-coverage.md` (Stage 4 independent verify + deep investigation sections).

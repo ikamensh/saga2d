@@ -252,7 +252,9 @@ class Component:
             return False
 
         # Children in reverse order (front-most first).
-        for child in reversed(self._children):
+        # Snapshot via list() so that child event handlers that add/remove
+        # siblings don't corrupt the iterator (EC5 fix).
+        for child in reversed(list(self._children)):
             if child.handle_event(event):
                 return True
 
@@ -294,7 +296,9 @@ class Component:
         if not self.visible:
             return
         self.on_draw()
-        for child in self._children:
+        # Snapshot via list() so that on_draw() callbacks that add/remove
+        # siblings don't skip children or corrupt the iterator (EC4 fix).
+        for child in list(self._children):
             child.draw()
 
     def on_draw(self) -> None:
@@ -445,5 +449,7 @@ class _UIRoot(Component):
         if not component.visible:
             return
         component.update(dt)
-        for child in component._children:
+        # Snapshot via list() so that update() callbacks that add/remove
+        # siblings don't skip children or corrupt the iterator (EC3 fix).
+        for child in list(component._children):
             _UIRoot._update_recursive(child, dt)

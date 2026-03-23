@@ -1,6 +1,6 @@
 # Feature Coverage
 
-Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21. Stage 4 fixes: 2026-03-22. Fresh re-test: 2026-03-23. **Stage 1 re-verify:** commit `4227501`, 2026-03-23.
+Tracked across `kodo test` runs. Baseline: commit 477220f, 2026-03-21. Stage 4 fixes: 2026-03-22. Fresh re-test: 2026-03-23. **Stage 1 re-verify:** commit `4227501`, 2026-03-23. **Stage 4 independent verify + F29/F30 fixes:** 2026-03-23. **Stage 4 deep edge-case investigation + F31/F32/F33 fixes:** 2026-03-23.
 
 ## Stage 1 — Baseline install & full automated suite (verified 2026-03-23)
 
@@ -26,11 +26,11 @@ SAGA2D_HEADLESS=1 uv run python -m pytest tests/ \
 
 | Metric | Value |
 |--------|-------|
-| Collected | **2200** |
-| Passed | **2197** |
+| Collected | **2443** |
+| Passed | **2440** |
 | Skipped | **3** (`tests/core/test_game.py` — `game.run()` when `SAGA2D_HEADLESS` is set) |
 | Failed | **0** |
-| Duration | ~34 s (representative local run) |
+| Duration | ~30 s (representative local run, 2026-03-23 recount after F29/F30 fixes) |
 
 **Stage 1 verdict:** baseline automated tests **pass**; set **`SAGA2D_HEADLESS=1`** in CI so `TestHeadlessMode` in `tests/test_kodo_core_fresh.py` and the `game.run()` guard stay consistent.
 
@@ -1372,4 +1372,149 @@ SAGA2D_HEADLESS=1 uv run python -m pytest tests/ \
 - **2429 tests passing**, 3 skipped, 0 failures
 - **34 new focused regression tests** for 6 risky edge-case categories
 - **0 new bugs found** — all edge cases handled safely by existing guards
+- **0 known defects remaining** in source code
+
+## Stage 4 Independent Verification — Camera/Audio/Tween/Particle Edge Cases (2026-03-23)
+
+### Scope
+
+Independent fresh-agent verification of all Stage 4 edge-case coverage: camera NaN/Inf, audio crossfade, tween zero/NaN, particle lifetime, component tree mutation.
+
+### Commands Run
+
+| # | Command | Result |
+|---|---------|--------|
+| 1 | `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_camera_drag_edge.py -v` | **38 passed** (0.04s) |
+| 2 | `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_animation_tween_edge.py -v` | **44 passed** (0.03s) |
+| 3 | `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_particle_nan_lifetime.py tests/test_kodo_ui_particle_edge.py -v` | **107 passed** (0.07s) |
+| 4 | `SAGA2D_HEADLESS=1 uv run python -m pytest tests/systems/test_audio.py tests/test_kodo_crossfade_repro.py -v` | **122 passed** (0.26s) |
+| 5 | `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_systems_edge.py tests/test_kodo_widget_edge.py tests/test_kodo_timer_widget_edge.py tests/test_kodo_stage3_regression.py tests/test_kodo_actions_edge.py -v` | **231 passed** (0.19s) |
+| 6 | `SAGA2D_HEADLESS=1 uv run python camera_advanced_edge_e2e_headless.py` | **PASS** |
+| 7 | `SAGA2D_HEADLESS=1 uv run python tween_edge_e2e_probe.py` | **all PASS** |
+| 8 | `SAGA2D_HEADLESS=1 uv run python e2e_multifeature_headless.py` | **PASS** |
+
+### Bugs Found and Fixed
+
+#### F29: Camera.scroll() NaN/Inf silent corruption
+
+- **File:** `saga2d/rendering/camera.py`
+- **Repro:** `Camera.scroll(float('nan'), 0)` silently corrupted `_x`/`_y` — unlike `center_on()` and `pan_to()` which already validated.
+- **Fix:** Added `math.isfinite()` guard at top of `scroll()` — raises `ValueError`.
+- **Regression tests:** `TestCameraScrollNaNInf` (7 tests) in `tests/test_kodo_camera_drag_edge.py`.
+
+#### F30: Component tree iteration mutation skips children (EC3/EC4/EC5)
+
+- **File:** `saga2d/ui/component.py`
+- **Repro:** Component callbacks that remove siblings during `draw()`, `_update_recursive()`, or `handle_event()` caused CPython to silently skip subsequent children in the iteration.
+- **Fix:** Snapshot `_children` with `list()` in all three iteration sites, matching `TweenManager.update()` / `TimerManager.update()` pattern.
+- **Regression tests:** `TestComponentMutationNoSkip` (4 tests) in `tests/test_kodo_ui_particle_edge.py`.
+
+#### EC2 Clarification
+
+- Documented as "MoveTo.update(NaN) silently corrupts sprite.position" — **not reproducible**. `Sprite.position` setter already raises `ValueError` on non-finite values. No fix needed.
+
+### Full Suite Post-Fix
+
+```bash
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/ \
+  --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+# 2440 passed, 3 skipped in ~30s
+```
+
+### Updated Cumulative Totals (Stage 4 Verification)
+
+- **2440 tests passing**, 3 skipped, 0 failures
+- **24 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F25R, F28, F29, F30)
+- **5 documented behaviors** (F11, F13, F14, F17, F20)
+- **0 known defects remaining** in source code
+
+## Stage 4 Deep Edge-Case Investigation (2026-03-23, second independent agent)
+
+### Scope
+
+Second independent agent probed all four Stage 4 systems (camera, audio, tween, particles) for untested edge cases. Focused on coverage gaps not previously exercised: NaN/Inf in shake parameters, NaN dt in Camera.update(), NaN target position in follow mode, NaN in edge/key scroll, and crossfade with duration=0.
+
+### Methodology
+
+1. Read all source code for camera.py, audio.py, tween.py, particles.py
+2. Cross-referenced with all existing test files to identify coverage gaps
+3. Wrote and executed a 22-check probe script (`edge_case_probe.py`) targeting untested scenarios
+4. Confirmed 3 real bugs, implemented minimal fixes, wrote 30 regression tests
+5. Re-ran full suite (2470 passed, 3 skipped, 0 failures)
+
+### Coverage Gaps Identified and Probed
+
+| Edge Case | Previously Tested? | Bug Found? |
+|-----------|-------------------|------------|
+| Camera.shake(NaN intensity) | No | **Yes (F31)** — NaN propagated to shake_offset_x/y → corrupted coordinate conversion |
+| Camera.shake(Inf intensity) | No | **Yes (F31)** — `random.uniform(-inf, inf)` → NaN |
+| Camera.shake(NaN/Inf decay) | No | **Yes (F31)** — `(1-progress)**NaN` → NaN |
+| Camera.shake(NaN duration) | No | **Yes (F31)** — NaN bypassed both `> 0` and `<= 0` guards (IEEE 754) |
+| Camera.update(NaN dt) + key_scroll | No | **Yes (F32)** — `speed * NaN` → NaN added to _x/_y |
+| Camera.update(NaN dt) + edge_scroll | No | **Yes (F32)** — same corruption path |
+| Camera.update(NaN dt) + shake | No | **Yes (F32)** — NaN elapsed, NaN progress |
+| Camera.follow(NaN position target) | No | **Yes (F33)** — NaN position directly assigned to _x/_y |
+| Camera.follow(target becomes NaN) | No | **Yes (F33)** — mid-flight corruption |
+| Audio.crossfade(duration=0) | Partial (0.001s) | No — TweenManager validates, completes instantly |
+| Tween duration=0 | Yes | No — `elapsed >= duration` (0 >= 0) fires completion path, skips division |
+| Camera.pan_to(duration=0) | Yes | No — TweenManager handles it |
+| Particle speed min > max | Yes | No — `random.uniform` handles inverted range |
+
+### Bugs Found and Fixed
+
+#### F31: Camera.shake() accepts NaN/Inf for intensity, duration, decay
+
+- **File:** `saga2d/rendering/camera.py`, `Camera.shake()`
+- **Severity:** Medium (silent state corruption → NaN shake offsets → corrupted world_to_screen/screen_to_world)
+- **Root cause:** `shake()` had no `math.isfinite()` validation on its parameters, unlike `center_on()`, `scroll()`, and `pan_to()`. NaN intensity propagated through `random.uniform(-NaN, NaN)` → NaN. NaN decay caused `(1-progress)**NaN` → NaN. NaN duration bypassed both `> 0` and `<= 0` guards (IEEE 754: `NaN > 0` is False, `NaN <= 0` is also False).
+- **Fix:** Added `math.isfinite()` guard on all three parameters — raises `ValueError` (5 lines added, matching existing pattern).
+- **Regression tests:** `TestCameraShakeNaNInf` (12 tests) in `tests/test_kodo_camera_nan_edge.py`.
+
+#### F32: Camera.update() NaN/Inf dt silently corrupts position via key_scroll/edge_scroll
+
+- **File:** `saga2d/rendering/camera.py`, `Camera.update()`
+- **Severity:** Medium (silent position corruption)
+- **Root cause:** `update()` uses `dt` in multiplication for key_scroll (`speed * dt`), edge_scroll (`speed * dt`), and shake elapsed tracking (`elapsed += dt`). NaN or Inf dt propagated through these calculations to corrupt `_x`, `_y`, and `_shake_elapsed`. The TweenManager and TimerManager already had `math.isfinite(dt)` guards, but Camera.update() was missing one.
+- **Fix:** Added `if not math.isfinite(dt): return` early guard at top of `update()` (2 lines + comment, matching TweenManager.update() pattern).
+- **Regression tests:** `TestCameraUpdateNaNInfDt` (8 tests) in `tests/test_kodo_camera_nan_edge.py`.
+
+#### F33: Camera.follow() copies NaN position from followed sprite
+
+- **File:** `saga2d/rendering/camera.py`, `Camera.update()` follow section
+- **Severity:** Medium (silent position corruption from external sprite state)
+- **Root cause:** Follow tracking directly assigned `target.x - self._vw / 2` to `_x` without checking if the target's position is finite. If a sprite's position becomes NaN (e.g., from physics bugs, NaN velocity accumulation), the camera position silently corrupts. With `world_bounds`, `_clamp()` produces platform-dependent results due to `max(left, min(NaN, max_x))` IEEE 754 behavior.
+- **Fix:** Added `math.isfinite(tx) and math.isfinite(ty)` check before assigning — silently skips the frame if target is non-finite, preserving last valid position (2 lines).
+- **Regression tests:** `TestCameraFollowNaNTarget` (7 tests) + `TestCameraCoordinateConversionAfterNaNGuard` (3 tests) in `tests/test_kodo_camera_nan_edge.py`.
+
+### Verified Non-Bugs
+
+| System | Edge Case | Why It's Not a Bug |
+|--------|-----------|-------------------|
+| Tween | duration=0 | `elapsed >= duration` (0 >= 0) triggers completion path, never reaches `elapsed / duration` division |
+| Audio | crossfade(duration=0) | TweenManager.create() validates `duration >= 0` and accepts 0; tween completes on first update |
+| Particle | speed min > max | `random.uniform(max, min)` returns a value in `[min, max]` — Python handles inverted args |
+| Camera.follow | dt-independent tracking | Follow doesn't use dt — but entire update is skipped on NaN dt for consistency |
+
+### Regression Tests: 30 new tests in `tests/test_kodo_camera_nan_edge.py`
+
+| Class | Count | What |
+|-------|-------|------|
+| `TestCameraShakeNaNInf` | 12 | NaN/Inf/−Inf for intensity, duration, decay; finite values still work; zero/negative duration resets |
+| `TestCameraUpdateNaNInfDt` | 8 | NaN/Inf dt with key_scroll, edge_scroll, shake, follow; normal dt still works |
+| `TestCameraFollowNaNTarget` | 7 | NaN x, NaN y, Inf, becomes-NaN, recovers-from-NaN, with world_bounds, normal finite |
+| `TestCameraCoordinateConversionAfterNaNGuard` | 3 | world_to_screen/screen_to_world stay finite after NaN rejection |
+
+### Full Suite Post-Fix
+
+```bash
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/ \
+  --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+# 2470 passed, 3 skipped in ~34s
+```
+
+### Updated Cumulative Totals (Stage 4 Deep Investigation)
+
+- **2470 tests passing**, 3 skipped, 0 failures
+- **29 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F25R, F28–F33)
+- **5 documented behaviors** (F11, F13, F14, F17, F20)
 - **0 known defects remaining** in source code
