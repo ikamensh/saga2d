@@ -12,10 +12,9 @@
 - Crossfade repro: `SAGA2D_HEADLESS=1 .venv/bin/python -m pytest tests/test_kodo_crossfade_repro.py -v`
 - Clean run: `SAGA2D_HEADLESS= .venv/bin/python -m pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -v`
 
-## Test Results (updated 2026-03-23, post Stage 14)
-- **2304 tests passing**, 3 skipped, 0 failures
-- 24 bugs found and fixed (F1, F3-F10, F12, F15-F16, F18-F19, F21-F27)
-- 5 documented behaviors (F11, F13, F14, F17, F20), 11 sharp edges (SE1-SE11)
+## Test Results (updated 2026-03-23, post Stage 16)
+- **25 bugs found and fixed** (F1, F3-F10, F12, F15-F16, F18-F19, F21-F28)
+- 5 documented behaviors (F11, F13, F14, F17, F20), 11 sharp edges (SE1-SE11; SE12→F28)
 
 ## Stage 14 — Mini-App Integration Test & F27 Fix (2026-03-23)
 - **Created**: `tests/test_kodo_mini_app.py` — 47 tests exercising all 12+ Saga2D systems together in a realistic "dungeon crawler" mini-app
@@ -66,6 +65,25 @@
 - **File changed**: `saga2d/rendering/particles.py`
 - **Tests**: `tests/test_kodo_particle_nan_lifetime.py` (20 tests) — 8 rejection, 5 valid-still-works, 7 real workflow via Game.tick()
 - **Updated**: `tests/test_kodo_systems_edge.py` — changed pre-fix documentation test to expect ValueError
+
+## Stage 15 — Real User App Integration Test (2026-03-23)
+- **Created**: `real_user_app.py` — 23-phase realistic game with simulated input
+- **Systems exercised**: All 12+ systems end-to-end via mock backend with injected input
+- **23 phases**: Title→Settings→World→Combat→Collect→Inventory→Timers→Save/Load→Camera→Rapid clicks→Rapid transitions→HUD→Tweens→Audio→Coordinates→Sprite removal→Camera follow removal→Game restart→Quit-to-title→Many sprites→Window close
+- **64/64 state checks pass, 0 crashes, 0 bugs found**
+- **API discovery pitfalls** (useful for developers):
+  - `Style(bg_color=...)` is WRONG — use `Style(background_color=...)`
+  - `Anchor` enum does NOT have `BOTTOM_CENTER` — use `Anchor.BOTTOM`
+  - `SaveManager` slots are 1-indexed (`slot >= 1`), not 0-indexed
+  - `game.save()` saves the **top** scene's state — if a PauseScene overlay is on top, it saves PauseScene's empty state, not the game scene below
+  - Camera `_follow_target` is cleared lazily during `update()`, not immediately on `sprite.remove()`
+
+## Stage 16 — F28: Scene-owned timers survive overlay push/pop (2026-03-23)
+- **Bug**: SE12 promoted to F28. `_cleanup_exiting_scene()` unconditionally cancelled timers on push-over
+- **Fix**: Added `permanent: bool = True` param to `_cleanup_exiting_scene()`, `_apply_push()` passes `permanent=False`
+- **File changed**: `saga2d/scene.py` — 2 edits
+- **Tests**: 1 updated + 4 new in `tests/core/test_scene_timers.py`, 1 updated in `tests/kodo_test_scene_lifecycle.py`
+- **Also updated**: `real_user_app.py` (removed SE12 workaround), `scripts/overlay_timer_se12_repro.py` (flipped expected outcome)
 
 ## Key Architecture & API Notes
 - Sprite("sprites/knight", position=(x,y)) — needs real asset in assets/images/sprites/

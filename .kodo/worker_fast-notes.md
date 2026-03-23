@@ -41,6 +41,7 @@ desired_examples/        # API design sketches
 - Exploratory suite: `tests/kodo_test_scene_lifecycle.py` (75 tests). With core scene tests: `pytest tests/core/test_scene.py tests/kodo_test_scene_lifecycle.py`.
 - Ordering harness: `python -m tests.harness.lifecycle_tester -v` (do not `pytest tests/harness/lifecycle_tester.py` — not pytest tests).
 - **F5 (fixed 2026-03-22):** `on_exit` exceptions no longer leave scenes stuck — `try/finally` in `_apply_pop` / `_apply_replace`; `clear_and_push` runs cleanup per scene and re-raises first error after stack clear. Tests: `test_on_exit_exception_pops_scene`, `..._during_replace_...`, `..._during_clear_and_push_...`.
+- **F28 (fixed 2026-03-23):** `Scene.every()` / `after()` timers were cancelled on push-over (overlay) because `_cleanup_exiting_scene` always called `_cleanup_owned_timers`. Fix: `_cleanup_exiting_scene(..., permanent=True)`; `_apply_push` passes `permanent=False` so timers survive until pop/replace/clear_and_push. Tests: `tests/core/test_scene_timers.py` (push/preserve/covered/reveal/clear_and_push), `tests/kodo_test_scene_lifecycle.py::test_timers_preserved_on_push_over`. Repro: `uv run python scripts/overlay_timer_se12_repro.py`.
 
 ## Sprites, actions, animations (kodo Stage 3–4, 2026-03-21–22)
 

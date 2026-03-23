@@ -185,25 +185,112 @@ def test_on_exit_runs_before_timer_cleanup(game: Game) -> None:
 
 
 # ------------------------------------------------------------------
-# Auto-cancel on push (old scene exits)
+# Timers survive push-over (F28 fix)
 # ------------------------------------------------------------------
 
 
-def test_push_cancels_old_scene_timers(game: Game) -> None:
-    """Pushing a new scene auto-cancels the old scene's timers."""
+def test_push_preserves_old_scene_timers(game: Game) -> None:
+    """Pushing a new scene preserves the old scene's timers (F28 fix)."""
     fired: list[str] = []
 
     class TimerScene(Scene):
         def on_enter(self) -> None:
-            self.after(0.5, lambda: fired.append("should not fire"))
+            self.after(0.5, lambda: fired.append("fired"))
 
     game.push(TimerScene())
-    game.push(Scene())  # pushes over → old scene exits
+    game.push(Scene())  # pushes over — timers survive
 
     game.tick(dt=1.0)
-    game.tick(dt=1.0)
 
-    assert len(fired) == 0
+    assert len(fired) == 1
+    assert fired[0] == "fired"
+
+
+def test_covered_scene_timers_fire_while_covered(game: Game) -> None:
+    """Scene.every() keeps ticking while the scene is covered by an overlay."""
+    count: list[int] = []
+
+    class TimerScene(Scene):
+        def on_enter(self) -> None:
+            self.every(0.2, lambda: count.append(1))
+
+    game.push(TimerScene())
+    game.tick(dt=0.2)
+    assert len(count) == 1  # fires once while on top
+
+    game.push(Scene())  # overlay pushes over
+
+    game.tick(dt=0.2)
+    assert len(count) == 2  # still fires while covered
+    game.tick(dt=0.2)
+    assert len(count) == 3
+
+
+def test_push_then_permanent_removal_cleans_timers(game: Game) -> None:
+    """Timers survive push-over but are cancelled on clear_and_push."""
+    fired: list[str] = []
+
+    class TimerScene(Scene):
+        def on_enter(self) -> None:
+            self.every(0.2, lambda: fired.append("tick"))
+
+    game.push(TimerScene())
+    game.push(Scene())  # push-over — timers survive
+
+    game.tick(dt=0.2)
+    assert len(fired) == 1  # timer still firing
+
+    game.clear_and_push(Scene())  # permanent removal
+
+    game.tick(dt=0.2)
+    game.tick(dt=0.2)
+
+    assert len(fired) == 1  # no more ticks after permanent removal
+
+
+def test_push_pop_reveal_timers_still_fire(game: Game) -> None:
+    """Full push→pop→reveal cycle: timers fire throughout."""
+    count: list[int] = []
+
+    class TimerScene(Scene):
+        def on_enter(self) -> None:
+            self.every(0.2, lambda: count.append(1))
+
+    base = TimerScene()
+    game.push(base)
+
+    game.tick(dt=0.2)
+    assert len(count) == 1  # fires while on top
+
+    game.push(Scene())  # overlay
+    game.tick(dt=0.2)
+    assert len(count) == 2  # fires while covered
+
+    game.pop()  # remove overlay, reveal base
+    game.tick(dt=0.2)
+    assert len(count) == 3  # fires after reveal
+
+
+def test_after_timer_fires_while_covered(game: Game) -> None:
+    """One-shot after() fires while covered and self-removes from owned set."""
+
+    class TimerScene(Scene):
+        def on_enter(self) -> None:
+            self.result: list[str] = []
+            self.tid = self.after(0.5, lambda: self.result.append("done"))
+
+    scene = TimerScene()
+    game.push(scene)
+    assert scene.tid in scene._get_owned_timers()
+
+    game.push(Scene())  # overlay
+
+    game.tick(dt=1.0)  # timer fires while covered
+
+    assert len(scene.result) == 1
+    assert scene.result[0] == "done"
+    # One-shot timer self-removes from owned set after firing
+    assert scene.tid not in scene._get_owned_timers()
 
 
 # ------------------------------------------------------------------

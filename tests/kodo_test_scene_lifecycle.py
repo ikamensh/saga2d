@@ -1028,15 +1028,15 @@ class TestCleanupOrdering:
         # After being pushed over, A's sprites are cleaned up
         assert len(a._get_owned_sprites()) == 0
 
-    def test_timers_cleaned_on_push_over(self, game: Game) -> None:
-        """Timers are cleaned when a scene is pushed over."""
+    def test_timers_preserved_on_push_over(self, game: Game) -> None:
+        """Timers are preserved when a scene is pushed over (F28 fix)."""
         a = Tracker("A")
         game.push(a)
         fired: list[bool] = []
         a.after(1.0, lambda: fired.append(True))
         assert len(a._get_owned_timers()) > 0
         game.push(Tracker("B"))
-        assert len(a._get_owned_timers()) == 0
+        assert len(a._get_owned_timers()) > 0  # timers survive push-over
 
     def test_ui_preserved_when_pushed_over(self, game: Game) -> None:
         """UI tree is NOT cleared when pushed over (may be revealed later)."""

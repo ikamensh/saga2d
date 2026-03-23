@@ -466,6 +466,15 @@ Discovered via Stage 5 exploratory testing. All verified by execution.
 | Grid.set_cell allows out-of-bounds | No bounds validation — component stored but never drawn/hit-tested. Harmless. |
 | TabGroup has no remove_tab() API | Removing a child component doesn't clean up internal tab tracking. Design gap, not bug. |
 
+### Runnable script — animation edge cases (manual E2E echo, 2026-03-23)
+
+| Item | Detail |
+|------|--------|
+| **Script** | `scripts/animation_edge_user_probe.py` |
+| **Run** | `uv run python scripts/animation_edge_user_probe.py` (from repo root) |
+| **What it prints** | Live outcomes for `AnimationDef` / `AnimationPlayer` with `frame_duration` in `{0, negative, NaN, ±Inf}`; `AnimationDef(frames=[])` construction; empty resolved frames + `Sprite.play` E2E; single-frame non-loop / loop; `AnimationPlayer.update(float('nan'))`; invalid duration blocked before `play`. |
+| **Pytest overlap** | Same invariants are covered in `tests/test_kodo_animation_tween_edge.py` and `tests/rendering/test_animation.py`; the script is for readable repro output without parsing pytest. |
+
 ## Stage 10 — NaN/Inf Validation Gaps in Tween/Timer/Actions/Widgets (2026-03-23, Run 3)
 
 ### Systematic NaN/Inf validation audit
@@ -665,8 +674,13 @@ Seven areas identified for deeper testing:
 | `duration = 0` → completes on first update | 157 | ✅ Works, tested |
 | `from_val`/`to_val` NaN/Inf → ValueError | 108–110 | ✅ Original code |
 | `dt` NaN/Inf → silent skip | 150–151 | ✅ Safe |
+| `dt` ≫ `duration` (spike) | 156–157 | ✅ Single update completes; lands on `to_val`, tween removed |
+| Very large finite `duration` | 170–172 | ✅ Stable: `progress = elapsed/duration` until complete |
+| Very small positive `duration` | 156–157 | ✅ Completes when first `dt` exceeds duration |
 
 **Existing tests:** `tests/actions/test_tween.py` (417 lines), `tests/test_kodo_animation_tween_edge.py` (535 lines), `tests/test_kodo_regression.py::TestF21TweenDurationValidation`
+
+**User E2E probe (2026-03-23):** From repo root, `uv run python tween_edge_e2e_probe.py` exercises **`Game` + `Scene` + `tween()` + `game.tick()`** (not only `TweenManager` unit tests). Observed: invalid durations raise `ValueError` at `tween()` time; `duration=0` snaps and runs `on_complete` on first tick (including `tick(0)`); `duration=1e-15` completes in one `tick(0.016)`; `duration=1e6` advances linearly on small ticks; `duration=100` with `tick(5000)` finishes in one step. **`Game.tick` does not validate `dt`:** negative `dt` subtracts from tween `elapsed`, so `progress` can be negative and the eased value can sit **outside** `[from_val, to_val]` until positive `dt` catches up — stable but a **sharp edge** if callers ever pass negative delta time (normal pyglet/mock clocks are non-negative).
 
 **Remaining test gaps:**
 
@@ -676,7 +690,7 @@ Seven areas identified for deeper testing:
 | Multiple tweens on same property simultaneously | Create two tweens on `obj.x`, verify last-write-wins behavior |
 | Cancel tween inside `on_complete` callback | Verify no crash, tween manager state consistent |
 | Tween target property raises on set | Use `@property` with setter that raises, verify tween removed gracefully |
-| Tween with dt=0 (zero-time step) | Verify tween does not advance, no division issues |
+| Tween with dt=0 (zero-time step) | Normal `duration>0`: one `tick(0)` does not advance; `duration=0` completes (see probe above) |
 
 ### Gap 6: Camera Advanced Scenarios
 
@@ -1130,4 +1144,45 @@ Built a realistic "dungeon crawler" mini-app (`tests/test_kodo_mini_app.py`) tha
 - **24 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F27)
 - **5 documented behaviors** (F11, F13, F14, F17, F20)
 - **11 sharp edges** (SE1–SE11)
+- **0 known defects remaining** in source code
+
+## Stage 16 — F28: Scene-owned timers survive overlay push/pop (2026-03-23)
+
+### Approach
+
+Fixed SE12 (sharp edge discovered in Stage 15): `Scene.every()` and `Scene.after()` timers were permanently cancelled when any overlay scene was pushed on top, even though the base scene remained in the stack. Root cause: `SceneStack._cleanup_exiting_scene()` unconditionally called `_cleanup_owned_timers()` for both temporary (push-over) and permanent (pop/replace) exits.
+
+### Fix: Gate timer cleanup on `permanent` flag
+
+Added `*, permanent: bool = True` parameter to `_cleanup_exiting_scene()`. Only `_apply_push()` passes `permanent=False` — all other callers (pop, replace, clear_and_push) use the default `True`.
+
+**File changed:** `saga2d/scene.py` — 2 edits (parameter addition + call-site update)
+
+### Test Changes
+
+**Updated tests** (inverted assertions):
+- `tests/core/test_scene_timers.py`: `test_push_cancels_old_scene_timers` → `test_push_preserves_old_scene_timers`
+- `tests/kodo_test_scene_lifecycle.py`: `test_timers_cleaned_on_push_over` → `test_timers_preserved_on_push_over`
+
+**New regression tests** in `tests/core/test_scene_timers.py`:
+1. `test_covered_scene_timers_fire_while_covered` — `every()` keeps ticking under overlay
+2. `test_push_then_permanent_removal_cleans_timers` — timers survive push but die on `clear_and_push`
+3. `test_push_pop_reveal_timers_still_fire` — full push→pop→reveal cycle, timers work throughout
+4. `test_after_timer_fires_while_covered` — one-shot `after()` fires while covered, self-removes from owned set
+
+**Other files updated:**
+- `real_user_app.py` — removed SE12 workaround (timer re-creation in Phase 9)
+- `scripts/overlay_timer_se12_repro.py` — flipped expected outcome to confirm fix
+
+### Feature Map Update
+
+| # | Feature / Workflow | Test File(s) | Test Count | Last Tested | Status | Findings |
+|---|-------------------|-------------|-----------|-------------|--------|----------|
+| 56 | Scene-owned timers survive overlay push/pop | test_scene_timers.py | 5 (1 updated + 4 new) | 2026-03-23 | pass | F28 fix |
+
+### Updated Cumulative Totals
+
+- **25 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F28)
+- **5 documented behaviors** (F11, F13, F14, F17, F20)
+- **11 sharp edges** (SE1–SE11; SE12 promoted to F28)
 - **0 known defects remaining** in source code
