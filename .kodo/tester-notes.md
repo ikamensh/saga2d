@@ -1,5 +1,48 @@
 # Tester Notes - Saga2D
 
+## 2026-03-23 — Stage 14 mini-app + F27 DataTable (tester re-verify)
+
+- **Ran:** `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_mini_app.py -q` → **47 passed**; full tree  
+  `uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q` → **2304 passed, 3 skipped** (~29s).
+- **F27 fix:** `DataTable.on_event()` early-returns when `_row_height <= 0` before `relative_y // _row_height` (`saga2d/ui/widgets.py`). Unguarded division → `ZeroDivisionError`; current `on_event(click)` returns `True` without crash.
+- **Workflow nuance:** E2E title→game→inventory uses `InventoryScene.stats_table` with **`row_height=28`** only. **`row_height=0`** is exercised in **`TestBugDiscovery`** (synthetic table + direct `on_event`), not the story Inventory UI.
+- **`~/.kodo/runs/20260323_163501/test-report.md`** matches repo **`.kodo/test-coverage.md`** Stage 14 on counts, F27 story, and `widgets.py` change; neither is a shell log — numbers **confirmed** by local pytest run above.
+
+## 2026-03-23 — Multi-feature headless user workflow (tester agent)
+
+- **Script:** `e2e_multifeature_headless.py` — `TitleScene` (Panel, Label, Button) → click → `WorldScene`: `Camera` + `pan_to` (tween), `enable_key_scroll`, `Sprite` + `Sequence`/`Parallel`/`PlayAnim`/`MoveTo`/`Do`, `ParticleEmitter.burst` + `stop`, `tween(ProgressBar)`, `play_sound` + `play_music` + `crossfade_music` + `stop_music` on exit. **Run:** `SAGA2D_HEADLESS=1 uv run python e2e_multifeature_headless.py` → prints `PASS`.
+- **Pyglet/screenshots in agent/sandbox:** `render_scene()` can fail with `IndexError: list index out of range` in `display.get_default_screen()` when no display screens exist — not a Saga2D bug. Real macOS desktop: usually OK with `visible=False`.
+- **Default input:** Camera key scroll uses **arrow keys** only (`InputManager` binds `left`/`right`/… to arrow keys, not WASD).
+
+## 2026-03-23 — Focused E2E: particles, empty widgets, tween, camera (Stage 11C)
+
+- **Automated:** Single pytest bundle → **449 passed, 0 failed** (~0.4s). Exact command and file list → `.kodo/test-coverage.md` § **Stage 11C**.
+- **Smoke:** `Grid(0,0)`, `TabGroup()`, `DataTable(columns=[], rows=[])`, `TweenManager` `duration=0` + `update(0)` → target snaps; `Game` + `push(Scene)` + `tick` + `_teardown`. **`Label`** is not in `saga2d.ui.widgets` (import from `saga2d.ui.components` / top-level saga2d).
+- **Manual:** With active `Game`, `Camera.pan_to(..., duration=inf)` → **`ValueError`** (tween duration validation). **PB1 — particle lifetime NaN (reproduced 2026-03-23):** `ParticleEmitter(..., lifetime=(nan,nan))` + **`burst()`** (burst required — ctor `count` does not spawn) → `random.uniform(nan,nan)` → nan; **`nan <= 0` is False** → particles **never** die; `is_active` stays True. **Repro:** `uv run python reproduce_particle_nan_lifetime.py`. **Pytest:** `tests/test_kodo_systems_edge.py::TestParticleEmitterNaNLifetime`. Mitigation until fix: validate lifetime in ctor or `remove()`.
+- **Grid 0×0 + mock click** in a real `Scene.ui` → OK. **Keyboard on Grid:** no handler (only click/motion) — Stage 11 “arrow keys on 0×0 Grid” is N/A.
+
+## 2026-03-23 — Tester agent: install + full suite (4227501)
+
+- **Install:** README `pip install -e ".[dev]"` in a **clean venv** → OK (verified with system Python 3.13). Repo workflow: **`uv sync --extra dev`** + `uv run …` (requires `uv`). Smoke: `uv run python -c "from saga2d import Game, Scene; g=Game('t',backend='mock'); g.push(Scene()); g.tick(0.016); g._teardown()"` → OK.
+- **Full automated suite (no display/screenshot dirs):**  
+  `SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q` → **2200 collected, 2197 passed, 3 skipped** (~34s). Skips: `tests/core/test_game.py` — `game.run()` disabled under `SAGA2D_HEADLESS`.
+- **Visual buckets:** `pytest tests/screenshot tests/visual tests/visual_verify` → **92 skipped** here (markers / no GPU path).
+- **Artifacts / logs:** Pytest cache in **`.pytest_cache/`** (gitignored). No default JUnit/HTML output unless added to pytest config.
+- **Gotcha:** `env -u SAGA2D_HEADLESS` → **2 failed** in `tests/test_kodo_core_fresh.py::TestHeadlessMode` (tests assert the var is set). **CI:** export `SAGA2D_HEADLESS=1`.
+
+## Gap map — targeted areas → implementation (tests in parentheses)
+
+- **Targeted gap areas:**
+  | Area | Code |
+  |------|------|
+  | AnimationPlayer / `frame_duration` | `saga2d/animation.py` (`AnimationPlayer`, `AnimationDef`); wired from `saga2d/rendering/sprite.py`. Tests: `tests/rendering/test_animation.py`, `tests/test_kodo_animation_tween_edge.py`. |
+  | List `item_height` | `saga2d/ui/widgets.py` (`List`). Tests: `tests/ui/test_widgets.py`, `tests/test_kodo_widget_edge.py`, `tests/test_kodo_timer_widget_edge.py`. |
+  | Particle lifetime | `saga2d/rendering/particles.py` (`ParticleEmitter`, `_Particle`); tick in `saga2d/game.py` `_update_particles`. Tests: `tests/rendering/test_particles.py`, `tests/test_kodo_systems_edge.py`, `tests/test_kodo_rendering_ui_fresh.py`. |
+  | Grid / TabGroup / DataTable empty states | `saga2d/ui/widgets.py` (`Grid`, `TabGroup`, `DataTable`). Tests: `tests/test_kodo_widget_edge.py`, `tests/test_kodo_timer_widget_edge.py`, `tests/test_kodo_rendering_ui_fresh.py`, `tests/kodo_test_systems.py`. |
+  | Tween duration | `saga2d/util/tween.py` (`tween()`, `TweenManager`, duration validation). Tests: `tests/actions/test_tween.py`, `tests/test_kodo_animation_tween_edge.py`, `tests/test_kodo_core_fresh.py` (tween section). |
+  | Camera “advanced” (no zoom/rotate) | `saga2d/rendering/camera.py` — follow, edge scroll, `world_bounds`, `pan_to` + tween cancel, shake coord mapping. Tests: `tests/rendering/test_camera.py`, `tests/test_kodo_camera_drag_edge.py`, `tests/kodo_test_rendering.py`. |
+  | Audio crossfade state | `saga2d/audio.py` (`_crossfade_old_player`, `_crossfade_tween_ids`, `_cancel_crossfade`, `_finish_crossfade`, `crossfade_music`). Tests: `tests/systems/test_audio.py`, `tests/kodo_test_stage7_e2e.py`, `tests/test_kodo_systems_edge.py`, `tests/integration/test_adversarial.py`. |
+
 ## Stage 7 — F13/F14 adversarial + final report structure (verified 2026-03-22)
 
 - **Commands (all PASS):**

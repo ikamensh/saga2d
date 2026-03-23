@@ -4,117 +4,81 @@
 - Location: `/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d`
 - Python: `.venv/bin/python` (3.13.2) — do NOT use system python3
 - Package manager: `uv` (`uv pip install -e ".[dev]"`)
-- Current commit: `477220f`
-- `SAGA2D_HEADLESS=1` is set in environment — causes 3 game.run() test failures
+- Current commit: `4227501`
+- `SAGA2D_HEADLESS=1` is set in environment — causes 3 game.run() test failures (skipped)
 
 ## Test Commands
-- Full suite: `.venv/bin/python -m pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -v`
-- Clean run (0 failures): `SAGA2D_HEADLESS= .venv/bin/python -m pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -v`
-- Scene lifecycle: `.venv/bin/python -m pytest tests/kodo_test_scene_lifecycle.py -v`
-- Sprite/action/animation: `.venv/bin/python -m pytest tests/kodo_test_sprite_actions.py -v`
-- Persistence/resources: `.venv/bin/python -m pytest tests/kodo_test_persistence_resources.py -v`
-- Stage 7 E2E: `.venv/bin/python -m pytest tests/kodo_test_stage7_e2e.py -v`
-- All kodo tests: `.venv/bin/python -m pytest tests/kodo_test_core.py tests/kodo_test_rendering.py tests/kodo_test_systems.py tests/kodo_test_scene_lifecycle.py tests/kodo_test_sprite_actions.py tests/kodo_test_persistence_resources.py tests/kodo_test_persistence_resources_ext.py tests/kodo_test_stage7_e2e.py -v`
+- Full suite: `SAGA2D_HEADLESS=1 .venv/bin/python -m pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q`
+- Crossfade repro: `SAGA2D_HEADLESS=1 .venv/bin/python -m pytest tests/test_kodo_crossfade_repro.py -v`
+- Clean run: `SAGA2D_HEADLESS= .venv/bin/python -m pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -v`
 
-## Test Results (updated 2026-03-22, Stage 7 + Adversarial)
-- 1411 main tests: all pass (SAGA2D_HEADLESS unset)
-- 664 kodo tests: all pass (8 files: core, rendering, systems, scene_lifecycle, sprite_actions, persistence, persistence_ext, stage7_e2e)
-- 78 example tests: all pass
-- 383 UI tests: all pass across 6 files
-- Stage 7: 62 base E2E + 8 adversarial = 70 tests in kodo_test_stage7_e2e.py
-- F13: NaN dt in Delay/FadeOut/FadeIn — documented, not fixed (5 tests)
-- F14: play_sound channel='music'/'master' accepted — documented, not fixed (3 tests)
+## Test Results (updated 2026-03-23, post Stage 14)
+- **2304 tests passing**, 3 skipped, 0 failures
+- 24 bugs found and fixed (F1, F3-F10, F12, F15-F16, F18-F19, F21-F27)
+- 5 documented behaviors (F11, F13, F14, F17, F20), 11 sharp edges (SE1-SE11)
 
-## Confirmed Findings
-- F1: cursor crash on FakeGame → fixed (commit 477220f)
-- F2: Repeat action yields 1/tick → design intent
-- F3: Sprite.move_to() speed=0/negative → fixed (commit 477220f)
-- F4: Button fires on right-click → fixed (commit 477220f)
-- F5: on_exit exception leaves scene stuck → **fixed 2026-03-22**
-  - scene.py: _apply_pop/replace use try/finally to pop before exception propagates
-  - scene.py: _apply_clear_and_push catches on_exit errors, cleans all scenes, re-raises first error
-  - 3 regression tests: pop, replace, clear_and_push paths
-- F6: sprite.do() inside Do callback drops new action → **fixed 2026-03-22**
-  - sprite.py update_action(): saves ref before update(dt), only clears if action unchanged
-  - Regression test: test_do_replaces_action_during_sequence_f6
-- F7: Animation queue chains of 3+ broken → **fixed 2026-03-22**
-  - sprite.py play(): added `_from_drain` param, skips queue.clear() when called from _drain_queue
-  - Regression test: test_queue_chain_three_f7
-- F8: Binary save file corruption → unhandled UnicodeDecodeError → **fixed 2026-03-22**
-  - save.py load(): added UnicodeDecodeError to except clause
-  - 2 regression tests: test_load_binary_content_raises_save_error, test_list_slots_with_binary_at_slot
-- F9: Valid JSON non-object (e.g. [1,2,3]) crashes list_slots/SaveLoadScreen → **fixed 2026-03-22**
-  - save.py load(): added `isinstance(data, dict)` check after json.loads(), raises SaveError if not dict
-  - 6 regression tests: array, string, null, number, boolean non-objects + list_slots with array
-  - Updated 3 existing tests that expected old buggy pass-through behavior
+## Stage 14 — Mini-App Integration Test & F27 Fix (2026-03-23)
+- **Created**: `tests/test_kodo_mini_app.py` — 47 tests exercising all 12+ Saga2D systems together in a realistic "dungeon crawler" mini-app
+- **Three scenes**: TitleScene (menu), GameScene (sprites/camera/particles/actions/timers/FSM/audio), InventoryScene (overlay with List/DataTable/TextBox)
+- **F27 found and fixed**: DataTable(row_height=0) ZeroDivisionError — same class as F24 (List widget). Added `if self._row_height <= 0: return True` guard in `DataTable.on_event()`
+- **File changed**: `saga2d/ui/widgets.py`
+- **Key integration patterns**: FSM transitions use nested dict `{state: {event: target}}`, Label uses `.text` property setter not `._text`, List uses `.selected_index` not `.selected`, Camera follow updates during `camera.update(dt)` not immediately, audio crossfade needs patched `audio._assets.music`/`audio._assets.sound` lambdas for mock backend
 
-- F10: Game.__del__ crashes on partial init → **fixed 2026-03-22**
-  - game.py _teardown(): hasattr guards for _timer_manager, _tween_manager, _scene_stack
-  - 2 regression tests: test_teardown_safe_after_partial_init_f10, test_del_safe_after_partial_init_f10
-- F11: Game.__del__ stderr on normal exit → **not fixed** (low value, try/except already catches)
-- F12: Camera shake vs mouse picking → **fixed 2026-03-22**
-  - camera.py: screen_to_world/world_to_screen now include _shake_offset_x/_y
-  - 7 regression tests in TestShakePickingRegression (unit + E2E)
-- F13: NaN dt in Delay/FadeOut/FadeIn → **not fixed** (documented with 5 tests)
-  - Delay.update(NaN): elapsed=NaN, action stuck forever (NaN >= seconds is False)
-  - FadeOut/FadeIn.update(NaN): ValueError from int(NaN)
-  - No known production path produces NaN dt; fix would be math.isfinite guard
-- F14: play_sound channel='music'/'master' accepted → **not fixed** (documented with 3 tests)
-  - Docstring says only sfx/ui, but validation uses `channel not in self._volumes` which includes all 4
-  - Functionally harmless — just applies different channel volume
+## Stage 12 Investigation (2026-03-23) — Audio Crossfade + Fix Verification
 
-## Sharp Edges (design-intent, verified by execution)
-- SE1: list_slots() aborts on first corrupt slot — no partial results
-- SE2: game.save() saves top scene only — bottom scene state invisible
-- SE3: game.load() with empty stack returns data but skips load_save_state()
-- SE4: game.save() after _teardown() is silent noop (top()=None → early return)
-- SE5: push() strips old top's resources (sprites removed, timers cancelled) — recreate in on_reveal()
-- SE6: push() fires on_exit() on old top (not just pop/replace)
-- SE7: failed save (non-serializable) leaves original file intact via atomic write
-- SE8: SaveManager.load() now validates top-level is dict (F9 fix) — but doesn't validate envelope keys; wrong-typed "state" still loads fine
-- SE9: Game.load() passes data["state"] to load_save_state without type-checking (list/None/string all passed through)
-- SE10: Future version numbers (version=99) load without error — no version gating in load()
+### Audio Crossfade: No State Corruption Bug Found
+- `_CrossfadeProxy` reads `_volumes` dict **live** on each setter call — channel volume changes propagate on next tween tick automatically
+- **SE11 (sharp edge)**: `set_volume()` mid-crossfade immediately re-applies to `_current_player_id` (new player) but NOT `_crossfade_old_player`. The old player has stale effective volume for **one frame** until the next tween tick via proxy. Not audible, not a bug.
+- `duration=0`: both tweens complete on first `game.tick()`, old player stopped, state clean
+- Missing asset during crossfade: `_cancel_crossfade()` runs first (cancels tweens, stops old player), then `AssetNotFoundError` propagates — state consistent
+- Rapid interruptions (4 crossfades): each cancels the previous, no player leak
+- `_teardown` during crossfade: clean shutdown via `stop_music()` → `_cancel_crossfade()`
+- Pool duplicate names: no-repeat uses index exclusion, not name — can "repeat" same sound via different indices. Design intent.
+- Negative duration → `ValueError` from `TweenManager.create()`
 
-## Stage 6C: Shake vs Picking + F10/F11 (2026-03-22)
-- **F12**: Camera shake vs mouse picking — `screen_to_world`/`world_to_screen` now include shake offsets
-  - camera.py: both methods add `_shake_offset_x/_y` to match rendering in `_sync_sprites_to_camera`
-  - 7 regression tests in `tests/rendering/test_camera.py::TestShakePickingRegression`
-  - E2E test proves click at rendered sprite position → correct world coords during shake
-- **F10**: Game.__del__ crash on partial init — `_teardown()` now uses `hasattr` guards
-  - game.py: guards `_timer_manager`, `_tween_manager`, `_scene_stack` with hasattr checks
-  - 2 regression tests in `tests/kodo_test_persistence_resources.py::TestTeardownCompleteness`
-- **F11**: Game.__del__ stderr on normal exit — NOT FIXED (low value)
-  - Only fires if user forgets `_teardown()` + script exit with scenes on stack
-  - `game.run()` always calls `_teardown()` in finally block, so production code unaffected
-  - Existing `try/except` in `__del__` prevents propagation; just stderr noise
+### AnimationPlayer frame_duration=0: Fix Verified ✅
+- `AnimationDef.__init__` + `AnimationPlayer.__init__`: `if not math.isfinite(frame_duration) or frame_duration <= 0: raise ValueError`
+- 10 repros: 0, negative, NaN, Inf, -Inf for both classes, normal operation, loop-doesn't-hang
 
-## Stage 6A: Clean-Room Install Findings (2026-03-22)
-- `pip install .` works cleanly, installs saga2d + numpy + Pillow + pyglet
-- `pip install -e ".[dev]"` also works, 1401/1404 tests pass (3 SAGA2D_HEADLESS failures)
-- **F10**: Game.__del__ crashes on partial init — if Game() throws (e.g. wrong kwargs), `_teardown()` in `__del__` hits `AttributeError: 'Game' object has no attribute '_timer_manager'`. Repro: `Game('x', width=320)` → stderr noise.
-- **F11**: Game.__del__ stderr noise on normal script exit — if user forgets `_teardown()` and script ends with scene on stack, `__del__` → `_teardown()` → `_cleanup_exiting_scene` → `ImportError: sys.meta_path is None` during Python shutdown. Repro: push a scene, don't teardown, exit script.
-- Game is a singleton — second `Game()` without teardown raises RuntimeError
-- No public `top()` on Game — must use `g._scene_stack.top()` (private API)
-- No `camera` on Game — camera is per-scene (accessed via `getattr(scene, 'camera', None)`)
-- No `tween` on Game — `tween()` is a module-level function
-- `SaveManager(save_dir)` requires `Path`, not `str`
-- `MoveTo((x,y), speed=n)` — position is a tuple, not two args
-- `Panel()` doesn't take `x=`/`y=` kwargs — use `layout=`/`anchor=` based construction
-- `Scene.add_sprite()` not `Scene.add()` for sprites; `scene.ui.add()` for UI
-- `StateMachine(states_list, initial, transitions=dict)` not `StateMachine(initial)`
+### List item_height=0: Fix Verified ✅
+- `List.on_event()`: `if self._item_height <= 0: return True` at click and motion paths
+- `_visible_count()`: returns 0 when item_height ≤ 0
+- 5 repros: 0 click, 0 motion, 0 visible_count, -10 click, normal click
+
+### Test File
+`tests/test_kodo_crossfade_repro.py` — 39 tests (all pass)
+
+## Stage 11B Audit (2026-03-23) — New Edge Cases
+- **EC1**: DataTable(row_height=0) click → ZeroDivisionError (widgets.py on_event, no guard like List has)
+- **EC2**: MoveTo.update(dt=NaN) silently corrupts sprite.position to (NaN,NaN) — no production path
+- **EC3–EC5**: component.py iterates _children directly in draw(), handle_event(), _update_recursive() — no snapshot copy like TweenManager/TimerManager use → mutation during dispatch can skip/crash
+- All details in `.kodo/test-report.md` and `.kodo/test-coverage.md` Stage 11B section
+
+## Remaining Gaps (from Stage 11 discovery, not yet tested)
+- ~~**Gap 3**: Particle NaN lifetime (PB1) — immortal particles, memory leak risk~~ **FIXED as F26 in Stage 13**
+- **Gap 4**: Widget edge cases — Grid(0,0) keyboard nav, TabGroup add/select empty, DataTable click empty
+- **Gap 5**: Tween from==to no-op, concurrent tweens, cancel-in-callback
+- **Gap 6**: Camera pan_to(Inf), shake(decay=0), update(dt=0), large viewport vs small bounds
+
+## Stage 13 — F26: ParticleEmitter NaN Lifetime Fix (2026-03-23)
+- **Bug**: `lifetime=(nan, nan)` → `random.uniform(nan,nan)` returns NaN → `NaN <= 0` is False → particle never dies
+- **Fix**: Added `math.isfinite()` + `>= 0` validation in `ParticleEmitter.__init__` for both lifetime tuple values
+- **File changed**: `saga2d/rendering/particles.py`
+- **Tests**: `tests/test_kodo_particle_nan_lifetime.py` (20 tests) — 8 rejection, 5 valid-still-works, 7 real workflow via Game.tick()
+- **Updated**: `tests/test_kodo_systems_edge.py` — changed pre-fix documentation test to expect ValueError
 
 ## Key Architecture & API Notes
 - Sprite("sprites/knight", position=(x,y)) — needs real asset in assets/images/sprites/
 - Available test images: knight, knight_walk_01-03, knight_attack_01-03, enemy, crate, background
-- Sprite.do(action) → registers in game._action_sprites; update_action() called each tick
-- Sprite.play(anim) → registers in game._animated_sprites; update_animation() each tick
 - Tick order: input → scene update → actions → particles → timers → tweens → animations → draw
-- Actions run before animations — action callbacks can queue animations for same frame
-- Sequence chains instant actions (dt=0 for next child) — Delay first tick gets dt=0 if preceded by instant
-- Parallel finishes when all *finite* children done, stops infinite ones
-- Repeat yields after each iteration (1 per tick for instant children)
-- Z-order: layer * 100_000 + int(y). Higher y → drawn in front.
-- Removed sprite: _removed=True, deregistered from all game sets, property sets still work internally but don't sync to backend
+- Removed sprite: _removed=True, deregistered from all game sets
 - FakeGame can't call draw() (no _backend) — use real Game fixture for draw tests
 - MockBackend.inject_key(key, type="key_press") — NOT pressed=True
-- Scene owned timers: _get_owned_timers() (lazy set)
+- Game is a singleton — `_teardown()` between instances
+- Camera is per-scene, not per-game
+- `tween()` is module-level function
+- `SaveManager(save_dir)` requires `Path`, not `str` (fixed F19: now auto-converts)
+- `_CrossfadeProxy` in `audio.py` bridges tween system to backend player volumes
+- `_cancel_crossfade()` stops old player tweens AND the old fading-out player
+- List `on_event()` uses `InputEvent` (frozen dataclass from `saga2d.input`) — FakeEvent objects must include `action` attribute
+- Widget `hit_test` needs `_computed_x/y/w/h` to be set manually in unit tests

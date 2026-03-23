@@ -265,6 +265,27 @@ class TestParticleEmitterNaNPosition:
         emitter.remove()
 
 
+class TestParticleEmitterNaNLifetime:
+    """lifetime=(nan, nan): now rejected at construction (F26 fix).
+
+    Previously particles with NaN lifetime never died (IEEE 754: nan <= 0 is
+    False).  Fix validates lifetime in ``ParticleEmitter.__init__``.
+    """
+
+    def test_nan_lifetime_raises_value_error(
+        self, mock_game: Any
+    ) -> None:
+        from saga2d.rendering.particles import ParticleEmitter
+
+        with pytest.raises(ValueError, match="finite"):
+            ParticleEmitter(
+                "sprites/spark",
+                position=(100, 100),
+                count=3,
+                lifetime=(float("nan"), float("nan")),
+            )
+
+
 class TestParticleEmitterLargeDt:
     """update() with very large dt should kill all particles."""
 

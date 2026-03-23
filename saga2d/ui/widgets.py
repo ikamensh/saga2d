@@ -1825,6 +1825,8 @@ class DataTable(Component):
         # Mouse click — determine which data row was clicked.
         if event.type == "click" and event.button == "left":
             if self.hit_test(event.x, event.y):
+                if self._row_height <= 0:
+                    return True
                 relative_y = event.y - self._computed_y - self._header_height
                 if relative_y >= 0:
                     row_idx = self._scroll_offset + int(relative_y // self._row_height)

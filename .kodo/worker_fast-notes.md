@@ -74,3 +74,10 @@ desired_examples/        # API design sketches
 - **F14 (documented, not fixed):** `play_sound` doc says `sfx`/`ui` only; code accepts any key in `_volumes` (`music`/`master`). Subclass: `TestPlaySoundChannelValidation`.
 - **Tilemaps:** not a first-class engine feature — grid/sprite workflows in examples/tutorials only.
 - Coverage narrative: `.kodo/test-coverage.md` Stage 7 block; commands also in `.kodo/tester-notes.md`.
+
+## Multi-feature mini-app + particle/datatable hardening (2026-03-23)
+
+- **Suite:** `tests/test_kodo_mini_app.py` — headless mock E2E across scenes, sprites, UI, particles, anims, tween, camera, input, save/load, audio APIs (~47 tests). Run: `pytest tests/test_kodo_mini_app.py -q`.
+- **F26:** `ParticleEmitter` validates `lifetime` tuple at construction — non-finite (NaN/Inf) or negative values → `ValueError` (avoids immortal particles: `nan <= 0` is false). Regression: `TestParticleEmitterNaNLifetime` in `tests/test_kodo_systems_edge.py`.
+- **F27:** `DataTable` left-click with `row_height <= 0` no longer divides by zero — early `return True` in click handler. Regression: `test_datatable_row_height_zero_*` in mini-app suite.
+- Full non-visual suite (this pass): `pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` — green; see `.kodo/test-coverage.md` for counts.
