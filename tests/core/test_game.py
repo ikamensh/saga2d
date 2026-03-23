@@ -1,7 +1,16 @@
 """Tests for Game, mock backend, tick/quit/run behavior."""
 
+import os
+
+import pytest
+
 from saga2d import Game, Scene
 from saga2d.backends.mock_backend import MockBackend
+
+_headless = os.environ.get("SAGA2D_HEADLESS", "").strip() not in ("", "0")
+_skip_headless = pytest.mark.skipif(
+    _headless, reason="game.run() disabled when SAGA2D_HEADLESS is set"
+)
 
 
 class InputTrackingScene(Scene):
@@ -85,6 +94,7 @@ def test_mock_backend_records_sprite_text_sound(
     assert len(mock_backend.sounds_played) >= 1
 
 
+@_skip_headless
 def test_run_pushes_start_scene_and_loops() -> None:
     """run() pushes the start scene, loops, and exits when quit is called."""
     game = Game("Test", backend="mock", resolution=(1920, 1080))
@@ -106,6 +116,7 @@ def test_run_pushes_start_scene_and_loops() -> None:
     assert game.running is False
 
 
+@_skip_headless
 def test_run_calls_backend_quit_after_loop() -> None:
     """run() calls backend.quit() after the loop exits."""
     game = Game("Test", backend="mock", resolution=(1920, 1080))
@@ -120,6 +131,7 @@ def test_run_calls_backend_quit_after_loop() -> None:
     assert backend.is_running is False
 
 
+@_skip_headless
 def test_window_close_stops_run_loop() -> None:
     """Window close event causes run() to exit cleanly."""
     game = Game("Test", backend="mock", resolution=(1920, 1080))
