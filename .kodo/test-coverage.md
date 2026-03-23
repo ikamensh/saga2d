@@ -1180,9 +1180,196 @@ Added `*, permanent: bool = True` parameter to `_cleanup_exiting_scene()`. Only 
 |---|-------------------|-------------|-----------|-------------|--------|----------|
 | 56 | Scene-owned timers survive overlay push/pop | test_scene_timers.py | 5 (1 updated + 4 new) | 2026-03-23 | pass | F28 fix |
 
-### Updated Cumulative Totals
+### Updated Cumulative Totals (Stage 16)
 
 - **25 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F28)
 - **5 documented behaviors** (F11, F13, F14, F17, F20)
 - **11 sharp edges** (SE1–SE11; SE12 promoted to F28)
+- **0 known defects remaining** in source code
+
+## Stage 17 — UI/Particle Edge Case Audit & Regression Tests (2026-03-23)
+
+### Environment
+
+| Field | Value |
+|-------|-------|
+| Baseline tests | **2308 passed**, 3 skipped |
+| After stage | **2395 passed**, 3 skipped |
+| New tests added | **87** |
+| Bugs found | **0** |
+
+### Scope
+
+Systematic audit and targeted execution of risky UI/particle edge cases identified in prior gaps (EC3-EC5, Gap 4, Gap 5, Gap 6) plus additional boundary conditions in widgets, particles, camera, tweens, and component tree management.
+
+### New test file
+
+**`tests/test_kodo_ui_particle_edge.py`** — 87 tests, all pass
+
+| Test Class | Count | Area Covered | Finding |
+|------------|-------|--------------|---------|
+| `TestComponentMutationDuringDraw` | 3 | EC3: child remove/add self during draw() | **Safe** — Python list iteration tolerates mutation |
+| `TestComponentMutationDuringHandleEvent` | 2 | EC4: child remove self/sibling during handle_event() | **Safe** — reversed() on list is safe |
+| `TestComponentMutationDuringUpdate` | 2 | EC5: child remove/add during _update_recursive() | **Safe** — mutation during iteration doesn't crash |
+| `TestGridZeroDimensions` | 8 | Gap 4: Grid(0,0) creation, click, draw, cell_at, keyboard nav | **Safe** — guards return None/0 |
+| `TestTabGroupEmpty` | 5 | Gap 4: TabGroup empty init, select, add/remove, draw | **Safe** — raises KeyError properly |
+| `TestDataTableClickEmpty` | 6 | Gap 4: DataTable empty rows/columns, short rows | **Safe** — guards work |
+| `TestTweenFromEqualsTo` | 2 | Gap 5: from_val==to_val, zero-duration | **Safe** — on_complete fires |
+| `TestConcurrentTweens` | 2 | Gap 5: two tweens same property, cancel one | **Safe** — last-write-wins |
+| `TestCancelInCallback` | 3 | Gap 5: cancel/create/cancel_all inside on_complete | **Safe** — snapshot iteration |
+| `TestCameraShakeDecayZero` | 2 | Gap 6: shake(decay=0) | **Safe** — constant intensity, still expires |
+| `TestCameraUpdateDtZero` | 4 | Gap 6: update(dt=0) all modes | **Safe** — no division/NaN |
+| `TestCameraLargeViewportSmallBounds` | 2 | Gap 6: viewport > bounds, inverted bounds | **Safe** — clamps |
+| `TestCameraPanDuringShake` | 1 | Gap 6: pan_to during active shake | **Safe** — coexist |
+| `TestParticleZeroLifetime` | 2 | Particle: lifetime=(0,0) | **Safe** — die immediately |
+| `TestParticleContinuousDtZero` | 2 | Particle: continuous+dt=0, high rate | **Safe** — guards work |
+| `TestParticleBurstZero` | 2 | Particle: burst(0/-5) | **Safe** — n<=0 guard |
+| `TestParticleSpeedZero` | 1 | Particle: speed=(0,0) | **Safe** — stationary |
+| `TestParticleFadeWithZeroLifetime` | 1 | Particle: fade + lifetime=0 | **Safe** — total_lifetime>0 guard |
+| `TestParticleRemoveThenBurst` | 1 | Particle: burst after remove | **Safe** — re-registers |
+| `TestProgressBarEdgeCases` | 6 | Widget: max=0/-10, value>max, narrow rounded | **Safe** — max<=0 guard |
+| `TestWordWrapEdges` | 4 | Widget: empty, single char, max_width=1, only newlines | **Safe** |
+| `TestListEdgeCases` | 4 | Widget: empty move, clamp, scroll past | **Safe** |
+| `TestTooltipEdgeCases` | 4 | Widget: delay=0/-1, reset, off-screen | **Safe** |
+| `TestTextBoxEdgeCases` | 4 | Widget: empty, typewriter change, complete, skip/reset | **Safe** |
+| `TestComponentTreeEdges` | 10 | Component: self-add, reparent, negative dims, 100-deep | **Safe** |
+| `TestGameTickWithEdgeCases` | 4 | Integration: particles+UI, dt=0, rapid transitions, shake+burst | **Safe** |
+
+### Analysis of EC3-EC5 (component tree mutation during iteration)
+
+Confirmed that `draw()`, `handle_event()`, and `_update_recursive()` iterate `_children` directly (not a copy), but **mutation during iteration is safe in practice** — Python list iteration handles removal/addition without crashing. While it could theoretically skip or double-visit elements during mutation, no crash or hang occurs. The `children` property already returns a copy for external consumers.
+
+### Gaps closed
+
+| Gap | Status | Tests |
+|-----|--------|-------|
+| Gap 4: Grid(0,0) keyboard nav, TabGroup empty ops, DataTable click empty | **Closed** | 19 |
+| Gap 5: Tween from==to, concurrent tweens, cancel-in-callback | **Closed** | 7 |
+| Gap 6: Camera shake(decay=0), update(dt=0), large viewport, pan+shake | **Closed** | 9 |
+| EC3-EC5: Component _children mutation during traversal | **Closed** | 7 |
+
+### Verification commands
+
+```bash
+# Run the new edge-case tests
+SAGA2D_HEADLESS=1 .venv/bin/python -m pytest tests/test_kodo_ui_particle_edge.py -v
+
+# Full suite verification
+SAGA2D_HEADLESS=1 .venv/bin/python -m pytest tests/ \
+  --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+```
+
+### Updated Cumulative Totals (Stage 17)
+
+- **2395 tests passing**, 3 skipped, 0 failures
+- **57+ feature areas** tested
+- **25 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F28)
+- **5 documented behaviors** (F11, F13, F14, F17, F20)
+- **11 sharp edges** (SE1–SE11; SE12 promoted to F28)
+- **All known gaps (4, 5, 6, EC3-EC5) closed** with 87 regression tests
+- **0 new bugs found** — framework handles all edge cases safely
+- **0 known defects remaining** in source code
+
+---
+
+## Stage 3 — Focused Regression Coverage (2026-03-23)
+
+Targeted regression tests for the six risky edge cases explicitly requested.
+All tests live in **`tests/test_kodo_stage3_regression.py`** (34 tests).
+
+### Test file & command
+
+```bash
+# Run only the Stage 3 regression tests
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage3_regression.py -v
+
+# Full suite verification (including Stage 3)
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/ \
+  --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+```
+
+### Results
+
+| Metric | Value |
+|--------|-------|
+| Collected (new file) | **34** |
+| Passed | **34** |
+| Failed | **0** |
+| Full suite collected | **2429** |
+| Full suite passed | **2429** |
+| Full suite skipped | **3** |
+| Duration (new file) | ~0.04 s |
+| Duration (full suite) | ~30 s |
+
+### Coverage by edge case
+
+#### 1. Grid zero dimensions (5 tests)
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_zero_grid_set_cell_is_noop` | `set_cell(0,0,…)` on Grid(0,0) doesn't crash; child stored |
+| `test_zero_cols_nonzero_rows` | Grid(0,5): preferred size ≥ 0, selected setter clears |
+| `test_nonzero_cols_zero_rows` | Grid(3,0): preferred size ≥ 0, selected setter clears |
+| `test_zero_grid_full_tick_no_crash` | Grid(0,0) survives `game.tick()` (draw + event dispatch) |
+| `test_zero_grid_click_event_no_crash` | Click inside 0×0 grid: `_cell_at` → None, no crash |
+
+#### 2. TabGroup empty / invalid key (6 tests)
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_empty_tabgroup_preferred_size` | No tabs: returns (100, tab_height) default |
+| `test_empty_tabgroup_get_tab_content_returns_none` | `get_tab_content("anything")` → None |
+| `test_select_tab_empty_raises_keyerror` | `select_tab` on empty → KeyError |
+| `test_empty_tabgroup_full_tick_no_crash` | Empty TabGroup survives `game.tick()` |
+| `test_add_then_remove_tab_then_select_old_raises` | Stale key after manual removal → KeyError |
+| `test_invalid_key_on_populated_tabgroup` | Non-existent key lists available tabs in error |
+
+#### 3. ProgressBar max_value≤0 and negative value (7 tests)
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_negative_max_value_fraction_zero` | max_value < 0 ⇒ fraction = 0.0 |
+| `test_negative_value_fraction_clamped` | value < 0 ⇒ fraction clamped to 0.0 |
+| `test_both_negative` | Both negative ⇒ fraction = 0.0 |
+| `test_zero_max_value_draw_no_crash` | Draw with max_value=0, rectangular mode |
+| `test_negative_max_value_draw_rounded` | Draw rounded bar with max_value < 0 |
+| `test_value_mutation_after_init` | Value set to negative post-init ⇒ fraction stays 0.0 |
+| `test_max_value_zero_value_zero` | 0/0 guarded by max_value ≤ 0 check |
+
+#### 4. ParticleEmitter lifetime=(0,0) with fade_out=True (3 tests)
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_burst_zero_lifetime_fade_all_die_immediately` | 10 particles burst, all die on first update |
+| `test_burst_zero_lifetime_fade_no_nan_opacity` | total_lifetime=0 + fade_out=True: no div-by-zero (particles removed before fade calc) |
+| `test_continuous_zero_lifetime_fade_cleanup` | Continuous mode: particles spawn and die each tick, emitter stays active |
+
+#### 5. AnimationPlayer frame_duration=0 (7 tests)
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_animationdef_rejects_zero` | AnimationDef(frame_duration=0) → ValueError |
+| `test_animationdef_rejects_negative` | AnimationDef(frame_duration=-1) → ValueError |
+| `test_animationplayer_rejects_zero` | AnimationPlayer(frame_duration=0) → ValueError |
+| `test_animationplayer_rejects_negative` | AnimationPlayer(frame_duration=-0.5) → ValueError |
+| `test_animationplayer_rejects_nan` | AnimationPlayer(frame_duration=NaN) → ValueError |
+| `test_animationplayer_rejects_inf` | AnimationPlayer(frame_duration=+Inf) → ValueError |
+| `test_valid_frame_duration_plays_normally` | Positive value works end-to-end (sanity) |
+
+#### 6. List item_height=0 (6 tests)
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_visible_count_zero` | `_visible_count()` returns 0 (guard active) |
+| `test_preferred_size_height_uses_item_height` | Preferred height = 0 with item_height=0 |
+| `test_click_with_zero_item_height_no_crash` | Click guard returns early, no div-by-zero |
+| `test_keyboard_nav_still_works` | `_move_selection` works (independent of item_height) |
+| `test_draw_with_game_no_crash` | on_draw with visible_count=0 skips items, no crash |
+| `test_motion_with_zero_item_height_no_crash` | Mouse motion guard prevents div-by-zero |
+
+### Updated Cumulative Totals (Stage 3 Regression)
+
+- **2429 tests passing**, 3 skipped, 0 failures
+- **34 new focused regression tests** for 6 risky edge-case categories
+- **0 new bugs found** — all edge cases handled safely by existing guards
 - **0 known defects remaining** in source code

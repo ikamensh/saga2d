@@ -1,5 +1,26 @@
 # Tester Notes - Saga2D
 
+## 2026-03-23 — Edge-case UX bundle (Grid / TabGroup / ProgressBar / particles / Animation / List)
+
+- **Install:** `uv run` from repo root (deps via `uv sync --extra dev` if needed). **Headless:** `SAGA2D_HEADLESS=1`.
+- **Pytest (36 passed, ~0.04s):**
+  ```bash
+  SAGA2D_HEADLESS=1 uv run python -m pytest \
+    tests/test_kodo_widget_edge.py::TestGridZeroDimensions \
+    tests/test_kodo_widget_edge.py::TestGridPreferredSizeZero \
+    tests/test_kodo_widget_edge.py::TestTabGroupEmpty \
+    tests/test_kodo_widget_edge.py::TestTabGroupInvalidKey \
+    tests/test_kodo_widget_edge.py::TestProgressBarMaxZero \
+    tests/test_kodo_timer_widget_edge.py::TestProgressBarEdgeCases \
+    tests/test_kodo_particle_nan_lifetime.py::TestValidLifetimeStillWorks::test_zero_zero_lifetime_accepted \
+    tests/test_kodo_crossfade_repro.py::TestAnimationPlayerFrameDurationZero \
+    tests/test_kodo_crossfade_repro.py::TestListItemHeightZero \
+    -q
+  ```
+- **One-shot mock E2E (no GUI):** same scenarios in one process — `uv run python -c '...'` in agent log; uses `g._scene_stack.top()` (**method**, not property) before `scene.ui.add(...)`.
+- **Results:** No crashes/hangs. **TabGroup:** empty tabs → `active_tab is None`, draw/tick OK; `select_tab("missing")` → **`KeyError`** with message listing available tabs (intentional). **AnimationPlayer `frame_duration=0`** → **`ValueError`** (`positive finite`). **`AnimationPlayer([], frame_duration=0)`** raises **empty-frames first** (see `scripts/animation_edge_user_probe.py`). **ProgressBar:** `max_value<=0` → `fraction==0`; negative **value** → fraction clamped to 0. **ParticleEmitter `lifetime=(0,0)`, `fade_out=True`:** burst + `update` → all particles gone immediately. **List `item_height=0`:** click returns `True`, no `ZeroDivisionError`.
+- **Extra:** `uv run python scripts/animation_edge_user_probe.py` — PASS; documents `update(nan)` stuck playback on valid player.
+
 ## 2026-03-23 — Stage 14 mini-app + F27 DataTable (tester re-verify)
 
 - **Ran:** `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_mini_app.py -q` → **47 passed**; full tree  

@@ -82,3 +82,10 @@ desired_examples/        # API design sketches
 - **F26:** `ParticleEmitter` validates `lifetime` tuple at construction — non-finite (NaN/Inf) or negative values → `ValueError` (avoids immortal particles: `nan <= 0` is false). Regression: `TestParticleEmitterNaNLifetime` in `tests/test_kodo_systems_edge.py`.
 - **F27:** `DataTable` left-click with `row_height <= 0` no longer divides by zero — early `return True` in click handler. Regression: `test_datatable_row_height_zero_*` in mini-app suite.
 - Full non-visual suite (this pass): `pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` — green; see `.kodo/test-coverage.md` for counts.
+
+## Stage 3 / Stage 17 — UI & particle edge regressions (2026-03-23)
+
+- **Focused (34):** `tests/test_kodo_stage3_regression.py` — Grid 0× dims, empty TabGroup / bad key, ProgressBar max≤0 & negative value, `lifetime=(0,0)` + `fade_out`, `AnimationPlayer`/`AnimationDef` reject `frame_duration<=0`/non-finite, `List` `item_height=0`. Run: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage3_regression.py -q`.
+- **Broad (87):** `tests/test_kodo_ui_particle_edge.py` — component mutation during draw/event/update, gaps 4–6, extra widget/particle/camera cases. See `.kodo/test-coverage.md` Stage 17.
+- **Mock input:** use `inject_mouse_move()`, not `inject_motion()` (worker_smart-notes).
+- **Related repros:** `tests/test_kodo_crossfade_repro.py`, `tests/test_kodo_particle_nan_lifetime.py` (F26 / animation–list edges); referenced from `.kodo/tester-notes.md`.

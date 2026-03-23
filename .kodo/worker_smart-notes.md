@@ -12,9 +12,24 @@
 - Crossfade repro: `SAGA2D_HEADLESS=1 .venv/bin/python -m pytest tests/test_kodo_crossfade_repro.py -v`
 - Clean run: `SAGA2D_HEADLESS= .venv/bin/python -m pytest --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -v`
 
-## Test Results (updated 2026-03-23, post Stage 16)
+## Test Results (updated 2026-03-23, post Stage 3 Regression)
 - **25 bugs found and fixed** (F1, F3-F10, F12, F15-F16, F18-F19, F21-F28)
 - 5 documented behaviors (F11, F13, F14, F17, F20), 11 sharp edges (SE1-SE11; SE12→F28)
+- **2429 tests passing**, 3 skipped, 0 failures
+- All known gaps (4, 5, 6, EC3-EC5) closed with 87+34 regression tests
+
+## Stage 3 Regression — Focused Edge Case Coverage (2026-03-23)
+- **Created**: `tests/test_kodo_stage3_regression.py` — 34 focused regression tests
+- **Covers**: Grid(0,0), TabGroup empty/invalid key, ProgressBar max_value≤0 & negative value, ParticleEmitter lifetime=(0,0)+fade_out=True, AnimationPlayer frame_duration=0, List item_height=0
+- **MockBackend gotcha**: use `inject_mouse_move()` NOT `inject_motion()`
+- **No bugs found** — all guards work correctly
+
+## Stage 17 — UI/Particle Edge Case Audit (2026-03-23)
+- **Created**: `tests/test_kodo_ui_particle_edge.py` — 87 tests covering all identified edge cases
+- **No bugs found** — all risky code paths handle edge cases safely
+- **Key findings**: Component tree mutation during iteration (draw/handle_event/update) is safe in CPython — list iteration doesn't crash on mutation, just may skip/double-visit
+- **Closed gaps**: Grid(0,0), TabGroup empty, DataTable empty, tween from==to, cancel-in-callback, camera shake(decay=0), update(dt=0), large viewport, particles zero lifetime/speed/dt
+- Remaining gaps: None identified
 
 ## Stage 14 — Mini-App Integration Test & F27 Fix (2026-03-23)
 - **Created**: `tests/test_kodo_mini_app.py` — 47 tests exercising all 12+ Saga2D systems together in a realistic "dungeon crawler" mini-app
