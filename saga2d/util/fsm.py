@@ -75,7 +75,12 @@ class StateMachine:
             self._on_exit[old_state]()
         self._state = target
         if target in self._on_enter:
-            self._on_enter[target]()
+            try:
+                self._on_enter[target]()
+            except Exception:
+                # Roll back state change so FSM stays consistent.
+                self._state = old_state
+                raise
         return True
 
     @property
