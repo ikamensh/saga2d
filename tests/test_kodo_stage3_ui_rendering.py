@@ -287,91 +287,25 @@ class TestProgressBarEdgeValues:
 
 
 class TestDataTableRowHeight:
-    """DataTable does NOT validate row_height in __init__. Negative or zero
-    row_height is accepted silently.
+    """DataTable now validates row_height > 0 in __init__ (F54 fix).
 
-    - row_height=0: The click handler has `if self._row_height <= 0: return True`,
-      preventing division by zero. get_preferred_size returns height = header_height
-      (rows contribute 0 each). Drawing may produce overlapping rows at same y.
-
-    - row_height=-10: get_preferred_size returns header_height + rows * (-10),
-      which can go negative. Click handler returns True (guard catches it).
-      Drawing will draw rows at decreasing y, going above the header.
-
-    VERDICT: BUG — negative/zero row_height should be rejected in __init__.
+    Negative or zero row_height is rejected with ValueError.
     """
 
-    def test_negative_row_height_accepted(self, game):
-        """Negative row_height is silently accepted — this is a bug."""
-        scene = Scene()
-        game.push(scene)
-        game.tick(0)
+    def test_negative_row_height_raises(self, game):
+        """Negative row_height now raises ValueError (F54 fix)."""
+        with pytest.raises(ValueError, match="row_height must be positive"):
+            DataTable(columns=["A", "B"], row_height=-10)
 
-        table = DataTable(columns=["A", "B"], row_height=-10)
-        scene.ui.add(table)
-        game.tick(0)
+    def test_zero_row_height_raises(self, game):
+        """Zero row_height now raises ValueError (F54 fix)."""
+        with pytest.raises(ValueError, match="row_height must be positive"):
+            DataTable(columns=["A", "B"], row_height=0)
 
-        assert table.row_height == -10, "Negative row_height should be stored as-is"
-
-        # Preferred size can go negative
-        w, h = table.get_preferred_size()
-        # With 0 rows: h = header_height(32) + 0 * (-10) = 32
-        assert h == 32, f"Expected h=32 with 0 rows, got {h}"
-
-        # Add some rows — preferred height shrinks below header
-        table.add_row(["1", "2"])
-        table.add_row(["3", "4"])
-        w2, h2 = table.get_preferred_size()
-        # h = 32 + 2 * (-10) = 12 — absurd but accepted
-        assert h2 == 12, f"Expected h=12 with 2 rows at row_height=-10, got {h2}"
-
-    def test_zero_row_height_accepted(self, game):
-        """Zero row_height is silently accepted — this is a bug."""
-        scene = Scene()
-        game.push(scene)
-        game.tick(0)
-
-        table = DataTable(columns=["A", "B"], row_height=0)
-        scene.ui.add(table)
-        game.tick(0)
-
-        assert table.row_height == 0, "Zero row_height should be stored"
-        # All rows contribute 0 height
-        table.add_row(["1", "2"])
-        table.add_row(["3", "4"])
-        w, h = table.get_preferred_size()
-        # h = 32 + 2 * 0 = 32
-        assert h == 32, f"Expected h=32, got {h}"
-
-    def test_zero_row_height_click_guard(self, game):
-        """The click handler guards `if self._row_height <= 0: return True`
-        to prevent ZeroDivisionError. This guard works, but the constructor
-        should still reject invalid values.
-
-        Note: on_event only returns True if hit_test passes. Without proper
-        layout bounds, the click coordinates may not hit the table. We verify
-        the guard by checking the code path directly.
-        """
-        scene = Scene()
-        game.push(scene)
-        game.tick(0)
-
-        table = DataTable(columns=["A", "B"], row_height=0, width=200, height=100)
-        table.add_row(["1", "2"])
-        scene.ui.add(table)
-        game.tick(0)  # layout computes bounds
-
-        from saga2d.input import InputEvent
-        # Simulate a click within the table's computed bounds
-        evt = InputEvent(
-            type="click",
-            x=table._computed_x + 10,
-            y=table._computed_y + 50,
-            button="left",
-        )
-        result = table.on_event(evt)
-        # The guard `if self._row_height <= 0: return True` catches this
-        assert result is True, "Click on row_height=0 table should be consumed"
+    def test_positive_row_height_accepted(self, game):
+        """Positive row_height still works normally."""
+        table = DataTable(columns=["A", "B"], row_height=28)
+        assert table.row_height == 28
 
 
 # ===================================================================

@@ -91,6 +91,13 @@ desired_examples/        # API design sketches
 - **Mock input:** use `inject_mouse_move()`, not `inject_motion()` (worker_smart-notes).
 - **Related repros:** `tests/test_kodo_crossfade_repro.py`, `tests/test_kodo_particle_nan_lifetime.py` (F26 / animation–list edges); referenced from `.kodo/tester-notes.md`.
 
+## Stage 3 UI/rendering — F44–F56 shipped (2026-03-25)
+
+- **Regression:** `tests/test_kodo_stage3_ui_rendering_regression.py` (headless). Run: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage3_ui_rendering_regression.py -q`.
+- **Code:** finite/valid params for ProgressBar, Button text, ParticleEmitter (speed/direction/life, position), AnimationPlayer.update, Camera (scroll/keys/world_bounds), Tooltip delay, Sprite tint/move_to; DataTable `row_height > 0`; Grid rejects negative `cell_size` (zero still degenerate/safe); SaveLoadScreen `slot_count > 0`.
+- **Acceptable:** DataTable short `col_widths` — flexible layout, missing width → 0 (no crash).
+- **Docs:** `.kodo/test-coverage.md`, `.kodo/test-report.md`, `.kodo/tester-notes.md`.
+
 ## Stage 2 — core actions F42–F43 (2026-03-25)
 
 - **F42:** `Repeat(..., times=<negative int>)` → `ValueError` (`times must be >= 0`); `bool` subclass of int → `TypeError`; non-int `times` (float/NaN) → `TypeError`. Regression: `tests/test_kodo_stage2_regression.py`; expectations updated in `tests/test_kodo_stage2_core_actions.py`, `tests/test_kodo_new_edge_cases.py`, `tests/kodo_test_rendering.py`.

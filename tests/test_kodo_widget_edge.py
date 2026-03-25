@@ -454,19 +454,10 @@ class TestProgressBarNaN:
     # ------------------------------------------------------------------
     # Test 19: value=NaN — fraction is misleading (known quirk)
     # ------------------------------------------------------------------
-    def test_nan_value_fraction(self) -> None:
-        """Test 19: value=NaN produces a misleading fraction due to CPython
-        min/max behaviour with NaN.
-
-        NaN / 100 = NaN.  min(1.0, NaN) -> 1.0, max(0.0, 1.0) -> 1.0.
-        So fraction is 1.0 (bar looks full) — a silent bug / quirk.
-        """
-        bar = ProgressBar(value=float("nan"), max_value=100)
-        frac = bar.fraction
-        # CPython: min(1.0, NaN) -> 1.0 (returns first arg when NaN is involved)
-        assert frac == 1.0, (
-            f"Expected 1.0 (CPython NaN quirk), got {frac}"
-        )
+    def test_nan_value_raises(self) -> None:
+        """Test 19: value=NaN now raises ValueError at construction (F44 fix)."""
+        with pytest.raises(ValueError, match="finite"):
+            ProgressBar(value=float("nan"), max_value=100)
 
 
 class TestProgressBarNegativeMax:
@@ -546,13 +537,10 @@ class TestTooltipNegativeDelay:
     # ------------------------------------------------------------------
     # Test 24: negative delay should show immediately
     # ------------------------------------------------------------------
-    def test_negative_delay_shows_immediately(self) -> None:
-        """Test 24: Tooltip(delay=-1) becomes visible on show() immediately."""
-        tip = Tooltip("Negative delay", delay=-1.0)
-        tip.show(100, 100)
-        assert tip._visible_now is True, (
-            "Tooltip with negative delay should show immediately"
-        )
+    def test_negative_delay_raises(self) -> None:
+        """Test 24: Tooltip(delay=-1) now raises ValueError (F51 fix)."""
+        with pytest.raises(ValueError, match="delay must be >= 0"):
+            Tooltip("Negative delay", delay=-1.0)
 
 
 class TestTooltipShowHideShow:

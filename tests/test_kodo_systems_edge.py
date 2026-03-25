@@ -227,8 +227,8 @@ class TestParticleEmitterNaNPosition:
     would gracefully skip NaN-positioned spawns.
     """
 
-    def test_nan_position_setter_accepts_nan(self, mock_game: Any) -> None:
-        """The position setter does not validate — NaN is silently accepted."""
+    def test_nan_position_setter_raises(self, mock_game: Any) -> None:
+        """The position setter now validates and raises ValueError (F46 fix)."""
         from saga2d.rendering.particles import ParticleEmitter
 
         emitter = ParticleEmitter(
@@ -236,11 +236,8 @@ class TestParticleEmitterNaNPosition:
             position=(100, 100),
         )
 
-        # Setting NaN position does NOT raise (no validation in setter).
-        emitter.position = (float("nan"), float("nan"))
-        x, y = emitter.position
-        assert math.isnan(x)
-        assert math.isnan(y)
+        with pytest.raises(ValueError, match="finite"):
+            emitter.position = (float("nan"), float("nan"))
         emitter.remove()
 
     def test_nan_position_burst_raises_value_error(self, mock_game: Any) -> None:

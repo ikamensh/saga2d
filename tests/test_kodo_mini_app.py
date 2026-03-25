@@ -1310,98 +1310,27 @@ class TestMultiSystemStress:
 class TestBugDiscovery:
     """Tests that deliberately exercise edge cases to find bugs."""
 
-    def test_datatable_row_height_zero_click(self, app):
-        """F27: DataTable(row_height=0) must not ZeroDivisionError on click.
+    def test_datatable_row_height_zero_raises(self, app):
+        """F54: DataTable(row_height=0) now raises ValueError at construction."""
+        with pytest.raises(ValueError, match="row_height must be positive"):
+            DataTable(
+                columns=["Name", "Value"],
+                rows=[["a", "1"], ["b", "2"]],
+                width=400,
+                height=200,
+                row_height=0,
+            )
 
-        This was identified as EC1 in Stage 11B — the guard in List.on_event()
-        for item_height=0 was not replicated in DataTable.on_event().
-        Fixed: added `if self._row_height <= 0: return True` guard.
-        """
-        game, backend = app
-
-        scene = Scene()
-        game.push(scene)
-        game.tick(0.016)
-
-        # Create a DataTable with row_height=0
-        dt = DataTable(
-            columns=["Name", "Value"],
-            rows=[["a", "1"], ["b", "2"]],
-            width=400,
-            height=200,
-            row_height=0,
-        )
-        scene.ui.add(dt)
-        game.tick(0.016)
-
-        # Click inside the data area (below header)
-        dt._computed_x = 0
-        dt._computed_y = 0
-        dt._computed_w = 400
-        dt._computed_h = 200
-
-        # This should NOT crash with ZeroDivisionError
-        from saga2d.input import InputEvent
-        click = InputEvent(type="click", button="left", x=200, y=50)
-        # Direct on_event call — must not raise
-        result = dt.on_event(click)
-        assert result is True  # event consumed, no crash
-
-    def test_datatable_row_height_zero_scroll(self, app):
-        """F27 coverage: DataTable(row_height=0) scroll doesn't crash."""
-        game, backend = app
-
-        scene = Scene()
-        game.push(scene)
-        game.tick(0.016)
-
-        dt = DataTable(
-            columns=["Name", "Value"],
-            rows=[["a", "1"], ["b", "2"]],
-            width=400,
-            height=200,
-            row_height=0,
-        )
-        scene.ui.add(dt)
-        game.tick(0.016)
-
-        dt._computed_x = 0
-        dt._computed_y = 0
-        dt._computed_w = 400
-        dt._computed_h = 200
-
-        from saga2d.input import InputEvent
-        scroll = InputEvent(type="scroll", x=200, y=100, dy=-3)
-        result = dt.on_event(scroll)
-        assert result is True  # event consumed, no crash
-
-    def test_datatable_row_height_negative_click(self, app):
-        """F27 coverage: DataTable(row_height=-10) doesn't crash on click."""
-        game, backend = app
-
-        scene = Scene()
-        game.push(scene)
-        game.tick(0.016)
-
-        dt = DataTable(
-            columns=["A"],
-            rows=[["x"]],
-            width=200,
-            height=100,
-            row_height=-10,
-        )
-        scene.ui.add(dt)
-        game.tick(0.016)
-
-        dt._computed_x = 0
-        dt._computed_y = 0
-        dt._computed_w = 200
-        dt._computed_h = 100
-
-        from saga2d.input import InputEvent
-        click = InputEvent(type="click", button="left", x=100, y=50)
-        result = dt.on_event(click)
-        assert result is True  # event consumed, no crash
+    def test_datatable_row_height_negative_raises(self, app):
+        """F54: DataTable(row_height=-10) now raises ValueError at construction."""
+        with pytest.raises(ValueError, match="row_height must be positive"):
+            DataTable(
+                columns=["A"],
+                rows=[["x"]],
+                width=200,
+                height=100,
+                row_height=-10,
+            )
 
     def test_datatable_normal_click_still_works(self, app):
         """F27 coverage: Normal DataTable click still selects rows."""

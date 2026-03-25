@@ -1,6 +1,6 @@
 # Feature Coverage
 
-Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25 (see repo `test-report.md`).
+Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25. **Stage 2 tester pass:** 2026-03-25. **Stage 3 tester pass (UI/rendering edge cases):** 2026-03-25 — 13 bugs fixed (F44–F56), 84 new regression tests, 2 acceptable edge cases documented.
 
 ## Stage 1 — Window, game loop, scenes (PLAN.md)
 
@@ -46,24 +46,84 @@ Manual `uv run python` probes + pytest bundle: `tests/test_kodo_stage2_core_acti
 
 **Stage 2 fixes (F42–F43):** Tests updated to match stricter validation. Regression suite: `tests/test_kodo_stage2_regression.py` (20 tests). Headless total: **2651 passed, 3 skipped**.
 
+### Stage 3 — UI/Rendering Edge-Case Validation (2026-03-25)
+
+Runtime probes via `stage3_repro.py` + pytest regression suite: `tests/test_kodo_stage3_ui_rendering_regression.py` (84 tests).
+
+| Workflow | Outcome |
+|----------|---------|
+| `ProgressBar(value=NaN)` constructor | **`ValueError`** — constructor now validates both `value` and `max_value` with `math.isfinite()` **(F44)** |
+| `ProgressBar(max_value=NaN)` constructor | **`ValueError`** — NaN max_value no longer bypasses fraction guard **(F44)** |
+| `ProgressBar(value=Inf)` constructor | **`ValueError`** — Inf rejected **(F44)** |
+| `Button.text = None` | **`TypeError`** — None rejected at setter (was crashing downstream in `_estimate_text_width`) **(F45)** |
+| `ParticleEmitter.position = (NaN, 0)` | **`ValueError`** — setter now validates with `math.isfinite()` **(F46)** |
+| `AnimationPlayer.update(dt=NaN)` | **Returns None** — skips frame, preserves state, recovers on next valid dt **(F47)** |
+| `Camera.enable_edge_scroll(NaN, NaN)` | **`ValueError`** — margin and speed validated **(F48)** |
+| `Camera.enable_key_scroll(speed=NaN)` | **`ValueError`** — speed validated **(F49)** |
+| `Camera.world_bounds = (NaN, 0, 800, 600)` | **`ValueError`** — all 4 values must be finite **(F50)** |
+| `Camera.world_bounds = (100, 0, 50, 600)` inverted | **`ValueError`** — left must be <= right, top <= bottom **(F50)** |
+| `Tooltip(delay=NaN)` | **`ValueError`** — delay must be finite **(F51)** |
+| `Tooltip(delay=-1)` | **`ValueError`** — delay must be >= 0 **(F51)** |
+| `Sprite.tint = (NaN, 0.5, 0.5)` | **`ValueError`** — NaN/Inf components rejected **(F52)** |
+| `Sprite.move_to((NaN, 0), speed=100)` | **`ValueError`** — target position must be finite **(F53)** |
+| `DataTable(row_height=0)` | **`ValueError`** — row_height must be positive **(F54)** |
+| `DataTable(row_height=-10)` | **`ValueError`** — row_height must be positive **(F54)** |
+| `DataTable(col_widths=[100])` with 3 columns | **Accepted** — graceful fallback: missing widths get 0; deliberate API flexibility (documented, not a bug) |
+| `Grid(cell_size=(-10, 64))` | **`ValueError`** — cell_size dimensions must be non-negative **(F55)** |
+| `Grid(cell_size=(0, 0))` | **Accepted** — degenerate but safe: `_cell_at` returns None, no crash (documented, not a bug) |
+| `SaveLoadScreen(slot_count=0)` | **`ValueError`** — slot_count must be positive **(F56)** |
+| `SaveLoadScreen(slot_count=-1)` | **`ValueError`** — slot_count must be positive **(F56)** |
+
+**Stage 3 fixes (F44–F56):** 16 existing tests updated to match stricter validation. Regression suite: `tests/test_kodo_stage3_ui_rendering_regression.py` (84 tests). Headless total: **2734 passed, 3 skipped**.
+
 ### NEW Gaps to Test This Run
 
 | Feature / Workflow | Last tested | Status | Findings |
 |--------------------|-------------|--------|----------|
-| ParticleEmitter speed/direction NaN/Inf | 2026-03-25 | pending | No validation on speed/direction tuples |
+| ParticleEmitter speed/direction NaN/Inf | 2026-03-25 | **verified** | **Ctor `ValueError`** (finite required); negative finite speed range still spawns; **pytest** + headless repro |
 | Do() non-callable fn parameter | 2026-03-25 | **fixed** | **TypeError** at construction — already guarded before Stage 2 |
 | Repeat() times negative/float/NaN | 2026-03-25 | **fixed (F42)** | Negative int now raises `ValueError`; float/NaN/bool raise `TypeError` |
 | MoveTo bad position tuple (1-tuple, scalar) | 2026-03-25 | **fixed (F43)** | Clear `TypeError` with actionable message (was raw `IndexError`) |
 | Game.tick(dt=NaN) propagation to scene | 2026-03-25 | **fixed** | Rejected at `Game.tick` level — already guarded before Stage 2 |
-| ProgressBar value=NaN setter | 2026-03-25 | pending | No setter validation |
-| DataTable negative row_height | 2026-03-25 | pending | Wrong row index calculation |
-| Grid zero cell_size | 2026-03-25 | pending | Layout calculations fail |
+| ProgressBar value=NaN setter | 2026-03-25 | **fixed (F44)** | **`ValueError`** on assign AND at construction; `max_value` also validated |
+| ProgressBar constructor NaN/Inf bypass | 2026-03-25 | **fixed (F44)** | Constructor now validates both `value` and `max_value` with `isfinite()` |
+| Button.text = None crash | 2026-03-25 | **fixed (F45)** | `TypeError` at setter (was crashing downstream in `_estimate_text_width`) |
+| ParticleEmitter.position NaN | 2026-03-25 | **fixed (F46)** | Setter now validates with `isfinite()`; was silently storing NaN |
+| AnimationPlayer.update(dt=NaN) freeze | 2026-03-25 | **fixed (F47)** | Skips frame, preserves state, recovers on next valid dt |
+| Camera.enable_edge_scroll NaN/Inf | 2026-03-25 | **fixed (F48)** | Margin and speed validated with `isfinite()` |
+| Camera.enable_key_scroll NaN/Inf | 2026-03-25 | **fixed (F49)** | Speed validated with `isfinite()` |
+| Camera.world_bounds NaN/inverted | 2026-03-25 | **fixed (F50)** | All 4 values validated finite; left<=right, top<=bottom enforced |
+| Tooltip delay NaN/Inf/negative | 2026-03-25 | **fixed (F51)** | Delay must be finite and >= 0 |
+| Sprite.tint NaN/Inf propagation | 2026-03-25 | **fixed (F52)** | Components validated with `isfinite()` before clamping |
+| Sprite.move_to NaN target | 2026-03-25 | **fixed (F53)** | Target position validated with `isfinite()` |
+| DataTable negative/zero row_height | 2026-03-25 | **fixed (F54)** | `row_height <= 0` now raises `ValueError`; positive values accepted normally |
+| DataTable `col_widths` shorter than `columns` | 2026-03-25 | **acceptable** | Draw uses **width 0** for missing entries — graceful fallback, deliberate API flexibility; 3 documentation tests |
+| Grid negative `cell_size` | 2026-03-25 | **fixed (F55)** | Negative dimensions now raise `ValueError`; zero accepted (guarded by `_cell_at`) |
+| Grid zero `cell_size` | 2026-03-25 | **acceptable** | `_cell_at` returns None for zero stride; clicks select nothing; draw emits zero-rects; 3 documentation tests |
+| SaveLoadScreen `slot_count<=0` | 2026-03-25 | **fixed (F56)** | `slot_count <= 0` now raises `ValueError`; positive values create slot buttons normally |
 | Scene.add_sprite(None) | 2026-03-25 | pending | No None guard |
 | Game invalid resolution | 2026-03-25 | pending | Negative/zero accepted |
 | ColorSwap empty color lists | 2026-03-25 | pending | Silent no-op |
 | DragDrop callback exceptions | 2026-03-25 | pending | May corrupt drag state |
 | Game after teardown method calls | 2026-03-25 | pending | Methods still callable |
 | Parallel.update() on unstarted children | 2026-03-25 | pending | No start() guarantee |
+
+**Commands (tester agent UI/particle edge, 2026-03-25):**
+
+```bash
+cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
+SAGA2D_HEADLESS=1 uv run python -c "from saga2d.rendering.particles import ParticleEmitter; from saga2d.ui.widgets import ProgressBar, DataTable, Grid; from saga2d.ui.screens import SaveLoadScreen; print('imports OK')"
+SAGA2D_HEADLESS=1 uv run python -m pytest \
+  tests/test_kodo_stage3_ui_rendering.py \
+  tests/test_kodo_widget_edge.py::TestGridZeroDimensions \
+  tests/test_kodo_widget_edge.py::TestGridPreferredSizeZero \
+  tests/test_kodo_mini_app.py::TestBugDiscovery::test_datatable_row_height_zero_click \
+  tests/test_kodo_mini_app.py::TestBugDiscovery::test_datatable_row_height_negative_click \
+  tests/ui/test_screens.py::TestSaveLoadScreen \
+  tests/test_kodo_systems_edge.py::TestParticleEmitterNaNLifetime \
+  -q
+# → 40 passed (local run)
+```
 
 ### Previously Passing Features
 

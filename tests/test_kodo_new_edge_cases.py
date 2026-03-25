@@ -333,14 +333,11 @@ class TestF41CameraEdgeScrollValidation:
         cam.update(0.016, mouse_x=805, mouse_y=300)
         # Should not scroll since 805 < 810
 
-    def test_edge_scroll_nan_speed(self, game, scene):
-        """NaN speed should be rejected or produce finite scroll."""
+    def test_edge_scroll_nan_speed_raises(self, game, scene):
+        """NaN speed is now rejected at enable_edge_scroll (F48 fix)."""
         cam = Camera((800, 600), world_bounds=(0, 0, 2000, 2000))
-        cam.enable_edge_scroll(margin=50, speed=float('nan'))
-        cam.update(0.016, mouse_x=10, mouse_y=300)
-        # Camera position should still be finite
-        assert math.isfinite(cam.x), f"Camera x is {cam.x}, should be finite"
-        assert math.isfinite(cam.y), f"Camera y is {cam.y}, should be finite"
+        with pytest.raises(ValueError, match="finite"):
+            cam.enable_edge_scroll(margin=50, speed=float('nan'))
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -473,26 +470,19 @@ class TestF46HUDEdgeCases:
 class TestF47SpriteTintEdgeCases:
     """Sprite tint should clamp or reject NaN/Inf values."""
 
-    def test_tint_nan_values_clamped(self, game, scene):
-        """NaN tint values should be clamped to valid range."""
+    def test_tint_nan_raises(self, game, scene):
+        """NaN tint values now raise ValueError (F52 fix)."""
         sp = Sprite("sprites/test", position=(100, 100))
         scene.add_sprite(sp)
-        sp.tint = (float('nan'), 0.5, 0.5)
-        # The tint setter uses max(0.0, min(1.0, v)) — NaN comparisons are weird
-        r, g, b = sp.tint
-        assert math.isfinite(r), f"tint r={r} should be finite"
-        assert math.isfinite(g), f"tint g={g} should be finite"
-        assert math.isfinite(b), f"tint b={b} should be finite"
+        with pytest.raises(ValueError, match="finite"):
+            sp.tint = (float('nan'), 0.5, 0.5)
 
-    def test_tint_inf_values_clamped(self, game, scene):
-        """Inf tint values should be clamped."""
+    def test_tint_inf_raises(self, game, scene):
+        """Inf tint values now raise ValueError (F52 fix)."""
         sp = Sprite("sprites/test", position=(100, 100))
         scene.add_sprite(sp)
-        sp.tint = (float('inf'), float('-inf'), 0.5)
-        r, g, b = sp.tint
-        assert 0.0 <= r <= 1.0, f"tint r={r} should be in [0, 1]"
-        assert 0.0 <= g <= 1.0, f"tint g={g} should be in [0, 1]"
-        assert 0.0 <= b <= 1.0, f"tint b={b} should be in [0, 1]"
+        with pytest.raises(ValueError, match="finite"):
+            sp.tint = (float('inf'), float('-inf'), 0.5)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

@@ -1061,11 +1061,10 @@ class TestTooltipEdgeCases:
         t.show(100, 100)
         assert t._visible_now is True
 
-    def test_tooltip_delay_negative_shows_immediately(self):
-        """Tooltip with delay=-1 should show immediately on show()."""
-        t = Tooltip("help text", delay=-1)
-        t.show(100, 100)
-        assert t._visible_now is True
+    def test_tooltip_delay_negative_raises(self):
+        """Tooltip with negative delay now raises ValueError (F51 fix)."""
+        with pytest.raises(ValueError, match="delay must be >= 0"):
+            Tooltip("help text", delay=-1)
 
     def test_tooltip_hide_then_show_resets_timer(self):
         """hide() then show() should restart delay timer."""

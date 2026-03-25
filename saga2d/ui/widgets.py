@@ -123,7 +123,17 @@ class ProgressBar(Component):
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
+        import math
+
         super().__init__(width=width, height=height, style=style, **kwargs)
+        if not math.isfinite(value):
+            raise ValueError(
+                f"ProgressBar value must be a finite number, got {value!r}"
+            )
+        if not math.isfinite(max_value):
+            raise ValueError(
+                f"ProgressBar max_value must be a finite number, got {max_value!r}"
+            )
         self._value = value
         self._max_value = max_value
         self._bar_color = bar_color
@@ -929,10 +939,16 @@ class Grid(Component):
     ) -> None:
         if spacing < 0:
             raise ValueError(f"spacing cannot be negative, got {spacing}")
+        cw, ch = cell_size
+        if cw < 0 or ch < 0:
+            raise ValueError(
+                f"Grid cell_size dimensions must be non-negative, "
+                f"got ({cw}, {ch})"
+            )
         super().__init__(width=width, height=height, style=style, **kwargs)
         self._columns = columns
         self._rows = rows
-        self._cell_w, self._cell_h = cell_size
+        self._cell_w, self._cell_h = cw, ch
         self._spacing = spacing
         self.on_select = on_select
         self._selected: tuple[int, int] | None = None
@@ -1225,7 +1241,17 @@ class Tooltip(Component):
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
+        import math
+
         super().__init__(style=style, **kwargs)
+        if not math.isfinite(delay):
+            raise ValueError(
+                f"Tooltip delay must be a finite number, got {delay!r}"
+            )
+        if delay < 0:
+            raise ValueError(
+                f"Tooltip delay must be >= 0, got {delay!r}"
+            )
         self._text = text
         self._delay = delay
         self._font_handle: Any = None
@@ -1731,6 +1757,10 @@ class DataTable(Component):
         style: Style | None = None,
         **kwargs: Any,
     ) -> None:
+        if row_height <= 0:
+            raise ValueError(
+                f"DataTable row_height must be positive, got {row_height}"
+            )
         super().__init__(style=style, **kwargs)
         self._columns = list(columns)
         self._rows: list[list[str]] = list(rows) if rows is not None else []

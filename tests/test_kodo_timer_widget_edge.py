@@ -218,40 +218,20 @@ class TestProgressBarEdgeCases:
         bar = ProgressBar(value=0, max_value=0)
         assert bar.fraction == 0.0
 
-    def test_value_nan(self) -> None:
-        """value=NaN with valid max_value: NaN / 100 = NaN.
+    def test_value_nan_raises(self) -> None:
+        """value=NaN now raises ValueError at construction (F44 fix)."""
+        with pytest.raises(ValueError, match="finite"):
+            ProgressBar(value=float("nan"), max_value=100)
 
-        In CPython, max(0.0, min(1.0, NaN)) depends on argument order:
-        - min(1.0, NaN) returns 1.0  (first arg returned when NaN involved)
-        - max(0.0, 1.0) returns 1.0
-        So fraction silently returns 1.0 for NaN value — a misleading result.
-        """
-        bar = ProgressBar(value=float("nan"), max_value=100)
-        frac = bar.fraction
-        # CPython min/max with NaN: min(1.0, nan) -> 1.0, max(0.0, 1.0) -> 1.0
-        # This is a subtle bug: NaN value produces fraction=1.0 instead of
-        # raising or returning 0.0. The bar looks "full" when value is invalid.
-        assert frac == 1.0, (
-            f"BUG: NaN value silently produces fraction=1.0 (misleading), got {frac}"
-        )
+    def test_max_value_nan_raises(self) -> None:
+        """max_value=NaN now raises ValueError at construction (F44 fix)."""
+        with pytest.raises(ValueError, match="finite"):
+            ProgressBar(value=50, max_value=float("nan"))
 
-    def test_max_value_nan(self) -> None:
-        """max_value=NaN: NaN <= 0 is False, so we enter the division.
-        50 / NaN = NaN. But CPython min/max behavior with NaN:
-        min(1.0, NaN) -> 1.0, max(0.0, 1.0) -> 1.0.
-        So fraction silently returns 1.0."""
-        bar = ProgressBar(value=50, max_value=float("nan"))
-        frac = bar.fraction
-        # NaN <= 0 is False, so we don't return 0.0 early.
-        # 50 / NaN = NaN. Then: min(1.0, NaN) -> 1.0, max(0.0, 1.0) -> 1.0
-        assert frac == 1.0, (
-            f"BUG: NaN max_value silently produces fraction=1.0, got {frac}"
-        )
-
-    def test_value_inf(self) -> None:
-        """value=+Inf: Inf / 100 = Inf. min(1.0, Inf) = 1.0."""
-        bar = ProgressBar(value=float("inf"), max_value=100)
-        assert bar.fraction == 1.0
+    def test_value_inf_raises(self) -> None:
+        """value=+Inf now raises ValueError at construction (F44 fix)."""
+        with pytest.raises(ValueError, match="finite"):
+            ProgressBar(value=float("inf"), max_value=100)
 
     def test_normal_fraction(self) -> None:
         """Sanity: normal values produce correct fraction."""

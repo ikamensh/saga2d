@@ -710,23 +710,18 @@ def test_opacity_inf_clamped_to_255(game: Game) -> None:
     assert sprite.opacity == 255
 
 
-def test_tint_nan_clamped_by_min_max(game: Game, backend: MockBackend) -> None:
-    """tint with NaN is clamped via min/max (Python 3.12+ returns non-NaN)."""
+def test_tint_nan_raises_value_error(game: Game, backend: MockBackend) -> None:
+    """tint with NaN now raises ValueError (F52 fix)."""
     sprite = Sprite("sprites/knight", position=(100, 100))
-    sprite.tint = (float("nan"), 0.5, float("nan"))
-
-    # min(1, nan) and max(0, ...) behavior: NaN channel becomes 1.0 or 0.0
-    assert all(isinstance(c, float) and 0.0 <= c <= 1.0 for c in sprite.tint)
-    assert backend.sprites[sprite.sprite_id]["tint"] == sprite.tint
+    with pytest.raises(ValueError, match="finite"):
+        sprite.tint = (float("nan"), 0.5, float("nan"))
 
 
-def test_tint_inf_clamped(game: Game, backend: MockBackend) -> None:
-    """tint with Inf is clamped to [0, 1]."""
+def test_tint_inf_raises_value_error(game: Game, backend: MockBackend) -> None:
+    """tint with Inf now raises ValueError (F52 fix)."""
     sprite = Sprite("sprites/knight", position=(100, 100))
-    sprite.tint = (float("inf"), 0.0, float("-inf"))
-
-    assert sprite.tint == (1.0, 0.0, 0.0)
-    assert backend.sprites[sprite.sprite_id]["tint"] == (1.0, 0.0, 0.0)
+    with pytest.raises(ValueError, match="finite"):
+        sprite.tint = (float("inf"), 0.0, float("-inf"))
 
 
 # ==================================================================

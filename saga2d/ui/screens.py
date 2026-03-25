@@ -291,6 +291,10 @@ class SaveLoadScreen(Scene):
     ) -> None:
         if mode not in ("save", "load"):
             raise ValueError(f"mode must be 'save' or 'load', got {mode!r}")
+        if slot_count <= 0:
+            raise ValueError(
+                f"slot_count must be positive, got {slot_count}"
+            )
         self._mode = mode
         self._save_manager_override = save_manager
         self._on_save = on_save

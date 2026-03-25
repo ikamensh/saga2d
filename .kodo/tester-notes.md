@@ -1,5 +1,57 @@
 # Tester Notes - Saga2D
 
+## Stage 3 — F54/F55/F56 ctor validation (tester agent, 2026-03-25)
+
+**Implemented (matches `.kodo/test-coverage.md` / `test-report.md`):**
+
+- **`DataTable`:** `row_height <= 0` → **`ValueError`** (`DataTable row_height must be positive, got …`) in `__init__` (`saga2d/ui/widgets.py`). `on_event` / `_visible_rows` still defensively guard `<= 0` if internal state ever violated.
+- **`Grid`:** `cell_size` with **negative** width or height → **`ValueError`** (`Grid cell_size dimensions must be non-negative, got (…)`) in `__init__`. **`(0,0)`** still accepted (degenerate; `_cell_at` returns `None`).
+- **`SaveLoadScreen`:** `slot_count <= 0` → **`ValueError`** (`slot_count must be positive, got …`) in `__init__` (`saga2d/ui/screens.py`).
+
+**Commands (all PASS this run):**
+
+- Regression file: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage3_ui_rendering_regression.py -q` → **84 passed** (~0.8s). Includes F54–F56 + prior F44–F53-style cases.
+- Stage 3 UI + mini_app + SaveLoad + Grid zero:  
+  `pytest tests/test_kodo_stage3_ui_rendering.py tests/test_kodo_mini_app.py tests/ui/test_screens.py::TestSaveLoadScreen tests/test_kodo_widget_edge.py::TestGridZeroDimensions tests/test_kodo_widget_edge.py::TestGridPreferredSizeZero -q` → **83 passed**.
+- Expanded spot-check (**279 passed**, ~0.9s):
+
+```bash
+SAGA2D_HEADLESS=1 uv run python -m pytest \
+  tests/test_kodo_stage3_ui_rendering_regression.py \
+  tests/test_kodo_stage3_ui_rendering.py \
+  tests/test_kodo_mini_app.py \
+  tests/test_kodo_ui_particle_edge.py \
+  tests/test_kodo_systems_edge.py::TestParticleEmitterNaNLifetime \
+  tests/test_kodo_particle_nan_lifetime.py \
+  tests/test_kodo_widget_edge.py::TestGridZeroDimensions \
+  tests/test_kodo_widget_edge.py::TestGridPreferredSizeZero \
+  tests/ui/test_screens.py::TestSaveLoadScreen \
+  -q
+```
+- One-liner ctor smoke: construct `DataTable(…, row_height=0)`, `Grid(…, cell_size=(-1,10))`, `SaveLoadScreen(…, slot_count=0)` → each raises **`ValueError`** with expected substring; `Grid(…, (0,0))` and `SaveLoadScreen(…, slot_count=1)` OK.
+
+**Still acceptable (unchanged):** `DataTable` `col_widths` shorter than `columns` → missing columns draw at width **0** (overlap risk). **`Grid(cell_size=(0,0))`** — documented degenerate case.
+
+**Env:** `uv run` from repo root; stray `VIRTUAL_ENV` from another repo → uv warns and uses **this** project `.venv`.
+
+## UI / particles edge E2E (mock, 2026-03-25)
+
+**Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run python` (project `.venv`; ignore stray `VIRTUAL_ENV` from other repos).
+
+**Singleton Game:** only one `Game` alive — call `g._teardown()` before constructing another. **InputEvent** lives in `saga2d.input`, not `backends.base`.
+
+**ParticleEmitter** (`saga2d/rendering/particles.py`): non-finite **speed** / **direction** → **`ValueError`** at construction. **lifetime** with any negative component → **`ValueError`**. Finite but **negative speed range** `(min, max)` still constructs; `burst` + `tick` runs (velocity from `random.uniform` × trig — can be large finite values). **Requires** active `Game` + resolvable sprite image (`AssetManager` + temp `images/sprites/*.png` is enough for mock).
+
+**ProgressBar:** assigning **`value=float('nan')`** → **`ValueError`** (`finite number`). **Negative value** with positive `max_value` → **`fraction` clamped to 0.0**. **`max_value<=0`** → **`fraction==0.0`** (no crash).
+
+**DataTable:** **`row_height<=0`** → **`ValueError` at construction (F54)**. **`col_widths`** shorter than **`columns`** → missing columns get **width 0** in draw (overlap risk — silent).
+
+**Grid:** **`cell_size=(0,0)`** → tiny preferred size; **`_cell_at`** returns **`None`**. **Negative `cell_size` component** → **`ValueError` at construction (F55)**.
+
+**SaveLoadScreen:** **`slot_count<=0`** → **`ValueError` at construction (F56)**.
+
+**Pytest bundle (same files; counts drift with suite):** `tests/test_kodo_stage3_ui_rendering.py`, `tests/test_kodo_widget_edge.py::TestGridZeroDimensions`, `::TestGridPreferredSizeZero`, `tests/test_kodo_mini_app.py::TestBugDiscovery::test_datatable_row_height_zero_raises`, `::test_datatable_row_height_negative_raises`, `tests/ui/test_screens.py::TestSaveLoadScreen`, `tests/test_kodo_systems_edge.py::TestParticleEmitterNaNLifetime`.
+
 ## Actions + `Game.tick(dt)` edge probes (2026-03-25)
 
 **Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run python` (project `.venv`).

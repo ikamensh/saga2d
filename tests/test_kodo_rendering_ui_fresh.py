@@ -995,12 +995,10 @@ class TestWordWrap:
 class TestTooltipEdgeCases:
     """Test Tooltip with edge-case delay values."""
 
-    def test_negative_delay_shows_immediately(self) -> None:
-        """Tooltip with delay <= 0 should show immediately on show()."""
-        tip = Tooltip("info", delay=-1.0)
-        tip.show(100, 200)
-        # With delay <= 0, _visible_now should be True immediately
-        assert tip._visible_now is True
+    def test_negative_delay_raises(self) -> None:
+        """Tooltip with negative delay now raises ValueError (F51 fix)."""
+        with pytest.raises(ValueError, match="delay must be >= 0"):
+            Tooltip("info", delay=-1.0)
 
     def test_zero_delay_shows_immediately(self) -> None:
         """Tooltip with delay=0 should show immediately."""
