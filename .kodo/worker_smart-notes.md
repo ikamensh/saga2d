@@ -4,17 +4,30 @@
 - 2D game framework (Python 3.12+, pyglet backend, mock backend for headless testing)
 - Repo: `/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d`
 - Run tests: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q`
+- Smoke test: `uv run python scripts/smoke_game_move_to.py` (no env vars needed)
 
 ## Key Architecture
 - `saga2d/` — core package: Game, Scene, Sprite, actions, audio, UI components, util (tween, timer, fsm)
 - `saga2d/rendering/` — camera.py, sprite.py, particles.py, animation.py, layers.py
 - `saga2d/ui/` — component.py (base Component + _UIRoot), components.py (Label/Button/Panel), widgets.py (List/Grid/DataTable/etc), layout.py, theme.py
 - `saga2d/backends/` — mock_backend.py (headless), pyglet_backend.py
-- `tests/` — 2470+ tests, organized by area (actions/, core/, rendering/, systems/, ui/, integration/, kodo_test_*.py, test_kodo_*.py)
+- `tests/` — 2631+ tests (headless), organized by area (actions/, core/, rendering/, systems/, ui/, integration/, kodo_test_*.py, test_kodo_*.py)
 
-## Test Counts (2026-03-23)
-- 2470 passed, 3 skipped (game.run() under SAGA2D_HEADLESS), 0 failures
-- ~34s runtime
+## Test Counts (2026-03-25)
+- 2631 passed, 3 skipped (game.run() under SAGA2D_HEADLESS), 0 failures (excluding visual_verify)
+- Full tree: 2665 collected, 2649 passed, 11 failed (AI visual_verify only), 5 skipped
+- ~34s runtime (headless)
+
+## Stage 1 Status — COMPLETE (2026-03-25)
+- Scope: Environment Setup & Smoke Testing — game loop, push/pop scenes, backend protocol, Game + Scene/SceneStack
+- Smoke script `scripts/smoke_game_move_to.py` validates Game→Scene→Sprite→MoveTo E2E
+- Documented in: `test-report.md` (how to run, what it validates), `.kodo/test-coverage.md` (Stage 1 table row + commands), `.kodo/run-status.md` (marked COMPLETE)
+
+## Changes Made (2026-03-25 — Stage 1 completion)
+- `test-report.md`: Added § "Smoke script" with how-to-run, validation table, usage guidance; added smoke command to commands-run list; updated Stage 1 UX paragraph to reference smoke script
+- `.kodo/test-coverage.md`: Added E2E smoke row to Stage 1 table; restructured Commands section with smoke + pytest commands
+- `.kodo/run-status.md`: Rewrote with current test counts (2631), marked Stage 1 COMPLETE, added smoke/pytest verification lines
+- `.kodo/worker_smart-notes.md`: Updated test counts, added Stage 1 status, recorded changes
 
 ## Bugs Fixed (F-numbered)
 - F1-F10, F12, F15-F16, F18-F19, F21-F33 (29 total)

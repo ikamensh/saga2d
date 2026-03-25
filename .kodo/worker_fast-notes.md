@@ -31,9 +31,10 @@ desired_examples/        # API design sketches
 - Pyglet event handlers must `return True` to prevent fallthrough (e.g. ESC closing window)
 - Screenshot capture: between `batch.draw()` and `window.flip()` (double-buffering)
 
-## Baseline (477220f, 2026-03-21)
+## Baseline (2026-03-25, Stage 1 re-verify)
 
-- Main suite (ignore `visual_verify`, `visual`, `screenshot`): **1404** collected — **`SAGA2D_HEADLESS=1`** → **3** fails in `tests/core/test_game.py` (`game.run()` headless guard); **unset** → **1404** pass.
+- **`SAGA2D_HEADLESS=1`**, full `tests/`: **2665** collected — **2649** passed, **11** failed (`tests/visual_verify` AI/screenshot only), **5** skipped (`game.run()` headless + optional `ANTHROPIC_API_KEY`).
+- Same env, **`--ignore=tests/visual_verify`**: **2631** passed, **3** skipped (`game.run()` only). Install: `uv sync --extra dev`. Details: repo `test-report.md`.
 - FakeGame + cursor: `hasattr(scene.game, "cursor")` in `saga2d/scene.py` (~526) — no cursor regression; adversarial + kodo FakeGame tests pass.
 
 ## Scene lifecycle (kodo Stage 2, 2026-03-21)
@@ -89,6 +90,10 @@ desired_examples/        # API design sketches
 - **Broad (87+):** `tests/test_kodo_ui_particle_edge.py` — includes **F30** `TestComponentMutationNoSkip` (snapshot `list(_children)` in draw/update/handle_event — see `saga2d/ui/component.py`). See `.kodo/test-coverage.md` Stage 17 + Stage 4 blocks.
 - **Mock input:** use `inject_mouse_move()`, not `inject_motion()` (worker_smart-notes).
 - **Related repros:** `tests/test_kodo_crossfade_repro.py`, `tests/test_kodo_particle_nan_lifetime.py` (F26 / animation–list edges); referenced from `.kodo/tester-notes.md`.
+
+## Smoke script (2026-03-25)
+
+- **`scripts/smoke_game_move_to.py`** — minimal `Game` + `Scene` + `Sprite` + `MoveTo`, mock backend, temp asset dir with placeholder `dot.png`. Run: `uv run python scripts/smoke_game_move_to.py` → prints `PASS`. Documented in repo `test-report.md`.
 
 ## Stage 4 — camera non-finite + UI traversal (2026-03-23)
 

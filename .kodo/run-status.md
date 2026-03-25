@@ -1,17 +1,11 @@
 # Run Status
 
 ## Goal
-# Project Context
-Saga2D is a mature Python 2D game framework with 2024 passing tests. Previous runs fixed F15-F19 and covered 50 feature areas. This run targets NEW gaps: AnimationPlayer infinite loop with frame_duration=0 (critical), List ZeroDivisionError with item_height=0, particle lifetime=(0,0) division by zero, untested widget edge cases (Grid 0x0, TabGroup empty, DataTable empty), tween duration edge cases, camera advanced scenarios, and audio crossfade state corruption. The most likely...
+saga2d is a 2D game framework. Stage 1 covers Environment Setup & Smoke Testing: running game loop with push/pop scenes, colored backgrounds; backend protocol + `Game` + `Scene`/`SceneStack`. Deep edge-case testing (NaN/Inf validation, numeric parameter guards) was performed across 14+ areas. 29 bugs fixed (F1–F33). 2631 headless tests pass; 3 skip (interactive `game.run()`). Smoke script `scripts/smoke_game_move_to.py` validates the core E2E pipeline.
 
 ## Progress
-- Stage: 4/4: Advanced Camera, Audio, and Tweening Edge Cases
-- Cycle: 5/45
-- Elapsed: 2h22m
-
-## Agent Stats
-| Agent | Calls | Errors | Tokens | Time |
-|-------|-------|--------|--------|------|
-| tester | 16 | 0 | 0 | 29m29s |
-| worker_fast_auto_commit | 3 | 0 | 0 | 5m28s |
-| worker_smart | 12 | 0 | 297k | 1h46m |
+- Stage: 1/1: Environment Setup & Smoke Testing — **COMPLETE**
+- Cycle: 1/50
+- Smoke: `uv run python scripts/smoke_game_move_to.py` → PASS
+- Pytest (headless): 2631 passed, 3 skipped (~34s)
+- Verified: 2026-03-25

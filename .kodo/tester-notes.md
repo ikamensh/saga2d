@@ -1,5 +1,14 @@
 # Tester Notes - Saga2D
 
+## Stage 1 tester agent — install + full pytest (2026-03-25)
+
+- **Install:** `uv sync --extra dev` at repo root → OK. **Uv quirk:** if shell `VIRTUAL_ENV` points outside the project (e.g. another repo’s `.venv`), uv warns and still uses **this** project’s `.venv`.
+- **`scripts/smoke_game_move_to.py` (E2E, 2026-03-25):** `SAGA2D_HEADLESS=1 uv run python scripts/smoke_game_move_to.py` → **PASS** (`PASS — smoke: Game, Scene, Sprite, MoveTo`). Mock backend, temp `images/sprites/dot.png`; exercises `Game` → `push(SmokeScene)` → `on_enter` adds `Sprite` + `MoveTo` → ticks until within 1px of target → `_teardown()`. Imports: `from saga2d import Game, MoveTo, Scene, Sprite` → OK.
+- **Docs:** repo **`test-report.md`** § Smoke script + commands; **`.kodo/test-coverage.md`** § Stage 1 table (E2E smoke row) + pytest commands.
+- **Import smoke:** `SAGA2D_HEADLESS=1 uv run python -c "from saga2d import Game, Scene; g=Game('t',backend='mock'); g.push(Scene()); g.tick(0.016); g._teardown(); print('import_smoke OK')"` → OK.
+- **Full `pytest tests/`:** **2665** collected; **2649 passed**, **11 failed**, **5 skipped** (~45s). Failures are **only** `tests/visual_verify/` (8× menu tutorial AI + 3× UI screenshot golden / AI). **Exclude `visual_verify`:** **2631 passed**, **3 skipped** (~34s) — skips are **`game.run()`** in `tests/core/test_game.py` under `SAGA2D_HEADLESS=1`. Two `test_ai_checker` tests skip without `ANTHROPIC_API_KEY`.
+- **Artifacts:** exact commands and numbers → repo root **`test-report.md`**; Stage 1 PLAN mapping → **`.kodo/test-coverage.md`** § Stage 1.
+
 ## Stage 4 — camera / audio / tween / particles (headless E2E) — verified 2026-03-23
 
 **Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run`, **no GUI** (mock backend). **Stereo pan:** not in `saga2d/audio.py` — only scalar **volume** on channels / `play_sound` / crossfade.
@@ -191,15 +200,6 @@ SAGA2D_HEADLESS=1 uv run python -m pytest \
   - `python -m tests.harness.systems_util_harness J -v` → Scenario **J** PASS
 - **F9 non-object JSON (verified 2026-03-22):** `SaveManager.load()` rejects top-level JSON that is not an object (`list`, `str`, `null`, number, bool) with **`SaveError`** (message includes slot path and type). `list_slots()` propagates that `SaveError` (no `TypeError`). **`SaveLoadScreen`:** `on_enter` calls `list_slots` uncaught → pushing the screen with a bad `save_1.json` raises **`SaveError`** at push time (screen does not mount); not an in-UI corruption banner. Regression: `pytest tests/kodo_test_persistence_resources_ext.py::TestMalformedSaveFiles -v` (10 passed).
 - **Other manual checks:** Truncated/invalid JSON → `SaveError` with slot hint. JSON object **without** `"state"` → `Game.load` returns data, does **not** call `load_save_state` (documented).
-
-## Stage 1 baseline (verified 2026-03-21)
-
-- **Commit** `477220f` — matches external run `~/.kodo/runs/20260321_213413/test-report.md`.
-- **Main suite** (ignores `visual_verify`, `visual`, `screenshot`): **1404** collected; **`SAGA2D_HEADLESS=1`** → **3 failed** (`tests/core/test_game.py` — all `game.run()` blocked by headless guard); **`env -u SAGA2D_HEADLESS`** → **1404 passed**. Failures are **only** those three when headless is set.
-- **FakeGame / cursor**: `hasattr(scene.game, "cursor")` guard at `saga2d/scene.py` ~526 — **no** FakeGame-related failures. Adversarial 7-test subset and `kodo_test_core -k "FakeGame or cursor"` (5 tests) pass.
-- **Kodo regression**: `kodo_test_{core,rendering,systems}.py` — **348 passed**.
-- **Timing**: full run ~33s here vs ~29s in report — normal machine variance.
-- **Doc nit**: live `RuntimeError` from `game.run()` includes an extra sentence (use `tick` / screenshot harness); report truncates the message.
 
 ## E2E: core engine + scene stack (2026-03-21)
 
