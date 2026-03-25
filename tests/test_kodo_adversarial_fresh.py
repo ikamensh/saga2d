@@ -91,17 +91,12 @@ class TestReentrantSceneOperations:
         assert "B.on_enter" in order
 
     def test_on_exit_pushes_new_scene_outside_tick(self, mock_game: Game) -> None:
-        """BUG FOUND: on_exit pushes a scene outside of tick — the deferred
-        push is silently dropped because flush_pending_ops is only called
-        during tick().
+        """FIXED (F58): on_exit pushes a scene outside of tick — the deferred
+        push is now automatically flushed after the direct operation completes.
 
-        When push(B) is called outside tick(), _apply_push runs immediately.
-        During old.on_exit(), _in_on_exit=True so push(C) is deferred.
-        But after _apply_push finishes, no flush occurs — the deferred
-        SceneC push is lost forever.
-
-        This is a REAL BUG. The pending_ops queue is never drained outside
-        of tick().
+        Previously, the deferred push from on_exit was silently dropped because
+        flush_pending_ops was only called during tick(). Now direct scene ops
+        auto-flush deferred ops via _flush_after_direct_op().
         """
         pushed = []
 
@@ -114,15 +109,12 @@ class TestReentrantSceneOperations:
                 pushed.append("C")
 
         mock_game.push(SceneA())
-        mock_game.push(Scene())  # causes SceneA.on_exit -> push SceneC (deferred)
+        mock_game.push(Scene())  # causes SceneA.on_exit -> push SceneC (deferred+flushed)
 
-        # BUG: SceneC is deferred but never flushed — it's silently dropped.
-        # The pending ops queue has an un-flushed push.
-        assert len(mock_game._scene_stack._pending_ops) == 1, (
-            "Deferred push from on_exit should be in pending_ops"
-        )
-        # SceneC was NOT pushed — this is the bug
-        assert "C" not in pushed
+        # F58 fix: deferred ops from on_exit are now flushed automatically
+        assert len(mock_game._scene_stack._pending_ops) == 0
+        # SceneC IS now pushed
+        assert "C" in pushed
 
     def test_on_exit_pushes_new_scene_inside_tick(self, mock_game: Game) -> None:
         """on_exit push from within a tick DOES work (flush happens).

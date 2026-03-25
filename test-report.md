@@ -160,3 +160,68 @@ uv run python scripts/smoke_game_move_to.py
 Automated coverage for **window / game loop / scenes** is exercised primarily via **mock backend** + `Game.tick()` in `tests/core/` (and integration/adversarial scene-stack tests). The **smoke script** (`scripts/smoke_game_move_to.py`) provides a fast standalone E2E check of the Game → Scene → Sprite → MoveTo pipeline. **Interactive `game.run()`** is intentionally skipped under `SAGA2D_HEADLESS=1`. Pyglet window demos (for example `tests/visual/test_stage1_visual.py`) are outside this headless Stage 1 pass unless run manually with a display.
 
 See `.kodo/test-coverage.md` § **Stage 1** for feature-to-test mapping.
+
+## Stage 4 — Real-User Gameplay Workflow
+
+**Date:** 2026-03-25
+
+### Scope
+
+End-to-end gameplay workflow simulating what a real saga2d user would build: a game with a player character, enemy sprites, collectible items, input-driven movement, AABB collision detection, scene transitions (push/pop/replace), timers, and composable actions — all running headlessly via the mock backend.
+
+### Deliverables
+
+| File | Description |
+|------|-------------|
+| `scripts/stage4_gameplay_workflow.py` | Standalone headless workflow script (run: `uv run python scripts/stage4_gameplay_workflow.py`) |
+| `tests/test_kodo_stage4_gameplay_workflow.py` | Pytest suite: 24 tests (16 workflow, 8 AABB collision unit tests) |
+
+### How to run
+
+```bash
+# Standalone script (no env vars needed)
+uv run python scripts/stage4_gameplay_workflow.py
+# → PASS — Stage 4 gameplay workflow: all assertions passed
+
+# Pytest (24 tests)
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage4_gameplay_workflow.py -v
+# → 24 passed
+
+# Full suite (including new tests)
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+# → 2795 passed, 3 skipped
+```
+
+### What it exercises
+
+1. **Game instantiation** — `Game("WorkflowTest", backend="mock", resolution=(800,600), asset_path=...)` with temp asset directory
+2. **GameplayScene with Camera** — `Camera(viewport, world_bounds)`, `center_on()`, camera follows player
+3. **Player character** — `Sprite("sprites/player")`, positioned and moved via input
+4. **Enemy patrol** — `Repeat(Sequence(MoveTo, Delay, MoveTo, Delay))` composable action loop
+5. **Ghost fade** — `Repeat(Sequence(FadeOut(0.4), FadeIn(0.4)))` infinite fade action
+6. **Collectible coin** — sprite with fade action, removed on collision
+7. **Input handling** — `backend.inject_key()` → `handle_input()` → `_move_dx/_move_dy` → `update()` movement
+8. **AABB collision detection** — custom `aabb_collides()` using `sprite_rect()` (position + 64×64 image, BOTTOM_CENTER anchor)
+9. **Coin collection** — collision → `sprite.remove()` → score updated → `coin_alive=False`
+10. **Enemy damage** — collision → `player.tint = (1.0, 0.3, 0.3)` → timer-based tint reset
+11. **Score timer** — `scene.every(1.0, callback)` fires repeatedly
+12. **Bonus spawn timer** — `scene.after(2.0, callback)` one-shot
+13. **PauseScene push** — `bind_key("cancel", ...)` → `game.push(PauseScene())` with `transparent=True`, `pop_on_cancel=True`
+14. **Entity state preservation** — positions saved in `on_exit()`, sprites re-created in `on_reveal()`
+15. **InventoryScene push/pop** — `bind_key("i", ...)`, timer cancelled on scene exit
+16. **Replace with VictoryScene** — `game.replace(VictoryScene())`, all gameplay sprites cleaned up
+17. **draw_world_rect** — debug collision overlays drawn in world space via camera
+
+### Bugs found
+
+**None.** All framework subsystems worked correctly in the integrated workflow.
+
+### Key framework behavior documented
+
+- **Owned sprites removed on push-over**: When a scene is pushed over, `_cleanup_exiting_scene(permanent=False)` calls `_cleanup_owned_sprites()`. Users must save entity state in `on_exit()` and re-create sprites in `on_reveal()`.
+- **Timers survive push-over**: Scene-owned timers continue running when the scene is covered (`permanent=False`). They are only cancelled on permanent removal (pop/replace/clear_and_push).
+- **Scene-owned timer cancellation**: InventoryScene's `after(0.5, ...)` timer is properly cancelled when the scene exits before the timer fires.
+
+### Verification
+
+All 24 tests pass. Full suite: **2795 passed, 3 skipped** (up from 2771 — 24 new tests added, 0 regressions).

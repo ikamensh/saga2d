@@ -420,40 +420,28 @@ class TestEdgeCases:
         mock_game.tick(dt=0.0)  # Should not crash
 
     def test_tick_with_negative_dt(self, mock_game: Game) -> None:
-        """BUG: tick() with negative dt silently accepted, corrupts timer state.
+        """FIXED (Stage 2): tick() with negative dt now raises ValueError.
 
-        Negative dt causes timer accumulators to go negative, delaying timer
-        firing by an additional abs(dt) seconds beyond the expected delay.
-        For example, a timer set for 0.1s after a tick(dt=-1.0) won't fire
-        until 1.1s of positive dt has elapsed.
-
-        The framework does not validate dt. This is a silent-wrong bug.
+        Previously, negative dt was silently accepted and corrupted timer state.
+        Now it is rejected at the Game.tick() level before reaching any subsystem.
         """
-        fired = []
+        import pytest
 
         class TimerScene(Scene):
             def on_enter(self) -> None:
-                self.after(0.1, lambda: fired.append("timer"))
+                self.after(0.1, lambda: None)
 
         scene = TimerScene()
         mock_game.push(scene)
-        mock_game.tick(dt=-1.0)  # Silently accepted
-
-        # After negative dt, need to tick much more than 0.1s to fire the timer
-        for _ in range(10):
-            mock_game.tick(dt=0.016)  # 0.16s total
-        assert len(fired) == 0, \
-            "Timer with 0.1s delay has not fired after 0.16s because negative dt corrupted state"
+        with pytest.raises(ValueError, match="dt must not be negative"):
+            mock_game.tick(dt=-1.0)
 
     def test_scene_modifies_stack_from_on_exit_outside_tick(self, mock_game: Game) -> None:
-        """BUG: Scene that pushes from on_exit OUTSIDE a tick() loses the deferred op.
+        """FIXED (F58): Scene that pushes from on_exit outside tick() now works.
 
-        When game.pop() is called outside of tick(), the push from on_exit is
-        deferred (because _in_on_exit is True), but flush_pending_ops() is never
-        called afterward. The deferred push is silently lost.
-
-        This is a silent-wrong bug: the deferred operation is queued but never
-        executed when pop() is called outside of a tick.
+        Previously, the push from on_exit was deferred but never flushed
+        when pop() was called outside of tick(). The deferred push was
+        silently lost. Now direct scene ops auto-flush deferred ops.
         """
         log: list[str] = []
 
@@ -477,12 +465,11 @@ class TestEdgeCases:
         log.clear()
         mock_game.pop()
 
-        # BUG: The deferred push is lost -- stack is empty even though
-        # on_exit queued a push("Replacement").
-        # The pending op sits in _pending_ops but is never flushed.
-        assert mock_game._scene_stack.top() is None  # Documenting the bug
-        assert len(mock_game._scene_stack._pending_ops) > 0, \
-            "The deferred push should still be in the pending queue"
+        # F58 fix: deferred ops from on_exit are now flushed automatically
+        assert mock_game._scene_stack.top() is not None
+        assert mock_game._scene_stack.top().__class__.__name__ == "TrackingScene"
+        assert len(mock_game._scene_stack._pending_ops) == 0
+        assert "Replacement.on_enter" in log
 
     def test_scene_modifies_stack_from_on_exit_during_tick(self, mock_game: Game) -> None:
         """Scene that pushes from on_exit DURING a tick should work correctly,

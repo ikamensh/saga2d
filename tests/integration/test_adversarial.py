@@ -252,8 +252,8 @@ class TestSceneStackReentrancyAdvanced:
         assert "C.on_enter" in log
 
     def test_on_exit_pushes_scene(self) -> None:
-        """When A is popped, A.on_exit pushes D -> deferred. D materialises
-        only after the pending ops are flushed (next tick or manual flush)."""
+        """When A is popped, A.on_exit pushes D -> deferred during on_exit,
+        then automatically flushed after the direct pop completes (F58 fix)."""
         log: list[str] = []
         fake_game = FakeGame()
         stack = SceneStack(cast(Game, fake_game))
@@ -271,15 +271,14 @@ class TestSceneStackReentrancyAdvanced:
         stack.pop()
 
         assert "A.on_exit" in log
-        assert len(stack._pending_ops) == 1
-
-        stack.flush_pending_ops()
+        # F58 fix: deferred ops from on_exit are now flushed automatically
+        assert len(stack._pending_ops) == 0
         assert stack.top() is not None
         assert stack.top().name == "D"  # type: ignore[union-attr]
         assert "D.on_enter" in log
 
     def test_on_exit_pushes_during_pop(self) -> None:
-        """B.on_exit pushes X -> deferred; when flushed X is on top."""
+        """B.on_exit pushes X -> deferred during on_exit, auto-flushed (F58)."""
         log: list[str] = []
         fake_game = FakeGame()
         stack = SceneStack(cast(Game, fake_game))
@@ -299,14 +298,13 @@ class TestSceneStackReentrancyAdvanced:
 
         assert "B.on_exit" in log
         assert "A.on_reveal" in log
-        assert len(stack._pending_ops) == 1
-
-        stack.flush_pending_ops()
+        # F58 fix: deferred ops from on_exit are now flushed automatically
+        assert len(stack._pending_ops) == 0
         assert stack.top().name == "X"  # type: ignore[union-attr]
         assert "X.on_enter" in log
 
     def test_on_reveal_pushes_scene(self) -> None:
-        """A.on_reveal pushes E -> deferred; E on top after flush."""
+        """A.on_reveal pushes E -> deferred during on_reveal, auto-flushed (F58)."""
         log: list[str] = []
         fake_game = FakeGame()
         stack = SceneStack(cast(Game, fake_game))
@@ -327,9 +325,8 @@ class TestSceneStackReentrancyAdvanced:
         stack.pop()
 
         assert "A.on_reveal" in log
-        assert len(stack._pending_ops) == 1
-
-        stack.flush_pending_ops()
+        # F58 fix: deferred ops from on_reveal are now flushed automatically
+        assert len(stack._pending_ops) == 0
         assert "E.on_enter" in log
         assert stack.top().name == "E"  # type: ignore[union-attr]
 

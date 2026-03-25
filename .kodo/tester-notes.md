@@ -34,6 +34,12 @@ SAGA2D_HEADLESS=1 uv run python -m pytest \
 
 **Env:** `uv run` from repo root; stray `VIRTUAL_ENV` from another repo → uv warns and uses **this** project `.venv`.
 
+## Stage 4 — lifecycle / deferred stack (tester, 2026-03-25)
+
+**F57/F58 fixes verified:** `flush_pending_ops` exception → queue cleared (F57). Direct `push`/`pop`/`replace`/`clear_and_push` **outside** `tick` → **`_flush_after_direct_op()`** drains deferred ops from `on_exit`/`on_reveal` immediately (F58) — no stale `_pending_ops` until next tick.
+
+**Regression:** `tests/test_kodo_stage4_lifecycle_regression.py` (**37** tests). **Manual probes:** `SAGA2D_HEADLESS=1 uv run python scripts/stage4_probe.py` (**41** PASS). **See `.kodo/test-coverage.md` § Stage 4** for the broader **96-test** bundle + lifecycle harness (**5/5**).
+
 ## UI / particles edge E2E (mock, 2026-03-25)
 
 **Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run python` (project `.venv`; ignore stray `VIRTUAL_ENV` from other repos).

@@ -1,6 +1,6 @@
 # Feature Coverage
 
-Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25. **Stage 2 tester pass:** 2026-03-25. **Stage 3 tester pass (UI/rendering edge cases):** 2026-03-25 — 13 bugs fixed (F44–F56), 84 new regression tests, 2 acceptable edge cases documented.
+Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25. **Stage 2 tester pass:** 2026-03-25. **Stage 3 tester pass (UI/rendering edge cases):** 2026-03-25 — 13 bugs fixed (F44–F56), 84 new regression tests, 2 acceptable edge cases documented. **Stage 4 tester pass (integration/lifecycle):** 2026-03-25 — 2 bugs fixed (F57–F58), 37 new regression tests, 6 existing tests updated.
 
 ## Stage 1 — Window, game loop, scenes (PLAN.md)
 
@@ -101,6 +101,25 @@ Runtime probes via `stage3_repro.py` + pytest regression suite: `tests/test_kodo
 | Grid negative `cell_size` | 2026-03-25 | **fixed (F55)** | Negative dimensions now raise `ValueError`; zero accepted (guarded by `_cell_at`) |
 | Grid zero `cell_size` | 2026-03-25 | **acceptable** | `_cell_at` returns None for zero stride; clicks select nothing; draw emits zero-rects; 3 documentation tests |
 | SaveLoadScreen `slot_count<=0` | 2026-03-25 | **fixed (F56)** | `slot_count <= 0` now raises `ValueError`; positive values create slot buttons normally |
+| flush_pending_ops exception stale ops | 2026-03-25 | **fixed (F57)** | Exception in flush now clears queue; prevents stale op leaks across ticks |
+| Direct scene ops unflushed deferred ops | 2026-03-25 | **fixed (F58)** | push/pop/replace/clear_and_push now auto-flush deferred ops from on_exit/on_reveal |
+| Deferred ops cap (1000) silent discard | 2026-03-25 | **fixed** | Now logs warning and clears remaining ops (was silently leaving them in queue) |
+| Action stopped on scene pop (owned sprite) | 2026-03-25 | **verified** | Sprite removed → action stops; non-owned sprite survives |
+| Timer cancelled on scene pop | 2026-03-25 | **verified** | Scene-owned timers cancelled; timer chains fully cancelled |
+| Timer survives push-over | 2026-03-25 | **verified** | permanent=False preserves timers when scene is covered |
+| clear_and_push kills all timers/actions | 2026-03-25 | **verified** | All owned resources cleaned up across multiple scenes |
+| on_enter exception rollback | 2026-03-25 | **verified** | Failed scene popped from stack; exception propagates |
+| on_exit exception cleanup | 2026-03-25 | **verified** | Cleanup runs in finally block; scene removed from stack |
+| on_reveal exception | 2026-03-25 | **verified** | Exception propagates; popped scene still removed |
+| on_exit exception in clear_and_push | 2026-03-25 | **verified** | All scenes cleaned up; first exception re-raised |
+| update/draw exception propagation | 2026-03-25 | **verified** | Exceptions propagate; end_frame called via try/finally |
+| Repeated Game init/teardown cycles | 2026-03-25 | **verified** | 5+ cycles work cleanly; singleton guard works |
+| Teardown with on_exit exception | 2026-03-25 | **verified** | Logged and continues cleaning up remaining scenes |
+| Double teardown | 2026-03-25 | **verified** | Safe no-op on second call |
+| Sprite after teardown | 2026-03-25 | **verified** | Clean RuntimeError("No active Game") |
+| Deferred ops FIFO order | 2026-03-25 | **verified** | Multiple deferred ops execute in queue order |
+| Nested deferred ops (on_enter during flush) | 2026-03-25 | **verified** | New ops from on_enter picked up by flush loop |
+| pop_on_cancel deferred correctly | 2026-03-25 | **verified** | Auto-pop deferred during input phase |
 | Scene.add_sprite(None) | 2026-03-25 | pending | No None guard |
 | Game invalid resolution | 2026-03-25 | pending | Negative/zero accepted |
 | ColorSwap empty color lists | 2026-03-25 | pending | Silent no-op |
@@ -149,6 +168,90 @@ SAGA2D_HEADLESS=1 uv run python -m pytest \
 | InputManager | 2026-03-25 | pass | — |
 | Theme/Style/Layout | 2026-03-25 | pass | — |
 | HUD visibility | 2026-03-25 | pass | — |
+
+### Stage 4 — Integration/Lifecycle Edge Cases (2026-03-25)
+
+**Investigation scope:** Scene stack transitions during active actions/timers, exceptions in scene hooks, repeated Game init/teardown, deferred operations safety/limits.
+
+**Runtime probes:** `scripts/stage4_probe.py` — 41 probes covering all 4 areas. All PASS.
+
+**Bugs found and fixed (F57–F58):**
+
+| Bug | Description | Fix |
+|-----|-------------|-----|
+| **F57** | `flush_pending_ops` exception left stale ops in `_pending_ops` queue, leaking across ticks | Added `except` clause that clears `_pending_ops` before re-raising |
+| **F58** | Direct scene ops (push/pop/replace/clear_and_push outside tick) didn't flush deferred ops from on_exit/on_reveal | Added `_flush_after_direct_op()` call after each direct `_apply_*` method |
+
+**Also fixed:** Deferred ops cap (1000 iterations) now logs a warning and clears remaining ops instead of silently leaving them in the queue.
+
+**Regression suite:** `tests/test_kodo_stage4_lifecycle_regression.py` — 37 tests. **6 existing tests updated** to match corrected behavior.
+
+**Headless total (post-lifecycle fixes): 2771 passed, 3 skipped.**
+
+**Runtime behavior (verified by tests + runtime probes):**
+
+| Workflow | Outcome |
+|----------|---------|
+| `push`/`pop`/`replace` during `update` / `handle_input` | **Deferred**; `SceneStack.flush_pending_ops()` drains queue at end of `Game.tick` (`max_iterations = 1000`; excess ops logged + cleared). |
+| `on_exit` calls `game.push(...)` **outside** `tick()` | Push is **queued** (`_in_on_exit` forces defer), then **auto-flushed** by `_flush_after_direct_op()` **(F58 fix)**. |
+| `on_exit` calls `game.push(...)` **inside** `tick()` | Push is **deferred** until `flush_pending_ops()` at end of phase — same as before. |
+| `on_reveal` calls `game.push(...)` **outside** `tick()` | Push is **queued** (`_in_on_exit` forces defer), then **auto-flushed** **(F58 fix)**. |
+| `on_enter` calls `game.push(...)` directly | Executes **immediately** (not deferred — `on_enter` is NOT in a deferred context). Allows chaining: A.on_enter→push(B), B.on_enter→push(C). |
+| `flush_pending_ops` raises exception | Remaining ops **cleared** (F57 fix); `_flushing` flag reset in `finally`. |
+| Deferred ops cap (1000) hit | Warning logged; excess ops cleared. |
+| Active action on owned sprite during scene pop | Sprite removed → action stops; callback never fires. |
+| Scene-owned timer during scene pop | Timer cancelled (permanent=True); chain fully cancelled. |
+| Timer survives push-over | Timer continues (permanent=False). |
+| `clear_and_push` with timers/actions | All owned resources cleaned up across all cleared scenes. |
+| `on_enter` raises | Failed scene rolled back off stack; exception propagates. |
+| `on_exit` raises on `pop()` | Cleanup still runs (finally block); scene removed; exception propagates. |
+| `on_exit` raises during `clear_and_push` | All scenes cleaned up; first exception re-raised. |
+| `update()` raises | Exception propagates through `tick()`; scene remains on stack. |
+| `draw()` raises | `end_frame()` called via try/finally; exception propagates. |
+| Repeated Game init/teardown (5+ cycles) | Clean — singleton guard + `_teardown()` clears module globals. |
+| Teardown with on_exit exception | Logged and continues; all scenes cleaned up. |
+| Double teardown | Safe no-op. |
+| Sprite creation after teardown | Clean `RuntimeError("No active Game")`. |
+| Non-owned sprite survives scene pop | Sprite + action continue running after scene exit. |
+
+### Stage 4 — Real-User Gameplay Workflow (2026-03-25)
+
+**Scope:** End-to-end gameplay workflow simulating what a real saga2d user would build — player character, input handling, game loop, AABB collision detection, scene transitions, timers, and composable actions.
+
+**Standalone script:** `scripts/stage4_gameplay_workflow.py` — headless, no env vars needed.
+
+**Pytest suite:** `tests/test_kodo_stage4_gameplay_workflow.py` — 24 tests (16 workflow + 8 AABB collision unit tests).
+
+**No bugs found.** All framework subsystems worked correctly in the integrated workflow.
+
+| Workflow | Outcome |
+|----------|---------|
+| Game creation (mock backend, custom asset_path) | Works correctly |
+| GameplayScene with Camera, player/enemy/ghost/coin sprites | on_enter lifecycle correct |
+| Enemy patrol via `Repeat(Sequence(MoveTo, Delay, MoveTo, Delay))` | Actions advance every tick |
+| Player movement via injected key_press/key_release input events | handle_input → update loop moves player |
+| AABB collision: player vs coin (collectible) | Detected, coin removed, score updated |
+| AABB collision: player vs enemy (damage) | Detected, player tint changed, timer-based reset |
+| Score timer (scene.every 1.0s) | Fires correctly, score increments |
+| Bonus spawn timer (scene.after 2.0s) | Fires correctly, bonus sprite created |
+| Push PauseScene via bind_key("cancel") | on_exit called, **owned sprites removed** (framework design) |
+| Pop PauseScene (pop_on_cancel) | on_reveal called, **sprites re-created** from preserved entity state |
+| Entity position preservation across push/pop | Positions saved in on_exit, restored in _create_sprites |
+| Collected coin not re-created after reveal | `coin_alive` flag prevents re-creation |
+| Push InventoryScene via bind_key("i") | Inventory timer starts, scene entered |
+| Pop InventoryScene (pop_on_cancel) | **Inventory timer cancelled on exit** (scene-owned timer cleanup) |
+| Ghost fade action (Repeat(FadeOut, FadeIn)) runs after reveal | Re-created in on_reveal, opacity varies |
+| Replace gameplay → VictoryScene | All gameplay sprites cleaned up (permanent exit) |
+| Camera follows player movement | camera.center_on updates in update() |
+| draw_world_rect debug overlays | 3+ rects drawn per frame in draw() |
+| Multiple transition lifecycle counting | 3 exits, 2 reveals across pause+inventory+replace |
+
+**Key framework behavior documented:**
+- Owned sprites are **always removed** when a scene is pushed over (`_cleanup_exiting_scene(permanent=False)` still calls `_cleanup_owned_sprites()`). Users must save entity state in on_exit and re-create sprites in on_reveal.
+- Scene-owned timers survive push-over (permanent=False) but are cancelled on permanent exit (pop/replace/clear_and_push).
+- Inventory timers cancelled on scene exit — verified by running 60 ticks after exit, timer never fires.
+
+**Headless total: 2795 passed, 3 skipped.**
 
 ### Blocked Workflows
 | Workflow | Reason |

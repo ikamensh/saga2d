@@ -115,3 +115,9 @@ desired_examples/        # API design sketches
 - **F30:** `Component.draw` / `handle_event` / `_UIRoot._update_recursive` iterate over `list(_children)` so sibling add/remove during traversal cannot skip children. Tests: `TestComponentMutationNoSkip` in `tests/test_kodo_ui_particle_edge.py`.
 - **F31–F33:** `Camera.shake()` rejects non-finite params; `Camera.update()` returns early on non-finite `dt`; follow mode skips frame when target `x,y` non-finite. Suite: `tests/test_kodo_camera_nan_edge.py` (30 tests). Run: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_camera_nan_edge.py -v`.
 - Narrative + commands: `.kodo/test-coverage.md` (Stage 4 independent verify + deep investigation sections).
+
+## Stage 4 — scene stack F57–F58 + headless gameplay workflow (2026-03-25)
+
+- **F57:** `SceneStack.flush_pending_ops`: if an exception is raised while flushing, `_pending_ops` is cleared so stale queued ops do not run on the next tick. Iteration cap logs a warning and clears overflow.
+- **F58:** Direct `push`/`pop`/`replace`/`clear_and_push` outside tick call `_flush_after_direct_op()` so deferred work scheduled from `on_exit` / `on_reveal` runs when the outer stack call returns.
+- **Tests / probes:** `tests/test_kodo_stage4_lifecycle_regression.py`; `tests/test_kodo_stage4_gameplay_workflow.py`; `tests/test_kodo_stage4_integration.py`; `tests/test_kodo_adversarial_fresh.py::TestReentrantSceneOperations`. Probes: `SAGA2D_HEADLESS=1 uv run python scripts/stage4_probe.py`. Scripted workflow: `uv run python scripts/stage4_gameplay_workflow.py`.

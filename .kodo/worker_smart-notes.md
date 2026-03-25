@@ -11,11 +11,11 @@
 - `saga2d/rendering/` — camera.py, sprite.py, particles.py, animation.py, layers.py
 - `saga2d/ui/` — component.py (base Component + _UIRoot), components.py (Label/Button/Panel), widgets.py (List/Grid/DataTable/etc), layout.py, theme.py
 - `saga2d/backends/` — mock_backend.py (headless), pyglet_backend.py
-- `tests/` — 2651+ tests (headless), organized by area (actions/, core/, rendering/, systems/, ui/, integration/, kodo_test_*.py, test_kodo_*.py)
+- `tests/` — 2795+ tests (headless), organized by area (actions/, core/, rendering/, systems/, ui/, integration/, kodo_test_*.py, test_kodo_*.py)
 
-## Test Counts (2026-03-25, post-Stage 3 complete)
-- 2734 passed, 3 skipped (game.run() under SAGA2D_HEADLESS), 0 failures (excluding visual_verify)
-- ~65s runtime (headless)
+## Test Counts (2026-03-25, post-Stage 4 gameplay workflow)
+- 2795 passed, 3 skipped (game.run() under SAGA2D_HEADLESS), 0 failures (excluding visual_verify)
+- ~30s runtime (headless)
 
 ## Stage 1 Status — COMPLETE (2026-03-25)
 - Scope: Environment Setup & Smoke Testing — game loop, push/pop scenes, backend protocol, Game + Scene/SceneStack
@@ -71,8 +71,52 @@
 - `tests/test_kodo_stage3_ui_rendering_regression.py` — NEW (84 tests)
 - 9 existing test files updated (16 tests total)
 
+## Stage 4 — Integration/Lifecycle Edge Cases (2026-03-25)
+### Investigation results (2 bugs confirmed via runtime probes)
+- F57: flush_pending_ops exception left stale ops in queue, leaking across ticks
+- F58: Direct scene ops (push/pop/replace/clear_and_push) outside tick() didn't flush deferred ops from on_exit/on_reveal
+- Also: deferred ops cap (1000) silently discarded ops — now logs warning and clears
+
+### Areas verified correct (no bugs)
+- Scene stack transitions during active actions/timers (owned sprites removed, timers cancelled, non-owned survive)
+- Exceptions in on_enter (rollback), on_exit (finally block cleanup), on_reveal (propagates)
+- Repeated Game init/teardown (5+ cycles clean, singleton guard works, double teardown safe)
+- Deferred ops FIFO order, nested ops from on_enter during flush, 1000-cap for deferred path
+
+### Fixes applied
+- F57: `saga2d/scene.py` — flush_pending_ops() clears queue on exception before re-raising
+- F58: `saga2d/scene.py` — added `_flush_after_direct_op()` method; called after each direct `_apply_*` in push/pop/replace/clear_and_push
+- Deferred ops cap: both flush methods now log warning and clear remaining ops
+
+### Files changed
+- `saga2d/scene.py` — F57 + F58 fixes + _flush_after_direct_op method
+- `tests/test_kodo_stage4_lifecycle_regression.py` — NEW, 37 regression tests
+- `tests/integration/test_adversarial.py` — 3 tests updated (pending_ops == 0 after auto-flush)
+- `tests/kodo_test_core.py` — 2 tests updated (negative dt ValueError, on_exit outside tick auto-flush)
+- `tests/test_kodo_adversarial_fresh.py` — 1 test updated (on_exit push outside tick auto-flush)
+- `scripts/stage4_probe.py` — NEW, 41 runtime probes
+
+## Stage 4 Gameplay Workflow (2026-03-25) — NO BUGS FOUND
+### What it exercises
+- Full gameplay loop: Game→GameplayScene→player/enemy/ghost/coin sprites
+- Input handling via mock backend inject_key → handle_input → update movement
+- AABB collision detection (custom sprite_rect + aabb_collides helpers)
+- Scene transitions: push PauseScene, pop via pop_on_cancel, push InventoryScene, replace VictoryScene
+- Timers (scene.every, scene.after) + composable actions (Repeat, Sequence, MoveTo, FadeOut/In, Delay)
+- Entity state preservation across push/pop (save in on_exit, re-create sprites in on_reveal)
+- Camera follows player, draw_world_rect debug overlays
+
+### Key insight: owned sprites removed on push-over
+- `_cleanup_exiting_scene(permanent=False)` still calls `_cleanup_owned_sprites()`
+- Users must save entity state in on_exit and re-create sprites in on_reveal
+- Scene-owned timers survive push-over but are cancelled on permanent exit
+
+### Files created
+- `scripts/stage4_gameplay_workflow.py` — standalone headless script
+- `tests/test_kodo_stage4_gameplay_workflow.py` — 24 pytest tests (16 workflow + 8 AABB unit)
+
 ## Bugs Fixed (F-numbered)
-- F1-F10, F12, F15-F16, F18-F19, F21-F33, F42-F56 (44 total)
+- F1-F10, F12, F15-F16, F18-F19, F21-F33, F42-F58 (46 total)
 - F42: Repeat(times=negative_int) now raises ValueError (actions.py)
 - F43: MoveTo position validation — clear TypeError for scalar/short-tuple/non-numeric (actions.py)
 - F44: ProgressBar constructor NaN/Inf bypass — ctor now validates value + max_value (widgets.py)
@@ -88,6 +132,8 @@
 - F54: DataTable(row_height<=0) accepted — now raises ValueError (widgets.py)
 - F55: Grid(cell_size=negative) accepted — now raises ValueError; zero remains accepted (widgets.py)
 - F56: SaveLoadScreen(slot_count<=0) accepted — now raises ValueError (screens.py)
+- F57: flush_pending_ops exception left stale ops in queue — now clears queue before re-raising (scene.py)
+- F58: Direct scene ops didn't auto-flush deferred ops from on_exit/on_reveal — added _flush_after_direct_op() (scene.py)
 
 ## Key Patterns
 - NaN/Inf: All public APIs validate with `math.isfinite()` (actions, tween, timer, camera, particles, widgets, sprite tint/move_to, animation.update)
@@ -98,6 +144,8 @@
 - Assets: `Sprite('sprites/knight')` resolves to `assets/images/sprites/knight.png`
 - Repeat: bool is subclass of int — must check `isinstance(times, bool)` explicitly to reject it
 - MoveTo: use iter()/next() for position validation — avoids index-based access that leaks raw errors
+- SceneStack deferred ops: _should_defer() checks _in_tick, _flushing, _in_on_exit; direct public methods call _flush_after_direct_op() for ops queued during on_exit/on_reveal
+- on_enter is NOT deferred — executes immediately (many tests depend on this behavior)
 
 ## Gotchas
 - `Game.__del__` prints ImportError during Python shutdown (known F11, cosmetic)
