@@ -218,22 +218,18 @@ class TestF37ProgressBarEdgeCases:
     """ProgressBar should handle edge case values gracefully."""
 
     def test_progressbar_nan_value(self, game, scene):
-        """NaN value should be rejected or clamped."""
+        """NaN value should be rejected with ValueError."""
         bar = ProgressBar(value=50, max_value=100)
         scene.ui.add(bar)
-        # Setting value to NaN
-        bar.value = float('nan')
-        # fraction should not be NaN — it should be clamped
-        frac = bar.fraction
-        assert math.isfinite(frac), f"fraction is {frac}, should be finite"
+        with pytest.raises(ValueError, match="finite"):
+            bar.value = float('nan')
 
     def test_progressbar_inf_value(self, game, scene):
-        """Inf value should result in clamped fraction."""
+        """Inf value should be rejected with ValueError."""
         bar = ProgressBar(value=50, max_value=100)
         scene.ui.add(bar)
-        bar.value = float('inf')
-        frac = bar.fraction
-        assert math.isfinite(frac), f"fraction is {frac}, should be finite"
+        with pytest.raises(ValueError, match="finite"):
+            bar.value = float('inf')
 
     def test_progressbar_max_value_zero(self, game, scene):
         """max_value=0 should not divide by zero."""
@@ -273,9 +269,10 @@ class TestF38ShowSequenceEmpty:
 class TestF39GameTickNegativeDt:
     """Game.tick() with negative dt should not corrupt state."""
 
-    def test_negative_dt_no_crash(self, game, scene):
-        """Negative dt should not crash the game loop."""
-        game.tick(dt=-0.016)  # Should not raise or corrupt
+    def test_negative_dt_rejected(self, game, scene):
+        """Negative dt should raise ValueError."""
+        with pytest.raises(ValueError, match="negative"):
+            game.tick(dt=-0.016)
 
     def test_zero_dt_no_crash(self, game, scene):
         """Zero dt should be a valid no-op tick."""
