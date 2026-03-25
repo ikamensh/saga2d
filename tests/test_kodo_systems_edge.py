@@ -157,25 +157,22 @@ class TestParticleEmitterContinuousZeroRate:
         assert len(emitter._particles) == 0
         emitter.remove()
 
-    def test_continuous_negative_rate_spawns_nothing(self, mock_game: Any) -> None:
-        """Negative rate should not spawn particles.
+    def test_continuous_negative_rate_rejected(self, mock_game: Any) -> None:
+        """Negative rate should now raise ValueError (was silently treated as 0).
 
-        The continuous() method sets _continuous_rate directly.  The update()
-        method only spawns when _continuous_rate > 0, so negative values
-        are effectively treated as 0 (no spawning).
+        Since negative rate has no valid meaning and Inf rate causes an
+        infinite loop, all non-finite and negative rates are now rejected
+        at the call site with a clear error message.
         """
+        import pytest
         from saga2d.rendering.particles import ParticleEmitter
 
         emitter = ParticleEmitter(
             "sprites/spark",
             position=(100, 100),
         )
-        emitter.continuous(rate=-10)
-
-        for _ in range(100):
-            emitter.update(0.016)
-
-        assert len(emitter._particles) == 0
+        with pytest.raises(ValueError, match="rate must be >= 0"):
+            emitter.continuous(rate=-10)
         emitter.remove()
 
 
