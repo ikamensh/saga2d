@@ -187,13 +187,70 @@ b.target = c
 
 ---
 
+## Stage 4 Independent Verification (2026-03-23, fresh agent run)
+
+### Commands Run and Outcomes
+
+| Command | Scope | Result |
+|---------|-------|--------|
+| `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_camera_drag_edge.py -v` | Camera drag, scroll NaN/Inf, shake, pan_to, drag-drop, save, scene | **38 passed** (0.04s) |
+| `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_animation_tween_edge.py -v` | Tween zero/NaN/Inf duration, easing, conflict, cancel | **44 passed** (0.03s) |
+| `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_particle_nan_lifetime.py tests/test_kodo_ui_particle_edge.py -v` | Particle NaN lifetime, zero speed, camera shake, UI widgets, component tree | **107 passed** (0.07s) |
+| `SAGA2D_HEADLESS=1 uv run python -m pytest tests/systems/test_audio.py tests/test_kodo_crossfade_repro.py -v` | Audio crossfade, volume clamping, pools, asset loading | **122 passed** (0.26s) |
+| `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_systems_edge.py tests/test_kodo_widget_edge.py tests/test_kodo_timer_widget_edge.py tests/test_kodo_stage3_regression.py tests/test_kodo_actions_edge.py -v` | Broader edge-case suites | **231 passed** (0.19s) |
+| `SAGA2D_HEADLESS=1 uv run python camera_advanced_edge_e2e_headless.py` | Camera E2E (shake, pan, follow, edge scroll) | **PASS** |
+| `SAGA2D_HEADLESS=1 uv run python tween_edge_e2e_probe.py` | Tween E2E (invalid duration, zero, on_complete, negative dt) | **all PASS** |
+| `SAGA2D_HEADLESS=1 uv run python e2e_multifeature_headless.py` | Multi-system integration | **PASS** |
+
+### Bugs Reproduced and Fixed
+
+#### F29: Camera.scroll() NaN/Inf silent corruption (uncommitted fix found)
+
+- **Repro:** `Camera.scroll(float('nan'), 0)` silently corrupted internal `_x`/`_y` — all subsequent coordinate conversions produced NaN.
+- **Root cause:** `scroll()` lacked `math.isfinite()` guard unlike `center_on()` and `pan_to()`.
+- **Fix:** Added `if not math.isfinite(dx) or not math.isfinite(dy): raise ValueError(...)` guard at the top of `scroll()`.
+- **Test:** `TestCameraScrollNaNInf` (7 tests) in `tests/test_kodo_camera_drag_edge.py` — all pass.
+- **Status:** Fix already present as uncommitted change in `saga2d/rendering/camera.py`.
+
+#### F30: Component tree iteration mutation skips children (EC3/EC4/EC5)
+
+- **Repro:** If a component's `update()`, `on_draw()`, or `on_event()` callback removes a sibling from `_children`, the iterator over the live list silently skips subsequent children. Confirmed all three paths:
+  - EC3: `_update_recursive()` — sibling removed during `update()` → next child skipped
+  - EC4: `draw()` — sibling removed during `on_draw()` → next child skipped
+  - EC5: `handle_event()` — `reversed()` on live list → removed child skipped
+- **Root cause:** All three iteration sites iterated over `self._children` / `component._children` directly without snapshotting, unlike `TweenManager.update()` and `TimerManager.update()` which use `list()`.
+- **Fix:** Changed all three to iterate over `list(self._children)` / `list(component._children)` snapshots in `saga2d/ui/component.py`:
+  - `handle_event()`: `reversed(self._children)` → `reversed(list(self._children))`
+  - `draw()`: `for child in self._children` → `for child in list(self._children)`
+  - `_update_recursive()`: `for child in component._children` → `for child in list(component._children)`
+- **Tests:** `TestComponentMutationNoSkip` (4 tests) in `tests/test_kodo_ui_particle_edge.py` — all pass. These assert children are NOT skipped (stronger than prior "no crash" tests).
+
+### EC2 Clarification
+
+- **Documented as:** "MoveTo.update(NaN) silently sets sprite.position=(NaN,NaN)"
+- **Actual behavior (verified):** `Sprite.position` setter already validates with `math.isfinite()` and **raises ValueError**. No silent corruption occurs. No fix needed.
+
+### Full Suite After Fixes
+
+```
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/ \
+  --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+```
+
+| Metric | Value |
+|--------|-------|
+| Collected | **2440** |
+| Passed | **2440** |
+| Skipped | **3** (game.run() under SAGA2D_HEADLESS) |
+| Failed | **0** |
+| Duration | ~30s |
+
 ## Cumulative Summary
 
-- **2197 tests passing**, 3 skipped (SAGA2D_HEADLESS), 0 failures
-- **22 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F25R)
+- **2440 tests passing**, 3 skipped (SAGA2D_HEADLESS), 0 failures
+- **24 bugs found and fixed** (F1, F3–F10, F12, F15–F16, F18–F19, F21–F25R, F28, F29, F30)
 - **5 documented behaviors** (F11, F13, F14, F17, F20)
 - **10 sharp edges** (SE1–SE10)
-- **5 new edge cases identified** (EC1–EC5) by focused audit
-- **EC1 is actionable** (DataTable ZeroDivisionError on row_height=0)
-- **EC3–EC5 are architectural** (component iteration safety, low production risk)
-- **EC2 is defensive** (NaN dt in action.update(), no production path)
+- **EC1 fixed** (F27 — DataTable ZeroDivisionError on row_height=0)
+- **EC2 not a bug** (Sprite.position setter already raises ValueError on NaN)
+- **EC3–EC5 fixed** (F30 — component iteration snapshot safety)

@@ -1,5 +1,78 @@
 # Tester Notes - Saga2D
 
+## Stage 4 — camera / audio / tween / particles (headless E2E) — verified 2026-03-23
+
+**Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run`, **no GUI** (mock backend). **Stereo pan:** not in `saga2d/audio.py` — only scalar **volume** on channels / `play_sound` / crossfade.
+
+**Import smoke**
+
+```bash
+SAGA2D_HEADLESS=1 uv run python -c "from saga2d import Game, Scene; g=Game('t',backend='mock'); g.push(Scene()); g.tick(0.016); g._teardown(); print('import_smoke OK')"
+```
+
+**Runnable scripts (user-style `Game.tick`)**
+
+```bash
+SAGA2D_HEADLESS=1 uv run python camera_advanced_edge_e2e_headless.py   # shake decay=0, 2nd pan replaces 1st, bounds shrink + follow, edge_scroll margin=0
+SAGA2D_HEADLESS=1 uv run python tween_edge_e2e_probe.py                # invalid duration → ValueError; duration=0; large dt; non-finite dt; negative tick(dt)
+SAGA2D_HEADLESS=1 uv run python e2e_multifeature_headless.py           # tween + particles + audio workflow
+```
+
+**F31/F32/F33 — camera NaN/Inf (worker_smart) — verified 2026-03-23**
+
+- **Pytest (all behaviors):** `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_camera_nan_edge.py -v` → **30 passed** (~0.03s). Covers: `shake()` rejects non-finite intensity/duration/decay; `update()` ignores non-finite `dt` (key_scroll, edge_scroll, shake elapsed, follow); `follow()` skips non-finite target coords; coordinate helpers stay finite after guards.
+- **User-style smoke (prints `user_probe F31/F32/F33 OK`):** exercise `Camera` directly — invalid `shake()` → `ValueError` (`finite`); `enable` key scroll + `update(nan)` → `_x/_y` unchanged; `follow` sprite then `target.x = nan` + `update` → camera position unchanged and finite. Run the same logic in a local `python -c` or copy from `tests/test_kodo_camera_nan_edge.py` examples.
+
+**Pytest bundles (last run: 20 + 135 + 66 = 221 passed)**
+
+```bash
+cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
+SAGA2D_HEADLESS=1 uv run python -m pytest \
+  tests/test_kodo_systems_edge.py::TestCameraShakeDecayZero \
+  tests/test_kodo_systems_edge.py::TestCameraPanToDuringShake \
+  tests/test_kodo_systems_edge.py::TestCameraEdgeScrollMarginZero \
+  tests/test_kodo_systems_edge.py::TestParticleEmitterInvertedRanges \
+  tests/test_kodo_systems_edge.py::TestParticleEmitterNaNPosition \
+  tests/test_kodo_camera_drag_edge.py::TestCameraPanToCancels \
+  tests/test_kodo_camera_drag_edge.py::TestCameraScrollNaNInf \
+  tests/rendering/test_camera.py::TestPanTo::test_pan_to_replaces_previous_pan \
+  tests/rendering/test_camera.py::TestFollow::test_follow_clamps_to_world_bounds \
+  tests/rendering/test_camera.py::TestWorldBounds::test_world_bounds_setter_clamps_immediately \
+  tests/rendering/test_camera.py::TestEdgeScroll::test_edge_scroll_via_game_tick \
+  -q
+
+SAGA2D_HEADLESS=1 uv run python -m pytest \
+  tests/systems/test_audio.py \
+  tests/integration/test_adversarial.py::TestAudioAdversarial \
+  tests/integration/test_adversarial.py::TestAudioEdgeCases \
+  tests/test_kodo_adversarial_fresh.py::TestAudioStress \
+  tests/test_kodo_crossfade_repro.py \
+  -q
+
+SAGA2D_HEADLESS=1 uv run python -m pytest \
+  tests/test_kodo_animation_tween_edge.py::TestTweenZeroDuration \
+  tests/test_kodo_animation_tween_edge.py::TestTweenNegativeDuration \
+  tests/test_kodo_animation_tween_edge.py::TestTweenLargeDt \
+  tests/test_kodo_animation_tween_edge.py::TestTweenConflict \
+  tests/test_kodo_animation_tween_edge.py::TestTweenExistingValidation \
+  tests/actions/test_tween.py \
+  tests/test_kodo_ui_particle_edge.py::TestParticleZeroLifetime \
+  tests/test_kodo_ui_particle_edge.py::TestParticleSpeedZero \
+  tests/test_kodo_ui_particle_edge.py::TestParticleFadeWithZeroLifetime \
+  tests/test_kodo_particle_nan_lifetime.py \
+  -q
+```
+
+**Findings (no bugs on mock paths)**
+
+| Area | Result |
+|------|--------|
+| Camera | `decay=0` keeps amplitude until shake ends; second `pan_to` replaces tween ids; follow clamps after `world_bounds` shrink; `margin=0` scroll only when pointer is **strictly outside** viewport. |
+| Audio | Concurrent crossfades, rapid play/stop/SFX, volume extremes covered in pytest; mock has no speaker. Py 3.13: `set_volume(..., nan)` can store **1.0** via `min`/`max` — sharp edge, not a crash. |
+| Tweens | Invalid duration raises `ValueError`; `duration=0` snaps on first tick; overlapping tweens on same property **do not auto-cancel** (`TestTweenConflict`); negative `tick(dt)` can move value backward / below `from_val` (documented). |
+| Particles | Inverted `(high, low)` ranges OK (`uniform`); NaN/Inf **lifetime** rejected in ctor; NaN **position** + `burst` → `ValueError` from `Sprite`. |
+| Obsolete script | `reproduce_particle_nan_lifetime.py` — ctor now rejects non-finite lifetime; use `tests/test_kodo_particle_nan_lifetime.py`. |
+
 ## 2026-03-23 — Edge-case UX bundle (Grid / TabGroup / ProgressBar / particles / Animation / List)
 
 - **Install:** `uv run` from repo root (deps via `uv sync --extra dev` if needed). **Headless:** `SAGA2D_HEADLESS=1`.
