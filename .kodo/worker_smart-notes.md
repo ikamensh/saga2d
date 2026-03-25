@@ -13,9 +13,9 @@
 - `saga2d/backends/` — mock_backend.py (headless), pyglet_backend.py
 - `tests/` — 2795+ tests (headless), organized by area (actions/, core/, rendering/, systems/, ui/, integration/, kodo_test_*.py, test_kodo_*.py)
 
-## Test Counts (2026-03-25, post-Stage 4 gameplay workflow)
+## Test Counts (2026-03-25, post-Stage 5 final)
 - 2795 passed, 3 skipped (game.run() under SAGA2D_HEADLESS), 0 failures (excluding visual_verify)
-- ~30s runtime (headless)
+- ~31s runtime (headless)
 
 ## Stage 1 Status — COMPLETE (2026-03-25)
 - Scope: Environment Setup & Smoke Testing — game loop, push/pop scenes, backend protocol, Game + Scene/SceneStack
@@ -134,6 +134,34 @@
 - F56: SaveLoadScreen(slot_count<=0) accepted — now raises ValueError (screens.py)
 - F57: flush_pending_ops exception left stale ops in queue — now clears queue before re-raising (scene.py)
 - F58: Direct scene ops didn't auto-flush deferred ops from on_exit/on_reveal — added _flush_after_direct_op() (scene.py)
+
+## Stage 5 — Asset/Resource Edge Cases (2026-03-25) — NO BUGS FOUND
+### Investigation results (44 runtime probes, all pass)
+- Missing image/sound/music → AssetNotFoundError with tried paths
+- Empty string image name → AssetNotFoundError
+- play_sound/play_music optional=True → returns None gracefully
+- crossfade_music with missing target → AssetNotFoundError (no optional flag)
+- Cache behavior correct (same handle returned for repeated loads)
+- Corrupt/zero-byte files: mock backend never reads contents; PIL would fail on real decode
+- ColorSwap palette errors: proper KeyError/TypeError for invalid palettes
+- CursorManager missing images → AssetNotFoundError
+- ParticleEmitter: deferred image validation — ctor succeeds, crashes at burst() (by design)
+- Sprite.image setter with missing asset → AssetNotFoundError
+- AnimationDef frame_duration ≤ 0 → ValueError
+- Sprite.play() with missing frames → AssetNotFoundError
+- Sprite creation after teardown → RuntimeError("No active Game")
+- @2x variant selection: prefers @2x when available
+- Audio channels: stop/volume on invalid channel → graceful (no crash)
+- SaveManager: empty slots, corrupt JSON, binary garbage, zero-byte, non-serializable → SaveError with slot info and recovery hints
+- FSM unknown event → ignored (no crash)
+
+### Files created
+- `scripts/stage5_asset_probe.py` — 44 runtime probes
+
+### Key gaps documented (not bugs)
+- Mock backend never validates file contents — corrupt media only caught by pyglet in display mode
+- No optional flag on crossfade_music — users must guard missing music themselves
+- ParticleEmitter deferred image validation — fail-fast alternative not available
 
 ## Key Patterns
 - NaN/Inf: All public APIs validate with `math.isfinite()` (actions, tween, timer, camera, particles, widgets, sprite tint/move_to, animation.update)

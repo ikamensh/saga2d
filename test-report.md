@@ -1,7 +1,16 @@
-# Test report — Stage 1 install & smoke (tester agent)
+# Test Report — Saga2D Quality Assurance
 
-**Date:** 2026-03-25  
+**Dates:** 2026-03-25
 **Repo:** `saga2d` (workspace root)
+**Final suite (delivery baseline, excl. visual_verify):** **2795 passed, 3 skipped, 0 failed** (~31s headless)
+**Bugs fixed:** **F42–F58** (17 bugs found and fixed across Stages 2–4)
+**Stages 4–5 (gameplay workflow + asset/resource probes):** 0 new bugs found
+
+---
+
+## Stage 1 — Install & Smoke (tester agent)
+
+**Date:** 2026-03-25
 
 ## Environment
 
@@ -32,22 +41,25 @@ SAGA2D_HEADLESS=1 uv run python -m pytest tests/visual_verify/ -q --tb=no
 
 ## Full pytest (`tests/`)
 
-**Collection:** **2665** tests (`pytest tests/ --co -q`).
+> **Two baselines are tracked throughout this report:**
+>
+> | Baseline | What it includes | Use |
+> |----------|-----------------|-----|
+> | **Delivery baseline** | `--ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` | Clean pass/fail metric; all failures are actionable engine bugs |
+> | **Full tree** | All of `tests/` | Includes AI/screenshot golden-image tests that require `ANTHROPIC_API_KEY` + display server; failures here are environment-dependent, not engine regressions |
 
-**With `SAGA2D_HEADLESS=1` (full tree):**
+### Stage 1 snapshot (before Stages 2–5 additions)
 
-- **2649 passed**, **11 failed**, **5 skipped**, ~45s (first full run timing)
-- **Failures:** all under `tests/visual_verify/` — `test_menu_tutorial_ai.py` (8 tests) and `test_ui_with_ai.py` (3 tests); failures are AI / screenshot golden assertions (not mock-backend regressions)
-- **Skips:** 3× `tests/core/test_game.py` — `game.run()` disabled when `SAGA2D_HEADLESS` is set; 2× `tests/visual_verify/test_ai_checker.py` — requires `ANTHROPIC_API_KEY`
+These counts were captured at the start of testing, before any fixes or new tests were added. They are preserved here for reference only; **see [Final Test Suite Counts](#final-test-suite-counts) for current numbers.**
 
-**Excluding optional AI visual bucket** (`--ignore=tests/visual_verify`):
+- **Full tree:** 2665 collected → 2649 passed, 11 failed (`tests/visual_verify/`), 5 skipped
+- **Delivery baseline:** 2631 passed, 3 skipped (`game.run()` under `SAGA2D_HEADLESS=1`)
 
-- **2631 passed**, **3 skipped** (~34s)
-- **Skips:** same three `game.run()` tests in `tests/core/test_game.py`
+The 11 full-tree failures are all AI/screenshot assertions in `tests/visual_verify/` (`test_menu_tutorial_ai.py` × 8, `test_ui_with_ai.py` × 3) — not engine regressions. The 2 extra skips are `tests/visual_verify/test_ai_checker.py` (requires `ANTHROPIC_API_KEY`).
 
-## Claimed “2,522 tests”
+### Note on earlier "2,522 tests" claim
 
-On this machine, **2,522 passing is not current**: the suite collected **2665** tests and **2649** passed with the full tree (before counting failures as “not pass”). The **2631** figure matches “everything except `tests/visual_verify`” with only the headless `game.run()` skips.
+That count predates this checkout. The Stage 1 baseline was 2665 collected / 2631 delivery-passing.
 
 ## Smoke script: `scripts/smoke_game_move_to.py`
 
@@ -225,3 +237,243 @@ SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --
 ### Verification
 
 All 24 tests pass. Full suite: **2795 passed, 3 skipped** (up from 2771 — 24 new tests added, 0 regressions).
+
+## Stage 5 — Asset/Resource Edge-Case Probes & Final Report
+
+**Date:** 2026-03-25
+
+### Scope
+
+Systematic runtime probes of every asset/resource error path: missing files, corrupt files, bad parameters, cache behavior, save file corruption variants, audio channel errors, cursor registration, particle emitter deferred validation, animation frame resolution, @2x variant selection.
+
+### Runtime probe script
+
+`scripts/stage5_asset_probe.py` — **44 probes**, all executed headlessly.
+
+```bash
+uv run python scripts/stage5_asset_probe.py
+# → 44/44 passed, 0 bugs found
+# → PASS — all asset/resource edge cases handled correctly
+```
+
+### Probes by category
+
+**Asset loading — missing files (A1–A5):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A1 | `Sprite("sprites/nonexistent")` | `AssetNotFoundError` with tried paths in message |
+| A2 | `Sprite("")` (empty name) | `AssetNotFoundError` |
+| A3 | `assets.sound("missing_sfx")` | `AssetNotFoundError` listing .wav/.ogg/.mp3 |
+| A4 | `assets.music("missing_track")` | `AssetNotFoundError` listing .ogg/.wav/.mp3 |
+| A5 | `assets.frames("nonexistent_walk")` | `AssetNotFoundError` with glob pattern |
+
+**Asset loading — optional/graceful handling (A6–A8):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A6 | `audio.play_sound("missing", optional=True)` | Returns `None` silently |
+| A7 | `audio.play_music("missing", optional=True)` | Returns `None` silently |
+| A8 | `audio.crossfade_music("missing")` (no optional flag) | `AssetNotFoundError` propagates |
+
+**Asset loading — caching (A9–A10):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A9 | Same image name returns same handle | Cached correctly |
+| A10 | Same sound name returns same handle | Cached correctly |
+
+**Corrupt/empty files (A11–A12):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A11 | Corrupt PNG bytes (`\x00\x01BAD`) | Mock backend accepts (no content validation) |
+| A12 | Zero-byte PNG file | Mock backend accepts (path exists → OK) |
+
+**ColorSwap / palettes (A13–A15):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A13 | `get_palette("nonexistent_team")` | `KeyError` with palette name |
+| A14 | `Sprite("knight", team_palette="blue_team")` unregistered | `KeyError` |
+| A15 | `ColorSwap(source=[2 colors], target=[1 color])` | `ValueError` |
+
+**CursorManager (A16–A17):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A16 | `cursor.register("attack", "ui/nonexistent")` | `AssetNotFoundError` |
+| A17 | `cursor.set("nonexistent")` | `KeyError` |
+
+**ParticleEmitter deferred validation (A18):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A18 | `ParticleEmitter("nonexistent_particle")` — construct then `burst()` | Construction succeeds; `AssetNotFoundError` on `burst()` |
+
+**Sprite edge cases (A19, A24):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A19 | `sprite.image = "nonexistent"` | `AssetNotFoundError` |
+| A24 | `Sprite(...)` after `game._teardown()` | `RuntimeError("No active Game")` |
+
+**AnimationDef validation (A20–A23):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A20 | `AnimationDef(frame_duration=0)` | `ValueError` |
+| A21 | `AnimationDef(frame_duration=-0.1)` | `ValueError` |
+| A22 | `AnimationDef(frame_duration=NaN)` | `ValueError` |
+| A23 | `Sprite.play()` with missing frame images | `AssetNotFoundError` |
+
+**@2x variant selection (A25–A26):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| A25 | `scale_factor=2.0` with `hero@2x.png` present | @2x variant selected |
+| A26 | `scale_factor=1.0` with `hero@2x.png` present | Base variant selected |
+
+**Audio edge cases (AU1–AU5):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| AU1 | `audio.set_volume("nonexistent_channel", 0.5)` | `KeyError` |
+| AU2 | `audio.play_sound("click", channel="nonexistent")` | `KeyError` |
+| AU3 | `audio.crossfade_music("b", duration=NaN)` | `ValueError` |
+| AU4 | `audio.crossfade_music("b", duration=-1.0)` | `ValueError` |
+| AU5 | `audio.play_pool("nonexistent_pool")` | `KeyError` |
+
+**SaveManager edge cases (S1–S12):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| S1 | `load(1)` on empty slot | Returns `None` |
+| S2 | `save(1, ...)` creates missing directory | Directory auto-created |
+| S3 | Corrupt JSON in save file | `SaveError` with slot number + recovery hint |
+| S4 | JSON array (non-dict) in save file | `SaveError("expected JSON object")` |
+| S5 | Binary garbage in save file | `SaveError` (wraps `UnicodeDecodeError`) |
+| S6 | Zero-byte save file | `SaveError` (wraps `JSONDecodeError`) |
+| S7 | Non-serializable state (lambda) | `SaveError` (wraps `TypeError`) |
+| S8 | `slot=0`, `slot=-1`, `slot=float`, `slot=str` | `ValueError` / `TypeError` |
+| S9 | `delete(99)` on nonexistent slot | Silent no-op |
+| S10 | `delete(1)` on existing slot | File removed, `load(1)` returns `None` |
+| S11 | `list_slots()` with corrupt slot 3 | `SaveError` propagates |
+| S12 | `delete()` slot validation | `ValueError`/`TypeError` as expected |
+
+**FSM (F1):**
+
+| Probe | Edge case | Outcome |
+|-------|-----------|---------|
+| F1 | `sm.trigger("nonexistent_event")` | Silent no-op (state unchanged) |
+
+### Bugs found
+
+**None.** All 44 probes passed. The framework's asset, audio, save, and resource error handling is comprehensive and consistent.
+
+---
+
+## Findings Summary Table (F42–F58)
+
+All bugs were found via runtime probes with exact repro steps. Fixed with regression tests.
+
+| ID | Stage | Component | Description | Fix | Tests |
+|----|-------|-----------|-------------|-----|-------|
+| **F42** | 2 | `actions.py` | `Repeat(times=-1)` silently accepted as no-op | `ValueError` for negative int; `TypeError` for bool | 6 |
+| **F43** | 2 | `actions.py` | `MoveTo(scalar)` leaked raw `IndexError`/`TypeError` | `iter()`/`next()` validation with clear messages | 14 |
+| **F44** | 3 | `widgets.py` | `ProgressBar(value=NaN)` bypassed setter validation | Constructor validates `isfinite()` | 11 |
+| **F45** | 3 | `components.py` | `Button.text = None` crashed in `_estimate_text_width` | `TypeError` at setter | 3 |
+| **F46** | 3 | `particles.py` | `ParticleEmitter.position = (NaN, 0)` silently stored | Setter validates `isfinite()` | 4 |
+| **F47** | 3 | `animation.py` | `AnimationPlayer.update(NaN)` froze permanently | Skip frame, preserve state, recover | 5 |
+| **F48** | 3 | `camera.py` | `Camera.enable_edge_scroll(NaN, NaN)` accepted | Validates `isfinite()` | 5 |
+| **F49** | 3 | `camera.py` | `Camera.enable_key_scroll(NaN)` accepted | Validates `isfinite()` | 5 |
+| **F50** | 3 | `camera.py` | `Camera.world_bounds = (NaN, ...)` / inverted accepted | Validates finite + ordering | 9 |
+| **F51** | 3 | `widgets.py` | `Tooltip(delay=NaN/Inf/-1)` misbehaved | Validates finite + ≥ 0 | 8 |
+| **F52** | 3 | `sprite.py` | `Sprite.tint = (NaN, ...)` passed NaN to backend | Validates `isfinite()` per component | 6 |
+| **F53** | 3 | `sprite.py` | `Sprite.move_to((NaN, 0))` created NaN-duration tween | Validates `isfinite()` | 5 |
+| **F54** | 3 | `widgets.py` | `DataTable(row_height=0)` accepted | `ValueError` for ≤ 0 | 8 |
+| **F55** | 3 | `widgets.py` | `Grid(cell_size=(-10, 64))` accepted | `ValueError` for negative | 10 |
+| **F56** | 3 | `screens.py` | `SaveLoadScreen(slot_count=0)` accepted | `ValueError` for ≤ 0 | 5 |
+| **F57** | 4 | `scene.py` | `flush_pending_ops` exception left stale ops in queue | Clear queue before re-raising | 2 |
+| **F58** | 4 | `scene.py` | Direct scene ops didn't flush deferred ops from on_exit | Added `_flush_after_direct_op()` | 11 |
+
+> **Tests column** counts all tests in each finding's regression class(es), including supplemental/acceptable-edge-case documentation tests. **F54** includes 3 `DataTableShortColWidthsAcceptable` tests. **F55** includes 3 `GridZeroCellSizeAcceptable` tests. **F58** includes 5 `DeferredOpsSafety` supplemental tests. Stage 4 lifecycle file also contains 24 general lifecycle tests not attributed to a specific finding.
+
+**Total: 17 bugs found and fixed, 141 regression tests across 3 files (Stages 2–4), plus 24 gameplay-workflow tests (Stage 4).**
+
+---
+
+## Final Test Suite Counts
+
+### Delivery baseline (`--ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot`)
+
+| Metric | Value |
+|--------|-------|
+| **Collected** | **2798** |
+| **Passed** | **2795** |
+| **Skipped** | **3** (`game.run()` under `SAGA2D_HEADLESS=1`) |
+| **Failed** | **0** |
+| **Runtime** | ~31s |
+
+### Full tree (all of `tests/`)
+
+| Metric | Value |
+|--------|-------|
+| **Collected** | **2829** |
+| **Passed** | 2795 + visual_verify passes (environment-dependent) |
+| **Failed** | 11 (`tests/visual_verify/` — AI/screenshot golden assertions, not engine bugs) |
+| **Skipped** | 3 (`game.run()`) + 2 (`test_ai_checker.py` — needs `ANTHROPIC_API_KEY`) |
+
+### Work product
+
+| Metric | Value |
+|--------|-------|
+| **New test files (Stages 2–4)** | 4 files, 165 tests (20 + 84 + 37 + 24); net Δ +164 passing¹ |
+| **Delivery baseline change** | 2631 → 2795 passed (+164) |
+| **Runtime probe scripts** | 44 probes (Stage 5) + 41 probes (Stage 4) = 85 total |
+| **Standalone scripts** | `smoke_game_move_to.py`, `stage4_gameplay_workflow.py`, `stage4_probe.py`, `stage5_asset_probe.py` |
+
+> ¹ 165 tests in files vs +164 net passing: Stage 3 added 84 tests but 16 existing tests were updated to expect stricter validation, and one of those updates subsumed coverage that had been counted in the prior baseline, yielding a net +83 for that stage.
+
+### Test evolution (delivery baseline)
+
+| Milestone | Passed | Δ |
+|-----------|--------|---|
+| Stage 1 baseline | 2631 | — |
+| + Stage 2 (actions edge cases) | 2651 | +20 |
+| + Stage 3 (UI/rendering edge cases) | 2734 | +83 |
+| + Stage 4 (lifecycle regression) | 2771 | +37 |
+| + Stage 4 (gameplay workflow) | 2795 | +24 |
+| **Final** | **2795** | **+164** |
+
+---
+
+## Self-Critique
+
+### What went well
+
+1. **Systematic probing**: Runtime probes before fixes ensured every bug had exact repro steps and wasn't a test artifact.
+2. **NaN/Inf coverage**: The IEEE 754 quirk discovery (Python 3.13 `min/max` behavior) caught subtle bugs that static analysis would miss.
+3. **End-to-end workflow**: The Stage 4 gameplay workflow discovered a key framework design property (sprites removed on push-over) that wasn't obvious from unit tests alone.
+4. **Error message quality**: Every `AssetNotFoundError` includes tried paths; every `SaveError` includes slot number and recovery hint.
+
+### What could be improved
+
+1. **Corrupt file testing limited by mock backend**: The mock backend never reads file contents, so corrupt PNG/WAV/OGG files don't surface errors. These edge cases can only be tested with the real pyglet backend (requires a display server). This is a structural testing gap.
+2. **No `optional` flag on `crossfade_music()`**: Unlike `play_sound()` and `play_music()`, `crossfade_music()` has no graceful degradation for missing assets. A missing track during crossfade crashes. This is a potential API gap (documented, not fixed — requires design decision).
+3. **`ParticleEmitter` defers image validation**: A particle emitter constructed with a nonexistent image name will succeed silently, then crash at spawn time. This is by design (lazy loading), but could surprise users who expect fail-fast. Documented in Stage 5 probe A18.
+4. **`SaveManager.delete()` doesn't wrap `PermissionError`**: Unlike `save()` and `load()`, `delete()` lets raw `PermissionError` propagate instead of wrapping it in `SaveError`. Documented, not fixed — minor consistency issue.
+5. **No headless test for `game.run()` loop**: The production loop is guarded by `SAGA2D_HEADLESS=1`, so 3 tests are always skipped. The `tick()`-based testing is comprehensive, but the `run()` integration path (which includes clock timing) is only manually testable.
+6. **Visual/screenshot tests have AI failures**: 11 tests in `visual_verify/` fail due to AI screenshot comparison, not engine bugs. These are not actionable without `ANTHROPIC_API_KEY` and a display server.
+
+### Open coverage gaps (documented, not addressed)
+
+| Gap | Reason |
+|-----|--------|
+| Corrupt file content (truncated PNG, bad WAV) | Mock backend doesn't validate; needs pyglet + display |
+| `game.run()` production loop | Blocked by `SAGA2D_HEADLESS=1` |
+| Pyglet rendering correctness | Requires display server |
+| Audio hardware playback | Requires audio hardware |
+| `crossfade_music()` missing `optional` parameter | API design decision needed |
+| `Scene.add_sprite(None)` no guard | Low priority — documented in coverage gaps |
+| `Game()` negative/zero resolution | Low priority — documented in coverage gaps |

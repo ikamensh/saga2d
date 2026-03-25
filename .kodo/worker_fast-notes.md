@@ -31,10 +31,10 @@ desired_examples/        # API design sketches
 - Pyglet event handlers must `return True` to prevent fallthrough (e.g. ESC closing window)
 - Screenshot capture: between `batch.draw()` and `window.flip()` (double-buffering)
 
-## Baseline (2026-03-25, Stage 1 re-verify)
+## Baseline (2026-03-25, delivery + Stage 5)
 
-- **`SAGA2D_HEADLESS=1`**, full `tests/`: **2665** collected — **2649** passed, **11** failed (`tests/visual_verify` AI/screenshot only), **5** skipped (`game.run()` headless + optional `ANTHROPIC_API_KEY`).
-- Same env, **`--ignore=tests/visual_verify`**: **2631** passed, **3** skipped (`game.run()` only). Install: `uv sync --extra dev`. Details: repo `test-report.md`.
+- **Non-visual delivery:** `SAGA2D_HEADLESS=1 pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` — **2795** passed, **3** skipped, **0** failed. Install: `uv sync --extra dev`.
+- **Full tree** including `tests/visual_verify`: **11** failures (env / AI / screenshot — not counted as delivery baseline). Counts and F42–F58 table: repo `test-report.md`.
 - FakeGame + cursor: `hasattr(scene.game, "cursor")` in `saga2d/scene.py` (~526) — no cursor regression; adversarial + kodo FakeGame tests pass.
 
 ## Scene lifecycle (kodo Stage 2, 2026-03-21)
@@ -60,6 +60,11 @@ desired_examples/        # API design sketches
 - Suites: `tests/kodo_test_persistence_resources.py`, `tests/kodo_test_persistence_resources_ext.py` (malformed saves, version/envelope edge cases, stacked save/load, emitters, camera pan, `on_exit` resources, rapid deferred transitions).
 - **F8:** Binary/invalid UTF-8 in slot files — `read_text` could raise `UnicodeDecodeError`; `SaveManager.load` now maps it to `SaveError` like other corruption.
 - **F9:** Valid JSON that is not an object (`[]`, string, etc.) — previously crashed `list_slots` / `SaveLoadScreen` with `TypeError`; `load()` now requires `isinstance(data, dict)` and raises `SaveError` with a clear message.
+
+## kodo Stage 5 — assets at runtime (2026-03-25)
+
+- **Probe:** `SAGA2D_HEADLESS=1 uv run python scripts/stage5_asset_probe.py` — 44 runtime checks (missing image/audio/music/frame, corrupt files, headless-safe).
+- **Regression:** `tests/test_kodo_stage5_regression.py` (28 tests). This pass reported no new engine bugs; findings F42–F58 and suite narrative in `test-report.md` / `.kodo/test-coverage.md`.
 
 ## Input / camera / install (kodo Stage 6, 2026-03-22)
 

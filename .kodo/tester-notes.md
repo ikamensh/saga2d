@@ -40,6 +40,12 @@ SAGA2D_HEADLESS=1 uv run python -m pytest \
 
 **Regression:** `tests/test_kodo_stage4_lifecycle_regression.py` (**37** tests). **Manual probes:** `SAGA2D_HEADLESS=1 uv run python scripts/stage4_probe.py` (**41** PASS). **See `.kodo/test-coverage.md` § Stage 4** for the broader **96-test** bundle + lifecycle harness (**5/5**).
 
+## Stage 5 — resources / asset loading (tester, 2026-03-25)
+
+**Exercised:** `tests/systems/test_assets.py` (**17**), `tests/test_kodo_systems_fresh.py` asset-edge selection (**14**), `tests/integration/test_adversarial.py::TestAudioAdversarial` (**6**), `tests/test_kodo_systems_edge.py::TestAudioPlaySoundEmptyString` (**1**). **Manual:** temp dirs — missing sprite in `on_enter`, garbage bytes in `.png` (mock OK, PIL rejects), missing SFX/music/frames, wrong sound extension (`.txt` only).
+
+**Result:** **0 bugs.** `AssetNotFoundError` + path hints consistent; `optional=True` for SFX works. **Mock blind spot:** corrupt-but-existing files are not rejected until **pyglet** decode. Full command block → **`.kodo/test-coverage.md` § Stage 5**.
+
 ## UI / particles edge E2E (mock, 2026-03-25)
 
 **Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run python` (project `.venv`; ignore stray `VIRTUAL_ENV` from other repos).

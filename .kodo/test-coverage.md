@@ -1,6 +1,6 @@
 # Feature Coverage
 
-Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25. **Stage 2 tester pass:** 2026-03-25. **Stage 3 tester pass (UI/rendering edge cases):** 2026-03-25 — 13 bugs fixed (F44–F56), 84 new regression tests, 2 acceptable edge cases documented. **Stage 4 tester pass (integration/lifecycle):** 2026-03-25 — 2 bugs fixed (F57–F58), 37 new regression tests, 6 existing tests updated.
+Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25. **Stage 2 tester pass:** 2026-03-25. **Stage 3 tester pass (UI/rendering edge cases):** 2026-03-25 — 13 bugs fixed (F44–F56), 84 new regression tests, 2 acceptable edge cases documented. **Stage 4 tester pass (integration/lifecycle):** 2026-03-25 — 2 bugs fixed (F57–F58), 37 new regression tests, 6 existing tests updated. **Stage 5 tester pass (resources / asset loading):** 2026-03-25 — **0 new bugs**; see § Stage 5 below.
 
 ## Stage 1 — Window, game loop, scenes (PLAN.md)
 
@@ -252,6 +252,49 @@ SAGA2D_HEADLESS=1 uv run python -m pytest \
 - Inventory timers cancelled on scene exit — verified by running 60 ticks after exit, timer never fires.
 
 **Headless total: 2795 passed, 3 skipped.**
+
+### Stage 5 — Resources / asset loading (tester, 2026-03-25)
+
+**Scope:** Missing images/sounds/music, animation `frames()`, audio `optional=True` vs strict, wrong sound extensions, corrupt-on-disk files vs mock backend, scene path (`Sprite` in `on_enter`).
+
+**Pytest executed (all PASS this run):**
+
+```bash
+cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/systems/test_assets.py -q
+# → 17 passed
+
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_systems_fresh.py \
+  -k "TestLoadImage or TestLoadSound or TestFramesNo or TestAssetMusic or TestPlaySoundOptional or TestAssetCaching" -q
+# → 14 passed, 102 deselected
+
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/integration/test_adversarial.py::TestAudioAdversarial -q
+# → 6 passed
+
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_systems_edge.py::TestAudioPlaySoundEmptyString -q
+# → 1 passed
+```
+
+**Manual probes (same session):** temp asset roots under `/var/folders/.../T/...` via `tempfile.mkdtemp()` — (1) `push` scene whose `on_enter` adds `Sprite("sprites/missing_hero")` → **`AssetNotFoundError`** with path hint; (2) `garbage.png` containing non-PNG bytes → **mock** `Game` + `tick` succeeds (backend does not decode); same bytes → **PIL `UnidentifiedImageError`** (proves real decode would fail); (3) `audio.play_sound("ghost", optional=True)` → **`None`**, `optional=False` → **`AssetNotFoundError`**; (4) `audio.play_music("no_track")` on empty `music/` → **`AssetNotFoundError`**; (5) `assets.frames("sprites/walk")` with no `_*` PNGs → **`AssetNotFoundError`** (“No animation frames”); (6) only `sounds/beep.txt` → **`AssetNotFoundError`** listing tried `.wav`/`.ogg`/`.mp3`.
+
+**Extended runtime probes:** `scripts/stage5_asset_probe.py` — 44 probes covering 7 subsystems. All PASS, 0 bugs found.
+
+| Category | Probes | Result |
+|----------|--------|--------|
+| Missing files (image/sound/music/frames) | A1-A5 | AssetNotFoundError with tried paths |
+| Optional handling (play_sound/music optional=True) | A6-A8 | Returns None gracefully; crossfade has no optional flag |
+| Cache behavior | A9-A10 | Same handle returned for repeated loads |
+| Corrupt/empty files | A11-A12 | Mock backend accepts (never reads contents); PIL rejects |
+| ColorSwap/palettes | A13-A15 | Proper KeyError/TypeError for invalid palettes |
+| CursorManager/ParticleEmitter | A16-A19 | Missing images: AssetNotFoundError; ParticleEmitter defers to burst() |
+| AnimationDef/Sprite edge cases | A20-A26 | frame_duration≤0 → ValueError; @2x preferred when available |
+| Audio channels | AU1-AU5 | Invalid channel ops graceful (no crash) |
+| SaveManager | S1-S12 | Corrupt JSON/binary/zero-byte → SaveError; non-serializable → SaveError; empty slots clean |
+| FSM | F1 | Unknown event → ignored (no crash) |
+
+**Findings:** **No bugs.** Behavior matches design: **`AssetManager`** validates **filesystem presence** and **extension search order** before calling the backend; **`AssetNotFoundError`** subclasses **`FileNotFoundError`** and messages list tried paths. **`play_sound(..., optional=True)`** is the intended user-facing soft path for missing SFX. **Gap (not a failure):** **mock** `load_image` / `load_sound` never validate file contents — **pyglet** would still raise when decoding corrupt media (`pyglet.image.load` / `pyglet.media.load`); headless CI relies on mock. **Fonts:** default theme uses logical names (`serif`); **mock** `load_font` does not open files — TTF path failures are a **pyglet / display** concern.
+
+**Final headless total: 2795 passed, 3 skipped.**
 
 ### Blocked Workflows
 | Workflow | Reason |
