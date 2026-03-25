@@ -29,15 +29,32 @@ Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Sta
 - **2631 passed**, **3 skipped** if `tests/visual_verify/` is ignored (matches “automated mock + screenshot” focus)
 - Older note **“2,522 passing, 1 visual failing”** is **stale** relative to this checkout
 
+### Runtime exercised — tick(dt), MoveTo, Repeat, Do (2026-03-25)
+
+Manual `uv run python` probes + pytest bundle: `tests/test_kodo_stage2_core_actions.py` + `tests/test_kodo_stage5_regression.py::TestF40GameTickDtValidation`.
+
+| Workflow | Outcome (runtime) |
+|----------|-------------------|
+| `Game.tick` with `nan` or `±inf` | **`ValueError`** before scene update — message `dt must be a finite number, got …` |
+| `Game.tick(negative)` | **`ValueError`** — `dt must not be negative, got …` |
+| `MoveTo` scalar / `()` / `(x,)` | **`TypeError`** with explicit messages (tuple type, element count); not `IndexError` for 1-tuple |
+| `Repeat(..., times=float / nan / inf)` | **`TypeError`** — `Repeat times must be an int or None, got float` |
+| `Repeat(..., times<0)` | **`ValueError`** — `Repeat times must be >= 0, got …` |
+| `Repeat(..., times=True)` | **`TypeError`** — bool rejected (`… got bool`) |
+| `Repeat(..., times=0)` | Constructs; **`start()`** no-ops child (finishes immediately) |
+| `Do(non-callable)` | **`TypeError`** at **`__init__`** |
+
+**Stage 2 fixes (F42–F43):** Tests updated to match stricter validation. Regression suite: `tests/test_kodo_stage2_regression.py` (20 tests). Headless total: **2651 passed, 3 skipped**.
+
 ### NEW Gaps to Test This Run
 
 | Feature / Workflow | Last tested | Status | Findings |
 |--------------------|-------------|--------|----------|
 | ParticleEmitter speed/direction NaN/Inf | 2026-03-25 | pending | No validation on speed/direction tuples |
-| Do() non-callable fn parameter | 2026-03-25 | pending | No callable validation |
-| Repeat() times negative/float/NaN | 2026-03-25 | pending | No validation in __init__ |
-| MoveTo bad position tuple (1-tuple, scalar) | 2026-03-25 | pending | No length validation |
-| Game.tick(dt=NaN) propagation to scene | 2026-03-25 | pending | dt not validated at Game level |
+| Do() non-callable fn parameter | 2026-03-25 | **fixed** | **TypeError** at construction — already guarded before Stage 2 |
+| Repeat() times negative/float/NaN | 2026-03-25 | **fixed (F42)** | Negative int now raises `ValueError`; float/NaN/bool raise `TypeError` |
+| MoveTo bad position tuple (1-tuple, scalar) | 2026-03-25 | **fixed (F43)** | Clear `TypeError` with actionable message (was raw `IndexError`) |
+| Game.tick(dt=NaN) propagation to scene | 2026-03-25 | **fixed** | Rejected at `Game.tick` level — already guarded before Stage 2 |
 | ProgressBar value=NaN setter | 2026-03-25 | pending | No setter validation |
 | DataTable negative row_height | 2026-03-25 | pending | Wrong row index calculation |
 | Grid zero cell_size | 2026-03-25 | pending | Layout calculations fail |

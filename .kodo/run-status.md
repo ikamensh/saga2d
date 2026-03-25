@@ -1,11 +1,18 @@
 # Run Status
 
 ## Goal
-saga2d is a 2D game framework. Stage 1 covers Environment Setup & Smoke Testing: running game loop with push/pop scenes, colored backgrounds; backend protocol + `Game` + `Scene`/`SceneStack`. Deep edge-case testing (NaN/Inf validation, numeric parameter guards) was performed across 14+ areas. 29 bugs fixed (F1–F33). 2631 headless tests pass; 3 skip (interactive `game.run()`). Smoke script `scripts/smoke_game_move_to.py` validates the core E2E pipeline.
+# Project Context
+saga2d is a 2D game framework with 2,522 passing tests. 24 bugs previously fixed (mostly NaN/Inf validation). Code review reveals ~14 new untested edge cases: ParticleEmitter speed/direction NaN, Do() non-callable, Repeat() times validation, MoveTo bad position tuples, Game.tick() NaN dt propagation, ProgressBar NaN value, DataTable negative row_height, Grid zero cell_size. Most likely to break for users: numeric parameter validation gaps in actions and UI widgets, and Game.tic...
 
 ## Progress
-- Stage: 1/1: Environment Setup & Smoke Testing — **COMPLETE**
-- Cycle: 1/50
-- Smoke: `uv run python scripts/smoke_game_move_to.py` → PASS
-- Pytest (headless): 2631 passed, 3 skipped (~34s)
-- Verified: 2026-03-25
+- Stage: 2/2: Core Engine & Actions Edge Cases
+- Cycle: 1/49
+- Elapsed: 42m27s
+
+## Agent Stats
+| Agent | Calls | Errors | Tokens | Time |
+|-------|-------|--------|--------|------|
+| tester | 3 | 1 | 0 | 6m18s |
+| worker_fast | 2 | 1 | 0 | 1m06s |
+| worker_fast_auto_commit | 1 | 0 | 0 | 1m02s |
+| worker_smart | 1 | 0 | 11k | 4m18s |

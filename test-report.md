@@ -81,6 +81,80 @@ No environment variables or display server needed — it uses the mock backend.
 - **CI gating** before running the full pytest suite — fails fast if core imports or the game loop are broken
 - **Agent workflows** — safe to run headless with no display dependency
 
+## Stage 2 — Core Engine & Actions Edge Cases
+
+**Date:** 2026-03-25
+
+### Investigation scope
+
+Four areas flagged in `.kodo/test-coverage.md` for edge-case validation:
+
+| Area | Pre-existing fix? | Bug found? |
+|------|-------------------|------------|
+| `Game.tick(dt=NaN/Inf/negative)` | Yes — raises `ValueError` | No new bug |
+| `Do(non-callable)` | Yes — raises `TypeError` | No new bug |
+| `Repeat(times=float/NaN)` | Yes — raises `TypeError` | No new bug |
+| `Repeat(times=negative_int)` | **No** | **F42** — silently accepted, action completed instantly without executing |
+| `MoveTo(scalar/1-tuple)` | **No** | **F43** — leaked raw `IndexError`/`TypeError: not subscriptable` |
+
+### Exact repro steps (before fix)
+
+```python
+# F42: Repeat(times=-1) — silently accepted, no error, action never fires
+from saga2d.actions import Repeat, Delay
+r = Repeat(Delay(0.1), times=-1)  # should raise ValueError but doesn't
+# r.start(sprite) → _current = None (because -1 <= 0)
+# r.update(dt) → True immediately — action "finished" without ever running
+
+# F43: MoveTo(scalar) — confusing raw error
+from saga2d.actions import MoveTo
+MoveTo(100, speed=200)
+# TypeError: 'int' object is not subscriptable  (unhelpful)
+MoveTo((100,), speed=200)
+# IndexError: tuple index out of range  (unhelpful)
+```
+
+### Fixes applied
+
+| Bug | File | Change |
+|-----|------|--------|
+| **F42** | `saga2d/actions.py` | `Repeat.__init__` now raises `ValueError("Repeat times must be >= 0, got {times}")` for negative ints. Also rejects `bool` (subclass of `int`) with `TypeError`. |
+| **F43** | `saga2d/actions.py` | `MoveTo.__init__` validates position with `iter()`/`next()` — raises `TypeError` with actionable message for scalars ("must be a (x, y) tuple"), short tuples ("must have at least 2 elements"), and non-numeric elements ("must be numbers"). |
+
+### Regression tests added
+
+**File:** `tests/test_kodo_stage2_regression.py` — 20 tests
+
+| Class | Tests | What it covers |
+|-------|-------|----------------|
+| `TestF42RepeatNegativeTimes` | 6 | negative → `ValueError`; zero/positive/None still accepted; bool → `TypeError` |
+| `TestF43MoveToPositionValidation` | 14 | scalar/None/empty/1-tuple → `TypeError`; string/non-numeric tuple → `TypeError`; valid 2-tuple/list/3-tuple; NaN/Inf/speed still → `ValueError` |
+
+### Existing tests updated
+
+| File | Test | Old behavior | New behavior |
+|------|------|-------------|--------------|
+| `tests/test_kodo_stage2_core_actions.py` | `test_repeat_negative_times_*` | Expected silent finish | Expects `ValueError` |
+| `tests/test_kodo_stage2_core_actions.py` | `test_moveto_1tuple_*` | Expected `IndexError` | Expects `TypeError` with message |
+| `tests/test_kodo_new_edge_cases.py` | `test_repeat_negative_times` | Expected silent no-op | Expects `ValueError` |
+| `tests/kodo_test_rendering.py` | `test_repeat_negative_times` | Expected silent no-op | Expects `ValueError` |
+
+### Verification
+
+```bash
+# Regression tests (20 new)
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage2_regression.py -v
+# → 20 passed
+
+# Full headless suite
+SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q
+# → 2651 passed, 3 skipped (~78s)
+
+# Smoke script
+uv run python scripts/smoke_game_move_to.py
+# → PASS — smoke: Game, Scene, Sprite, MoveTo
+```
+
 ## Stage 1 UX (PLAN.md scope)
 
 Automated coverage for **window / game loop / scenes** is exercised primarily via **mock backend** + `Game.tick()` in `tests/core/` (and integration/adversarial scene-stack tests). The **smoke script** (`scripts/smoke_game_move_to.py`) provides a fast standalone E2E check of the Game → Scene → Sprite → MoveTo pipeline. **Interactive `game.run()`** is intentionally skipped under `SAGA2D_HEADLESS=1`. Pyglet window demos (for example `tests/visual/test_stage1_visual.py`) are outside this headless Stage 1 pass unless run manually with a display.

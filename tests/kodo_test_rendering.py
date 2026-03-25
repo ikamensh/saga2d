@@ -418,12 +418,10 @@ class TestRepeatAction:
         r = Repeat(Delay(1.0), times=5)
         assert r.is_finite
 
-    def test_repeat_negative_times(self, game: Game, backend: MockBackend):
-        count = [0]
-        s = Sprite("test_img", position=(100, 200))
-        s.do(Repeat(Do(lambda: count.__setitem__(0, count[0] + 1)), times=-1))
-        game.tick(dt=0.016)
-        assert count[0] == 0
+    def test_repeat_negative_times_raises(self, game: Game, backend: MockBackend):
+        """FIXED (F42): Repeat(action, times=-1) raises ValueError."""
+        with pytest.raises(ValueError, match=">="):
+            Repeat(Do(lambda: None), times=-1)
 
 
 class TestRemoveAction:
@@ -765,11 +763,11 @@ class TestTimers:
         assert results == []
 
     def test_after_negative_delay_raises(self, game: Game, backend: MockBackend):
-        with pytest.raises(ValueError, match="delay must be >= 0"):
+        with pytest.raises(ValueError, match="finite number"):
             game.after(-1, lambda: None)
 
     def test_every_zero_interval_raises(self, game: Game, backend: MockBackend):
-        with pytest.raises(ValueError, match="interval must be > 0"):
+        with pytest.raises(ValueError, match="finite number"):
             game.every(0, lambda: None)
 
     def test_after_zero_delay_fires_immediately(self, game: Game, backend: MockBackend):

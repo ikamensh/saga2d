@@ -410,17 +410,10 @@ class TestF44RepeatEdgeCases:
         game.tick(0.016)
         assert executed[0] == 0, "Repeat(times=0) should not execute the action"
 
-    def test_repeat_negative_times(self, game, scene):
-        """Repeat(action, times=-1) should complete immediately."""
-        executed = [0]
-        def count():
-            executed[0] += 1
-
-        sp = Sprite("sprites/test", position=(100, 100))
-        scene.add_sprite(sp)
-        sp.do(Repeat(Do(count), times=-1))
-        game.tick(0.016)
-        assert executed[0] == 0, "Repeat(times=-1) should not execute"
+    def test_repeat_negative_times_raises(self, game, scene):
+        """FIXED (F42): Repeat(action, times=-1) raises ValueError."""
+        with pytest.raises(ValueError, match=">="):
+            Repeat(Do(lambda: None), times=-1)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

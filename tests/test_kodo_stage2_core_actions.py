@@ -136,12 +136,11 @@ class TestRepeatTimesValidation:
         action.start(FakeSprite())
         assert action.update(0.016) is True
 
-    def test_repeat_negative_times_finishes_immediately(self):
-        """GOOD (G3): Repeat(delay, times=-5) finishes immediately.
-        start() treats negative the same as zero (times <= 0)."""
-        action = Repeat(Delay(0.1), times=-5)
-        action.start(FakeSprite())
-        assert action.update(0.016) is True
+    def test_repeat_negative_times_raises(self):
+        """FIXED (F42): Repeat(delay, times=-5) raises ValueError.
+        Negative times is not a meaningful repetition count."""
+        with pytest.raises(ValueError, match=">="):
+            Repeat(Delay(0.1), times=-5)
 
     def test_repeat_float_times_rejected(self):
         """FIXED (F38): Repeat(delay, times=3.7) raises TypeError."""
@@ -165,23 +164,20 @@ class TestRepeatTimesValidation:
 
 
 class TestMoveToBadPosition:
-    """MoveTo validates positions at construction. Mostly GOOD, with caveats.
+    """MoveTo validates positions at construction.
 
-    MoveTo uses index-based access (position[0], position[1]) rather than
-    unpacking (x, y = position), so:
-    - 1-tuple raises IndexError (no position[1])
-    - 3+-tuple silently works (ignores extra elements) -- a minor bug
-    - NaN/Inf positions are properly validated
+    FIXED (F43): MoveTo now validates position shape up front with clear
+    TypeError messages instead of leaking raw IndexError / subscript errors.
     """
 
-    def test_moveto_1tuple_raises_indexerror(self):
-        """MoveTo((100,), speed=50) raises IndexError on position[1]."""
-        with pytest.raises(IndexError):
+    def test_moveto_1tuple_raises_typeerror(self):
+        """FIXED (F43): MoveTo((100,), speed=50) raises TypeError."""
+        with pytest.raises(TypeError, match="at least 2 elements"):
             MoveTo((100,), speed=50)
 
     def test_moveto_scalar_raises(self):
-        """GOOD (G4): MoveTo(100, speed=50) raises TypeError."""
-        with pytest.raises(TypeError):
+        """FIXED (F43): MoveTo(100, speed=50) raises TypeError."""
+        with pytest.raises(TypeError, match=r"\(x, y\) tuple"):
             MoveTo(100, speed=50)
 
     def test_moveto_nan_x_raises(self):

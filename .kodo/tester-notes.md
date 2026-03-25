@@ -1,5 +1,19 @@
 # Tester Notes - Saga2D
 
+## Actions + `Game.tick(dt)` edge probes (2026-03-25)
+
+**Env:** repo root, `SAGA2D_HEADLESS=1`, `uv run python` (project `.venv`).
+
+**`Game.tick(dt)`** (`saga2d/game.py`): non-finite `dt` (`nan`, `±inf`) → **`ValueError`** (`dt must be a finite number, got …`). Negative `dt` → **`ValueError`** (`dt must not be negative, got …`). Rejected **before** `SceneStack.update(dt)`.
+
+**`MoveTo(position, speed)`** (`saga2d/actions.py`): scalar → **`TypeError`** (`position must be a (x, y) tuple, got int` / `float`). `()` → **`TypeError`** (`position must have at least 2 elements, got 0`). `(x,)` → **`TypeError`** (`… got 1`). (No `IndexError` on current code.)
+
+**`Repeat(action, times)`**: `times` is **`None`** (infinite), or **`int` not `bool`**, and **`times >= 0`**. **`times < 0`** → **`ValueError`** (`Repeat times must be >= 0, got …`). **`float`** / **`nan`** / **`inf`** → **`TypeError`** (`Repeat times must be an int or None, got float`). **`bool`** (e.g. `True`) → **`TypeError`** (`… got bool`). **`times=0`**: constructs; `start()` leaves `_current` **None** → action completes immediately without running child.
+
+**`Do(fn)`**: non-callable (`str`, `int`, `None`, …) → **`TypeError`** (`Do() requires a callable, got …`) at **`__init__`**.
+
+**Pytest:** `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage2_core_actions.py tests/test_kodo_stage5_regression.py::TestF40GameTickDtValidation -q` → **49 passed, 2 failed** — failures are **expectations behind code**: `test_repeat_negative_times_finishes_immediately` (expects `Repeat(..., -5)` to construct; code now raises **`ValueError`**), `test_moveto_1tuple_raises_indexerror` (expects **`IndexError`**; code now raises **`TypeError`**). **`TestF40GameTickDtValidation`** (5 tests) → all **pass**.
+
 ## Stage 1 tester agent — install + full pytest (2026-03-25)
 
 - **Install:** `uv sync --extra dev` at repo root → OK. **Uv quirk:** if shell `VIRTUAL_ENV` points outside the project (e.g. another repo’s `.venv`), uv warns and still uses **this** project’s `.venv`.

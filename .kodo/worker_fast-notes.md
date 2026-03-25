@@ -91,6 +91,13 @@ desired_examples/        # API design sketches
 - **Mock input:** use `inject_mouse_move()`, not `inject_motion()` (worker_smart-notes).
 - **Related repros:** `tests/test_kodo_crossfade_repro.py`, `tests/test_kodo_particle_nan_lifetime.py` (F26 / animation–list edges); referenced from `.kodo/tester-notes.md`.
 
+## Stage 2 — core actions F42–F43 (2026-03-25)
+
+- **F42:** `Repeat(..., times=<negative int>)` → `ValueError` (`times must be >= 0`); `bool` subclass of int → `TypeError`; non-int `times` (float/NaN) → `TypeError`. Regression: `tests/test_kodo_stage2_regression.py`; expectations updated in `tests/test_kodo_stage2_core_actions.py`, `tests/test_kodo_new_edge_cases.py`, `tests/kodo_test_rendering.py`.
+- **F43:** `MoveTo` validates `position` as length-2 numeric tuple → clear `TypeError` (no leaked `IndexError` on 1-tuple).
+- **Re-verified (no code change):** `Game.tick` rejects non-finite/negative `dt`; `Do(non-callable)` raises at `__init__`.
+- Focused run: `SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_stage2_regression.py tests/test_kodo_stage2_core_actions.py -q`
+
 ## Smoke script (2026-03-25)
 
 - **`scripts/smoke_game_move_to.py`** — minimal `Game` + `Scene` + `Sprite` + `MoveTo`, mock backend, temp asset dir with placeholder `dot.png`. Run: `uv run python scripts/smoke_game_move_to.py` → prints `PASS`. Documented in repo `test-report.md`.
