@@ -137,6 +137,12 @@ class ProgressBar(Component):
 
     @value.setter
     def value(self, v: float) -> None:
+        import math
+
+        if not math.isfinite(v):
+            raise ValueError(
+                f"ProgressBar value must be a finite number, got {v!r}"
+            )
         self._value = v
 
     @property
