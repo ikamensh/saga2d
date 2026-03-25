@@ -1,307 +1,648 @@
-# Feature Coverage
+# Feature Coverage — Subsystem Test Map
 
-Tracked across `kodo test` runs. Previous runs: commit 477220f (2026-03-21), Stage 4 fixes (2026-03-22), Fresh re-test (2026-03-23), Stage 1 re-verify (2026-03-23), F29/F30 fixes (2026-03-23), F31-F33 fixes (2026-03-23), F34/F35 fixes (2026-03-25). **Stage 1 tester pass:** 2026-03-25. **Stage 2 tester pass:** 2026-03-25. **Stage 3 tester pass (UI/rendering edge cases):** 2026-03-25 — 13 bugs fixed (F44–F56), 84 new regression tests, 2 acceptable edge cases documented. **Stage 4 tester pass (integration/lifecycle):** 2026-03-25 — 2 bugs fixed (F57–F58), 37 new regression tests, 6 existing tests updated. **Stage 5 tester pass (resources / asset loading):** 2026-03-25 — **0 new bugs**; see § Stage 5 below.
+## Verified baseline (non-visual delivery)
 
-## Stage 1 — Window, game loop, scenes (PLAN.md)
+| Item | Value |
+|------|--------|
+| **Command** | `uv sync --extra dev` then `SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` |
+| **Result** | **2795 passed**, **3 skipped**, **0 failed** (verified 2026-03-25, ~40s) |
+| **Skips** | `tests/core/test_game.py` — three `game.run()` tests (headless disables interactive loop) |
+| **Not in baseline** | `tests/screenshot/` (golden PNGs), `tests/visual/` (manual/GUI-adjacent), `tests/visual_verify/` (AI + env) — run separately; failures there do not invalidate delivery baseline |
 
-**PLAN goal:** running game loop with push/pop scenes, colored backgrounds; backend protocol + `Game` + `Scene`/`SceneStack`.
+**Local variants:** `pytest` instead of `uv run python -m pytest` if project `.venv` is active. Full tree: drop `--ignore` flags (expect visual/AI/env variance).
 
-| Stage 1 area | Implementation (typical) | What exercised it (automated) |
-|--------------|--------------------------|------------------------------|
-| Backend protocol, frame lifecycle, events | `saga2d/backends/base.py`, `mock_backend.py`, `pyglet_backend.py` | `Game.tick()` paths in `tests/core/test_game.py`; mock backend fixtures (`tests/conftest.py`); pyglet paths exercised when screenshot/visual tests run (display-dependent) |
-| `Game` constructor, `tick`, stack delegation, teardown | `saga2d/game.py` | `tests/core/test_game.py` (excluding `game.run()` under headless), `tests/kodo_test_core.py`, headless guard tests in `tests/test_kodo_core_fresh.py` |
-| `Scene` / `SceneStack`: push, pop, replace, `clear_and_push`, deferred ops | `saga2d/scene.py` | `tests/core/test_scene.py`, `tests/core/test_scene_*.py`, `tests/integration/test_adversarial.py` (stack re-entrancy and related) |
-| Lifecycle hooks (`on_enter` / `on_exit` / `on_reveal`), transparency, `pause_below` | `saga2d/scene.py`, draw/update orchestration in `game.py` | `tests/core/test_scene.py`, `tests/ui/test_ui.py` (transparent stack), `tests/ui/test_hud.py` |
-| `game.run()` interactive loop | `saga2d/game.py` | **Skipped** when `SAGA2D_HEADLESS=1` (`tests/core/test_game.py` — 3 tests); manual / display-only |
-| Pyglet window + push/pop demo | `PygletBackend`, scenes | `tests/visual/test_stage1_visual.py` — manual or display; not part of default headless CI |
-| **E2E smoke: Game→Scene→Sprite→MoveTo** | `saga2d/game.py`, `scene.py`, `rendering/sprite.py`, `actions.py` | **`scripts/smoke_game_move_to.py`** — standalone headless script; creates Game (mock), pushes Scene, adds Sprite, runs MoveTo action via `tick()` loop, asserts target reached. Run: `uv run python scripts/smoke_game_move_to.py`. See `test-report.md` for full details. |
+---
 
-**Commands (Stage 1 tester, 2026-03-25):**
+## Stage 1 — Coverage anchor (PLAN core + target subsystem slice)
 
-- Smoke script: `uv run python scripts/smoke_game_move_to.py` → `PASS — smoke: Game, Scene, Sprite, MoveTo`
-- Full pytest (headless): `SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify -q` → **2631 passed, 3 skipped** (~34s)
-- Full pytest (all): `SAGA2D_HEADLESS=1 uv run python -m pytest tests/ -q` → **2665** collected, **2649 passed, 11 failed, 5 skipped** — failures are AI/screenshot checks in `visual_verify`, not Stage 1 mock regressions.
+**PLAN.md Stage 1** (backend protocol, `Game` loop, `Scene` / `SceneStack`, push/pop/replace): covered under the **Verified baseline** command via `tests/core/test_game.py`, `tests/core/test_scene.py`, `tests/core/test_scene_timers.py`, `tests/core/test_scene_draw.py`, `tests/core/test_scene_sprites.py`, and related integration suites. With `SAGA2D_HEADLESS=1`, three `game.run()` tests in `test_game.py` are **skipped**. Standalone smoke (Game → Scene → Sprite → `MoveTo`, mock): `scripts/smoke_game_move_to.py`.
 
-## Current Run — Deep Edge Case Testing (2026-03-25)
+**Target subsystems** — files, classes, **initial baseline coverage** (pytest collected in listed modules; all pass under the delivery baseline; verified 2026-03-25). **Gap summary:** table *Initial feature coverage — untested / partial* below; detail: §1–§8.
 
-### Baseline (re-measured 2026-03-25 — tester agent)
-- **2665** tests collected; **2649 passed**, **11 failed** (`tests/visual_verify/*`), **5 skipped** with `SAGA2D_HEADLESS=1` (~45s full `tests/`)
-- **2631 passed**, **3 skipped** if `tests/visual_verify/` is ignored (matches “automated mock + screenshot” focus)
-- Older note **“2,522 passing, 1 visual failing”** is **stale** relative to this checkout
+| Subsystem | Source module | Primary types (approx. lines) | Integration | Primary pytest | Tests collected |
+|-----------|---------------|------------------------------|-------------|----------------|-----------------|
+| **Audio** | `saga2d/audio.py` | `AudioManager` (~L80), `_CrossfadeProxy` (~L30) | `Game.audio`; `saga2d/backends/base.py` audio protocol; `AssetManager.sound` / `.music` in `saga2d/assets.py` | `tests/systems/test_audio.py` | **83** |
+| **Input** | `saga2d/input.py` | `InputEvent` (~L36), `_with_world_coords()` (~L87), `InputManager` (~L117) | `Game.tick` in `saga2d/game.py`; `mock_backend` injectors | `tests/systems/test_input.py`; world coords also `tests/kodo_test_systems.py` | **33** (+ kodo) |
+| **Cursor** | `saga2d/cursor.py` | `CursorManager` | `Game.cursor`; backend cursor API; `scene.py` cleanup | `tests/systems/test_cursor.py` | **18** |
+| **ColorSwap** | `saga2d/rendering/color_swap.py` | `ColorSwap` (~L50); `register_palette`, `get_palette`, `_clear_palettes` | `Sprite` / `AssetManager.image_swapped` (`sprite.py`, `assets.py`); `Game._teardown` clears palettes | `tests/rendering/test_color_swap.py` | **25** |
+| **Layout** | `saga2d/ui/layout.py` | `Anchor`, `Layout`; `compute_anchor_position`, `compute_flow_layout`, `compute_content_size` | `component.py` / `components.py` (`Panel`); `widgets.py` (Grid, TabGroup, DataTable) | `tests/ui/test_ui.py` (`TestLayoutMath`, `TestLayoutErrorMessages`, sizing) | **23** with `-k Layout`; more tests hit Panel flow |
+| **Theme** | `saga2d/ui/theme.py` | `Style`, `ResolvedStyle`, `_pick`, `Theme` + `resolve_*` | `Game.theme`; components/widgets | `tests/ui/test_theme.py`; `tests/ui/test_drag_drop.py::TestThemeDragProperties` | **13** (+ drag theme class) |
+| **DragDrop** | `saga2d/ui/drag_drop.py` | `DragManager`, `_DragSession` | `Component` attrs; `_UIRoot.drag_manager` in `component.py`; theme drop/ghost colors | `tests/ui/test_drag_drop.py` (baseline); screenshot suite excluded | **49** |
+| **Screens / dialogs / sequence / settings** | `saga2d/ui/screens.py` | `MessageScreen` (~L54), `ChoiceScreen` (~L116), `ConfirmDialog` (~L193), `SaveLoadScreen` (~L265), `_SequenceRunner` (~L399), `_SettingsScene` (~L461) | **`Game.show_sequence`** → `_SequenceRunner`; **`Game.push_settings`** → `_SettingsScene` (`saga2d/game.py`) | `tests/ui/test_screens.py`; `tests/core/test_settings.py` | **42** + **36** |
 
-### Runtime exercised — tick(dt), MoveTo, Repeat, Do (2026-03-25)
+**Naming:** There is no public `SettingsScene` or `SequenceRunner` type — use **`_SettingsScene`** / **`_SequenceRunner`** in source, or **`Game.push_settings`** / **`Game.show_sequence`** from game code.
 
-Manual `uv run python` probes + pytest bundle: `tests/test_kodo_stage2_core_actions.py` + `tests/test_kodo_stage5_regression.py::TestF40GameTickDtValidation`.
+### Eight subsystems — file/class map (quick reference)
 
-| Workflow | Outcome (runtime) |
-|----------|-------------------|
-| `Game.tick` with `nan` or `±inf` | **`ValueError`** before scene update — message `dt must be a finite number, got …` |
-| `Game.tick(negative)` | **`ValueError`** — `dt must not be negative, got …` |
-| `MoveTo` scalar / `()` / `(x,)` | **`TypeError`** with explicit messages (tuple type, element count); not `IndexError` for 1-tuple |
-| `Repeat(..., times=float / nan / inf)` | **`TypeError`** — `Repeat times must be an int or None, got float` |
-| `Repeat(..., times<0)` | **`ValueError`** — `Repeat times must be >= 0, got …` |
-| `Repeat(..., times=True)` | **`TypeError`** — bool rejected (`… got bool`) |
-| `Repeat(..., times=0)` | Constructs; **`start()`** no-ops child (finishes immediately) |
-| `Do(non-callable)` | **`TypeError`** at **`__init__`** |
+| Subsystem | Module | Primary types |
+|-----------|--------|---------------|
+| Audio | `saga2d/audio.py` | `AudioManager`, `_CrossfadeProxy` |
+| Input | `saga2d/input.py` | `InputEvent`, `InputManager`, `_with_world_coords()` |
+| Cursor | `saga2d/cursor.py` | `CursorManager` |
+| ColorSwap | `saga2d/rendering/color_swap.py` | `ColorSwap`, `register_palette`, `get_palette`, `_clear_palettes` |
+| Layout | `saga2d/ui/layout.py` | `Anchor`, `Layout`, `compute_anchor_position`, `compute_flow_layout`, `compute_content_size` |
+| Theme | `saga2d/ui/theme.py` | `Style`, `ResolvedStyle`, `_pick`, `Theme` |
+| DragDrop | `saga2d/ui/drag_drop.py` | `DragManager`, `_DragSession` |
+| Screens / dialogs | `saga2d/ui/screens.py` (+ `saga2d/game.py`) | `MessageScreen`, `ChoiceScreen`, `ConfirmDialog`, `SaveLoadScreen`, `_SequenceRunner`, `_SettingsScene`; `Game.show_sequence`, `Game.push_settings` |
 
-**Stage 2 fixes (F42–F43):** Tests updated to match stricter validation. Regression suite: `tests/test_kodo_stage2_regression.py` (20 tests). Headless total: **2651 passed, 3 skipped**.
+### Initial feature coverage — untested / partial (project context)
 
-### Stage 3 — UI/Rendering Edge-Case Validation (2026-03-25)
+Condensed gap list from §1–§8, kodo findings (e.g. F14 channel docs), and AGENTS.md (mock vs real pyglet `dispatch_event`). **U** = no dedicated test; **P** = covered in part or only via related paths. Baseline still green; this tracks *depth*, not pass/fail.
 
-Runtime probes via `stage3_repro.py` + pytest regression suite: `tests/test_kodo_stage3_ui_rendering_regression.py` (84 tests).
+| Subsystem | Untested (U) | Partial (P) |
+|-----------|--------------|-------------|
+| **Audio** | `play_sound` with unknown channel; `crossfade_music(..., duration=0)`; `_teardown` / idempotent teardown; `set_volume` with NaN/Inf (no `isfinite` guard in code) | Effective volume / crossfade interruption well covered |
+| **Input** | `bind` with empty string or `None` key/action; `translate` given unknown raw event types | Defaults, rebind, mouse path, game integration covered; **real pyglet** `dispatch_event` path not in mock baseline |
+| **Cursor** | `register` with missing image asset; `set_visible` with non-bool; multi-cursor switching; cursor vs scene push/pop | Single custom cursor, backend args, `Game.cursor` lazy init |
+| **ColorSwap** | `_clear_palettes` in isolation; duplicate source colors in mapping (last-wins undocumented); non-RGBA / odd formats; `Sprite.image` reassigned after construction with swap | `apply`, registry, `image_swapped`, sprite at construct time |
+| **Layout** | `compute_flow_layout` **padding**; anchor with **zero-size** parent; child **larger** than parent; **negative** spacing/padding | Spacing, anchors (9), flow VERTICAL/HORIZONTAL, error messages |
+| **Theme** | `resolve_list_style`, `resolve_grid_style`, `resolve_tooltip_style`, `resolve_tabgroup_style`, `resolve_datatable_style`; many property accessors (tab/datatable/progressbar/list/grid shadows, button outline, …) | `resolve_label` / `resolve_button` / `resolve_panel`; `button_min_width`; drag colors via `TestThemeDragProperties` |
+| **DragDrop** | `DragManager.cancel_active()`; ghost using `_image_handle` (sprite path); `drop_accept` / `on_drop` raising; drag while **scene pops** | Rect ghost, targets, escape cancel, nested targets, `Game.tick` hook |
+| **Screens / dialogs** | `ChoiceScreen` **empty** `choices`; number key **`"0"`**; `ConfirmDialog` **double** Enter; `MessageScreen` dismiss on release/scroll/drag; `SaveLoadScreen` implicit `game.save_manager`, **overwrite** occupied slot; `_SettingsScene` **rebind steals** another action’s key | Core flows for each screen, sequence runner, settings volume/rebind happy path |
 
-| Workflow | Outcome |
-|----------|---------|
-| `ProgressBar(value=NaN)` constructor | **`ValueError`** — constructor now validates both `value` and `max_value` with `math.isfinite()` **(F44)** |
-| `ProgressBar(max_value=NaN)` constructor | **`ValueError`** — NaN max_value no longer bypasses fraction guard **(F44)** |
-| `ProgressBar(value=Inf)` constructor | **`ValueError`** — Inf rejected **(F44)** |
-| `Button.text = None` | **`TypeError`** — None rejected at setter (was crashing downstream in `_estimate_text_width`) **(F45)** |
-| `ParticleEmitter.position = (NaN, 0)` | **`ValueError`** — setter now validates with `math.isfinite()` **(F46)** |
-| `AnimationPlayer.update(dt=NaN)` | **Returns None** — skips frame, preserves state, recovers on next valid dt **(F47)** |
-| `Camera.enable_edge_scroll(NaN, NaN)` | **`ValueError`** — margin and speed validated **(F48)** |
-| `Camera.enable_key_scroll(speed=NaN)` | **`ValueError`** — speed validated **(F49)** |
-| `Camera.world_bounds = (NaN, 0, 800, 600)` | **`ValueError`** — all 4 values must be finite **(F50)** |
-| `Camera.world_bounds = (100, 0, 50, 600)` inverted | **`ValueError`** — left must be <= right, top <= bottom **(F50)** |
-| `Tooltip(delay=NaN)` | **`ValueError`** — delay must be finite **(F51)** |
-| `Tooltip(delay=-1)` | **`ValueError`** — delay must be >= 0 **(F51)** |
-| `Sprite.tint = (NaN, 0.5, 0.5)` | **`ValueError`** — NaN/Inf components rejected **(F52)** |
-| `Sprite.move_to((NaN, 0), speed=100)` | **`ValueError`** — target position must be finite **(F53)** |
-| `DataTable(row_height=0)` | **`ValueError`** — row_height must be positive **(F54)** |
-| `DataTable(row_height=-10)` | **`ValueError`** — row_height must be positive **(F54)** |
-| `DataTable(col_widths=[100])` with 3 columns | **Accepted** — graceful fallback: missing widths get 0; deliberate API flexibility (documented, not a bug) |
-| `Grid(cell_size=(-10, 64))` | **`ValueError`** — cell_size dimensions must be non-negative **(F55)** |
-| `Grid(cell_size=(0, 0))` | **Accepted** — degenerate but safe: `_cell_at` returns None, no crash (documented, not a bug) |
-| `SaveLoadScreen(slot_count=0)` | **`ValueError`** — slot_count must be positive **(F56)** |
-| `SaveLoadScreen(slot_count=-1)` | **`ValueError`** — slot_count must be positive **(F56)** |
+Full method-level tables: §1–§8 below.
 
-**Stage 3 fixes (F44–F56):** 16 existing tests updated to match stricter validation. Regression suite: `tests/test_kodo_stage3_ui_rendering_regression.py` (84 tests). Headless total: **2734 passed, 3 skipped**.
+**Headless multi-subsystem demo** (cursor, audio, List, drag, Message/Choice/Confirm, settings/rebind): `scripts/multi_subsystem_headless_demo.py` — see section *Headless multi-subsystem demo* below.
 
-### NEW Gaps to Test This Run
+---
 
-| Feature / Workflow | Last tested | Status | Findings |
-|--------------------|-------------|--------|----------|
-| ParticleEmitter speed/direction NaN/Inf | 2026-03-25 | **verified** | **Ctor `ValueError`** (finite required); negative finite speed range still spawns; **pytest** + headless repro |
-| Do() non-callable fn parameter | 2026-03-25 | **fixed** | **TypeError** at construction — already guarded before Stage 2 |
-| Repeat() times negative/float/NaN | 2026-03-25 | **fixed (F42)** | Negative int now raises `ValueError`; float/NaN/bool raise `TypeError` |
-| MoveTo bad position tuple (1-tuple, scalar) | 2026-03-25 | **fixed (F43)** | Clear `TypeError` with actionable message (was raw `IndexError`) |
-| Game.tick(dt=NaN) propagation to scene | 2026-03-25 | **fixed** | Rejected at `Game.tick` level — already guarded before Stage 2 |
-| ProgressBar value=NaN setter | 2026-03-25 | **fixed (F44)** | **`ValueError`** on assign AND at construction; `max_value` also validated |
-| ProgressBar constructor NaN/Inf bypass | 2026-03-25 | **fixed (F44)** | Constructor now validates both `value` and `max_value` with `isfinite()` |
-| Button.text = None crash | 2026-03-25 | **fixed (F45)** | `TypeError` at setter (was crashing downstream in `_estimate_text_width`) |
-| ParticleEmitter.position NaN | 2026-03-25 | **fixed (F46)** | Setter now validates with `isfinite()`; was silently storing NaN |
-| AnimationPlayer.update(dt=NaN) freeze | 2026-03-25 | **fixed (F47)** | Skips frame, preserves state, recovers on next valid dt |
-| Camera.enable_edge_scroll NaN/Inf | 2026-03-25 | **fixed (F48)** | Margin and speed validated with `isfinite()` |
-| Camera.enable_key_scroll NaN/Inf | 2026-03-25 | **fixed (F49)** | Speed validated with `isfinite()` |
-| Camera.world_bounds NaN/inverted | 2026-03-25 | **fixed (F50)** | All 4 values validated finite; left<=right, top<=bottom enforced |
-| Tooltip delay NaN/Inf/negative | 2026-03-25 | **fixed (F51)** | Delay must be finite and >= 0 |
-| Sprite.tint NaN/Inf propagation | 2026-03-25 | **fixed (F52)** | Components validated with `isfinite()` before clamping |
-| Sprite.move_to NaN target | 2026-03-25 | **fixed (F53)** | Target position validated with `isfinite()` |
-| DataTable negative/zero row_height | 2026-03-25 | **fixed (F54)** | `row_height <= 0` now raises `ValueError`; positive values accepted normally |
-| DataTable `col_widths` shorter than `columns` | 2026-03-25 | **acceptable** | Draw uses **width 0** for missing entries — graceful fallback, deliberate API flexibility; 3 documentation tests |
-| Grid negative `cell_size` | 2026-03-25 | **fixed (F55)** | Negative dimensions now raise `ValueError`; zero accepted (guarded by `_cell_at`) |
-| Grid zero `cell_size` | 2026-03-25 | **acceptable** | `_cell_at` returns None for zero stride; clicks select nothing; draw emits zero-rects; 3 documentation tests |
-| SaveLoadScreen `slot_count<=0` | 2026-03-25 | **fixed (F56)** | `slot_count <= 0` now raises `ValueError`; positive values create slot buttons normally |
-| flush_pending_ops exception stale ops | 2026-03-25 | **fixed (F57)** | Exception in flush now clears queue; prevents stale op leaks across ticks |
-| Direct scene ops unflushed deferred ops | 2026-03-25 | **fixed (F58)** | push/pop/replace/clear_and_push now auto-flush deferred ops from on_exit/on_reveal |
-| Deferred ops cap (1000) silent discard | 2026-03-25 | **fixed** | Now logs warning and clears remaining ops (was silently leaving them in queue) |
-| Action stopped on scene pop (owned sprite) | 2026-03-25 | **verified** | Sprite removed → action stops; non-owned sprite survives |
-| Timer cancelled on scene pop | 2026-03-25 | **verified** | Scene-owned timers cancelled; timer chains fully cancelled |
-| Timer survives push-over | 2026-03-25 | **verified** | permanent=False preserves timers when scene is covered |
-| clear_and_push kills all timers/actions | 2026-03-25 | **verified** | All owned resources cleaned up across multiple scenes |
-| on_enter exception rollback | 2026-03-25 | **verified** | Failed scene popped from stack; exception propagates |
-| on_exit exception cleanup | 2026-03-25 | **verified** | Cleanup runs in finally block; scene removed from stack |
-| on_reveal exception | 2026-03-25 | **verified** | Exception propagates; popped scene still removed |
-| on_exit exception in clear_and_push | 2026-03-25 | **verified** | All scenes cleaned up; first exception re-raised |
-| update/draw exception propagation | 2026-03-25 | **verified** | Exceptions propagate; end_frame called via try/finally |
-| Repeated Game init/teardown cycles | 2026-03-25 | **verified** | 5+ cycles work cleanly; singleton guard works |
-| Teardown with on_exit exception | 2026-03-25 | **verified** | Logged and continues cleaning up remaining scenes |
-| Double teardown | 2026-03-25 | **verified** | Safe no-op on second call |
-| Sprite after teardown | 2026-03-25 | **verified** | Clean RuntimeError("No active Game") |
-| Deferred ops FIFO order | 2026-03-25 | **verified** | Multiple deferred ops execute in queue order |
-| Nested deferred ops (on_enter during flush) | 2026-03-25 | **verified** | New ops from on_enter picked up by flush loop |
-| pop_on_cancel deferred correctly | 2026-03-25 | **verified** | Auto-pop deferred during input phase |
-| Scene.add_sprite(None) | 2026-03-25 | pending | No None guard |
-| Game invalid resolution | 2026-03-25 | pending | Negative/zero accepted |
-| ColorSwap empty color lists | 2026-03-25 | pending | Silent no-op |
-| DragDrop callback exceptions | 2026-03-25 | pending | May corrupt drag state |
-| Game after teardown method calls | 2026-03-25 | pending | Methods still callable |
-| Parallel.update() on unstarted children | 2026-03-25 | pending | No start() guarantee |
+## Repo-wide subsystem map
 
-**Commands (tester agent UI/particle edge, 2026-03-25):**
+High-level mapping from `saga2d/` sources to primary pytest areas. Status = coverage *under the baseline command above* (mock + headless).
 
-```bash
-cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
-SAGA2D_HEADLESS=1 uv run python -c "from saga2d.rendering.particles import ParticleEmitter; from saga2d.ui.widgets import ProgressBar, DataTable, Grid; from saga2d.ui.screens import SaveLoadScreen; print('imports OK')"
-SAGA2D_HEADLESS=1 uv run python -m pytest \
-  tests/test_kodo_stage3_ui_rendering.py \
-  tests/test_kodo_widget_edge.py::TestGridZeroDimensions \
-  tests/test_kodo_widget_edge.py::TestGridPreferredSizeZero \
-  tests/test_kodo_mini_app.py::TestBugDiscovery::test_datatable_row_height_zero_click \
-  tests/test_kodo_mini_app.py::TestBugDiscovery::test_datatable_row_height_negative_click \
-  tests/ui/test_screens.py::TestSaveLoadScreen \
-  tests/test_kodo_systems_edge.py::TestParticleEmitterNaNLifetime \
-  -q
-# → 40 passed (local run)
-```
+| Subsystem | Source (main) | Primary tests | Baseline notes |
+|-----------|---------------|-----------------|----------------|
+| **Game / loop** | `saga2d/game.py` | `tests/core/test_game.py` | 3 skips when `SAGA2D_HEADLESS=1` |
+| **Scene / stack / timers** | `saga2d/scene.py` | `tests/core/test_scene.py`, `test_scene_timers.py`, `test_scene_draw.py`, `test_scene_sprites.py`, `tests/kodo_test_scene_lifecycle.py`, `tests/test_kodo_stage4_*.py` | Lifecycle + flush/deferred ops heavily covered |
+| **Actions / sequences** | `saga2d/actions.py` | `tests/actions/test_actions.py`, `tests/kodo_test_sprite_actions.py`, `tests/test_kodo_stage2_*.py` | F42/F43 regressions |
+| **Animation** | `saga2d/animation.py` | `tests/rendering/test_animation.py`, `tests/kodo_test_rendering.py` | |
+| **Sprite** | `saga2d/rendering/sprite.py` | `tests/rendering/test_sprite.py`, kodo suites | |
+| **Camera** | `saga2d/rendering/camera.py` | `tests/rendering/test_camera.py`, `tests/test_kodo_camera_*_edge.py` | Shake / `screen_to_world` regressions |
+| **Particles** | `saga2d/rendering/particles.py` | `tests/rendering/test_particles.py`, `tests/test_kodo_systems_edge.py` | F26 lifetime validation |
+| **Color swap** | `saga2d/rendering/color_swap.py` — `ColorSwap`, palette API | `tests/rendering/test_color_swap.py` | See §4; Stage 1 table |
+| **Layers / tint** | `saga2d/rendering/layers.py` | `tests/rendering/test_tint.py` | |
+| **UI tree / events** | `saga2d/ui/component.py` | `tests/ui/test_ui.py`, `tests/ui/test_widgets.py` | F30 mutation-during-traversal |
+| **Components** | `saga2d/ui/components.py` | `tests/ui/test_ui.py`, `tests/test_kodo_stage3_*.py` | |
+| **Widgets** | `saga2d/ui/widgets.py` | `tests/ui/test_widgets.py`, kodo UI suites | |
+| **Layout math** | `saga2d/ui/layout.py` — `Anchor`, `Layout`, `compute_*` | `tests/ui/test_ui.py` (`TestLayoutMath`, …) | See §5; Stage 1 table |
+| **Theme / style** | `saga2d/ui/theme.py` — `Style`, `ResolvedStyle`, `Theme` | `tests/ui/test_theme.py`, `tests/ui/test_drag_drop.py` | See §6 — resolver gaps; Stage 1 table |
+| **Screens / dialogs** | `saga2d/ui/screens.py` — `MessageScreen`, `ChoiceScreen`, `ConfirmDialog`, `SaveLoadScreen`, `_SequenceRunner`, `_SettingsScene` | `tests/ui/test_screens.py`, `tests/core/test_settings.py` | See §8; `game.py` `show_sequence` / `push_settings` |
+| **HUD** | `saga2d/ui/hud.py` | `tests/ui/test_hud.py` | |
+| **Drag & drop** | `saga2d/ui/drag_drop.py` — `DragManager`, `_DragSession` | `tests/ui/test_drag_drop.py` | See §7; Stage 1 table |
+| **Assets** | `saga2d/assets.py` | `tests/systems/test_assets.py` | |
+| **Save / load** | `saga2d/save.py` | `tests/systems/test_save.py`, `tests/kodo_test_persistence_resources*.py` | Corrupt / envelope edges |
+| **Audio** | `saga2d/audio.py` — `AudioManager`, `_CrossfadeProxy` | `tests/systems/test_audio.py` | See §1; Stage 1 table |
+| **Input** | `saga2d/input.py` — `InputEvent`, `InputManager` | `tests/systems/test_input.py`, `tests/kodo_test_systems.py` | See §2; Stage 1 table |
+| **Cursor** | `saga2d/cursor.py` — `CursorManager` | `tests/systems/test_cursor.py` | See §3; Stage 1 table |
+| **FSM** | `saga2d/util/fsm.py` | `tests/systems/test_fsm.py` | |
+| **Timer / tween** | `saga2d/util/timer.py`, `tween.py` | `tests/actions/test_timer.py`, `tests/actions/test_tween.py` | |
+| **Settings UI** | `saga2d/ui/screens.py::_SettingsScene` + `saga2d/game.py::push_settings` | `tests/core/test_settings.py` | Stage 1 table + §8f |
+| **Backends** | `saga2d/backends/{base,mock,pyglet}.py` | Mock: all baseline; pyglet: screenshot | Real `dispatch_event` rarely exercised |
+| **Cross-cutting E2E** | — | `tests/kodo_test_stage7_e2e.py`, `tests/integration/*.py`, `tests/examples/test_*.py` | |
 
-### Previously Passing Features
+---
 
-| Feature / Workflow | Last tested | Status | Findings |
-|--------------------|-------------|--------|----------|
-| Game initialization (mock backend) | 2026-03-25 | pass | — |
-| Game initialization (invalid backend) | 2026-03-25 | pass | ValueError raised correctly |
-| Game.tick() basic cycle | 2026-03-25 | pass | — |
-| Scene push/pop/replace/clear_and_push | 2026-03-25 | pass | — |
-| Scene lifecycle hooks | 2026-03-25 | pass | — |
-| Scene timer ownership | 2026-03-25 | pass | — |
-| Actions: Sequence/Parallel/Delay/MoveTo/FadeIn/Out | 2026-03-25 | pass | F15/F16/F24 fixed |
-| Camera follow/scroll/pan/shake | 2026-03-25 | pass | F31-33 fixed |
-| Sprites creation/positioning/removal | 2026-03-25 | pass | — |
-| Animation play/queue/stop/loop | 2026-03-25 | pass | F21-23 fixed |
-| ParticleEmitter burst/continuous | 2026-03-25 | pass | F34 fixed |
-| UI: All core widgets | 2026-03-25 | pass | — |
-| Tween system | 2026-03-25 | pass | F21 fixed |
-| Timer after/every/then | 2026-03-25 | pass | F22-23 fixed |
-| FSM transitions | 2026-03-25 | pass | F18 fixed |
-| Audio channels/crossfade | 2026-03-25 | pass | F35 fixed |
-| SaveManager | 2026-03-25 | pass | F19 fixed |
-| InputManager | 2026-03-25 | pass | — |
-| Theme/Style/Layout | 2026-03-25 | pass | — |
-| HUD visibility | 2026-03-25 | pass | — |
+## Highest-priority gaps (repo context + scan)
 
-### Stage 4 — Integration/Lifecycle Edge Cases (2026-03-25)
+Ordered for future cycles — combines documented engine blind spots, baseline-excluded suites, and §1–§8 gap lists.
 
-**Investigation scope:** Scene stack transitions during active actions/timers, exceptions in scene hooks, repeated Game init/teardown, deferred operations safety/limits.
+1. **GPU / pyglet path vs mock** — Z-order, blending, real font metrics: mock tests do not see draw order.
+2. **Pyglet input dispatch** — `inject_key()` bypasses `dispatch_event`. Need tests calling `window.dispatch_event(...)`.
+3. **Theme** — 5 untested `resolve_*` methods + 10+ accessor properties (§6). Largest single API gap.
+4. **Layout** — `compute_flow_layout` padding, zero-size parent, child > parent, negative spacing (§5).
+5. **Audio** — `set_volume` has no `isfinite` guard; `crossfade(duration=0)`, `_teardown` untested (§1).
+6. **Drag/drop** — `cancel_active()`, sprite ghost, exception safety, drag across scene transition (§7).
+7. **Screens** — Empty `ChoiceScreen`, key `"0"`, double-confirm, save overwrite (§8).
+8. **Cursor / ColorSwap / Input** — Missing asset, `_clear_palettes`, bind validation, unknown event types (§2–§4).
+9. **Extended suites** — `visual_verify` depends on API keys; treat as optional CI lane.
 
-**Runtime probes:** `scripts/stage4_probe.py` — 41 probes covering all 4 areas. All PASS.
+---
 
-**Bugs found and fixed (F57–F58):**
+## Headless multi-subsystem demo
 
-| Bug | Description | Fix |
-|-----|-------------|-----|
-| **F57** | `flush_pending_ops` exception left stale ops in `_pending_ops` queue, leaking across ticks | Added `except` clause that clears `_pending_ops` before re-raising |
-| **F58** | Direct scene ops (push/pop/replace/clear_and_push outside tick) didn't flush deferred ops from on_exit/on_reveal | Added `_flush_after_direct_op()` call after each direct `_apply_*` method |
+| Item | Detail |
+|------|--------|
+| **Path** | `scripts/multi_subsystem_headless_demo.py` |
+| **Run** | `uv run python scripts/multi_subsystem_headless_demo.py` (`backend="mock"` — no GUI) |
+| **Outcome** | Prints `PASS`/`FAIL`; exit 0/1 |
 
-**Also fixed:** Deferred ops cap (1000 iterations) now logs a warning and clears remaining ops instead of silently leaving them in the queue.
+**Workflow:** temp assets → Theme override → HubScene with cursor, audio, List → drag-drop → MessageScreen → ChoiceScreen → ConfirmDialog → push_settings → rebind confirm → Escape pop → assert rebind.
 
-**Regression suite:** `tests/test_kodo_stage4_lifecycle_regression.py` — 37 tests. **6 existing tests updated** to match corrected behavior.
+**Finding (2026-03-25, PASS):** `List.on_event` consumes confirm action before Scene.handle_input sees it — expected dispatch order. No defect.
 
-**Headless total (post-lifecycle fixes): 2771 passed, 3 skipped.**
+---
 
-**Runtime behavior (verified by tests + runtime probes):**
+**§1–§8 deep-dive:** Audio, Input, Cursor, ColorSwap, Layout, Theme, DragDrop, Screens/Dialogs.
 
-| Workflow | Outcome |
-|----------|---------|
-| `push`/`pop`/`replace` during `update` / `handle_input` | **Deferred**; `SceneStack.flush_pending_ops()` drains queue at end of `Game.tick` (`max_iterations = 1000`; excess ops logged + cleared). |
-| `on_exit` calls `game.push(...)` **outside** `tick()` | Push is **queued** (`_in_on_exit` forces defer), then **auto-flushed** by `_flush_after_direct_op()` **(F58 fix)**. |
-| `on_exit` calls `game.push(...)` **inside** `tick()` | Push is **deferred** until `flush_pending_ops()` at end of phase — same as before. |
-| `on_reveal` calls `game.push(...)` **outside** `tick()` | Push is **queued** (`_in_on_exit` forces defer), then **auto-flushed** **(F58 fix)**. |
-| `on_enter` calls `game.push(...)` directly | Executes **immediately** (not deferred — `on_enter` is NOT in a deferred context). Allows chaining: A.on_enter→push(B), B.on_enter→push(C). |
-| `flush_pending_ops` raises exception | Remaining ops **cleared** (F57 fix); `_flushing` flag reset in `finally`. |
-| Deferred ops cap (1000) hit | Warning logged; excess ops cleared. |
-| Active action on owned sprite during scene pop | Sprite removed → action stops; callback never fires. |
-| Scene-owned timer during scene pop | Timer cancelled (permanent=True); chain fully cancelled. |
-| Timer survives push-over | Timer continues (permanent=False). |
-| `clear_and_push` with timers/actions | All owned resources cleaned up across all cleared scenes. |
-| `on_enter` raises | Failed scene rolled back off stack; exception propagates. |
-| `on_exit` raises on `pop()` | Cleanup still runs (finally block); scene removed; exception propagates. |
-| `on_exit` raises during `clear_and_push` | All scenes cleaned up; first exception re-raised. |
-| `update()` raises | Exception propagates through `tick()`; scene remains on stack. |
-| `draw()` raises | `end_frame()` called via try/finally; exception propagates. |
-| Repeated Game init/teardown (5+ cycles) | Clean — singleton guard + `_teardown()` clears module globals. |
-| Teardown with on_exit exception | Logged and continues; all scenes cleaned up. |
-| Double teardown | Safe no-op. |
-| Sprite creation after teardown | Clean `RuntimeError("No active Game")`. |
-| Non-owned sprite survives scene pop | Sprite + action continue running after scene exit. |
+---
 
-### Stage 4 — Real-User Gameplay Workflow (2026-03-25)
+## 1. Audio System
 
-**Scope:** End-to-end gameplay workflow simulating what a real saga2d user would build — player character, input handling, game loop, AABB collision detection, scene transitions, timers, and composable actions.
+**Source:** `saga2d/audio.py` (375 LOC) — `AudioManager`, `_CrossfadeProxy`
+**Backend:** `backends/base.py` (protocol: `load_sound`, `play_sound`, `load_music`, `play_music`, `set_player_volume`, `stop_player`); `backends/mock_backend.py` (recording impl); `backends/pyglet_backend.py` (real playback via pyglet.media)
+**Asset loading:** `saga2d/assets.py` — `AssetManager.sound()` (`.wav`→`.ogg`→`.mp3`), `AssetManager.music()` (`.ogg`→`.wav`→`.mp3`)
+**Tests:** `tests/systems/test_audio.py` (**83 passed**; 8 classes: TestChannelVolume, TestPlaySound, TestPlayMusic, TestStopMusic, TestCrossfadeMusic, TestSoundPools, TestAssetManagerAudio, TestGameIntegration)
 
-**Standalone script:** `scripts/stage4_gameplay_workflow.py` — headless, no env vars needed.
+### Key classes/functions
 
-**Pytest suite:** `tests/test_kodo_stage4_gameplay_workflow.py` — 24 tests (16 workflow + 8 AABB collision unit tests).
+| Class/Function | Location | Public API |
+|---|---|---|
+| `AudioManager` | `audio.py` | `set_volume(ch, level)`, `get_volume(ch)`, `play_sound(name, channel, optional)`, `play_music(name, loop, optional)`, `stop_music()`, `crossfade_music(name, duration, loop)`, `register_pool(name, sounds)`, `play_pool(name)`, `_teardown()` |
+| `_CrossfadeProxy` | `audio.py:30` | Internal tween target — `old_volume`/`new_volume` property setters apply master×music×value |
+| Volume channels | `AudioManager.__init__` | `master`, `music`, `sfx`, `ui` (all default 1.0) |
 
-**No bugs found.** All framework subsystems worked correctly in the integrated workflow.
+### Feature coverage table
 
-| Workflow | Outcome |
-|----------|---------|
-| Game creation (mock backend, custom asset_path) | Works correctly |
-| GameplayScene with Camera, player/enemy/ghost/coin sprites | on_enter lifecycle correct |
-| Enemy patrol via `Repeat(Sequence(MoveTo, Delay, MoveTo, Delay))` | Actions advance every tick |
-| Player movement via injected key_press/key_release input events | handle_input → update loop moves player |
-| AABB collision: player vs coin (collectible) | Detected, coin removed, score updated |
-| AABB collision: player vs enemy (damage) | Detected, player tint changed, timer-based reset |
-| Score timer (scene.every 1.0s) | Fires correctly, score increments |
-| Bonus spawn timer (scene.after 2.0s) | Fires correctly, bonus sprite created |
-| Push PauseScene via bind_key("cancel") | on_exit called, **owned sprites removed** (framework design) |
-| Pop PauseScene (pop_on_cancel) | on_reveal called, **sprites re-created** from preserved entity state |
-| Entity position preservation across push/pop | Positions saved in on_exit, restored in _create_sprites |
-| Collected coin not re-created after reveal | `coin_alive` flag prevents re-creation |
-| Push InventoryScene via bind_key("i") | Inventory timer starts, scene entered |
-| Pop InventoryScene (pop_on_cancel) | **Inventory timer cancelled on exit** (scene-owned timer cleanup) |
-| Ghost fade action (Repeat(FadeOut, FadeIn)) runs after reveal | Re-created in on_reveal, opacity varies |
-| Replace gameplay → VictoryScene | All gameplay sprites cleaned up (permanent exit) |
-| Camera follows player movement | camera.center_on updates in update() |
-| draw_world_rect debug overlays | 3+ rects drawn per frame in draw() |
-| Multiple transition lifecycle counting | 3 exits, 2 reveals across pause+inventory+replace |
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| Channel defaults (master/music/sfx/ui=1.0) | `__init__` | TestChannelVolume | ✅ tested | |
+| set_volume / get_volume | `set_volume`, `get_volume` | TestChannelVolume | ✅ tested | |
+| Volume clamp (0.0–1.0) | `set_volume` | TestChannelVolume | ✅ tested | |
+| Unknown channel → KeyError | `set_volume`, `get_volume` | TestChannelVolume | ✅ tested | |
+| Effective volume: master × channel | `play_sound` | TestChannelVolume | ✅ tested | sfx, ui, music |
+| Volume change re-applies to active music | `set_volume` | TestChannelVolume | ✅ tested | |
+| play_sound (sfx/ui channels) | `play_sound` | TestPlaySound | ✅ tested | |
+| play_sound — missing asset (optional flag) | `play_sound` | TestPlaySound | ✅ tested | |
+| play_sound — unknown channel | `play_sound` | – | ❌ **untested** | channel="bogus" → KeyError expected |
+| play_music (loop, volume, stops old) | `play_music` | TestPlayMusic | ✅ tested | |
+| play_music — missing asset | `play_music` | TestPlayMusic | ✅ tested | |
+| stop_music (stops player, no-op) | `stop_music` | TestStopMusic | ✅ tested | |
+| crossfade (two players, midpoint, completion) | `crossfade_music` | TestCrossfadeMusic | ✅ tested | |
+| crossfade — same track = no-op | `crossfade_music` | TestCrossfadeMusic | ✅ tested | |
+| crossfade — no music → fallthrough to play | `crossfade_music` | TestCrossfadeMusic | ✅ tested | |
+| crossfade — interruption (second crossfade) | `crossfade_music` | TestCrossfadeMusic | ✅ tested | |
+| crossfade — respects channel volume | `crossfade_music` | TestCrossfadeMusic | ✅ tested | |
+| crossfade — NaN/Inf/negative duration | `crossfade_music` | test_kodo_new_edge_cases | ✅ tested | |
+| crossfade — duration=0 | `crossfade_music` | – | ❌ **untested** | Edge: instant crossfade |
+| stop_music cancels crossfade | `stop_music` | TestCrossfadeMusic | ✅ tested | |
+| Sound pools (register, play, no-repeat) | `register_pool`, `play_pool` | TestSoundPools | ✅ tested | |
+| Pool — empty/single/two-sound | `play_pool` | TestSoundPools | ✅ tested | |
+| Pool — unregistered → KeyError | `play_pool` | TestSoundPools | ✅ tested | |
+| Pool — re-register replaces | `register_pool` | TestSoundPools | ✅ tested | |
+| Asset extensions (wav/ogg/mp3, caching) | `AssetManager.sound/music` | TestAssetManagerAudio | ✅ tested | |
+| Game.audio integration | `Game.audio` | TestGameIntegration | ✅ tested | |
+| _teardown | `_teardown` | – | ❌ **untested** | Called by Game._teardown, not isolated |
+| set_volume with NaN/Inf | `set_volume` | – | ❌ **untested** | **No isfinite guard** — potential bug |
 
-**Key framework behavior documented:**
-- Owned sprites are **always removed** when a scene is pushed over (`_cleanup_exiting_scene(permanent=False)` still calls `_cleanup_owned_sprites()`). Users must save entity state in on_exit and re-create sprites in on_reveal.
-- Scene-owned timers survive push-over (permanent=False) but are cancelled on permanent exit (pop/replace/clear_and_push).
-- Inventory timers cancelled on scene exit — verified by running 60 ticks after exit, timer never fires.
+### Likely workflows & edge cases to test next
+- **NaN/Inf volume** → `set_volume("sfx", float('nan'))` — may corrupt effective volume math (master×NaN=NaN). Other setters hardened; this is the last holdout.
+- **Instant crossfade** → `crossfade_music("track", duration=0)` — tween completes immediately; verify old player stops cleanly.
+- **Unknown channel on play_sound** → `play_sound("hit", channel="bogus")` — should raise KeyError, but may compute NaN volume silently.
+- **_teardown idempotency** → call `_teardown()` twice, or during active crossfade — verify cleanup is clean.
+- **Pool with 0 sounds after register** → currently registers, but `play_pool` with empty list is no-op. Verify no crash.
 
-**Headless total: 2795 passed, 3 skipped.**
+---
 
-### Stage 5 — Resources / asset loading (tester, 2026-03-25)
+## 2. Input System
 
-**Scope:** Missing images/sounds/music, animation `frames()`, audio `optional=True` vs strict, wrong sound extensions, corrupt-on-disk files vs mock backend, scene path (`Sprite` in `on_enter`).
+**Source:** `saga2d/input.py` (228 LOC) — `InputEvent` (frozen dataclass), `InputManager`, `_with_world_coords`
+**Backend events:** `backends/base.py` — `KeyEvent`, `MouseEvent`, `WindowEvent`, `Event` union
+**Mock injection:** `backends/mock_backend.py` — `inject_key()`, `inject_click()`, `inject_mouse_move()`, `inject_scroll()`, `inject_drag()`, `inject_window_event()`, `inject_event()`
+**Game dispatch pipeline:** `game.py:tick()` — poll → window filter → mouse tracking → translate → dispatch (HUD → UI → Camera → Scene bindings → Scene.handle_input)
+**Tests:** `tests/systems/test_input.py` (**33 passed**; 5 classes), plus `tests/kodo_test_systems.py`, `tests/rendering/test_camera.py`
 
-**Pytest executed (all PASS this run):**
+### Key classes/functions
 
-```bash
-cd /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d
-SAGA2D_HEADLESS=1 uv run python -m pytest tests/systems/test_assets.py -q
-# → 17 passed
+| Class/Function | Location | Public API |
+|---|---|---|
+| `InputEvent` | `input.py:35` | Frozen dataclass: `type`, `key`, `action`, `x`, `y`, `button`, `dx`, `dy`, `world_x`, `world_y` |
+| `InputManager` | `input.py:117` | `bind(action, key)`, `unbind(action)`, `get_bindings()`, `translate(raw_events)` |
+| `_with_world_coords` | `input.py:87` | Populates `world_x/y` from camera; `_MOUSE_EVENT_TYPES` frozenset |
+| Default bindings | `_setup_defaults` | confirm→return, cancel→escape, up/down/left/right→arrows |
 
-SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_systems_fresh.py \
-  -k "TestLoadImage or TestLoadSound or TestFramesNo or TestAssetMusic or TestPlaySoundOptional or TestAssetCaching" -q
-# → 14 passed, 102 deselected
+### Feature coverage table
 
-SAGA2D_HEADLESS=1 uv run python -m pytest tests/integration/test_adversarial.py::TestAudioAdversarial -q
-# → 6 passed
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| InputEvent frozen dataclass, defaults | `InputEvent` | TestInputEvent | ✅ tested | |
+| InputEvent world_x/world_y | `InputEvent` | test_camera.py | ✅ tested | |
+| Default bindings (6 actions) | `_setup_defaults` | TestInputManagerDefaults | ✅ tested | |
+| translate — key_press/release with action | `translate` | TestInputManagerTranslate | ✅ tested | |
+| translate — unmapped key → action=None | `translate` | TestInputManagerTranslate | ✅ tested | |
+| translate — mouse events | `translate` | TestInputManagerTranslate | ✅ tested | click/move/scroll/drag |
+| translate — empty list / None | `translate` | TestInputManagerTranslate | ✅ tested | |
+| bind — custom action | `bind` | TestInputManagerBindings | ✅ tested | |
+| bind — replaces old key for same action | `bind` | TestInputManagerBindings | ✅ tested | |
+| bind — key stealing | `bind` | TestInputManagerEdgeCases | ✅ tested | |
+| unbind — removes / no-op on unknown | `unbind` | TestInputManagerBindings | ✅ tested | |
+| get_bindings — returns copy | `get_bindings` | TestInputManagerBindings | ✅ tested | |
+| _with_world_coords — mouse with/without camera | `_with_world_coords` | kodo_test_systems | ✅ tested | |
+| _with_world_coords — non-mouse unchanged | `_with_world_coords` | kodo_test_systems | ✅ tested | |
+| Game integration — scenes receive InputEvent | `Game.tick` | TestGameInputIntegration | ✅ tested | |
+| Game integration — WindowEvent close | `Game.tick` | TestGameInputIntegration | ✅ tested | |
+| bind — empty string action/key | `bind` | – | ❌ **untested** | No validation on empty strings |
+| bind — None action/key | `bind` | – | ❌ **untested** | No type check |
+| translate — unknown event type | `translate` | – | ❌ **untested** | Silently skipped |
 
-SAGA2D_HEADLESS=1 uv run python -m pytest tests/test_kodo_systems_edge.py::TestAudioPlaySoundEmptyString -q
-# → 1 passed
-```
+### Likely workflows & edge cases to test next
+- **bind("", "")** → empty-string bindings may corrupt the key→action map or produce ghost bindings.
+- **bind(None, None)** → may crash on dict operations or silently store None keys.
+- **translate([object()])** → unknown event type in input list — currently silently skipped, but should be validated or documented.
+- **Rapid rebind during gameplay** → bind("confirm", "a") then immediately bind("confirm", "b") — verify old key fully removed.
+- **Event dispatch order** → HUD → UI → Camera → Bindings → handle_input. Test that consumed events stop propagating at each layer.
 
-**Manual probes (same session):** temp asset roots under `/var/folders/.../T/...` via `tempfile.mkdtemp()` — (1) `push` scene whose `on_enter` adds `Sprite("sprites/missing_hero")` → **`AssetNotFoundError`** with path hint; (2) `garbage.png` containing non-PNG bytes → **mock** `Game` + `tick` succeeds (backend does not decode); same bytes → **PIL `UnidentifiedImageError`** (proves real decode would fail); (3) `audio.play_sound("ghost", optional=True)` → **`None`**, `optional=False` → **`AssetNotFoundError`**; (4) `audio.play_music("no_track")` on empty `music/` → **`AssetNotFoundError`**; (5) `assets.frames("sprites/walk")` with no `_*` PNGs → **`AssetNotFoundError`** (“No animation frames”); (6) only `sounds/beep.txt` → **`AssetNotFoundError`** listing tried `.wav`/`.ogg`/`.mp3`.
+---
 
-**Extended runtime probes:** `scripts/stage5_asset_probe.py` — 44 probes covering 7 subsystems. All PASS, 0 bugs found.
+## 3. Cursor System
 
-| Category | Probes | Result |
-|----------|--------|--------|
-| Missing files (image/sound/music/frames) | A1-A5 | AssetNotFoundError with tried paths |
-| Optional handling (play_sound/music optional=True) | A6-A8 | Returns None gracefully; crossfade has no optional flag |
-| Cache behavior | A9-A10 | Same handle returned for repeated loads |
-| Corrupt/empty files | A11-A12 | Mock backend accepts (never reads contents); PIL rejects |
-| ColorSwap/palettes | A13-A15 | Proper KeyError/TypeError for invalid palettes |
-| CursorManager/ParticleEmitter | A16-A19 | Missing images: AssetNotFoundError; ParticleEmitter defers to burst() |
-| AnimationDef/Sprite edge cases | A20-A26 | frame_duration≤0 → ValueError; @2x preferred when available |
-| Audio channels | AU1-AU5 | Invalid channel ops graceful (no crash) |
-| SaveManager | S1-S12 | Corrupt JSON/binary/zero-byte → SaveError; non-serializable → SaveError; empty slots clean |
-| FSM | F1 | Unknown event → ignored (no crash) |
+**Source:** `saga2d/cursor.py` (66 LOC) — `CursorManager`
+**Backend:** `base.py` — `set_cursor(handle|None, hotspot_x, hotspot_y)`, `set_cursor_visible(bool)`; mock records state; pyglet converts hotspot y-coordinate for y-up
+**Scene integration:** `scene.py:_cleanup_paused_scene()` — resets cursor to "default" on scene pop
+**Tests:** `tests/systems/test_cursor.py` (**18 passed**; 5 classes: TestCursorRegister, TestCursorSet, TestCursorCurrent, TestCursorVisible, TestCursorBackendCalls + TestCursorGameIntegration)
 
-**Findings:** **No bugs.** Behavior matches design: **`AssetManager`** validates **filesystem presence** and **extension search order** before calling the backend; **`AssetNotFoundError`** subclasses **`FileNotFoundError`** and messages list tried paths. **`play_sound(..., optional=True)`** is the intended user-facing soft path for missing SFX. **Gap (not a failure):** **mock** `load_image` / `load_sound` never validate file contents — **pyglet** would still raise when decoding corrupt media (`pyglet.image.load` / `pyglet.media.load`); headless CI relies on mock. **Fonts:** default theme uses logical names (`serif`); **mock** `load_font` does not open files — TTF path failures are a **pyglet / display** concern.
+### Key classes/functions
 
-**Final headless total: 2795 passed, 3 skipped.**
+| Class/Function | Location | Public API |
+|---|---|---|
+| `CursorManager` | `cursor.py` | `register(name, image_name, hotspot=(0,0))`, `set(name)`, `set_visible(visible)`, `current` (property) |
+| Game integration | `game.py` | `game.cursor` (lazy property → CursorManager) |
 
-### Blocked Workflows
+### Feature coverage table
+
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| register — load image + store handle | `register` | TestCursorRegister | ✅ tested | |
+| register — custom hotspot | `register` | TestCursorRegister | ✅ tested | |
+| register — overwrite existing | `register` | TestCursorRegister | ✅ tested | |
+| set("default") — restores system cursor | `set` | TestCursorSet | ✅ tested | |
+| set(custom) — activates registered cursor | `set` | TestCursorSet | ✅ tested | |
+| set(unregistered) → KeyError | `set` | TestCursorSet | ✅ tested | |
+| current property (initial="default") | `current` | TestCursorCurrent | ✅ tested | |
+| set_visible(True/False) | `set_visible` | TestCursorVisible | ✅ tested | |
+| Backend receives correct handle/hotspot/None | – | TestCursorBackendCalls | ✅ tested | |
+| Game.cursor lazy property | `Game.cursor` | TestCursorGameIntegration | ✅ tested | |
+| register — missing asset | `register` | – | ❌ **untested** | Should raise AssetNotFoundError |
+| register — set after re-register | `register` | – | ⚠️ partial | Overwrite tested, not switch-after-reregister |
+| set_visible(non-bool) | `set_visible` | – | ❌ **untested** | No type validation |
+| Multiple cursors — switch between several | – | – | ❌ **untested** | Only single custom cursor tested |
+
+### Likely workflows & edge cases to test next
+- **Missing asset on register** → `cursor.register("aim", "nonexistent_cursor")` — should raise AssetNotFoundError.
+- **Multi-cursor switching** → register 3 cursors, cycle through them, verify backend receives correct handle each time.
+- **Cursor persistence across scene push/pop** → push scene (cursor reset to default), pop (verify scene's cursor choice restored or not).
+- **set_visible(42)** → non-bool truthy value — backend may misinterpret.
+- **Re-register then set** → register("aim", "old.png"), register("aim", "new.png"), set("aim") — verify new handle used.
+
+---
+
+## 4. ColorSwap System
+
+**Source:** `saga2d/rendering/color_swap.py` (112 LOC) — `ColorSwap`, `register_palette()`, `get_palette()`, `_clear_palettes()`
+**Sprite integration:** `rendering/sprite.py` — `Sprite(color_swap=..., team_palette=...)` (color_swap > team_palette > plain)
+**Asset caching:** `assets.py` — `AssetManager.image_swapped(name, swap)` — key is `(name, swap.cache_key())`
+**Backend:** `base.py:load_image_from_pil(pil_image)` — converts PIL Image to backend handle
+**Teardown:** `game.py:_teardown()` calls `_clear_palettes()`
+**Tests:** `tests/rendering/test_color_swap.py` (**25 passed**; 6 classes: TestColorSwap, TestPaletteRegistry, TestColorSwapAssetManager, TestLoadImageFromPil, TestColorSwapSprite, TestColorSwapIntegration)
+
+### Key classes/functions
+
+| Class/Function | Location | Public API |
+|---|---|---|
+| `ColorSwap` | `color_swap.py` | `__init__(source_colors, target_colors)`, `apply(image_path)` → PIL Image, `cache_key()` → hashable tuple |
+| `register_palette` | `color_swap.py` | `register_palette(name, swap)` — global registry |
+| `get_palette` | `color_swap.py` | `get_palette(name)` → ColorSwap (raises KeyError) |
+| `_clear_palettes` | `color_swap.py` | Internal — clears registry (called by Game._teardown) |
+
+### Feature coverage table
+
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| apply — color replacement | `apply` | TestColorSwap | ✅ tested | |
+| apply — preserves alpha | `apply` | TestColorSwap | ✅ tested | |
+| apply — unmatched pixels unchanged | `apply` | TestColorSwap | ✅ tested | |
+| Empty mapping | `apply` | TestColorSwap | ✅ tested | |
+| Mismatched lengths → ValueError | `__init__` | TestColorSwap | ✅ tested | |
+| Nonexistent file → FileNotFoundError | `apply` | TestColorSwap | ✅ tested | |
+| cache_key — unique, equal, hashable | `cache_key` | TestColorSwap | ✅ tested | |
+| Palette registry — register/get | `register_palette` | TestPaletteRegistry | ✅ tested | |
+| Palette registry — unregistered → KeyError | `get_palette` | TestPaletteRegistry | ✅ tested | |
+| Palette registry — overwrite | `register_palette` | TestPaletteRegistry | ✅ tested | |
+| image_swapped — handle + caching | `image_swapped` | TestColorSwapAssetManager | ✅ tested | |
+| Sprite with color_swap / team_palette | `Sprite()` | TestColorSwapSprite | ✅ tested | |
+| color_swap > team_palette precedence | – | TestColorSwapSprite | ✅ tested | |
+| Two sprites same swap → same handle | – | TestColorSwapIntegration | ✅ tested | |
+| _clear_palettes | `_clear_palettes` | – | ❌ **untested** | Called by Game._teardown, not isolated |
+| Duplicate source colors | `apply` | – | ❌ **untested** | Last-wins behavior undocumented |
+| Non-RGBA image format | `apply` | – | ❌ **untested** | .convert("RGBA") edge path |
+| Sprite.image setter with color_swap post-construction | `Sprite.image` | – | ❌ **untested** | Only construction tested |
+
+### Likely workflows & edge cases to test next
+- **_clear_palettes isolation** → register palette, clear, verify get_palette raises KeyError.
+- **Duplicate source colors** → `ColorSwap([(255,0,0),(255,0,0)], [(0,255,0),(0,0,255)])` — which target wins?
+- **Non-PNG image** → apply() uses `formats=["PNG"]` — test with a JPEG or BMP to verify error path.
+- **Sprite.image reassignment with swap** → change image on existing sprite that has color_swap — verify swap re-applied.
+- **Concurrent sprites with different palettes on same base image** → verify cache distinguishes them correctly.
+
+---
+
+## 5. Layout System
+
+**Source:** `saga2d/ui/layout.py` (141 LOC) — `Anchor` (9 enum values), `Layout` (3 enum values), `compute_anchor_position()`, `compute_flow_layout()`, `compute_content_size()`
+**Component integration:** `component.py:Component.compute_layout()` → `_layout_children()`; `components.py:Panel._layout_children()` calls `compute_flow_layout`; `Panel.get_preferred_size()` calls `compute_content_size`
+**Widget layout:** `widgets.py:Grid` — cell-based layout with `cell_size`, `spacing`; `TabGroup` — tab bar + content; `DataTable` — column-width distribution
+**Tests:** `tests/ui/test_ui.py` (**24 layout-specific tests**; TestLayoutMath, TestLayoutErrorMessages + Panel/Button/Label sizing tests)
+
+### Key classes/functions
+
+| Class/Function | Location | Public API |
+|---|---|---|
+| `Anchor` | `layout.py:6` | CENTER, TOP, BOTTOM, LEFT, RIGHT, TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT |
+| `Layout` | `layout.py:20` | NONE, VERTICAL, HORIZONTAL |
+| `compute_anchor_position` | `layout.py:28` | `(anchor, parent_x, parent_y, parent_w, parent_h, child_w, child_h, margin=0)` → `(x, y)` |
+| `compute_flow_layout` | `layout.py:72` | `(layout, parent_x/y/w/h, children_sizes, spacing=0, padding=0)` → `[(x, y), ...]` |
+| `compute_content_size` | `layout.py:112` | `(layout, children_sizes, spacing=0, padding=0)` → `(w, h)` |
+
+### Feature coverage table
+
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| Anchor — all 9 positions | `compute_anchor_position` | TestLayoutMath | ✅ tested | |
+| Anchor — with margin | `compute_anchor_position` | TestLayoutMath | ✅ tested | |
+| flow_layout — VERTICAL | `compute_flow_layout` | TestLayoutMath | ✅ tested | |
+| flow_layout — HORIZONTAL | `compute_flow_layout` | TestLayoutMath | ✅ tested | |
+| content_size — VERTICAL | `compute_content_size` | TestLayoutMath | ✅ tested | |
+| content_size — HORIZONTAL | `compute_content_size` | TestLayoutMath | ✅ tested | |
+| content_size — NONE/empty | `compute_content_size` | TestLayoutMath | ✅ tested | returns (2×padding, 2×padding) |
+| flow_layout — NONE → [] | `compute_flow_layout` | TestLayoutMath | ✅ tested | |
+| Error messages (bogus anchor/layout) | – | TestLayoutErrorMessages | ✅ tested | |
+| flow_layout — padding parameter | `compute_flow_layout` | – | ❌ **untested** | padding arg exists, only spacing tested |
+| anchor — zero-size parent | `compute_anchor_position` | – | ❌ **untested** | 0×0 parent rect |
+| anchor — child larger than parent | `compute_anchor_position` | – | ❌ **untested** | Negative offsets |
+| flow_layout — single child | `compute_flow_layout` | – | ❌ **untested** | Only 2+ children tested |
+| content_size — padding + spacing combined | `compute_content_size` | – | ❌ **untested** | Both non-zero at once |
+| Layout.NONE with children → empty positions | `compute_flow_layout` | – | ⚠️ partial | Tested empty list, not NONE with sizes |
+| Negative spacing/padding | – | – | ❌ **untested** | No validation exists |
+
+### Likely workflows & edge cases to test next
+- **Padding in flow layout** → `compute_flow_layout(VERTICAL, ..., padding=10)` — children should be inset from edges.
+- **Zero-size parent** → anchor calculations with 0×0 parent — verify no division errors, reasonable (0,0) output.
+- **Child > parent** → anchor CENTER with child bigger than parent — should compute negative offsets (valid math, unusual UX).
+- **Single child flow** → verify single child centers on cross-axis correctly.
+- **Negative spacing** → `compute_flow_layout(VERTICAL, ..., spacing=-5)` — overlapping children. No crash expected but behavior undefined.
+- **Panel with padding + spacing + children** → end-to-end Panel layout with both values set — verify content_size and child positions agree.
+
+---
+
+## 6. Theme System
+
+**Source:** `saga2d/ui/theme.py` (413 LOC) — `Style` (optional overrides), `ResolvedStyle` (concrete values), `Theme` (40+ constructor params), `_pick()` helper
+**Resolve methods:** `resolve_label_style`, `resolve_button_style` (state-aware: normal/hovered/pressed/disabled), `resolve_panel_style`, `resolve_list_style`, `resolve_grid_style`, `resolve_tooltip_style`, `resolve_tabgroup_style`, `resolve_datatable_style`
+**Properties:** `button_min_width`, `button_hover_outline_color/width`, `progressbar_color/bg_color`, `selected_color`, `list_alt_row_bg_color`, `grid_cell_bg_color`, `tab_active/inactive_color`, `datatable_header_bg/text_color`, `datatable_row/alt_row_bg_color`, `drop_accept/reject_color`, `ghost_opacity`, `panel_shadow_offset/color`
+**Integration:** `game.py:game.theme` (lazy); components call `resolve_*` in their draw/layout; widgets access properties directly
+**Tests:** `tests/ui/test_theme.py` (**13 passed**; TestStyle, TestTheme) + `tests/ui/test_drag_drop.py:TestThemeDragProperties`
+
+### Key classes/functions
+
+| Class/Function | Location | Public API |
+|---|---|---|
+| `Style` | `theme.py:17` | Dataclass: `font`, `font_size`, `text_color`, `background_color`, `padding`, `border_color`, `border_width`, `hover_color`, `press_color` (all optional/None) |
+| `ResolvedStyle` | `theme.py:35` | Dataclass: same fields but all concrete (non-None) |
+| `Theme` | `theme.py:55` | 40+ kwargs; 8 `resolve_*` methods; 19 property accessors |
+| `_pick(explicit, default)` | `theme.py:50` | Returns explicit if not None, else default |
+
+### Feature coverage table
+
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| Style — all fields optional | `Style` | TestStyle | ✅ tested | |
+| Style — partial override | `Style` | TestStyle | ✅ tested | |
+| resolve_label_style — defaults + overrides | `resolve_label_style` | TestTheme | ✅ tested | |
+| resolve_button_style — 4 states | `resolve_button_style` | TestTheme | ✅ tested | normal/hovered/pressed/disabled |
+| resolve_button_style — explicit hover override | `resolve_button_style` | TestTheme | ✅ tested | |
+| resolve_panel_style — defaults + override | `resolve_panel_style` | TestTheme | ✅ tested | |
+| None means inherit from theme | `_pick` | TestTheme | ✅ tested | |
+| button_min_width property | `button_min_width` | TestTheme | ✅ tested | |
+| Drag-drop theme properties | `drop_accept_color` etc. | TestThemeDragProperties | ✅ tested | |
+| Custom theme colors (DnD) | – | TestThemeDragProperties | ✅ tested | |
+| **resolve_list_style** | `resolve_list_style` | – | ❌ **untested** | Used by List widget |
+| **resolve_grid_style** | `resolve_grid_style` | – | ❌ **untested** | Used by Grid widget |
+| **resolve_tooltip_style** | `resolve_tooltip_style` | – | ❌ **untested** | Used by Tooltip widget |
+| **resolve_tabgroup_style** | `resolve_tabgroup_style` | – | ❌ **untested** | Used by TabGroup widget |
+| **resolve_datatable_style** | `resolve_datatable_style` | – | ❌ **untested** | Used by DataTable widget |
+| DataTable theme properties (4 accessors) | properties | – | ❌ **untested** | header/row/alt colors |
+| Tab theme properties (2 accessors) | properties | – | ❌ **untested** | active/inactive color |
+| panel_shadow_offset / shadow_color | properties | – | ❌ **untested** | 2 accessors |
+| Theme custom constructor args | `Theme.__init__` | – | ⚠️ partial | Only DnD colors tested |
+| list_alt_row/grid_cell/progressbar colors | properties | – | ❌ **untested** | 3+ accessors |
+| button_hover_outline color/width | properties | – | ❌ **untested** | 2 accessors |
+
+### Likely workflows & edge cases to test next
+- **5 untested resolvers** → call each (`resolve_list_style`, `resolve_grid_style`, `resolve_tooltip_style`, `resolve_tabgroup_style`, `resolve_datatable_style`) with None and with explicit Style — verify returned ResolvedStyle matches theme defaults / overrides.
+- **All 19 property accessors** → instantiate Theme with custom args, assert each property returns the custom value.
+- **Full theme propagation** → set `game.theme = Theme(...)` with all-custom colors, render each widget type, verify resolved styles used correct values.
+- **Style conflict resolution** → Style(padding=20) on a component in a Theme(panel_padding=8) — explicit wins.
+- **Default Theme comparison** → `Theme()` with no args — verify all defaults match documented Slate color palette values.
+
+---
+
+## 7. Drag-and-Drop System
+
+**Source:** `saga2d/ui/drag_drop.py` (295 LOC) — `DragManager`, `_DragSession`
+**Component attributes:** `component.py` — `draggable`, `drag_data`, `drop_accept`, `on_drop` on `Component`
+**UI root:** `component.py:_UIRoot.drag_manager` (lazy property)
+**Theme:** `theme.py` — `drop_accept_color`, `drop_reject_color`, `ghost_opacity`
+**Tests:** `tests/ui/test_drag_drop.py` (**49 passed**; 11+ classes), `tests/test_kodo_camera_drag_edge.py`, `tests/screenshot/test_drag_drop_screenshots.py`
+
+### Key classes/functions
+
+| Class/Function | Location | Public API |
+|---|---|---|
+| `DragManager` | `drag_drop.py` | `handle_event(event)` → bool, `cancel_active()`, `is_dragging` (property), `drag_data` (property) |
+| `_DragSession` | `drag_drop.py:45` | Internal dataclass: source, data, start_x/y, ghost_x/y, ghost_offset_x/y, current_target, target_accepts |
+| Component attrs | `component.py` | `draggable: bool`, `drag_data: Any`, `drop_accept: Callable`, `on_drop: Callable` |
+
+**Event flow:** left-click on draggable → `_start_drag()` → move/drag updates ghost → release → `_end_drag()` evaluates target → calls `on_drop` if accepted. Escape → `_cancel_drag()`. All events consumed during drag.
+
+### Feature coverage table
+
+| Feature | Source method | Test class | Status | Notes |
+|---|---|---|---|---|
+| DragManager — initial state, lazy creation | `__init__` | TestDragManagerConstruction | ✅ tested | |
+| Component drag attributes | `Component` | TestComponentDragAttributes | ✅ tested | |
+| Start drag — click on draggable | `_start_drag` | TestDragStart | ✅ tested | |
+| No drag — non-draggable/right-click/disabled/invisible | – | TestDragStart | ✅ tested | |
+| Ghost tracking — follows move/drag | `handle_event` | TestGhostTracking | ✅ tested | |
+| Drop on valid target — fires on_drop | `_end_drag` | TestDropOnValidTarget | ✅ tested | |
+| Drop on rejecting target — no on_drop | `_end_drag` | TestDropOnValidTarget | ✅ tested | |
+| Drop on non-target / empty space | `_end_drag` | TestDropOnValidTarget | ✅ tested | |
+| Cancel drag — Escape key | `_cancel_drag` | TestCancelDrag | ✅ tested | |
+| All events consumed during drag | `handle_event` | TestEdgeCases | ✅ tested | |
+| Drop target feedback — accept/reject/change | `_find_drop_target` | TestDropTargetFeedback | ✅ tested | |
+| Source excluded from drop targets | `_walk_for_target` | TestDropTargetFeedback | ✅ tested | |
+| Ghost rendering (rect fallback, overlays) | `_draw_ghost` | TestGhostRendering | ✅ tested | |
+| Game.tick integration | – | TestGameTickIntegration | ✅ tested | |
+| Nested components — deepest target wins | `_walk_for_target` | TestNestedComponents | ✅ tested | |
+| Various drag_data types | – | TestDragDataTypes | ✅ tested | |
+| Multiple drags in sequence | – | TestEdgeCases | ✅ tested | |
+| Cancel then new drag | – | TestEdgeCases | ✅ tested | |
+| cancel_active() — external cancel | `cancel_active` | – | ❌ **untested** | Public API |
+| Ghost with _image_handle (sprite-based) | `_draw_ghost` | – | ❌ **untested** | Only rect fallback tested |
+| drop_accept raising exception | `_find_drop_target` | – | ❌ **untested** | Callback exception safety |
+| on_drop raising exception | `_end_drag` | – | ❌ **untested** | Propagation behavior |
+| Drag during scene transition | – | – | ❌ **untested** | Active drag when scene pops |
+
+### Likely workflows & edge cases to test next
+- **cancel_active()** → start drag, call `drag_manager.cancel_active()` programmatically — verify session ends, ghost cleared.
+- **Exception in drop_accept** → `drop_accept=lambda d: 1/0` — does DragManager catch it or crash? Ghost stuck?
+- **Exception in on_drop** → valid drop target, on_drop raises — verify drag session still cleaned up.
+- **Sprite-based ghost** → component with `_image_handle` set — verify image-based ghost rendering path.
+- **Drag across scene pop** → start drag, then `game.pop()` — does DragManager reference stale component? Is drag cancelled?
+- **Double release** → inject two mouse releases rapidly — verify no crash from ending already-ended drag.
+
+---
+
+## 8. Screens & Dialog Workflows
+
+**Source:** `saga2d/ui/screens.py` (654 LOC) — `MessageScreen`, `ChoiceScreen`, `ConfirmDialog`, `SaveLoadScreen`, `_SequenceRunner`, `_SettingsScene`
+**Game convenience:** `game.py` — `game.show_sequence(screens, on_complete)`, `game.push_settings()`
+**Scene base:** `scene.py` — `transparent`, `show_hud`, `pop_on_cancel` properties
+**Tests:** `tests/ui/test_screens.py` (**42 passed**; TestMessageScreen, TestChoiceScreen, TestConfirmDialog, TestSaveLoadScreen, TestShowSequence), `tests/core/test_settings.py` (**36 passed**)
+
+### Key classes/functions
+
+| Class | Location | Constructor params | Key methods |
+|---|---|---|---|
+| `MessageScreen` | `screens.py:54` | `text, on_dismiss` | `on_enter()`, `handle_input()`, `_dismiss()` |
+| `ChoiceScreen` | `screens.py:116` | `prompt, choices, on_choice` | `on_enter()`, `handle_input()`, `_select(index)` |
+| `ConfirmDialog` | `screens.py:193` | `question, on_confirm, on_cancel` | `on_enter()`, `handle_input()`, `_confirm()`, `_cancel()` |
+| `SaveLoadScreen` | `screens.py:265` | `mode, save_manager, on_save, on_load, slot_count` | `on_enter()`, `handle_input()`, `_on_slot_click()` |
+| `_SequenceRunner` | `screens.py:399` | `screens, on_complete` | `on_enter()`, `on_reveal()`, `_finish()` |
+| `_SettingsScene` | `screens.py:461` | (none) | `on_enter()`, `handle_input()`, `_adjust_volume()`, `_start_listening()` |
+
+All screens: `transparent=True`, `show_hud=False`, modal (consume all events).
+
+### Feature coverage table
+
+#### 8a. MessageScreen
+
+| Feature | Status | Notes |
+|---|---|---|
+| transparent + show_hud attrs | ✅ tested | |
+| Dismiss on key_press / click | ✅ tested | |
+| on_dismiss callback fires | ✅ tested | |
+| Consumes all events (modal) | ✅ tested | |
+| UI build + render | ✅ tested | |
+| Dismiss on release/scroll/drag | ❌ **untested** | Only key_press/click tested |
+
+#### 8b. ChoiceScreen
+
+| Feature | Status | Notes |
+|---|---|---|
+| Escape cancels (no callback) | ✅ tested | |
+| Button click → on_choice(index) | ✅ tested | |
+| Number key shortcuts (1–9) | ✅ tested | |
+| Invalid number ignored | ✅ tested | |
+| Modal | ✅ tested | |
+| on_choice=None works | ✅ tested | |
+| Empty choices list | ❌ **untested** | 0 buttons + prompt only |
+| Number key "0" | ❌ **untested** | "0" is digit, maps to index –1 |
+
+#### 8c. ConfirmDialog
+
+| Feature | Status | Notes |
+|---|---|---|
+| Yes/No buttons | ✅ tested | |
+| on_confirm / on_cancel callbacks | ✅ tested | |
+| Enter → confirm, Escape → cancel | ✅ tested | |
+| Modal | ✅ tested | |
+| No callbacks works | ✅ tested | |
+| Double-confirm (Enter twice) | ❌ **untested** | Second pop on empty stack? |
+
+#### 8d. SaveLoadScreen
+
+| Feature | Status | Notes |
+|---|---|---|
+| Invalid mode → ValueError | ✅ tested | |
+| slot_count ≤ 0 → ValueError (F56) | ✅ tested | |
+| Load mode — filled/empty slots | ✅ tested | |
+| Save mode — saves state | ✅ tested | |
+| Back / Escape pops | ✅ tested | |
+| on_save / on_load callbacks | ✅ tested | |
+| save_manager=None → game's manager | ❌ **untested** | Only explicit override tested |
+| Overwrite existing save slot | ❌ **untested** | Save to occupied slot |
+
+#### 8e. _SequenceRunner / show_sequence
+
+| Feature | Status | Notes |
+|---|---|---|
+| Chains message screens | ✅ tested | |
+| on_complete fires after last | ✅ tested | |
+| Empty sequence → immediate complete | ✅ tested | |
+| transparent=True | ✅ tested | |
+
+#### 8f. _SettingsScene / push_settings
+
+| Feature | Status | Notes |
+|---|---|---|
+| UI structure (volume + keybindings) | ✅ tested | |
+| Volume +/- buttons | ✅ tested | |
+| Volume clamped 0.0–1.0 | ✅ tested | |
+| Key rebinding — listen + bind | ✅ tested | |
+| Escape cancels listening | ✅ tested | |
+| Back / Escape pops | ✅ tested | |
+| game.push_settings() convenience | ✅ tested | |
+| Rebind stealing another action's key | ❌ **untested** | Bind confirm to escape |
+
+### Likely workflows & edge cases to test next
+- **ChoiceScreen(choices=[])** → 0 buttons, prompt only. Number keys should all be ignored. Escape still pops.
+- **Number key "0"** → `int("0") - 1 = -1` → may index last choice or be out of range.
+- **Double-confirm** → press Enter twice on ConfirmDialog — first pop removes it, second pop hits scene below.
+- **Save overwrite** → save to slot 1 (already occupied), verify data replaced and on_save fired with correct slot.
+- **Rebind key stealing in settings** → rebind "confirm" to "escape" key — verify "cancel" action loses its key, settings still navigable.
+- **MessageScreen dismiss on drag** → inject drag event — does handle_input consume it? Is _dismiss called?
+- **SaveLoadScreen with game.save_manager** → construct without explicit save_manager, verify it falls through to game's.
+
+---
+
+## Coverage Summary (§1–§8 subsystems)
+
+Feature-level audit from the tables above — verified against actual pytest runs (2026-03-25).
+
+| Subsystem | Source LOC | Primary Tests | Tested | Untested | Coverage |
+|---|---|---|---|---|---|
+| **Audio** | 375 | 83 | 24 | 4 | 🟢 86% |
+| **Input** | 228 | 33 | 18 | 3 | 🟢 86% |
+| **Cursor** | 66 | 18 | 10 | 4 | 🟡 71% |
+| **ColorSwap** | 112 | 25 | 14 | 4 | 🟡 78% |
+| **Layout** | 141 | 24 | 9 | 6 | 🟡 60% |
+| **Theme** | 413 | 13 | 10 | 12 | 🔴 45% |
+| **DragDrop** | 295 | 49 | 18 | 5 | 🟢 78% |
+| **Screens** | 654 | 78 | 40 | 10 | 🟢 80% |
+| **TOTAL** | **2,284** | **323** | **143** | **48** | **75%** |
+
+### Legend
+- 🟢 ≥ 78% features tested
+- 🟡 60–77% features tested
+- 🔴 < 60% features tested
+
+### Priority gaps for next test pass
+
+1. **Theme resolve methods** — 5 untested resolvers + 12 untested property accessors. Largest single API gap. Pure Python → easy to test.
+2. **Layout edge cases** — padding, zero-size, child > parent, negative spacing, single-child. Pure math → easy to test.
+3. **Audio validation** — `set_volume` NaN/Inf guard, `crossfade(duration=0)`, `_teardown` isolation, unknown channel.
+4. **DragDrop exception safety** — `cancel_active()`, exception in `drop_accept`/`on_drop`, sprite ghost, drag during scene pop.
+5. **Screens edge cases** — empty ChoiceScreen, key "0", double-confirm, save overwrite, rebind stealing in settings.
+6. **Cursor gaps** — missing asset, multi-cursor switching, non-bool set_visible.
+7. **ColorSwap internals** — `_clear_palettes`, duplicate source colors, non-RGBA, post-construction swap.
+8. **Input validation** — empty/None bind args, unknown event type in translate.
+
+---
+
+## Appendix — environment blockers
+
+Workflows that do not run under default headless mock CI (carried forward from prior coverage notes).
+
 | Workflow | Reason |
 |----------|--------|
 | Pyglet backend rendering | Requires display server (X11/Wayland) |
 | Screenshot golden-image comparison | Requires pyglet + display |
-| AI visual verification | Requires ANTHROPIC_API_KEY |
+| AI visual verification | Requires `ANTHROPIC_API_KEY` |
 | Interactive game examples | Requires windowed display |
 | Audio hardware playback | Requires audio hardware |
-| game.run() loop | Blocked by SAGA2D_HEADLESS=1 |
+| `game.run()` loop | Blocked by `SAGA2D_HEADLESS=1` |
+
+## Appendix — archived kodo stage narratives
+
+Long-form Stage 1–5 tester logs (runtime outcome tables for F42–F58, Stage 4 gameplay workflow, Stage 5 asset probes, pytest command snippets) lived in `.kodo/test-coverage.md` **before** the subsystem-map rewrite. Retrieve an older revision with:
+
+`git log --oneline -- .kodo/test-coverage.md` → pick the commit *before* the rewrite → `git show <hash>:.kodo/test-coverage.md`
