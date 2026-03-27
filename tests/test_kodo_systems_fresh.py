@@ -415,13 +415,15 @@ class TestSetVolumeOutOfRange:
         audio.set_volume("music", -999.99)
         assert audio.get_volume("music") == 0.0
 
-    def test_volume_infinity_clamped(self, audio: AudioManager) -> None:
-        audio.set_volume("ui", float("inf"))
-        assert audio.get_volume("ui") == 1.0
+    def test_volume_infinity_raises(self, audio: AudioManager) -> None:
+        """set_volume with +inf raises ValueError (F59)."""
+        with pytest.raises(ValueError, match="finite"):
+            audio.set_volume("ui", float("inf"))
 
-    def test_volume_negative_infinity_clamped(self, audio: AudioManager) -> None:
-        audio.set_volume("ui", float("-inf"))
-        assert audio.get_volume("ui") == 0.0
+    def test_volume_negative_infinity_raises(self, audio: AudioManager) -> None:
+        """set_volume with -inf raises ValueError (F59)."""
+        with pytest.raises(ValueError, match="finite"):
+            audio.set_volume("ui", float("-inf"))
 
 
 class TestSetVolumeInvalidChannel:

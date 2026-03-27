@@ -911,19 +911,10 @@ class TestAudioEdgeCases:
         return backend, assets, audio
 
     def test_set_volume_with_nan(self, mock_game: Game) -> None:
-        """set_volume with NaN: Python max(0, min(1, nan)) -> max(0, nan) -> nan.
-
-        In CPython 3.x, max(0.0, float('nan')) returns the first argument 0.0
-        on some platforms, but this is implementation-defined for NaN comparisons.
-        We verify the volume is clamped to a finite value in [0.0, 1.0].
-        """
+        """set_volume with NaN raises ValueError (F59)."""
         audio = mock_game.audio
-        audio.set_volume("sfx", float("nan"))
-        vol = audio.get_volume("sfx")
-        # The result depends on Python's max/min NaN behavior.
-        # On CPython: min(1.0, nan) -> nan, max(0.0, nan) -> nan or 0.0.
-        # We accept either 0.0 or nan (stored as-is). The key thing is no crash.
-        assert isinstance(vol, float)
+        with pytest.raises(ValueError, match="finite"):
+            audio.set_volume("sfx", float("nan"))
 
     def test_play_sound_with_missing_asset_optional(self, mock_game: Game) -> None:
         """play_sound with non-existent name and optional=True does not raise."""
