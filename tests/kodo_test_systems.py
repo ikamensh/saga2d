@@ -1834,12 +1834,12 @@ class TestTextBoxWordWrap:
 
 
 class TestTooltipNegativeDelay:
-    """Tooltip with negative delay should show immediately."""
+    """Tooltip with negative delay should raise ValueError."""
 
-    def test_negative_delay_shows_immediately(self):
-        tt = Tooltip("Test", delay=-1.0)
-        tt.show(100, 200)
-        assert tt._visible_now is True
+    def test_negative_delay_raises(self):
+        import pytest
+        with pytest.raises(ValueError, match="delay must be >= 0"):
+            Tooltip("Test", delay=-1.0)
 
 
 class TestTabGroupEmptyDraw:
