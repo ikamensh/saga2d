@@ -17,14 +17,11 @@ _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-from saga2d import Game, InputEvent, Scene, ring_positions  # noqa: E402
+from saga2d import Game, InputEvent, Scene, TextStyle, Theme, ring_positions  # noqa: E402
 
 BG_COLOR = (18, 14, 28, 255)
-GOLD = (255, 220, 80, 255)
 WHITE = (245, 245, 250, 255)
 DIM = (140, 140, 150, 255)
-SUB_LABEL = (210, 210, 225, 230)
-MUTED = (155, 155, 170, 255)
 HP_COLOR = (255, 140, 160, 255)
 COIN_COLOR = (245, 205, 90, 255)
 CURRENT_GLOW = (255, 255, 255, 255)
@@ -162,12 +159,12 @@ class RingOfPainScene(Scene):
         # Title (top-left) and floor (top-right) stay clear of the ring area.
         self.draw_text(
             "Ring of Pain", 20, 28,
-            font_size=22, color=GOLD,
+            style="title",
             anchor_x="left", anchor_y="center",
         )
         self.draw_text(
             f"Floor {self.level}", w - 20, 28,
-            font_size=18, color=WHITE,
+            style="hud",
             anchor_x="right", anchor_y="center",
         )
 
@@ -208,33 +205,46 @@ class RingOfPainScene(Scene):
             self.draw_text(
                 self._sub_label(node),
                 nx, ny + node_r + 18,
-                font_size=13,
-                color=SUB_LABEL if node.alive else MUTED,
+                style="sub" if node.alive else "caption",
                 anchor_x="center", anchor_y="center",
             )
+
+            # "YOU ARE HERE" caption floats radially outward from the current
+            # node so the white glow reads as "player position", not styling.
+            if is_current:
+                dx, dy = nx_f - cx, ny_f - cy
+                d = math.hypot(dx, dy) or 1.0
+                offset = node_r + 26
+                ox = int(nx_f + dx / d * offset)
+                oy = int(ny_f + dy / d * offset)
+                self.draw_text(
+                    "YOU", ox, oy,
+                    style="caption", color=CURRENT_GLOW,
+                    anchor_x="center", anchor_y="center",
+                )
 
         # Message (above the HUD so it never fights HP/Coins for the baseline).
         self.draw_text(
             self.message, int(cx), h - 44,
-            font_size=14, color=MUTED,
+            style="caption",
             anchor_x="center", anchor_y="center",
         )
 
         # HUD — single row across the bottom.
         self.draw_text(
             f"HP {self.hp}/{self.max_hp}", 20, h - 20,
-            font_size=18, color=HP_COLOR,
+            style="hud", color=HP_COLOR,
             anchor_x="left", anchor_y="center",
         )
         self.draw_text(
             f"Coins {self.coins}", 160, h - 20,
-            font_size=18, color=COIN_COLOR,
+            style="hud", color=COIN_COLOR,
             anchor_x="left", anchor_y="center",
         )
         self.draw_text(
             "←  →  move     space  interact",
             w - 20, h - 20,
-            font_size=14, color=MUTED,
+            style="caption",
             anchor_x="right", anchor_y="center",
         )
 
@@ -245,6 +255,14 @@ def main() -> None:
         resolution=(800, 600),
         fullscreen=False,
         backend="pyglet",
+    )
+    # Tighten the dungeon-crawl typography: bump the title a little and
+    # make the sub-labels slightly brighter than the default.
+    game.theme = Theme(
+        text_styles={
+            "title": TextStyle(font_size=24, color=(255, 215, 100, 255)),
+            "sub":   TextStyle(font_size=13, color=(220, 220, 232, 240)),
+        },
     )
     game.run(RingOfPainScene())
 

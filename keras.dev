@@ -244,3 +244,112 @@ in Ring of Pain (draw loop dropped, no regression).
 * **Reactive HUD binding**: `Label(text=lambda: f"HP {self.hp}")` or
   a `StateLabel` that rebinds on attribute change.
 * **`draw_ring_outline` primitive**: single call for annular rings.
+
+---
+
+## Iteration 3 — 2026-04-16
+
+### What shipped
+
+* `saga2d.TextStyle` dataclass + `Theme.text_styles` map with six
+  pre-registered styles (`title`, `heading`, `hud`, `body`, `sub`,
+  `caption`). `Theme(text_styles={...})` constructor param merges
+  user overrides into the defaults.
+* `Scene.draw_text(..., style="title")` / `style=TextStyle(...)` —
+  font_size / color / font are now optional; explicit values override
+  the style; with neither, theme defaults are used.
+* `Ring of Pain` draw() migrated to named styles: every `draw_text`
+  call now says *role* ("this is a title / hud / sub-label") instead
+  of *appearance* (font_size=22, color=(255,220,80,255)). When the
+  scene overrides `Theme(text_styles={"title": ...})`, every title
+  instantly restyles — proof that the theme-driven refactor works.
+* **Semantic player marker**: "YOU" caption floating radially outward
+  from the current node. Pairs with the existing white glow ring so
+  the cue is both visual (glow) and literal (caption).
+
+Screenshot: `/tmp/ring_of_pain_v6.png`. 144 core+util tests still pass;
+the 14 failures in `tests/visual_verify/` were confirmed pre-existing
+(stash-and-run reproduction on HEAD).
+
+### What the styling refactor actually saves
+
+Before each `draw_text` call carried six hand-picked values:
+
+    self.draw_text(
+        "Ring of Pain", 20, 28,
+        font_size=22, color=(255, 220, 80, 255),
+        anchor_x="left", anchor_y="center",
+    )
+
+After:
+
+    self.draw_text(
+        "Ring of Pain", 20, 28,
+        style="title",
+        anchor_x="left", anchor_y="center",
+    )
+
+Per-call save is modest; the bigger win is **centralised restyling**.
+A game's "dungeon crawl" theme can redefine `title` / `hud` / `sub`
+once and every scene's `draw_text` inherits. This maps well onto how
+Keras separates model structure from training config — the scene
+describes *what* text appears; the theme describes *how* it looks.
+
+### Second-AI (Gemini 2.5 Pro) critique of v6
+
+Full text: `/tmp/ring_of_pain_v6_review.txt`. Highlights:
+
+* **Still reads the glow ring as a state indicator, not a player
+  marker** — even with the "YOU" caption. The visual weight of the
+  rim dominates the 12 pt caption. *Signal: a chevron + caption
+  combo, or a caption in the title-style gold instead of white,
+  would communicate player position more loudly than a subtle rim.*
+* "Inconsistent typography" — persists. Gemini points at casing
+  inconsistencies ("HP" vs "atk") and at the `$` glyph looking
+  different from other text (font rendering, not an actual choice).
+* "Poor information hierarchy": enemy stats (`3 HP 1 atk`) smaller
+  than the generic "E" icon — Gemini argues the stats are the
+  important info, the icon is cosmetic.
+* Still flags `→ floor 2` crowding the adjacent E node.
+
+### API friction noticed this iteration
+
+1. **Screenshot harness doesn't run `main()`** — it only pushes the
+   scene, so any theme customisation in `main()` is skipped. A test
+   rendering the game will miss the actual production theme. The
+   harness (or the scene) needs a way to apply theme before the first
+   tick. Workaround: set theme in `Scene.on_enter`, but then themes
+   can't be shared across scenes. Real fix: a `Game(theme=...)`
+   constructor param.
+2. **`Theme.__init__` has 35+ keyword arguments.** It's been accreting.
+   The `text_styles` dict pattern (namespace grouping) scales better —
+   worth pulling `panel_*`, `button_*`, etc. into `theme.panel_style`,
+   `theme.button_style` dataclasses over time. Not this iteration.
+3. **`style` kwarg in `draw_text` shadows the local `style` variable
+   in Ring of Pain's loop** (each node has a `style` dict for
+   fill/rim/glyph). Named them `text_styles` vs `style` in the
+   dataclass, but the call site still has `style` as both. Not
+   breaking, but confusing.
+
+### Concrete step taken this iteration
+
+Shipped theme-driven text styling. The scene now says *role* not
+*appearance* for every `draw_text` call. One theme edit restyles
+every scene — the Keras-equivalent of moving from
+`layer = Dense(128, activation="relu")` toward
+`model.compile(optimizer="adam")` where named defaults sit in config.
+
+### Parked for iteration 4
+
+* **Louder player marker**: chevron icon pointing at the current
+  node + caption in a distinctive colour (gold, matching the title
+  style), to outweigh the rim in perceived hierarchy.
+* **Scene title casing**: uppercase node stat labels ("3 HP 1 ATK")
+  for consistency. Cheap.
+* **`Game(theme=...)` constructor param** so screenshot harness and
+  `main()` share a theme.
+* **Reactive `Label` / `StateLabel` binding**.
+* **A `TextStyle.anchor_x` / `anchor_y` field** — right now anchors
+  stay at the call site because they're layout-specific, but "title"
+  is almost always left-centered and "hud" left-centered, so baking
+  anchors into the style might cut another two kwargs per call.
