@@ -4501,3 +4501,101 @@ recovers" parked item now has a partial workaround.
   the display (mock-to-PIL is a partial substitute, not total
   replacement).
 * **Second user** — still the remaining validation gap.
+
+---
+
+## Iteration 39 — 2026-04-17
+
+First iteration since iter-9 to **act on a cross-check finding in the
+same round it was raised**. iter-38's mock-to-PIL renderer caught a
+real layout regression; iter-39 fixed it + the consensus-flagged
+typography issue, then re-cross-checked to verify.
+
+### What shipped
+
+* **Ring of Pain ``ring_budget`` margin_bottom 88 → 140**. The
+  iter-38 cross-check flagged that ``Floor 1 — clear the ring.``
+  at ``Anchor.BOTTOM margin=48`` overlapped the bottom-node
+  sub-label. The iter-12 ``ring_budget`` change inflated the
+  ring past iter-9's fixed ``0.32`` ratio; the enlarged ring
+  pushed the bottom sub-label down into the message's space.
+  A bigger bottom margin tells ``ring_budget`` to reserve more
+  vertical room for the HUD + message + label gap, shrinking
+  the ring proportionally. Now the three bottom rows stack
+  cleanly: sub-label → status message → HUD.
+* **Theme typography unified from 4 → 3 tiers**. Previously
+  ``title`` 28 / ``hud`` 18 / ``sub`` 13 / ``caption`` 12.
+  iter-38's cross-check called four sizes unnecessary. Now
+  ``sub`` and ``caption`` share ``font_size=15`` and differ
+  only by colour (light slate for node attached-info vs muted
+  grey for status / hints). The bump from 13 to 15 also
+  addresses the iter-39 cross-check's follow-up consensus
+  ("node labels too small to read comfortably").
+* **Second round cross-check** via the mock-to-PIL renderer.
+  The bottom-center collision moved from **consensus** in
+  iter-38 to **drift** in iter-39 ("risks collision on smaller
+  resolutions" — speculative, not at 800×600). That's the
+  diagnostic loop working: ship a fix, re-check, see the issue
+  demoted. Per iter-6's meta-lesson (cross-check has a ceiling),
+  iter-39 stops at one additional round rather than chasing
+  consensus drift.
+
+850 mock-backend tests pass (no new tests this round; the iter-15
+snapshot regression caught no drift in the layout change).
+
+### The iter-38→39 loop closed end-to-end
+
+A full Keras-style visual regression workflow ran for the first
+time:
+
+1. iter-38: build ``render_mock_scene`` + first cross-check.
+2. iter-38 diagnostic: bottom-center collision flagged as
+   consensus.
+3. iter-39: adjust ``ring_budget`` margin + theme tiers.
+4. iter-39 re-render → re-cross-check.
+5. iter-39 synthesis: the original consensus issue now sits in
+   drift; the new consensus points are different issues
+   (node-text readability, HUD stylistic clash).
+
+This is the loop pattern the iter-7/8 cross-check methodology
+was built for, finally running end-to-end on saga2d's own
+artifacts. The mock-to-PIL renderer closing the 28-round visual-
+verification backlog is what unblocked it.
+
+### Meta: thirty iterations unrendered via pyglet
+
+Mock-backend test count 566 → 850. The pyglet subprocess still
+returns empty screens; the mock-to-PIL renderer gives saga2d a
+visual story nonetheless.
+
+### API friction noticed this iteration
+
+1. **The PIL renderer understates text weight** compared to what
+   pyglet would produce. iter-39's "node labels too small"
+   finding may partially reflect PIL's lighter glyph rendering
+   rather than actual saga2d output. The renderer is still
+   useful for layout/collision/palette checks; typography fine-
+   tuning benefits from eventual pyglet verification.
+2. **``margin_bottom=140`` on an 800×600 viewport eats 23% of
+   the vertical space**. A smaller ring. The cross-check loop
+   has no opinion on "is the ring too small now"; my own
+   judgment is it's fine — nodes are still readable and the
+   bottom rows have clean vertical separation.
+
+### Concrete steps taken this iteration
+
+Two theme/geometry adjustments on Ring of Pain, one re-render,
+one verification cross-check. The diagnostic loop that iter-38
+unblocked ran end-to-end for the first time and produced the
+expected result: a real fix for a real issue.
+
+### Parked for iteration 40
+
+* **Pyglet render** — still blocked.
+* **HUD stylistic-clash** consensus finding from iter-39's
+  cross-check. The pink HP bar + ``Row`` layout reads as
+  "different game" from the circular nodes. Could be
+  addressed by moving the HUD inside a framed Panel that
+  matches the node style, or by restyling the progress bar's
+  pill shape. Neither is trivial.
+* **Second user** — still outstanding.

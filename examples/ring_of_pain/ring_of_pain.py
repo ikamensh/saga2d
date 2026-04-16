@@ -296,17 +296,20 @@ class RingOfPainScene(Scene):
         w, h = self.game.resolution
 
         # Ring geometry computed from the viewport + node-label
-        # footprint — no more hand-tuned ``* 0.32`` literal. ``ring_budget``
-        # reserves vertical room for the title row (top) and the HUD +
-        # message row (bottom), plus one label-footprint above and below
-        # the ring for the top-node and bottom-node captions.
+        # footprint. iter-39: margin_bottom bumped 88 → 140 to clear
+        # the "Floor 1 — clear the ring" message that iter-38's
+        # first-in-28-iterations cross-check flagged as overlapping
+        # the bottom-node sub-label. ``ring_budget`` reserves vertical
+        # room for the title row (top), the HUD row + centred message
+        # (bottom), and one label-footprint above and below the ring
+        # for the top-node and bottom-node captions.
         cx = w / 2
         cy = h / 2 - 5
         ring_r, node_r_f = ring_budget(
             (w, h),
             self.ring_size,
             margin_top=60,
-            margin_bottom=88,   # HUD row + message baseline
+            margin_bottom=140,  # HUD row + message baseline (iter-39)
             margin_x=40,
             label_height=14,
             label_gap=18,
@@ -410,8 +413,16 @@ def build_theme() -> Theme:
         text_styles={
             "title":   TextStyle(font_size=28, color=TITLE_GOLD),
             "hud":     TextStyle(font_size=18, color=WHITE),
-            "sub":     TextStyle(font_size=13, color=(220, 220, 232, 240)),
-            "caption": TextStyle(font_size=12, color=(155, 155, 170, 255)),
+            # iter-39: sub + caption unified at size 15 — iter-38's
+            # cross-check flagged four size tiers as unnecessary
+            # typographic noise (collapsed to three), and the
+            # second-round cross-check flagged node labels as too
+            # small (13 → 15 is the +15% bump that reads comfortably
+            # without invading the HUD row's visual weight).
+            # Colour alone distinguishes sub (node-attached info)
+            # from caption (status / hints).
+            "sub":     TextStyle(font_size=15, color=(220, 220, 232, 240)),
+            "caption": TextStyle(font_size=15, color=(155, 155, 170, 255)),
         },
     )
 
