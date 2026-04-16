@@ -353,3 +353,137 @@ every scene — the Keras-equivalent of moving from
   stay at the call site because they're layout-specific, but "title"
   is almost always left-centered and "hud" left-centered, so baking
   anchors into the style might cut another two kwargs per call.
+
+---
+
+## Iteration 4 — 2026-04-16
+
+This was the iteration where saga2d crossed into "declarative" territory.
+Reactive labels + Game(theme=…) + the Panel-shadow fix mean a scene's
+visible HUD is a list of labels bound to attributes; the engine takes
+care of the rest.
+
+### What shipped
+
+* **`Game(theme=...)` constructor param**. Previously theme could only
+  be set post-construction via `game.theme = …`, which the screenshot
+  harness never hit (it pushes scenes directly). Production and
+  screenshots now share one theme via `build_theme()` in
+  `examples/ring_of_pain/ring_of_pain.py`.
+* **Reactive `Label`** — `text=` accepts a `Callable[[], str]`.
+  Evaluated each draw; assigning explicitly to `.text` unbinds. Four
+  property tests cover: fresh evaluation on tick, unbinding on
+  explicit set, plain-string behaviour unchanged, empty-string safe.
+* **Declarative HUD** in Ring of Pain: every HUD label now looks
+  like::
+
+        Label(lambda: f"HP {self.hp}/{self.max_hp}", font_size=18, ...)
+
+  No `self.hp_label = Label(...)` + `self.hp_label.text = "..."`
+  after every state change. The scene's `draw()` method is *only*
+  the ring + nodes + player token — no `draw_text` for HUD at all.
+* **Bug fix: Panel shadow on transparent background**. A horizontal
+  `Panel` with alpha-0 background still cast the theme shadow, which
+  rendered as an unwanted gray rectangle behind the HUD row. Fixed
+  by skipping the shadow when the resolved background alpha is 0.
+  Two regression tests (transparent → 0 shadows; opaque → ≥1 shadow).
+* **Louder player marker**: gold pip (outer halo + gold disc + dark
+  dot) sits *outside* the ring at the current node's angle, visually
+  separate from node styling. Bigger "YOU" caption (font_size 18) in
+  gold. The previous white glow around the current node is gone —
+  that read as "selected state" to Gemini.
+* **Scene title casing**: `3 HP 1 ATK` (was `1 atk`). Consistency win.
+* **Message moved to ring centre**. The empty space inside the ring
+  was wasted; putting the objective text there opens up the bottom
+  for a clean HP/Coins row without collisions.
+
+Screenshot: `/tmp/ring_of_pain_v9.png`. 150 core+util+new tests pass.
+
+### Why reactive Label is the biggest "Keras for game dev" step so far
+
+Keras's leverage isn't the layer constructors — it's that `model.fit()`
+owns the training loop so user code describes *what to learn*. The
+analogue here: the HUD describes *what values to show*, the framework
+owns the per-frame refresh. Before this iteration, Ring of Pain's draw
+method had six hand-authored `self.draw_text(...)` calls, each
+interpolating a `self.hp` / `self.coins` / `self.message`. After::
+
+    self.ui.add(Panel(
+        anchor=Anchor.BOTTOM_LEFT, margin=16,
+        layout=Layout.HORIZONTAL, spacing=26,
+        style=HUD_BG,
+        children=[
+            Label(lambda: f"HP {self.hp}/{self.max_hp}", ...),
+            Label(lambda: f"Coins {self.coins}", ...),
+        ],
+    ))
+
+…and *no draw call at all* for HUD. That compositional form is where
+game UI code should live. It's also the first point in these logs
+where adding a new HUD element is unambiguously a one-liner: `add a
+stamina bar` = `Label(lambda: f"Stamina {self.stamina}")`.
+
+### Second-AI (Gemini 2.5 Pro) critique of v9
+
+Full text: `/tmp/ring_of_pain_v9_review.txt`. Highlights:
+
+* "Muddled gold — title / player / coin nodes share a dull gold that
+  lacks pop against dark bg." Points at our colour palette, not our
+  code.
+* Still asks for a **subtle outer glow on the current node** — same
+  Gemini model that flagged the glow in v4 as "inconsistent styling"
+  now asks it back. Net learning: the fix is *both* a pip/caption
+  (semantic) *and* a subtle outline (visual emphasis), not either
+  alone.
+* "→ floor 2" arrow nearly touches the adjacent 'O' node.
+* "Generic, anti-aliased font feels like a placeholder" — the
+  unsurprising answer: we haven't bundled a custom game font.
+
+### API friction noticed this iteration
+
+1. **Label can't consume a `TextStyle` by name.** `Scene.draw_text`
+   can; `Label` takes only `font_size` / `text_color` individually.
+   Means HUD Labels hand-pick appearance again. Fix: `Label(text,
+   text_style="hud")` that resolves through the active theme.
+2. **No `HudRow` / `HudStat` shorthand.** Every declarative HUD row
+   still spells out `Panel(anchor=…, margin=…, layout=HORIZONTAL,
+   spacing=…, style=HUD_BG, children=[...])`. The `HUD_BG` constant
+   is a workaround for a missing "I want a transparent container"
+   primitive. A 10-line `Row(*children, anchor=…)` helper would
+   eliminate this.
+3. **Reactive Label invalidates layout on every text change.** Fine
+   for isolated HUD elements; potentially expensive for a bound
+   Label inside a deeply nested flow layout that changes every
+   frame. No measured impact yet; flagged for later.
+4. **Panel shadow bug escaped screenshot testing.** Our mock-backend
+   tests have full visibility into `draw_rect` calls and would have
+   caught "Panel with alpha-0 bg emits extra rect at theme
+   shadow_color" trivially. The existing `tests/ui/test_ui.py`
+   doesn't cover this path; the new regression test does. Worth a
+   broader sweep for Component draws that fire unconditionally when
+   visibility/transparency should suppress them.
+
+### Concrete steps taken this iteration
+
+Biggest: reactive `Label(text=Callable)`. Supporting: `Game(theme=)`,
+Panel shadow transparency fix, player marker semantic rework.
+
+### Parked for iteration 5
+
+* **`Label(text_style="hud")` parity with `Scene.draw_text`** so
+  declarative Labels read from the theme just as imperative
+  `draw_text` calls do.
+* **A compact `Row` / `Column` helper** (transparent Panel with
+  layout=HORIZONTAL / VERTICAL) so declarative HUD construction
+  stops repeating the `HUD_BG` style boilerplate.
+* **Subtle outline on the current node** combined with the existing
+  gold pip — Gemini oscillates on whether a glow reads as
+  "selection" or "inconsistency"; pairing a semantic marker (pip +
+  YOU) with a *subtle* outline is the robust answer.
+* **Bundle or reference a game font** — every Gemini round ends
+  with "typography looks generic." Providing a single themed font
+  (e.g., a permissively-licensed display face) would silence that
+  line and raise perceived polish.
+* **Broader sweep for "theme draws that fire unconditionally"** —
+  Button hover outline? Tooltip shadow? The pattern that broke
+  Panel is probably present elsewhere.

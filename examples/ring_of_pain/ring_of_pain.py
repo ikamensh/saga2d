@@ -17,14 +17,30 @@ _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-from saga2d import Game, InputEvent, Scene, TextStyle, Theme, ring_positions  # noqa: E402
+from saga2d import (  # noqa: E402
+    Anchor,
+    Game,
+    InputEvent,
+    Label,
+    Layout,
+    Panel,
+    Scene,
+    Style,
+    TextStyle,
+    Theme,
+    ring_positions,
+)
 
 BG_COLOR = (18, 14, 28, 255)
 WHITE = (245, 245, 250, 255)
 DIM = (140, 140, 150, 255)
 HP_COLOR = (255, 140, 160, 255)
 COIN_COLOR = (245, 205, 90, 255)
-CURRENT_GLOW = (255, 255, 255, 255)
+MUTED = (155, 155, 170, 255)
+PLAYER_GOLD = (255, 215, 100, 255)
+TITLE_GOLD = (255, 215, 100, 255)
+
+HUD_BG = Style(background_color=(0, 0, 0, 0), border_width=0, padding=0)
 
 TYPE_ENEMY = "enemy"
 TYPE_TREASURE = "treasure"
@@ -142,7 +158,7 @@ class RingOfPainScene(Scene):
             return "cleared"
         t = node.type
         if t == TYPE_ENEMY:
-            return f"{node.data['hp']} HP  {node.data['atk']} atk"
+            return f"{node.data['hp']} HP  {node.data['atk']} ATK"
         if t == TYPE_TREASURE:
             return f"+{node.data['coins']}g"
         if t == TYPE_HEART:
@@ -153,23 +169,55 @@ class RingOfPainScene(Scene):
             return f"→ floor {self.level + 1}"
         return ""
 
+    # -- Declarative HUD ----------------------------------------------------
+    # Labels bound to scene attributes rebind every frame; no manual
+    # `self.hp_label.text = …` wiring needed after each state change.
+
+    def on_enter(self) -> None:
+        self.ui.add(Label(
+            "Ring of Pain",
+            anchor=Anchor.TOP_LEFT, margin=20,
+            font_size=26, text_color=TITLE_GOLD,
+        ))
+        self.ui.add(Label(
+            lambda: f"Floor {self.level}",
+            anchor=Anchor.TOP_RIGHT, margin=20,
+            font_size=18, text_color=WHITE,
+        ))
+        self.ui.add(Panel(
+            anchor=Anchor.BOTTOM_LEFT, margin=16,
+            layout=Layout.HORIZONTAL, spacing=26,
+            style=HUD_BG,
+            children=[
+                Label(
+                    lambda: f"HP {self.hp}/{self.max_hp}",
+                    font_size=18, text_color=HP_COLOR,
+                ),
+                Label(
+                    lambda: f"Coins {self.coins}",
+                    font_size=18, text_color=COIN_COLOR,
+                ),
+            ],
+        ))
+        self.ui.add(Label(
+            "\u2190  \u2192  move     space  interact",
+            anchor=Anchor.BOTTOM_RIGHT, margin=20,
+            font_size=13, text_color=MUTED,
+        ))
+        # Message sits in the empty ring centre — lots of clear space, and
+        # no risk of collision with the bottom sub-label or the HUD row.
+        self.ui.add(Label(
+            lambda: self.message,
+            anchor=Anchor.CENTER,
+            font_size=14, text_color=(200, 200, 220, 255),
+        ))
+
+    # -- Ring & player drawing (inherently per-frame procedural) ----------
+
     def draw(self) -> None:
         w, h = self.game.resolution
 
-        # Title (top-left) and floor (top-right) stay clear of the ring area.
-        self.draw_text(
-            "Ring of Pain", 20, 28,
-            style="title",
-            anchor_x="left", anchor_y="center",
-        )
-        self.draw_text(
-            f"Floor {self.level}", w - 20, 28,
-            style="hud",
-            anchor_x="right", anchor_y="center",
-        )
-
-        # Ring geometry — sized so sub-labels never hit the title at the top
-        # or the HUD / message at the bottom.
+        # Ring geometry — sub-labels must clear HUD (bottom) and title (top).
         cx = w / 2
         cy = h / 2 - 5
         ring_r = min(w, h - 120) * 0.33
@@ -180,11 +228,6 @@ class RingOfPainScene(Scene):
         for idx, (node, (nx_f, ny_f)) in enumerate(zip(self.nodes, positions)):
             nx, ny = int(nx_f), int(ny_f)
             style = NODE_STYLES[node.type]
-            is_current = idx == self.player_idx
-
-            # Current-node highlight — thick white ring behind the node.
-            if is_current:
-                self.draw_circle(nx, ny, node_r + 7, CURRENT_GLOW)
 
             if node.alive:
                 self.draw_circle(nx, ny, node_r + 3, style["rim"])
@@ -209,44 +252,41 @@ class RingOfPainScene(Scene):
                 anchor_x="center", anchor_y="center",
             )
 
-            # "YOU ARE HERE" caption floats radially outward from the current
-            # node so the white glow reads as "player position", not styling.
-            if is_current:
-                dx, dy = nx_f - cx, ny_f - cy
-                d = math.hypot(dx, dy) or 1.0
-                offset = node_r + 26
-                ox = int(nx_f + dx / d * offset)
-                oy = int(ny_f + dy / d * offset)
-                self.draw_text(
-                    "YOU", ox, oy,
-                    style="caption", color=CURRENT_GLOW,
-                    anchor_x="center", anchor_y="center",
-                )
+        # Player token — a distinct gold pip *outside* the ring, visually
+        # separate from node styling. Previously a white glow around the
+        # current node which read as "selected state" rather than "player".
+        nx_f, ny_f = positions[self.player_idx]
+        dx, dy = nx_f - cx, ny_f - cy
+        d = math.hypot(dx, dy) or 1.0
+        pip_offset = node_r + 20
+        px = int(nx_f + dx / d * pip_offset)
+        py = int(ny_f + dy / d * pip_offset)
+        # Faint halo so the pip reads as emissive against dark bg.
+        self.draw_circle(px, py, 18, (255, 215, 100, 55))
+        self.draw_circle(px, py, 13, PLAYER_GOLD)
+        self.draw_circle(px, py, 8, (20, 20, 30, 255))
 
-        # Message (above the HUD so it never fights HP/Coins for the baseline).
+        # "YOU" caption just beyond the pip — bigger than before so the
+        # player indicator carries real visual weight.
+        cap_offset = pip_offset + 26
+        cx2 = int(nx_f + dx / d * cap_offset)
+        cy2 = int(ny_f + dy / d * cap_offset)
         self.draw_text(
-            self.message, int(cx), h - 44,
-            style="caption",
+            "YOU", cx2, cy2,
+            font_size=18, color=PLAYER_GOLD,
             anchor_x="center", anchor_y="center",
         )
 
-        # HUD — single row across the bottom.
-        self.draw_text(
-            f"HP {self.hp}/{self.max_hp}", 20, h - 20,
-            style="hud", color=HP_COLOR,
-            anchor_x="left", anchor_y="center",
-        )
-        self.draw_text(
-            f"Coins {self.coins}", 160, h - 20,
-            style="hud", color=COIN_COLOR,
-            anchor_x="left", anchor_y="center",
-        )
-        self.draw_text(
-            "←  →  move     space  interact",
-            w - 20, h - 20,
-            style="caption",
-            anchor_x="right", anchor_y="center",
-        )
+
+def build_theme() -> Theme:
+    """Dungeon-crawl theme — passed through Game(theme=…) so the same
+    styling applies to production and to the screenshot harness."""
+    return Theme(
+        text_styles={
+            "title": TextStyle(font_size=26, color=TITLE_GOLD),
+            "sub":   TextStyle(font_size=13, color=(220, 220, 232, 240)),
+        },
+    )
 
 
 def main() -> None:
@@ -255,14 +295,7 @@ def main() -> None:
         resolution=(800, 600),
         fullscreen=False,
         backend="pyglet",
-    )
-    # Tighten the dungeon-crawl typography: bump the title a little and
-    # make the sub-labels slightly brighter than the default.
-    game.theme = Theme(
-        text_styles={
-            "title": TextStyle(font_size=24, color=(255, 215, 100, 255)),
-            "sub":   TextStyle(font_size=13, color=(220, 220, 232, 240)),
-        },
+        theme=build_theme(),
     )
     game.run(RingOfPainScene())
 

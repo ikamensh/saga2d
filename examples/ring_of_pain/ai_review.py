@@ -64,7 +64,7 @@ def call_gemini(image_b64: str, api_key: str, model: str) -> str:
                 ],
             }
         ],
-        "generationConfig": {"temperature": 0.4, "maxOutputTokens": 2048},
+        "generationConfig": {"temperature": 0.4, "maxOutputTokens": 4096},
     }
     req = urllib.request.Request(
         url,

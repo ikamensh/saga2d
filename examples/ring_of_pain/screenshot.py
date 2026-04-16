@@ -11,12 +11,17 @@ if str(_project_root) not in sys.path:
 
 from tests.screenshot.harness import render_scene  # noqa: E402
 
-from examples.ring_of_pain.ring_of_pain import RingOfPainScene  # noqa: E402
+from examples.ring_of_pain.ring_of_pain import (  # noqa: E402
+    RingOfPainScene,
+    build_theme,
+)
 
 
 def capture(output: Path, resolution: tuple[int, int] = (800, 600)) -> None:
     def setup(game) -> None:
-        game.run_tick = False  # not required; placeholder for reader
+        # Apply the production theme so the screenshot matches what the
+        # player actually sees. Uses the Game(theme=…) path via setter.
+        game.theme = build_theme()
         game._scene_stack.push(RingOfPainScene(ring_size=8, seed=7))
 
     image = render_scene(setup, tick_count=2, resolution=resolution)
