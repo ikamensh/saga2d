@@ -3310,3 +3310,114 @@ from the rendered-era cross-check consensus are now closed.
   still open.
 * **Visual evaluation cycle** covering iter-10..28 when
   rendering unblocks.
+
+---
+
+## Iteration 29 — 2026-04-17
+
+Exercised the first of the three parked "untested subsystems" from
+iter-25's retrospective: **save/load**. The saga2d framework has
+shipped ``SaveManager`` / ``Scene.get_save_state`` / ``Scene.
+load_save_state`` since iter-1 but no example used them. Ring of
+Pain now round-trips its full state through the SaveManager, and
+the reactive HUD picks up the loaded values without any manual UI
+refresh.
+
+### What shipped
+
+* **``RingOfPainScene.get_save_state() -> dict``** serialising the
+  full persistable surface: player_idx, hp, max_hp, coins, level,
+  message, ring_size, and the list of ``{type, data, alive}`` node
+  records.
+* **``RingOfPainScene.load_save_state(state: dict)``** — reverse,
+  rebuilding ``Node`` dataclasses from the dicts.
+* **Three round-trip tests** in ``tests/examples/test_ring_of_pain_save_load.py``:
+
+    - *Full state preservation* — mutate state, ``game.save(slot=1)``,
+      teardown, new Game in same directory, ``game.load(slot=1)``,
+      assert every persisted field matches the pre-save snapshot
+      (including all node data).
+    - *Reactive HUD refresh* — mutate ``hp`` and ``coins``, save,
+      load into a fresh scene, tick, assert the HP and Coins Labels
+      show the loaded values. Confirms iter-4's reactive pattern
+      composes cleanly with save/load — the loaded attributes drive
+      the existing ``Label(lambda: f"HP {self.hp}")`` bindings
+      without any manual ``label.text = …`` wiring.
+    - *Missing slot* — ``game.load(slot=99)`` returns ``None`` and
+      doesn't raise.
+
+798 mock-backend tests pass (3 new).
+
+### Why this matters for the "Keras for game dev" story
+
+Keras has checkpointing: ``model.save()`` / ``model.load()`` round-
+trip a model's weights + architecture so training can resume. Saga2d
+has the same pattern for game scenes: ``game.save(slot)`` writes
+``scene.get_save_state()`` output as JSON; ``game.load(slot)`` calls
+``scene.load_save_state(state)`` on the current top scene. Both pairs
+share the same structure: the framework handles file I/O, the user
+provides the state dict.
+
+The crucial thing iter-29 demonstrates is **composability with the
+declarative HUD**: once ``self.hp`` is restored, every
+``Label(lambda: f"HP {self.hp}")`` in the scene reads the loaded
+value on the next tick. No separate post-load "refresh UI" call.
+That's the reactive-declarative-save combination working as one
+piece — the game-dev equivalent of "load weights, resume training,
+loss curves update automatically."
+
+### Meta: twenty iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–28 | (see earlier rows)                                     |
+|  29  | Save/load on Ring of Pain + round-trip tests             |
+
+Mock-test count 566 → 798. Twenty rounds without a rendered pixel
+— but saga2d's subsystems are each getting stress-tested one by
+one. Iter-29 covered save/load; sprites and audio remain.
+
+### API friction noticed this iteration
+
+1. **Scene save/load is all-manual**. The user writes the full
+   serialise/deserialise pair. For a data-class-backed state
+   (most scenes), a ``@auto_save_state(fields=("hp", "coins", ...))``
+   decorator would factor out the boilerplate. Not worth a full
+   feature for one example but flagged for when a second scene
+   needs save/load.
+2. **Nodes are saved as ``{type, data, alive}`` dicts**, rebuilt
+   via ``Node(**n)``. Since ``data`` is itself a dict of mixed
+   primitives (hp, atk, coins, heal) and saga2d's JSON pathway
+   passes it through cleanly, the round-trip works without a
+   schema. For a more complex node with Sprite references, game
+   code would need a custom codec. Flagged.
+3. **``game.load`` only refreshes the top scene**. If the loaded
+   state implies a different scene class (world-map save in a
+   battle scene?) the user has to pop / push / call
+   ``load_save_state`` manually. ``game.load`` could return the
+   ``scene_class`` hint and offer a ``replace_if_different`` mode.
+   Over-engineering for now.
+
+### Concrete steps taken this iteration
+
+Two methods on RingOfPainScene (``get_save_state``,
+``load_save_state``), three round-trip tests, zero framework-
+level changes (``SaveManager`` already had all the plumbing).
+The first "untested subsystem" from iter-25's list is now
+demonstrated.
+
+### Parked for iteration 30
+
+* **Render** when pyglet recovers — twenty-iteration backlog.
+* **Audio demo** — the second untested subsystem. A tiny sound
+  effect on Ring of Pain interactions (attack hit, coin pickup,
+  heal) would exercise ``game.audio.play_sound``. Would need
+  WAV files — could be generated procedurally or declined.
+* **Sprites demo** — the third untested subsystem. Ring of Pain
+  could swap node primitives for Sprite instances backed by
+  image assets; even procedurally-generated PIL pixmaps
+  demonstrate the pattern.
+* **30-round retrospective** — matches the iter-25 mid-point one,
+  revisits progress against "Keras for game dev" and lists any
+  remaining truly-substantial gaps.
+* **Logging hook on font parse failure** — still open.

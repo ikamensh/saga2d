@@ -124,6 +124,41 @@ class RingOfPainScene(Scene):
 
     # -- logic ---------------------------------------------------------------
 
+    # -- save / load --------------------------------------------------------
+    # iter-29 exercises saga2d's save subsystem (shipping since iter-1 but
+    # never demonstrated through the examples). ``game.save(slot)`` calls
+    # ``get_save_state`` on the top scene and writes the dict as JSON via
+    # the :class:`SaveManager`. ``game.load(slot)`` reads it back and calls
+    # ``load_save_state`` on the current top scene.
+
+    def get_save_state(self) -> dict:
+        return {
+            "player_idx": self.player_idx,
+            "max_hp": self.max_hp,
+            "hp": self.hp,
+            "coins": self.coins,
+            "level": self.level,
+            "message": self.message,
+            "ring_size": self.ring_size,
+            "nodes": [
+                {"type": n.type, "data": n.data, "alive": n.alive}
+                for n in self.nodes
+            ],
+        }
+
+    def load_save_state(self, state: dict) -> None:
+        self.player_idx = state["player_idx"]
+        self.max_hp = state["max_hp"]
+        self.hp = state["hp"]
+        self.coins = state["coins"]
+        self.level = state["level"]
+        self.message = state["message"]
+        self.ring_size = state["ring_size"]
+        self.nodes = [
+            Node(type=n["type"], data=dict(n["data"]), alive=n["alive"])
+            for n in state["nodes"]
+        ]
+
     def _interact(self) -> None:
         node = self.nodes[self.player_idx]
         if not node.alive:
