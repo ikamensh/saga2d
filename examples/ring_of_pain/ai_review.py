@@ -255,32 +255,97 @@ def synthesise_consensus(
     critiques: list[tuple[str, str]],
     env: dict[str, str] | None = None,
 ) -> str | None:
-    """Use a neutral third model (Claude Haiku) to extract consensus.
+    """Return a structured consensus-vs-drift synthesis of two critiques.
 
-    Returns the synthesis string on success, or ``None`` when no
-    ANTHROPIC_API_KEY is available or the call fails. Fewer than two
-    critiques yields ``None`` — there's nothing to compare.
+    Preferred path: Claude (ANTHROPIC_API_KEY) reads both critiques and
+    emits structured markdown. Fallback path (zero-dep): a keyword-
+    overlap heuristic that lists phrases appearing in both reviews.
+
+    Returns ``None`` only when there are fewer than two critiques to
+    compare.
     """
     if len(critiques) < 2:
         return None
     env = env if env is not None else load_env()
     api_key = env.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        return None
-    reviews_block = "\n\n".join(
-        f"--- Reviewer {chr(65 + i)} ({provider}) ---\n{text}"
-        for i, (provider, text) in enumerate(critiques)
+    if api_key:
+        reviews_block = "\n\n".join(
+            f"--- Reviewer {chr(65 + i)} ({provider}) ---\n{text}"
+            for i, (provider, text) in enumerate(critiques)
+        )
+        prompt = SYNTH_PROMPT.format(reviews=reviews_block)
+        for model in ("claude-haiku-4-5-20251001", "claude-sonnet-4-6"):
+            try:
+                return call_claude(prompt, api_key, model)
+            except urllib.error.HTTPError as e:
+                err_body = e.read().decode(errors="replace")[:300]
+                print(f"[claude/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
+            except Exception as e:  # noqa: BLE001
+                print(f"[claude/{model}] {e}", file=sys.stderr)
+        # Claude attempted but failed — fall through to the naive path.
+    return _naive_consensus(critiques)
+
+
+# Stop-words filtered from the naive consensus pass — common English
+# that would otherwise dominate any keyword overlap.
+_STOP_WORDS = frozenset(
+    "the a an and or but of for with on to in is are was were be been being "
+    "this that these those it its they them their there here has have had "
+    "as at by from so no not very well more most many much some such all "
+    "one two three really quite also only just even too than then if when "
+    "what which who whom whose why how i you he she we us our your my me "
+    "would could should might may can do does did doing done make made "
+    "good clear like seem feels look looks reads read".split()
+)
+
+
+def _naive_consensus(critiques: list[tuple[str, str]]) -> str:
+    """Zero-dep fallback: extract keyword overlap between two critiques.
+
+    Not as good as an LLM synthesiser, but useful when
+    ANTHROPIC_API_KEY isn't available — at least tells you which
+    concepts both reviewers touched on.
+    """
+    import re
+
+    def _keywords(text: str) -> set[str]:
+        words = re.findall(r"[a-zA-Z][a-zA-Z-]{3,}", text.lower())
+        return {w for w in words if w not in _STOP_WORDS}
+
+    (name_a, text_a), (name_b, text_b) = critiques[0], critiques[1]
+    ka, kb = _keywords(text_a), _keywords(text_b)
+    shared = sorted(ka & kb)
+
+    # Keep only the top-N by combined frequency in both texts.
+    def _freq(text: str, word: str) -> int:
+        return len(re.findall(rf"\b{re.escape(word)}\b", text.lower()))
+
+    ranked = sorted(
+        shared,
+        key=lambda w: -(_freq(text_a, w) + _freq(text_b, w)),
+    )[:15]
+
+    a_only = sorted(ka - kb)[:8]
+    b_only = sorted(kb - ka)[:8]
+
+    lines = ["## CONSENSUS (keyword overlap, naive fallback)"]
+    if ranked:
+        lines.append("Both reviewers reference: " + ", ".join(ranked))
+    else:
+        lines.append("No shared keywords.")
+    lines.append("")
+    lines.append(f"## DRIFT — {name_a} only")
+    lines.append(", ".join(a_only) if a_only else "none")
+    lines.append("")
+    lines.append(f"## DRIFT — {name_b} only")
+    lines.append(", ".join(b_only) if b_only else "none")
+    lines.append("")
+    lines.append("## RECOMMENDED NEXT ACTION")
+    lines.append(
+        "(no synthesiser LLM — read the top CONSENSUS keywords and act "
+        "on whichever points at a concrete visual defect.)"
     )
-    prompt = SYNTH_PROMPT.format(reviews=reviews_block)
-    for model in ("claude-haiku-4-5-20251001", "claude-sonnet-4-6"):
-        try:
-            return call_claude(prompt, api_key, model)
-        except urllib.error.HTTPError as e:
-            err_body = e.read().decode(errors="replace")[:300]
-            print(f"[claude/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
-        except Exception as e:  # noqa: BLE001
-            print(f"[claude/{model}] {e}", file=sys.stderr)
-    return None
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

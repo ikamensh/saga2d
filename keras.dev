@@ -1068,3 +1068,135 @@ than from single-model reviews.
 * **Auto-run cross-check + synthesis as part of ``screenshot.py``**
   so the one-liner ``./screenshot.py`` produces the synthesis
   write-up automatically, not as a separate command.
+
+---
+
+## Iteration 10 — 2026-04-16
+
+Three parked items from iter-9 shipped. Biggest of them: a truly
+*declarative* input map at the class level — the scene describes
+its controls as data, not as imperative ``bind_keys`` calls.
+
+### What shipped
+
+* **``Scene.controls`` — class-level declarative input map**. The
+  class states its key bindings as a dict mapping a key/action name
+  (or a tuple of aliases) to the name of a method on the class::
+
+        class RingOfPainScene(Scene):
+            controls = {
+                ("right", "d"):       "rotate_cw",
+                ("left", "a"):        "rotate_ccw",
+                ("confirm", "space"): "interact",
+            }
+
+  ``Scene.__init_subclass__`` flattens tuple aliases into a
+  ``_normalised_controls`` dict once per subclass (not per-instance).
+  ``_dispatch_key_bindings`` falls back to the class dict after
+  instance-level ``bind_key`` handlers, so explicit runtime binding
+  still wins. Eight property tests cover: single-string routing,
+  tuple aliases, once-per-subclass normalisation, instance override,
+  unknown-key fall-through, action-name matching, missing-method
+  safety, empty-controls safety.
+* **Ring of Pain migrated to ``controls = {...}``**. The whole
+  ``_bind_controls`` method disappears; each key binding is one
+  dict entry. Methods renamed from ``_rotate_cw`` (private helper)
+  to ``rotate_cw`` (public dispatch target) so the class-level
+  ``controls`` dict uses the stable, typed name. That's two fewer
+  lines of imperative wiring to read.
+* **Naive-fallback synthesiser** when ``ANTHROPIC_API_KEY`` is
+  absent. Same three-section markdown skeleton (``## CONSENSUS`` /
+  ``## DRIFT`` / ``## RECOMMENDED NEXT ACTION``) so downstream
+  tooling parses either the LLM synthesis or the fallback
+  identically. The naive path extracts shared ≥4-letter keywords
+  filtered through a small stop-word list, ranked by combined
+  frequency. Not as good as Claude but catches the concepts. Four
+  property tests.
+* **``screenshot.py`` auto-runs cross-check + synthesis** on the
+  captured PNG. ``--no-review`` flag skips the LLM round-trip for
+  geometry-only iterations. The two-command workflow
+  (render → ``ai_review.py``) collapses to one.
+
+578 tests pass (8 scene-controls + 4 naive-consensus new).
+
+### Why Scene.controls matters
+
+Before this iteration, even with ``bind_keys`` sugar from iter-7,
+input mapping was still *imperative*::
+
+    def on_enter(self) -> None:
+        self._bind_controls()        # called once
+    def _bind_controls(self) -> None:
+        self.bind_keys(["right", "d"], self._rotate_cw)
+        self.bind_keys(["left", "a"],  self._rotate_ccw)
+        self.bind_keys(["confirm", "space"], self._interact)
+
+After::
+
+    class RingOfPainScene(Scene):
+        controls = {
+            ("right", "d"): "rotate_cw",
+            ("left", "a"):  "rotate_ccw",
+            ("confirm", "space"): "interact",
+        }
+
+It isn't just shorter — the controls are now *introspectable*. A
+tooling pass can read every Scene subclass's ``controls`` dict and
+generate a controls help screen, a settings-rebind UI, or a
+documentation table. Imperative ``bind_key`` calls are opaque at
+rest — you have to *execute* on_enter to know what they bind.
+The class-level dict is the first piece of saga2d that's static
+data describing the scene's contract. This is the Keras ``Model``
+summary equivalent: the structure is visible without running.
+
+### Meta: visual verification blocked this run
+
+``pyglet.display.get_display().get_screens()`` returned ``[]`` for
+every screenshot subprocess this round — a macOS transient
+(probably display-lock or screen-saver state) that earlier runs
+didn't hit. Unit tests (578) verify the code changes are correct;
+v20 is logical but unrendered. The next iteration's first step
+will be a fresh screenshot + cross-check on the now-committed
+v20 layout. *Noted here so the iter-11 log entry isn't confused
+about the v-number gap.*
+
+### API friction noticed this iteration
+
+1. **``controls`` uses method *name strings*, not function
+   references.** Typos aren't caught at class-definition time —
+   only when the key press fires (and then silently, because
+   ``getattr(self, name, None)`` falls through). A one-line
+   sanity check at ``__init_subclass__`` (``for name in values:
+   assert hasattr(cls, name)``) would catch typos at import
+   rather than at runtime. Flagged, not shipped.
+2. **No way to pass the event into the handler**. Methods take
+   ``self`` only. If a handler wants the raw ``InputEvent`` (e.g.
+   to know modifier keys), it can't. Callable-based ``bind_key``
+   already has the same limitation — solving both at once would
+   be a bigger change.
+3. **Naive-fallback consensus is genuinely worse** than Claude.
+   Keyword overlap catches concepts but not phrasing — "typography"
+   will show up even when one reviewer praises and the other
+   criticises. Good enough to be a fallback, not a replacement.
+
+### Concrete steps taken this iteration
+
+- ``Scene.controls`` class-level declarative input dispatch
+  (the biggest Keras-like step this round).
+- Naive-fallback for the consensus synthesiser so the cross-check
+  pipeline works without ``ANTHROPIC_API_KEY``.
+- ``screenshot.py`` auto-runs cross-check + synthesis in one
+  command with ``--no-review`` to skip.
+
+### Parked for iteration 11
+
+* **Re-render v20 when pyglet display cooperates** — catch any
+  regression the unit tests can't see.
+* **``Scene.controls`` hasattr-check at ``__init_subclass__``** —
+  catch typo'd method names at import rather than first key press.
+* **Bundle a custom game font** (still consensus typography).
+* **``ReactiveValue.default`` simplification** (seed from one-shot
+  callable invocation).
+* **``layout_budget`` radial-sizing utility**.
+* **Handler signatures that can receive the raw ``InputEvent``**
+  for modifier-aware controls.

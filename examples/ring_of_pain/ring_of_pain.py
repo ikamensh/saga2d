@@ -65,6 +65,15 @@ class Node:
 class RingOfPainScene(Scene):
     background_color = BG_COLOR
 
+    # Declarative input map — pair aliases in tuples; values are method
+    # names on this class resolved at dispatch time. Replaces the
+    # iter-6 _bind_controls() imperative helper.
+    controls = {
+        ("right", "d"):       "rotate_cw",
+        ("left", "a"):        "rotate_ccw",
+        ("confirm", "space"): "interact",
+    }
+
     def __init__(self, ring_size: int = 8, seed: int | None = 7) -> None:
         super().__init__()
         self.ring_size = ring_size
@@ -100,22 +109,17 @@ class RingOfPainScene(Scene):
         return nodes
 
     # -- input ---------------------------------------------------------------
+    # Key mappings live in the class-level ``controls`` dict above. These
+    # methods are the targets the dispatcher resolves via getattr.
 
-    def _bind_controls(self) -> None:
-        """Declarative control map. One line per logical action.
-
-        ``bind_keys`` takes a list of aliases so the WASD+arrow and
-        confirm+space pairings read as one intent each.
-        """
-        self.bind_keys(["right", "d"],  self._rotate_cw)
-        self.bind_keys(["left", "a"],   self._rotate_ccw)
-        self.bind_keys(["confirm", "space"], self._interact)
-
-    def _rotate_cw(self) -> None:
+    def rotate_cw(self) -> None:
         self.player_idx = (self.player_idx + 1) % self.ring_size
 
-    def _rotate_ccw(self) -> None:
+    def rotate_ccw(self) -> None:
         self.player_idx = (self.player_idx - 1) % self.ring_size
+
+    def interact(self) -> None:
+        self._interact()
 
     # -- logic ---------------------------------------------------------------
 
@@ -178,7 +182,8 @@ class RingOfPainScene(Scene):
     # `self.hp_label.text = …` wiring needed after each state change.
 
     def on_enter(self) -> None:
-        self._bind_controls()
+        # Controls come from the class-level ``controls`` dict — no
+        # imperative bind_key calls needed.
         # Corner labels use named theme styles — appearance lives in
         # build_theme(), not scattered across call sites.
         self.ui.add(Label(
