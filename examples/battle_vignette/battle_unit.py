@@ -472,7 +472,7 @@ class BaseUnit:
         self.hp = max(0, self.hp - actual)
 
         # Sound effect, damage flash, and screen shake
-        self.scene.game.audio.play_sound("sounds/sword_hit", optional=True)
+        self.scene.game.audio.play_sound("sword_hit", optional=True)
         if hasattr(self.scene, "_flash_opacity"):
             self.scene._flash_opacity = 1.0
             tween(self.scene, "_flash_opacity", 1.0, 0.0, 0.2, ease=Ease.EASE_OUT)
@@ -533,7 +533,7 @@ class BaseUnit:
         """Play death animation, fade out, and remove the sprite."""
         self.alive = False
         self.deselect()
-        self.scene.game.audio.play_sound("sounds/death", optional=True)
+        self.scene.game.audio.play_sound("death", optional=True)
 
         # Death dust burst
         sx, sy = self.sprite.position

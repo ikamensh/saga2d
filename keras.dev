@@ -4177,3 +4177,80 @@ before this run started.
 * **Second user** — fundamentally outside-the-project.
 * **Tidy battle_vignette's broken play_sound references** if
   the example is meant to survive the stack-complete declaration.
+
+---
+
+## Iteration 36 — 2026-04-17
+
+Closed the bug the iter-35 diagnostic warning surfaced. Clean
+closure of a surprising find — my own warning change was the
+mechanism that revealed a pre-existing issue, and this round fixed
+it.
+
+### What shipped
+
+* **``examples/battle_vignette/battle_unit.py``** and
+  **``examples/battle_vignette/battle_demo.py``** —
+  ``play_sound("sounds/X")`` corrected to ``play_sound("X")`` on
+  all eight call sites. The prefix was redundant: saga2d's
+  ``AssetManager.sound(name)`` resolves to
+  ``<base_path>/sounds/{name}.wav`` automatically, so passing
+  ``"sounds/X"`` made the resolver look for
+  ``<base_path>/sounds/sounds/X.wav`` which didn't exist. The
+  ``optional=True`` flag meant this failed silently before
+  iter-35 and with a warning afterwards — but the sounds never
+  actually played for the battle example, despite existing in
+  its ``assets/sounds/`` directory.
+
+833 mock-backend tests pass — and the warning count dropped
+from 20 (iter-35) to zero (this round). Clean bill of health.
+
+### Meta: the diagnostic loop closed in one round
+
+iter-30 added an ``AssetManager`` font warning for silent
+fallbacks. iter-35 added the audio equivalent, as a parallel
+improvement. The audio warning immediately surfaced
+twenty silently-failing calls in a pre-existing example —
+exactly the "silent failure makes 'why is there no sound' hard
+to diagnose" concern the warning was added for.
+
+iter-36 fixed the surfaced issue.
+
+This is the diagnostic loop working as intended: add a
+warning → run the tests → observe what fires → fix the surfaced
+bug. Saga2d's own improvement paid for itself on the very next
+iteration, on code that had been silently broken for an unknown
+amount of time before this run started.
+
+### Meta: twenty-seven iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–35| (see earlier rows)                                      |
+|  36  | battle_vignette play_sound path fix                     |
+
+Mock-test count 566 → 833, same as iter-35 (no new tests, just
+behaviour fix). The parked list is now down to two items, both
+outside saga2d's control:
+
+* **Render** when pyglet recovers.
+* **Second user** — real-world validation.
+
+There are no remaining internal improvements with obvious
+marginal value. The stack is done.
+
+### Concrete steps taken this iteration
+
+Two sed-style fixes across two example files (8 call sites
+corrected). Zero net new tests; the existing suite now runs
+with zero warnings. Cleanest post-stack-complete closure
+possible.
+
+### Parked for iteration 37
+
+* **Render** when pyglet recovers — twenty-seven-iteration
+  backlog. Still the only technical unknown.
+* **Second user** — the remaining validation gap.
+
+Both fundamentally outside the project. No further "ship one
+more API item" remains obvious at iter-36.

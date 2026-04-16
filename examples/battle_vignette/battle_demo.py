@@ -432,7 +432,7 @@ class BattleScene(Scene):
         self._hint_label.text = "Enemy turn..."
         self._end_turn_btn.enabled = False
         self._turn_label.text = "Enemy Turn"
-        self.game.audio.play_sound("sounds/turn_change", optional=True)
+        self.game.audio.play_sound("turn_change", optional=True)
 
         # Queue living skeletons
         self._ai_queue = [s for s in self.skeletons if s.alive]
@@ -475,7 +475,7 @@ class BattleScene(Scene):
         self._deselect()
         self.selected_unit = unit
         unit.select()
-        self.game.audio.play_sound("sounds/select", optional=True)
+        self.game.audio.play_sound("select", optional=True)
 
     def _deselect(self) -> None:
         if self.selected_unit is not None:
@@ -531,7 +531,7 @@ class BattleScene(Scene):
             return
 
         # Animate the walk, then snap grid position and transition
-        self.game.audio.play_sound("sounds/move", optional=True)
+        self.game.audio.play_sound("move", optional=True)
         target_x, _ = self.grid.grid_to_world_center(col, row)
         target_y = self.grid.origin_y + (row + 1) * TILE_SIZE
 
@@ -644,7 +644,7 @@ class BattleScene(Scene):
         target: BaseUnit,
     ) -> None:
         """AI moves to cell, then attacks target."""
-        self.game.audio.play_sound("sounds/move", optional=True)
+        self.game.audio.play_sound("move", optional=True)
         col, row = cell
         target_x, _ = self.grid.grid_to_world_center(col, row)
         target_y = self.grid.origin_y + (row + 1) * TILE_SIZE
@@ -673,7 +673,7 @@ class BattleScene(Scene):
 
     def _ai_execute_move(self, ai_unit: BaseUnit, cell: tuple[int, int]) -> None:
         """AI moves toward enemies (no attack possible)."""
-        self.game.audio.play_sound("sounds/move", optional=True)
+        self.game.audio.play_sound("move", optional=True)
         col, row = cell
         target_x, _ = self.grid.grid_to_world_center(col, row)
         target_y = self.grid.origin_y + (row + 1) * TILE_SIZE
@@ -701,7 +701,7 @@ class BattleScene(Scene):
         self._turn_number += 1
         self.acted_this_turn.clear()
         if not self._check_game_over():
-            self.game.audio.play_sound("sounds/turn_change", optional=True)
+            self.game.audio.play_sound("turn_change", optional=True)
             self.fsm.trigger(E_AI_DONE)
 
     # ------------------------------------------------------------------
