@@ -2728,3 +2728,122 @@ One new module (``saga2d/testing.py``), one reference consumer
   regression coverage of the three examples.
 * **``summary(include_bounds=True)``**.
 * **Fourth example with sprites / audio / save-load**.
+
+---
+
+## Iteration 24 — 2026-04-17
+
+Two parked items shipped together, both compounding directly on
+iter-23: bulk-update env-var mode for the snapshot utility and
+snapshot tests for the remaining two example games. All three
+saga2d example scenes now have structured regression coverage.
+
+### What shipped
+
+* **``SAGA2D_UPDATE_SNAPSHOTS=1 pytest``** bulk-update mode.
+  Recognises ``1`` / ``true`` / ``yes`` / ``on`` (case-
+  insensitive). When set, every ``assert_scene_matches_snapshot``
+  call overwrites its JSON file with the current value and
+  passes, rather than raising. Standard ML-testing pattern for
+  "I made a deliberate framework change that shifts many scenes;
+  let me regenerate them all in one run and review the git diff."
+* **Error message now names the env-var** so the developer
+  learns about the escape hatch the first time a snapshot
+  mismatches, not by stumbling on documentation later.
+* **``tests/examples/test_ring_of_pain_snapshot.py``** +
+  ``snapshots/ring_of_pain.json`` — covers the largest
+  declarative scene in the examples (title + reactive HP bar +
+  controls + 8-node layout fed by ``ring_positions`` /
+  ``ring_budget``).
+* **``tests/examples/test_tictactoe_snapshot.py``** +
+  ``snapshots/tictactoe.json`` — covers the non-radial grid-based
+  scene. Completes three-out-of-three regression coverage.
+* **4 new env-var property tests**: overwrites on ``1``, accepts
+  truthy variants, rejects falsy/empty/unset values, error
+  message mentions the env-var for discoverability.
+
+772 mock-backend tests pass (6 new this iteration; 4 env-var +
+2 scene snapshots).
+
+### Why the bulk-update mode matters beyond convenience
+
+Without it, updating N snapshots requires N ``rm`` commands or
+a one-off script. That friction discourages making intentional
+framework changes because the post-change cleanup is tedious.
+With the env-var mode:
+
+    $ # before: delete each snapshot by hand, rerun pytest
+    $ # after:
+    $ SAGA2D_UPDATE_SNAPSHOTS=1 pytest
+    $ git diff tests/examples/snapshots/   # review
+    $ git add -A && git commit -m "..."
+
+The second workflow is the one ML teams use; ``jest
+--updateSnapshot`` / ``cargo insta review`` are the same
+pattern in JavaScript and Rust. Making framework changes cheap
+to absorb is the point.
+
+### Meta: fifteen iterations unrendered
+
+Tally now stretches to fifteen:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handlers               |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial)                 |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields                              |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all``                      |
+|  20  | ``Scene.summary()``                                     |
+|  21  | tutorial walk-through + verified snippets               |
+|  22  | ``Scene.summary_json()``                                |
+|  23  | ``assert_scene_matches_snapshot``                       |
+|  24  | env-var bulk-update + snapshots for remaining examples  |
+
+Mock-test count 566 → 772. Fifteen consecutive iterations of
+pure mock-only development have produced a complete declarative
+stack, a tutorial, three example games all covered by snapshot
+regression tests, an introspection pair (``summary`` +
+``summary_json``), and a testing utility with its own env-var
+workflow. The visual-blockage has been a forcing function the
+whole time — shipping a bundled font (the one consensus-flagged
+item from rendered-era cross-checks) would have been nice but
+nothing in the recent work suffered for its absence.
+
+### API friction noticed this iteration
+
+1. **Three snapshot test files are near-identical**
+   (three lines of imports, a fixture, one assertion). A tiny
+   pytest plugin or fixture factory would collapse them. Not
+   urgent — the duplication is ~15 lines per file.
+2. **Bootstrapping a snapshot is silent**. The first test run
+   writes the file without any stdout message, so a developer
+   could miss that a snapshot was created when they didn't
+   expect one. A one-line ``print`` on creation would help;
+   parked, minor.
+3. **``SAGA2D_UPDATE_SNAPSHOTS=1`` is session-global**. If a
+   single test in a large suite should accept its new snapshot
+   while others should still assert, the developer has to
+   filter with ``-k``. A per-snapshot ``force_update=True``
+   kwarg would let tooling bypass the env-var for targeted
+   updates. Parked.
+
+### Concrete steps taken this iteration
+
+Env-var mode + 4 property tests; two new snapshot test files
+with their generated snapshots. 772 mock-backend tests pass.
+
+### Parked for iteration 25
+
+* **Render** when pyglet recovers — fifteen-iteration backlog.
+* **Bundle a custom game font** — sixteen iterations parked.
+* **Snapshot-fixture helper** to collapse the three near-
+  identical snapshot test files.
+* **``summary(include_bounds=True)``** — single-place change
+  given iter-22's JSON-driven formatter.
+* **Fourth example with sprites / audio / save-load**.

@@ -26,11 +26,26 @@ from __future__ import annotations
 
 import difflib
 import json
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from saga2d.scene import Scene
+
+
+_UPDATE_ENV_VAR = "SAGA2D_UPDATE_SNAPSHOTS"
+
+
+def _should_update_snapshots() -> bool:
+    """True when the current env requests wholesale snapshot updates.
+
+    Recognises ``SAGA2D_UPDATE_SNAPSHOTS=1`` / ``true`` / ``yes`` /
+    ``on`` (case-insensitive). Empty, unset, or ``0`` means no
+    update — a matched snapshot still passes without rewriting.
+    """
+    raw = os.environ.get(_UPDATE_ENV_VAR, "")
+    return raw.strip().lower() in ("1", "true", "yes", "on")
 
 
 def assert_scene_matches_snapshot(
@@ -50,7 +65,14 @@ def assert_scene_matches_snapshot(
     diff of the two pretty-printed JSON forms so the caller can see
     exactly which field changed.
 
-    To accept a new snapshot as the baseline, delete the file at
+    **Bulk update mode.** Run the whole test suite with
+    ``SAGA2D_UPDATE_SNAPSHOTS=1 pytest`` and every snapshot assertion
+    overwrites its file with the current value and passes. Use after
+    an intentional framework change that legitimately shifts many
+    scene structures at once. Review the resulting diff in git
+    before committing.
+
+    To accept a single new snapshot without the env-var, delete
     ``{snapshot_dir}/{name}.json`` and re-run.
 
     Parameters
@@ -64,10 +86,16 @@ def assert_scene_matches_snapshot(
     """
     snapshot_path = Path(snapshot_dir) / f"{name}.json"
     actual = scene.summary_json()
+    actual_text = json.dumps(actual, indent=2) + "\n"
+
+    if _should_update_snapshots():
+        snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+        snapshot_path.write_text(actual_text)
+        return
 
     if not snapshot_path.exists():
         snapshot_path.parent.mkdir(parents=True, exist_ok=True)
-        snapshot_path.write_text(json.dumps(actual, indent=2) + "\n")
+        snapshot_path.write_text(actual_text)
         return
 
     expected_text = snapshot_path.read_text()
@@ -76,10 +104,9 @@ def assert_scene_matches_snapshot(
     if actual == expected:
         return
 
-    actual_text = json.dumps(actual, indent=2)
     diff_lines = difflib.unified_diff(
         expected_text.splitlines(),
-        actual_text.splitlines(),
+        actual_text.rstrip("\n").splitlines(),
         fromfile=f"{name}.json (stored)",
         tofile=f"{name}.json (actual)",
         lineterm="",
@@ -89,5 +116,6 @@ def assert_scene_matches_snapshot(
     raise AssertionError(
         f"Scene snapshot '{name}' does not match {snapshot_path}.\n"
         f"{diff}\n"
-        f"To accept the new snapshot, delete the file above and re-run."
+        f"To accept the new snapshot: delete the file above and re-run,\n"
+        f"or bulk-accept with SAGA2D_UPDATE_SNAPSHOTS=1 pytest."
     )
