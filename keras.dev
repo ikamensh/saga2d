@@ -2457,3 +2457,139 @@ parked item is closed.
   iter-20 parked items still open.
 * **Fourth example** with sprites / audio / save-load, or
   decide the three existing examples are enough.
+
+---
+
+## Iteration 22 — 2026-04-17
+
+Shipped ``scene.summary_json()`` — the structured counterpart to
+iter-20's formatted-string summary. Tooling (debug overlays, snapshot
+tests, IDE integrations) can now consume scene introspection data
+without string-parsing. Plus a clean refactor: ``summary()`` now
+formats from the same JSON shape ``summary_json()`` exposes, so the
+two can never drift.
+
+### What shipped
+
+* **``Scene.summary_json() -> dict``** — JSON-serialisable dict.
+  Schema::
+
+      {
+        "scene": "DialMenuScene",
+        "background_color": [16, 18, 28, 255],
+        "controls": [
+          {"keys": ["confirm", "space"], "method": "confirm"},
+          {"keys": ["a", "left"], "method": "rotate_ccw"},
+          ...
+        ],
+        "ui": {
+          "type": "_UIRoot",
+          "children": [
+            {"type": "Label",
+             "text": {"reactive": false, "value": "Dial Menu"},
+             "text_style": "title",
+             "anchor": "TOP_LEFT",
+             "margin": 20},
+            {"type": "Label",
+             "text": {"reactive": true},
+             "text_style": "heading",
+             "anchor": "CENTER"},
+            ...
+          ]
+        }
+      }
+
+  Round-trips through ``json.dumps`` so any consumer that speaks
+  JSON can ingest it. Every field omitted when unset — a snapshot
+  diff stays focused on actual deltas.
+* **``summary()`` refactored to format from JSON**. The iter-20
+  method is now a ~15-line formatter over the ``summary_json()``
+  output. The two methods share the same data model, so any
+  future extension (``include_bounds``, ``include_computed``,
+  etc.) only has to add a field in one place.
+* **12 new property tests**: JSON-serialisability round-trip,
+  scene field present, background_color as list (not tuple, for
+  JSON fidelity), background absent when unset, controls as list
+  of key-groups, UI tree with nested children, reactive-flag on
+  Label text, reactive-flag on ProgressBar value, text_style
+  present when set and absent when not, anchor + margin shown,
+  summary / summary_json never drift (consensus test), minimal
+  dict on empty scene.
+* **All 12 iter-20 ``summary()`` tests still pass** without
+  modification — the refactor is byte-transparent.
+
+757 mock-backend tests pass (12 new).
+
+### The Keras parallel
+
+iter-20 added ``Scene.summary()`` — Keras's ``Model.summary()``.
+iter-22 adds ``Scene.summary_json()`` — Keras's ``Model.to_json()`` /
+``Model.get_config()``. Same split:
+
+* Human-readable form for debugging / bug reports / docs
+* Machine-readable form for tooling / serialisation / snapshots
+
+The two share one data source, same as Keras. This matters because
+once a saga2d snapshot-testing library exists (iter-23 candidate),
+it compares structured dicts rather than strings, which makes
+diffs meaningful (``"moved TOP_LEFT → TOP_CENTER"`` instead of
+``"line 5 changed"``).
+
+### Meta: thirteen iterations unrendered
+
+Pyglet-cocoa empty screens continues. Full tally through iter-22:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handler signatures     |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial)                 |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields (end-to-end modifier arc)    |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all``                      |
+|  20  | ``Scene.summary()``                                     |
+|  21  | tutorial walk-through + verified snippets               |
+|  22  | ``Scene.summary_json()`` + shared-formatter refactor    |
+
+Mock-test count 566 → 757. The no-render stretch now has 191
+extra tests and a library that's substantially more debuggable
+than its iter-9 state.
+
+### API friction noticed this iteration
+
+1. **Tuple round-trip through JSON is a real trap**. The
+   ``background_color`` field had to be converted to a list
+   explicitly or ``json.dumps`` would coerce it to a list while
+   the tuple form silently became a list on read. Choosing list-
+   on-output makes the contract obvious.
+2. **Reactive values deliberately omit their snapshot in
+   ``summary_json``**. ``text: {"reactive": true}`` has no
+   ``value`` key — the point is snapshot stability. A consumer
+   that wants live values can always read the actual Label.
+3. **``Anchor`` is serialised as its ``.name`` string** (e.g.
+   ``"TOP_LEFT"``). That's the stable human-readable identifier
+   even though ``TOP_LEFT`` and ``TOP_CENTER`` share the same
+   underlying enum member (iter-14 aliases). If a consumer
+   deserialises, it reads back to the original enum correctly.
+
+### Concrete steps taken this iteration
+
+``Scene.summary_json()`` API addition, ``Scene.summary()``
+internal refactor to share data shape, 12 new tests, 0 existing
+tests broken.
+
+### Parked for iteration 23
+
+* **Render** when pyglet recovers — thirteen-iteration backlog.
+* **Bundle a custom game font** — fourteen iterations parked.
+* **Snapshot-test harness** — now trivial on top of
+  ``summary_json()``; a consumer that writes structured diffs
+  produces meaningful test failures.
+* **``summary(include_bounds=True)``** — adds computed layout
+  rects to each node. Single-place change now that ``summary()``
+  reads from JSON.
+* **Fourth example with sprites / audio / save-load**.
