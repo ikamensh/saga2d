@@ -182,7 +182,7 @@ class TicTacToeScene(Scene):
 
 def build_theme() -> Theme:
     return Theme(
-        font="Avenir Next Condensed",
+        font="Cinzel",  # iter-26 bundled OFL font — see assets/fonts/
         text_styles={
             "title":   TextStyle(font_size=30, color=(245, 245, 255, 255)),
             "heading": TextStyle(font_size=22, color=(245, 245, 255, 255)),

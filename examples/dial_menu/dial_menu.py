@@ -121,7 +121,7 @@ class DialMenuScene(Scene):
 
 def build_theme() -> Theme:
     return Theme(
-        font="Avenir Next Condensed",
+        font="Cinzel",  # iter-26 bundled OFL font — see assets/fonts/
         text_styles={
             "title":   TextStyle(font_size=28, color=ACCENT),
             "heading": TextStyle(font_size=42, color=GOLD),

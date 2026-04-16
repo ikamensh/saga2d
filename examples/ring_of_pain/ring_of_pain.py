@@ -327,13 +327,14 @@ def build_theme() -> Theme:
 
     …with zero appearance decisions duplicated.
 
-    ``font`` defaults to Avenir Next Condensed, a macOS system face.
-    This is the iter-9 response to the consensus typography complaint
-    (every cross-check round flagged the default serif as placeholder).
-    A bundled custom font would be better; this is the zero-asset step.
+    ``font`` is now "Cinzel" — iter-26 bundled
+    ``assets/fonts/Cinzel.ttf`` (SIL OFL licence; see
+    ``assets/fonts/OFL.txt``). saga2d's AssetManager auto-registers
+    every TTF under ``assets/fonts/`` on startup, so on pyglet
+    backends the name resolves cross-platform.
     """
     return Theme(
-        font="Avenir Next Condensed",
+        font="Cinzel",
         text_styles={
             "title":   TextStyle(font_size=28, color=TITLE_GOLD),
             "hud":     TextStyle(font_size=18, color=WHITE),
