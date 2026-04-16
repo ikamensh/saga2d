@@ -3085,3 +3085,120 @@ is now addressed.
   or declare the stack complete.
 * **Visual evaluation of iter-10..26 cumulatively** once the
   display comes back.
+
+---
+
+## Iteration 27 — 2026-04-17
+
+Closed the concrete follow-up to iter-26: bundled fonts now register
+under the family name their TTF actually declares, not the filename
+stem that iter-26 used as an approximation.
+
+### What shipped
+
+* **``saga2d/util/fontname.py``** — a stdlib-only TTF name-table
+  parser. ~80 lines using ``struct``, no third-party deps. Reads
+  the ``name`` table, extracts the *typographic family*
+  (name_id=16) preferentially, falls back to *family* (name_id=1).
+  Prefers Windows-Unicode records over Macintosh for stable
+  UTF-16 decoding. Every malformed / corrupt / truncated input
+  returns ``None`` rather than raising — defensive for
+  ``AssetManager`` which now calls it on every bundled font.
+* **``AssetManager._register_bundled_fonts``** now uses the
+  parsed family name as the registration name, falling back to
+  the filename stem on parse failure. Fixed the iter-26
+  approximation hazard:
+
+      # iter-26: backend.load_font("Cinzel", "…/Cinzel.ttf")
+      # iter-27: backend.load_font(parsed_family, "…/Cinzel.ttf")
+      #          where parsed_family = "Cinzel" — same answer for
+      #          Cinzel specifically, but now a *rule*, not a
+      #          coincidence.
+* **Verified the parser against the real bundled Cinzel TTF**:
+  it extracts ``"Cinzel"`` (the typographic family) rather than
+  ``"CinzelRoman"`` (the subfamily-qualified name_id=6
+  PostScript name that the ``file`` command reports).
+* **Nine new property tests**: seven for the parser (Cinzel
+  family, missing file, empty file, truncated header,
+  non-TTF binary, str-path accepted, return type invariant) and
+  two for the AssetManager integration (wrong stem still
+  registers correctly under parsed family; unparseable font
+  falls back to stem).
+
+788 mock-backend tests pass (9 new).
+
+### Why a stdlib parser rather than fontTools
+
+``fontTools`` is the canonical Python font library — ~2MB of
+code handling glyph processing, subsetting, OpenType features,
+hinting. For the one thing saga2d actually needs (family name
+from ``name`` table), an 80-line struct-based parser is both
+smaller *and* more auditable. The trade-off: if an exotic
+font has quirks our parser mishandles, we return ``None``
+and fall back to the stem. That degraded mode is acceptable
+because the stem-based registration was already iter-26's
+baseline.
+
+### Meta: seventeen iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handlers               |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial)                 |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields                              |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all``                      |
+|  20  | ``Scene.summary()``                                     |
+|  21  | tutorial walk-through + verified snippets               |
+|  22  | ``Scene.summary_json()``                                |
+|  23  | ``assert_scene_matches_snapshot``                       |
+|  24  | ``SAGA2D_UPDATE_SNAPSHOTS`` env-var + more snapshots    |
+|  25  | ``assert_snapshot`` pytest fixture + retrospective      |
+|  26  | Bundled Cinzel font + AssetManager auto-registration    |
+|  27  | TTF family-name parser — register by parsed family      |
+
+Mock-test count 566 → 788. Eighteen rounds without a rendered
+pixel.
+
+### API friction noticed this iteration
+
+1. **``parse_font_family_name`` is still best-effort for
+   exotic platforms / encodings**. The four platform/encoding
+   combos it handles cover the vast majority of fonts
+   (Windows-Unicode is universal; Macintosh is legacy but
+   widespread). Flagged for if a game bundled a font that
+   somehow fails both.
+2. **No logging on parse failure**. A game bundled a font that
+   parsed to ``None`` and registered under a stem-mismatched
+   name would get silent fallback — a warning or debug log
+   would help a developer notice. Minor; the mock-backend test
+   with ``FakeStem.ttf`` shows the fallback working, but real
+   usage might benefit.
+3. **Concern: variable-font axes**. Cinzel ``Cinzel[wght].ttf``
+   has a weight axis. At draw time, Pyglet might pick a
+   default instance. If a game wanted "Cinzel Bold
+   specifically," the current mechanism (font string only)
+   can't express that. Parked — no saga2d game uses it yet.
+
+### Concrete steps taken this iteration
+
+stdlib TTF parser, AssetManager using it, 9 tests, 0 breakage.
+The asset-integration story from iter-26 is now complete:
+bundle a TTF, get the right family name registered
+automatically. Drop-in for any saga2d game.
+
+### Parked for iteration 28
+
+* **Render** when pyglet recovers — eighteen-iteration backlog.
+* **Logging hook on font parse failure** for developer
+  visibility.
+* **``summary(include_bounds=True)``** — still waiting.
+* **Fourth end-to-end example** or formal "stack complete"
+  declaration.
+* **Visual evaluation cycle** covering iter-10..27 when
+  rendering is unblocked.

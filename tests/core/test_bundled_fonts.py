@@ -68,10 +68,49 @@ def test_bundled_cinzel_is_picked_up_by_default_manager() -> None:
     try:
         # Access .assets triggers lazy AssetManager creation.
         _ = game.assets
-        # "Cinzel" is the stem of the TTF we bundled.
+        # iter-27: registered under the font's actual family name
+        # parsed from the TTF, not the filename stem. Cinzel's
+        # typographic family is "Cinzel" so the two happen to agree,
+        # but the parser is what makes it a rule and not a coincidence.
         assert "Cinzel" in game.backend.fonts
     finally:
         game._teardown()
+
+
+def test_font_registered_under_parsed_family_not_stem(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """When the TTF's family differs from its filename stem, the
+    register-by-stem approximation was wrong. The iter-27 parser
+    fixes this: registration uses the parsed family name."""
+    fonts_dir = tmp_path / "fonts"
+    fonts_dir.mkdir()
+    # Copy the real Cinzel TTF under a deliberately wrong stem.
+    import shutil
+    real = Path(__file__).resolve().parents[2] / "assets" / "fonts" / "Cinzel.ttf"
+    wrong_stem = fonts_dir / "MyCustomStem.ttf"
+    shutil.copy(real, wrong_stem)
+
+    backend = MockBackend(100, 100)
+    AssetManager(backend, base_path=tmp_path)
+    # Parser returned the font's true typographic family — "Cinzel".
+    assert "Cinzel" in backend.fonts
+    # Not registered under the filename stem.
+    assert "MyCustomStem" not in backend.fonts
+
+
+def test_unparseable_font_falls_back_to_stem(tmp_path: Path) -> None:
+    """If the parser can't extract a family name (corrupt TTF), the
+    AssetManager still registers the file using the filename stem —
+    degraded but functional."""
+    fonts_dir = tmp_path / "fonts"
+    fonts_dir.mkdir()
+    (fonts_dir / "FakeStem.ttf").write_bytes(b"not a real font")
+
+    backend = MockBackend(100, 100)
+    AssetManager(backend, base_path=tmp_path)
+    # Parser returned None → fallback uses the stem.
+    assert "FakeStem" in backend.fonts
 
 
 def test_reregistration_is_idempotent(tmp_path: Path) -> None:
