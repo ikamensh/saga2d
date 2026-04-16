@@ -82,35 +82,101 @@ def call_gemini(image_b64: str, api_key: str, model: str) -> str:
 
 def call_openai(image_b64: str, api_key: str, model: str) -> str:
     url = "https://api.openai.com/v1/chat/completions"
+
+    def _do(token_field: str) -> str:
+        body = {
+            "model": model,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": PROMPT},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/png;base64,{image_b64}"
+                            },
+                        },
+                    ],
+                }
+            ],
+            token_field: 1200,
+            "temperature": 0.4,
+        }
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(body).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read().decode())
+        return data["choices"][0]["message"]["content"]
+
+    # gpt-5.x rejects `max_tokens` and wants `max_completion_tokens`.
+    # Try the modern field first; fall back on older models that still
+    # require the legacy name.
+    try:
+        return _do("max_completion_tokens")
+    except urllib.error.HTTPError as e:
+        if e.code == 400:
+            # Re-read the body; some older models require `max_tokens`.
+            return _do("max_tokens")
+        raise
+
+
+def call_claude(prompt: str, api_key: str, model: str) -> str:
+    """Call Anthropic Messages API for a text-only synthesis step."""
+    url = "https://api.anthropic.com/v1/messages"
     body = {
         "model": model,
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": PROMPT},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/png;base64,{image_b64}"},
-                    },
-                ],
-            }
-        ],
-        "max_tokens": 600,
-        "temperature": 0.4,
+        "max_tokens": 1024,
+        "messages": [{"role": "user", "content": prompt}],
     }
     req = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
         },
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
         data = json.loads(resp.read().decode())
-    return data["choices"][0]["message"]["content"]
+    return "".join(
+        part.get("text", "")
+        for part in data.get("content", [])
+        if part.get("type") == "text"
+    )
+
+
+SYNTH_PROMPT = """You are synthesising two independent visual reviews of the
+same game UI screenshot. Extract signal from noise: items BOTH reviewers
+raise are high-signal (CONSENSUS); items only one raises are noise (DRIFT).
+
+{reviews}
+
+Output *exactly* this structure, nothing else:
+
+## CONSENSUS
+- <issue>: <≤15 words describing how both reviewers framed it>
+- (list every issue both raise, even if phrased differently)
+
+## DRIFT (single-reviewer, treat as noise)
+- Reviewer A only: <issue>
+- Reviewer B only: <issue>
+
+## RECOMMENDED NEXT ACTION
+<one concrete change that addresses the highest-impact consensus item,
+≤40 words>
+
+Under 250 words total. No preamble, no closing remarks.
+"""
 
 
 def _try_gemini(image_b64: str, key: str) -> tuple[str, str] | None:
@@ -185,6 +251,38 @@ def cross_check(image_path: Path) -> list[tuple[str, str]]:
     return results
 
 
+def synthesise_consensus(
+    critiques: list[tuple[str, str]],
+    env: dict[str, str] | None = None,
+) -> str | None:
+    """Use a neutral third model (Claude Haiku) to extract consensus.
+
+    Returns the synthesis string on success, or ``None`` when no
+    ANTHROPIC_API_KEY is available or the call fails. Fewer than two
+    critiques yields ``None`` — there's nothing to compare.
+    """
+    if len(critiques) < 2:
+        return None
+    env = env if env is not None else load_env()
+    api_key = env.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return None
+    reviews_block = "\n\n".join(
+        f"--- Reviewer {chr(65 + i)} ({provider}) ---\n{text}"
+        for i, (provider, text) in enumerate(critiques)
+    )
+    prompt = SYNTH_PROMPT.format(reviews=reviews_block)
+    for model in ("claude-haiku-4-5-20251001", "claude-sonnet-4-6"):
+        try:
+            return call_claude(prompt, api_key, model)
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode(errors="replace")[:300]
+            print(f"[claude/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001
+            print(f"[claude/{model}] {e}", file=sys.stderr)
+    return None
+
+
 if __name__ == "__main__":
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/tmp/ring_of_pain.png")
     mode = sys.argv[2] if len(sys.argv) > 2 else "cross"
@@ -192,6 +290,11 @@ if __name__ == "__main__":
         provider, critique = review(path)
         print(f"=== Provider: {provider} ===\n{critique}")
     else:
-        for provider, critique in cross_check(path):
+        critiques = cross_check(path)
+        for provider, critique in critiques:
             print(f"\n{'=' * 60}\n=== Provider: {provider} ===\n{'=' * 60}")
             print(critique)
+        synthesis = synthesise_consensus(critiques)
+        if synthesis:
+            print(f"\n{'=' * 60}\n=== Synthesis (Claude) ===\n{'=' * 60}")
+            print(synthesis)

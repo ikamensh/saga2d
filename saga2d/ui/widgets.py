@@ -24,6 +24,8 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any, Callable
 
+from saga2d.util.reactive import ReactiveValue
+
 from saga2d.ui.component import Component
 from saga2d.ui.components import _estimate_text_width
 from saga2d.ui.theme import ResolvedStyle, Style
@@ -139,26 +141,20 @@ class ProgressBar(Component):
         import math
 
         super().__init__(width=width, height=height, style=style, **kwargs)
-        if callable(value):
-            self._value_fn: Callable[[], float] | None = value
-            self._value: float = 0.0
-        else:
-            if not math.isfinite(value):
-                raise ValueError(
-                    f"ProgressBar value must be a finite number, got {value!r}"
-                )
-            self._value_fn = None
-            self._value = value
-        if callable(max_value):
-            self._max_value_fn: Callable[[], float] | None = max_value
-            self._max_value: float = 100.0
-        else:
-            if not math.isfinite(max_value):
-                raise ValueError(
-                    f"ProgressBar max_value must be a finite number, got {max_value!r}"
-                )
-            self._max_value_fn = None
-            self._max_value = max_value
+        # Initial static values are still validated as finite; callables
+        # are validated on each refresh inside _refresh().
+        if not callable(value) and not math.isfinite(value):
+            raise ValueError(
+                f"ProgressBar value must be a finite number, got {value!r}"
+            )
+        if not callable(max_value) and not math.isfinite(max_value):
+            raise ValueError(
+                f"ProgressBar max_value must be a finite number, got {max_value!r}"
+            )
+        self._value_rv: ReactiveValue[float] = ReactiveValue(value, default=0.0)
+        self._max_value_rv: ReactiveValue[float] = ReactiveValue(
+            max_value, default=100.0
+        )
         self._bar_color = bar_color
         self._bg_color = bg_color
         self._rounded = rounded
@@ -167,26 +163,35 @@ class ProgressBar(Component):
         """Re-evaluate bound callables for value / max_value, if any."""
         import math
 
-        if self._value_fn is not None:
-            v = self._value_fn()
-            if not math.isfinite(v):
-                raise ValueError(
-                    f"ProgressBar value callable returned non-finite {v!r}"
-                )
-            self._value = v
-        if self._max_value_fn is not None:
-            mv = self._max_value_fn()
-            if not math.isfinite(mv):
-                raise ValueError(
-                    f"ProgressBar max_value callable returned non-finite {mv!r}"
-                )
-            self._max_value = mv
+        self._value_rv.refresh()
+        if not math.isfinite(self._value_rv.value):
+            raise ValueError(
+                f"ProgressBar value callable returned non-finite "
+                f"{self._value_rv.value!r}"
+            )
+        self._max_value_rv.refresh()
+        if not math.isfinite(self._max_value_rv.value):
+            raise ValueError(
+                f"ProgressBar max_value callable returned non-finite "
+                f"{self._max_value_rv.value!r}"
+            )
+
+    # ``_value`` / ``_max_value`` are kept as internal read-only
+    # properties so the existing ``_draw_rectangular`` / ``_draw_rounded``
+    # helpers (which read them directly) keep working unchanged.
+    @property
+    def _value(self) -> float:
+        return self._value_rv.value
+
+    @property
+    def _max_value(self) -> float:
+        return self._max_value_rv.value
 
     @property
     def value(self) -> float:
         """Current value. For a reactive bar, re-evaluates the callable."""
         self._refresh()
-        return self._value
+        return self._value_rv.value
 
     @value.setter
     def value(self, v: float) -> None:
@@ -196,15 +201,13 @@ class ProgressBar(Component):
             raise ValueError(
                 f"ProgressBar value must be a finite number, got {v!r}"
             )
-        # Explicit assignment detaches any callable binding.
-        self._value_fn = None
-        self._value = v
+        self._value_rv.set(v)
 
     @property
     def max_value(self) -> float:
         """Maximum value. For a reactive bar, re-evaluates the callable."""
         self._refresh()
-        return self._max_value
+        return self._max_value_rv.value
 
     @max_value.setter
     def max_value(self, v: float) -> None:
@@ -214,16 +217,16 @@ class ProgressBar(Component):
             raise ValueError(
                 f"ProgressBar max_value must be a finite number, got {v!r}"
             )
-        self._max_value_fn = None
-        self._max_value = v
+        self._max_value_rv.set(v)
 
     @property
     def fraction(self) -> float:
         """Proportion from 0.0 to 1.0 (refreshes bound callables first)."""
         self._refresh()
-        if self._max_value <= 0:
+        mv = self._max_value_rv.value
+        if mv <= 0:
             return 0.0
-        return max(0.0, min(1.0, self._value / self._max_value))
+        return max(0.0, min(1.0, self._value_rv.value / mv))
 
     def get_preferred_size(self) -> tuple[int, int]:
         return (self._width or 200, self._height or 24)

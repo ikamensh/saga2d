@@ -829,3 +829,130 @@ Ring of Pain message relocated on the basis of two-model consensus.
 * **``_lighten_color`` deduplication** into a util module.
 * **Quiet fallback for OpenAI model-param drift** (``max_tokens`` ->
   ``max_completion_tokens`` for gpt-5.x).
+
+---
+
+## Iteration 8 — 2026-04-16
+
+Three items from iter-7's parked list shipped: the reactive-binding
+factoring, auto-consensus synthesis, and the gpt-5 param fallback.
+The synthesis step makes the cross-check loop genuinely automatic —
+no more manual "which of these points did both models raise?"
+
+### What shipped
+
+* **``saga2d.util.reactive.ReactiveValue[T]``** — single abstraction
+  for "slot that accepts either ``T`` or ``Callable[[], T]``", with
+  ``refresh()`` / ``set()`` / ``is_reactive`` / optional ``on_change``
+  callback. Six property tests cover static pass-through, callable
+  refresh, change-detection return value, explicit-set unbinding,
+  and on_change firing on both refresh and set.
+* **Label + ProgressBar migrated** to use ``ReactiveValue``. Label's
+  text now stores ``ReactiveValue[str]`` with an on_change callback
+  that invalidates font cache and marks layout dirty. ProgressBar
+  uses two ``ReactiveValue[float]`` slots (value + max_value).
+  Widget-specific validation (NaN rejection on ProgressBar) stays
+  at the widget; binding mechanics live in the helper. Zero
+  regression — the 15 existing reactive + text_style tests pass
+  unchanged.
+* **Auto-consensus synthesis** (``ai_review.synthesise_consensus``).
+  After ``cross_check()`` returns ≥2 critiques, a third, neutral
+  model (Claude Haiku 4.5, ANTHROPIC_API_KEY) reads both and emits
+  a structured output::
+
+      ## CONSENSUS
+      - <issue>: <how both framed it>
+      ## DRIFT (single-reviewer, noise)
+      - Reviewer A only: <…>
+      - Reviewer B only: <…>
+      ## RECOMMENDED NEXT ACTION
+      <one concrete change, ≤40 words>
+
+  The v15 test run distinguished "typography + label-placement
+  systematic inconsistency" (both flag → consensus) from "YOU-to-S
+  collision" (Gemini only → drift) and "title dominates HUD"
+  (OpenAI only → drift).
+* **gpt-5.x ``max_completion_tokens`` fallback** — ``call_openai``
+  now tries the modern field name first, catches the specific HTTP
+  400 from older models, and retries with ``max_tokens``. gpt-5.1
+  now succeeds silently where iter-7 fell back to gpt-4o with
+  stderr noise.
+
+178 tests pass (6 new for ReactiveValue; Label/ProgressBar existing
+tests unchanged).
+
+### Auto-consensus at work on v15
+
+    ## CONSENSUS
+    - Text placement inconsistency: labels positioned arbitrarily
+      around nodes lack systematic positioning rules.
+    - Typography needs standardization: multiple font sizes and
+      alignments feel unstyled.
+    - Node label positioning broken at scale: text around nodes
+      isn't anchored systematically, will fail with localisation.
+
+    ## DRIFT (noise)
+    - Gemini only: YOU↔S outline collision; 'O' too abstract.
+    - GPT-5.1 only: title dominates HUD; controls padding; floor
+      text collision risk.
+
+    ## RECOMMENDED NEXT ACTION
+    Define and apply a consistent text positioning system: place all
+    node labels at a fixed vertical offset below their circles,
+    centred. Use a single font size for node text.
+
+*Note the synthesis is pointing at work that would partially revert
+iter-6's radial placement — the radial layout fixed a concrete
+"``→ floor 2`` over E" collision but both models now read radial as
+"chaotic." Real design tension; logged rather than acted on this
+round, because the reactive + synthesis work is already a full
+iteration.*
+
+### Why the synthesis step matters
+
+The iter-7 cross-check proved two models + human diff reveals
+consensus. This round made the diff automatic. Time to signal
+dropped from "read both critiques, mentally overlap, decide" to
+"read the CONSENSUS list." For a 5-minute iteration this is
+substantial; for a 50-iteration project it's the difference
+between the loop staying on-target and drifting into polish-game.
+
+### API friction noticed this iteration
+
+1. **``ReactiveValue`` has a ``default`` kwarg** so callable-based
+   sources have something to return before their first refresh.
+   Awkward — the callable knows its own "initial" value. Could make
+   ``default`` optional and call the callable once at construction
+   to seed the snapshot. Not critical.
+2. **Claude synthesiser is pay-to-play** (ANTHROPIC_API_KEY). The
+   sys returns ``None`` cleanly when absent, but the user loses
+   the automation. A zero-dep fallback (naive string-diff of the
+   two critiques) would degrade gracefully.
+3. **Single recommended action comes from the synthesiser's own
+   taste**. For v15 it recommended reverting radial placement —
+   that might be the right call, but the synthesiser is an LLM
+   itself and carries its own visual biases. The recommendation
+   field is a *suggestion*, not a vote. Logged.
+
+### Concrete steps taken this iteration
+
+One refactor (ReactiveValue helper), one methodology upgrade
+(auto-consensus), one parameter-drift fix (gpt-5.x). The refactor
+is maintenance debt paid off before iteration 9 needs a fourth
+reactive widget.
+
+### Parked for iteration 9
+
+* **Address the consensus recommendation**: unify node-label
+  positioning so both reviewers stop flagging "chaotic text."
+  Candidate approach — fixed below-node placement, uniform offset,
+  centred, and rephrase ``→ floor 2`` to ``floor 2`` (no arrow,
+  no ``→`` character extending horizontally).
+* **Bundle a game font** — persistent typography complaint; now
+  listed in consensus, not just single-model drift.
+* **``_lighten_color`` deduplication** — still 4 copies.
+* **``ReactiveValue.default`` ergonomic simplification** — seed
+  snapshot from one-shot callable invocation.
+* **Graceful fallback when ANTHROPIC_API_KEY absent**: naive
+  overlap extraction so the synthesis step still helps without a
+  third-party key.
