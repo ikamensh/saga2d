@@ -3699,3 +3699,135 @@ closed item: all three example games have save/load parity.
   files or procedurally-generated PIL pixmaps.
 * **``@persist_state(...)`` decorator** if a fourth scene needs
   save/load — deferred until actually needed.
+
+---
+
+## Iteration 32 — 2026-04-17
+
+Covered the **audio** subsystem from iter-25's "untested" list. The
+interesting editorial detail: WAV files were generated *procedurally*
+from pure stdlib — no external downloads, no licensing concerns.
+
+### What shipped
+
+* **``scripts/generate_sfx.py``** — stdlib-only (``wave`` +
+  ``struct`` + ``math.sin``) WAV generator. Run once at project
+  root, produces three short effects under ``assets/sounds/``:
+    - ``hit.wav`` — 120 ms descending sweep (600 → 180 Hz)
+    - ``coin.wav`` — two rising chirps (900 → 1100, 1400 → 1600 Hz)
+    - ``heal.wav`` — three-note rising arpeggio (A4, E5, A5)
+  Each has a simple attack/decay envelope so adjacent plays don't
+  click. Total asset footprint: ~24 KB for all three.
+* **``assets/sounds/hit.wav`` / ``coin.wav`` / ``heal.wav``** —
+  checked into the repo so ``python examples/ring_of_pain/…`` works
+  without running the generator. Generator script stays as the
+  source-of-truth; anyone can regenerate or tune.
+* **Ring of Pain ``_interact`` fires SFX** per-branch:
+  enemy → ``hit``, treasure → ``coin``, heart → ``heal``, portal →
+  ``coin`` (reused as a chime), shop → silent (NYI). A small
+  ``_play(sound)`` helper wraps ``self.game.audio.play_sound(
+  sound, optional=True)`` in a try/except so a stripped-down
+  deployment without the WAVs still runs.
+* **7 audio-integration tests**. A key methodology detail:
+  ``MockBackend.sounds_played`` records opaque handles like
+  ``"sound_0"`` that don't contain the asset name. The tests
+  reverse the backend's ``_loaded_sounds`` dict (path → handle)
+  to resolve handles back to source paths, then assert
+  ``"hit" in path``. This generalises to any test that wants to
+  check "did the right sound fire?" through the mock backend.
+    - ``test_wavs_are_bundled`` — prerequisite
+    - ``test_enemy_interaction_plays_hit``
+    - ``test_treasure_interaction_plays_coin``
+    - ``test_heart_interaction_plays_heal``
+    - ``test_shop_interaction_is_silent`` — negative case
+    - ``test_dead_node_interaction_is_silent``
+    - ``test_end_to_end_audio_fires_via_keypress`` — full
+      dispatch chain through ``Scene.controls``
+
+811 mock-backend tests pass (7 new).
+
+### The procedural-WAV approach is the editorial choice that matters
+
+Every previous attempt to "bundle assets" hit the question of
+licensing / bundling-size / which-sound-to-pick. By generating the
+WAVs from stdlib at repo-construction time:
+
+* **Zero external licensing** — the repo's own audio, nothing to
+  attribute.
+* **Zero external dependencies** — ``wave`` + ``math`` + ``struct``
+  are stdlib.
+* **The generator is the documentation** — someone reading
+  ``scripts/generate_sfx.py`` understands both what the sounds
+  *are* and how to tweak them.
+* **Small and reproducible** — 24 KB total, bit-for-bit identical
+  across runs.
+
+The same pattern would work for sprites: generate small PNGs via
+PIL at repo-construction time. That's the plan for iter-33 if the
+``/loop`` continues.
+
+### iter-25 retrospective revisited
+
+Untested-subsystems status:
+
+| Subsystem | Covered by | When |
+|-----------|-----------|------|
+| Save/load | Ring of Pain, dial_menu, tic-tac-toe | iter-29, iter-31 |
+| Audio     | Ring of Pain                       | iter-32 (this round) |
+| Sprites   | —                                  | parked for iter-33 |
+
+Two of three subsystems from iter-25's parked list are now closed.
+Sprites remain; the same procedural-asset pattern (``scripts/
+generate_sprites.py``?) would close it.
+
+### Meta: twenty-three iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–31| (see earlier rows)                                      |
+|  32  | Procedural WAVs + audio on Ring of Pain                 |
+
+Mock-test count 566 → 811. Twenty-three rounds without a rendered
+pixel; the audio subsystem is verified through the mock backend's
+``sounds_played`` record + path resolution, which is as thorough
+as mock coverage can be.
+
+### API friction noticed this iteration
+
+1. **``MockBackend.sounds_played`` entries don't include the asset
+   name**, only a synthetic handle. Tests need a helper to reverse-
+   lookup via ``_loaded_sounds``. A convenience ``sounds_played_
+   names`` property on MockBackend would make this one-liner; not
+   shipped this round because the reverse-lookup is fine and
+   changing the mock backend has wider blast radius.
+2. **``AudioManager.play_sound(optional=True)`` silently returns
+   None on missing asset**, which combined with Ring of Pain's
+   ``_play`` try/except means two layers of "silent on failure."
+   Defensive but makes debugging ("no sound, why?") a two-step
+   dance. A log message on the AudioManager side would help;
+   parallels iter-30's font-registration warning.
+3. **Procedural WAVs aren't pretty**. Sine-sweep-plus-envelope is
+   functional but lacks character. For a real game, hand-authored
+   SFX are better — but the procedural generator gives users a
+   starting point they own, not an asset-licensing negotiation.
+
+### Concrete steps taken this iteration
+
+One stdlib WAV-generator script, three generated WAV files, one
+_play helper, five per-branch ``_play(...)`` calls in
+``_interact``, seven audio-integration tests. The second
+untested subsystem is now demonstrated end-to-end.
+
+### Parked for iteration 33
+
+* **Render** when pyglet recovers — twenty-three-iteration backlog.
+* **Sprites demo via procedurally-generated PNGs** — follow the
+  iter-32 pattern with ``scripts/generate_sprites.py`` writing
+  small PNG files under ``assets/images/nodes/``. Each node type
+  gets a stylised disc image; Ring of Pain's ``draw`` replaces
+  the ``draw_circle`` primitives with Sprite instances.
+* **``AudioManager`` warning on missing sound**, parallel to
+  iter-30's font-failure warning.
+* **The "stack complete" call** — after iter-33 the three
+  untested-subsystem items from iter-25 are all addressed; that
+  may be the natural end.

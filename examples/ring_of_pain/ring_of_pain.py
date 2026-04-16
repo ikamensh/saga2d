@@ -159,6 +159,17 @@ class RingOfPainScene(Scene):
             for n in state["nodes"]
         ]
 
+    def _play(self, sound: str) -> None:
+        """Fire-and-forget SFX via saga2d's AudioManager. ``optional=True``
+        so a game run without the WAV files (e.g. a stripped demo)
+        doesn't crash — a missing sound is just silence. iter-32
+        added procedurally-generated ``hit/coin/heal.wav`` under
+        ``assets/sounds/``; see ``scripts/generate_sfx.py``."""
+        try:
+            self.game.audio.play_sound(sound, optional=True)
+        except Exception:
+            pass
+
     def _interact(self) -> None:
         node = self.nodes[self.player_idx]
         if not node.alive:
@@ -169,6 +180,7 @@ class RingOfPainScene(Scene):
             node.data["hp"] -= 2
             dmg = node.data.get("atk", 1)
             self.hp = max(0, self.hp - dmg)
+            self._play("hit")
             if node.data["hp"] <= 0:
                 node.alive = False
                 self.message = f"Slew enemy (-{dmg} HP)."
@@ -177,11 +189,13 @@ class RingOfPainScene(Scene):
         elif t == TYPE_TREASURE:
             self.coins += node.data["coins"]
             node.alive = False
+            self._play("coin")
             self.message = f"+{node.data['coins']} coins."
         elif t == TYPE_HEART:
             gain = min(node.data["heal"], self.max_hp - self.hp)
             self.hp += gain
             node.alive = False
+            self._play("heal")
             self.message = f"Healed {gain} HP."
         elif t == TYPE_SHOP:
             self.message = "Shop (NYI)."
@@ -189,6 +203,7 @@ class RingOfPainScene(Scene):
             self.level += 1
             self.nodes = self._roll_nodes(seed=None)
             self.player_idx = 0
+            self._play("coin")  # portal chime reuses coin SFX
             self.message = f"Descended to floor {self.level}."
 
     # -- drawing -------------------------------------------------------------
