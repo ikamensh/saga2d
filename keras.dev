@@ -4096,3 +4096,84 @@ each demonstrating a different part of the saga2d stack.
   outstanding improvement.
 * **PIL as explicit direct dependency**.
 * **Second user** — the remaining real-world validation gap.
+
+---
+
+## Iteration 35 — 2026-04-17
+
+Closes two of the four iter-34 parked items with one small change
++ one housekeeping correction.
+
+### What shipped
+
+* **``AudioManager.play_sound`` warns on missing-and-optional**.
+  Parallel to iter-30's ``AssetManager`` font-registration warning.
+  The silence-is-safe contract (returns None, doesn't raise) is
+  unchanged, but a ``RuntimeWarning`` is now emitted so a
+  developer chasing "why is there no sound" sees the specific
+  missing asset name. Four property tests:
+    - missing + ``optional=True`` → warning emitted, no raise
+    - missing + ``optional=False`` → AssetNotFoundError as before
+    - present + ``optional=True`` → no warning, plays normally
+    - missing + ``optional=True`` → backend.sounds_played
+      unchanged (fallback contract preserved)
+* **"PIL as explicit direct dependency" struck off the parked
+  list**. iter-33 flagged PIL as a transitive dep needing
+  formalisation. Checking ``pyproject.toml`` this round: PIL
+  (``Pillow>=12.1.1``) has been a direct dep since before the
+  ``/loop`` started. The iter-33 note was wrong; closing
+  without action.
+
+833 mock-backend tests pass (4 new).
+
+### Incidental: the new warning catches a real issue
+
+The full-suite run now emits 20 ``RuntimeWarnings`` originating
+in ``examples/battle_vignette/battle_unit.py`` — a pre-existing
+example that calls ``play_sound("sounds/death", optional=True)``
+for a sound file that doesn't exist in the repo. iter-1..34 silently
+discarded that call; iter-35 surfaces it. That's exactly the
+diagnostic value the warning was added for — someone
+maintaining battle_vignette now knows they have a broken asset
+reference they can fix or remove.
+
+### Meta: twenty-six iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–34| (see earlier rows)                                      |
+|  35  | Audio missing-sound warning + PIL dep housekeeping       |
+
+Mock-test count 566 → 833. The parked list is down to two items:
+
+* **Render** when pyglet recovers (environmental).
+* **Second user** — real-world validation. Can't close from
+  inside the project.
+
+### API friction noticed this iteration
+
+1. **Warning-before-return pattern is now used in two places**
+   (iter-30 font, iter-35 audio). A shared
+   ``saga2d._missing_asset_warning(category, name)`` helper
+   would normalise the messaging. With two call sites this is
+   over-engineering; at three I would factor.
+2. **The battle_vignette warning storm is noisy in pytest**.
+   The 20 warnings run through a CI-style verbose output. A
+   pytest-level ``filterwarnings``-based suppression for those
+   specific tests would hide them; leaving them for now because
+   silencing would mask the iter-35 signal.
+
+### Concrete steps taken this iteration
+
+Three-line AudioManager change (``warnings.warn`` + the import)
+plus four property tests. PIL dep housekeeping: iter-33 was
+wrong about the dep needing formalising; it's been direct since
+before this run started.
+
+### Parked for iteration 36
+
+* **Render** when pyglet recovers — twenty-six-iteration
+  backlog.
+* **Second user** — fundamentally outside-the-project.
+* **Tidy battle_vignette's broken play_sound references** if
+  the example is meant to survive the stack-complete declaration.
