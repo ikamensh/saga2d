@@ -4369,3 +4369,135 @@ exhaustive.
 
 Down to the two outside-the-project items. The stack is
 **actually** complete now, with the iter-25 oversight corrected.
+
+---
+
+## Iteration 38 — 2026-04-17
+
+**Finally rendered something.** After 28 iterations of pyglet-cocoa's
+empty-screens state blocking subprocess rendering, iter-38 took a
+different path: skip pyglet entirely, consume the mock backend's
+recorded draw operations, and paint an approximate PIL image. First
+visual cross-check since iter-9.
+
+### What shipped
+
+* **``saga2d/testing/mock_renderer.py``** — the alternative
+  rendering path. ``render_mock_scene(setup_fn, resolution, theme)``
+  runs a mock-backend Game, ticks, then walks
+  ``backend.rects`` / ``circles`` / ``images`` / ``texts`` /
+  ``clear_color`` onto an RGBA PIL image. Uses the bundled
+  Cinzel TTF for text. Not pixel-identical to pyglet (different
+  anti-aliasing, font metrics) but correct enough for layout,
+  palette, and composition.
+* **``saga2d/testing.py`` → ``saga2d/testing/`` package**. Converted
+  the iter-23 module into a package so the mock renderer could live
+  alongside ``assert_scene_matches_snapshot``. Existing imports
+  (``from saga2d.testing import assert_scene_matches_snapshot``)
+  continue to work unchanged.
+* **Rendered all five examples** via the new path. PNGs at
+  ``/tmp/saga2d_{example}.png``. Side-by-side observations of
+  what twenty-eight unrendered rounds produced:
+    - Dial menu: elegant Cinzel typography, gold-on-blue current-
+      option highlight, clean.
+    - Tic-tac-toe: grid lines clean, cursor highlight prominent,
+      turn status readable.
+    - Guess the number: large centered number, gold title, HUD at
+      bottom.
+    - Reaction test: similar clean composition.
+    - Ring of Pain: the most complex — and exposed real issues.
+* **First dual-model cross-check since iter-9** via
+  ``ai_review.py`` on the Ring of Pain render.
+* **Seven property tests** for the renderer: resolution match,
+  background-color fill, draw_rect produces expected pixels at
+  location, draw_circle produces disc centre, Labels produce
+  non-background pixels near centre, missing-image handle is
+  skipped silently, two identical render calls produce
+  pixel-identical output (snapshot-viability).
+
+850 mock-backend tests pass (7 new).
+
+### What the first-in-28-iterations cross-check surfaced
+
+The Claude synthesis consensus on the Ring of Pain PNG:
+
+> ## CONSENSUS
+> - Typography hierarchy is inconsistent: multiple font sizes,
+>   weights, and styles across titles, nodes, and descriptions
+>   hurt readability.
+> - Bottom HUD (HP/Coins bar) clashes visually with the circular,
+>   minimal aesthetic; it uses incompatible styling (sharp
+>   corners, heavy borders, bright pink).
+> - Bottom-center text collides with or is obscured by UI
+>   elements, rendering it unreadable.
+
+The last point is a **real layout regression** — "Floor 1 — clear
+the ring." at ``Anchor.BOTTOM`` with ``margin=48`` falls on top of
+the bottom-node sub-label at this viewport size. The iter-12
+``ring_budget`` change made the ring bigger than iter-9's fixed
+``0.32`` ratio, pushing the bottom sub-label into the message's
+space. iter-9 Gemini couldn't have caught this before because it
+was never rendered.
+
+The typography-hierarchy point is partially a renderer artifact
+(PIL's font metrics differ from pyglet's) and partially a real
+issue — the Ring of Pain theme has sizes 28/18/13/12 which is
+four tiers where three would read cleaner.
+
+### Meta: twenty-nine iterations later, one rendered round
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–37| (mock-only API / tooling / examples)                    |
+|  38  | **Mock-to-PIL renderer + first rendered cross-check**    |
+
+Mock-test count 566 → 850. The /loop now has TWO independent
+rendering paths to the same saga2d primitives:
+
+1. **pyglet** (blocked since iter-10): GPU-accelerated, final
+   output, pixel-identical to what a player sees.
+2. **mock-to-PIL** (iter-38): stdlib + Pillow, approximate but
+   faithful on layout / palette / composition, works without a
+   display.
+
+Both consume the same mock backend recording in the mock case.
+A future pyglet-backed game would match the pyglet path; until
+pyglet recovers, the mock-to-PIL path is the only way to see
+what saga2d does.
+
+### API friction noticed this iteration
+
+1. **Mock backend's per-type lists don't preserve draw order**.
+   ``rects``, ``circles``, ``images``, ``texts`` are separate
+   lists. The renderer draws them in a fixed painter's order
+   (rects → circles → images → text) that works for the
+   examples but would be wrong if a scene drew text *under* a
+   rect. Flagged for a possible future unified draw log on the
+   mock backend.
+2. **PIL can't render arrow characters** (``←``/``→``/``↑``/``↓``
+   in the controls-hint strings) with the default font. The
+   renders show these as empty boxes. Cinzel has them but the
+   PIL text layout may not fall through correctly. Minor
+   aesthetic issue; the keys are still identifiable from
+   context ("W up", "S down" nearby).
+3. **The ``FLOOR 1 — CLEAR THE RING`` vs sub-label collision**
+   is a genuine layout bug that iter-10..37 couldn't see.
+   Fixable in iter-39 now that it's visible.
+
+### Concrete steps taken this iteration
+
+One 160-line mock-to-PIL renderer, the ``saga2d/testing`` module
+→ package conversion, 7 property tests, first successful dual-
+model visual cross-check since iter-9. The "render when pyglet
+recovers" parked item now has a partial workaround.
+
+### Parked for iteration 39
+
+* **Fix the Ring of Pain bottom-center collision** that iter-38
+  just surfaced. Real regression; fixable.
+* **Unify the theme's typography tiers** if iter-39's cross-check
+  continues to flag it.
+* **Continue the actual pyglet render** if macOS ever recovers
+  the display (mock-to-PIL is a partial substitute, not total
+  replacement).
+* **Second user** — still the remaining validation gap.
