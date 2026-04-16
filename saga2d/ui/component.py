@@ -146,6 +146,61 @@ class Component:
         """A *copy* of the children list (for safe iteration)."""
         return list(self._children)
 
+    def walk(self, *, include_self: bool = False):
+        """Depth-first iterator over descendants.
+
+        Yields each descendant :class:`Component` in the order a
+        painter's-style draw would visit them. Useful for tests,
+        debugging, and tooling that wants to see the whole tree
+        without reaching into ``_children``::
+
+            for label in scene.ui.walk():
+                if isinstance(label, Label) and "HP" in label.text:
+                    ...
+
+        *include_self*: when ``True``, yields the receiver first.
+        Default is ``False`` — game code calling
+        ``scene.ui.walk()`` usually doesn't care about the invisible
+        root itself.
+        """
+        if include_self:
+            yield self
+        for child in self._children:
+            yield child
+            yield from child.walk(include_self=False)
+
+    def find(
+        self,
+        predicate: Callable[[Component], bool],
+        *,
+        include_self: bool = False,
+    ) -> Component | None:
+        """Return the first descendant satisfying *predicate*, or ``None``.
+
+        Convenience shortcut for the common ``next((c for c in walk()
+        if predicate(c)), None)`` pattern::
+
+            hp_label = scene.ui.find(
+                lambda c: isinstance(c, Label) and "HP" in c.text,
+            )
+        """
+        for component in self.walk(include_self=include_self):
+            if predicate(component):
+                return component
+        return None
+
+    def find_all(
+        self,
+        predicate: Callable[[Component], bool],
+        *,
+        include_self: bool = False,
+    ) -> list[Component]:
+        """Return every descendant satisfying *predicate* as a list."""
+        return [
+            c for c in self.walk(include_self=include_self)
+            if predicate(c)
+        ]
+
     # ------------------------------------------------------------------
     # Layout
     # ------------------------------------------------------------------

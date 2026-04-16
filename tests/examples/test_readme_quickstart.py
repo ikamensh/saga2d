@@ -93,20 +93,12 @@ def test_scene_parses_and_ticks(game: Game) -> None:
 
 def test_reactive_hud_reflects_initial_state(game: Game) -> None:
     scene = _push(game)
-    # Find the HP label by its reactive binding — after one tick the
-    # snapshot should read "HP 10/10".
-    labels = [
-        child for child in scene.ui._children  # noqa: SLF001
-        if isinstance(child, Row)
+    # Use the iter-19 public walk/find_all — no private reach.
+    label_texts = [
+        c.text for c in scene.ui.find_all(lambda c: isinstance(c, Label))
     ]
-    assert labels, "expected a Row in the scene's UI"
-    row = labels[0]
-    texts = [
-        c.text for c in row._children  # noqa: SLF001
-        if isinstance(c, Label)
-    ]
-    assert "HP 10/10" in texts
-    assert "Coins 0" in texts
+    assert "HP 10/10" in label_texts
+    assert "Coins 0" in label_texts
 
 
 def test_gain_coin_advances_state_and_hud(game: Game) -> None:
@@ -115,13 +107,11 @@ def test_gain_coin_advances_state_and_hud(game: Game) -> None:
         InputEvent(type="key_press", key="right")
     )
     assert scene.coins == 1
-    # Next tick refreshes the reactive Label.
-    game.tick(dt=1 / 60)
-    row = next(c for c in scene.ui._children if isinstance(c, Row))  # noqa: SLF001
-    coin_label = [
-        c for c in row._children  # noqa: SLF001
-        if isinstance(c, Label) and "Coins" in c.text
-    ][0]
+    game.tick(dt=1 / 60)  # next tick refreshes the reactive Label
+    coin_label = scene.ui.find(
+        lambda c: isinstance(c, Label) and c.text.startswith("Coins")
+    )
+    assert coin_label is not None
     assert coin_label.text == "Coins 1"
 
 
@@ -146,8 +136,8 @@ def test_reset_restores_initial_state(game: Game) -> None:
 def test_progressbar_fraction_tracks_hp(game: Game) -> None:
     """The reactive ProgressBar binding works across HP changes."""
     scene = _push(game)
-    row = next(c for c in scene.ui._children if isinstance(c, Row))  # noqa: SLF001
-    bar = next(c for c in row._children if isinstance(c, ProgressBar))  # noqa: SLF001
+    bar = scene.ui.find(lambda c: isinstance(c, ProgressBar))
+    assert bar is not None
     assert bar.fraction == 1.0  # hp=10, max=10
 
     scene.take_damage()

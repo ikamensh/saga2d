@@ -2071,3 +2071,111 @@ longest-outstanding parked item is now closed.
 * **``primary`` synthetic modifier**, still speculative.
 * **Fourth example**, or further docs (tutorial walk-through of
   one of the existing examples).
+
+---
+
+## Iteration 19 — 2026-04-17
+
+Closed the iter-18 friction point on the second try: tests no longer
+need to reach into ``_children``. One pure addition (walk / find /
+find_all) plus migration of the iter-18 README tests.
+
+### What shipped
+
+* **``Component.walk(include_self=False)``** — depth-first
+  generator over descendants. Yields each component in
+  painter-draw order so tests and tooling can see the whole
+  tree without touching private attributes.
+* **``Component.find(predicate, include_self=False)``** — returns
+  the first descendant matching *predicate*, or ``None``. Shortcut
+  for the idiomatic ``next((c for c in walk() if p(c)), None)``.
+* **``Component.find_all(predicate, include_self=False)``** —
+  every matching descendant as a list.
+* **iter-18 README tests migrated** from ``scene.ui._children``
+  poking to ``scene.ui.find(lambda c: isinstance(c, Label) and
+  c.text.startswith("HP"))``. Same assertions, public surface.
+* **Eight property tests** on walk / find / find_all: DFS order,
+  include_self semantics, first-match for find, None-on-miss,
+  empty-on-miss for find_all, bare-component walk yields nothing
+  (or just self with include_self=True).
+
+723 mock-backend tests pass (8 new).
+
+### Why this matters beyond test hygiene
+
+Keras's ``Model.summary()`` and ``Model.layers`` are the introspection
+surface that makes the framework debuggable. You print the model
+and see every layer, trainable status, parameter count. You iterate
+layers to attach custom hooks. That introspection is what makes it
+possible for third-party tooling (TensorBoard, model visualisers)
+to exist without Keras having to ship them.
+
+``Component.walk`` is the same primitive for saga2d UI trees. A
+debug HUD could walk a scene, print every component's class and
+computed rect, draw its bounding box for layout debugging. A
+snapshot tester could walk the tree and diff against a prior
+snapshot. A stylesheet inspector could find every Label with a
+given ``text_style`` and show what the theme resolves to. None of
+these tools exist yet, but all of them are now *possible* via the
+public API — that's what shipping introspection does.
+
+### Meta: ten iterations unrendered
+
+Still pyglet-cocoa empty. The tally continues:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handler signatures     |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial) + shim deletion |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields (end-to-end modifier arc)    |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all`` introspection        |
+
+Ten consecutive mock-only iterations. Mock-test count 566 → 723.
+Every API surface change in this run has a test; the no-render
+discipline has not cost correctness signal. The cost has been
+zero visual polish in ten rounds — the bundled-game-font item
+has now survived more iterations than any other parked item
+(ten, as the tally shows).
+
+### API friction noticed this iteration
+
+1. **``walk()`` yields all components including invisible ones**.
+   An invisible subtree is still walked. For layout inspection
+   this is what you want (invisible components still have
+   computed rects). For drawing-related walks it isn't. A
+   ``visible_only=True`` flag would help; not urgent.
+2. **``find`` uses a predicate callable**. Nice and flexible,
+   but a CSS-selector-like convenience (``find("Label[text^=HP]")``)
+   is a real option later. Over-engineering for now; callables
+   are fine.
+
+### Concrete steps taken this iteration
+
+One pure-additive API (walk / find / find_all), one test file
+migration, 8 new property tests. The longest-outstanding
+micro-friction is now closed.
+
+### Parked for iteration 20
+
+* **Render** when pyglet recovers — ten-iteration backlog.
+* **Bundle a custom game font** — eleven iterations parked. At
+  some point this becomes a real decision: ship it or decide
+  the stack is OK without one. (macOS system font "Avenir Next
+  Condensed" currently handles the three examples adequately in
+  the mock-rendered world.)
+* **``Component.walk(visible_only=True)``** — a flag for
+  drawing-related walks.
+* **``scene.summary()``** — Keras-``Model.summary()``-equivalent
+  that prints the scene's ``controls``, UI tree, reactive
+  bindings. Now possible via ``walk`` + introspection of
+  ``_text_rv`` / ``_value_rv``.
+* **Fourth example, or tutorial walk-through**. The three
+  examples span three shapes; a fourth would only add value if
+  it stresses something untested (real sprites? audio? save/
+  load?).
