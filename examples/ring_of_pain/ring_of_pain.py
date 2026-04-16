@@ -26,6 +26,7 @@ from saga2d import (  # noqa: E402
     Scene,
     TextStyle,
     Theme,
+    ring_budget,
     ring_positions,
 )
 
@@ -237,14 +238,23 @@ class RingOfPainScene(Scene):
     def draw(self) -> None:
         w, h = self.game.resolution
 
-        # Ring geometry — 0.32 is the sweet spot: enough vertical room
-        # for the bottom sub-label to clear the message above the HUD,
-        # but enough horizontal chord between nodes that the "3 HP · 1
-        # ATK" enemy labels don't touch the neighbouring $ discs.
+        # Ring geometry computed from the viewport + node-label
+        # footprint — no more hand-tuned ``* 0.32`` literal. ``ring_budget``
+        # reserves vertical room for the title row (top) and the HUD +
+        # message row (bottom), plus one label-footprint above and below
+        # the ring for the top-node and bottom-node captions.
         cx = w / 2
         cy = h / 2 - 5
-        ring_r = min(w, h - 120) * 0.32
-        node_r = int(min(w, h - 120) * 0.09)
+        ring_r, node_r_f = ring_budget(
+            (w, h),
+            self.ring_size,
+            margin_top=60,
+            margin_bottom=88,   # HUD row + message baseline
+            margin_x=40,
+            label_height=14,
+            label_gap=18,
+        )
+        node_r = int(node_r_f)
 
         positions = ring_positions(self.ring_size, (cx, cy), ring_r)
 

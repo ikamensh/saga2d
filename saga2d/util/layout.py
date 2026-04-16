@@ -120,3 +120,61 @@ def line_positions(
         (sx + (ex - sx) * i / (count - 1), sy + (ey - sy) * i / (count - 1))
         for i in range(count)
     ]
+
+
+def ring_budget(
+    viewport: Pos,
+    count: int,
+    *,
+    margin_top: float = 60,
+    margin_bottom: float = 60,
+    margin_x: float = 60,
+    label_height: float = 18,
+    label_gap: float = 18,
+    node_r_fraction: float = 0.28,
+) -> tuple[float, float]:
+    """Compute ``(ring_r, node_r)`` that fits *count* labelled nodes in
+    *viewport* without sub-labels crashing into the top/bottom margins.
+
+    Ring of Pain spent nine iterations tweaking ``0.33 * min(w, h-120)``
+    by eye. This helper does the geometry once:
+
+    * ``margin_top`` / ``margin_bottom`` — vertical space reserved for a
+      title row / HUD row. Sub-labels below the bottom node stay above
+      ``bottom`` of this margin; the top node stays below ``top`` of it.
+    * ``margin_x`` — horizontal gutter on both sides (for corner labels
+      like ``Floor 1`` that live in the viewport corners).
+    * ``label_height`` / ``label_gap`` — vertical footprint reserved
+      beneath each node for its sub-label (``"3 HP · 1 ATK"`` etc.).
+    * ``node_r_fraction`` — how much of each node's ring-slice angular
+      width the disc consumes. 0.28 leaves 72% of the chord for the
+      label text.
+
+    Returns ``(ring_r, node_r)`` in the same units as *viewport*. Both
+    values are non-negative; if the viewport is too small for the
+    requested margins they clamp to zero.
+    """
+    import math as _math
+
+    vw, vh = viewport
+    # Vertical budget: top and bottom margins + one label-footprint above
+    # and below the ring (for the top-node label that sits outside when
+    # the player pip uses the inside; plus the bottom-node label).
+    v_available = vh - margin_top - margin_bottom - 2 * (label_height + label_gap)
+    # Horizontal budget: inner room between left and right gutters.
+    h_available = vw - 2 * margin_x
+    if v_available <= 0 or h_available <= 0:
+        return (0.0, 0.0)
+
+    # Ring diameter is bounded by whichever dimension is tighter.
+    max_diameter = min(v_available, h_available)
+    ring_r = max_diameter / 2
+
+    # Chord length between two neighbouring nodes on the ring.
+    # For *count* evenly-spaced nodes: chord = 2 * ring_r * sin(pi / count).
+    if count >= 2:
+        chord = 2 * ring_r * _math.sin(_math.pi / count)
+    else:
+        chord = 2 * ring_r
+    node_r = chord * node_r_fraction
+    return (ring_r, node_r)

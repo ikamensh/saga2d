@@ -1302,3 +1302,107 @@ caching; seven new tests (2 validation + 5 event-handler).
 * **``layout_budget`` radial-sizing utility**.
 * **Clean up ``_SIG_TAKES_EVENT`` cache** — weak-reference or
   per-scene lifetime rather than module-global id-keyed.
+
+---
+
+## Iteration 12 — 2026-04-16
+
+Two more parked items shipped as pure API wins. Visual verification
+of the iter-10/11/12 stack is still blocked — ``pyglet.display``
+returns empty ``screens`` from every subprocess this session, so
+no render landed. The code correctness is covered by 590 tests.
+
+### What shipped
+
+* **``ReactiveValue`` default is now optional when source is callable**.
+  Previously every widget wrote::
+
+      ReactiveValue(source, default="")
+
+  which was annoying because the callable could just be invoked once
+  at construction to seed the snapshot. Now::
+
+      ReactiveValue(lambda: f"HP {self.hp}")
+
+  — the callable fires once at construction. Pass ``default=`` only
+  when you want a specific initial value before the first
+  :meth:`refresh` (e.g. deferring a side-effectful first read).
+  Two new tests cover the seed-from-callable path and the
+  explicit-default override.
+* **``saga2d.ring_budget(viewport, count, ...)``** — pure-math helper
+  returning ``(ring_r, node_r)`` that fits *count* labelled nodes in
+  *viewport* without sub-labels crashing top/bottom margins. Closes
+  the iter-9 friction ("iterating on ring-layout geometry is
+  trial-and-error; no helper that says 'given a viewport and a node
+  count, what's the max ring_r that keeps labels from colliding?'").
+  Four property tests cover: non-negative radii, vertical-margin fit,
+  per-node radius shrinks with node count, zero-return on impossibly
+  small viewports.
+* **Ring of Pain now uses ``ring_budget``** — the magic ``* 0.32``
+  literal tuned over iterations 1–9 by hand is gone. The ring
+  geometry is computed from the viewport plus the sub-label
+  footprint and the title/HUD margins.
+
+590 mock-backend tests pass.
+
+### The magic-literal reduction
+
+At iteration 9 the draw code was::
+
+    ring_r = min(w, h - 120) * 0.32
+    node_r = int(min(w, h - 120) * 0.09)
+
+Three hand-tuned numbers (``120``, ``0.32``, ``0.09``) that had
+drifted across nine rounds of cross-check feedback. After
+iteration 12::
+
+    ring_r, node_r_f = ring_budget(
+        (w, h), self.ring_size,
+        margin_top=60, margin_bottom=88, margin_x=40,
+        label_height=14, label_gap=18,
+    )
+
+Every number is named and describes a concrete visual role (title
+height, HUD height, label size). A different game tuning its ring
+layout doesn't have to retune the same ``0.32`` from scratch — it
+passes the margins its HUD actually needs.
+
+### Meta: visual-verification backlog now three iterations deep
+
+iter-10, iter-11, iter-12 all shipped without a pyglet render.
+Every subprocess spawn returns ``screens == []`` deep in
+pyglet-cocoa. Reproduces with venv python directly too — not a
+``uv run`` / subprocess issue, it's the macOS session state.
+Earlier iterations (v1–v17) worked; something changed outside the
+repo. When pyglet recovers, the first action is a full
+render + cross-check + synthesis on the combined iter-10..12
+stack.
+
+### API friction noticed this iteration
+
+1. **``ring_budget`` still hard-codes "one label footprint above and
+   below the ring"** because that fits the Ring-of-Pain pattern
+   specifically. A more general helper would take a list of
+   "fixture positions" (``top_node_label``, ``bottom_node_label``,
+   etc.) and compute around each. Parked until a second game uses
+   the helper and that generality becomes necessary.
+2. **Every new util helper gets re-exported from both
+   ``saga2d.util`` and ``saga2d``**. Cheap duplication; fine for
+   now but a ``__getattr__`` shim on top-level ``saga2d`` would
+   save the double-update pattern. Not urgent.
+
+### Concrete steps taken this iteration
+
+``ReactiveValue`` seed-from-callable optional; ``ring_budget``
+utility that replaces magic literals in Ring of Pain.
+
+### Parked for iteration 13
+
+* **Render when pyglet-cocoa recovers** — three-iteration backlog.
+* **Bundle a custom game font** — consensus typography, four
+  iterations old.
+* **``InputEvent`` modifier fields** — the plumbing from iter-11
+  awaits a reason to fire.
+* **Weakref-ify the ``_SIG_TAKES_EVENT`` cache** — iter-11 parked.
+* **Second example game that uses ``ring_budget``** — proof the
+  helper generalises beyond Ring of Pain.

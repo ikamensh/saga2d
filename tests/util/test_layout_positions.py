@@ -107,3 +107,47 @@ def test_line_positions_even_spacing() -> None:
     xs = [p[0] for p in pts]
     gaps = [xs[i + 1] - xs[i] for i in range(len(xs) - 1)]
     assert all(math.isclose(g, 2.0, abs_tol=1e-9) for g in gaps)
+
+
+# -- ring_budget ------------------------------------------------------------
+
+
+from saga2d import ring_budget  # noqa: E402
+
+
+def test_ring_budget_returns_non_negative_radii() -> None:
+    ring_r, node_r = ring_budget((800, 600), 8)
+    assert ring_r > 0
+    assert node_r > 0
+    assert node_r <= ring_r  # node disc smaller than its ring slice
+
+
+def test_ring_budget_fits_vertical_margins() -> None:
+    """With margin_top + margin_bottom + label slots, the ring must fit
+    inside the remaining vertical band."""
+    vh = 600
+    top, bot = 60, 60
+    label_h, label_gap = 18, 18
+    ring_r, _ = ring_budget(
+        (800, vh), 8,
+        margin_top=top, margin_bottom=bot,
+        label_height=label_h, label_gap=label_gap,
+    )
+    # Ring diameter + 2 label slots must fit inside vh - top - bot.
+    budget = vh - top - bot - 2 * (label_h + label_gap)
+    assert 2 * ring_r <= budget + 1e-9
+
+
+def test_ring_budget_node_scales_with_count() -> None:
+    """Larger rings (more nodes) get smaller per-node discs because
+    the chord between neighbouring nodes shrinks."""
+    ring_r_8, node_r_8 = ring_budget((800, 600), 8)
+    ring_r_16, node_r_16 = ring_budget((800, 600), 16)
+    assert ring_r_8 == ring_r_16  # same ring_r
+    assert node_r_16 < node_r_8    # tighter chord → smaller node
+
+
+def test_ring_budget_zero_on_tiny_viewport() -> None:
+    """When the viewport can't fit the margins, ring_budget returns
+    zeros rather than negative radii."""
+    assert ring_budget((100, 100), 8, margin_top=80, margin_bottom=80) == (0.0, 0.0)

@@ -82,3 +82,32 @@ def test_on_change_fires_on_explicit_set() -> None:
     rv.set("b")  # same value, no fire
     rv.set("c")
     assert history == [("a", "b"), ("b", "c")]
+
+
+def test_callable_seeds_snapshot_from_one_shot_invocation() -> None:
+    """With no *default*, a callable source is called once at
+    construction to populate the snapshot — no sentinel required.
+    """
+    rv: ReactiveValue[int] = ReactiveValue(lambda: 42)
+    assert rv.value == 42
+    assert rv.is_reactive
+
+
+def test_explicit_default_wins_over_callable_seed() -> None:
+    """When the caller passes *default*, the initial snapshot uses it
+    instead of invoking the callable. Lets widgets defer side-effectful
+    first-read until the real draw loop.
+    """
+    calls = {"n": 0}
+
+    def read() -> int:
+        calls["n"] += 1
+        return 99
+
+    rv = ReactiveValue(read, default=0)
+    assert rv.value == 0  # seeded from default, not callable
+    assert calls["n"] == 0  # read() not yet invoked
+
+    rv.refresh()
+    assert rv.value == 99
+    assert calls["n"] == 1
