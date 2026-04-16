@@ -1,0 +1,70 @@
+{
+  "scene": "DialMenuScene",
+  "background_color": [
+    16,
+    18,
+    28,
+    255
+  ],
+  "controls": [
+    {
+      "keys": [
+        "cancel"
+      ],
+      "method": "cancel"
+    },
+    {
+      "keys": [
+        "confirm",
+        "space"
+      ],
+      "method": "confirm"
+    },
+    {
+      "keys": [
+        "a",
+        "left"
+      ],
+      "method": "rotate_ccw"
+    },
+    {
+      "keys": [
+        "d",
+        "right"
+      ],
+      "method": "rotate_cw"
+    }
+  ],
+  "ui": {
+    "type": "_UIRoot",
+    "children": [
+      {
+        "type": "Label",
+        "text": {
+          "reactive": false,
+          "value": "Dial Menu"
+        },
+        "text_style": "title",
+        "anchor": "TOP_LEFT",
+        "margin": 20
+      },
+      {
+        "type": "Label",
+        "text": {
+          "reactive": true
+        },
+        "text_style": "heading",
+        "anchor": "CENTER"
+      },
+      {
+        "type": "Label",
+        "text": {
+          "reactive": true
+        },
+        "text_style": "caption",
+        "anchor": "BOTTOM",
+        "margin": 24
+      }
+    ]
+  }
+}

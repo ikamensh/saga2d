@@ -2593,3 +2593,138 @@ tests broken.
   rects to each node. Single-place change now that ``summary()``
   reads from JSON.
 * **Fourth example with sprites / audio / save-load**.
+
+---
+
+## Iteration 23 — 2026-04-17
+
+Closed the iter-22 parked item that was the most natural extension:
+``saga2d.testing.assert_scene_matches_snapshot``. Given a scene and a
+name, compare ``scene.summary_json()`` against a stored JSON file and
+raise with a unified diff on mismatch. The direct Keras parallel is
+the snapshot-testing pattern ML teams use to catch silent model-
+architecture drift — now saga2d has it for scene structure drift.
+
+### What shipped
+
+* **New module ``saga2d/testing.py``** — currently holds one
+  public function::
+
+      from saga2d.testing import assert_scene_matches_snapshot
+
+      def test_my_scene_structure_stable(game):
+          scene = MyScene()
+          game._scene_stack.push(scene)
+          game.tick(dt=1 / 60)
+          assert_scene_matches_snapshot(
+              scene, "my_scene", Path("./snapshots"),
+          )
+
+  First invocation writes ``{snapshot_dir}/my_scene.json``, passes.
+  Every subsequent run re-compares. On mismatch, an
+  ``AssertionError`` carries a unified diff pointing at the
+  snapshot path so the developer can either fix the drift or
+  delete the file to accept the new baseline.
+* **``tests/examples/test_dial_menu_snapshot.py``** — the
+  reference consumer. Runs the dial-menu example, asserts its
+  structure matches ``tests/examples/snapshots/dial_menu.json``.
+  The stored snapshot is a pretty-printed, git-diffable JSON
+  file showing every control binding, every Label, every
+  ``text_style`` / ``anchor`` / ``margin``. A reviewer reading
+  a PR diff of the snapshot can see *exactly* how the scene
+  changed.
+* **8 property tests** covering the bootstrap path (first run
+  writes file, passes), the match path (identical call passes
+  without rewriting — git-blame stability), the mismatch path
+  (error message includes old + new values + unified diff
+  markers), snapshot-directory creation, and pretty-printed
+  output. Run with ``pytest``'s ``tmp_path`` fixture so each
+  test gets its own isolated snapshot dir.
+
+766 mock-backend tests pass (8 new for the utility, 1 new for
+the dial-menu consumer).
+
+### Why snapshot-testing matters for "Keras for game dev"
+
+The ML-regression workflow that Keras users rely on is:
+
+1. Change a layer, a hyperparameter, or the training loop.
+2. Run ``pytest``. If any model's serialised config changed
+   unexpectedly (a layer dropped, a shape altered), the
+   snapshot test fails with a structured diff.
+3. Either fix the regression or accept the new snapshot.
+
+Without structured snapshots the regression is invisible until
+someone re-runs the model end-to-end and notices the output
+changed. Saga2d's game-dev equivalent:
+
+1. Ship a framework-level change (new default, renamed class,
+   ordering tweak in Scene.on_enter).
+2. Run ``pytest``. Every example scene's snapshot test
+   re-evaluates ``summary_json()``. If a framework change
+   structurally altered a scene, the diff flags it.
+3. Fix the framework change or accept the new snapshot per
+   example.
+
+Without this, a rename like iter-10's ``_bind_controls`` → ``controls``
+could silently break downstream scenes. The snapshot catches it.
+
+### Meta: fourteen iterations unrendered
+
+Pyglet-cocoa subprocess display still empty. Tally:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handlers               |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial)                 |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields                              |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all``                      |
+|  20  | ``Scene.summary()``                                     |
+|  21  | tutorial walk-through + verified snippets               |
+|  22  | ``Scene.summary_json()`` + shared-formatter refactor    |
+|  23  | ``assert_scene_matches_snapshot`` + reference consumer  |
+
+Mock-test count 566 → 766. The tooling loop is tight:
+``summary_json()`` → ``assert_scene_matches_snapshot`` →
+structured-diff regression catches. None of it needed a
+rendered pixel.
+
+### API friction noticed this iteration
+
+1. **Snapshot dir is passed as a parameter every call**.
+   Convention-over-configuration would let tests declare a
+   default once: ``@snapshot_scene("dial_menu")`` decorator, or
+   a module-level ``SNAPSHOT_DIR`` pytest fixture discovered by
+   name. Deferred — explicit is clearer for a new API.
+2. **No merge-helper for intentional snapshot updates**. Today
+   the developer deletes the JSON file and re-runs. A
+   ``SAGA2D_UPDATE_SNAPSHOTS=1 pytest`` env-var mode (overwrite
+   unconditionally) is a common pattern in ML testing; worth
+   adding if snapshot volume grows.
+3. **JSON diffs are line-based, not structural**. The
+   ``difflib.unified_diff`` output is readable but a key-path
+   diff (``controls[0].method: "fire" → "shoot"``) would be
+   more actionable. Fine for now, flagged.
+
+### Concrete steps taken this iteration
+
+One new module (``saga2d/testing.py``), one reference consumer
+(``tests/examples/test_dial_menu_snapshot.py``), 9 new tests,
+0 existing tests broken.
+
+### Parked for iteration 24
+
+* **Render** when pyglet recovers — fourteen-iteration backlog.
+* **Bundle a custom game font** — fifteen iterations parked.
+* **``SAGA2D_UPDATE_SNAPSHOTS=1`` env-var mode** for bulk
+  snapshot updates. Only needed once snapshot volume warrants.
+* **Snapshot the Ring-of-Pain and tic-tac-toe scenes** for full
+  regression coverage of the three examples.
+* **``summary(include_bounds=True)``**.
+* **Fourth example with sprites / audio / save-load**.
