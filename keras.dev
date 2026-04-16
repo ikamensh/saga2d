@@ -133,3 +133,114 @@ primitive and reactive HUD are bigger bricks for later iterations.
 * Prototype `RingLayout` as a `Scene` mixin (or a standalone helper that
   returns `(x, y)` for `i` of `n`).
 * Try a reactive Label binding, even as a 20-line helper.
+
+---
+
+## Iteration 2 — 2026-04-16
+
+### What shipped
+
+* `saga2d/util/layout.py` — `ring_positions`, `grid_positions`,
+  `line_positions`. Re-exported from top-level `saga2d`. 11 property
+  tests (count, radius invariance, equal spacing, endpoint inclusion,
+  row-major order, single-point special case).
+* Ring of Pain `draw()` rewrite using `ring_positions(...)` — the only
+  loop-index math left is `zip(self.nodes, positions)`. Lines of
+  draw logic dropped from ~55 to ~40 despite gaining features.
+* Visual fixes resolving every v1 critique:
+    - title + floor moved to corners (no node collision)
+    - redundant "YOU" center label removed
+    - every node shows a consistent sub-label ("shop", "→ floor 2",
+      "+3 HP", "3 HP 1 atk", "+5g", etc.)
+    - player position marked by a thick white glow rim behind the
+      current node — far more legible than the previous subtle dot
+    - message placed above the HUD, HUD on its own baseline
+* Screenshot: `/tmp/ring_of_pain_v4.png`.
+
+### What the helper actually saves
+
+Before (pure `math` inside the draw loop)::
+
+    ang = -math.pi / 2 + 2 * math.pi * idx / self.ring_size
+    nx = int(cx + radius * math.cos(ang))
+    ny = int(cy + radius * math.sin(ang))
+
+After::
+
+    positions = ring_positions(self.ring_size, (cx, cy), radius)
+    for idx, (node, (nx, ny)) in enumerate(zip(self.nodes, positions)):
+        ...
+
+The saving is small per-game, but the semantics moved: the scene now
+says "I have 8 nodes on a ring," not "for each i in range(8), compute
+theta and trig." The same helper drives any fan, spinner, or radial
+menu without the game re-implementing the math. `grid_positions` and
+`line_positions` are one-liners that cover most of the remaining
+"common layouts every game writes."
+
+### Second-AI (Gemini 2.5 Pro) critique of v4
+
+Verbatim highlights (full text `/tmp/ring_of_pain_v4_review.txt`):
+
+* "Typography: at least four different fonts/weights between title,
+  floor, node sub-labels, HUD. Looks pieced together."
+* "Scattered information: Floor top-right, HP bottom-left, objective
+  bottom-center. Wants a single anchored HUD."
+* "**Inconsistent node styling**: top 'S' has thick bright outline,
+  others have thin/dark — breaks design language."
+* "Arrow `→ floor 2` slightly overlaps red E node directly below."
+
+The third point is actually the player-position glow, not a styling
+inconsistency — Gemini misread it. That's a real signal: the current
+highlight reads as visual drift, not as "you are here." Means a more
+semantic cue (a chevron icon, a "YOU" caption floating beside the
+current node, or a consistent glow on *all* nodes with the current one
+in a different color) would land better.
+
+The typography + scattered-HUD critique is a separate class of
+feedback: saga2d has `Theme` for UI components but the scene's own
+`draw_text` calls don't share any theme defaults. Each call is
+bare-metal: font_size, color, anchor all hand-picked. The "Keras for
+game dev" version of this is:
+
+    self.draw_text("Ring of Pain", 20, 28, style=HeadingStyle)
+    self.draw_text(f"HP {hp}", 20, h-20, style=HudStyle)
+
+…where `HeadingStyle` / `HudStyle` pull from the scene's active theme.
+
+### API friction noticed this iteration
+
+1. **`draw_text` takes too many parameters at call site.** Eight
+   arguments including `anchor_x`/`anchor_y` as strings. A `TextStyle`
+   or theme slot would fold six of them.
+2. **No `draw_ring` / `draw_line_chain` primitive.** Drawing the current-
+   node glow is "draw bigger white circle, then draw normal node on
+   top." For an outline-only ring I'd want a dedicated primitive. The
+   game can still compose it, but every game writes this one-liner.
+3. **No per-scene input binding map.** `handle_input` is a switch on
+   `event.action`/`event.key`. `self.bind_key(...)` exists (found in
+   `Scene`) but was not discoverable from reading `DESIGN.md` — worth
+   surfacing in the "Input" section.
+4. **No declarative HUD layout.** The scene drew four pieces of HUD
+   text at absolute coordinates. An HUD that's a `Panel(layout=…,
+   children=[…])` bound to scene state would be the declarative win,
+   but that depends on reactive binding (parked).
+
+### Concrete step taken this iteration
+
+Shipped the smallest bet that multiplies across games: `ring_positions`
++ `grid_positions` + `line_positions`, tested, re-exported. Proved it
+in Ring of Pain (draw loop dropped, no regression).
+
+### Parked for iteration 3
+
+* **Typography / HUD theming**: a `scene.text_style(name)` resolver or
+  a `TextStyle` dataclass passable to `draw_text`, defaulting from the
+  active theme. First step: pull default font size + color into the
+  theme and stop hand-picking them in Ring of Pain's `draw_text` calls.
+* **Player-marker semantics**: replace the white glow with (a) a
+  chevron pointing to the current node, or (b) a caption near the
+  node, so an uninformed viewer doesn't read it as styling drift.
+* **Reactive HUD binding**: `Label(text=lambda: f"HP {self.hp}")` or
+  a `StateLabel` that rebinds on attribute change.
+* **`draw_ring_outline` primitive**: single call for annular rings.

@@ -17,10 +17,17 @@ _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-from saga2d import Game, InputEvent, Scene  # noqa: E402
+from saga2d import Game, InputEvent, Scene, ring_positions  # noqa: E402
 
 BG_COLOR = (18, 14, 28, 255)
-RING_TRAIL = (70, 50, 100, 160)
+GOLD = (255, 220, 80, 255)
+WHITE = (245, 245, 250, 255)
+DIM = (140, 140, 150, 255)
+SUB_LABEL = (210, 210, 225, 230)
+MUTED = (155, 155, 170, 255)
+HP_COLOR = (255, 140, 160, 255)
+COIN_COLOR = (245, 205, 90, 255)
+CURRENT_GLOW = (255, 255, 255, 255)
 
 TYPE_ENEMY = "enemy"
 TYPE_TREASURE = "treasure"
@@ -57,7 +64,7 @@ class RingOfPainScene(Scene):
         self.hp = 10
         self.coins = 0
         self.level = 1
-        self.message = "Arrow keys: move   Space: interact"
+        self.message = "Floor 1 — clear the ring."
 
     def _roll_nodes(self, seed: int | None) -> list[Node]:
         rng = random.Random(seed)
@@ -133,101 +140,102 @@ class RingOfPainScene(Scene):
 
     # -- drawing -------------------------------------------------------------
 
+    def _sub_label(self, node: Node) -> str:
+        if not node.alive:
+            return "cleared"
+        t = node.type
+        if t == TYPE_ENEMY:
+            return f"{node.data['hp']} HP  {node.data['atk']} atk"
+        if t == TYPE_TREASURE:
+            return f"+{node.data['coins']}g"
+        if t == TYPE_HEART:
+            return f"+{node.data['heal']} HP"
+        if t == TYPE_SHOP:
+            return "shop"
+        if t == TYPE_PORTAL:
+            return f"→ floor {self.level + 1}"
+        return ""
+
     def draw(self) -> None:
         w, h = self.game.resolution
-        cx, cy = w / 2, h / 2
-        radius = min(w, h) * 0.32
-        node_r = int(min(w, h) * 0.085)
 
-        # Faint ring trail (dotted)
-        for i in range(72):
-            a = 2 * math.pi * i / 72
-            x = cx + radius * math.cos(a)
-            y = cy + radius * math.sin(a)
-            self.draw_circle(int(x), int(y), 2, RING_TRAIL)
-
-        # Nodes
-        for idx, node in enumerate(self.nodes):
-            ang = -math.pi / 2 + 2 * math.pi * idx / self.ring_size
-            nx = int(cx + radius * math.cos(ang))
-            ny = int(cy + radius * math.sin(ang))
-            style = NODE_STYLES[node.type]
-            if node.alive:
-                # Outer rim
-                self.draw_circle(nx, ny, node_r + 3, style["rim"])
-                self.draw_circle(nx, ny, node_r, style["fill"])
-            else:
-                self.draw_circle(nx, ny, node_r, (50, 50, 60, 255))
-            glyph = style["glyph"] if node.alive else "x"
-            self.draw_text(
-                glyph, nx, ny,
-                font_size=int(node_r * 0.9),
-                color=(255, 255, 255, 255) if node.alive else (140, 140, 150, 255),
-                anchor_x="center", anchor_y="center",
-            )
-            # Tiny HP / coin hint under enemies/treasure
-            hint: str | None = None
-            if node.alive and node.type == TYPE_ENEMY:
-                hint = f"HP {node.data['hp']}"
-            elif node.alive and node.type == TYPE_TREASURE:
-                hint = f"{node.data['coins']}g"
-            if hint:
-                self.draw_text(
-                    hint, nx, ny + node_r + 14,
-                    font_size=12,
-                    color=(210, 210, 220, 255),
-                    anchor_x="center", anchor_y="center",
-                )
-
-        # Player marker — small disc just inside the ring on the current node
-        ang = -math.pi / 2 + 2 * math.pi * self.player_idx / self.ring_size
-        px = int(cx + (radius - node_r - 14) * math.cos(ang))
-        py = int(cy + (radius - node_r - 14) * math.sin(ang))
-        self.draw_circle(px, py, 11, (245, 245, 255, 255))
-        self.draw_circle(px, py, 6, (20, 20, 30, 255))
-
-        # Center emblem
-        self.draw_circle(int(cx), int(cy), 18, (40, 30, 55, 255))
+        # Title (top-left) and floor (top-right) stay clear of the ring area.
         self.draw_text(
-            "YOU", int(cx), int(cy),
-            font_size=12, color=(230, 230, 240, 255),
-            anchor_x="center", anchor_y="center",
-        )
-
-        # Title
-        self.draw_text(
-            "Ring of Pain", int(cx), 40,
-            font_size=30, color=(255, 220, 80, 255),
-            anchor_x="center", anchor_y="center",
-        )
-        self.draw_text(
-            "(saga2d sketch)", int(cx), 66,
-            font_size=13, color=(170, 170, 190, 255),
-            anchor_x="center", anchor_y="center",
-        )
-
-        # HUD
-        self.draw_text(
-            f"HP {self.hp}/{self.max_hp}", 20, h - 24,
-            font_size=18, color=(255, 140, 160, 255),
+            "Ring of Pain", 20, 28,
+            font_size=22, color=GOLD,
             anchor_x="left", anchor_y="center",
         )
         self.draw_text(
-            f"Coins {self.coins}", 20, h - 48,
-            font_size=18, color=(245, 205, 90, 255),
-            anchor_x="left", anchor_y="center",
-        )
-        self.draw_text(
-            f"Floor {self.level}", w - 20, h - 24,
-            font_size=18, color=(220, 220, 235, 255),
+            f"Floor {self.level}", w - 20, 28,
+            font_size=18, color=WHITE,
             anchor_x="right", anchor_y="center",
         )
 
-        # Message
+        # Ring geometry — sized so sub-labels never hit the title at the top
+        # or the HUD / message at the bottom.
+        cx = w / 2
+        cy = h / 2 - 5
+        ring_r = min(w, h - 120) * 0.33
+        node_r = int(min(w, h - 120) * 0.09)
+
+        positions = ring_positions(self.ring_size, (cx, cy), ring_r)
+
+        for idx, (node, (nx_f, ny_f)) in enumerate(zip(self.nodes, positions)):
+            nx, ny = int(nx_f), int(ny_f)
+            style = NODE_STYLES[node.type]
+            is_current = idx == self.player_idx
+
+            # Current-node highlight — thick white ring behind the node.
+            if is_current:
+                self.draw_circle(nx, ny, node_r + 7, CURRENT_GLOW)
+
+            if node.alive:
+                self.draw_circle(nx, ny, node_r + 3, style["rim"])
+                self.draw_circle(nx, ny, node_r, style["fill"])
+            else:
+                self.draw_circle(nx, ny, node_r + 3, (70, 70, 85, 255))
+                self.draw_circle(nx, ny, node_r, (40, 40, 52, 255))
+
+            self.draw_text(
+                style["glyph"] if node.alive else "x",
+                nx, ny,
+                font_size=int(node_r * 0.85),
+                color=WHITE if node.alive else DIM,
+                anchor_x="center", anchor_y="center",
+            )
+
+            # Consistent sub-label under every node.
+            self.draw_text(
+                self._sub_label(node),
+                nx, ny + node_r + 18,
+                font_size=13,
+                color=SUB_LABEL if node.alive else MUTED,
+                anchor_x="center", anchor_y="center",
+            )
+
+        # Message (above the HUD so it never fights HP/Coins for the baseline).
         self.draw_text(
-            self.message, int(cx), h - 24,
-            font_size=14, color=(200, 200, 215, 255),
+            self.message, int(cx), h - 44,
+            font_size=14, color=MUTED,
             anchor_x="center", anchor_y="center",
+        )
+
+        # HUD — single row across the bottom.
+        self.draw_text(
+            f"HP {self.hp}/{self.max_hp}", 20, h - 20,
+            font_size=18, color=HP_COLOR,
+            anchor_x="left", anchor_y="center",
+        )
+        self.draw_text(
+            f"Coins {self.coins}", 160, h - 20,
+            font_size=18, color=COIN_COLOR,
+            anchor_x="left", anchor_y="center",
+        )
+        self.draw_text(
+            "←  →  move     space  interact",
+            w - 20, h - 20,
+            font_size=14, color=MUTED,
+            anchor_x="right", anchor_y="center",
         )
 
 
