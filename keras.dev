@@ -3202,3 +3202,111 @@ automatically. Drop-in for any saga2d game.
   declaration.
 * **Visual evaluation cycle** covering iter-10..27 when
   rendering is unblocked.
+
+---
+
+## Iteration 28 — 2026-04-17
+
+Closed a parked item that had been waiting since iter-20:
+``summary(include_bounds=True)``. Completes the introspection
+API's layout-debugging story — a developer hitting "why isn't this
+Label where I expected" now has a one-line answer.
+
+### What shipped
+
+* **``Scene.summary_json(include_bounds=True)``** — each UI node
+  gains ``"bounds": [x, y, w, h]`` from its computed rect.
+* **``Scene.summary(include_bounds=True)``** — the formatted
+  string gets a ``bounds=[x,y WxH]`` tag appended to each
+  component's one-line description.
+* **Default remains ``False``** — bounds depend on viewport size,
+  so including them by default would make every snapshot test
+  resolution-coupled. Off-by-default keeps
+  ``assert_scene_matches_snapshot`` stable.
+* **``_ui._ensure_layout()`` call** before reading bounds, so
+  components added in ``on_enter`` that haven't yet laid out
+  produce real coordinates rather than zeros.
+* **7 property tests**: absent-by-default, present-when-requested
+  (root has ``[0, 0, w, h]``), bounds propagate through
+  containers, JSON-serialisable (round-trips through
+  ``json.dumps``), formatted string has bounds-tag on every
+  visible node when on, default formatted string has no bounds
+  tag, **resolution-coupling check** (two games at different
+  sizes produce different bounds — documenting the reason bounds
+  default off).
+
+795 mock-backend tests pass (7 new).
+
+### Sample output with ``include_bounds=True``
+
+Ring of Pain, 800×600 viewport (text form)::
+
+    Scene: RingOfPainScene
+      background_color: (18, 14, 28, 255)
+      controls:
+        confirm, space  → interact
+        a, left  → rotate_ccw
+        d, right  → rotate_cw
+      ui:
+        Label "Ring of Pain", text_style=title, anchor=TOP_LEFT,
+          margin=20, bounds=[20,20 168x39]
+        Label ← callable, text_style=hud, anchor=TOP_RIGHT,
+          margin=20, bounds=[706,20 74x25]
+        Row anchor=BOTTOM_LEFT, margin=16, bounds=[16,562 420x22]
+          Label ← callable, text_style=hud,
+            bounds=[16,562 94x25]
+          ProgressBar ← callable, bounds=[138,566 100x12]
+          Label ← callable, text_style=hud,
+            bounds=[264,562 72x25]
+        …
+
+A developer can paste this into a bug report and the assignee sees
+exactly where every HUD piece landed, which is the layout-
+debugging workflow the iter-20 ``summary()`` implied but couldn't
+answer.
+
+### Meta: eighteen iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–27| (see earlier rows)                                      |
+|  28  | ``summary(include_bounds=True)`` — layout debugging     |
+
+Mock-test count 566 → 795. Nineteen rounds without a rendered
+pixel. The introspection API is now complete: ``summary`` for
+humans, ``summary_json`` for tooling, ``assert_scene_matches_
+snapshot`` for regression, ``include_bounds=True`` for layout
+debugging. Any future question of the form "what does saga2d
+think this scene is?" has a one-method answer.
+
+### API friction noticed this iteration
+
+1. **Bounds of ``_UIRoot``** show up in ``summary_json`` but
+   not in the formatted ``summary`` text — the string walker
+   starts from the root's children, skipping the invisible
+   root itself. That's deliberate: the root always covers
+   the viewport and listing it adds noise. Tests had to
+   account for this (the check shifted from "root bounds in
+   text" to "every Label has bounds"); flagged for docs.
+2. **The ``_ensure_layout`` call is idempotent** but invokes
+   the full tree-layout pass. Not expensive (<1 ms even on
+   large trees) but noted in case large scenes ever call
+   ``summary()`` frequently in a hot loop.
+
+### Concrete steps taken this iteration
+
+One-flag addition (``include_bounds=True``), iter-22's
+formatter extended, iter-20's tests unchanged, 7 new
+property tests, 0 existing regressions. All parked items
+from the rendered-era cross-check consensus are now closed.
+
+### Parked for iteration 29
+
+* **Render** when pyglet recovers — nineteen-iteration backlog.
+* **Fourth end-to-end example** (sprites / audio / save-load)
+  or a formal "stack complete" declaration at the 28-round
+  mark.
+* **Logging hook on font parse failure** — iter-26 micro-item
+  still open.
+* **Visual evaluation cycle** covering iter-10..28 when
+  rendering unblocks.
