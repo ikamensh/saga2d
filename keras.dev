@@ -622,3 +622,109 @@ Three API improvements shipping together:
   scenes share the overlay.
 * **`Label(text_style="typoed")` stricter validation** — raise at
   attach-time rather than first tick.
+
+---
+
+## Iteration 6 — 2026-04-16
+
+Mixed iteration — a legitimate framework bug fix, two polish-level
+visual fixes, one code-cleanliness migration, and one meta-lesson
+about the limits of the Gemini cross-check loop.
+
+### What shipped
+
+* **Button hover-outline bug** (same class as the iter-4 Panel-shadow
+  bug): ``theme.button_hover_outline_color`` is opaque, so a ghost
+  (alpha-0) button that the user intentionally styled as invisible
+  would grow a visible blue glow on hover. Now the outline is
+  skipped when the *explicit* style carries alpha-0 background.
+  Two regression tests (transparent → 0 glow rects, opaque → ≥1).
+  Audit of Tooltip + TabGroup draws came up clean; the bug was
+  Panel + Button, both fixed.
+* **Heart node is green** — ``+`` node background/rim went from
+  pink (confusingly similar to enemy red) to green. Gain and threat
+  now read as different categories of information at a glance. One
+  line in the NODE_STYLES map; Gemini had flagged this every round
+  since v8.
+* **Sub-label placement is radial outward** — every node's info
+  label pushes *away* from the ring centre rather than straight
+  down, so the O-node's ``→ floor 2`` no longer bleeds into the
+  E-node directly beneath it. Horizontal anchor chosen per-node
+  from the radial direction so labels grow outward instead of back
+  toward the ring.
+* **Player pip flipped INSIDE the ring** — the pip and "YOU"
+  caption used to fight sub-labels for the same outside-the-ring
+  space. With radial sub-labels claiming *outside*, the player
+  token now lives *inside* the ring, pointing outward at the
+  current node. The two visual channels never collide again
+  regardless of which node the player is on.
+* **`handle_input` replaced by `bind_key`** — Ring of Pain's input
+  went from a nested if-else on `event.action` / `event.key` to
+  six flat `self.bind_key(...)` calls in a new `_bind_controls()`
+  helper. The scene describes *what* each key does, not *how* the
+  event dispatcher routes it.
+
+Screenshot: ``/tmp/ring_of_pain_v12.png``. 164 tests pass (2 new
+regression tests; 12 from iter 5 carried forward).
+
+### Meta-lesson: Gemini oscillation as a structural ceiling
+
+v10 Gemini asked for message *out* of the ring; v12 Gemini (now
+that the centre is quieter) asks for it back *inside* because the
+outside "feels chaotic." v9 Gemini called the white glow a
+"selection inconsistency"; v10 called its absence a "weak player
+indicator"; v12 called the radial sub-label layout — which fixed
+a concrete collision — "chaotic text placement." The same model
+flips on the same questions across rounds.
+
+This is the ceiling of the single-LLM cross-check loop. Beyond
+~v8, Gemini's feedback is *drift*, not signal. The right read is:
+
+* **Before ~v8**: Gemini catches concrete, reproducible issues
+  (title/node collision, ambiguous player marker, casing,
+  missing sub-labels). Take these seriously.
+* **After ~v8**: Gemini ranks aesthetic preferences that oscillate
+  each round. Any fix will satisfy one round and displease the
+  next. Use Gemini's *agreement across rounds* (heart-pink
+  called out in v8/v9/v10 → real) rather than any single round's
+  recommendation.
+
+Parked for beyond this exercise: cross-check against a *second*
+independent model (GPT-5.x) and treat consensus between them as
+signal; single-model drift is noise.
+
+### API friction noticed this iteration
+
+1. **`bind_key` doesn't support aliases directly.** Each raw-key
+   alias (WASD + arrows, space + enter) needs its own call. A
+   `bind_keys(["right", "d"], callback)` or list-keyed form would
+   halve the boilerplate.
+2. **`_lighten_color` is duplicated** four times across
+   `ui/widgets.py` (ProgressBar, List, Tooltip, TabGroup). Not a
+   bug; worth a `util` extraction when the file gets its next
+   edit.
+3. **Theme has opaque colour constants that stay visible against
+   user intent**. The Panel-shadow and Button-hover-outline bugs
+   share root cause: a theme property draws when the component
+   says "I'm invisible." A `Theme.is_decoration_enabled(component)`
+   hook — or a blanket rule that alpha-0 components skip every
+   decoration — would close the class. Flagged for future.
+
+### Concrete steps taken this iteration
+
+One legitimate framework bug fixed (Button hover outline on
+transparent). Three UX improvements (heart colour, radial
+sub-labels, pip inside ring). One code-cleanliness migration
+(handle_input → bind_key). One meta-lesson logged.
+
+### Parked for iteration 7
+
+* **`bind_keys([...], cb)` list form** — cut the alias boilerplate.
+* **Bundle a game font** — the single biggest remaining visual
+  complaint from every Gemini round.
+* **Cross-check with a second model (GPT-5.x)** — treat consensus
+  as signal, single-model drift as noise.
+* **Message out of ring centre**: YOU pip now lives inside; a
+  large message there fights it when the player is at the top
+  node. Move to ``Anchor.TOP`` below title.
+* **`_lighten_color` deduplication** into a util module.

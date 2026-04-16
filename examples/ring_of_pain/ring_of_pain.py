@@ -20,7 +20,6 @@ if str(_project_root) not in sys.path:
 from saga2d import (  # noqa: E402
     Anchor,
     Game,
-    InputEvent,
     Label,
     Row,
     Scene,
@@ -47,7 +46,9 @@ TYPE_PORTAL = "portal"
 NODE_STYLES: dict[str, dict] = {
     TYPE_ENEMY:    {"fill": (110, 30, 40, 255),  "rim": (235, 80, 95, 255),   "glyph": "E"},
     TYPE_TREASURE: {"fill": (120, 85, 25, 255),  "rim": (245, 205, 90, 255),  "glyph": "$"},
-    TYPE_HEART:    {"fill": (110, 35, 55, 255),  "rim": (255, 130, 150, 255), "glyph": "+"},
+    # Heart deliberately uses green, not pink — gain must read as a
+    # different category from threat (red) in the palette.
+    TYPE_HEART:    {"fill": (35, 100, 60, 255),  "rim": (120, 220, 140, 255), "glyph": "+"},
     TYPE_SHOP:     {"fill": (35, 80, 105, 255),  "rim": (120, 190, 230, 255), "glyph": "S"},
     TYPE_PORTAL:   {"fill": (60, 45, 115, 255),  "rim": (180, 140, 255, 255), "glyph": "O"},
 }
@@ -99,19 +100,25 @@ class RingOfPainScene(Scene):
 
     # -- input ---------------------------------------------------------------
 
-    def handle_input(self, event: InputEvent) -> bool:
-        if event.type != "key_press":
-            return False
-        if event.action == "right" or event.key in ("right", "d"):
-            self.player_idx = (self.player_idx + 1) % self.ring_size
-            return True
-        if event.action == "left" or event.key in ("left", "a"):
-            self.player_idx = (self.player_idx - 1) % self.ring_size
-            return True
-        if event.action == "confirm" or event.key == "space":
-            self._interact()
-            return True
-        return False
+    def _bind_controls(self) -> None:
+        """Declarative control map. Each action+alias is bound explicitly.
+
+        bind_key checks named actions first, then raw key names, so binding
+        "right" handles both the mapped right-arrow action and any raw key
+        literally named "right". WASD / space are bound as aliases.
+        """
+        self.bind_key("right", self._rotate_cw)
+        self.bind_key("d",     self._rotate_cw)
+        self.bind_key("left",  self._rotate_ccw)
+        self.bind_key("a",     self._rotate_ccw)
+        self.bind_key("confirm", self._interact)
+        self.bind_key("space",   self._interact)
+
+    def _rotate_cw(self) -> None:
+        self.player_idx = (self.player_idx + 1) % self.ring_size
+
+    def _rotate_ccw(self) -> None:
+        self.player_idx = (self.player_idx - 1) % self.ring_size
 
     # -- logic ---------------------------------------------------------------
 
@@ -170,6 +177,7 @@ class RingOfPainScene(Scene):
     # `self.hp_label.text = …` wiring needed after each state change.
 
     def on_enter(self) -> None:
+        self._bind_controls()
         # Corner labels use named theme styles — appearance lives in
         # build_theme(), not scattered across call sites.
         self.ui.add(Label(
@@ -249,33 +257,48 @@ class RingOfPainScene(Scene):
                 anchor_x="center", anchor_y="center",
             )
 
-            # Consistent sub-label under every node.
+            # Sub-label placed radially outward from the ring centre, so
+            # each node's info pushes *away* from its neighbours rather
+            # than crowding straight down toward the next node. Labels
+            # near the ring's vertical axis still fall cleanly above or
+            # below; labels on the sides slide left or right.
+            rdx, rdy = nx_f - cx, ny_f - cy
+            rd = math.hypot(rdx, rdy) or 1.0
+            label_offset = node_r + 18
+            sub_x = int(nx_f + rdx / rd * label_offset)
+            sub_y = int(ny_f + rdy / rd * label_offset)
+            # Choose horizontal anchor so the label grows *away* from the
+            # ring rather than back toward it.
+            horiz = "center"
+            if rdx > node_r * 0.4:
+                horiz = "left"
+            elif rdx < -node_r * 0.4:
+                horiz = "right"
             self.draw_text(
                 self._sub_label(node),
-                nx, ny + node_r + 18,
+                sub_x, sub_y,
                 style="sub" if node.alive else "caption",
-                anchor_x="center", anchor_y="center",
+                anchor_x=horiz, anchor_y="center",
             )
 
-        # Player token — a distinct gold pip *outside* the ring, visually
-        # separate from node styling. Previously a white glow around the
-        # current node which read as "selected state" rather than "player".
+        # Player token — a gold pip *inside* the ring, pointing at the
+        # current node from the centre side. Outside the ring belongs to
+        # sub-labels now (radial layout, iter 6); putting the pip inside
+        # keeps the two visual channels separated forever. The caption
+        # then sits further toward centre.
         nx_f, ny_f = positions[self.player_idx]
         dx, dy = nx_f - cx, ny_f - cy
         d = math.hypot(dx, dy) or 1.0
         pip_offset = node_r + 20
-        px = int(nx_f + dx / d * pip_offset)
-        py = int(ny_f + dy / d * pip_offset)
-        # Faint halo so the pip reads as emissive against dark bg.
+        px = int(nx_f - dx / d * pip_offset)
+        py = int(ny_f - dy / d * pip_offset)
         self.draw_circle(px, py, 18, (255, 215, 100, 55))
         self.draw_circle(px, py, 13, PLAYER_GOLD)
         self.draw_circle(px, py, 8, (20, 20, 30, 255))
 
-        # "YOU" caption just beyond the pip — bigger than before so the
-        # player indicator carries real visual weight.
         cap_offset = pip_offset + 26
-        cx2 = int(nx_f + dx / d * cap_offset)
-        cy2 = int(ny_f + dy / d * cap_offset)
+        cx2 = int(nx_f - dx / d * cap_offset)
+        cy2 = int(ny_f - dy / d * cap_offset)
         self.draw_text(
             "YOU", cx2, cy2,
             font_size=18, color=PLAYER_GOLD,
