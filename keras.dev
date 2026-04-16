@@ -956,3 +956,115 @@ reactive widget.
 * **Graceful fallback when ANTHROPIC_API_KEY absent**: naive
   overlap extraction so the synthesis step still helps without a
   third-party key.
+
+---
+
+## Iteration 9 — 2026-04-16
+
+This is the first iteration whose plan was *dictated by the auto-
+consensus synthesiser* from iter-8 rather than by single-model critique
+or my own aesthetic judgment. Three consensus items shipped, plus the
+``_lighten_color`` dedup.
+
+### What shipped
+
+* **Acted on iter-8 synthesis recommendation**: uniform node-label
+  placement. All sub-labels now sit at a fixed vertical offset
+  below their node, centred, same font style. Reverts iter-6's
+  radial layout because two independent reviewers agreed the
+  radial placement read as "chaotic."
+* **Sub-label copy tightened** to fit the below-node footprint
+  without horizontal collisions::
+
+      enemy    → "3 HP · 1 ATK"      (was "3 HP  1 atk")
+      treasure → "+5 GOLD"           (was "+5g")
+      heart    → "+3 HP"             (unchanged)
+      shop     → "SHOP"              (was "shop")
+      portal   → "FLOOR 2"           (was "→ floor 2")
+
+  Dropping the ``→`` arrow character removed the iter-3-era
+  collision between the portal label and the adjacent enemy node.
+* **Player pip moved to always-above-node**. With sub-labels now
+  uniformly below, placing the YOU pip uniformly above guarantees
+  the two visual channels never share pixels — regardless of
+  which node the player is on. For the top node the pip sits
+  outside the ring; for the bottom node, inside. The rule is one
+  line of code.
+* **Default theme font** changed from ``"serif"`` to
+  ``"Avenir Next Condensed"``. macOS system face, zero-asset
+  change, visibly more polished than the previous rendering.
+  Every cross-check round has flagged typography; this is the
+  first response that actually lands in pixels.
+* **``saga2d.util.color.lighten(color, factor)``** extracted from
+  four identical ``_lighten_color`` methods (ProgressBar, List,
+  Tooltip, TabGroup). All four call sites now call the shared
+  helper directly. Five property tests cover identity, clamping,
+  alpha preservation, darkening, zero-factor safety. **Per
+  CLAUDE.md rule 6 ("don't deprecate, delete"), the local shim
+  methods were removed outright rather than kept as aliases.**
+* **Ring geometry nudged 0.33 → 0.32** so the bottom-node
+  sub-label clears the status message above the HUD without
+  making side-node labels touch the adjacent discs.
+
+Screenshot: ``/tmp/ring_of_pain_v19.png``. 566 tests pass.
+
+### Meta: first synthesis-driven iteration
+
+Iter-8 shipped the auto-consensus machinery. This round proved it
+actually reduces cycle time. The v15 synthesis output::
+
+    ## RECOMMENDED NEXT ACTION
+    Define and apply a consistent text positioning system: place all
+    node labels at a fixed vertical offset below their circles,
+    centred.
+
+…was the literal plan of iter-9's first task. No human had to read
+the raw critiques and decide; the recommendation was already
+extracted. Saves ~2 minutes of an iteration, which matters when
+the wall clock is 5.
+
+The v17/v19 cross-check still produced a synthesis — unsurprisingly,
+it now flags "message crowds bottom enemy subtext" (both models)
+rather than radial placement, because that specific issue was fixed.
+The method is working: each round the consensus recommendation
+points at the *next* most actionable item, not the same one.
+
+### API friction noticed this iteration
+
+1. **Cross-check loop is hitting a content floor** — reviewers
+   keep reaching for typography + hierarchy. Both a bundled
+   distinctive font and stricter line-height-ish rules in the
+   default theme would raise the floor. Not this iteration.
+2. **Iterating on ring-layout geometry is trial-and-error**.
+   There's no helper that says "given a viewport size and a
+   ring count, what's the max ring_r that keeps labels from
+   colliding?" A ``layout_budget(viewport, nodes, label_w)``
+   utility could make this a one-liner. Flagged for when more
+   than one saga2d game needs rings.
+3. **Ring layouts always read as "chaotic" to vision LLMs**
+   compared to rectangular lists — likely a training-data bias
+   toward grid UIs. Worth noting so future iterations don't
+   chase consensus feedback that is actually model bias.
+
+### Concrete steps taken this iteration
+
+Three consensus-driven visual fixes (unified label placement,
+pip-always-above, better font) plus one dedup (``lighten``). The
+first iteration planned from the auto-synthesiser's output rather
+than from single-model reviews.
+
+### Parked for iteration 10
+
+* **Bundle a custom game font**. System fonts (Avenir) took the
+  edge off but "typography feels generic" may keep surfacing.
+  Permissive-licence display face (e.g. ``Cinzel``, ``IM FELL``)
+  vendored under ``assets/fonts/``.
+* **Synthesis fallback when ANTHROPIC_API_KEY absent** — naive
+  string-overlap of the two critiques when no Claude key is
+  configured.
+* **``ReactiveValue.default`` ergonomic simplification**.
+* **``layout_budget`` utility** for radial-layout sizing given
+  viewport + label widths.
+* **Auto-run cross-check + synthesis as part of ``screenshot.py``**
+  so the one-liner ``./screenshot.py`` produces the synthesis
+  write-up automatically, not as a separate command.

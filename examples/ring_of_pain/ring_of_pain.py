@@ -154,19 +154,23 @@ class RingOfPainScene(Scene):
     # -- drawing -------------------------------------------------------------
 
     def _sub_label(self, node: Node) -> str:
+        # Short, uniform-width labels so every node caption fits in the
+        # same footprint when placed centered-below (iter-9 consensus fix).
+        # No horizontal arrows (their tail caused the iter-5..iter-6
+        # `→ floor 2` ↔ neighbour-E collision).
         if not node.alive:
             return "cleared"
         t = node.type
         if t == TYPE_ENEMY:
-            return f"{node.data['hp']} HP  {node.data['atk']} ATK"
+            return f"{node.data['hp']} HP · {node.data['atk']} ATK"
         if t == TYPE_TREASURE:
-            return f"+{node.data['coins']}g"
+            return f"+{node.data['coins']} GOLD"
         if t == TYPE_HEART:
             return f"+{node.data['heal']} HP"
         if t == TYPE_SHOP:
-            return "shop"
+            return "SHOP"
         if t == TYPE_PORTAL:
-            return f"→ floor {self.level + 1}"
+            return f"FLOOR {self.level + 1}"
         return ""
 
     # -- Declarative HUD ----------------------------------------------------
@@ -228,10 +232,13 @@ class RingOfPainScene(Scene):
     def draw(self) -> None:
         w, h = self.game.resolution
 
-        # Ring geometry — sub-labels must clear HUD (bottom) and title (top).
+        # Ring geometry — 0.32 is the sweet spot: enough vertical room
+        # for the bottom sub-label to clear the message above the HUD,
+        # but enough horizontal chord between nodes that the "3 HP · 1
+        # ATK" enemy labels don't touch the neighbouring $ discs.
         cx = w / 2
         cy = h / 2 - 5
-        ring_r = min(w, h - 120) * 0.33
+        ring_r = min(w, h - 120) * 0.32
         node_r = int(min(w, h - 120) * 0.09)
 
         positions = ring_positions(self.ring_size, (cx, cy), ring_r)
@@ -263,50 +270,32 @@ class RingOfPainScene(Scene):
                 anchor_x="center", anchor_y="center",
             )
 
-            # Sub-label placed radially outward from the ring centre, so
-            # each node's info pushes *away* from its neighbours rather
-            # than crowding straight down toward the next node. Labels
-            # near the ring's vertical axis still fall cleanly above or
-            # below; labels on the sides slide left or right.
-            rdx, rdy = nx_f - cx, ny_f - cy
-            rd = math.hypot(rdx, rdy) or 1.0
-            label_offset = node_r + 18
-            sub_x = int(nx_f + rdx / rd * label_offset)
-            sub_y = int(ny_f + rdy / rd * label_offset)
-            # Choose horizontal anchor so the label grows *away* from the
-            # ring rather than back toward it.
-            horiz = "center"
-            if rdx > node_r * 0.4:
-                horiz = "left"
-            elif rdx < -node_r * 0.4:
-                horiz = "right"
+            # Uniform sub-label: fixed vertical offset below every node,
+            # centered, same font style. Both Gemini and GPT-5.1 agreed
+            # radial placement looked "chaotic" (iter-8 synthesis).
+            # Short label text (see ``_sub_label``) keeps the footprint
+            # inside the chord between adjacent nodes.
             self.draw_text(
                 self._sub_label(node),
-                sub_x, sub_y,
+                nx, ny + node_r + 18,
                 style="sub" if node.alive else "caption",
-                anchor_x=horiz, anchor_y="center",
+                anchor_x="center", anchor_y="center",
             )
 
-        # Player token — a gold pip *inside* the ring, pointing at the
-        # current node from the centre side. Outside the ring belongs to
-        # sub-labels now (radial layout, iter 6); putting the pip inside
-        # keeps the two visual channels separated forever. The caption
-        # then sits further toward centre.
+        # Player token — gold pip always *above* the current node. Since
+        # sub-labels live uniformly below each node (iter-9 consensus
+        # fix), putting the pip uniformly above guarantees the two
+        # visual channels never share pixels, regardless of which node
+        # the player is on.
         nx_f, ny_f = positions[self.player_idx]
-        dx, dy = nx_f - cx, ny_f - cy
-        d = math.hypot(dx, dy) or 1.0
-        pip_offset = node_r + 20
-        px = int(nx_f - dx / d * pip_offset)
-        py = int(ny_f - dy / d * pip_offset)
+        px = int(nx_f)
+        py = int(ny_f) - (node_r + 20)
         self.draw_circle(px, py, 18, (255, 215, 100, 55))
         self.draw_circle(px, py, 13, PLAYER_GOLD)
         self.draw_circle(px, py, 8, (20, 20, 30, 255))
 
-        cap_offset = pip_offset + 26
-        cx2 = int(nx_f - dx / d * cap_offset)
-        cy2 = int(ny_f - dy / d * cap_offset)
         self.draw_text(
-            "YOU", cx2, cy2,
+            "YOU", px, py - 26,
             font_size=18, color=PLAYER_GOLD,
             anchor_x="center", anchor_y="center",
         )
@@ -322,13 +311,19 @@ def build_theme() -> Theme:
         Label(lambda: f"Stamina {self.stamina}", text_style="hud")
 
     …with zero appearance decisions duplicated.
+
+    ``font`` defaults to Avenir Next Condensed, a macOS system face.
+    This is the iter-9 response to the consensus typography complaint
+    (every cross-check round flagged the default serif as placeholder).
+    A bundled custom font would be better; this is the zero-asset step.
     """
     return Theme(
+        font="Avenir Next Condensed",
         text_styles={
-            "title":   TextStyle(font_size=26, color=TITLE_GOLD),
+            "title":   TextStyle(font_size=28, color=TITLE_GOLD),
             "hud":     TextStyle(font_size=18, color=WHITE),
-            "sub":     TextStyle(font_size=14, color=(220, 220, 232, 240)),
-            "caption": TextStyle(font_size=13, color=(155, 155, 170, 255)),
+            "sub":     TextStyle(font_size=13, color=(220, 220, 232, 240)),
+            "caption": TextStyle(font_size=12, color=(155, 155, 170, 255)),
         },
     )
 

@@ -24,6 +24,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any, Callable
 
+from saga2d.util.color import lighten
 from saga2d.util.reactive import ReactiveValue
 
 from saga2d.ui.component import Component
@@ -869,7 +870,7 @@ class List(Component):
 
             # Hover highlighting (drawn over alternating bg, under selection).
             if i == self._hover_index and i != self._selected_index:
-                hover_color = self._lighten_color(resolved.background_color, 1.3)
+                hover_color = lighten(resolved.background_color, 1.3)
                 self._game._backend.draw_rect(
                     self._computed_x,
                     row_y,
@@ -949,13 +950,6 @@ class List(Component):
         if self.on_select is not None:
             self.on_select(self._selected_index)
 
-    def _lighten_color(self, color: Color, factor: float) -> Color:
-        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
-        r, g, b, a = color
-        r = min(255, int(r * factor))
-        g = min(255, int(g * factor))
-        b = min(255, int(b * factor))
-        return (r, g, b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -1191,7 +1185,7 @@ class Grid(Component):
 
                 # Hover highlighting (drawn over cell bg, under selection).
                 if self._hover_cell == (col, row) and self._selected != (col, row):
-                    hover_color = self._lighten_color(cell_bg, 1.4)
+                    hover_color = lighten(cell_bg, 1.4)
                     self._game._backend.draw_rect(
                         cx,
                         cy,
@@ -1255,13 +1249,6 @@ class Grid(Component):
             return (col, row)
         return None
 
-    def _lighten_color(self, color: Color, factor: float) -> Color:
-        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
-        r, g, b, a = color
-        r = min(255, int(r * factor))
-        g = min(255, int(g * factor))
-        b = min(255, int(b * factor))
-        return (r, g, b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -1444,7 +1431,7 @@ class Tooltip(Component):
         )
 
         # Border for depth (1px lighter border)
-        border_color = self._lighten_color(resolved.background_color, 1.5)
+        border_color = lighten(resolved.background_color, 1.5)
         border_width = 1
         # Top border
         self._game._backend.draw_rect(draw_x, draw_y, box_w, border_width, border_color)
@@ -1479,13 +1466,6 @@ class Tooltip(Component):
 
         return Theme().resolve_tooltip_style(self.style)
 
-    def _lighten_color(self, color: Color, factor: float) -> Color:
-        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
-        r, g, b, a = color
-        r = min(255, int(r * factor))
-        g = min(255, int(g * factor))
-        b = min(255, int(b * factor))
-        return (r, g, b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -1995,7 +1975,7 @@ class DataTable(Component):
 
         # Header separator line (bottom border of header)
         separator_height = 2
-        separator_color = self._lighten_color(theme.datatable_header_bg_color, 1.3)
+        separator_color = lighten(theme.datatable_header_bg_color, 1.3)
         self._game._backend.draw_rect(
             x0,
             y0 + self._header_height - separator_height,
@@ -2124,10 +2104,3 @@ class DataTable(Component):
             )
         self._ensure_selected_visible()
 
-    def _lighten_color(self, color: Color, factor: float) -> Color:
-        """Lighten a color by the given factor (1.0 = no change, >1.0 = lighter)."""
-        r, g, b, a = color
-        r = min(255, int(r * factor))
-        g = min(255, int(g * factor))
-        b = min(255, int(b * factor))
-        return (r, g, b, a)
