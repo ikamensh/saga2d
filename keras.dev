@@ -2179,3 +2179,158 @@ micro-friction is now closed.
   examples span three shapes; a fourth would only add value if
   it stresses something untested (real sprites? audio? save/
   load?).
+
+---
+
+## Iteration 20 — 2026-04-17
+
+Milestone round: shipped the most direct Keras-parallel to land in
+saga2d yet — ``scene.summary()``. Keras's ``Model.summary()`` is
+arguably the single feature most cited when people explain "why I
+reach for Keras over raw TensorFlow" — given a model, tell me what's
+in it. ``Scene.summary()`` is literally that for game scenes.
+
+### What shipped
+
+* **``Scene.summary() -> str``** returns a human-readable dump of
+  a scene's declared structure:
+
+    - scene class name
+    - background colour if set
+    - ``controls`` dict, grouped by target method (``right, d  →
+      rotate_cw`` on one line instead of two)
+    - UI tree via iter-19's ``walk``, indented by depth, each
+      component shown with class + text (literal or ``← callable``)
+      + text_style + anchor + margin
+* **Two internal helpers**: ``_walk_with_depth`` (depth-pair
+  generator) and ``_describe_component`` (one-line component
+  description). Both are module-private — the formatting logic
+  intentionally does not leak into the public surface.
+* **Twelve property tests** covering every shape of output:
+  scene class name present, background colour shown/hidden
+  appropriately, aliased controls grouped on one line, static
+  text shown literally vs. reactive shown as ``← callable``,
+  text_style tag present when set, anchor + margin shown,
+  ProgressBar with callable value flagged, nested children
+  indented one level deeper than parent, empty scene renders
+  without crashing, multi-line string returned.
+
+735 mock-backend tests pass (12 new).
+
+### Sample outputs (real, from the three examples)
+
+Ring of Pain::
+
+    Scene: RingOfPainScene
+      background_color: (18, 14, 28, 255)
+      controls:
+        confirm, space  → interact
+        a, left  → rotate_ccw
+        d, right  → rotate_cw
+      ui:
+        Label "Ring of Pain", text_style=title, anchor=TOP_LEFT, margin=20
+        Label ← callable, text_style=hud, anchor=TOP_RIGHT, margin=20
+        Row anchor=BOTTOM_LEFT, margin=16
+          Label ← callable, text_style=hud
+          ProgressBar ← callable
+          Label ← callable, text_style=hud
+        Label "←  →  move     space  interact", text_style=caption, anchor=BOTTOM_RIGHT, margin=20
+        Label ← callable, text_style=caption, anchor=BOTTOM, margin=48
+
+    Scene: DialMenuScene
+      background_color: (16, 18, 28, 255)
+      controls:
+        cancel  → cancel
+        confirm, space  → confirm
+        a, left  → rotate_ccw
+        d, right  → rotate_cw
+      ui:
+        Label "Dial Menu", text_style=title, anchor=TOP_LEFT, margin=20
+        Label ← callable, text_style=heading, anchor=CENTER
+        Label ← callable, text_style=caption, anchor=BOTTOM, margin=24
+
+Every declarative feature the scene uses shows up in the summary:
+iter-10's ``controls`` dict, iter-4's reactive Labels (the ``←
+callable`` marker), iter-5's ``text_style`` on Labels, iter-14's
+Anchor vocabulary, iter-7's reactive ProgressBar.
+
+### Why this is the capstone for the "Keras for game dev" positioning
+
+Each earlier iteration added a declarative API surface. Until this
+iteration, nothing told the developer *from a running scene* what
+declarative wiring was actually in effect. The summary is the
+readout that makes the rest of the stack *inspectable at runtime*:
+
+* Did the ``controls`` dict validate? ``summary()`` shows the
+  flattened keys; if a key is missing, you know immediately.
+* Is a Label reactive, or did somebody type ``text="…"`` by
+  mistake? ``← callable`` vs. ``"literal"`` in the output.
+* Is the ``text_style`` hooked up? The tag appears in the
+  description.
+* Is a child inside the right parent? Indentation encodes the
+  tree.
+
+Keras's ``Model.summary`` plays this role for ML models. Scene
+summary is the game-dev equivalent — same debugging loop, same
+paste-into-a-bug-report value.
+
+### Meta: eleven iterations unrendered
+
+The no-render tally is now eleven consecutive iterations:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handler signatures     |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial) + shim deletion |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields (end-to-end modifier arc)    |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all`` introspection        |
+|  20  | ``Scene.summary()`` — Keras-style scene dump            |
+
+Mock-test count 566 → 735. The no-render stretch yielded the
+framework's two most useful introspection primitives (walk +
+summary) — specifically *because* visual polish was off the
+table, and the remaining headroom was in debuggability.
+
+### API friction noticed this iteration
+
+1. **``summary()`` output is stable-but-informal**. A future
+   ``summary_json()`` that emits the same information as a
+   structured dict would let tooling consume the output without
+   string-parsing. Not needed yet — human-readable is the
+   dominant use case — but flagged if a debugger UI ever
+   consumes it.
+2. **``_describe_component`` uses hasattr on ``_text_rv`` /
+   ``_value_rv``** as the reactive-binding detector. Clean-ish
+   but fragile if a future widget uses a differently-named
+   reactive slot. A widget-level ``describe_self()`` hook would
+   be the proper extension point; not worth it for two current
+   users.
+3. **Summary doesn't show computed layout bounds**. A flag
+   ``summary(include_bounds=True)`` would add the
+   ``_computed_x/y/w/h`` rect per component, useful for "why
+   doesn't my Label show up where I expected". Saved for when
+   someone hits that debugging need.
+
+### Concrete steps taken this iteration
+
+One Scene method (``summary``), two internal helpers, 12
+property tests. The Keras parallel the log has been building
+toward since iter-4 finally has its namesake.
+
+### Parked for iteration 21
+
+* **Render** when pyglet recovers — eleven-iteration backlog.
+* **Bundle a custom game font** — twelve iterations parked,
+  still the sole un-addressed consensus finding.
+* **``summary_json()``** — structured form of the summary for
+  tooling consumption.
+* **``summary(include_bounds=True)``** — layout-rect overlay
+  for "why is this component positioned wrong" debugging.
+* **Fourth example, or tutorial walk-through of an existing
+  one** — still open, still not obviously blocking.
