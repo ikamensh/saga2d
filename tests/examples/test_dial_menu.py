@@ -40,21 +40,21 @@ def _press(key: str | None = None, action: str | None = None) -> InputEvent:
 
 def test_initial_selection_is_zero(game: Game) -> None:
     scene = _push(game, DialMenuScene())
-    assert scene.selected == 0
+    assert scene.selector.index == 0
 
 
 def test_right_arrow_rotates_clockwise(game: Game) -> None:
     scene = _push(game, DialMenuScene())
     scene._dispatch_key_bindings(_press(key="right"))
-    assert scene.selected == 1
+    assert scene.selector.index == 1
     scene._dispatch_key_bindings(_press(key="d"))  # WASD alias
-    assert scene.selected == 2
+    assert scene.selector.index == 2
 
 
 def test_left_arrow_rotates_counterclockwise_and_wraps(game: Game) -> None:
     scene = _push(game, DialMenuScene())
     scene._dispatch_key_bindings(_press(key="left"))
-    assert scene.selected == len(scene.options) - 1  # wrapped
+    assert scene.selector.index == len(scene.selector) - 1  # wrapped
 
 
 def test_confirm_updates_status_with_selection(game: Game) -> None:
@@ -62,7 +62,7 @@ def test_confirm_updates_status_with_selection(game: Game) -> None:
     scene._dispatch_key_bindings(_press(key="right"))
     scene._dispatch_key_bindings(_press(key="right"))
     scene._dispatch_key_bindings(_press(action="confirm"))
-    assert scene.options[scene.selected] in scene.status
+    assert scene.selector.value in scene.status
     assert "Selected" in scene.status
 
 
@@ -74,11 +74,11 @@ def test_cancel_action_updates_status(game: Game) -> None:
 
 def test_custom_options_length_respected(game: Game) -> None:
     scene = _push(game, DialMenuScene(options=["A", "B", "C"]))
-    assert len(scene.options) == 3
+    assert len(scene.selector) == 3
     # Wrap after three right-presses.
     for _ in range(3):
         scene._dispatch_key_bindings(_press(key="right"))
-    assert scene.selected == 0
+    assert scene.selector.index == 0
 
 
 def test_controls_dict_is_validated_at_class_def() -> None:

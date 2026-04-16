@@ -64,18 +64,6 @@ class DialMenuScene(Scene):
         self.selector: Selector[str] = Selector(options or OPTIONS)
         self.status = "Use ← / → to choose, Enter to confirm."
 
-    # Backward-compat read-only views — older iter-13 tests still use
-    # ``scene.options`` and ``scene.selected``; keep them as shallow
-    # pass-throughs to :class:`Selector`.
-
-    @property
-    def options(self) -> tuple[str, ...]:
-        return self.selector.options
-
-    @property
-    def selected(self) -> int:
-        return self.selector.index
-
     def rotate_cw(self) -> None:
         self.selector.next()
 

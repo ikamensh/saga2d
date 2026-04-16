@@ -1612,3 +1612,121 @@ justified by iter-13's dial-menu evidence.
 * **Third example game** — genuinely different shape (not a ring)
   so the stack gets stressed outside radial layouts. Candidates:
   card-draft vertical list, tile-grid inventory.
+
+---
+
+## Iteration 15 — 2026-04-16
+
+Two items shipped: CLAUDE-md hygiene (delete the iter-14
+backward-compat shims on schedule) and the real generalisation bet —
+a third example game of **non-radial shape** to stress the stack
+outside rings.
+
+### What shipped
+
+* **Deleted ``DialMenuScene.options`` / ``.selected``** shims added
+  in iter-14. Per CLAUDE.md rule 6 (*"don't deprecate, delete"*),
+  they went on the same turn the next-iteration plan said they
+  should. Iter-13 tests updated to access ``scene.selector.value``
+  / ``.index`` / ``len(scene.selector)`` directly.
+* **``examples/tictactoe/``** — the third saga2d example, 144 lines
+  including full win detection, draw detection, reset, and status
+  bar. Deliberately non-radial:
+    - ``grid_positions(9, columns=3, ...)`` for the 3x3 board —
+      *not* ``ring_positions``. This is the first example that uses
+      ``grid_positions``.
+    - Cursor navigation via ``Scene.controls`` with 6 aliases
+      (arrows + WASD + space + R for reset).
+    - Reactive ``Label(self._status_text, text_style="heading")``
+      — passes a method as the callable source directly, letting
+      the status text (``"X's turn"`` / ``"O wins!"`` / ``"Draw!"``)
+      fall out of game state each frame.
+    - ``Anchor.TOP_CENTER`` / ``BOTTOM_CENTER`` / ``BOTTOM_LEFT``
+      — the iter-14 aliases finally get used.
+    - Per-piece colour through ``self.draw_text(..., color=…)``
+      (X light-blue, O pink, winner highlight green).
+* **12 property tests** for the tic-tac-toe example, covering
+  cursor clamping, turn alternation, row/column/diagonal win
+  detection, draw detection, post-winner lockout, reset, status
+  text for turn vs. winner. This is the kind of pure-logic tests
+  mock-backend is excellent at.
+
+699 mock-backend tests pass.
+
+### Why the non-radial example matters more than a radial one
+
+After 12 iterations of saga2d development driven by Ring of Pain,
+and one iteration (13) generalising to another radial game
+(dial menu), there was a real risk the framework had quietly
+specialised on rings. The tic-tac-toe example is the strongest
+possible disproof: different layout primitive (``grid_positions``),
+different input shape (clamped grid navigation, not wrap-around),
+different game loop (turn-based with win state, not continuous
+rotation), different HUD shape (top-centre + bottom-centre, not
+corners).
+
+Everything it needed already existed. No new framework code
+beyond this one example file and its tests. The iter-2..14 stack
+generalises to both radial *and* grid-based games from the same
+primitives — which is what "Keras for game dev" has always meant
+in these logs: describe the game, not the engine.
+
+### Meta: six iterations unrendered
+
+iter-10 through iter-15 shipped without a pyglet render because
+the macOS session's display enumeration has been broken since
+iter-9. The pattern from iter-14's log continues to hold: without
+visual feedback the iterations optimised toward API quality and
+example diversity. Six iterations in:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handler signatures     |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial) + shim deletion |
+
+That's two new example games, five new first-class utilities
+(``ring_budget``, ``Selector``, ``ReactiveValue`` helper,
+``Scene.controls``, Anchor aliases), and the cross-check-auto-
+consensus methodology — all without a single rendered pixel.
+The mock-test suite carries it: 566 at iter-9 → 699 at iter-15.
+
+### API friction noticed this iteration
+
+1. **Tic-tac-toe's cell-border rendering uses two ``draw_rect``
+   calls per cell** (outer line + inner fill). saga2d has no
+   "draw a filled rectangle *with a border*" primitive; you
+   compose from two solid fills. Works, but the three lines per
+   cell add up. A ``draw_rect(..., border_color=…, border_width=…)``
+   kwarg would halve the draw call count and read cleaner. Parked.
+2. **``grid_positions`` returns cell centres, but grid rendering
+   usually wants cell corners** too (for the border). Either the
+   helper returns both, or the game computes corners from centres
+   and cell size (what tic-tac-toe does). Fine; noted.
+3. **The ``Anchor.TOP_CENTER`` vs ``TOP`` equivalence isn't
+   discoverable from autocomplete** — both exist, both are the
+   same instance. Sphinx docs would enumerate them; nothing in
+   the type system surfaces "these are aliases." Flagged for
+   when saga2d has proper API docs.
+
+### Concrete steps taken this iteration
+
+CLAUDE.md rule 6 followed to the letter (shims deleted the round
+after addition). Third example game, chosen specifically to
+stress the framework on a non-radial shape, verified the whole
+API stack generalises. 12 new tests.
+
+### Parked for iteration 16
+
+* **Render** when pyglet recovers — now a six-iteration backlog.
+* **Bundle a custom game font** — seven iterations old.
+* **``draw_rect(..., border_color, border_width)`` helper** so
+  tic-tac-toe's cell borders are one call per cell instead of
+  two. Minor, noted for the next time someone writes grid-heavy
+  UI code.
+* **``InputEvent`` modifier fields**.
+* **Weakref-ify the ``_SIG_TAKES_EVENT`` cache**.
+* **A fourth example** — or scope back to polish/docs/font.
