@@ -149,6 +149,22 @@ def test_reset_restores_initial_state(game: Game) -> None:
     assert scene.winner is None
 
 
+def test_shift_r_opens_with_x_in_centre(game: Game) -> None:
+    """iter-17 event-aware handler + modifier demo. Shift+R is a
+    convenience ("open centre") distinct from plain R (full reset)."""
+    scene = _push(game)
+    # Fill some state first so the reset obviously wipes it.
+    scene.board[0] = "X"
+    scene.board[8] = "O"
+    scene._dispatch_key_bindings(
+        InputEvent(type="key_press", key="r", shift=True)
+    )
+    assert scene.board[0] == ""
+    assert scene.board[8] == ""
+    assert scene.board[4] == "X"    # opening move
+    assert scene.turn == "O"
+
+
 # -- status text -----------------------------------------------------------
 
 

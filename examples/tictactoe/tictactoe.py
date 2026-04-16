@@ -22,6 +22,7 @@ if str(_project_root) not in sys.path:
 from saga2d import (  # noqa: E402
     Anchor,
     Game,
+    InputEvent,
     Label,
     Scene,
     TextStyle,
@@ -90,12 +91,19 @@ class TicTacToeScene(Scene):
         if not self.winner:
             self.turn = "O" if self.turn == "X" else "X"
 
-    def reset(self) -> None:
+    def reset(self, event: InputEvent | None = None) -> None:
+        """Reset the board. Shift+R opens with X in the centre — a
+        common "let me test a losing position" shortcut. Plain R is
+        a full reset. Demonstrates iter-17's event-aware modifier
+        plumbing: the handler takes the event iff it signals one arg."""
         self.board = [""] * 9
         self.cursor = 4
         self.turn = "X"
         self.winner = None
         self.winning_line = None
+        if event is not None and event.shift:
+            self.board[4] = "X"
+            self.turn = "O"
 
     def _check_winner(self) -> None:
         for a, b, c in WIN_LINES:
@@ -123,7 +131,7 @@ class TicTacToeScene(Scene):
             anchor=Anchor.BOTTOM_CENTER, margin=24,
         ))
         self.ui.add(Label(
-            "← ↑ → ↓ move   space place   R reset",
+            "← ↑ → ↓ move   space place   R reset   Shift+R open-centre",
             text_style="caption",
             anchor=Anchor.BOTTOM_LEFT, margin=16,
         ))

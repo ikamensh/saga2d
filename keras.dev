@@ -1832,3 +1832,126 @@ migrated tic-tac-toe to the new API.
 * **Attribute-set-once signature hint** if held-key repeat becomes a
   thing saga2d supports.
 * **Fourth example**, or deliberate polish/docs pause.
+
+---
+
+## Iteration 17 — 2026-04-16
+
+Completed the iter-11 → iter-16 event-dispatch arc: ``InputEvent``
+now carries modifier state, the pyglet backend populates it from the
+keypress bitmask, and event-aware handlers read modifiers end-to-end.
+The feature round-trips through both backends and lands in a
+tic-tac-toe shortcut.
+
+### What shipped
+
+* **``InputEvent.shift / ctrl / alt / meta``** — four new boolean
+  fields on the ``InputEvent`` dataclass (default ``False``; keeps
+  every existing test fixture working unchanged).
+* **``KeyEvent`` grew the same four fields**. The backend-to-framework
+  event type mirrors the public one.
+* **Pyglet backend wiring**. Added ``_mods_to_kwargs(modifiers)``
+  that decodes pyglet's ``MOD_SHIFT`` / ``MOD_CTRL`` /
+  ``MOD_ALT | MOD_OPTION`` / ``MOD_COMMAND | MOD_WINDOWS`` bitmask
+  into the four booleans. The on_key_press and on_key_release
+  handlers now pass modifier state through to the KeyEvent.
+  Cross-platform: ``alt`` fires on Option (macOS) or Alt (Win);
+  ``meta`` fires on Cmd (macOS) or Windows key.
+* **Mock backend ``inject_key(..., shift=True, ctrl=False, ...)``**
+  kwargs. Tests can simulate any modifier combination without going
+  through pyglet. Five property tests cover: defaults-false,
+  shift-flows-through, meta+ctrl combo, event-aware Scene handler
+  reads ``event.shift``, bind_key lambda sees modifiers.
+* **``InputManager.translate``** passes the four booleans through
+  from KeyEvent to InputEvent.
+* **Tic-tac-toe demo**: ``Shift+R`` opens with X in the centre, plain
+  ``R`` is a full reset. The ``reset`` method declares
+  ``def reset(self, event: InputEvent | None = None)`` — iter-11's
+  signature-aware dispatcher passes the event when the method takes
+  one arg, omits it otherwise. No code at the call site; the scene
+  just reads ``event.shift`` inside the handler. New test covers
+  the shortcut.
+
+709 mock-backend tests pass.
+
+### Why this arc matters
+
+Three iterations of plumbing (iter-11 signature-aware dispatch,
+iter-16 cache removal, iter-17 modifier fields) converge into one
+game-level feature: a declarative shortcut modifier. The arc:
+
+* iter-11 added the ``cb`` takes-event detection so handlers could
+  be zero-arg or one-arg without a wrapper.
+* iter-16 removed the half-baked cache that made that detection
+  inefficient-and-unsafe.
+* iter-17 populated the event with the actual modifier state.
+
+Now a scene can write::
+
+    class MyScene(Scene):
+        controls = {"r": "reset"}
+        def reset(self, event):
+            if event.shift: self._reset_to_checkpoint()
+            else: self._full_reset()
+
+— and saga2d's dispatcher handles everything: the declarative
+class-level mapping, the method-name validation at class-def time,
+the signature-aware invocation, the modifier state propagation.
+What the game sees is ``if event.shift``. What the framework
+handles is an entire dispatch chain that didn't exist as one piece
+before.
+
+### Meta: eight iterations unrendered
+
+Still pyglet-cocoa empty screens from a subprocess. Tally:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handler signatures     |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial) + shim deletion |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields (end-to-end modifier arc)    |
+
+Mock-test count 566 → 709. Every feature added in this run is
+exercised through a test against the mock backend, so the
+no-render discipline has continued without sacrificing
+correctness signal.
+
+### API friction noticed this iteration
+
+1. **``meta``'s cross-platform semantics leak into game code**.
+   A scene that binds Cmd+Z on macOS and Ctrl+Z on Windows still
+   has to write two different controls. saga2d could normalise
+   this further — e.g. a synthetic ``"primary"`` modifier that's
+   Cmd on macOS, Ctrl elsewhere — but overloading meta itself
+   would surprise macOS users who want genuine Cmd-but-not-Ctrl
+   behaviour. Not urgent.
+2. **``KeyEvent`` modifier booleans default ``False`` for
+   backward compat** — fine, but means a backend that *doesn't*
+   populate them is indistinguishable from a user holding no
+   modifiers. No observable bug today; flagged.
+
+### Concrete steps taken this iteration
+
+Four dataclass fields, one 20-line helper, one InputManager
+pass-through, one mock-backend ``inject_key`` kwargs addition, one
+tic-tac-toe demo, five new tests. The "plumbing already ready"
+promise from iter-11 kept.
+
+### Parked for iteration 18
+
+* **Render** when pyglet recovers — eight-iteration backlog.
+* **Bundle a custom game font** — nine iterations old. At this
+  point the consensus-driven typography complaint has quietly
+  survived more rounds than any other parked item.
+* **``primary`` synthetic modifier**? Cross-platform Cmd-or-Ctrl
+  convenience, if a saga2d game needs it.
+* **Docs / README pass**. Seventeen iterations of framework
+  development have accumulated without a README update. The
+  stack has many moving parts now; a user landing on the repo
+  wouldn't know where to start. High-value for "Keras-like"
+  positioning.
