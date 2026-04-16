@@ -86,6 +86,9 @@ def test_normalisation_happens_once_per_subclass() -> None:
             "c": "m",
         }
 
+        def m(self) -> None:
+            pass
+
     assert S._normalised_controls == {"a": "m", "b": "m", "c": "m"}
 
 
@@ -132,15 +135,31 @@ def test_action_dispatch_matches_controls(game: Game) -> None:
     assert hits == ["select"]
 
 
-def test_missing_method_does_not_crash(game: Game) -> None:
-    """A typo'd method name silently falls through — better than
-    crashing mid-game on a key press."""
+def test_typoed_method_name_raises_at_class_definition() -> None:
+    """A typo'd method name is caught at class-def time, not swallowed
+    at keypress time. This is the iter-11 fix for the iter-10 friction
+    point: silent runtime fall-through was confusing to debug."""
+    with pytest.raises(AttributeError, match="does_not_exist"):
 
-    class S(Scene):
-        controls = {"x": "this_method_does_not_exist"}
+        class S(Scene):  # noqa: F841
+            controls = {"x": "does_not_exist"}
 
-    scene = _push(game, S())
-    assert scene._dispatch_key_bindings(_press(key="x")) is False
+
+def test_typoed_method_names_listed_together() -> None:
+    """Error message enumerates every missing method in one shot so
+    you don't have to fix-and-reimport repeatedly."""
+    with pytest.raises(AttributeError) as exc:
+
+        class S(Scene):  # noqa: F841
+            controls = {"x": "miss1", "y": "miss2", "z": "hasattr_"}
+
+            def hasattr_(self) -> None:
+                pass
+
+    msg = str(exc.value)
+    assert "miss1" in msg
+    assert "miss2" in msg
+    assert "hasattr_" not in msg
 
 
 def test_empty_controls_is_fine(game: Game) -> None:

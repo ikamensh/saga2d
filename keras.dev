@@ -1200,3 +1200,105 @@ about the v-number gap.*
 * **``layout_budget`` radial-sizing utility**.
 * **Handler signatures that can receive the raw ``InputEvent``**
   for modifier-aware controls.
+
+---
+
+## Iteration 11 — 2026-04-16
+
+Two of iter-10's parked items shipped, both hardening
+``Scene.controls`` against the friction points noted the prior round.
+Visual verification remains blocked by pyglet-cocoa's empty-screens
+state (same subprocess-display issue that hit iter-10).
+
+### What shipped
+
+* **``Scene.controls`` validation at class-definition time**.
+  ``__init_subclass__`` now checks every method name referenced in
+  ``controls`` against the class's attributes. A typo raises
+  ``AttributeError`` at import with every missing method listed in
+  one message — not silently swallowed at keypress time. The
+  iter-10 friction point ("controls use method-name strings;
+  typos aren't caught at class-definition time") is closed.
+* **Event-aware handler signatures**. ``Scene.controls`` methods
+  and ``bind_key`` callbacks may optionally take a single
+  positional :class:`InputEvent` argument. The dispatcher
+  inspects the signature once per callable (cached by id), then
+  invokes with-or-without the event accordingly. Zero-arg
+  callers still work; modifier-aware handlers can now reach
+  ``event.key`` / ``event.action`` / (in future) modifiers
+  without a wrapper. Five property tests cover: zero-arg method,
+  one-arg method, zero-arg lambda, one-arg lambda, cache
+  correctness across five repeated presses.
+
+584 mock-backend tests pass.
+
+### Why the hasattr check matters
+
+The iter-10 ``controls = {"x": "rotate_cw"}`` form is
+declarative and introspectable, but the stringly-typed method
+reference meant a typo lived until the user hit the key and got
+nothing. Worse, the dispatcher's ``getattr(self, name, None)`` + ``if
+callable(method)`` silently fell through, so there was no error
+message anywhere. Now the class body itself refuses to define::
+
+    class RingOfPainScene(Scene):
+        controls = {"space": "rotate_cw", "x": "fireball"}
+        # AttributeError: ... references methods that do not exist
+        # on the class: fireball
+
+This is the difference between a declarative API that is
+*enforced* versus one that is *just a convention*. Keras layers
+validate their ``units=`` and ``activation=`` at construction;
+the same pattern applies here.
+
+### Meta: pyglet-cocoa subprocess display still empty
+
+Same as iter-10. ``pyglet.display.get_display().get_screens()`` →
+``[]`` from every Python subprocess spawned by ``uv run`` or the
+venv's python directly. Earlier iterations (v1–v17) worked, so
+this is a macOS session-state regression. Unit tests still cover
+correctness — but the tests that actually create a pyglet window
+(``tests/test_kodo_stage3_ui_rendering_regression.py``,
+``tests/core/test_game.py::test_run_*``) all error with the same
+``IndexError`` deep in pyglet's cocoa display path. These are
+**environmental failures, not caused by my changes**: a
+``git stash`` + re-run reproduces the same errors on HEAD.
+
+The 584-test mock-backend subset is the canonical green signal
+for this and iter-10. Real-render verification is bundled with
+the iter-12 agenda.
+
+### API friction noticed this iteration
+
+1. **``_SIG_TAKES_EVENT`` cache is module-global**. Keyed by
+   ``id(cb)``; fine for long-lived handlers but could theoretically
+   miscache if a short-lived lambda is GC'd and its address is
+   reused. Mitigation: the dispatch itself isn't memoising
+   results, only signature shape, so at worst a future callable
+   gets the cached shape check (correct if shape matches, wrong
+   otherwise). No observed issue; flagged.
+2. **No test for modifier keys** because ``InputEvent`` doesn't
+   yet carry modifier state (shift/ctrl/alt). The event-aware
+   handler plumbing is now ready; extending ``InputEvent`` is
+   the next step if a game needs it.
+
+### Concrete steps taken this iteration
+
+``__init_subclass__`` attribute-existence validation on
+``Scene.controls``; event-aware handler dispatch with signature
+caching; seven new tests (2 validation + 5 event-handler).
+
+### Parked for iteration 12
+
+* **Render v20 / v21 as soon as pyglet-cocoa recovers** — still
+  blocking visual verification of the entire iter-10/11 stack.
+* **Bundle a custom game font**. Consensus typography complaint
+  surviving three iterations now.
+* **``InputEvent`` modifier fields** (shift / ctrl / alt / meta)
+  so event-aware handlers can actually *use* modifier state.
+  The event plumbing is already in place.
+* **``ReactiveValue.default`` ergonomic simplification** — seed
+  snapshot from one-shot callable invocation at construction.
+* **``layout_budget`` radial-sizing utility**.
+* **Clean up ``_SIG_TAKES_EVENT`` cache** — weak-reference or
+  per-scene lifetime rather than module-global id-keyed.
