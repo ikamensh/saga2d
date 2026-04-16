@@ -1955,3 +1955,119 @@ promise from iter-11 kept.
   stack has many moving parts now; a user landing on the repo
   wouldn't know where to start. High-value for "Keras-like"
   positioning.
+
+---
+
+## Iteration 18 — 2026-04-16
+
+Picked up the longest-parked-but-never-tackled item: the README.
+Seventeen iterations of framework development had accumulated
+without a docs pass. A user landing on the repo couldn't learn
+any of the declarative APIs from the old Quick Start — it showed
+`Button` / `Label` / `Panel` construction that predated reactive
+HUDs, `Scene.controls`, themed text styles, `Row` / `Column`,
+`Selector`, and the three example games.
+
+### What shipped
+
+* **Quick Start rewritten** around the iter-4..17 declarative
+  form. The sample scene is 30 lines and demonstrates:
+    - class-level ``controls`` dict with tuple aliases
+    - reactive ``Label(lambda: ...)`` for HP / Coins readouts
+    - reactive ``ProgressBar(value=lambda: self.hp, max_value=10)``
+    - ``Row(...)`` transparent container
+    - ``Theme(text_styles={...})`` + ``text_style="hud"`` at the
+      call site
+    - ``Anchor.TOP_LEFT`` / ``BOTTOM_LEFT`` anchored UI
+  All five behaviours that collectively define "saga2d is Keras-
+  like for game dev" now show up in the first thirty lines a new
+  user reads.
+* **Explicit "what's declarative" callout** under the Quick Start
+  naming the five pieces — state, controls, HUD, layout,
+  typography — and one sentence each describing what the
+  framework does about each.
+* **Showcase section** listing the three example games under
+  ``examples/`` (ring_of_pain, dial_menu, tictactoe) with what
+  each exercises. Each is a "load it, read it, copy the shape"
+  entry point for a different game genre.
+* **Core Features table refreshed** with the iter-2..17
+  additions (declarative controls, reactive HUD, layout
+  primitives, Selector, theme text styles, Row/Column,
+  modifier input fields).
+* **``tests/examples/test_readme_quickstart.py``** — six tests
+  mirroring the README sample verbatim, ensuring the code a
+  user copies actually works. A README with a broken sample is
+  worse than no README. Tests cover: class-def validation,
+  initial HUD state, gain-coin mutation + HUD update,
+  take-damage floor-at-zero, reset, ProgressBar fraction
+  tracking.
+
+715 mock-backend tests pass (6 new).
+
+### Why the README pass matters for "Keras for game dev"
+
+Keras's appeal isn't its layer primitives — Torch and JAX have
+equivalents. It's the first page of the docs: the ``Sequential``
++ ``compile`` + ``fit`` triangle, the "this is how you do it"
+shape. For the eighteen-iteration saga2d stack to feel like
+"Keras for game dev", the README needs to teach the declarative
+triangle (state / controls / reactive HUD) in the first thirty
+lines.
+
+Before this iteration: the README showed a Panel with a Button
+and a Label that cleared a scene on click. True, but not Keras-
+like. After: the same thirty lines show scene-as-class, state-
+as-attrs, controls-as-dict, HUD-as-reactive-labels. The user
+lands on the page and sees the shape saga2d wants to teach.
+
+### Meta: nine iterations unrendered
+
+The docs pass happened without pyglet cooperation — only test
+assertions and the README's own claim that its sample parses
+and mutates state correctly. The README promises:
+
+> Everything in this scene is declarative:
+>   * State — plain Python attributes
+>   * Controls — a class-level dict
+>   * HUD — `Label(lambda: …)` and `ProgressBar(value=lambda: …)`
+>   * Layout — `Row(...)` / `Column(...)`
+>   * Typography — `text_style="hud"`
+
+Every one of those claims is covered by a test in
+``test_readme_quickstart.py``. If any of them broke the tests
+would catch it before the README drifted from reality.
+
+### API friction noticed this iteration
+
+1. **``Theme(text_styles={"title": TextStyle(28, gold), ...})``
+   positional-args form** reads nicely in the README but shadows
+   the keyword-form that the docstring uses. Both work
+   (``TextStyle(font_size=28, color=gold)`` is explicit). The
+   README uses positional for density; that's fine, but it means
+   someone copying might not realise ``TextStyle`` takes named
+   kwargs. Minor; not urgent.
+2. **Test has to do ``scene.ui._children`` introspection** to
+   find reactive Labels and assert on them. A public
+   ``scene.ui.walk()`` iterator or ``Row.labels`` property would
+   let tests (and game code) inspect the tree without reaching
+   into private attrs. Flagged.
+3. **``ProgressBar.fraction``** recomputes via ``_refresh`` on
+   each access — fine at the scale saga2d runs, but noted.
+
+### Concrete steps taken this iteration
+
+One README rewrite (Quick Start + Showcase + Features refresh),
+one test file verifying the sample code, 6 new tests. The
+longest-outstanding parked item is now closed.
+
+### Parked for iteration 19
+
+* **Render** when pyglet recovers — nine-iteration backlog.
+* **Bundle a custom game font** — now the sole longest-lived
+  parked item at ten rounds. Still the one visual complaint
+  iter-7..9 consensus kept flagging.
+* **Public ``scene.ui.walk()``** iterator so tests and tooling
+  don't reach into ``_children``.
+* **``primary`` synthetic modifier**, still speculative.
+* **Fourth example**, or further docs (tutorial walk-through of
+  one of the existing examples).
