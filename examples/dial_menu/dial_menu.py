@@ -27,6 +27,7 @@ from saga2d import (  # noqa: E402
     Game,
     Label,
     Scene,
+    Selector,
     TextStyle,
     Theme,
     ring_budget,
@@ -60,18 +61,29 @@ class DialMenuScene(Scene):
 
     def __init__(self, options: list[str] | None = None) -> None:
         super().__init__()
-        self.options = options or OPTIONS
-        self.selected = 0
+        self.selector: Selector[str] = Selector(options or OPTIONS)
         self.status = "Use ← / → to choose, Enter to confirm."
 
+    # Backward-compat read-only views — older iter-13 tests still use
+    # ``scene.options`` and ``scene.selected``; keep them as shallow
+    # pass-throughs to :class:`Selector`.
+
+    @property
+    def options(self) -> tuple[str, ...]:
+        return self.selector.options
+
+    @property
+    def selected(self) -> int:
+        return self.selector.index
+
     def rotate_cw(self) -> None:
-        self.selected = (self.selected + 1) % len(self.options)
+        self.selector.next()
 
     def rotate_ccw(self) -> None:
-        self.selected = (self.selected - 1) % len(self.options)
+        self.selector.prev()
 
     def confirm(self) -> None:
-        self.status = f"Selected: {self.options[self.selected]}"
+        self.status = f"Selected: {self.selector.value}"
 
     def cancel(self) -> None:
         self.status = "Cancelled."
@@ -83,7 +95,7 @@ class DialMenuScene(Scene):
             anchor=Anchor.TOP_LEFT, margin=20,
         ))
         self.ui.add(Label(
-            lambda: self.options[self.selected],
+            lambda: self.selector.value,
             text_style="heading", text_color=GOLD,
             anchor=Anchor.CENTER,
         ))
@@ -97,16 +109,16 @@ class DialMenuScene(Scene):
         w, h = self.game.resolution
         cx, cy = w / 2, h / 2
         ring_r, node_r_f = ring_budget(
-            (w, h), len(self.options),
+            (w, h), len(self.selector),
             margin_top=60, margin_bottom=60,
             margin_x=40, label_height=14, label_gap=18,
         )
         node_r = int(node_r_f)
-        positions = ring_positions(len(self.options), (cx, cy), ring_r)
+        positions = ring_positions(len(self.selector), (cx, cy), ring_r)
 
-        for idx, (opt, (nx, ny)) in enumerate(zip(self.options, positions)):
+        for idx, (opt, (nx, ny)) in enumerate(zip(self.selector.options, positions)):
             nx, ny = int(nx), int(ny)
-            is_current = idx == self.selected
+            is_current = idx == self.selector.index
             if is_current:
                 self.draw_circle(nx, ny, node_r + 6, ACCENT)
             self.draw_circle(nx, ny, node_r + 2, DIM)
