@@ -4254,3 +4254,118 @@ possible.
 
 Both fundamentally outside the project. No further "ship one
 more API item" remains obvious at iter-36.
+
+---
+
+## Iteration 37 — 2026-04-17
+
+Caught an **omission in iter-25's retrospective**: the "untested
+subsystems" list missed timers. ``Scene.after(delay, cb)`` /
+``Scene.every(interval, cb)`` have been in saga2d since iter-1 but
+no example used them — the same oversight that motivated iter-29's
+save/load demo, iter-32's audio demo, iter-33's sprite demo.
+iter-37 closes the real last gap with a fifth example game.
+
+### What shipped
+
+* **``examples/reaction_test/reaction_test.py``** — 130 lines.
+  A reaction-time tester: disc turns red/green, player hits space
+  when green, reaction time recorded. The core mechanic is a
+  ``Scene.after(delay, self._go_green)`` call that schedules the
+  red→green transition after a random 1–3 s delay. State machine
+  (waiting → ready → done / early) driven by the timer.
+* Uses the established declarative idioms — ``Scene.controls``
+  with tuple aliases, reactive ``Label`` (including bound
+  methods as reactive sources, ``Label(self._status_text)``),
+  ``Row``, ``Theme(text_styles={...})``, bundled Cinzel font.
+* **10 property tests** including the critical timer-driven
+  test (``test_go_green_fires_after_scheduled_delay``):
+    - Schedule a 0.5 s timer manually
+    - Tick 0.4 s → state still WAITING
+    - Tick another 0.2 s (total 0.6 s) → state advances to READY
+
+  This is the first test in the saga2d suite that directly
+  verifies ``Scene.after`` fires on the expected tick.
+* **README updated**: five examples now, with the reaction_test
+  flagged as the timer-subsystem demo.
+
+843 mock-backend tests pass (10 new).
+
+### iter-25 "untested subsystems" final tally
+
+| Subsystem | Example | iter |
+|-----------|---------|------|
+| save / load | all three of iter-29's examples + iter-31 parity + iter-34's fourth | 29, 31, 34 |
+| audio       | Ring of Pain (procedural WAVs)      | 32    |
+| sprites     | Ring of Pain (procedural PNG)       | 33    |
+| **timers**  | **reaction_test (iter-37)**         | **37** |
+
+The retrospective I wrote at iter-25 was incomplete — timers didn't
+make the list. The "stack complete" declaration at iter-33 was
+premature for the same reason. iter-37 corrects both.
+
+### Why this matters beyond a fifth example
+
+Timers are structurally different from every other saga2d
+subsystem. Scenes so far have reacted to *input events*: keypresses,
+``on_enter``, ``on_exit``. The reaction-test scene reacts to a
+*scheduled callback* — the disc changes colour with no input event,
+purely because wall-clock time passed. Testing that cleanly through
+the mock backend required passing deterministic ``dt`` values into
+``game.tick``, which worked without any framework changes —
+``TimerManager`` consumes whatever dt the game loop delivers.
+
+This is probably the most "Keras-training-callback-like" feature
+in saga2d. Keras fires callbacks at epoch boundaries via its
+training loop; saga2d fires them at time boundaries via
+``game.tick(dt)``. The declarative API is shared: register a
+callback, framework handles the firing.
+
+### Meta: twenty-eight iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–36| (see earlier rows)                                      |
+|  37  | reaction_test example — fifth untested subsystem (timers) |
+
+Mock-test count 566 → 843. The **genuinely-complete** iter-25
+tally has five subsystems covered (save/load, audio, sprites,
+timers, and the core declarative stack from iter-2..17 which was
+never questioned). Five example games, one tutorial, dual-model
+cross-check methodology, introspection + snapshot testing,
+bundled procedural assets, reactive HUD that composes cleanly
+with load/save.
+
+### API friction noticed this iteration
+
+1. **iter-25's retrospective was written too confidently.** It
+   listed three untested subsystems and treated that list as
+   exhaustive. Twelve iterations later, timers surfaced. Lesson:
+   an "untested subsystems" accounting is only as good as
+   someone enumerating the full subsystem list.
+2. **``Scene.after``'s owned-timers lifecycle is invisible to
+   tests unless you poke ``_owned_timers``**. The reaction-test
+   for manual timer scheduling had to clear the set to get a
+   clean baseline. A public ``scene.cancel_all_timers()`` would
+   make this explicit. Not urgent.
+3. **Testing time-dependent state machines is finicky**. The
+   reaction test patches ``time.monotonic`` in two tests to
+   produce deterministic reaction times. saga2d has no built-in
+   "virtual clock" helper; for heavier timer-heavy games a
+   ``Clock`` abstraction injected into Game would let tests
+   advance time without monkey-patching. Over-engineering for
+   five examples.
+
+### Concrete steps taken this iteration
+
+One 130-line scene, 10 property tests, one README update. The
+iter-25 retrospective's subsystem coverage is now genuinely
+exhaustive.
+
+### Parked for iteration 38
+
+* **Render** when pyglet recovers.
+* **Second user** — still the remaining validation gap.
+
+Down to the two outside-the-project items. The stack is
+**actually** complete now, with the iter-25 oversight corrected.

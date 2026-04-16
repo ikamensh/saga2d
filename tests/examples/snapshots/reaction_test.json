@@ -1,0 +1,85 @@
+{
+  "scene": "ReactionTestScene",
+  "background_color": [
+    18,
+    20,
+    30,
+    255
+  ],
+  "controls": [
+    {
+      "keys": [
+        "confirm",
+        "space"
+      ],
+      "method": "click"
+    },
+    {
+      "keys": [
+        "r"
+      ],
+      "method": "reset"
+    }
+  ],
+  "ui": {
+    "type": "_UIRoot",
+    "children": [
+      {
+        "type": "Label",
+        "text": {
+          "reactive": false,
+          "value": "Reaction Test"
+        },
+        "text_style": "title",
+        "anchor": "TOP",
+        "margin": 20
+      },
+      {
+        "type": "Label",
+        "text": {
+          "reactive": true
+        },
+        "text_style": "display",
+        "anchor": "CENTER"
+      },
+      {
+        "type": "Row",
+        "anchor": "BOTTOM",
+        "margin": 24,
+        "children": [
+          {
+            "type": "Label",
+            "text": {
+              "reactive": true
+            },
+            "text_style": "hud"
+          },
+          {
+            "type": "Label",
+            "text": {
+              "reactive": true
+            },
+            "text_style": "hud"
+          },
+          {
+            "type": "Label",
+            "text": {
+              "reactive": true
+            },
+            "text_style": "hud"
+          }
+        ]
+      },
+      {
+        "type": "Label",
+        "text": {
+          "reactive": false,
+          "value": "Space: click when green   R: reset"
+        },
+        "text_style": "caption",
+        "anchor": "BOTTOM_LEFT",
+        "margin": 16
+      }
+    ]
+  }
+}
