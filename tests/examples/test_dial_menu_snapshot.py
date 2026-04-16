@@ -1,26 +1,18 @@
 """Snapshot regression test for the dial_menu example.
 
-Demonstrates ``saga2d.testing.assert_scene_matches_snapshot`` in a
-real project context. If any future framework change accidentally
-restructures this scene (e.g. renames a class, silently drops a
-control binding, reorders children), the stored snapshot diff will
-flag it before it ships. Fixing it is then a choice: update the
-saga2d API to preserve behaviour, or delete
-``snapshots/dial_menu.json`` to accept the new shape.
+Uses iter-25's ``assert_snapshot`` fixture (see ``conftest.py``).
+If any framework change accidentally restructures this scene, the
+stored snapshot's unified diff flags it — either fix the code or
+delete ``snapshots/dial_menu.json`` / rerun with
+``SAGA2D_UPDATE_SNAPSHOTS=1`` to accept.
 """
 
 from __future__ import annotations
-
-from pathlib import Path
 
 import pytest
 
 from examples.dial_menu.dial_menu import DialMenuScene, build_theme
 from saga2d import Game
-from saga2d.testing import assert_scene_matches_snapshot
-
-
-SNAPSHOT_DIR = Path(__file__).parent / "snapshots"
 
 
 @pytest.fixture
@@ -37,12 +29,8 @@ def game():
     g._teardown()
 
 
-def test_dial_menu_scene_structure_stable(game: Game) -> None:
-    """The dial menu's declared structure is frozen in
-    ``snapshots/dial_menu.json``. If this test fails after a saga2d
-    change, inspect the diff — either the change is intentional
-    (update the snapshot) or an accident (fix the code)."""
+def test_dial_menu_scene_structure_stable(game: Game, assert_snapshot) -> None:
     scene = DialMenuScene()
     game._scene_stack.push(scene)
     game.tick(dt=1 / 60)
-    assert_scene_matches_snapshot(scene, "dial_menu", SNAPSHOT_DIR)
+    assert_snapshot(scene, "dial_menu")
