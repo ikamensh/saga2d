@@ -2334,3 +2334,126 @@ toward since iter-4 finally has its namesake.
   for "why is this component positioned wrong" debugging.
 * **Fourth example, or tutorial walk-through of an existing
   one** — still open, still not obviously blocking.
+
+---
+
+## Iteration 21 — 2026-04-17
+
+Shipped the longest-outstanding not-yet-addressed parked item that
+wasn't a rendering block: a five-step tutorial walk-through. Every
+saga2d iteration since iter-2 accumulated API surface; none of them
+added a *Keras-tutorial*-equivalent guide. Today closes that.
+
+### What shipped
+
+* **``tutorials/declarative/tutorial.md``** — a five-step progression
+  that builds a tiny guess-the-number game from scratch, introducing
+  exactly one declarative API per step. The final scene is under
+  40 lines. Section breakdown:
+
+    1. The empty ``Scene`` (``background_color`` + lifecycle)
+    2. Plain-Python state attributes
+    3. Class-level ``controls`` dict with tuple aliases
+    4. Reactive HUD (``Label(lambda: …)`` + ``Row(…)``)
+    5. ``Theme`` + ``text_style="…"``
+    6. Bonus: introspect with ``scene.summary()``
+
+  Each step shows only the delta; the reader sees the scene grow
+  one declarative piece at a time, ending at the idiomatic shape
+  that the earlier iterations' examples use.
+* **``tests/examples/test_tutorial_snippets.py``** — 10 property
+  tests mirroring the tutorial's code verbatim. Every code block
+  in the markdown is exercised by a test: step-3 arrow/WASD
+  aliases both fire the same method, step-4 reactive labels
+  update after a tick, step-5 theme resolves font_size/color,
+  the summary block contains the expected structural markers.
+  A tutorial with broken samples is worse than no tutorial.
+* **README pointer** to ``tutorials/declarative/tutorial.md`` as
+  the "new to saga2d? start here" entry point, with an explicit
+  note that snippets are CI-tested.
+
+745 mock-backend tests pass (10 new).
+
+### Why this closes a real gap
+
+After twenty iterations the framework had a README (iter-18) and
+three example games (iter-1, iter-13, iter-15), but no guided
+progression. A new user had two choices:
+
+* Read ``README.md`` → see a 30-line scene using five declarative
+  APIs at once.
+* Open ``examples/ring_of_pain/ring_of_pain.py`` → see 250 lines
+  of a finished game.
+
+Neither teaches the APIs *one at a time*. Keras's
+``getting-started`` tutorial is effective specifically because it
+introduces ``Sequential`` before ``compile`` before ``fit`` — each
+concept alone, then composed. iter-21 brings the same pedagogy to
+saga2d: the reader learns ``controls`` as a class dict *before*
+meeting reactive Labels, ``Row`` alone *before* themed text styles.
+
+### Meta: twelve iterations unrendered
+
+Pyglet-cocoa still empty-screens from subprocess. Roll tally:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` declarative input                    |
+|  11  | hasattr-validation + event-aware handlers               |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example)                              |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example) + shim deletion             |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+|  17  | InputEvent modifier fields                              |
+|  18  | README pass + verified-sample tests                     |
+|  19  | ``walk`` / ``find`` / ``find_all``                      |
+|  20  | ``Scene.summary()``                                     |
+|  21  | tutorial walk-through + verified snippets               |
+
+Mock-test count 566 → 745. The no-render stretch has now produced:
+
+* Two introspection primitives (walk, summary)
+* Three example games
+* README, tutorial
+* Five new framework-first utilities (Selector, ring_budget,
+  ReactiveValue helper, Anchor aliases, lighten)
+* Four declarative API patterns (controls, reactive HUD,
+  Row/Column, theme text_styles)
+
+…all without a single rendered pixel. The mock-only discipline
+was a forcing function that steered iterations toward API quality
+over polish. The stack this produced is probably tighter than one
+steered by visual-polish demands would have been.
+
+### API friction noticed this iteration
+
+1. **Tutorial snippets that build on each other need careful
+   variable-name discipline**. Each step's snippet should be
+   self-contained (paste + run), but that means re-declaring the
+   full class every time. Total tutorial is ~140 lines of code
+   across 5 snippets because of this repetition. Could be solved
+   with a `"# ...continuing from step N"` convention; not worth
+   it for a 5-step tutorial.
+2. **Markdown + verified-snippet pair is a good pattern**. The
+   README (iter-18) did this with one snippet; the tutorial
+   (iter-21) does it with five. If saga2d grows more docs, a
+   shared ``tests/examples/_snippet_harness.py`` helper would
+   cut the boilerplate — each test is a ``class`` + a few
+   ``game.tick()`` calls.
+
+### Concrete steps taken this iteration
+
+One tutorial (``tutorials/declarative/tutorial.md``), 10 snippet
+tests, a README link. The longest-outstanding non-rendering
+parked item is closed.
+
+### Parked for iteration 22
+
+* **Render** when pyglet recovers — twelve-iteration backlog.
+* **Bundle a custom game font** — thirteen iterations parked.
+* **Shared snippet-test harness** if docs grow further.
+* **``summary_json()``** / **``summary(include_bounds=True)``** —
+  iter-20 parked items still open.
+* **Fourth example** with sprites / audio / save-load, or
+  decide the three existing examples are enough.
