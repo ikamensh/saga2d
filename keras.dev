@@ -3421,3 +3421,176 @@ demonstrated.
   revisits progress against "Keras for game dev" and lists any
   remaining truly-substantial gaps.
 * **Logging hook on font parse failure** — still open.
+
+---
+
+## Iteration 30 — 2026-04-17
+
+Milestone iteration. Closed iter-26's micro-parked item
+(silent-font-registration-failure → ``warnings.warn``) and paused
+for a full-run retrospective at 30 iterations.
+
+### What shipped
+
+* **``AssetManager`` warns on font-registration failure**. Previously
+  swallowed silently so a corrupt or unreadable TTF vanished without
+  trace. Now emits a ``RuntimeWarning`` with the filename + the
+  underlying exception. The silence-is-safe invariant (construction
+  continues) still holds. Existing test updated to assert the
+  warning category and message content, so future refactors can't
+  re-introduce silence without breaking a test.
+
+798 mock-backend tests pass (1 test converted from
+silent-behaviour-check to warning-behaviour-check, no net change).
+
+### 30-round retrospective — progress against "Keras for game dev"
+
+The ``/loop`` started with a prompt to write a Ring of Pain-like
+game using saga2d and reflect on what would make it "Keras for
+game dev." Thirty rounds on, here's an honest accounting.
+
+**What exists now that didn't at iter-0:**
+
+Declarative APIs that form saga2d's Keras-analogue surface:
+
+| saga2d construct                         | Keras analogue                |
+|------------------------------------------|-------------------------------|
+| ``class MyScene(Scene):`` + class-level attributes | ``keras.Model`` subclass      |
+| ``controls = {(…): "method"}``           | ``model.compile(metrics=[…])``|
+| ``Label(lambda: self.hp)``               | ``keras.Metric`` tracking live|
+| ``ProgressBar(value=lambda:…)``          | training-progress callbacks   |
+| ``Row(...)`` / ``Column(...)``           | layer composition helpers     |
+| ``Theme(text_styles={...})``             | ``keras.config`` global state |
+| ``ring_positions`` / ``ring_budget``     | layout utilities              |
+| ``Selector[T]``                          | state helpers                 |
+| ``Scene.summary()``                      | ``Model.summary()``           |
+| ``Scene.summary_json()``                 | ``Model.to_json()``           |
+| ``assert_scene_matches_snapshot``        | ML regression snapshots       |
+| ``SAGA2D_UPDATE_SNAPSHOTS=1``            | ``--update-snapshot`` patterns|
+| ``game.save(slot)``/``game.load(slot)``  | ``model.save``/``load``       |
+| ``Scene.walk()`` / ``find`` / ``find_all`` | ``Model.layers`` iteration  |
+| ``Scene.summary(include_bounds=True)``   | layout-debug flag (no Keras analogue) |
+
+Three example games (Ring of Pain, dial menu, tic-tac-toe) covering
+radial, selector, and grid shapes — each under 200 lines, each
+snapshot-regressed, each built entirely from the declarative stack.
+
+Methodology: a dual-model cross-check (Gemini + GPT) with a neutral
+synthesiser (Claude) that extracts consensus from drift. Documented
+as a reusable utility in ``examples/ring_of_pain/ai_review.py``.
+
+Docs: README rewritten around the declarative form, five-step
+tutorial with CI-verified snippets, keras.dev as a per-round
+build log.
+
+**What's still imperative, and why that's probably fine:**
+
+* ``Scene.draw()`` — still a loop over game-specific primitives.
+  Every game has to compute its own circle/rect positions. A
+  declarative alternative would have to understand game semantics;
+  saga2d correctly declines.
+* ``Scene._interact`` (and equivalents) — gameplay logic. Keras
+  doesn't have a declarative analogue for "what does this layer
+  actually do"; it just calls your forward pass.
+* ``update(dt)`` — continuous simulation. Physics, AI, animation
+  controllers. Genuinely imperative.
+
+**What was parked and never picked up:**
+
+Only one item from the rendered-era cross-check consensus made it
+all the way through without being shipped: **visual verification**.
+Pyglet-cocoa's empty-screens state has blocked subprocess rendering
+since iter-10. Every iter-10..30 addition has been verified with
+the mock backend. This has been the biggest non-ideal thing about
+the run — no fresh cross-check round in 20 iterations — but it's
+not something saga2d could fix.
+
+**Meta: how "mock-only" changed the work.**
+
+Compare the editorial character of iter-1..9 (rendered) vs
+iter-10..30 (mock-only):
+
+* iter-1..9 shipped API + iterated on *visual polish* (title font,
+  label placement, palette).
+* iter-10..30 shipped API + iterated on *introspection, testing,
+  and documentation*.
+
+Without visual feedback, iterations routed effort toward
+debuggability. ``walk`` / ``summary`` / ``summary_json`` /
+``assert_scene_matches_snapshot`` / ``include_bounds`` exist
+because there was no easier thing to do. Accidentally, the
+framework is now more inspectable at runtime than most rendered
+peers.
+
+**What's genuinely suboptimal at iter-30:**
+
+1. **Cross-platform font fallback is still partial**. The bundled
+   Cinzel TTF was iter-26's answer; iter-27 made family-name
+   resolution correct. But pyglet's fallback chain when a font
+   fails to load hasn't been exercised at all because rendering
+   has been blocked. The infrastructure is right; the aesthetic
+   outcome on non-macOS systems is untested.
+2. **Sprite and audio subsystems remain formally untested through
+   examples**. Save/load got exercised in iter-29; the other two
+   remain. A fourth example game that uses all three subsystems
+   would close the loop, but would need asset bundling.
+3. **The declarative-for-everything dream stops at ``draw()``**.
+   Three example games all drop into primitive drawing inside a
+   procedural loop. A ``NodeRing(nodes=…)`` or ``GridBoard(cells=…)``
+   higher-level primitive would keep the declarative surface
+   unbroken, but would be game-pattern-specific in a way that's
+   awkward to put in a generic framework.
+4. **Real users are zero**. The saga2d code has been reviewed only
+   by two LLMs (the cross-check loop). The README has been tested
+   only by CI-verifying its sample. Every iteration has claimed
+   APIs compose cleanly because the three example games compose
+   cleanly; a fourth author might find cases where they don't.
+
+**The editorial call at iter-30:**
+
+The stack is close to done for the use cases it covered. Further
+iterations would either:
+
+(a) **Wait for pyglet to come back** and spend several rounds
+    evaluating iter-10..30 cumulatively through the cross-check
+    loop. Real aesthetic feedback, likely small visual fixes.
+
+(b) **Ship a fourth example** exercising sprites + audio. Requires
+    asset-bundling decisions; biggest remaining untested-subsystem
+    coverage gap.
+
+(c) **Declare the stack complete** for the ``/loop`` run and stop
+    adding. The API is cohesive enough that further additions
+    risk being over-fitting to edge cases.
+
+All three are reasonable. The ``/loop`` fires again in ~5 minutes,
+so the decision is the *next* iteration's.
+
+### Meta: twenty-one iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–29| (see earlier rows)                                      |
+|  30  | Font-failure warning + 30-round retrospective           |
+
+Mock-test count 566 → 798. The retrospective is the deliverable
+this round; the warning change is a small closure of a
+long-parked micro-item.
+
+### Concrete steps taken this iteration
+
+One ``warnings.warn`` call, one test conversion from
+silent-check to warning-check, a 100-line retrospective
+cataloguing the 30-round arc.
+
+### Parked for iteration 31
+
+* **Render** when pyglet recovers — twenty-one-iteration backlog
+  and the biggest outstanding unknown.
+* **Fourth example** with sprites + audio (needs asset-bundling
+  decision).
+* **Third example save/load** — parity with iter-29. Dial menu
+  could persist the last-selected option; tic-tac-toe could save
+  mid-game.
+* **The formal "stack complete" call** if iter-31..33 don't
+  surface anything new.

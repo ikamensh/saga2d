@@ -40,8 +40,11 @@ def test_no_fonts_dir_is_silent_noop(tmp_path: Path) -> None:
 
 
 def test_corrupt_font_does_not_break_construction(tmp_path: Path) -> None:
-    """If the backend raises on a bad file, AssetManager swallows the
-    error — one corrupt asset shouldn't kill the whole game startup."""
+    """If the backend raises on a bad file, AssetManager's best-effort
+    policy continues — one corrupt asset shouldn't kill the whole
+    game startup. Iter-30 changes this from *silent* to *warning*
+    so the developer notices; the silence-is-safe invariant still
+    holds (construction still completes)."""
     fonts_dir = tmp_path / "fonts"
     fonts_dir.mkdir()
     (fonts_dir / "Broken.ttf").write_bytes(b"")
@@ -51,7 +54,15 @@ def test_corrupt_font_does_not_break_construction(tmp_path: Path) -> None:
             raise RuntimeError("corrupt font")
 
     backend = ExplodingBackend(100, 100)
-    AssetManager(backend, base_path=tmp_path)  # no exception
+    import warnings
+    with warnings.catch_warnings(record=True) as captured:
+        warnings.simplefilter("always")
+        AssetManager(backend, base_path=tmp_path)  # no exception
+    # Iter-30: developer gets a warning rather than silent failure.
+    assert len(captured) == 1
+    assert issubclass(captured[0].category, RuntimeWarning)
+    assert "Broken.ttf" in str(captured[0].message)
+    assert "corrupt font" in str(captured[0].message)
 
 
 def test_bundled_cinzel_is_picked_up_by_default_manager() -> None:
