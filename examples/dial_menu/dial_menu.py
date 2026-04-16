@@ -64,6 +64,20 @@ class DialMenuScene(Scene):
         self.selector: Selector[str] = Selector(options or OPTIONS)
         self.status = "Use ← / → to choose, Enter to confirm."
 
+    def get_save_state(self) -> dict:
+        return {
+            "selected_index": self.selector.index,
+            "options": list(self.selector.options),
+            "status": self.status,
+        }
+
+    def load_save_state(self, state: dict) -> None:
+        # Replace-then-set guards against the options list drifting from
+        # what was saved (e.g. a later version added a new menu item).
+        self.selector.replace(state.get("options", list(OPTIONS)))
+        self.selector.set_index(state["selected_index"])
+        self.status = state["status"]
+
     def rotate_cw(self) -> None:
         self.selector.next()
 

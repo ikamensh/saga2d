@@ -105,6 +105,32 @@ class TicTacToeScene(Scene):
             self.board[4] = "X"
             self.turn = "O"
 
+    # -- save / load --------------------------------------------------------
+    # iter-31 parity with Ring of Pain (iter-29). Saves the full board
+    # state so a player resuming mid-match picks up exactly where they
+    # left off.
+
+    def get_save_state(self) -> dict:
+        return {
+            "board": list(self.board),
+            "cursor": self.cursor,
+            "turn": self.turn,
+            "winner": self.winner,
+            "winning_line": (
+                list(self.winning_line)
+                if self.winning_line is not None
+                else None
+            ),
+        }
+
+    def load_save_state(self, state: dict) -> None:
+        self.board = list(state["board"])
+        self.cursor = state["cursor"]
+        self.turn = state["turn"]
+        self.winner = state["winner"]
+        wl = state["winning_line"]
+        self.winning_line = tuple(wl) if wl is not None else None
+
     def _check_winner(self) -> None:
         for a, b, c in WIN_LINES:
             if self.board[a] and self.board[a] == self.board[b] == self.board[c]:

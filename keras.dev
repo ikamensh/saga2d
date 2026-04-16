@@ -3594,3 +3594,108 @@ cataloguing the 30-round arc.
   mid-game.
 * **The formal "stack complete" call** if iter-31..33 don't
   surface anything new.
+
+---
+
+## Iteration 31 — 2026-04-17
+
+Closed the "parity" parked item. iter-29 added save/load to Ring of
+Pain; iter-31 brings dial_menu and tic-tac-toe into the same story.
+All three examples now round-trip their state through saga2d's
+SaveManager, and all three exercise the reactive-HUD-after-load
+composition.
+
+### What shipped
+
+* **``DialMenuScene.get_save_state`` / ``load_save_state``** —
+  persists ``selector.index``, the ``options`` list itself (so an
+  old save survives a menu-item rename), and the status text.
+* **``TicTacToeScene.get_save_state`` / ``load_save_state``** —
+  persists the full board, cursor, whose turn, and the winner +
+  winning_line (for a finished game).
+* **6 round-trip tests** across two new test files:
+    - dial_menu: preserves selection/status/options; reactive
+      heading label shows the loaded option; save includes options
+      list for version-drift safety.
+    - tic-tac-toe: mid-match round-trip; post-winner round-trip
+      preserves winner + winning_line; reactive status label
+      (``self._status_text`` bound method) shows the loaded turn.
+
+804 mock-backend tests pass (6 new).
+
+### All three examples now share the save/load story
+
+| Example        | iter added | Persisted state                              |
+|---------------|-----------|----------------------------------------------|
+| Ring of Pain  | iter-29   | player_idx, HP, coins, level, nodes list     |
+| dial_menu     | iter-31   | selector.index, options, status              |
+| tic-tac-toe   | iter-31   | board, cursor, turn, winner, winning_line    |
+
+Every persisted field is JSON-serialisable and every example's
+reactive HUD Labels pick up the loaded values on the next tick
+without any post-load refresh — the iter-4 ``Label(lambda: …)``
+pattern composes cleanly with iter-29's save path for every game.
+
+### The "version drift" detail
+
+``DialMenuScene.get_save_state`` includes the ``options`` list in
+the save file, not just the selected index. Why: a future version
+that adds a new menu item would shift indices. An old save that
+read "selected index 3" would resolve to a different option
+after the rename. Saving the options list lets
+``load_save_state`` call ``selector.replace(...)`` with the
+historical options, then ``set_index`` lands the player on the
+option they chose.
+
+This is the kind of save-format thinking that matters at save
+file v1 — decisions made now survive across any future schema
+migration. The test ``test_save_includes_options_for_version_drift``
+asserts the pattern so it can't be regressed out.
+
+### Meta: twenty-two iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–30| (see earlier rows)                                      |
+|  31  | Save/load parity across dial_menu + tic-tac-toe          |
+
+Mock-test count 566 → 804. Save/load is now fully exercised
+across all three example games. The remaining "untested
+subsystems" from iter-25's retrospective are audio and sprites,
+both of which would need asset bundling to demo.
+
+### API friction noticed this iteration
+
+1. **Three ``get_save_state`` / ``load_save_state`` pairs across
+   three scenes have real structural repetition** (list fields,
+   build dict, reverse). A ``@persist_state("player_idx", "hp",
+   "coins", …)`` decorator on Scene subclasses would auto-generate
+   the pair. Not urgent — three manual implementations are
+   readable — but the fourth would be the moment to factor.
+2. **Winner / winning_line None round-trip** in tic-tac-toe needed
+   an explicit ``None`` check because the tuple field was stored
+   as a list in JSON. ``load_save_state`` reads ``wl = state[…];
+   self.winning_line = tuple(wl) if wl is not None else None``.
+   This hand-written codec per nullable-tuple-field is fine at
+   this scale, would be friction if saga2d had a schema layer.
+3. **Reactive-label-refreshes-after-load** is now tested in all
+   three games and provably works. The Label(lambda: …) pattern
+   from iter-4 is more composable than I expected at the time —
+   it works across save/load without any coordination, because
+   Labels read state live.
+
+### Concrete steps taken this iteration
+
+Two scene save/load pairs, six round-trip tests, zero framework-
+level changes. The story from iter-25's retrospective has one more
+closed item: all three example games have save/load parity.
+
+### Parked for iteration 32
+
+* **Render** when pyglet recovers — twenty-two-iteration backlog.
+* **Audio demo** on one of the three examples (Ring of Pain: sound
+  on each interaction). Would need WAV files.
+* **Sprites demo** on one of the three examples. Would need PNG
+  files or procedurally-generated PIL pixmaps.
+* **``@persist_state(...)`` decorator** if a fourth scene needs
+  save/load — deferred until actually needed.
