@@ -3978,3 +3978,121 @@ asked for thirty-three rounds ago. Remaining items for future
 None of these are blockers for calling the stack complete. The
 next ``/loop`` iteration can treat them as incremental polish or
 move on.
+
+---
+
+## Iteration 34 — 2026-04-17
+
+Ships the guess-the-number scene from the declarative tutorial as a
+runnable fourth example. Closes a subtle gap: the tutorial taught
+how to build the scene in five steps but never shipped the finished
+form, so readers couldn't ``python examples/.../guess_the_number.py``
+to see what they'd learned.
+
+### What shipped
+
+* **``examples/guess_the_number/guess_the_number.py``** — the
+  finished scene, 85 lines including save/load. Exercises the
+  iter-10..33 declarative stack in one compact piece:
+    - ``Scene.controls`` with tuple aliases (``("up", "w")``, etc.)
+      and a single-string key (``"r"`` for reset)
+    - Event-aware modifier handler: ``Shift+Up`` / ``Shift+Down``
+      jump by 10 instead of 1 (iter-17's plumbing in real use)
+    - Reactive ``Label(lambda: str(self.current))`` for the big
+      central number display — updates on every bump with zero
+      UI wiring
+    - ``Row(...)`` for the bottom-centre status bar with
+      ``Label(lambda: f"Guesses {self.guesses}")`` + hint
+    - ``Theme(font="Cinzel", text_styles={"title", "display",
+      "hud", "caption"})`` — the iter-26 bundled font showing up
+      for a fourth game
+    - ``get_save_state`` / ``load_save_state`` with round-trip
+      test parity with the other three examples
+* **12 property tests** covering every declarative feature:
+  alias bindings, shift-modifier step, clamping at [1, 100],
+  Higher/Lower/Correct hints, reset, reactive label refresh
+  after bump / guess, save/load round trip, structured snapshot.
+* **README "Examples" section** updated — four examples now,
+  with the guess-the-number flagged as "**Start here if you're
+  new**" because it's the simplest and most directly ties to the
+  tutorial.
+
+829 mock-backend tests pass (12 new).
+
+### Why this closes a real gap
+
+The iter-21 tutorial taught the declarative stack but never
+shipped the tutorial's final scene as a runnable file. A reader
+following the tutorial:
+
+1. Read five markdown snippets.
+2. Understood the progression.
+3. Had no runnable finished form to compare their own assembly
+   against.
+
+iter-34 ships that comparison point. The example:
+
+* Is the *exact* API the tutorial introduces, nothing more.
+* Adds two small flourishes beyond the tutorial (Shift for ±10
+  steps; R for reset) so a reader sees the natural "how do I
+  extend this?" steps.
+* Has the same test coverage as the other three examples, so
+  it's part of the CI regression surface.
+
+### The example count at iter-34
+
+| Example         | Shape    | Complexity       | Line count |
+|----------------|----------|------------------|-----------:|
+| guess_the_number | linear  | tutorial baseline |         85 |
+| dial_menu      | radial   | selector menu    |         95 |
+| tictactoe      | grid     | turn-based game  |        145 |
+| ring_of_pain   | radial   | roguelike + sfx  |        220 |
+
+Four shapes, four complexity tiers, four independent test files,
+four bootstrap snapshots. Someone picking up saga2d has a clear
+on-ramp: start at guess_the_number, move to dial_menu for
+``Selector`` and radial layouts, tictactoe for grid + turn
+logic, ring_of_pain for the full declarative stack including
+audio and sprites.
+
+### Meta: twenty-five iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–33| (see earlier rows)                                      |
+|  34  | guess_the_number example + tests + README update        |
+
+Mock-test count 566 → 829. The "stack complete" declaration from
+iter-33 stands: the framework covers its use cases. iter-34 adds
+usage coverage — the tutorial's finished form is now verifiable
+by anyone who checks out the repo and runs ``pytest``.
+
+### API friction noticed this iteration
+
+1. **The four example themes each redefine their own text_styles**
+   — title / hud / caption / display / heading appear in slight
+   variants. A shared ``saga2d.themes.dungeon_crawl()`` or similar
+   preset would factor this, but the variation is intentional —
+   the examples demonstrate that themes are per-game, not global.
+2. **``Scene.controls`` mixing tuple and string keys** (``"r":
+   "reset"``) still reads a little odd next to tuple-aliased
+   entries. iter-14 noted this and declined to normalise; it's
+   still fine.
+3. **No failure case in the tests** — all twelve pass. A negative
+   test ("what if target is outside 1..100"?) would be
+   over-engineering; current coverage is appropriate.
+
+### Concrete steps taken this iteration
+
+One 85-line scene, 12 property tests, one README section update.
+Four complete example games in the repo, each end-to-end tested,
+each demonstrating a different part of the saga2d stack.
+
+### Parked for iteration 35
+
+* **Render** when pyglet recovers — twenty-five-iteration
+  backlog.
+* **AudioManager warning on missing sound** — still the smallest
+  outstanding improvement.
+* **PIL as explicit direct dependency**.
+* **Second user** — the remaining real-world validation gap.
