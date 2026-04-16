@@ -1,0 +1,135 @@
+# keras.dev — building toward "Keras for game dev" on saga2d
+
+Running log of attempts to build a small game (Ring of Pain-ish) with saga2d,
+noting what is smooth vs. painful, and proposing concrete API steps toward
+a "you-write-game-logic-not-engine-plumbing" library.
+
+The recurring experiment: take a known genre/mechanic, implement the thinnest
+slice in saga2d, screenshot it, cross-check visuals with a second AI, and then
+change the library — not the game — to make the next slice easier.
+
+---
+
+## Iteration 1 — 2026-04-16
+
+### What was built
+
+* `examples/ring_of_pain/ring_of_pain.py` — single file, ~180 lines.
+  8-node ring (enemy / treasure / heart / shop / portal), player rotates
+  CW/CCW with arrow keys, Space interacts (attack, loot, heal, descend).
+  Screenshot: `/tmp/ring_of_pain_v1.png`.
+* `examples/ring_of_pain/screenshot.py` — headless render harness wrapper.
+* `examples/ring_of_pain/ai_review.py` — Gemini 2.5 Pro (fallback: Flash,
+  GPT-4o) vision critique via stdlib urllib. No new deps.
+
+### What saga2d made easy
+
+* **Scene subclass + `draw()` override** — zero boilerplate; three lines and
+  you're on screen. `background_color` as a class attribute is delightful.
+* **`render_scene()` harness** — offscreen headless PNG with `visible=False`,
+  already handles the pyglet front-buffer capture timing. One call returns
+  a PIL image. Exactly the "screenshot any scene from any test" primitive
+  I want.
+* **Input events are pre-mapped to actions** — `event.action == "right"`
+  worked without configuring key bindings. This is the right default.
+
+### What was friction (in order of how often it bit me)
+
+1. **`game.resolution` is private.** Every scene that draws absolutely-
+   positioned HUD, or lays sprites out in a ring/grid/fan, needs `w, h`.
+   I had to reach into `self.game._resolution`. This is a trivial fix
+   (public property) but it's a papercut you get every 10 lines.
+2. **`scene.draw_rect` exists but `scene.draw_circle` / `scene.draw_text`
+   don't.** I had to call `self.game._backend.draw_circle(...)` —
+   violating the "backend types never leak" principle stated in DESIGN.md.
+   Either all three helpers should exist on Scene or none should.
+3. **No 2D layout primitive for world-space.** `Panel` / `Layout.VERTICAL`
+   only works inside the UI tree. Laying out N things around a circle, on
+   a grid, on a hex grid, on a fan of cards — all require manual
+   `math.cos/sin` and tracking indices. This is the single thing that
+   would most accelerate prototyping. Ring of Pain, dial menus, radial
+   combat, Slay-the-Spire-style map, ability wheels all want this.
+4. **HUD text is redrawn every frame manually.** The right abstraction is
+   a reactive `Label(text=lambda: f"HP {self.hp}/{self.max_hp}")` or
+   `Label.bind("text", lambda: ...)` that updates when the bound value
+   changes. Current UI forces either manual `label.text = ...` wiring or
+   drawing via backend each frame.
+5. **No Card / Node primitive.** Every grid-based, ring-based, hex-based
+   game is an arrangement of "thing with art + metadata + on_click" —
+   that's game-agnostic. A saga2d `Card` or `Node` (sprite + data dict +
+   interaction callbacks) would be framework-level.
+
+### Second-AI (Gemini 2.5 Pro) critique of `ring_of_pain_v1.png`
+
+Verbatim highlights (full text: `/tmp/ring_of_pain_v1_review.txt`):
+
+* "Typographic inconsistency… at least four different text treatments."
+* "Ambiguous player representation — small white ring under top 'S' node
+  but also a 'YOU' label in dead center. Confusing."
+* "Inconsistent info display — 'E' and '$' nodes show HP/gold; '+', 'S',
+  'O' nodes don't."
+* "Subtitle '(saga2d sketch)' collides with the top 'S' node."
+
+My own observations aligned on the subtitle collision and the too-subtle
+player marker. Gemini was sharper on typography and on the player
+representation ambiguity — I would not have caught those in isolation.
+The cross-check is worth the ~6k tokens per round.
+
+### What a "Keras for game dev" version would look like
+
+Keras's power isn't Dense / Conv — it's that `model = Sequential([...])` /
+`model.compile()` / `model.fit()` is one paragraph, and everything below
+is defaults. The saga2d equivalent for this Ring of Pain sketch should
+be something like:
+
+    scene = RingScene(
+        nodes=[
+            EnemyCard(hp=3, atk=1),
+            TreasureCard(coins=5),
+            HeartCard(heal=3),
+            ShopCard(),
+            PortalCard(),
+            # …
+        ],
+        player=Player(hp=10, position=0),
+        controls={"cw": "right", "ccw": "left", "interact": "confirm"},
+        hud=[
+            HudStat("HP", "player.hp", format="{}/{max}", color=RED),
+            HudStat("Coins", "player.coins", color=GOLD),
+        ],
+    )
+    Game("Ring of Pain").run(scene)
+
+At ~20 lines, no manual `draw()`, no cos/sin, no per-frame text emission.
+What's missing from saga2d to get there:
+
+1. A **world-space layout primitive** (`Ring`, `Grid`, `Fan`, `Line`) that
+   takes children and positions them.
+2. A **Card / Node** concept: sprite + metadata + click/select callbacks,
+   independent of game genre.
+3. **Reactive HUD binding** — a Label that rebinds to an attribute path.
+4. A **declarative controls map** instead of `handle_input` switch-case.
+
+### Concrete step taken this iteration
+
+Smallest step that removes visible friction for future iterations: add
+the missing scene helpers + public resolution.
+
+* `Game.resolution` as a public property (currently `_resolution`).
+* `Scene.draw_circle(x, y, r, color, *, opacity=1.0, segments=None)` —
+  parallel to the existing `Scene.draw_rect`.
+* `Scene.draw_text(text, x, y, *, font_size, color, font=None, anchor_x,
+  anchor_y)` — parallel to the existing `Scene.draw_rect`.
+
+These three changes cost < 40 LOC and delete the `self.game._backend.*`
+calls from every future sketch. They are the first brick; the layout
+primitive and reactive HUD are bigger bricks for later iterations.
+
+### Parked for next iteration
+
+* Fix `ring_of_pain_v1` visual defects flagged by Gemini: subtitle
+  collision, typographic hierarchy, consistent per-node sub-label, more
+  visible player marker.
+* Prototype `RingLayout` as a `Scene` mixin (or a standalone helper that
+  returns `(x, y)` for `i` of `n`).
+* Try a reactive Label binding, even as a 20-line helper.
