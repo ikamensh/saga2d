@@ -1406,3 +1406,107 @@ utility that replaces magic literals in Ring of Pain.
 * **Weakref-ify the ``_SIG_TAKES_EVENT`` cache** — iter-11 parked.
 * **Second example game that uses ``ring_budget``** — proof the
   helper generalises beyond Ring of Pain.
+
+---
+
+## Iteration 13 — 2026-04-16
+
+Shipped the iter-12-parked "second example game" as a generalisation
+check on the entire iter-2..12 API stack. Visual verification remains
+blocked (fourth iteration on that blocker).
+
+### What shipped
+
+* **``examples/dial_menu/``** — a radial menu selector (6 options
+  in a ring, arrow keys rotate, Enter confirms, Esc cancels).
+  97 lines total including docstring and entry point. Exercises:
+  - ``ring_positions`` + ``ring_budget`` for layout (no magic
+    literals, same pattern as Ring of Pain).
+  - ``Scene.controls`` class-level dict with tuple aliases for
+    arrows + WASD + confirm + space.
+  - Reactive ``Label`` bound to ``self.options[self.selected]``
+    and ``self.status``.
+  - ``Game(theme=build_theme())`` with three named text styles
+    (``title``, ``heading``, ``caption``).
+  - ``self.draw_circle`` / ``self.draw_text`` primitives.
+  - ``Anchor.TOP_LEFT`` / ``CENTER`` / ``BOTTOM`` anchored UI.
+* **Seven property tests** for the dial menu (initial state, CW/CCW
+  rotation, left-wrap, confirm-updates-status, cancel-updates-status,
+  custom-options-length, class-def-controls-validation). Every
+  saga2d iter-2..12 API used by the dial menu is exercised.
+
+675 mock-backend tests pass.
+
+### What the generalisation check validates
+
+Before this iteration, *every* API decision in iter-2..12 was
+weighed against a single game (Ring of Pain). The risk was that
+primitives had unintentionally specialised for that game's shape.
+
+The dial menu is a different-shape game (selector, not roguelike):
+- no combat, no state mutation per interaction
+- fewer node types (one — a menu item)
+- no HP/coin HUD
+- simpler input map (4 actions, not 3 actions)
+- needs 6 items on a ring, not 8
+
+It composes cleanly from the same primitives. In particular:
+- ``ring_budget`` was called with different margins (60/60 vs
+  60/88) and produced a sensibly sized ring without retuning
+  magic constants.
+- ``Scene.controls`` accepted ``"cancel"`` as a single-string key
+  alongside tuple-keyed ``("right", "d")`` — both syntaxes work.
+- The reactive Label pattern ``Label(lambda: self.options[self.selected])``
+  landed without needing new API.
+
+This is the kind of test that's easy to forget to run in a
+single-example project — the selected primitives "feel right"
+because they fit the only game you're building. A second game of
+a different shape is a cheap, high-signal generalisation check.
+
+### Meta: pyglet display still empty
+
+Fourth iteration unable to render. Tried ``uv run``, venv python
+directly, spawning the game script for 1 second before killing it
+— same ``IndexError: list index out of range`` deep in
+pyglet-cocoa. macOS session state remains un-recovered. Logged.
+
+### API friction noticed this iteration
+
+1. **``Scene.controls`` mixing tuple and string keys in the same
+   dict is correct but reads awkwardly**::
+
+       controls = {
+           ("right", "d"):        "rotate_cw",
+           ("left", "a"):         "rotate_ccw",
+           ("confirm", "space"):  "confirm",
+           "cancel":              "cancel",        # single-key odd one out
+       }
+
+   A ``("cancel",)`` tuple-of-one might normalise the rule
+   ("keys are always tuples") at the cost of a slightly uglier
+   call site. Current behaviour is fine but noted.
+2. **``Anchor.TOP`` / ``BOTTOM`` / ``CENTER`` don't have
+   ``TOP_CENTER`` / ``BOTTOM_CENTER`` aliases** — both common HUD
+   positions. Fine for now; readers have to remember ``Anchor.TOP``
+   centers horizontally already.
+3. **No built-in "option selector" pattern** — every game with a
+   choice menu writes the same "current index mod N" logic. A tiny
+   ``Selector`` state helper (wraps/clamps/emits events) would
+   reduce dial-menu's 4 lines of ``(self.selected + 1) % N`` to
+   zero. Flagged for when a third game needs it.
+
+### Concrete steps taken this iteration
+
+Built and tested the dial menu. Proved the iter-2..12 stack
+generalises to a second game shape without new framework code —
+the point of a generalisation check.
+
+### Parked for iteration 14
+
+* **Render** when pyglet recovers; four-iteration backlog now.
+* **Bundle a custom game font** — five iterations old.
+* **``InputEvent`` modifier fields** — iter-11 plumbing awaits use.
+* **``Anchor.TOP_CENTER`` / ``BOTTOM_CENTER`` aliases**.
+* **``Selector`` state helper** for choose-one-of-N menus.
+* **Weakref-ify the ``_SIG_TAKES_EVENT`` cache** — iter-11 parked.
