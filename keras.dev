@@ -1730,3 +1730,105 @@ API stack generalises. 12 new tests.
 * **``InputEvent`` modifier fields**.
 * **Weakref-ify the ``_SIG_TAKES_EVENT`` cache**.
 * **A fourth example** — or scope back to polish/docs/font.
+
+---
+
+## Iteration 16 — 2026-04-16
+
+Two items shipped, both concrete friction-resolution rather than new
+architecture. Plus a simplification: the iter-11 id-keyed cache on
+event-handler signatures was removed outright because it was unsafe
+and unnecessary.
+
+### What shipped
+
+* **``Scene.draw_rect(x, y, w, h, color, *, border_color=, border_width=)``**
+  — border kwargs on the scene convenience wrapper. Draws outer
+  border + inset inner fill when given; falls back to the single
+  rect when not. Closes the iter-15 friction ("tic-tac-toe uses
+  two draw_rect calls per cell"). Tic-tac-toe migrated — cell
+  frames are now one call. Four property tests (plain path
+  unchanged, bordered path emits outer-then-inner with correct
+  inset, ``border_color`` without width is a no-op, over-thick
+  border clamps inner size to zero rather than going negative).
+* **Removed ``_SIG_TAKES_EVENT`` id-keyed cache** from
+  ``_call_with_optional_event``. iter-11's cache had two
+  correctness hazards:
+    - Bound methods create a fresh object on every access, so the
+      cache missed every time for ``Scene.controls`` dispatch.
+    - Lambda GC could reuse ids, potentially caching the wrong
+      verdict for a later unrelated callable at the same address.
+  ``inspect.signature`` is ~1 μs per call and key presses happen
+  at human rate (<10/sec), so there's no measurable cost to
+  inspecting on every dispatch. The cleanup is a net win: fewer
+  moving parts, safer lifecycle, same observed performance. The
+  iter-11 test ``test_cache_works_across_repeated_presses``
+  renamed to ``test_repeated_presses_all_fire_correctly`` — same
+  assertion, new documenting intent.
+
+703 mock-backend tests pass.
+
+### Reflection: when the right move is to delete the cache you built
+
+The iter-11 cache was a reasonable hedge at the time (signature
+inspection in a hot dispatch loop *sounds* expensive). Five
+iterations later, with real usage across three examples:
+
+* Actual hit rate: essentially zero for ``Scene.controls`` dispatch
+  (fresh bound-method objects).
+* Actual cost avoided: sub-microsecond per press.
+* Actual risk introduced: id-reuse producing wrong verdicts.
+
+The honest math: the cache cost more than it saved. Deleting is
+the CLAUDE.md rule 6 answer applied to optimization work, not just
+API surface. Good test suites make this deletion safe to perform
+— one test adjustment, 703 other tests confirm nothing else
+noticed.
+
+### Meta: seven iterations unrendered
+
+Adding iter-16 to the earlier tally:
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+|  10  | ``Scene.controls`` class-level declarative input        |
+|  11  | hasattr-validation + event-aware handler signatures     |
+|  12  | ``ring_budget`` + ``ReactiveValue`` seed-from-callable  |
+|  13  | dial-menu (second example, radial)                      |
+|  14  | ``Selector`` + Anchor aliases                           |
+|  15  | tic-tac-toe (third example, non-radial) + shim deletion |
+|  16  | ``draw_rect`` border kwargs + cache removal             |
+
+Still zero rendered pixels in this stretch. Mock-test count
+566 → 703. The log's earlier observation holds: mock-only
+discipline steered iterations toward API quality.
+
+### API friction noticed this iteration
+
+1. **``draw_rect`` border currently draws outer-then-inner with
+   two fills**. Correct output, but a dedicated backend border
+   primitive (one GL call, edge-only geometry) would be cheaper
+   for pixel-art grids drawn every frame. Not a bottleneck at
+   saga2d's current scale; flagged for GPU-intensive games.
+2. **Cache removal dropped dispatch overhead, but the
+   inspect.signature call still fires on every keypress**. At
+   10-hz-human-rate this is fine. If saga2d ever supported
+   continuous input (held key auto-repeat at 60 Hz), inspecting
+   per dispatch would become 6× per second per bound key —
+   still sub-millisecond, but a ``hasattr(cb, '_takes_event')``
+   attribute-set-once pattern would be trivially faster without
+   the id-reuse hazard. Flagged.
+
+### Concrete steps taken this iteration
+
+``draw_rect`` border helper; removed stale dispatch cache;
+migrated tic-tac-toe to the new API.
+
+### Parked for iteration 17
+
+* **Render** when pyglet recovers — seven-iteration backlog.
+* **Bundle a custom game font** — eight iterations old.
+* **``InputEvent`` modifier fields** — plumbing ready since iter-11.
+* **Attribute-set-once signature hint** if held-key repeat becomes a
+  thing saga2d supports.
+* **Fourth example**, or deliberate polish/docs pause.

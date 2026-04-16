@@ -90,8 +90,9 @@ def test_one_arg_bind_key_lambda_gets_event(game: Game) -> None:
     assert captured == ["x"]
 
 
-def test_cache_works_across_repeated_presses(game: Game) -> None:
-    """Signature inspection happens once per callable id — not per press."""
+def test_repeated_presses_all_fire_correctly(game: Game) -> None:
+    """Cache or no cache — signature inspection must produce the same
+    verdict on every dispatch. Five presses => five callback hits."""
     calls: list[InputEvent] = []
 
     def handler(ev: InputEvent) -> None:

@@ -142,14 +142,11 @@ class TicTacToeScene(Scene):
 
         for i, (cx, cy) in enumerate(positions):
             cx, cy = int(cx), int(cy)
-            # Cell border
+            # Cell frame: one call, not two, thanks to iter-16 border kwargs.
             self.draw_rect(
                 cx - cell // 2 + 2, cy - cell // 2 + 2,
-                cell - 4, cell - 4, LINE,
-            )
-            self.draw_rect(
-                cx - cell // 2 + 4, cy - cell // 2 + 4,
-                cell - 8, cell - 8, BG,
+                cell - 4, cell - 4,
+                BG, border_color=LINE, border_width=2,
             )
             # Winning line highlight
             if self.winning_line and i in self.winning_line:
