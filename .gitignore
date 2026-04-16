@@ -31,6 +31,10 @@
 
 # Portable Network Graphics
 *.png
+# Bundled sprite assets (iter-33+) — the repo's own procedurally-
+# generated PNGs live under assets/images/ and should be tracked
+# despite the blanket *.png ignore above.
+!assets/images/**/*.png
 
 # Animated Portable Network Graphics
 *.apng
@@ -62,6 +66,9 @@
 # 3D Images
 *.3dm
 *.max
+
+### IDE
+.idea/
 
 ### Python & build
 __pycache__/

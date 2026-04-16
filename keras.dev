@@ -3831,3 +3831,150 @@ untested subsystem is now demonstrated end-to-end.
 * **The "stack complete" call** — after iter-33 the three
   untested-subsystem items from iter-25 are all addressed; that
   may be the natural end.
+
+---
+
+## Iteration 33 — 2026-04-17
+
+Closed the last iter-25-retrospective parked item: **sprites**.
+Following iter-32's procedural-asset pattern, a single PIL-generated
+PNG replaces Ring of Pain's three-``draw_circle`` player pip with a
+real saga2d sprite. Stack-complete declaration follows.
+
+### What shipped
+
+* **``scripts/generate_sprites.py``** — PIL-based generator. PIL is
+  already a transitive saga2d dependency (via the screenshot
+  harness), so no new package needed. Produces
+  ``assets/images/player_token.png`` — a 64×64 gold disc with a
+  soft halo, a solid core, and a dark centre. 3 KB after optimise.
+* **``Scene.draw_image(image_handle, x, y, w, h)``** — the
+  scene-level helper that was conspicuously missing next to
+  ``draw_rect`` / ``draw_circle`` / ``draw_text``. Its absence
+  is why Ring of Pain had been drawing the pip as three circles
+  rather than blitting an image. Now game code never needs to
+  touch ``self.game._backend.*`` for primitive draws at all.
+* **Ring of Pain uses the sprite**:
+    - ``on_enter`` loads the handle once via
+      ``self.game.assets.image("player_token")`` with a try/except
+      fallback (stripped deploys without the PNG still run).
+    - ``draw`` calls ``self.draw_image(handle, x, y, 48, 48)``
+      centred on the radial pip position.
+    - The fallback path (handle is None) still draws the old
+      three-circle procedural pip, so removing the asset doesn't
+      break the game — it just loses a polish layer.
+* **6 sprite-integration tests**:
+    - PNG is bundled in the repo
+    - AssetManager loads it by name
+    - Scene caches the handle in ``on_enter`` (not per-frame)
+    - ``draw_image`` fires during the scene's draw tick and the
+      blit references the cached handle
+    - Token follows the player: rotating CW three times
+      re-positions the image blit
+    - Missing-asset fallback path leaves
+      ``_player_token_handle`` at ``None`` and produces zero
+      image blits (procedural pip takes over)
+
+817 mock-backend tests pass (6 new).
+
+### The Keras story at "stack complete"
+
+Thirty-three iterations ago the prompt was "write Ring of Pain
+in saga2d and reflect on what would make it Keras for game dev."
+At iter-33 the three subsystems iter-25 flagged as "untested
+through examples" are all demonstrated end-to-end:
+
+| iter-25 untested | demo in | iter |
+|------------------|---------|------|
+| save / load      | all three examples | 29, 31 |
+| audio            | Ring of Pain       | 32    |
+| sprites          | Ring of Pain       | 33    |
+
+Paired with the declarative stack (controls / reactive HUD /
+Row / Column / themed text / Selector / layout helpers), the
+introspection suite (walk / summary / summary_json / snapshot
+testing with env-var bulk-update / pytest fixture / include_
+bounds), and the three example games (radial, selector, grid),
+saga2d now covers the "Keras for game dev" footprint the loop
+set out to build:
+
+* **Declarative scene definition** — classes, class-level dicts,
+  reactive labels, transparent containers.
+* **Centralised theming** — named text styles, bundled font
+  with family-name-aware registration.
+* **Introspection** — Scene.summary() + Scene.summary_json()
+  mirror Model.summary() + Model.to_json().
+* **Snapshot regression testing** — assert_scene_matches_snapshot
+  with bulk-update env-var mirror ML snapshot workflows.
+* **Save/load** — game.save(slot) / game.load(slot) mirror
+  model.save / model.load, and the reactive HUD composes with
+  load without any coordination.
+* **Asset pipeline** — AssetManager auto-registers fonts, loads
+  images and sounds; the repo's own generator scripts produce
+  SFX and sprites from stdlib + PIL so no third-party asset
+  licensing ever enters the story.
+* **Testing story** — 817 mock-backend tests covering every
+  feature added in the run.
+
+Further iterations would produce polish but few genuinely new
+primitives. The stack is close to done for the use cases the
+``/loop`` prompt described.
+
+### Meta: twenty-four iterations unrendered
+
+| iter | shipped                                                  |
+|------|---------------------------------------------------------|
+| 10–32| (see earlier rows)                                      |
+|  33  | ``Scene.draw_image`` + procedural PNG + sprite on RoP    |
+
+Mock-test count 566 → 817. Twenty-four consecutive iterations
+without a rendered pixel. Every iter-10..33 feature is exercised
+through the mock backend; the aesthetic cross-check is the one
+outstanding thing the run couldn't do.
+
+### API friction noticed this iteration
+
+1. **``Scene.draw_image``'s absence until iter-33** is a real
+   instance of "we kept not noticing this" — the three other
+   scene-level draw helpers (``draw_rect`` / ``draw_circle``
+   / ``draw_text``) were added across iter-1..3, and nobody
+   (including the cross-check loop) flagged the image analogue.
+   Ring of Pain drew pips as circles for thirty iterations
+   because there was no image helper inviting a rethink.
+2. **PIL is a transitive dependency** via the screenshot harness.
+   The sprite generator leans on this — ``try: from PIL import``
+   raises ``SystemExit`` rather than degrading, because a saga2d
+   install without PIL is already broken for other reasons.
+   Worth formalising PIL as a direct dependency so the expectation
+   is explicit.
+3. **The fallback pip path** (``_player_token_handle is None``)
+   exists because try/except AssetNotFoundError in ``on_enter``.
+   Same pattern as iter-32's ``_play(sound)`` helper. A small
+   mixin ``OptionalAsset[T]`` on Scene would factor both. Not
+   needed for three call sites.
+
+### Concrete steps taken this iteration
+
+One PIL sprite generator, one 64×64 PNG, one new
+``Scene.draw_image`` helper, one Ring-of-Pain integration, six
+tests. The iter-25 retrospective's parked list is now fully
+closed.
+
+### The "stack complete" call
+
+After iter-33 the saga2d stack genuinely covers what the prompt
+asked for thirty-three rounds ago. Remaining items for future
+``/loop`` fires (if any):
+
+* **Render** when pyglet-cocoa recovers — twenty-four-iteration
+  backlog of visual verification.
+* **AudioManager warning on missing sound** — one-line
+  improvement parallel to iter-30's font warning.
+* **PIL as an explicit direct dependency** (currently
+  transitive).
+* **Second user** — real-world validation that the API reads as
+  well to someone who didn't build it.
+
+None of these are blockers for calling the stack complete. The
+next ``/loop`` iteration can treat them as incremental polish or
+move on.

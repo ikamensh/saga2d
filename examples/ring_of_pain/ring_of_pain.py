@@ -235,6 +235,13 @@ class RingOfPainScene(Scene):
     def on_enter(self) -> None:
         # Controls come from the class-level ``controls`` dict — no
         # imperative bind_key calls needed.
+        # Load the iter-33 procedurally-generated player-token sprite.
+        # ``optional`` try/except so a stripped-down deploy without
+        # the PNG still runs (falls back to primitive pip draw).
+        try:
+            self._player_token_handle = self.game.assets.image("player_token")
+        except Exception:
+            self._player_token_handle = None
         # Corner labels use named theme styles — appearance lives in
         # build_theme(), not scattered across call sites.
         self.ui.add(Label(
@@ -352,15 +359,30 @@ class RingOfPainScene(Scene):
         # fix), putting the pip uniformly above guarantees the two
         # visual channels never share pixels, regardless of which node
         # the player is on.
+        #
+        # iter-33 replaces the three-``draw_circle`` pip with a single
+        # :class:`Sprite`-style image. The PNG is generated procedurally
+        # by ``scripts/generate_sprites.py`` and checked into
+        # ``assets/images/player_token.png``. Falls back to the old
+        # procedural pip if the asset is missing (best-effort load in
+        # ``on_enter``).
         nx_f, ny_f = positions[self.player_idx]
         px = int(nx_f)
         py = int(ny_f) - (node_r + 20)
-        self.draw_circle(px, py, 18, (255, 215, 100, 55))
-        self.draw_circle(px, py, 13, PLAYER_GOLD)
-        self.draw_circle(px, py, 8, (20, 20, 30, 255))
+        if self._player_token_handle is not None:
+            token_size = 48
+            self.draw_image(
+                self._player_token_handle,
+                px - token_size // 2, py - token_size // 2,
+                token_size, token_size,
+            )
+        else:
+            self.draw_circle(px, py, 18, (255, 215, 100, 55))
+            self.draw_circle(px, py, 13, PLAYER_GOLD)
+            self.draw_circle(px, py, 8, (20, 20, 30, 255))
 
         self.draw_text(
-            "YOU", px, py - 26,
+            "YOU", px, py - 32,
             font_size=18, color=PLAYER_GOLD,
             anchor_x="center", anchor_y="center",
         )
