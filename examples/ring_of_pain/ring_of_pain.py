@@ -21,6 +21,7 @@ from saga2d import (  # noqa: E402
     Anchor,
     Game,
     Label,
+    ProgressBar,
     Row,
     Scene,
     TextStyle,
@@ -101,18 +102,14 @@ class RingOfPainScene(Scene):
     # -- input ---------------------------------------------------------------
 
     def _bind_controls(self) -> None:
-        """Declarative control map. Each action+alias is bound explicitly.
+        """Declarative control map. One line per logical action.
 
-        bind_key checks named actions first, then raw key names, so binding
-        "right" handles both the mapped right-arrow action and any raw key
-        literally named "right". WASD / space are bound as aliases.
+        ``bind_keys`` takes a list of aliases so the WASD+arrow and
+        confirm+space pairings read as one intent each.
         """
-        self.bind_key("right", self._rotate_cw)
-        self.bind_key("d",     self._rotate_cw)
-        self.bind_key("left",  self._rotate_ccw)
-        self.bind_key("a",     self._rotate_ccw)
-        self.bind_key("confirm", self._interact)
-        self.bind_key("space",   self._interact)
+        self.bind_keys(["right", "d"],  self._rotate_cw)
+        self.bind_keys(["left", "a"],   self._rotate_ccw)
+        self.bind_keys(["confirm", "space"], self._interact)
 
     def _rotate_cw(self) -> None:
         self.player_idx = (self.player_idx + 1) % self.ring_size
@@ -190,18 +187,25 @@ class RingOfPainScene(Scene):
             text_style="hud",
             anchor=Anchor.TOP_RIGHT, margin=20,
         ))
-        # HUD row: Row() is a transparent horizontal container. Children
-        # are positional; each HP/Coins label binds reactively.
+        # HUD row: HP label + reactive ProgressBar + Coins label, all
+        # pulling directly from scene state. No manual update wiring.
         self.ui.add(Row(
             Label(
                 lambda: f"HP {self.hp}/{self.max_hp}",
                 text_style="hud", text_color=HP_COLOR,
             ),
+            ProgressBar(
+                value=lambda: self.hp,
+                max_value=lambda: self.max_hp,
+                width=100, height=12,
+                bar_color=HP_COLOR,
+                bg_color=(60, 30, 40, 255),
+            ),
             Label(
                 lambda: f"Coins {self.coins}",
                 text_style="hud", text_color=COIN_COLOR,
             ),
-            spacing=26,
+            spacing=16,
             anchor=Anchor.BOTTOM_LEFT, margin=16,
         ))
         self.ui.add(Label(
@@ -209,12 +213,14 @@ class RingOfPainScene(Scene):
             text_style="caption",
             anchor=Anchor.BOTTOM_RIGHT, margin=20,
         ))
-        # Message sits in the empty ring centre — lots of clear space, and
-        # no risk of collision with the bottom sub-label or the HUD row.
+        # Message sits below the ring. Both Gemini and GPT flagged a
+        # centre-of-ring message as "crowds the nodes" in iter-7; the
+        # agreement between independent models is the signal that matters
+        # (see keras.dev iter-6 meta-lesson on cross-check consensus).
         self.ui.add(Label(
             lambda: self.message,
-            text_style="sub",
-            anchor=Anchor.CENTER,
+            text_style="caption",
+            anchor=Anchor.BOTTOM, margin=48,
         ))
 
     # -- Ring & player drawing (inherently per-frame procedural) ----------

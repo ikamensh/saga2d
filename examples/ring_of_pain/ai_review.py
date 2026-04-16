@@ -113,40 +113,85 @@ def call_openai(image_b64: str, api_key: str, model: str) -> str:
     return data["choices"][0]["message"]["content"]
 
 
+def _try_gemini(image_b64: str, key: str) -> tuple[str, str] | None:
+    for model in ("gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash"):
+        try:
+            return (f"gemini/{model}", call_gemini(image_b64, key, model))
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode(errors="replace")[:300]
+            print(f"[gemini/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001
+            print(f"[gemini/{model}] {e}", file=sys.stderr)
+    return None
+
+
+def _try_openai(image_b64: str, key: str) -> tuple[str, str] | None:
+    for model in ("gpt-5.1", "gpt-4o", "gpt-4o-mini"):
+        try:
+            return (f"openai/{model}", call_openai(image_b64, key, model))
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode(errors="replace")[:300]
+            print(f"[openai/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001
+            print(f"[openai/{model}] {e}", file=sys.stderr)
+    return None
+
+
 def review(image_path: Path) -> tuple[str, str]:
-    """Return (provider_used, critique_text)."""
+    """Return (provider_used, critique_text).
+
+    Single-model path kept for backward compatibility. Prefer
+    :func:`cross_check` to silence single-model drift (iter-6 lesson).
+    """
     env = load_env()
     image_b64 = base64.b64encode(image_path.read_bytes()).decode()
-
-    # Try a Gemini model list in order of preference.
+    r = None
     gemini_key = env.get("GOOGLE_API_KEY")
     if gemini_key:
-        for model in ("gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-flash"):
-            try:
-                text = call_gemini(image_b64, gemini_key, model)
-                return (f"gemini/{model}", text)
-            except urllib.error.HTTPError as e:
-                err_body = e.read().decode(errors="replace")[:300]
-                print(f"[gemini/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
-            except Exception as e:  # noqa: BLE001
-                print(f"[gemini/{model}] {e}", file=sys.stderr)
+        r = _try_gemini(image_b64, gemini_key)
+    if r is None:
+        openai_key = env.get("OPENAI_API_KEY")
+        if openai_key:
+            r = _try_openai(image_b64, openai_key)
+    if r is None:
+        raise RuntimeError("No LLM provider succeeded (checked Gemini + OpenAI).")
+    return r
 
+
+def cross_check(image_path: Path) -> list[tuple[str, str]]:
+    """Call Gemini AND OpenAI in parallel and return every critique that
+    came back. The caller can then extract consensus from overlaps.
+
+    This is the iter-7 fix for single-model drift: a single reviewer's
+    feedback oscillates round-to-round (``keras.dev`` iter-6 meta-note).
+    Agreement *across independent models* in the same round is the real
+    signal; disagreement is noise.
+    """
+    env = load_env()
+    image_b64 = base64.b64encode(image_path.read_bytes()).decode()
+    results: list[tuple[str, str]] = []
+    gemini_key = env.get("GOOGLE_API_KEY")
+    if gemini_key:
+        r = _try_gemini(image_b64, gemini_key)
+        if r:
+            results.append(r)
     openai_key = env.get("OPENAI_API_KEY")
     if openai_key:
-        for model in ("gpt-5.1", "gpt-4o"):
-            try:
-                text = call_openai(image_b64, openai_key, model)
-                return (f"openai/{model}", text)
-            except urllib.error.HTTPError as e:
-                err_body = e.read().decode(errors="replace")[:300]
-                print(f"[openai/{model}] HTTP {e.code}: {err_body}", file=sys.stderr)
-            except Exception as e:  # noqa: BLE001
-                print(f"[openai/{model}] {e}", file=sys.stderr)
-
-    raise RuntimeError("No LLM provider succeeded (checked Gemini + OpenAI).")
+        r = _try_openai(image_b64, openai_key)
+        if r:
+            results.append(r)
+    if not results:
+        raise RuntimeError("No LLM provider succeeded (checked Gemini + OpenAI).")
+    return results
 
 
 if __name__ == "__main__":
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/tmp/ring_of_pain.png")
-    provider, critique = review(path)
-    print(f"=== Provider: {provider} ===\n{critique}")
+    mode = sys.argv[2] if len(sys.argv) > 2 else "cross"
+    if mode == "single":
+        provider, critique = review(path)
+        print(f"=== Provider: {provider} ===\n{critique}")
+    else:
+        for provider, critique in cross_check(path):
+            print(f"\n{'=' * 60}\n=== Provider: {provider} ===\n{'=' * 60}")
+            print(critique)

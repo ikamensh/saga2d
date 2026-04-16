@@ -728,3 +728,104 @@ sub-labels, pip inside ring). One code-cleanliness migration
   large message there fights it when the player is at the top
   node. Move to ``Anchor.TOP`` below title.
 * **`_lighten_color` deduplication** into a util module.
+
+---
+
+## Iteration 7 — 2026-04-16
+
+The methodology fix that iter-6 asked for: dual-model cross-check.
+Plus two API expansions that extend the reactive pattern to another
+widget and cut alias boilerplate from keybindings.
+
+### What shipped
+
+* **Dual-model cross-check** in ``ai_review.py`` — ``cross_check(path)``
+  calls Gemini and OpenAI in parallel and returns every critique. The
+  single-model ``review()`` kept for backward compatibility. Extracting
+  *consensus* between independent models is now possible in one run;
+  the iter-6 meta-lesson is now tooling, not just a note.
+* **Reactive ``ProgressBar(value=Callable[[], float])`` / ``max_value=…``**.
+  Same pattern as :class:`Label(text=callable)` from iter 4: the
+  callable is re-evaluated each draw; ``bar.value = 0.9`` unbinds.
+  Five property tests cover value binding, max_value binding, unbind
+  on explicit assignment, static-value backward compatibility, and
+  non-finite ValueError on callable returning NaN.
+* **``Scene.bind_keys(list | tuple, callback)``** — multi-alias form
+  so ``self.bind_keys(["right", "d"], self._rotate_cw)`` replaces
+  two separate ``bind_key`` calls. Three tests cover list + tuple
+  input and per-alias dispatch.
+* **Ring of Pain: reactive HP pill** between the HP / Coins Labels::
+
+        ProgressBar(
+            value=lambda: self.hp,
+            max_value=lambda: self.max_hp,
+            width=100, height=12, bar_color=HP_COLOR,
+        )
+
+  Zero wiring after combat — the bar updates from the same
+  ``self.hp`` the label does.
+* **Message moved below the ring** (``Anchor.BOTTOM`` margin 48),
+  fixing the one residual collision both Gemini and GPT agreed on
+  in v14. Details below.
+
+Screenshot: ``/tmp/ring_of_pain_v15.png``. 172 tests pass.
+
+### Dual-model cross-check actually closing the loop
+
+On v14 the two reviewers gave:
+
+| Issue                                          | Gemini 2.5 Pro | GPT-4o |
+|------------------------------------------------|----------------|--------|
+| Central "Floor 1 — clear the ring" collides    | ✓              | ✓       |
+| Unanchored / inconsistent label alignment      | ✓              | ✓       |
+| "YOU" indicator is too small                   | ✓              | ✗       |
+| Node sizes inconsistent (O / $ smaller)        | ✗              | ✓       |
+| Thick vs. thin rim outlines inconsistent       | ✓              | ✗       |
+
+The consensus row is what the iter-6 meta-lesson said to chase. The
+central-message overlap got a fix in v15 (anchored to the bottom,
+caption style). The label-alignment consensus partially matches the
+``shop`` label above the top node sitting above the YOU pip — both
+models read a crowding there. The Gemini-only "YOU too small" and
+GPT-only "node size inconsistent" sit in the drift column and were
+not acted on — the single-model recommendations that would have
+burned another iteration chasing noise.
+
+This is the first round where the *methodology* catches drift
+automatically.
+
+### API friction noticed this iteration
+
+1. **``ProgressBar.fraction`` re-evaluates the callable on every
+   read.** If a scene reads ``bar.fraction`` three times in its draw
+   (e.g., for tween-of-fill effects), the callable runs thrice.
+   Acceptable for cheap lambdas; a per-frame cache would harden it
+   for expensive reads.
+2. **OpenAI gpt-5.1 rejects ``max_tokens``** — it wants
+   ``max_completion_tokens``. Fell back to gpt-4o cleanly, but the
+   fallback printed to stderr. Worth a quiet retry with the
+   corrected param when we detect that specific error.
+3. **The ``Callable[[], T]`` binding pattern is now in *three*
+   places** (Label.text, ProgressBar.value, ProgressBar.max_value).
+   A ``_refresh_bound()`` helper or a tiny ``Reactive[T]``
+   descriptor would factor out the duplication before a fourth
+   widget lands. Not critical; logged for when the fourth arrives.
+
+### Concrete steps taken this iteration
+
+Three API extensions + one methodology upgrade:
+``cross_check()``, reactive ``ProgressBar``, ``bind_keys([...])``,
+Ring of Pain message relocated on the basis of two-model consensus.
+
+### Parked for iteration 8
+
+* **Factor the reactive-binding pattern** into a small helper once
+  a fourth widget needs it.
+* **Bundle a game font** — still the single biggest pending visual
+  complaint.
+* **Consensus-aware ``cross_check()`` summary** — a tiny synthesis
+  pass that prints "both flag X" and "only A/B flag Y" automatically
+  rather than leaving the human to do it.
+* **``_lighten_color`` deduplication** into a util module.
+* **Quiet fallback for OpenAI model-param drift** (``max_tokens`` ->
+  ``max_completion_tokens`` for gpt-5.x).
