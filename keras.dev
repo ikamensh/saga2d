@@ -487,3 +487,138 @@ Panel shadow transparency fix, player marker semantic rework.
 * **Broader sweep for "theme draws that fire unconditionally"** —
   Button hover outline? Tooltip shadow? The pattern that broke
   Panel is probably present elsewhere.
+
+---
+
+## Iteration 5 — 2026-04-16
+
+This iteration closed the "declarative HUD is almost declarative, but
+not quite" gap left at the end of iteration 4. After this round a HUD
+element is a single, flat, theme-driven line of code with no
+containers-as-punctuation, no appearance values at the call site, no
+per-component style boilerplate.
+
+### What shipped
+
+* **`Label(text_style="hud")`** — parity with
+  :meth:`Scene.draw_text(style=…)`. Label takes a string name (theme
+  lookup at draw time) or a :class:`TextStyle` instance. Explicit
+  ``font_size`` / ``text_color`` / ``font`` / ``style=`` kwargs still
+  override, so per-HUD-element accent colours (`text_color=HP_COLOR`
+  on top of ``text_style="hud"``) work. Six property tests cover:
+  string resolution, instance take-effect, explicit override, theme
+  swap, unknown-name raises, no-style falls back to theme defaults.
+* **`Row(*children, ...)` / `Column(*children, ...)`** — thin
+  transparent :class:`Panel` subclasses with the layout fixed and
+  no background/border/padding by default. Takes children
+  positionally. Six property tests cover: container type, layout
+  direction, LTR/TTB positioning, no visible shadow or background
+  rects, opt-back-in via explicit ``style=``.
+* **Subtle outline on the current node** paired with the external
+  gold pip — pale-gold 2px ring just outside the node's rim. The
+  previous "only pip and caption, no rim" read as a weak player
+  indicator in Gemini's v9 round; the earlier "white glow and
+  nothing else" in v4 read as "selected styling." Combining both
+  cues — semantic (pip + "YOU") *and* visual (rim outline) — is the
+  robust answer; both kinds of reader get a signal.
+* **Ring of Pain HUD collapsed to the canonical form**::
+
+        self.ui.add(Row(
+            Label(lambda: f"HP {self.hp}/{self.max_hp}",
+                  text_style="hud", text_color=HP_COLOR),
+            Label(lambda: f"Coins {self.coins}",
+                  text_style="hud", text_color=COIN_COLOR),
+            spacing=26,
+            anchor=Anchor.BOTTOM_LEFT, margin=16,
+        ))
+
+  No ``Panel(..., style=HUD_BG, layout=Layout.HORIZONTAL, children=[...])``
+  scaffolding. No ``font_size=18`` / ``HUD_BG`` constants at call
+  sites. Adding a new HUD readout is a one-liner::
+
+        Label(lambda: f"Stamina {self.stamina}", text_style="hud")
+
+Screenshot: ``/tmp/ring_of_pain_v10.png``. 162 tests pass (12 new).
+
+### What the new API collapses
+
+v9 HUD construction::
+
+    HUD_BG = Style(background_color=(0,0,0,0), border_width=0, padding=0)
+    ...
+    self.ui.add(Panel(
+        anchor=Anchor.BOTTOM_LEFT, margin=16,
+        layout=Layout.HORIZONTAL, spacing=26, style=HUD_BG,
+        children=[
+            Label(lambda: ..., font_size=18, text_color=HP_COLOR),
+            Label(lambda: ..., font_size=18, text_color=COIN_COLOR),
+        ],
+    ))
+
+v10 equivalent::
+
+    self.ui.add(Row(
+        Label(lambda: ..., text_style="hud", text_color=HP_COLOR),
+        Label(lambda: ..., text_style="hud", text_color=COIN_COLOR),
+        spacing=26, anchor=Anchor.BOTTOM_LEFT, margin=16,
+    ))
+
+Six lines fewer; no `HUD_BG` constant; `font_size` now lives once in
+the theme. A theme-edit restyles every ``text_style="hud"`` Label
+across every scene — the point of named styles.
+
+### Second-AI (Gemini 2.5 Pro) critique of v10
+
+Full: ``/tmp/ring_of_pain_v10_review.txt``. Highlights:
+
+* **Again oscillates on the current-node outline** — v9 (no outline)
+  was "weak player indicator"; v10 (subtle outline) is "inconsistent
+  border treatments." Net learning: a single-model reviewer's visual
+  feedback on "emphasis vs. styling" is noisy. This is a limit of the
+  cross-check loop — not fixable by more prompt engineering.
+* **"Inconsistent color language"**: pink on `+` heart node vs.
+  reddish on `E` enemy nodes. Fair. Green for heal, reserved red for
+  enemies is the standard palette convention; parked.
+* **"Move the objective text out of the ring"**: central message
+  crowds the focal point. Disagree *slightly* — the ring centre is
+  unused space when nothing else lives there — but "top area under
+  Floor" is a valid alternative. Parked.
+* **"→ floor 2" arrow still collides with adjacent 'E' node**. Real
+  bug, seen since iter 3. Fix: drop the arrow character or place
+  sub-labels radially outside rather than directly below each node.
+
+### API friction noticed this iteration
+
+1. **`Row`/`Column` expose no way to *swap* layout mid-flight.**
+   Panel's `_layout` is private and constructor-only. Fine for most
+   cases; noted for future dynamic-layout work.
+2. **`text_style` lookup error surfaces at draw time, not at
+   construction.** `Label(text_style="ttle")` succeeds; the first
+   tick raises `KeyError`. Could eagerly validate once the game is
+   attached. Not critical — the error is clear — but a stricter
+   mode would be welcome.
+3. **Gemini oscillation is a structural limit**, not an API problem.
+   Flagged here to note the cross-check loop's ceiling — you can
+   ship your iteration when Gemini flips on a call (outline vs no
+   outline), because the flip itself is the signal.
+
+### Concrete steps taken this iteration
+
+Three API improvements shipping together:
+`Label(text_style=)`, `Row`/`Column`, subtle current-node outline.
+
+### Parked for iteration 6
+
+* **Heart/heal node recolour** to green — distinguish gain from
+  threat in the palette.
+* **Sub-label placement**: radial outward rather than directly below,
+  removing the `→ floor 2` ↔ neighbour collision.
+* **Bundle a game font** — persistent typography complaint.
+* **Theme-draws-unconditionally sweep**: Button hover outline +
+  Tooltip shadow probably share Panel's bug class; sweep once and
+  close the pattern.
+* **`HUD` persistent layer in Ring of Pain** — right now the HUD
+  lives on the scene's `ui`. Using `game.hud` would let multiple
+  scenes share the overlay.
+* **`Label(text_style="typoed")` stricter validation** — raise at
+  attach-time rather than first tick.

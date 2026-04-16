@@ -22,10 +22,8 @@ from saga2d import (  # noqa: E402
     Game,
     InputEvent,
     Label,
-    Layout,
-    Panel,
+    Row,
     Scene,
-    Style,
     TextStyle,
     Theme,
     ring_positions,
@@ -36,11 +34,9 @@ WHITE = (245, 245, 250, 255)
 DIM = (140, 140, 150, 255)
 HP_COLOR = (255, 140, 160, 255)
 COIN_COLOR = (245, 205, 90, 255)
-MUTED = (155, 155, 170, 255)
 PLAYER_GOLD = (255, 215, 100, 255)
 TITLE_GOLD = (255, 215, 100, 255)
-
-HUD_BG = Style(background_color=(0, 0, 0, 0), border_width=0, padding=0)
+CURRENT_OUTLINE = (255, 235, 170, 255)
 
 TYPE_ENEMY = "enemy"
 TYPE_TREASURE = "treasure"
@@ -174,42 +170,43 @@ class RingOfPainScene(Scene):
     # `self.hp_label.text = …` wiring needed after each state change.
 
     def on_enter(self) -> None:
+        # Corner labels use named theme styles — appearance lives in
+        # build_theme(), not scattered across call sites.
         self.ui.add(Label(
             "Ring of Pain",
+            text_style="title",
             anchor=Anchor.TOP_LEFT, margin=20,
-            font_size=26, text_color=TITLE_GOLD,
         ))
         self.ui.add(Label(
             lambda: f"Floor {self.level}",
+            text_style="hud",
             anchor=Anchor.TOP_RIGHT, margin=20,
-            font_size=18, text_color=WHITE,
         ))
-        self.ui.add(Panel(
+        # HUD row: Row() is a transparent horizontal container. Children
+        # are positional; each HP/Coins label binds reactively.
+        self.ui.add(Row(
+            Label(
+                lambda: f"HP {self.hp}/{self.max_hp}",
+                text_style="hud", text_color=HP_COLOR,
+            ),
+            Label(
+                lambda: f"Coins {self.coins}",
+                text_style="hud", text_color=COIN_COLOR,
+            ),
+            spacing=26,
             anchor=Anchor.BOTTOM_LEFT, margin=16,
-            layout=Layout.HORIZONTAL, spacing=26,
-            style=HUD_BG,
-            children=[
-                Label(
-                    lambda: f"HP {self.hp}/{self.max_hp}",
-                    font_size=18, text_color=HP_COLOR,
-                ),
-                Label(
-                    lambda: f"Coins {self.coins}",
-                    font_size=18, text_color=COIN_COLOR,
-                ),
-            ],
         ))
         self.ui.add(Label(
             "\u2190  \u2192  move     space  interact",
+            text_style="caption",
             anchor=Anchor.BOTTOM_RIGHT, margin=20,
-            font_size=13, text_color=MUTED,
         ))
         # Message sits in the empty ring centre — lots of clear space, and
         # no risk of collision with the bottom sub-label or the HUD row.
         self.ui.add(Label(
             lambda: self.message,
+            text_style="sub",
             anchor=Anchor.CENTER,
-            font_size=14, text_color=(200, 200, 220, 255),
         ))
 
     # -- Ring & player drawing (inherently per-frame procedural) ----------
@@ -228,6 +225,14 @@ class RingOfPainScene(Scene):
         for idx, (node, (nx_f, ny_f)) in enumerate(zip(self.nodes, positions)):
             nx, ny = int(nx_f), int(ny_f)
             style = NODE_STYLES[node.type]
+            is_current = idx == self.player_idx
+
+            # Subtle outline behind the current node — pairs with the
+            # external gold pip for both semantic (YOU token) and visual
+            # (rim emphasis) feedback. Kept thin (2 px) so it reads as
+            # *"focus"* rather than *"selected styling"*.
+            if is_current:
+                self.draw_circle(nx, ny, node_r + 6, CURRENT_OUTLINE)
 
             if node.alive:
                 self.draw_circle(nx, ny, node_r + 3, style["rim"])
@@ -280,11 +285,21 @@ class RingOfPainScene(Scene):
 
 def build_theme() -> Theme:
     """Dungeon-crawl theme — passed through Game(theme=…) so the same
-    styling applies to production and to the screenshot harness."""
+    styling applies to production and to the screenshot harness.
+
+    Every text role Ring of Pain uses lives here. Adding a new HUD
+    element is then a one-liner at the call site::
+
+        Label(lambda: f"Stamina {self.stamina}", text_style="hud")
+
+    …with zero appearance decisions duplicated.
+    """
     return Theme(
         text_styles={
-            "title": TextStyle(font_size=26, color=TITLE_GOLD),
-            "sub":   TextStyle(font_size=13, color=(220, 220, 232, 240)),
+            "title":   TextStyle(font_size=26, color=TITLE_GOLD),
+            "hud":     TextStyle(font_size=18, color=WHITE),
+            "sub":     TextStyle(font_size=14, color=(220, 220, 232, 240)),
+            "caption": TextStyle(font_size=13, color=(155, 155, 170, 255)),
         },
     )
 
