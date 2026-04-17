@@ -100,10 +100,55 @@ def generate_rock(out: Path, seed: int = 42) -> None:
     img.save(out, "PNG", optimize=True)
 
 
+def generate_particle_spark(
+    out: Path,
+    rgb: tuple[int, int, int],
+    *,
+    size: int = 16,
+) -> None:
+    """Soft disc particle — used as the emit sprite for explosions and
+    the ship's thruster trail. ParticleEmitter accepts a list of asset
+    names and picks one per particle, so generating three variants
+    (yellow, orange, dim-red for explosion; one grey for the thruster)
+    gives a natural colour variation without a shader.
+
+    iter-45 default size is 16 px; iter-45 initial try at 8 px was too
+    faint to read at an 800-tall canvas (visible only under zoom).
+    """
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx = cy = size / 2
+    # Three-pass soft disc. Radii scale with size so the glow looks
+    # right at any requested dimension.
+    r, g, b = rgb
+    outer_r = size * 0.45
+    mid_r = size * 0.30
+    core_r = size * 0.18
+    draw.ellipse([(cx - outer_r, cy - outer_r), (cx + outer_r, cy + outer_r)],
+                 fill=(r, g, b, 60))
+    draw.ellipse([(cx - mid_r, cy - mid_r), (cx + mid_r, cy + mid_r)],
+                 fill=(r, g, b, 180))
+    draw.ellipse([(cx - core_r, cy - core_r), (cx + core_r, cy + core_r)],
+                 fill=(r, g, b, 255))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out, "PNG", optimize=True)
+
+
 def generate(root: Path) -> None:
     images_dir = root / "assets" / "images"
     generate_ship(images_dir / "dodge_ship.png")
     generate_rock(images_dir / "dodge_rock.png")
+    # iter-45 additions: three 16-px explosion spark variants + one
+    # 8-px dust for the ship thruster trail (dust stays small so it
+    # reads as exhaust rather than competing with the explosion).
+    generate_particle_spark(images_dir / "dodge_spark_yellow.png",
+                            (255, 230, 90), size=16)
+    generate_particle_spark(images_dir / "dodge_spark_orange.png",
+                            (255, 150, 60), size=16)
+    generate_particle_spark(images_dir / "dodge_spark_red.png",
+                            (230, 70, 60), size=16)
+    generate_particle_spark(images_dir / "dodge_dust.png",
+                            (200, 210, 230), size=8)
     print(f"Wrote dodge sprites under {images_dir}")
 
 

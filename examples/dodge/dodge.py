@@ -38,6 +38,7 @@ from saga2d import (  # noqa: E402
     Game,
     Label,
     MoveTo,
+    ParticleEmitter,  # iter-45
     Remove,
     Scene,
     Sequence,
@@ -89,6 +90,9 @@ class DodgeScene(Scene):
         self._player: Sprite | None = None
         self._rocks: list[Sprite] = []
         self._spawn_clock: float = 0.0
+        # iter-45: thruster emitter runs continuously while alive; the
+        # scene holds a reference so ``_end_run`` can stop it.
+        self._thruster: ParticleEmitter | None = None
 
     # -- input --------------------------------------------------------------
 
@@ -100,6 +104,11 @@ class DodgeScene(Scene):
         for rock in list(self._rocks):
             rock.remove()
         self._rocks.clear()
+        if self._thruster is not None:
+            # iter-45: remove the thruster (not just stop) so
+            # particles don't persist across the restart animation.
+            self._thruster.remove()
+            self._thruster = None
         self.time_survived = 0.0
         self.game_over = False
         self._spawn_clock = 0.0
@@ -135,6 +144,26 @@ class DodgeScene(Scene):
             "dodge_ship",
             position=(w // 2, h - 80),
         ))
+        # iter-45: thruster trail. Emits continuously downward from
+        # just below the ship, with random direction spread and short
+        # lifetime so the particles form a rapidly-fading vapour cone.
+        # Position is updated each tick in ``update`` so the trail
+        # tracks the ship — ParticleEmitter itself has no "parent"
+        # concept, so the scene drives it.
+        # ``rng=self._rng`` makes the particle stream reproducible
+        # under a fixed ``seed=`` (iter-45: snapshot tests depend on
+        # this). Without it, module-level random would produce
+        # different particle positions every run.
+        self._thruster = ParticleEmitter(
+            image="dodge_dust",
+            position=(self._player.x, self._player.y + 4),
+            speed=(40, 100),
+            direction=(75, 105),  # narrow cone straight down
+            lifetime=(0.15, 0.35),
+            fade_out=True,
+            rng=self._rng,
+        )
+        self._thruster.continuous(rate=40)
 
     def _spawn_rock(self) -> None:
         w, _ = self.game.resolution
@@ -197,6 +226,12 @@ class DodgeScene(Scene):
                 dx += PLAYER_SPEED * dt
             new_x = max(SHIP_W / 2, min(w - SHIP_W / 2, self._player.x + dx))
             self._player.x = new_x
+            # iter-45: the thruster emitter has no parent-relative
+            # positioning — to attach it to the ship, the scene pushes
+            # its position each tick. Parked as API friction:
+            # emitter.follow(sprite, offset) would be a nicer API.
+            if self._thruster is not None:
+                self._thruster.position = (self._player.x, self._player.y + 4)
 
         # Collision via iter-44's saga2d.util.collision. Sprite.aabb
         # gives centre-anchored bounding boxes; aabb_overlap is a free
@@ -218,6 +253,32 @@ class DodgeScene(Scene):
         # ``sprite.stop_actions()``.
         for rock in self._rocks:
             rock.stop_actions()
+        # iter-45: fire an explosion burst at the ship's last known
+        # position. Three-colour sprite list gives the particle
+        # emitter random colour variation per particle — no shader
+        # required. The emitter auto-deregisters when all particles
+        # die, so no scene-level cleanup is needed.
+        if self._player is not None:
+            burst = ParticleEmitter(
+                image=[
+                    "dodge_spark_yellow",
+                    "dodge_spark_orange",
+                    "dodge_spark_red",
+                ],
+                position=self._player.position,
+                count=40,
+                speed=(80, 260),
+                direction=(0, 360),
+                lifetime=(0.4, 1.0),
+                fade_out=True,
+                rng=self._rng,
+            )
+            burst.burst()
+            # Stop the thruster so the iter-45 post-collision frame
+            # shows the explosion and the frozen ship, without a
+            # continued vapour trail underneath the wreckage.
+            if self._thruster is not None:
+                self._thruster.stop()
         # Surface the game-over banner. Reactive, but dynamically added
         # so it only exists during game-over frames.
         self.ui.add(Label(

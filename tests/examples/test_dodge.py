@@ -177,3 +177,96 @@ def test_player_clamped_to_canvas(game: Game) -> None:
     w, _ = game.resolution
     assert scene._player.x >= 48 / 2, "player clamped to left edge"
     assert scene._player.x <= w - 48 / 2, "player clamped to right edge"
+
+
+# ---------------------------------------------------------------------------
+# iter-45 particle effects
+# ---------------------------------------------------------------------------
+
+
+def _loaded_name(game: Game, handle: str) -> str:
+    """Resolve a mock backend image handle back to its loaded asset path."""
+    for path, h in game.backend._loaded_images.items():
+        if h == handle:
+            return path
+    return handle
+
+
+def test_thruster_particles_spawn_while_alive(game: Game) -> None:
+    """The thruster is a continuous ParticleEmitter spawning dust
+    sprites below the ship. After a few ticks there should be several
+    ``dodge_dust.png`` sprites in the backend."""
+    scene = DodgeScene(seed=0)
+    game._scene_stack.push(scene)
+    # Tick long enough for the continuous emitter to spawn particles.
+    for _ in range(10):
+        game.tick(dt=1 / 60)
+    dust_count = sum(
+        1 for s in game.backend.sprites.values()
+        if "dodge_dust" in _loaded_name(game, s["image"])
+    )
+    assert dust_count > 0, "expected dust particles from the thruster"
+
+
+def test_explosion_burst_spawns_spark_particles(game: Game) -> None:
+    """On collision, a 40-particle burst of spark sprites emits at the
+    ship's position. Since iter-43's renderer changes, these sprites
+    live in ``backend.sprites`` and are the visible explosion."""
+    scene = DodgeScene(seed=0)
+    game._scene_stack.push(scene)
+    game.tick(dt=1 / 60)
+    # Baseline count before collision.
+    spark_before = sum(
+        1 for s in game.backend.sprites.values()
+        if "dodge_spark" in _loaded_name(game, s["image"])
+    )
+    assert spark_before == 0
+
+    # Force a collision.
+    scene._spawn_rock()
+    rock = scene._rocks[-1]
+    rock.stop_actions()
+    rock.position = scene._player.position
+    game.tick(dt=1 / 60)
+
+    spark_after = sum(
+        1 for s in game.backend.sprites.values()
+        if "dodge_spark" in _loaded_name(game, s["image"])
+    )
+    # Burst size is 40 (3 colour variants × ~13 each, with rounding).
+    assert spark_after >= 30, f"expected ~40 spark particles, got {spark_after}"
+
+
+def test_thruster_stops_after_game_over(game: Game) -> None:
+    """The thruster shouldn't keep spawning dust after game-over;
+    _end_run stops the emitter."""
+    scene = DodgeScene(seed=0)
+    game._scene_stack.push(scene)
+    game.tick(dt=1 / 60)
+    # Force game-over.
+    scene._end_run()
+    # The emitter is stopped — existing particles age out, no new
+    # spawns. Tick past the max dust lifetime (0.35s) to clear them.
+    for _ in range(30):
+        game.tick(dt=1 / 60)
+    dust_count = sum(
+        1 for s in game.backend.sprites.values()
+        if "dodge_dust" in _loaded_name(game, s["image"])
+    )
+    assert dust_count == 0, "thruster should have stopped spawning after game_over"
+
+
+def test_restart_removes_thruster_and_spawns_fresh(game: Game) -> None:
+    """Restart tears down the old thruster emitter and spawns a new
+    one with the new player. Without the iter-45 ``_thruster.remove()``
+    in restart(), the old emitter would keep running and attach to a
+    stale position."""
+    scene = DodgeScene(seed=0)
+    game._scene_stack.push(scene)
+    game.tick(dt=1 / 60)
+    old_thruster = scene._thruster
+    assert old_thruster is not None
+    scene.restart()
+    game.tick(dt=1 / 60)
+    assert scene._thruster is not None
+    assert scene._thruster is not old_thruster

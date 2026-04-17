@@ -5355,3 +5355,148 @@ one-example refactor.
 * **Font fallback chain** — still parked.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 45 — 2026-04-17
+
+Extended the iter-43 ``dodge`` example with two
+:class:`ParticleEmitter` s — continuous thruster trail +
+40-particle explosion on collision. Exercises the last saga2d
+subsystem without a runnable example. Surfaced exactly one API
+shortcoming (non-deterministic particle output) and fixed it
+in the same iteration with a new ``rng=`` parameter on
+:class:`ParticleEmitter`.
+
+### What shipped
+
+* **Dodge thruster trail**. ``ParticleEmitter(image=
+  "dodge_dust", ...)`` running continuously at ``rate=40``
+  particles/sec. Emitter position tracks the ship each
+  tick — ParticleEmitter has no "parent sprite" concept,
+  so the scene drives it. Stopped on game-over, fully
+  removed on restart.
+* **Dodge explosion burst**. On collision, a 40-particle
+  ``ParticleEmitter.burst()`` fires with three colour
+  variants (yellow / orange / red) picked per-particle
+  from a list. ``direction=(0, 360)`` for radial spread,
+  ``lifetime=(0.4, 1.0)`` for a visible but brief puff.
+  Auto-deregisters when all particles die.
+* **Four new particle sprite assets**. ``dodge_dust.png``
+  (8×8 grey exhaust), ``dodge_spark_yellow / orange /
+  red.png`` (16×16 three-pass soft discs). The script
+  ``scripts/generate_dodge_sprites.py`` generates them
+  procedurally; iter-45 initial attempt used 8-px sparks
+  but they were illegible at the game's 800-tall canvas
+  (only visible under zoom). 16 px reads.
+* **``ParticleEmitter(rng=)`` parameter**. Replaced all
+  ``random.uniform`` / ``random.choice`` calls with
+  ``self._rng.uniform`` / ``self._rng.choice``. ``rng=None``
+  (default) falls back to the random module for backwards
+  compatibility — existing call sites don't need to change.
+  Pass a ``Random(seed)`` when you need reproducible
+  output (PNG snapshots, cross-model cross-checks).
+* **Four property tests for the RNG parameter** at
+  ``tests/rendering/test_particles_rng.py``: same-seed →
+  identical state, different-seed → different state,
+  ``rng=None`` → default module-random still works,
+  ``rng=`` call doesn't disturb module-random state.
+* **Four new dodge tests**: thruster spawns dust, burst
+  spawns 30+ sparks, thruster stops after game-over,
+  restart removes the old thruster and creates a fresh one.
+
+923 mock-backend tests pass (8 new: 4 particle-RNG + 4
+dodge particle behaviours). The full mock+rendering suite
+hits 1273 pass.
+
+### The Keras parallel this iteration
+
+Keras's data pipeline API (``tf.data.Dataset``) accepts a
+``seed=`` kwarg for shuffle operations. TensorFlow itself
+has ``tf.random.Generator`` seedable via construction.
+Keras's ``ImageDataGenerator`` accepts ``seed`` for its
+random augmentations. Every part of the Keras stack that
+does randomness exposes a seed — because reproducible
+training is non-negotiable for research.
+
+saga2d's ParticleEmitter was the first subsystem in the
+framework to use module-level random without a seed hook.
+iter-45 fixed it. The emitter is now seed-reproducible the
+same way a Keras augmentation pipeline is. This surfaced
+naturally from the iter-41 PNG snapshot regression net
+breaking the *first* time a snapshot-tested example used
+particles — exactly the iteration cadence Keras training
+runs rely on.
+
+### Meta: the iteration pattern works
+
+iter-43 wrote the sprite example → iter-44 shipped
+``is_pressed`` + ``aabb_overlap`` to eliminate boilerplate
+→ iter-45 extended the example with particles → shipped
+``rng=`` so particle-based examples can be snapshot-tested.
+Each round the "example surfaces friction → framework
+absorbs the fix" loop closes cleanly.
+
+Mock-backend test count 915 → 923 (+8). The full
+mock+rendering count is 1273.
+
+### Cross-check outcome
+
+Reviewer observations are now recurring: typography
+hierarchy, UI safe-areas, asteroid contrast. The iter-45
+additions drew one positive mention: *"The small exhaust
+plume on the ship is a nice touch that adds a sense of
+motion"* (Gemini). No negative observation of particles
+from either model — a clean launch.
+
+### API friction noticed this iteration
+
+1. **ParticleEmitter position-tracking is caller-driven**.
+   The thruster emitter has no ``emitter.follow(sprite,
+   offset=(dx, dy))`` — the scene pushes
+   ``emitter.position = (player.x, player.y + 4)`` each
+   tick manually. A ``follow`` helper would let the
+   subsystem own the relationship and stop automatically
+   when the target sprite is removed. Parked.
+2. **Sprite size tuning was a visual-verification pass**.
+   iter-45 first tried 8×8 spark sprites; they rendered
+   correctly but were illegible on an 800-tall canvas
+   (the iter-38 mock-to-PIL renderer zoomed in showed
+   them, the full-canvas render did not). A
+   ``plot_scene(mode="overlay")`` render would have
+   surfaced "particles exist but are too small" earlier —
+   iter-42 shipped that exact tool; I didn't reach for it
+   until after the visual regression test failed.
+   Meta-lesson: use the framework's own introspection
+   tools before re-running the real cross-check.
+3. **random.Random and the module-level random share
+   ``uniform()``/``choice()`` signatures**. iter-45 relies
+   on this duck-typing (``self._rng`` can be either). If
+   a future subsystem uses e.g. ``random.getrandbits()``,
+   the module-random-as-default fallback won't transparently
+   work on a ``Random`` instance's method of the same
+   name (it would, but I'm noting the pattern). Documented
+   in the ``_rng`` comment.
+
+### Concrete steps taken this iteration
+
+One 40-LOC extension to dodge (thruster + explosion),
+one 5-LOC addition to ParticleEmitter (``rng=`` +
+attribute), four new sprite assets + script updates,
+eight property tests, two snapshot refreshes, one
+cross-check. Five saga2d subsystems (Scene, Sprite,
+Actions, Audio, Timers) already demonstrated by earlier
+examples; iter-45 closes **ParticleEmitter**.
+
+### Parked for iteration 46
+
+* **``Scene.follow(target, offset)``** helper for camera
+  / particle-emitter parent-tracking.
+* **Window-focus release-all** — iter-44's
+  ``_clear_pressed()`` still unwired.
+* **``aabb_overlap(a, b, strict=True)`` variant**.
+* **Per-pixel / explicit-hitbox collision** for
+  sprites with transparent padding.
+* **Font fallback chain**.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.
