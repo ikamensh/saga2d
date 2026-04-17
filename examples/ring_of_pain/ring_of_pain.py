@@ -22,8 +22,10 @@ from saga2d import (  # noqa: E402
     CircularGauge,
     Game,
     Label,
+    Panel,
     Row,
     Scene,
+    Style,
     TextStyle,
     Theme,
     ring_budget,
@@ -254,17 +256,26 @@ class RingOfPainScene(Scene):
             text_style="hud",
             anchor=Anchor.TOP_RIGHT, margin=20,
         ))
-        # HUD row: CircularGauge + HP label + Coins label — iter-40
-        # switches from the horizontal ProgressBar (iter-38 cross-check
-        # flagged its sharp-cornered rectangular style as clashing with
-        # the circular node aesthetic). The gauge is a disc whose inner
-        # radius scales with HP fraction, so the HUD reads as a smaller
-        # member of the same family as the ring nodes above.
+        # HUD grounding: iter-41 swaps Row's transparent-by-default
+        # style for an explicit dark-purple-alpha fill with padding.
+        # iter-40's cross-check consensus ("HUD reads as disconnected
+        # / floating") said the HP/Coins row lacked grounding vs. the
+        # ring of nodes above. A filled container without a border or
+        # shadow anchors the HUD without competing with the scene.
+        # Row inherits from Panel, so passing style= re-enables the
+        # background while keeping the horizontal flow layout —
+        # simpler than wrapping in a separate Panel (which would
+        # need explicit sizing since Layout.NONE defaults to 100x100).
+        hud_bg = Style(
+            background_color=(30, 20, 45, 180),
+            padding=10,
+            border_width=0,
+        )
         self.ui.add(Row(
             CircularGauge(
                 value=lambda: self.hp,
                 max_value=lambda: self.max_hp,
-                radius=11,
+                radius=13,
                 fill_color=HP_COLOR,
                 empty_color=(60, 30, 40, 255),
                 rim_color=(235, 80, 95, 255),
@@ -279,6 +290,7 @@ class RingOfPainScene(Scene):
                 text_style="hud", text_color=COIN_COLOR,
             ),
             spacing=14,
+            style=hud_bg,
             anchor=Anchor.BOTTOM_LEFT, margin=16,
         ))
         self.ui.add(Label(

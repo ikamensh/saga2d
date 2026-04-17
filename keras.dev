@@ -4739,3 +4739,170 @@ since iter-38 is now closed. No pyglet in sight still.
   introspection. The Keras-parallel step.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 41 — 2026-04-17
+
+Two things shipped: HUD grounding fix for the iter-40
+consensus issue, and the ``assert_scene_matches_png_snapshot``
+helper that turns iter-38's mock-to-PIL renderer into an
+automated visual-regression net for every example.
+
+### What shipped
+
+* **Ring of Pain HUD grounding**. iter-40's cross-check
+  synthesis said the HUD row read as "disconnected /
+  floating" — no container, no visual grouping with the
+  labels on the right. iter-41 passes an explicit
+  ``Style(background_color=(30, 20, 45, 180), padding=10)``
+  to the ``Row``, giving it a dark-purple semi-transparent
+  panel background. Row inherits from Panel, so this
+  re-enables the background that ``_TRANSPARENT_CONTAINER_STYLE``
+  had suppressed. Simpler than wrapping in a separate Panel
+  (a ``Layout.NONE`` Panel defaults to 100×100 which was
+  an iter-41 false-start — one 30-second render showed the
+  problem, good argument for keeping the mock-to-PIL render
+  loop fast).
+* **CircularGauge radius 11 → 13** (iter-40 GPT drift). At
+  the HUD scale next to 18-pt text, the bigger disc reads
+  more solidly. Small change, improved readability.
+* **``saga2d.testing.assert_scene_matches_png_snapshot``**.
+  100 LOC. First run writes ``{name}.png`` in the given
+  snapshot dir. Subsequent runs byte-compare. On mismatch,
+  writes ``{name}.actual.png`` alongside so the diff is
+  visually inspectable. ``SAGA2D_UPDATE_PNG_SNAPSHOTS=1``
+  bulk-accepts new snapshots (parallel to iter-15's
+  ``SAGA2D_UPDATE_SNAPSHOTS=1``).
+* **Visual regression tests for all 5 examples**. Each
+  renders at a fixed resolution with the example's theme
+  and seeds, captures a deterministic mock-to-PIL PNG, and
+  fails if the pixels ever drift. Ring of Pain is seeded
+  (``RingOfPainScene(ring_size=8, seed=7)``) so the node
+  layout is stable; Guess the Number is pinned to
+  ``scene.target = 50``.
+* **Three framework tests** for the snapshot helper itself:
+  first-run writes the baseline, mismatch drops the
+  ``.actual.png`` sibling, ``SAGA2D_UPDATE_PNG_SNAPSHOTS=1``
+  rewrites on demand.
+
+868 mock-backend tests pass (8 new: 5 examples + 3 framework).
+
+### Third diagnostic loop closed
+
+| iter | cross-check consensus on Ring of Pain render            |
+|------|--------------------------------------------------------|
+|  38  | 4 font sizes · pink bar clashes · bottom collision     |
+|  39  | 4 sizes → 3 · pink bar clashes · node text too small   |
+|  40  | **HUD lacks grounding** · node label spacing · type hier. |
+|  41  | Typography inconsistency · node-label align · YOU prom. |
+
+iter-40's consensus item — "HUD lacks grounding / feels like
+floating text" — is fully absent from iter-41's synthesis.
+Reviewer A now calls the iter-41 HUD a "debug panel" (drift)
+and Reviewer B praises it: *"Bottom-left HP/Coins bar is
+clear and legible; good use of icon + text."* Third diagnostic
+loop closed end-to-end.
+
+The iter-41 new consensus is narrower still — typography
+inconsistency (partly a PIL renderer artifact where non-Cinzel
+fonts fall back) and label alignment (real: ``FLOOR 1 — CLEAR
+THE RING.`` at ``Anchor.BOTTOM`` is canvas-centered, not
+ring-centered). Both are genuine iter-42 work, not iter-41
+regressions.
+
+### The Keras parallel: visual save/load
+
+Keras's ``model.save_weights()`` / ``load_weights()`` lets you
+persist a trained network so a future session can pick up where
+the last one left off — and crucially, so a regression test can
+assert *this specific network, trained on this specific data,
+produces this specific output*. saga2d now has the same thing
+for rendered scenes: pin the setup (seed, theme, resolution)
+and the mock-to-PIL output is byte-deterministic.
+
+Two layers of snapshot now exist:
+
+| layer | captures                | detects                       |
+|-------|-------------------------|-------------------------------|
+| JSON  | declared structure      | widget rename · control rebind |
+| PNG   | rendered pixels         | layout shift · theme drift    |
+
+A change in ``ring_budget`` that bumps a margin would leave the
+JSON snapshot untouched but change every pixel past the margin
+line — only the PNG snapshot catches it. Conversely, a change
+in ``text_style`` name from ``"hud"`` to ``"stats"`` that
+preserves the rendering (because the theme still resolves to the
+same size/colour) changes the JSON snapshot but leaves pixels
+identical — only the JSON snapshot catches it.
+
+This is exactly the dual-system Keras has: ``model.save()``
+captures architecture (JSON-like) AND weights (binary tensor
+output). saga2d now captures both. iter-41 is the step that
+brought visual regression into reach.
+
+### Meta: 41 iterations, 3 diagnostic loops closed
+
+The first diagnostic loop (iter-38→39) fixed a pure layout bug.
+The second (iter-38/39→40) fixed a stylistic-clash issue with
+a new widget. The third (iter-40→41) fixed a UX-grounding
+issue with a Style override. Each round: surface a real
+consensus issue → ship a targeted fix → verify via independent
+cross-models → repeat.
+
+Mock-backend test count 860 → 868.
+
+### API friction noticed this iteration
+
+1. **Panel(Layout.NONE) defaults to 100×100 when no explicit
+   ``width``/``height`` is given**. First iter-41 attempt
+   wrapped the HUD Row in a ``Panel(style=..., children=[Row(...)])``;
+   the resulting panel was 100×100 regardless of its child's
+   content size. The mock-to-PIL render showed a grey
+   rectangle below the HUD immediately — 30-second diagnostic.
+   Fix was to skip the outer Panel and pass the style
+   directly to ``Row`` (which inherits from Panel and
+   auto-sizes because it uses ``Layout.HORIZONTAL``). This
+   is a real usability footgun: a Panel that wraps other
+   widgets *should* content-fit by default when no size is
+   given. Parked as API debt.
+2. **``Row.style=`` re-enabling backgrounds is a hidden
+   capability**. Not in the Row docstring. Users who want a
+   non-transparent row need to discover that Row inherits
+   from Panel and that ``_TRANSPARENT_CONTAINER_STYLE`` is
+   the default they're overriding. A ``bg=`` or
+   ``background_color=`` convenience kwarg on Row/Column
+   would be clearer — parked for future API ergonomics.
+3. **``SAGA2D_UPDATE_PNG_SNAPSHOTS`` vs
+   ``SAGA2D_UPDATE_SNAPSHOTS``** — both env vars coexist
+   because iter-15 and iter-41 address different artefact
+   types. A user running one probably wants the other —
+   consider unifying under ``SAGA2D_UPDATE_ALL_SNAPSHOTS``.
+   Parked as minor API cleanup.
+
+### Concrete steps taken this iteration
+
+One HUD Style override, one gauge radius bump, one new
+testing helper, five example regression tests, three
+framework tests. One cross-check confirming iter-40's
+consensus is resolved.
+
+### Parked for iteration 42
+
+* **Typography consistency** — partial PIL artifact, partial
+  real (e.g., arrow glyphs in control hints render as boxes
+  because the default PIL font has no fallback to Cinzel's
+  glyph). Fixable by registering a pygame-style font
+  fallback chain.
+* **Ring-relative status message** — iter-41's consensus
+  alignment point. Currently ``"FLOOR 1 — CLEAR THE RING."``
+  is at ``Anchor.BOTTOM`` (canvas-centered). Should be
+  ``Anchor.BOTTOM`` with a margin that aligns its baseline
+  under the bottom node's sub-label. Minor fix.
+* **"YOU" indicator prominence** — iter-41's consensus
+  feedback that the player position doesn't read as the
+  focal point. Could brighten the gold glow, add an
+  animated pulse, or enlarge the sprite.
+* **Unify snapshot update env var** — API-debt item.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.
