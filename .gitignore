@@ -35,6 +35,9 @@
 # generated PNGs live under assets/images/ and should be tracked
 # despite the blanket *.png ignore above.
 !assets/images/**/*.png
+# iter-41 PNG regression snapshots — baseline renders committed
+# alongside the tests so future layout drift is caught on CI.
+!tests/**/png_snapshots/*.png
 
 # Animated Portable Network Graphics
 *.apng
