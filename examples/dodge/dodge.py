@@ -36,16 +36,15 @@ if str(_project_root) not in sys.path:
 from saga2d import (  # noqa: E402
     Anchor,
     Game,
-    InputEvent,
     Label,
     MoveTo,
     Remove,
-    Row,
     Scene,
     Sequence,
     Sprite,
     TextStyle,
     Theme,
+    aabb_overlap,  # iter-44: replaced the inline AABB helper
 )
 
 # --- palette ---------------------------------------------------------------
@@ -84,7 +83,6 @@ class DodgeScene(Scene):
         super().__init__()
         self._rng = random.Random(seed)
         self._seed = seed
-        self._held: set[str] = set()
         self.time_survived: float = 0.0
         self.high_score: float = 0.0
         self.game_over: bool = False
@@ -105,23 +103,7 @@ class DodgeScene(Scene):
         self.time_survived = 0.0
         self.game_over = False
         self._spawn_clock = 0.0
-        self._held.clear()
         self._spawn_player()
-
-    def handle_input(self, event: InputEvent) -> bool:
-        """Track held keys for continuous movement. saga2d has no
-        ``game.input.is_pressed()`` helper yet; the Scene tracks its
-        own pressed-set from press/release events instead.
-
-        iter-43 API-friction point: every example that needs held-key
-        movement will re-implement this same tracking block. A
-        framework-level ``game.input.is_pressed("a")`` would cut ten
-        lines from each game."""
-        if event.type == "key_press" and event.key is not None:
-            self._held.add(event.key)
-        elif event.type == "key_release" and event.key is not None:
-            self._held.discard(event.key)
-        return False  # don't consume — scene stack may want it too
 
     # -- lifecycle ----------------------------------------------------------
 
@@ -202,25 +184,27 @@ class DodgeScene(Scene):
         # collect them here without racing the Action system.
         self._rocks = [r for r in self._rocks if not r.is_removed]
 
-        # Continuous player movement from the held-keys set.
+        # Continuous player movement via the iter-44 level-triggered
+        # held-keys query. Before iter-44, every motion game had to
+        # maintain its own pressed-keys set in ``handle_input``.
         if self._player is not None:
             w, _ = self.game.resolution
+            pressed = self.game.input.pressed_keys()
             dx = 0.0
-            if "a" in self._held or "left" in self._held:
+            if "a" in pressed or "left" in pressed:
                 dx -= PLAYER_SPEED * dt
-            if "d" in self._held or "right" in self._held:
+            if "d" in pressed or "right" in pressed:
                 dx += PLAYER_SPEED * dt
             new_x = max(SHIP_W / 2, min(w - SHIP_W / 2, self._player.x + dx))
             self._player.x = new_x
 
-        # Collision. iter-43 writes inline — saga2d has no AABB helper
-        # in saga2d.util yet (parked in keras.dev as API-friction #2).
+        # Collision via iter-44's saga2d.util.collision. Sprite.aabb
+        # gives centre-anchored bounding boxes; aabb_overlap is a free
+        # function that takes Rects or (cx, cy, w, h) tuples.
         if self._player is not None:
+            player_aabb = self._player.aabb
             for rock in self._rocks:
-                if _aabb_overlap(
-                    self._player.x, self._player.y, SHIP_W, SHIP_H,
-                    rock.x, rock.y, ROCK_W, ROCK_H,
-                ):
+                if aabb_overlap(player_aabb, rock.aabb):
                     self._end_run()
                     return
 
@@ -241,21 +225,6 @@ class DodgeScene(Scene):
             text_style="title", text_color=GAME_OVER_COLOR,
             anchor=Anchor.CENTER,
         ))
-
-
-def _aabb_overlap(
-    ax: float, ay: float, aw: float, ah: float,
-    bx: float, by: float, bw: float, bh: float,
-) -> bool:
-    """Centre-anchored AABB overlap. saga2d's Sprite positions are the
-    sprite's visual anchor (default: ``BOTTOM_CENTER``). For the dodge
-    sprites both are centered *visually* enough that a simple
-    half-width distance test is correct to within 1–2 px — fine for
-    arcade gameplay."""
-    return (
-        abs(ax - bx) < (aw + bw) / 2
-        and abs(ay - by) < (ah + bh) / 2
-    )
 
 
 # ---------------------------------------------------------------------------

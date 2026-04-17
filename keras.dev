@@ -5218,3 +5218,140 @@ around motion rather than static UI.
 * **Font fallback chain** — still parked.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 44 — 2026-04-17
+
+Shipped the two API-debt fixes that iter-43 parked: held-key
+polling on :class:`InputManager` and an AABB collision helper
+on :mod:`saga2d.util`. Refactored :mod:`examples.dodge` to use
+both — real-user code proving the new primitives work end-to-
+end. Dodge is now cleaner than its iter-43 form: zero lines of
+held-keys tracking, zero lines of inline collision math.
+
+### What shipped
+
+* **``InputManager.is_pressed(key)``** + ``pressed_keys()``.
+  :class:`InputManager` now maintains a ``_pressed`` set
+  updated by :meth:`translate` on every key_press/key_release
+  event. Game code queries via ``game.input.is_pressed("a")``
+  (one key) or ``game.input.pressed_keys()`` (bulk frozen
+  snapshot). ``_clear_pressed()`` is the focus-loss escape
+  hatch. 40 LOC on ``saga2d/input.py``.
+* **``saga2d.util.collision``** — new module. :class:`Rect`
+  (frozen dataclass, centre-anchored ``cx/cy/w/h``, has
+  ``overlaps()`` and ``contains_point()``). :func:`aabb_overlap`
+  (free function accepting :class:`Rect` or ``(cx,cy,w,h)``
+  tuple — symmetric, translation-invariant, strict-inequality
+  for touching-edges). 90 LOC.
+* **``Sprite.aabb``** property. Returns a :class:`Rect`
+  centered on the sprite's *visual* center (anchor-corrected
+  via the existing ``_anchor_offset`` helper). Turns the
+  common-case "does player hit rock?" into ``aabb_overlap(
+  player.aabb, rock.aabb)``.
+* **``Sprite.size``** property. Exposes the underlying image's
+  ``(w, h)`` cached at construction. Useful for manual hit
+  boxes that don't want the full AABB.
+* **Public exports on ``saga2d`` top-level**: ``Rect``,
+  ``aabb_overlap``.
+* **``examples/dodge/dodge.py`` refactored** to use both new
+  APIs. Before: ~15 LOC of ``_held`` tracking +
+  ``handle_input`` + inline ``_aabb_overlap(ax, ay, aw, ah,
+  bx, by, bw, bh)``. After: ``game.input.pressed_keys()`` +
+  ``aabb_overlap(player.aabb, rock.aabb)``. Dodge is now 17
+  lines shorter with the same tests passing and byte-
+  identical PNG snapshot.
+* **26 property tests** (16 collision + 10 is_pressed):
+  reflexivity, symmetry, translation-invariance, touching-
+  edge convention, mixed-Rect-and-tuple interop,
+  ``Sprite.aabb`` tracking the sprite position, frozen-
+  snapshot semantics of ``pressed_keys()``, edge-triggered
+  dispatch unchanged by the level-triggered addition,
+  ``_clear_pressed`` escape hatch, and a stray-release
+  no-op case.
+
+915 mock-backend tests pass (26 new). Dodge PNG snapshot
+**byte-identical** to iter-43 — the refactor didn't change
+output, only the implementation. The iter-41 PNG-regression
+net caught zero drift, confirming the refactor is pure
+internal cleanup.
+
+### The Keras-for-game-dev posture
+
+Keras's batteries-included rule: a typical user should not
+need to write any "infrastructure" code. A dense layer is
+``Dense(64)``, not ``tf.matmul(x, tf.Variable(...)) +
+tf.Variable(...)``. In saga2d's game domain:
+
+*   **Before iter-44**: "make a game where the player moves
+    left and right" required 15 lines of infrastructure
+    (pressed-keys set, handle_input, collision math) before
+    any gameplay logic.
+*   **After iter-44**: zero. Three-line collision,
+    ``game.input.pressed_keys()`` for motion.
+
+A new user copy-pasting the iter-43 dodge example would
+have inherited the boilerplate; the iter-44 version shows
+the *actual* shape of a saga2d motion game.
+
+### Meta: framework shaped by its examples
+
+iter-43 wrote the first motion-driven example → iter-44
+surfaced and fixed the boilerplate that example exposed.
+This is the intended pattern: add a new example, note
+what felt bad, fix the framework, demonstrate the fix in
+the example. Every iteration narrows the gap between "what
+saga2d ships" and "what a game dev wants to write."
+
+Mock-backend test count 889 → 915.
+
+### API friction noticed this iteration
+
+1. **``sprite.aabb`` has a subtle anchor-related edge case**.
+   For ``BOTTOM_CENTER`` (the default), the AABB is correct
+   when the sprite image's *visual content* fills its raster.
+   If the sprite PNG has transparent padding around the
+   visible pixels (common for hand-painted sprites), the
+   AABB will include the padding — collisions register when
+   two sprites' transparent pixels touch, not their visible
+   ones. Fix would be per-pixel alpha masks or explicit
+   hitboxes. Parked until a real user complains.
+2. **Strict-inequality touching-edges convention isn't
+   universally right**. Tiled games usually want adjacent
+   tiles to NOT overlap (saga2d's current behavior).
+   Character-vs-wall collisions usually want "one pixel
+   inside the wall" to count — also current behavior. But
+   bullet-vs-player in a shoot'em-up often wants the bullet
+   to "tag" the player on first contact even if it's just
+   touching the edge. Fix: add ``aabb_overlap(a, b, strict=
+   True)``. Parked.
+3. **Documenting the full pressed-keys semantic contract**.
+   Does ``_clear_pressed`` fire on window defocus yet? No
+   — that's a pyglet event I haven't wired to
+   ``InputManager``. Will need to be before this feature
+   ships for a keyboard-heavy real game. Parked.
+
+### Concrete steps taken this iteration
+
+Two new API primitives (``is_pressed``, ``aabb_overlap`` +
+``Sprite.aabb``), one refactor of the iter-43 example,
+26 new property tests, one byte-identical re-render
+confirming no visual regression. Ring of Pain (and every
+other example) untouched — iter-44 is purely additive +
+one-example refactor.
+
+### Parked for iteration 45
+
+* **ParticleEmitter example** — still no runnable
+  demonstration of this subsystem.
+* **Window-focus release-all** — iter-44's pressed-keys
+  stubs expose ``_clear_pressed()`` but it's not wired to
+  any backend focus event yet.
+* **``aabb_overlap(a, b, strict=True)`` variant** —
+  bullet-tagging case.
+* **Per-pixel or explicit-hitbox sprite collision** — the
+  transparent-padding failure mode.
+* **Font fallback chain** — still parked.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.

@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from saga2d import Game, InputEvent
+from saga2d import Game
 from saga2d.testing import assert_scene_matches_snapshot
 
 from examples.dodge.dodge import DodgeScene, build_theme
@@ -112,9 +112,6 @@ def test_restart_resets_state(game: Game) -> None:
     assert scene.time_survived == 0.0
     assert scene.game_over is False
     assert scene._player is not None
-    # restart clears held keys — the player shouldn't auto-drift on
-    # first frame after restart.
-    assert scene._held == set()
 
 
 def test_high_score_tracked_across_restarts(game: Game) -> None:
@@ -130,16 +127,8 @@ def test_high_score_tracked_across_restarts(game: Game) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Input — continuous held-key motion
+# Input — continuous held-key motion, via iter-44's level-triggered API
 # ---------------------------------------------------------------------------
-
-
-def _press(scene: DodgeScene, key: str) -> None:
-    scene.handle_input(InputEvent(type="key_press", key=key))
-
-
-def _release(scene: DodgeScene, key: str) -> None:
-    scene.handle_input(InputEvent(type="key_release", key=key))
 
 
 def test_held_d_moves_player_right(game: Game) -> None:
@@ -147,7 +136,7 @@ def test_held_d_moves_player_right(game: Game) -> None:
     game._scene_stack.push(scene)
     game.tick(dt=1 / 60)
     start_x = scene._player.x
-    _press(scene, "d")
+    game.backend.inject_key("d", type="key_press")
     for _ in range(10):
         game.tick(dt=0.05)
     assert scene._player.x > start_x
@@ -158,7 +147,7 @@ def test_held_a_moves_player_left(game: Game) -> None:
     game._scene_stack.push(scene)
     game.tick(dt=1 / 60)
     start_x = scene._player.x
-    _press(scene, "a")
+    game.backend.inject_key("a", type="key_press")
     for _ in range(10):
         game.tick(dt=0.05)
     assert scene._player.x < start_x
@@ -168,10 +157,10 @@ def test_release_stops_movement(game: Game) -> None:
     scene = DodgeScene(seed=0)
     game._scene_stack.push(scene)
     game.tick(dt=1 / 60)
-    _press(scene, "d")
+    game.backend.inject_key("d", type="key_press")
     game.tick(dt=0.1)
     x_after_move = scene._player.x
-    _release(scene, "d")
+    game.backend.inject_key("d", type="key_release")
     for _ in range(10):
         game.tick(dt=0.05)
     assert scene._player.x == pytest.approx(x_after_move)
@@ -182,7 +171,7 @@ def test_player_clamped_to_canvas(game: Game) -> None:
     scene = DodgeScene(seed=0)
     game._scene_stack.push(scene)
     game.tick(dt=1 / 60)
-    _press(scene, "a")
+    game.backend.inject_key("a", type="key_press")
     for _ in range(200):  # way more than needed to reach the left edge
         game.tick(dt=0.05)
     w, _ = game.resolution
