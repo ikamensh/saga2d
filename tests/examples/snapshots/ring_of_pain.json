@@ -75,6 +75,13 @@
               "reactive": true
             },
             "text_style": "hud"
+          },
+          {
+            "type": "Label",
+            "text": {
+              "reactive": true
+            },
+            "text_style": "caption"
           }
         ]
       },
@@ -87,15 +94,6 @@
         "text_style": "caption",
         "anchor": "BOTTOM_RIGHT",
         "margin": 20
-      },
-      {
-        "type": "Label",
-        "text": {
-          "reactive": true
-        },
-        "text_style": "caption",
-        "anchor": "BOTTOM",
-        "margin": 48
       }
     ]
   }

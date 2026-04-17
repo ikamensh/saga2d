@@ -4906,3 +4906,146 @@ consensus is resolved.
 * **Unify snapshot update env var** — API-debt item.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 42 — 2026-04-17
+
+iter-42 shipped the Keras ``plot_model`` analog —
+``saga2d.testing.plot_scene`` — and addressed iter-41's
+status-message alignment issue by folding the message into the
+HUD Row itself. Diagnostic loop outcome: mixed. One iter-41
+consensus finding (node-label alignment) is now drift; another
+("YOU prominence") is now drift; but iter-42 introduced a new
+consensus finding (HUD overcrowded with the merged status).
+Lateral movement, not net progress — useful signal for when
+to stop iterating on a single area.
+
+### What shipped
+
+* **``saga2d.testing.plot_scene(setup_fn, path)``**. 180 LOC
+  in ``saga2d/testing/plot_scene.py``. Renders a scene with
+  every UI widget's bounding box outlined in a rotating
+  palette, labelled by type (``Label "Ring of Pain"``,
+  ``CircularGauge ← reactive``, ``Row``, etc.). Two modes:
+  ``schematic`` (dimmed bg + outlines, no render) and
+  ``overlay`` (full mock-to-PIL render + outlines).
+  Palette rotates by nesting depth so nested widgets read
+  visually different from their parents.
+* **Ring of Pain: status message merged into the HUD Row**.
+  Previously a standalone ``Label`` anchored at
+  ``Anchor.BOTTOM, margin=48``. iter-41's first attempt
+  (``margin=70``) collided with the bottom node's sub-label.
+  iter-42's approach: add the message as the fourth child of
+  the HUD ``Row``, so it sits beside HP/Coins inside the
+  grounding panel. The standalone floating label is gone;
+  the bottom of the screen is one visually-cohesive HUD
+  strip instead of HUD + floating text.
+* **``ring_budget(margin_bottom=)`` tuned 140 → 115**. With
+  the status message gone from its old floating position,
+  the ring can grow. 115 gives slight breathing room for the
+  bottom node sub-label without ring/HUD collision.
+* **Eight property tests for plot_scene**: output resolution
+  matches the request, writing to disk produces a file,
+  ``output_path=""`` returns in-memory without writing, each
+  widget bounds rectangle contributes non-background pixels,
+  schematic ≠ overlay pixel-wise, missing scene raises clear
+  error, two identical invocations are pixel-identical, and
+  nested widgets get different palette colours.
+
+876 mock-backend tests pass (8 new for plot_scene).
+
+### The Keras parallel lands
+
+| Keras utility                 | saga2d equivalent                     |
+|-------------------------------|----------------------------------------|
+| ``keras.utils.plot_model``    | ``saga2d.testing.plot_scene``          |
+| ``model.summary()``           | ``scene.summary()`` / ``summary_json`` |
+| ``model.save()`` + weights    | JSON snapshot + PNG snapshot           |
+| ``model.get_config()``        | ``scene.summary_json()``               |
+
+Only ``from_config()``/``from_json()`` (deserialising a scene
+from a spec) is still missing. The Keras-parallel story is
+increasingly complete.
+
+plot_scene directly answers the "why is my widget somewhere
+unexpected?" question that iter-41's Panel/Layout.NONE false-
+start surfaced. A schematic render would have shown the
+100×100 default Panel footprint immediately, without
+squinting at a partial overlay. It belongs in a saga2d dev's
+debugging toolkit alongside summary().
+
+### Cross-check: lateral movement
+
+| iter | consensus items (shortened)                           |
+|------|-------------------------------------------------------|
+|  41  | Typography · node alignment · YOU prominence         |
+|  42  | Typographic align · **Bottom UI overcrowded** · contrast |
+
+"YOU prominence" and "Typography inconsistency" moved to
+drift in iter-42. But the new status-message-in-HUD created
+its own consensus finding: reviewers now describe the HUD as
+containing "HP, Coins, objective, controls" — four things in
+one strip, asking to be split into "stats left, objective
+centre, controls right" (Claude's synthesis recommendation).
+
+This is the first iteration where a fix introduced a new
+consensus issue of comparable severity. iter-38→39→40→41 was
+a strict improvement at each step. iter-42 traded one
+consensus item (alignment) for another (overcrowding).
+Diminishing returns on cosmetic iteration.
+
+### Meta: when to stop the diagnostic loop
+
+Four diagnostic-loop rounds (iter-38 through iter-42) have
+now run. Rounds 1–3 produced unambiguous improvement. Round
+4 is the first with a neutral outcome. This matches the
+iter-6 meta-observation that cross-check has a ceiling: at
+some point the model is arguing about taste, not defects.
+For iter-43, the signal is to stop iterating on Ring of
+Pain's bottom HUD and move to unaddressed items (typography
+fallback, pyglet recovery, second user, a completely new
+example).
+
+### API friction noticed this iteration
+
+1. **``game._scene_stack.top`` is a method, not a property**.
+   Tripped me up in the first plot_scene implementation —
+   silently returned a function reference that crashed when
+   I called ``summary_json()`` on it. A ``@property``
+   decorator or a ``scene.top()`` / ``scene.peek()`` naming
+   would disambiguate.
+2. **Merging the status message into the HUD Row required
+   widening ``margin_bottom`` to avoid ring/HUD collision**.
+   The fact that a widget-tree change requires re-tuning a
+   rendering-function constant is a Demeter violation. A
+   ``ring_budget_from_layout(ui_root)`` that inspects the
+   UI tree's bottom-region footprint and returns the
+   reserve would be nicer — parked.
+3. **``plot_scene(setup_fn, path)`` needs the caller to
+   arrange a ``Game`` + ``_scene_stack.push``**. A higher-
+   level ``Scene.plot(path)`` instance method that
+   constructs a fresh Game, pushes self, and renders would
+   be friendlier for one-off debugging. Parked.
+
+### Concrete steps taken this iteration
+
+One new module (``plot_scene.py``, 180 LOC), one example
+refactor (HUD restructure), eight tests, one cross-check.
+JSON + PNG snapshots both refreshed to match the new HUD
+tree.
+
+### Parked for iteration 43
+
+* **Stop iterating on RoP's HUD** — the diagnostic loop has
+  reached the "taste" ceiling there. Move elsewhere.
+* **A sixth example** demonstrating something saga2d hasn't
+  yet shown off: sprites in motion, particle system,
+  animation scripting (the iter-24..26 work is present but
+  not exercised by any runnable example).
+* **``Scene.plot(path)``** instance method — the last bit
+  of friction on plot_scene.
+* **Font fallback chain** — so PIL can render Unicode arrows
+  + other glyphs that Cinzel lacks.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.

@@ -20,6 +20,7 @@ if str(_project_root) not in sys.path:
 from saga2d import (  # noqa: E402
     Anchor,
     CircularGauge,
+    Column,
     Game,
     Label,
     Panel,
@@ -256,16 +257,14 @@ class RingOfPainScene(Scene):
             text_style="hud",
             anchor=Anchor.TOP_RIGHT, margin=20,
         ))
-        # HUD grounding: iter-41 swaps Row's transparent-by-default
-        # style for an explicit dark-purple-alpha fill with padding.
-        # iter-40's cross-check consensus ("HUD reads as disconnected
-        # / floating") said the HP/Coins row lacked grounding vs. the
-        # ring of nodes above. A filled container without a border or
-        # shadow anchors the HUD without competing with the scene.
-        # Row inherits from Panel, so passing style= re-enables the
-        # background while keeping the horizontal flow layout —
-        # simpler than wrapping in a separate Panel (which would
-        # need explicit sizing since Layout.NONE defaults to 100x100).
+        # HUD: iter-42 groups the HUD row + status message into one
+        # Column so they move together as the bottom-left HUD block.
+        # iter-41's cross-check flagged the floating status message
+        # (``Floor 1 — clear the ring.`` at canvas-center BOTTOM)
+        # as competing vertically with the bottom node's sub-label.
+        # Moving it into the HUD cluster solves the spacing problem
+        # and creates a clear "player status" region separate from
+        # the ring itself.
         hud_bg = Style(
             background_color=(30, 20, 45, 180),
             padding=10,
@@ -289,6 +288,10 @@ class RingOfPainScene(Scene):
                 lambda: f"Coins {self.coins}",
                 text_style="hud", text_color=COIN_COLOR,
             ),
+            Label(
+                lambda: self.message,
+                text_style="caption",
+            ),
             spacing=14,
             style=hud_bg,
             anchor=Anchor.BOTTOM_LEFT, margin=16,
@@ -298,15 +301,10 @@ class RingOfPainScene(Scene):
             text_style="caption",
             anchor=Anchor.BOTTOM_RIGHT, margin=20,
         ))
-        # Message sits below the ring. Both Gemini and GPT flagged a
-        # centre-of-ring message as "crowds the nodes" in iter-7; the
-        # agreement between independent models is the signal that matters
-        # (see keras.dev iter-6 meta-lesson on cross-check consensus).
-        self.ui.add(Label(
-            lambda: self.message,
-            text_style="caption",
-            anchor=Anchor.BOTTOM, margin=48,
-        ))
+        # (iter-42 merged the former standalone status-message Label
+        # into the HUD Row above — it now appears alongside HP/Coins
+        # inside the grounding panel, so the two never compete
+        # vertically for the same pixels.)
 
     # -- Ring & player drawing (inherently per-frame procedural) ----------
 
@@ -327,7 +325,12 @@ class RingOfPainScene(Scene):
             (w, h),
             self.ring_size,
             margin_top=60,
-            margin_bottom=140,  # HUD row + message baseline (iter-39)
+            # iter-39 reserved 140 px for HUD + floating status message.
+            # iter-42 merged the status into the HUD Row (wider panel
+            # now), so the panel is taller — 115 px keeps the ring
+            # clear of the HUD, with slight breathing room for the
+            # bottom-node sub-label.
+            margin_bottom=115,
             margin_x=40,
             label_height=14,
             label_gap=18,
