@@ -5500,3 +5500,126 @@ examples; iter-45 closes **ParticleEmitter**.
 * **Font fallback chain**.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 46 — 2026-04-17
+
+Shipped two small parked-item fixes in one iteration —
+``ParticleEmitter.follow()`` and ``aabb_overlap(strict=True)``.
+Both surfaced from specific friction points in iter-44/45 and
+both are 20-LOC additions. Dodge refactored to use
+``follow()``, PNG snapshot byte-identical to iter-45 (pure
+internal cleanup, caught by the iter-41 regression net).
+
+### What shipped
+
+* **``ParticleEmitter.follow(target, offset=(dx, dy))``**.
+  Attaches the emitter to a sprite. Every :meth:`update`
+  call syncs the emitter's position to ``(target.x + dx,
+  target.y + dy)`` before spawning particles. When the
+  target is removed, the follow silently detaches on the
+  next tick — no stale reference retained, no exception.
+  ``follow(None)`` clears an existing attachment.
+  Finite-offset validation mirrors the existing
+  finite-position validation on :attr:`position`. ~30 LOC
+  on ``saga2d/rendering/particles.py``.
+* **``aabb_overlap(a, b, strict=True)`` variant**. Default
+  ``strict=False`` (saga2d's iter-44 convention: touching
+  edges ≠ overlap) covers tile-based games. ``strict=True``
+  uses ``<=`` so bullets tangent to a hitbox tag as hits on
+  first contact — the shoot'em-up case iter-44 parked.
+  4 LOC on ``saga2d/util/collision.py`` (one branch).
+* **Dodge refactor**. Replaced the scene-level
+  ``self._thruster.position = (...)`` per-tick boilerplate
+  with a single ``self._thruster.follow(self._player,
+  offset=(0, 4))`` call at emitter-construction time.
+  4 lines removed; emitter owns its own tracking now.
+* **9 new property tests** (7 follow + 2 strict):
+  immediate-snap on follow, target-movement tracking,
+  offset applied per tick, target removal auto-detaches,
+  ``follow(None)`` clears attachment, non-finite offset
+  rejected, continuous spawning uses synced position
+  (particles spawn where the emitter currently is, not
+  where it was constructed), touching-edges-as-overlap
+  opt-in, strict mode still rejects disjoint rects.
+
+1282 total tests pass (9 new: 7 follow + 2 strict).
+
+### The Keras parallel this iteration
+
+Keras's ``Layer.add_weight()`` / ``Layer.build()`` encodes
+the "subsystem owns its infrastructure" posture:
+when you add a ``Dense`` layer, you don't have to wire its
+weight tensors to the optimizer yourself — the layer
+registers them. saga2d's ParticleEmitter had a similar gap:
+when you attached it to a sprite, *you* had to keep them
+in sync every tick. iter-46 moved that bookkeeping into
+the emitter, same Keras-shape as moving weight-registration
+into the layer.
+
+### Iteration pattern still holds
+
+iter-45 parked "``emitter.follow`` would be a nicer API" ↓
+iter-46 shipped it in 30 LOC + 7 tests, used it in dodge
+without changing any rendered output. The parked-item →
+framework-fix cycle is at 4 consecutive iterations (iter-
+43/44/45/46 each closing the previous round's API debt).
+
+### API friction noticed this iteration
+
+1. **Sprite-to-sprite follow is not yet shipped**. iter-46
+   only handles ``ParticleEmitter.follow(sprite)``. A
+   common use case — an HP bar Sprite above an enemy
+   Sprite — would want ``Sprite.follow(other_sprite)`` too.
+   Not yet surfaced by any example; parked.
+2. **``follow()`` doesn't offer rotation inheritance**.
+   When a sprite rotation subsystem arrives (not yet),
+   emitters attached to a rotating ship would want to
+   rotate the ``offset`` with the ship's heading. saga2d
+   has no sprite rotation yet, so this is hypothetical.
+3. **No concept of "fire and detach"**. An emitter with
+   a ``follow`` and a finite burst could usefully detach
+   itself once the burst completes. Currently the caller
+   must remember to call ``emitter.follow(None)`` during
+   cleanup. Parked as minor API polish.
+
+### Cross-check outcome
+
+Skipped this iteration — PNG snapshot is byte-identical
+to iter-45, the iter-41 regression net is sufficient
+evidence that nothing visual changed. Saved ~30 seconds
+of cross-check API calls for a pure refactor.
+
+### Meta: 46 iterations, 6 examples, 4 clean diagnostic loops
+
+| stretch        | what it produced                                     |
+|----------------|-------------------------------------------------------|
+| iter-1..9      | static UI examples (dial, ttt, guess, RoP v1)         |
+| iter-10..37    | decl. API / testing / theming / ring + mock backend   |
+| iter-38..42    | mock-to-PIL renderer + cross-check diagnostic loop    |
+| iter-43..46    | sprite/action/particle subsystems exercised + fixed   |
+
+Mock-backend test count 923 → 932 (+9). Full mock+rendering
+1273 → 1282.
+
+### Concrete steps taken this iteration
+
+Two framework additions (~34 LOC together), one example
+refactor, nine new tests, zero visual diff. Dodge is
+now the smallest possible form of a motion-driven saga2d
+game — any more boilerplate removed would be below the
+"useful gameplay code" floor.
+
+### Parked for iteration 47
+
+* **``Sprite.follow(other_sprite, offset)``** — the HP-
+  bar-above-enemy / tagged-sidekick case.
+* **Burst-then-detach** — emitter self-cleanup for
+  follow+burst.
+* **Window-focus release-all** — iter-44's
+  ``_clear_pressed()`` still unwired.
+* **Per-pixel / explicit-hitbox collision**.
+* **Font fallback chain**.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.

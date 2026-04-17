@@ -115,6 +115,23 @@ def test_aabb_overlap_touching_edges_is_not_overlap() -> None:
     assert aabb_overlap((0, 0, 10, 10), (10, 0, 10, 10)) is False
 
 
+def test_aabb_overlap_strict_treats_touching_edges_as_overlap() -> None:
+    """iter-46 opt-in: ``strict=True`` flips touching-edges from
+    non-overlap to overlap. Useful for bullet-vs-player "first
+    contact tags as hit" semantics.
+    """
+    a = (0, 0, 10, 10)
+    b = (10, 0, 10, 10)  # right edge of a touches left edge of b
+    assert aabb_overlap(a, b) is False          # default: strict inequality
+    assert aabb_overlap(a, b, strict=True) is True   # opt-in: touch tags
+
+
+def test_aabb_overlap_strict_still_rejects_disjoint() -> None:
+    """strict=True flips only the boundary case — fully disjoint
+    rects still report non-overlap."""
+    assert aabb_overlap((0, 0, 10, 10), (100, 100, 10, 10), strict=True) is False
+
+
 def test_aabb_overlap_accepts_mixed_rect_and_tuple() -> None:
     r = Rect(0, 0, 10, 10)
     assert aabb_overlap(r, (5, 0, 10, 10)) is True

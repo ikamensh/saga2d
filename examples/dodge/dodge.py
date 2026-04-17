@@ -144,16 +144,12 @@ class DodgeScene(Scene):
             "dodge_ship",
             position=(w // 2, h - 80),
         ))
-        # iter-45: thruster trail. Emits continuously downward from
-        # just below the ship, with random direction spread and short
-        # lifetime so the particles form a rapidly-fading vapour cone.
-        # Position is updated each tick in ``update`` so the trail
-        # tracks the ship — ParticleEmitter itself has no "parent"
-        # concept, so the scene drives it.
-        # ``rng=self._rng`` makes the particle stream reproducible
-        # under a fixed ``seed=`` (iter-45: snapshot tests depend on
-        # this). Without it, module-level random would produce
-        # different particle positions every run.
+        # iter-46: thruster trail with emitter.follow() — the emitter
+        # tracks the ship each tick, no scene-level position pushing
+        # needed. iter-45 had to do ``self._thruster.position = ...``
+        # in update(); that boilerplate is now inside ParticleEmitter.
+        # ``rng=self._rng`` keeps the particle stream reproducible
+        # under a fixed ``seed=`` (required for PNG snapshot tests).
         self._thruster = ParticleEmitter(
             image="dodge_dust",
             position=(self._player.x, self._player.y + 4),
@@ -163,6 +159,7 @@ class DodgeScene(Scene):
             fade_out=True,
             rng=self._rng,
         )
+        self._thruster.follow(self._player, offset=(0, 4))
         self._thruster.continuous(rate=40)
 
     def _spawn_rock(self) -> None:
@@ -226,12 +223,10 @@ class DodgeScene(Scene):
                 dx += PLAYER_SPEED * dt
             new_x = max(SHIP_W / 2, min(w - SHIP_W / 2, self._player.x + dx))
             self._player.x = new_x
-            # iter-45: the thruster emitter has no parent-relative
-            # positioning — to attach it to the ship, the scene pushes
-            # its position each tick. Parked as API friction:
-            # emitter.follow(sprite, offset) would be a nicer API.
-            if self._thruster is not None:
-                self._thruster.position = (self._player.x, self._player.y + 4)
+            # iter-46: thruster position is kept in sync by the
+            # emitter itself via ``follow()`` — no per-tick update
+            # here. Left a comment where the old bookkeeping lived
+            # so future-me can see the before/after.
 
         # Collision via iter-44's saga2d.util.collision. Sprite.aabb
         # gives centre-anchored bounding boxes; aabb_overlap is a free
