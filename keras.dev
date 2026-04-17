@@ -5049,3 +5049,172 @@ tree.
   + other glyphs that Cinzel lacks.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 43 — 2026-04-17
+
+iter-43 broadened focus per iter-42's "taste-ceiling"
+diagnostic. Instead of iterating on RoP's HUD, shipped a
+sixth example that exercises saga2d's sprite + action
+subsystems — present since iter-24..26 but never demonstrated
+by a runnable game. Two API-friction points surfaced and are
+parked with concrete fix suggestions; one renderer gap found
+and filled in the same iteration.
+
+### What shipped
+
+* **``examples/dodge/dodge.py``** — a minimal arcade dodger
+  (~230 LOC). Player ship slides left/right via held A/D
+  (or arrows). Asteroids spawn from the top at increasing
+  rate + speed. Collision = game over; R restarts. Exercises:
+  :class:`Sprite` (2 asset types), :mod:`saga2d.actions`
+  (``Sequence(MoveTo, Remove)`` fire-and-forget tween
+  pattern), reactive :class:`Label` s bound to scene state,
+  ``controls`` dict for restart, manual held-keys tracking
+  for continuous motion, inline AABB for collision.
+* **``scripts/generate_dodge_sprites.py``** — procedural
+  48×48 triangular ship + 36×36 irregular asteroid (seeded
+  polygon + random pits + highlight). Same repo-reproducible
+  approach as iter-33's ``generate_sprites.py``.
+* **Mock-to-PIL renderer sprite support**. Single biggest
+  discovery of the iteration: the iter-38 renderer only
+  read ``backend.images`` (per-frame blits) — saga2d's
+  :class:`Sprite` instances live in ``backend.sprites``
+  (persistent dict keyed by sprite id) and were silently
+  skipped. Adding a sort-by-(layer, y) sprite loop to
+  ``_render_backend_state`` was 15 lines and immediately
+  made every saga2d sprite-based example renderable. Ring
+  of Pain's player token still works because iter-33 used
+  ``scene.draw_image`` (per-frame blits) rather than a real
+  Sprite — a pre-existing inconsistency that iter-43 didn't
+  touch.
+* **11 property tests for dodge**: structural JSON snapshot,
+  time advances per tick, rocks spawn, game_over defaults
+  False, forced collision flips it True, restart resets
+  state, high score tracked across restarts, held-D moves
+  right, held-A moves left, release stops motion, player
+  clamped to viewport edges.
+* **1 new property test on mock_renderer**: sprites contribute
+  non-background pixels to the canvas (regression guard
+  against silently reverting iter-43's renderer change).
+* **Cross-check on the dodge render**. Consensus points
+  largely cosmetic (typography hierarchy recurring, asset
+  quality of identical asteroids, safe-area margins). None
+  flag structural issues with the game or renderer — a
+  clean launch for a brand-new example.
+
+889 mock-backend tests pass (13 new: 11 dodge properties +
+1 mock_renderer sprite regression + 1 PNG snapshot for dodge).
+
+### The Keras parallel this iteration
+
+Keras's story for "how do you train a network?" is
+``model.compile() → model.fit(data)``. The analog in saga2d
+for "how do you animate a sprite?" turns out to be
+``sprite.do(Sequence(MoveTo(...), ...))``. iter-43 made that
+pattern visible for the first time via a runnable example.
+Before iter-43, a new user finding saga2d would have read
+``saga2d/actions.py`` and guessed at the API from tests. The
+dodge example is now a working reference.
+
+### API friction surfaced, not yet fixed
+
+1. **``game.input.is_pressed(key)`` does not exist**. saga2d
+   only dispatches edge-triggered events (press, release)
+   and offers no level-triggered query for held keys. Every
+   example that wants continuous motion (dodge; a future
+   platformer; any WASD-controlled game) will re-implement
+   this block:
+
+       self._held: set[str] = set()
+       def handle_input(self, e):
+           if e.type == "key_press": self._held.add(e.key)
+           elif e.type == "key_release": self._held.discard(e.key)
+
+   Fix: ship ``game.input.is_pressed(key) -> bool`` that
+   tracks this internally. 20-line addition to
+   :class:`saga2d.input.InputManager`. Parked for iter-44.
+2. **No AABB / bounding-box collision helper**. The dodge
+   example writes a 4-line ``_aabb_overlap`` inline. Every
+   2D game has collision — saga2d's lack of even a basic
+   AABB helper is API debt. Fix: add
+   ``saga2d.util.collision.aabb_overlap(a, b)`` and maybe
+   ``sprite.rect`` as a convenience. Parked for iter-44.
+3. **Sprite rendering in the mock-to-PIL renderer was a
+   silent gap** until iter-43 forced the issue. Would have
+   been caught earlier if the iter-38 mock-to-PIL renderer
+   had shipped with a property test that covered all three
+   saga2d image-drawing paths (``draw_image``, ``Sprite``,
+   and ``ImageBox``). Fixed in iter-43 but a similar gap
+   may exist for particle systems (``ParticleEmitter`` is
+   iter-24 and also unexercised by examples). Parked.
+
+### Cross-check: cosmetic consensus
+
+| issue                                   | severity              |
+|-----------------------------------------|-----------------------|
+| UI/Typography alignment                 | recurring / cosmetic  |
+| Font style inconsistency                | PIL artifact          |
+| Safe-area violations (edge margins)     | real / minor          |
+| Asteroid asset repetition               | real / mild           |
+| Bottom-left controls readability        | real / minor          |
+
+No structural bugs or layout collisions. A reasonable
+launch state for a ~230-line example.
+
+### Meta: 43 iterations, 6 examples, 3 diagnostic loops, 1 new
+subsystem exercised end-to-end
+
+| example          | subsystems exercised                           |
+|------------------|------------------------------------------------|
+| guess_the_number | Scene · controls · reactive Labels             |
+| dial_menu        | Scene · controls · reactive Labels             |
+| tictactoe        | Scene · grid math · controls                   |
+| ring_of_pain     | + save/load · audio · draw_image               |
+| reaction_test    | + Scene.after timers                           |
+| **dodge (iter-43)**  | + **Sprite** · **Actions** · held-keys tracking |
+
+ParticleEmitter still untested by an example — next candidate.
+Mock-backend test count 876 → 889.
+
+### API friction noticed this iteration
+
+(Friction also listed in the "surfaced, not yet fixed"
+section above — ``is_pressed`` and AABB helpers were the
+pain points.)
+
+4. **``backend.images`` vs ``backend.sprites`` is a confusing
+   split**. Images are per-frame blits (cleared every tick);
+   sprites are persistent state the scene manages. A new
+   user writing either a scene with ``draw_image`` calls or
+   a scene with Sprite instances sees different recording
+   paths in the mock backend when debugging. A unified
+   ``backend.get_frame_draw_ops()`` that returns both kinds
+   with consistent metadata would simplify assertions.
+5. **``Sprite.position`` is a ``tuple[float, float]`` but
+   ``Sprite.x`` / ``Sprite.y`` are float properties set
+   independently**. Makes sense individually but led to a
+   confusion where I nearly did ``sprite.position = (x,
+   sprite.position[1])`` instead of ``sprite.x = x``. A
+   ``sprite.set_position(x=…, y=…)`` convenience would be
+   kinder.
+
+### Concrete steps taken this iteration
+
+One new example (~230 LOC), one sprite-generation script,
+one renderer enhancement (15 LOC), 12 new property tests,
+one cross-check. Dodge is the first saga2d example built
+around motion rather than static UI.
+
+### Parked for iteration 44
+
+* **``game.input.is_pressed(key)`` helper** — concrete API
+  fix for iter-43 friction #1.
+* **``saga2d.util.collision.aabb_overlap``** — concrete API
+  fix for iter-43 friction #2. Plus maybe ``Sprite.rect``.
+* **ParticleEmitter example** — the subsystem still
+  unexercised by any example.
+* **Font fallback chain** — still parked.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.

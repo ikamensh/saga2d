@@ -106,6 +106,34 @@ def _render_backend_state(
         resized = img.resize((bw, bh), Image.LANCZOS)
         canvas.alpha_composite(resized, (blit["x"], blit["y"]))
 
+    # Sprites — iter-43 added support. saga2d Sprites live in
+    # ``backend.sprites`` (a persistent dict keyed by sprite id), not
+    # the ``backend.images`` per-frame blit list. Without this loop,
+    # any example that uses :class:`saga2d.Sprite` (dodge, ring_of_pain
+    # iter-33+) renders with the primitives but no sprite art. Sort
+    # by layer + y so draw order matches pyglet's behaviour.
+    sprites = getattr(backend, "sprites", None) or {}
+    for _sid, s in sorted(
+        sprites.items(),
+        key=lambda kv: (kv[1].get("layer", 0), kv[1].get("y", 0)),
+    ):
+        if not s.get("visible", True):
+            continue
+        opacity = s.get("opacity", 255)
+        if opacity <= 0:
+            continue
+        img = _lookup_blit_image(backend, s["image"])
+        if img is None:
+            continue
+        # Apply opacity if < full.
+        if opacity < 255:
+            alpha = img.split()[-1].point(
+                lambda a, o=opacity: int(a * o / 255)
+            )
+            img = img.copy()
+            img.putalpha(alpha)
+        canvas.alpha_composite(img, (int(s["x"]), int(s["y"])))
+
     font_cache: dict[int, ImageFont.FreeTypeFont] = {}
     for text_entry in backend.texts:
         color = text_entry["color"]

@@ -115,6 +115,40 @@ def test_missing_sprite_path_is_skipped_silently() -> None:
     assert img.size == (100, 100)
 
 
+def test_sprites_are_rendered_into_canvas() -> None:
+    """iter-43 extended the renderer to iterate over ``backend.sprites``
+    (persistent dict) in addition to ``backend.images`` (per-frame blits).
+    Without this, any scene using :class:`Sprite` instances would render
+    with the HUD and primitives but no sprite art. Regression test:
+    a sprite at a known position leaves non-background pixels there."""
+    from saga2d import Sprite
+
+    def setup(game: Game) -> None:
+        class S(Scene):
+            background_color = (0, 0, 0, 255)
+
+            def on_enter(self) -> None:
+                # Use the player_token asset — already bundled, round
+                # gold disc easy to detect.
+                self.add_sprite(Sprite(
+                    "player_token",
+                    position=(50, 50),
+                ))
+
+        game._scene_stack.push(S())
+
+    img = render_mock_scene(setup, resolution=(100, 100))
+    # player_token is 64×64 gold; anchored BOTTOM_CENTER at (50, 50)
+    # puts its top-left around (18, -14). Somewhere in the first
+    # 50×50 pixels should be gold.
+    non_bg = sum(
+        1 for x in range(0, 50, 2)
+        for y in range(0, 50, 2)
+        if img.getpixel((x, y)) != (0, 0, 0, 255)
+    )
+    assert non_bg > 3, "expected sprite pixels in the canvas"
+
+
 def test_render_is_deterministic_for_identical_input() -> None:
     """Two render_mock_scene calls with the same setup produce
     pixel-identical output — useful for snapshot-testing layouts."""

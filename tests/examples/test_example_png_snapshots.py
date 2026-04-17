@@ -114,6 +114,28 @@ def test_reaction_test_visual_snapshot() -> None:
     )
 
 
+def test_dodge_visual_snapshot() -> None:
+    """iter-43: sixth example. Tests the mock-to-PIL renderer's
+    iter-43 sprite-path addition — without it, dodge renders with
+    no ships or rocks, just the HUD."""
+    from examples.dodge.dodge import DodgeScene, build_theme
+
+    def setup(game: Game) -> None:
+        scene = DodgeScene(seed=0)
+        game._scene_stack.push(scene)
+        # Tick forward so some rocks are mid-screen when we capture.
+        for _ in range(100):
+            game.tick(dt=0.05)
+
+    assert_scene_matches_png_snapshot(
+        setup, "dodge",
+        snapshot_dir=SNAPSHOT_DIR,
+        resolution=(600, 800),
+        tick_count=0,  # Setup already ticked 100 frames.
+        theme=build_theme(),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Framework properties of the helper itself.
 # ---------------------------------------------------------------------------
