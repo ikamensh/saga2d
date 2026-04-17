@@ -19,9 +19,9 @@ if str(_project_root) not in sys.path:
 
 from saga2d import (  # noqa: E402
     Anchor,
+    CircularGauge,
     Game,
     Label,
-    ProgressBar,
     Row,
     Scene,
     TextStyle,
@@ -254,25 +254,31 @@ class RingOfPainScene(Scene):
             text_style="hud",
             anchor=Anchor.TOP_RIGHT, margin=20,
         ))
-        # HUD row: HP label + reactive ProgressBar + Coins label, all
-        # pulling directly from scene state. No manual update wiring.
+        # HUD row: CircularGauge + HP label + Coins label — iter-40
+        # switches from the horizontal ProgressBar (iter-38 cross-check
+        # flagged its sharp-cornered rectangular style as clashing with
+        # the circular node aesthetic). The gauge is a disc whose inner
+        # radius scales with HP fraction, so the HUD reads as a smaller
+        # member of the same family as the ring nodes above.
         self.ui.add(Row(
+            CircularGauge(
+                value=lambda: self.hp,
+                max_value=lambda: self.max_hp,
+                radius=11,
+                fill_color=HP_COLOR,
+                empty_color=(60, 30, 40, 255),
+                rim_color=(235, 80, 95, 255),
+                rim_width=2,
+            ),
             Label(
                 lambda: f"HP {self.hp}/{self.max_hp}",
                 text_style="hud", text_color=HP_COLOR,
-            ),
-            ProgressBar(
-                value=lambda: self.hp,
-                max_value=lambda: self.max_hp,
-                width=100, height=12,
-                bar_color=HP_COLOR,
-                bg_color=(60, 30, 40, 255),
             ),
             Label(
                 lambda: f"Coins {self.coins}",
                 text_style="hud", text_color=COIN_COLOR,
             ),
-            spacing=16,
+            spacing=14,
             anchor=Anchor.BOTTOM_LEFT, margin=16,
         ))
         self.ui.add(Label(

@@ -350,6 +350,184 @@ class ProgressBar(Component):
 
 
 # ---------------------------------------------------------------------------
+# CircularGauge
+# ---------------------------------------------------------------------------
+
+
+class CircularGauge(Component):
+    """Disc gauge — value/max_value shown as an inner-disc radius ratio.
+
+    Use instead of :class:`ProgressBar` when the surrounding art is
+    built from circles and a horizontal bar would break the aesthetic
+    (Ring of Pain's ring of discs being the canonical case).
+
+    Renders as two concentric circles:
+
+    *   ``empty_color`` slot at the full radius (always drawn).
+    *   ``fill_color`` inner disc at ``radius × fraction``.
+
+    An optional rim outline at the outer radius gives the gauge a
+    small "socket" feel — matches the rim-and-fill style of the
+    Ring of Pain nodes.
+
+    ``value`` / ``max_value`` accept zero-argument callables and
+    refresh each frame — same reactive pattern as :class:`Label` and
+    :class:`ProgressBar`::
+
+        CircularGauge(
+            value=lambda: self.hp,
+            max_value=lambda: self.max_hp,
+            radius=14,
+            fill_color=(255, 140, 160, 255),
+            empty_color=(60, 30, 40, 255),
+        )
+
+    Parameters:
+        value:       Current value — float or callable.
+        max_value:   Maximum value (default ``1.0``) — float or callable.
+        radius:      Outer gauge radius in pixels (default ``12``).
+        fill_color:  Colour of the inner filled disc.
+        empty_color: Colour of the background slot.
+        rim_color:   Optional outer ring colour drawn between empty
+                     and fill. ``None`` (default) draws no rim.
+        rim_width:   Rim thickness in pixels (ignored when ``rim_color``
+                     is ``None``).
+        style:       Explicit :class:`Style` overrides (unused for
+                     drawing; present for uniformity with other
+                     components).
+        **kwargs:    Forwarded to :class:`Component` (``anchor``,
+                     ``margin``, ``visible``, ``enabled``).
+    """
+
+    def __init__(
+        self,
+        value: float | Callable[[], float] = 0,
+        max_value: float | Callable[[], float] = 1.0,
+        *,
+        radius: int = 12,
+        fill_color: Color = (255, 255, 255, 255),
+        empty_color: Color = (60, 60, 60, 255),
+        rim_color: Color | None = None,
+        rim_width: int = 2,
+        style: Style | None = None,
+        **kwargs: Any,
+    ) -> None:
+        if radius <= 0:
+            raise ValueError(f"CircularGauge radius must be positive, got {radius!r}")
+        if not callable(value) and not math.isfinite(value):
+            raise ValueError(
+                f"CircularGauge value must be a finite number, got {value!r}"
+            )
+        if not callable(max_value) and not math.isfinite(max_value):
+            raise ValueError(
+                f"CircularGauge max_value must be a finite number, got {max_value!r}"
+            )
+        size = 2 * radius
+        super().__init__(width=size, height=size, style=style, **kwargs)
+        self._radius = radius
+        self._value_rv: ReactiveValue[float] = ReactiveValue(value, default=0.0)
+        self._max_value_rv: ReactiveValue[float] = ReactiveValue(
+            max_value, default=1.0
+        )
+        self._fill_color = fill_color
+        self._empty_color = empty_color
+        self._rim_color = rim_color
+        self._rim_width = rim_width
+
+    def _refresh(self) -> None:
+        self._value_rv.refresh()
+        if not math.isfinite(self._value_rv.value):
+            raise ValueError(
+                f"CircularGauge value callable returned non-finite "
+                f"{self._value_rv.value!r}"
+            )
+        self._max_value_rv.refresh()
+        if not math.isfinite(self._max_value_rv.value):
+            raise ValueError(
+                f"CircularGauge max_value callable returned non-finite "
+                f"{self._max_value_rv.value!r}"
+            )
+
+    @property
+    def value(self) -> float:
+        """Current value. For a reactive gauge, re-evaluates the callable."""
+        self._refresh()
+        return self._value_rv.value
+
+    @value.setter
+    def value(self, v: float) -> None:
+        if not math.isfinite(v):
+            raise ValueError(
+                f"CircularGauge value must be a finite number, got {v!r}"
+            )
+        self._value_rv.set(v)
+
+    @property
+    def max_value(self) -> float:
+        """Maximum value. For a reactive gauge, re-evaluates the callable."""
+        self._refresh()
+        return self._max_value_rv.value
+
+    @max_value.setter
+    def max_value(self, v: float) -> None:
+        if not math.isfinite(v):
+            raise ValueError(
+                f"CircularGauge max_value must be a finite number, got {v!r}"
+            )
+        self._max_value_rv.set(v)
+
+    @property
+    def fraction(self) -> float:
+        """Proportion 0.0..1.0 (refreshes bound callables first)."""
+        self._refresh()
+        mv = self._max_value_rv.value
+        if mv <= 0:
+            return 0.0
+        return max(0.0, min(1.0, self._value_rv.value / mv))
+
+    @property
+    def radius(self) -> int:
+        """Outer gauge radius in pixels."""
+        return self._radius
+
+    def get_preferred_size(self) -> tuple[int, int]:
+        size = 2 * self._radius
+        return (size, size)
+
+    def on_draw(self) -> None:
+        if self._game is None:
+            return
+        backend = self._game._backend
+        cx = self._computed_x + self._radius
+        cy = self._computed_y + self._radius
+        r = self._radius
+
+        # Slot — always drawn so an empty gauge still has a visual footprint.
+        backend.draw_circle(cx, cy, r, self._empty_color)
+
+        # Optional rim between slot and fill. Drawn as a filled disc that
+        # the inner fill overwrites (simpler than arcs and matches the
+        # rim/fill style used by saga2d's scene draw_circle stacking).
+        if self._rim_color is not None and self._rim_width > 0:
+            # A solid rim-colour disc just inside the slot, that the
+            # inner fill will cover in the filled portion.
+            inset = max(0, self._rim_width)
+            if r - inset > 0:
+                backend.draw_circle(cx, cy, r - inset, self._empty_color)
+            # Re-paint the rim on top of the slot (draw a rim-colour
+            # ring by drawing a rim-colour disc and then the inner
+            # slot on top of it).
+            backend.draw_circle(cx, cy, r, self._rim_color)
+            if r - inset > 0:
+                backend.draw_circle(cx, cy, r - inset, self._empty_color)
+
+        # Fill — inner disc sized to fraction.
+        fill_r = int(round(r * self.fraction))
+        if fill_r > 0:
+            backend.draw_circle(cx, cy, fill_r, self._fill_color)
+
+
+# ---------------------------------------------------------------------------
 # Word-wrap helper
 # ---------------------------------------------------------------------------
 

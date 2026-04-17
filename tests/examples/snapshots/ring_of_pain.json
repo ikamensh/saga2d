@@ -57,17 +57,17 @@
         "margin": 16,
         "children": [
           {
+            "type": "CircularGauge",
+            "value": {
+              "reactive": true
+            }
+          },
+          {
             "type": "Label",
             "text": {
               "reactive": true
             },
             "text_style": "hud"
-          },
-          {
-            "type": "ProgressBar",
-            "value": {
-              "reactive": true
-            }
           },
           {
             "type": "Label",

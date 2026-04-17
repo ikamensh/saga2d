@@ -4599,3 +4599,143 @@ expected result: a real fix for a real issue.
   matches the node style, or by restyling the progress bar's
   pill shape. Neither is trivial.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 40 — 2026-04-16
+
+Shipped a new :class:`CircularGauge` widget and used it to
+replace Ring of Pain's rectangular HP bar. This addresses
+iter-38/39's "HUD stylistic-clash" consensus finding with a
+general-purpose reusable component rather than a one-off fix.
+Closed the diagnostic loop end-to-end a second time: consensus
+issue surfaced in iter-38 → investigated in iter-39 (typography
+& layout) → widget-level fix in iter-40 → re-cross-check
+confirms the finding moved out of consensus.
+
+### What shipped
+
+* **``saga2d.CircularGauge`**. 200 LOC widget in
+  ``saga2d/ui/widgets.py``. Same reactive contract as
+  :class:`ProgressBar` (``value=callable``, ``max_value=callable``,
+  refreshed each frame). Renders as a disc slot with an inner
+  fill disc sized by the fraction. Optional rim colour for the
+  rim-and-fill style used by Ring of Pain nodes. Added to
+  public exports on both ``saga2d`` and ``saga2d.ui``.
+* **Ring of Pain HUD restyle**. Previous HUD row was
+  ``Label("HP") + ProgressBar(rectangular pink pill) +
+  Label("Coins")``. iter-40 swaps the ProgressBar for a
+  ``CircularGauge(radius=11, fill=HP_COLOR, rim=...)``. The HUD
+  now visually belongs to the same family as the ring of
+  circular nodes above — one visual language instead of two.
+* **Ten CircularGauge property tests** (``tests/ui/
+  test_circular_gauge.py``). Half are shared-contract with
+  ProgressBar (fraction arithmetic, NaN guards, reactive
+  rebinding). The other half verify *visual* properties via
+  the iter-38 mock-to-PIL renderer — the centre pixel of a
+  full gauge is the fill colour, the centre pixel of an empty
+  gauge is the empty colour, a half-full gauge's 15-px-out
+  pixel is empty-colour. These rely on ``draw_circle``
+  predictability and pass deterministically.
+
+860 mock-backend tests pass (10 new; previously 850).
+
+### The diagnostic loop ran cleanly a second time
+
+| iter | cross-check consensus on Ring of Pain render           |
+|------|-------------------------------------------------------|
+|  38  | 4 font sizes · **pink bar clashes** · bottom collision |
+|  39  | 4 sizes → 3 · pink bar clashes · node text too small   |
+|  40  | HUD lacks grounding · node label spacing · type hier.  |
+
+iter-38's "bottom collision" → drift in iter-39 (fixed by
+``margin_bottom`` bump).  iter-38's "4 font sizes" → drift in
+iter-40 (fixed by iter-39's ``sub`` / ``caption`` unification).
+iter-38/39's "pink HP bar clashes with circular aesthetic" →
+**gone entirely in iter-40** (CircularGauge replaced it). The
+cross-check synthesis no longer mentions the bar at all.
+
+The new consensus point is narrower: "HUD needs a containing
+panel to feel grounded." That's a more mundane UX improvement,
+not a stylistic clash. Progress.
+
+### Meta: 40 iterations, 2 diagnostic loops closed
+
+The iter-7/8 cross-check methodology was aimed at exactly this
+pattern: real cross-model consensus → fix → re-cross-check →
+issue either dissolves or crystallises. Before iter-38 there
+was no rendering pipeline for the loop to run on. In iter-38
+the pipeline came online. In iter-39 and iter-40 the loop ran
+twice and closed cleanly each time — iter-39 on a layout bug,
+iter-40 on an aesthetic widget-level fix.
+
+Mock-backend test count 850 → 860. CircularGauge is
+zero-external-dependency (same draw_circle primitive as every
+other saga2d circle) and self-contained — the only new code is
+one file with tests.
+
+### Keras-for-game-dev dimension this iteration
+
+Keras ships prebuilt layers (``Conv2D``, ``Dropout``,
+``BatchNormalization``). saga2d ships prebuilt widgets. Before
+iter-40: ``Label``, ``Button``, ``Panel``, ``Row``, ``Column``,
+``ProgressBar``, ``TextBox``, ``List``, ``Grid``, ``Tooltip``,
+``TabGroup``, ``DataTable``, ``ImageBox``. iter-40 adds
+``CircularGauge`` — a disc counterpart to ProgressBar for games
+with circular art, filling out the widget vocabulary one bit
+more. The pattern is "pick a widget, pass a reactive callable,
+the framework handles drawing and updating" — identical to
+Keras's "pick a layer, pass a shape, the framework handles
+gradients and weights."
+
+Where saga2d still diverges from Keras is in the *introspection
+story*. Keras's ``model.summary()`` reads cleanly because each
+layer's shape is mechanically derivable from its predecessor.
+saga2d's ``Scene.summary()`` (iter-24) lists the UI tree but
+not the visual footprint (how much screen real estate does this
+HUD row claim? which widgets overlap which?). A future
+iteration could add ``Scene.summary(include_bounds=True)`` to
+surface *visual* structure the same way Keras surfaces *tensor*
+structure.
+
+### API friction noticed this iteration
+
+1. **CircularGauge shares a lot with ProgressBar**. Both have
+   ``value``, ``max_value``, ``_refresh``, ``fraction``. Both
+   validate finiteness. Copy-paste rather than abstract base
+   felt right for two instances — if a third gauge-like widget
+   appears (RadialArc? Pie?) a ``ReactiveRatioWidget`` mixin
+   would be worth extracting. Three similar lines is better
+   than a premature abstraction.
+2. **The rim-color rendering uses 4 draw_circle calls to
+   simulate a ring**. A first-class ``draw_ring(cx, cy, r,
+   ring_width, color)`` primitive on the backend would cut
+   this to 1 call and be sharper on a GPU backend. Parked —
+   not worth adding until a second user appears.
+3. **GPT-5.1 called the new gauge "the HP pill icon is
+   squashed"**. The gauge is ``radius=11``, diameter 22 px,
+   rendered next to an 18-pt text label. At this scale, PIL
+   draws it slightly stippled. Bumping to ``radius=13``
+   would read more solidly — considered for iter-41.
+
+### Concrete steps taken this iteration
+
+One widget, ten property tests, one HUD restyle in Ring of
+Pain, one cross-check. The consensus point that has been open
+since iter-38 is now closed. No pyglet in sight still.
+
+### Parked for iteration 41
+
+* **HUD grounding** — iter-40's cross-check consensus. A
+  subtle semi-transparent panel behind the HUD row would
+  address the "disconnected / floating" feedback. Fits the
+  circular aesthetic if the panel is an oval or rounded
+  container (or simply a darker background rectangle with
+  low opacity).
+* **CircularGauge radius bump** — iter-40's drift (GPT only):
+  ``radius=11`` → ``radius=13`` would read cleaner at the
+  HUD scale. Not a consensus issue yet; deferred.
+* **Scene.summary(include_bounds=True)** — visual footprint
+  introspection. The Keras-parallel step.
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.
