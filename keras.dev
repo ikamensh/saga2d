@@ -5623,3 +5623,166 @@ game — any more boilerplate removed would be below the
 * **Font fallback chain**.
 * **Pyglet render** — still blocked.
 * **Second user** — still outstanding.
+
+---
+
+## Iteration 47 — 2026-04-17
+
+Reconnected with the /loop prompt's "ring of pain like game"
+focus after five iterations of dodge. Added **combat animation**
+to Ring of Pain's enemy interact: a gold projectile flies from
+the ring centre to the target node, trailing particles, and
+detonates on impact. This is the first time Ring of Pain
+exercises Sprite + Actions + ParticleEmitter subsystems —
+everything iter-43..46 shipped is now in use on the /loop's
+original example. Also shipped the parked
+:meth:`Sprite.follow()` API in the same iteration, as the
+mechanism for attaching the particle trail to the projectile.
+
+### What shipped
+
+* **``Sprite.follow(target, offset=(dx, dy))``**. Parallel to
+  iter-46's :meth:`ParticleEmitter.follow`. Snaps position
+  immediately on call so the first rendered frame is already
+  correct. :meth:`Game._update_sprite_follows(dt)` syncs
+  registered sprites once per tick. Order: actions → follows
+  → particles, so an emitter following a sprite sees the
+  sprite's post-action position. Auto-detaches on target
+  removal. ``follow(None)`` clears. Swapping targets
+  deregisters cleanly. ~50 LOC on
+  ``saga2d/rendering/sprite.py`` + ``saga2d/game.py``.
+* **Ring of Pain combat animation**. New
+  ``_fire_combat_bolt(target_idx)`` method on
+  :class:`RingOfPainScene`. Three-stage animation chain:
+  1. Spawn ``rop_bolt`` :class:`Sprite` at the ring centre.
+  2. Attach a trailing :class:`ParticleEmitter`
+     (``continuous(rate=50)``, short-lifetime yellow sparks)
+     that ``follow()`` s the bolt — pure iter-46 API, no
+     scene-level position pushing.
+  3. Bolt runs ``Sequence(MoveTo(target_pos, speed=400),
+     Do(on_impact), Remove())``. ``on_impact`` stops the
+     trail and fires an 18-particle radial burst at the
+     target node.
+* **``assets/images/rop_bolt.png``** + updated
+  ``scripts/generate_sprites.py``. 14×14 three-stop gold
+  halo, same repo-reproducible pattern as iter-32/33/45.
+* **Position caching in ``draw()``**. The combat call needs
+  ring-centre + per-node pixel coords; draw() stashes them
+  each frame in ``self._last_*`` fields. This surfaced as
+  API friction (see below).
+* **14 new property tests**: 8 for ``Sprite.follow`` (snap,
+  track, detach, clear, swap, chain, non-finite rejection,
+  remove-deregistration) + 6 for RoP combat (enemy spawns
+  bolt, non-enemy doesn't, bolt arrives and burst fires,
+  burst contains spark particles, trail uses ``follow()``
+  API, safety against no-draw-yet state).
+
+1296 total tests pass (14 new). Ring of Pain's default PNG
+snapshot is byte-identical to iter-46 — the combat animation
+only fires on keypress, and the snapshot captures the pre-
+combat state.
+
+### The Keras parallel this iteration
+
+Keras's ``Layer`` system lets layers compose — a ``Dense``
+feeds into a ``Dropout`` feeds into another ``Dense``,
+and each layer's output is automatically wired to the next
+layer's input. saga2d's iter-43..47 ``follow()`` APIs
+build the analogous composition primitive for spatial
+relationships: a particle emitter composes with a sprite
+(emitter.follow(sprite)); a sprite composes with another
+sprite (sprite.follow(target)). A projectile + trail +
+impact-burst chain — iter-47's combat animation — is the
+saga2d equivalent of a three-layer sub-network in Keras.
+
+Before iter-43..47, the scene had to manually wire every
+spatial relationship in ``update(dt)``. After iter-47, the
+subsystems wire themselves. That's the Keras posture —
+compose primitives, don't re-implement infrastructure.
+
+### Iteration pattern at 5 consecutive clean closes
+
+| iter | example work              | framework addition            |
+|------|---------------------------|-------------------------------|
+|  43  | dodge (sprites+actions)   | —                             |
+|  44  | dodge refactor            | is_pressed, aabb_overlap      |
+|  45  | dodge particles           | ParticleEmitter.rng param     |
+|  46  | dodge follow refactor     | ParticleEmitter.follow, strict|
+|  47  | RoP combat animation      | Sprite.follow                 |
+
+Each iteration: example surfaces a concrete missing primitive
+→ ship it in the framework → example uses it → commit. The
+primitives compound: iter-47's RoP combat uses Sprite.follow
+(iter-47 new) + ParticleEmitter.follow (iter-46) +
+ParticleEmitter.rng (iter-45) + particles themselves (iter-24,
+demonstrated iter-45). Five rounds of accumulated Keras-style
+primitives now all work together on a single example.
+
+### Cross-check outcome: the animation reads as glitch
+
+One new observation from iter-47's cross-check: a
+mid-flight capture of the combat bolt showed the bolt +
+trail near the ring centre. GPT-5.1 interpreted this as
+*"center glows slightly overlap; looks like duplicated
+sprites rather than intentional"* — reading an intentional
+animation frame as a layout bug.
+
+This is a limitation of still-image cross-check: a bolt in
+motion reads as animation; a single frame of that bolt
+reads as a rendering artifact. iter-47's static RoP
+snapshot (no combat) is byte-identical to iter-46, so the
+non-animating regression net gives no signal either way.
+
+Meta-lesson: visual verification of animation-only
+features needs video-style sampling (render N frames, check
+motion coherence) rather than single-frame cross-check.
+Parked for a future iteration — cross-check methodology
+needs extension before it can validate motion.
+
+### API friction noticed this iteration
+
+1. **Scene rendering positions aren't queryable from outside
+   ``draw()``**. iter-47 had to cache ring-centre / node-pos
+   in ``self._last_*`` fields because ``_interact`` (called
+   from input dispatch) had no other way to know where the
+   target node sits in pixel coords. A nicer API would be
+   ``scene.layout.node_position(idx)`` — layout logic lives
+   in a dedicated object, queryable from anywhere. Parked.
+2. **Long Action chains with closures on scene state are
+   awkward to read**. ``bolt.do(Sequence(MoveTo(target),
+   Do(on_impact_closure), Remove()))`` works but requires
+   defining the closure inline. Keras-style "Sequential API"
+   for Actions would be ``bolt.move_to(target).then(
+   on_impact).remove()`` — chainable. Parked as minor API
+   polish.
+3. **``add_sprite()`` wraps a Sprite in scene ownership but
+   sprites made for animations (the bolt, the trail
+   emitter) are auto-removed by action chains anyway. The
+   wrap-then-let-actions-manage-lifetime pattern works, but
+   isn't documented clearly anywhere**. Parked as docs
+   debt.
+
+### Concrete steps taken this iteration
+
+One new framework primitive (``Sprite.follow``, ~50 LOC),
+one new sprite asset + generator update (~20 LOC), one
+new scene method in Ring of Pain (~50 LOC), 14 new
+property tests, one cross-check (caught the animation
+but read it as glitch). Ring of Pain — the /loop prompt's
+original example — now uses every saga2d subsystem added
+since iter-24.
+
+### Parked for iteration 48
+
+* **Motion-aware cross-check** — render N frames and
+  sample for coherent motion rather than one-frame glitch
+  interpretation.
+* **``scene.layout.node_position(idx)``** queryable
+  layout surface.
+* **Chainable Action API** (``.move_to().then().remove()``).
+* **Burst-then-detach** on emitters (iter-46 parked).
+* **Window-focus release-all** (iter-44 parked).
+* **Per-pixel / explicit-hitbox collision** (iter-44 parked).
+* **Font fallback chain** (iter-42 parked).
+* **Pyglet render** — still blocked.
+* **Second user** — still outstanding.

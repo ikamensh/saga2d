@@ -69,9 +69,31 @@ def generate_player_token(out: Path) -> None:
     img.save(out, "PNG", optimize=True)
 
 
+def generate_rop_bolt(out: Path) -> None:
+    """iter-47: gold combat-bolt projectile.
+
+    Used by ``examples/ring_of_pain`` for the interact-with-enemy
+    animation — a bright bolt flies from the YOU pip to the enemy
+    node, trailing particles and detonating on impact. 14-px disc
+    with a three-stop gold halo matching the RoP palette."""
+    size = 14
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx = cy = size / 2
+    draw.ellipse([(cx - 6.5, cy - 6.5), (cx + 6.5, cy + 6.5)],
+                 fill=(255, 215, 100, 60))
+    draw.ellipse([(cx - 4.5, cy - 4.5), (cx + 4.5, cy + 4.5)],
+                 fill=(255, 230, 160, 180))
+    draw.ellipse([(cx - 2.5, cy - 2.5), (cx + 2.5, cy + 2.5)],
+                 fill=(255, 245, 210, 255))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out, "PNG", optimize=True)
+
+
 def generate(root: Path) -> None:
     images_dir = root / "assets" / "images"
     generate_player_token(images_dir / "player_token.png")
+    generate_rop_bolt(images_dir / "rop_bolt.png")
     print(f"Wrote sprites under {images_dir}")
 
 

@@ -21,11 +21,17 @@ from saga2d import (  # noqa: E402
     Anchor,
     CircularGauge,
     Column,
+    Do,
     Game,
     Label,
+    MoveTo,
     Panel,
+    ParticleEmitter,
+    Remove,
     Row,
     Scene,
+    Sequence,
+    Sprite,
     Style,
     TextStyle,
     Theme,
@@ -82,6 +88,7 @@ class RingOfPainScene(Scene):
         super().__init__()
         self.ring_size = ring_size
         self._seed = seed
+        self._rng = random.Random(seed if seed is not None else 0)
         self.nodes: list[Node] = self._roll_nodes(seed)
         self.player_idx = 0
         self.max_hp = 10
@@ -89,6 +96,15 @@ class RingOfPainScene(Scene):
         self.coins = 0
         self.level = 1
         self.message = "Floor 1 — clear the ring."
+        # iter-47: positions cache — _interact() needs to know where
+        # the YOU pip and target nodes are in screen coords to fire
+        # a projectile. draw() computes these every frame; we stash
+        # the most recent values so interact can animate from the
+        # same positions the player sees.
+        self._last_positions: list[tuple[int, int]] = []
+        self._last_node_r: int = 0
+        self._last_player_pos: tuple[int, int] = (0, 0)
+        self._last_center: tuple[int, int] = (0, 0)
 
     def _roll_nodes(self, seed: int | None) -> list[Node]:
         rng = random.Random(seed)
@@ -184,6 +200,9 @@ class RingOfPainScene(Scene):
             dmg = node.data.get("atk", 1)
             self.hp = max(0, self.hp - dmg)
             self._play("hit")
+            # iter-47: fire a visual attack bolt from YOU to the
+            # enemy. Cosmetic only — state above is already applied.
+            self._fire_combat_bolt(self.player_idx)
             if node.data["hp"] <= 0:
                 node.alive = False
                 self.message = f"Slew enemy (-{dmg} HP)."
@@ -208,6 +227,91 @@ class RingOfPainScene(Scene):
             self.player_idx = 0
             self._play("coin")  # portal chime reuses coin SFX
             self.message = f"Descended to floor {self.level}."
+
+    # -- iter-47 combat animation -----------------------------------------
+
+    def _fire_combat_bolt(self, target_idx: int) -> None:
+        """Animate a gold projectile from YOU to the target node.
+
+        Cosmetic feedback for enemy interaction — actual damage state
+        is applied in :meth:`_interact` regardless of animation timing.
+        Exercises iter-43 Sprites, iter-45 ParticleEmitter (with
+        iter-45 RNG + iter-46 follow), iter-46 Sprite.follow.
+
+        Chain:
+        1. Spawn ``rop_bolt`` sprite at the YOU pip position.
+        2. Attach a trailing ``ParticleEmitter`` that ``follow()`` s
+           the bolt (iter-46 API).
+        3. Bolt ``do(Sequence(MoveTo(target), Do(on_impact), Remove))``.
+        4. On impact, stop the trail, fire a radial spark burst at
+           the target, and let the trail age out naturally.
+
+        Requires the draw() positions cache to be populated — if
+        called before the first draw (e.g. via direct test call),
+        silently no-ops.
+        """
+        if not self._last_positions or target_idx >= len(self._last_positions):
+            return
+        target_x, target_y = self._last_positions[target_idx]
+        # iter-47: fire from the ring's geometric center rather than
+        # from the YOU pip (which is directly above the target and
+        # produces a ~60 px flight). Ring center → node-edge is a
+        # full ring radius of distance, giving the animation room
+        # to breathe.
+        from_x, from_y = self._last_center
+
+        # Projectile sprite. Registered with the scene's sprite
+        # ownership so it's cleaned up if the scene exits mid-flight.
+        try:
+            bolt = self.add_sprite(Sprite(
+                "rop_bolt",
+                position=(from_x, from_y),
+            ))
+        except Exception:
+            # Asset missing (stripped deploy) — fall back silently.
+            return
+
+        # Trailing emitter. Yellow sparks, very short lifetime so the
+        # trail reads as a comet tail rather than a fountain.
+        trail = ParticleEmitter(
+            image="dodge_spark_yellow",
+            position=(from_x, from_y),
+            speed=(10, 40),
+            direction=(0, 360),
+            lifetime=(0.1, 0.25),
+            fade_out=True,
+            rng=self._rng,
+        )
+        trail.follow(bolt)
+        trail.continuous(rate=50)
+
+        def on_impact() -> None:
+            # Stop trail spawns; existing particles age out on their own.
+            trail.stop()
+            # Impact burst — three-colour radial spread at target node.
+            burst = ParticleEmitter(
+                image=[
+                    "dodge_spark_yellow",
+                    "dodge_spark_orange",
+                    "dodge_spark_red",
+                ],
+                position=(target_x, target_y),
+                count=18,
+                speed=(60, 180),
+                direction=(0, 360),
+                lifetime=(0.3, 0.6),
+                fade_out=True,
+                rng=self._rng,
+            )
+            burst.burst()
+
+        # ~400 px/s gives a 0.3–0.6 s flight across the ring — fast
+        # enough that gameplay doesn't drag, slow enough to see.
+        bolt.do(Sequence(
+            MoveTo(position=(target_x, target_y), speed=400),
+            Do(on_impact),
+            Remove(),
+        ))
 
     # -- drawing -------------------------------------------------------------
 
@@ -338,6 +442,11 @@ class RingOfPainScene(Scene):
         node_r = int(node_r_f)
 
         positions = ring_positions(self.ring_size, (cx, cy), ring_r)
+        # iter-47: stash integer positions so _interact() can animate
+        # from the same pixel coords the player sees.
+        self._last_positions = [(int(x), int(y)) for x, y in positions]
+        self._last_node_r = node_r
+        self._last_center = (int(cx), int(cy))
 
         for idx, (node, (nx_f, ny_f)) in enumerate(zip(self.nodes, positions)):
             nx, ny = int(nx_f), int(ny_f)
@@ -393,6 +502,8 @@ class RingOfPainScene(Scene):
         nx_f, ny_f = positions[self.player_idx]
         px = int(nx_f)
         py = int(ny_f) - (node_r + 20)
+        # iter-47: stash YOU pip position for combat animations.
+        self._last_player_pos = (px, py)
         if self._player_token_handle is not None:
             token_size = 48
             self.draw_image(
