@@ -135,6 +135,49 @@
 - F57: flush_pending_ops exception left stale ops in queue — now clears queue before re-raising (scene.py)
 - F58: Direct scene ops didn't auto-flush deferred ops from on_exit/on_reveal — added _flush_after_direct_op() (scene.py)
 
+## Stage 7 — Audio Subsystem Probing (2026-03-25)
+### Target: AudioManager.set_volume — NaN/Inf validation gap
+- **F59 (confirmed):** `set_volume(channel, NaN)` silently accepts NaN — clamped to 1.0 (full volume) by accident of `max(0.0, min(1.0, NaN))` argument order
+- Root cause: `min(1.0, NaN)` → 1.0 on CPython 3.12+ (first arg returned when comparison is unordered), but `min(NaN, 1.0)` → NaN. Behavior is **argument-order-dependent** and platform-fragile.
+- Impact: User sets volume to NaN → stored as 1.0 (max volume). No error raised. Inconsistent with every other hardened API (crossfade_music duration, Sprite.tint, Camera bounds, etc. all use `math.isfinite()`).
+- Fix: Add `if not math.isfinite(level): raise ValueError(...)` before the clamp, matching the pattern in `crossfade_music`.
+- **Other probes (all pass):** Inf→1.0, -Inf→0.0 (clamped correctly), crossfade(duration=0) works, play_sound(channel=bogus)→KeyError, double _teardown safe, _teardown during crossfade cleans up, NaN mid-crossfade→no NaN leaked (because NaN was already clamped to 1.0)
+- **Not a bug:** bool values (True→1.0, False→0.0) — acceptable since bool subclasses int; non-numeric types crash with raw TypeError from max() — ugly but not silent corruption
+
+### Files changed
+- (none yet — F59 confirmed but not fixed)
+
+## Stage 6 — Subsystem Test Mapping (2026-03-25, updated)
+### Scope: Map 8 subsystems for future testing
+- Audio, Input, Cursor, ColorSwap, Layout, Theme, DragDrop, Screens/Dialogs
+- Full coverage table written to `.kodo/test-coverage.md` (§1–§8, ~160 feature rows)
+- **Verified test counts** (from pytest runs): Audio 83, Input 33, Cursor 18, ColorSwap 25, Theme 13, DragDrop 49, Screens 42, Settings 36 = 299 total across primary test files
+- **Source LOC**: Audio 375, Input 228, Cursor 66, ColorSwap 112, Layout 141, Theme 413, DragDrop 295, Screens 654 = 2284 total
+- **Overall feature coverage: 75%** (143 tested / 48 untested across 8 subsystems)
+
+### Key architecture patterns discovered
+- **Audio**: AudioManager delegates to Backend protocol (load_sound, play_sound, etc.); volume hierarchy is multiplicative (master×channel×base); crossfade uses _CrossfadeProxy + tweens; sound pools track last-played to avoid repeats
+- **Input**: Pipeline is poll→translate→dispatch (HUD→UI→Camera→Bindings→Scene.handle_input); 1:1 binding with key stealing; _MOUSE_EVENT_TYPES frozenset for world coord population
+- **Cursor**: Tiny module (66 LOC); lazy Game.cursor property; scene pop auto-resets to "default"; pyglet backend flips hotspot Y coordinate
+- **ColorSwap**: Pixel-level replacement at load time (not per-frame); PNG-only (CVE defense); cache key is tuple of (src,tgt) pairs; Game._teardown calls _clear_palettes
+- **Layout**: Pure math layer (3 functions) + Component tree layer; Panel is primary container with NONE/VERTICAL/HORIZONTAL; Grid does cell-based layout
+- **Theme**: 40+ kwargs, 8 resolve_* methods, 19 property accessors; _pick() null-coalescing pattern; Slate color scheme + Sky 400 accents
+- **DragDrop**: Event hijacking during drag (all events consumed); _DragSession dataclass tracks ghost state; theme provides accept/reject overlay colors
+- **Screens**: All transparent+modal; callbacks fire before pop; _SequenceRunner chains MessageScreens; _SettingsScene has rebind listening mode
+
+### Priority gaps (largest → smallest)
+1. **Theme** (🔴 45%) — 5 resolve_* + 12 property accessors untested
+2. **Layout** (🟡 60%) — padding, zero-size, child>parent, negative spacing, single-child
+3. **Audio** — set_volume NaN/Inf (no guard), crossfade(0), _teardown, unknown channel
+4. **DragDrop** — cancel_active(), exception safety, sprite ghost, drag during scene pop
+5. **Screens** — empty ChoiceScreen, key "0", double-confirm, save overwrite, rebind stealing
+6. **Cursor** — missing asset, multi-cursor, non-bool set_visible
+7. **ColorSwap** — _clear_palettes, duplicate source colors, non-RGBA, post-ctor swap
+8. **Input** — empty/None bind args, unknown event type
+
+### Files created/updated
+- `.kodo/test-coverage.md` — comprehensive 8-subsystem coverage table with §1–§8 deep-dive, per-feature status, workflow notes, edge case suggestions
+
 ## Stage 5 — Asset/Resource Edge Cases (2026-03-25) — NO BUGS FOUND
 ### Investigation results (44 runtime probes, all pass)
 - Missing image/sound/music → AssetNotFoundError with tried paths

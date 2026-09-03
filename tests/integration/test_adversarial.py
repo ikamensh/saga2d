@@ -38,7 +38,7 @@ from saga2d.input import InputEvent
 from saga2d.save import SaveManager
 from saga2d.scene import SceneStack
 from saga2d.ui import Anchor, Button, Component, Label, Layout, Panel
-from saga2d.ui.component import _UIRoot
+from saga2d.ui.base import _UIRoot
 from saga2d.ui.widgets import Tooltip
 from saga2d.util.fsm import StateMachine
 

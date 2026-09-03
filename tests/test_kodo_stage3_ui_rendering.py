@@ -359,7 +359,7 @@ class TestGridZeroCellSize:
         game.tick(0)
 
         # Create a simple child component
-        from saga2d.ui.component import Component
+        from saga2d.ui.base import Component
         child = Component(width=10, height=10)
         grid.set_cell(0, 0, child)
 

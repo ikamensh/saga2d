@@ -15,7 +15,7 @@
 *   :class:`DataTable` — rows of data with column headers, alternating
     row colours, and click-to-select.
 
-All inherit from :class:`~saga2d.ui.component.Component` and support
+All inherit from :class:`~saga2d.ui.base.Component` and support
 theming via the Theme system.
 """
 
@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING, Any, Callable
 from saga2d.util.color import lighten
 from saga2d.util.reactive import ReactiveValue
 
-from saga2d.ui.component import Component
+from saga2d.ui.base import Component
 from saga2d.ui.components import _estimate_text_width
 from saga2d.ui.theme import ResolvedStyle, Style
 

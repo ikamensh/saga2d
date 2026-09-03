@@ -31,9 +31,12 @@ desired_examples/        # API design sketches
 - Pyglet event handlers must `return True` to prevent fallthrough (e.g. ESC closing window)
 - Screenshot capture: between `batch.draw()` and `window.flip()` (double-buffering)
 
-## Baseline (2026-03-25, delivery + Stage 5)
+## Baseline (non-visual delivery)
 
-- **Non-visual delivery:** `SAGA2D_HEADLESS=1 pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` — **2795** passed, **3** skipped, **0** failed. Install: `uv sync --extra dev`.
+- **Install:** `uv sync --extra dev` (repo root; uses project `.venv`).
+- **Suite:** `SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot` — **2795** passed, **3** skipped, **0** failed (re-verified 2026-03-25). Equivalent: `pytest` instead of `uv run python -m pytest` if the project venv is active.
+- **Skips (expected with `SAGA2D_HEADLESS=1`):** `tests/core/test_game.py` — three tests that call `game.run()` (lines ~97, ~119, ~134).
+- **Shell:** if another `VIRTUAL_ENV` is active, `uv` may warn and ignore it; it still uses the project `.venv` unless you pass `--active`.
 - **Full tree** including `tests/visual_verify`: **11** failures (env / AI / screenshot — not counted as delivery baseline). Counts and F42–F58 table: repo `test-report.md`.
 - FakeGame + cursor: `hasattr(scene.game, "cursor")` in `saga2d/scene.py` (~526) — no cursor regression; adversarial + kodo FakeGame tests pass.
 

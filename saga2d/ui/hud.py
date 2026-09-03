@@ -1,7 +1,7 @@
 """HUD layer — persistent UI that renders above base scenes but below overlays.
 
 The :class:`HUD` is owned lazily by :class:`~saga2d.game.Game`.  It wraps a
-:class:`~saga2d.ui.component._UIRoot` and provides ``add`` / ``remove`` /
+:class:`~saga2d.ui.base._UIRoot` and provides ``add`` / ``remove`` /
 ``clear`` methods for managing persistent UI elements (health bars, mini-maps,
 resource counters, etc.).
 
@@ -40,7 +40,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from saga2d.game import Game
     from saga2d.input import InputEvent
-    from saga2d.ui.component import Component, _UIRoot
+    from saga2d.ui.base import Component, _UIRoot
 
 
 class HUD:
@@ -51,7 +51,7 @@ class HUD:
     """
 
     def __init__(self, game: Game) -> None:
-        from saga2d.ui.component import _UIRoot
+        from saga2d.ui.base import _UIRoot
 
         self._game = game
         self._root: _UIRoot = _UIRoot(game)

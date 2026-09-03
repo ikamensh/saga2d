@@ -18,7 +18,7 @@ import pytest
 from saga2d import Camera, Component, Game, Scene, Sprite
 from saga2d.input import InputEvent
 from saga2d.save import SaveError, SaveManager
-from saga2d.ui.component import _UIRoot
+from saga2d.ui.base import _UIRoot
 from saga2d.ui.drag_drop import DragManager
 
 
@@ -663,7 +663,7 @@ class TestHUDVisibilityToggle:
 
     def test_show_hud_false_hides_hud(self, mock_game, mock_backend):
         """When top scene has show_hud=False, HUD.draw should not be called."""
-        from saga2d.ui.component import Component
+        from saga2d.ui.base import Component
 
         # Create HUD with a component that draws a rect.
         class DrawingComponent(Component):
@@ -707,7 +707,7 @@ class TestHUDVisibilityToggle:
 
     def test_hud_visible_false_also_hides(self, mock_game, mock_backend):
         """Even with show_hud=True, setting hud.visible=False hides the HUD."""
-        from saga2d.ui.component import Component
+        from saga2d.ui.base import Component
 
         class DrawComp(Component):
             def on_draw(self):

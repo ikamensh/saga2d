@@ -16,7 +16,7 @@ from saga2d import (
     Delay, FadeOut, FadeIn, Sequence, Do, tween, Ease,
 )
 from saga2d.input import InputEvent
-from saga2d.ui.component import Component
+from saga2d.ui.base import Component
 from saga2d.backends.mock_backend import MockBackend
 
 

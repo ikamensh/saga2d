@@ -1,5 +1,16 @@
 # Tester Notes - Saga2D
 
+## Stage 1 deliverables + `.kodo/test-coverage.md` audit (tester, 2026-03-25)
+
+**PLAN.md Stage 1 (window / loop / scenes):** `saga2d/game.py`, `scene.py`, `backends/base.py`, `backends/pyglet_backend.py`, `__init__.py` — **present**. **`tests/test_stage1.py`** from PLAN — **not in repo** (headless policy: `tests/core/test_game.py`, `tests/core/test_scene*.py`, `scripts/smoke_game_move_to.py` instead). **`tests/visual/test_stage1_visual.py`** exists for pyglet/display workflows.
+
+**Delivery baseline (matches `.kodo/test-coverage.md` top table):**  
+`SAGA2D_HEADLESS=1 uv run python -m pytest tests/ --ignore=tests/visual_verify --ignore=tests/visual --ignore=tests/screenshot -q` → **2795 passed, 3 skipped, 0 failed** (~32s this run).
+
+**Smoke:** `SAGA2D_HEADLESS=1 uv run python scripts/smoke_game_move_to.py` → **PASS** (mock; Game → Scene → Sprite → MoveTo — extends beyond strict PLAN Stage 1).
+
+**Docs accuracy:** `.kodo/test-coverage.md` has **no `## Stage 1` section** (Stage 1 narrative lives in **`test-report.md`**). Subsystem map + §1–§8 (Audio … Screens) + **Coverage Summary** table are present. **§1–§8 “N tests” headers and Coverage Summary “Test Count” column are stale** vs current `pytest --collect-only` (e.g. `test_audio.py` **83** not 69; `test_drag_drop.py` **49** not 34; `test_screens.py` **42** not 31; `test_input.py` **33** not 28; `test_cursor.py` **18** not 17; `test_color_swap.py` **25** not 22; `test_theme.py` **13** not 9; `test_settings.py` **36** not 26). Refresh counts when editing that file.
+
 ## Stage 3 — F54/F55/F56 ctor validation (tester agent, 2026-03-25)
 
 **Implemented (matches `.kodo/test-coverage.md` / `test-report.md`):**
@@ -80,12 +91,7 @@ SAGA2D_HEADLESS=1 uv run python -m pytest \
 
 ## Stage 1 tester agent — install + full pytest (2026-03-25)
 
-- **Install:** `uv sync --extra dev` at repo root → OK. **Uv quirk:** if shell `VIRTUAL_ENV` points outside the project (e.g. another repo’s `.venv`), uv warns and still uses **this** project’s `.venv`.
-- **`scripts/smoke_game_move_to.py` (E2E, 2026-03-25):** `SAGA2D_HEADLESS=1 uv run python scripts/smoke_game_move_to.py` → **PASS** (`PASS — smoke: Game, Scene, Sprite, MoveTo`). Mock backend, temp `images/sprites/dot.png`; exercises `Game` → `push(SmokeScene)` → `on_enter` adds `Sprite` + `MoveTo` → ticks until within 1px of target → `_teardown()`. Imports: `from saga2d import Game, MoveTo, Scene, Sprite` → OK.
-- **Docs:** repo **`test-report.md`** § Smoke script + commands; **`.kodo/test-coverage.md`** § Stage 1 table (E2E smoke row) + pytest commands.
-- **Import smoke:** `SAGA2D_HEADLESS=1 uv run python -c "from saga2d import Game, Scene; g=Game('t',backend='mock'); g.push(Scene()); g.tick(0.016); g._teardown(); print('import_smoke OK')"` → OK.
-- **Full `pytest tests/`:** **2665** collected; **2649 passed**, **11 failed**, **5 skipped** (~45s). Failures are **only** `tests/visual_verify/` (8× menu tutorial AI + 3× UI screenshot golden / AI). **Exclude `visual_verify`:** **2631 passed**, **3 skipped** (~34s) — skips are **`game.run()`** in `tests/core/test_game.py` under `SAGA2D_HEADLESS=1`. Two `test_ai_checker` tests skip without `ANTHROPIC_API_KEY`.
-- **Artifacts:** exact commands and numbers → repo root **`test-report.md`**; Stage 1 PLAN mapping → **`.kodo/test-coverage.md`** § Stage 1.
+- Superseded by **Stage 1 deliverables + `.kodo/test-coverage.md` audit** at top of this file for baseline counts and doc mapping. Older snapshot: full `pytest tests/` without ignores showed `visual_verify` failures; delivery baseline is **three `--ignore`** dirs.
 
 ## Stage 4 — camera / audio / tween / particles (headless E2E) — verified 2026-03-23
 

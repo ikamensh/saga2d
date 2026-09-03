@@ -19,7 +19,7 @@ import pytest
 from saga2d import Game, Scene
 from saga2d.backends.base import MouseEvent
 from saga2d.input import InputEvent
-from saga2d.ui.component import Component
+from saga2d.ui.base import Component
 from saga2d.ui.drag_drop import DragManager, _DragSession
 from saga2d.ui.theme import Theme
 

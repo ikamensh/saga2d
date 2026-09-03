@@ -34,7 +34,7 @@ from saga2d.ui import (
     Theme,
     Tooltip,
 )
-from saga2d.ui.component import _UIRoot
+from saga2d.ui.base import _UIRoot
 from saga2d.ui.layout import Layout
 from saga2d.ui.widgets import _word_wrap
 

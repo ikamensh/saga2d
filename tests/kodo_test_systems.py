@@ -15,7 +15,7 @@ from saga2d.audio import AudioManager
 from saga2d.cursor import CursorManager
 from saga2d.input import InputEvent, InputManager, _with_world_coords
 from saga2d.save import SaveError, SaveManager
-from saga2d.ui.component import Component, _UIRoot
+from saga2d.ui.base import Component, _UIRoot
 from saga2d.ui.components import Button, Label, Panel
 from saga2d.ui.layout import Anchor, Layout, compute_anchor_position, compute_flow_layout
 from saga2d.ui.theme import Style

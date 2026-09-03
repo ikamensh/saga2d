@@ -21,7 +21,7 @@ import pytest
 from saga2d import Game, Scene
 from saga2d.rendering.camera import Camera
 from saga2d.rendering.particles import ParticleEmitter
-from saga2d.ui.component import Component, _UIRoot
+from saga2d.ui.base import Component, _UIRoot
 from saga2d.ui.widgets import (
     DataTable,
     Grid,

@@ -19,7 +19,7 @@ from typing import Any
 import pytest
 
 from saga2d import Game, Label, Panel, Scene
-from saga2d.ui.component import Component
+from saga2d.ui.base import Component
 from saga2d.ui.widgets import (
     DataTable,
     Grid,

@@ -18,7 +18,7 @@ import pytest
 from saga2d import Game, Scene
 from saga2d.backends.mock_backend import MockBackend
 from saga2d.ui import Anchor, Label, Panel, Style
-from saga2d.ui.component import Component, _UIRoot
+from saga2d.ui.base import Component, _UIRoot
 from saga2d.ui.hud import HUD
 
 

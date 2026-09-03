@@ -1,6 +1,6 @@
 """Drag-and-drop system — DragManager coordinates drag sessions within a scene's UI tree.
 
-A :class:`DragManager` is owned by :class:`~saga2d.ui.component._UIRoot`
+A :class:`DragManager` is owned by :class:`~saga2d.ui.base._UIRoot`
 (created lazily) and intercepts input events during an active drag.  It
 provides:
 
@@ -9,7 +9,7 @@ provides:
 * **Drop target feedback** — green/red overlays on components that accept or
   reject the dragged data.
 
-Drag-and-drop uses four attributes on :class:`~saga2d.ui.component.Component`:
+Drag-and-drop uses four attributes on :class:`~saga2d.ui.base.Component`:
 
 * ``draggable`` (bool) — can this component be dragged?
 * ``drag_data`` (Any) — opaque payload from source to target.
@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from saga2d.input import InputEvent
-    from saga2d.ui.component import Component, _UIRoot
+    from saga2d.ui.base import Component, _UIRoot
 
 
 # ---------------------------------------------------------------------------

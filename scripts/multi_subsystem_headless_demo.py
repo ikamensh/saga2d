@@ -34,7 +34,7 @@ from saga2d import (
     Theme,
 )
 from saga2d.backends.base import KeyEvent, MouseEvent
-from saga2d.ui.component import Component
+from saga2d.ui.base import Component
 from saga2d.ui.screens import _SettingsScene
 from saga2d.ui.widgets import List as ListWidget
 

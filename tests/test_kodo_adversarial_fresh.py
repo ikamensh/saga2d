@@ -35,7 +35,7 @@ from saga2d.actions import (
     Sequence,
 )
 from saga2d.save import SaveManager
-from saga2d.ui.component import Component
+from saga2d.ui.base import Component
 from saga2d.ui.components import Button, Label, Panel
 from saga2d.ui.layout import Anchor
 

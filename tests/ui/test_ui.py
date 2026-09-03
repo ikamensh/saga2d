@@ -29,7 +29,7 @@ from saga2d.ui import (
     Style,
     Theme,
 )
-from saga2d.ui.component import _UIRoot
+from saga2d.ui.base import _UIRoot
 from saga2d.ui.components import _estimate_text_width
 
 
