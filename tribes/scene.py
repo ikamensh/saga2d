@@ -323,7 +323,7 @@ class MapScene(Scene):
         self.cursor = pos
         self._refresh_selection()
         if not unit.can_act:
-            self._advance_after_action(unit)
+            self.select_unit(None)
 
     def _attack_selected(self, target: Unit) -> None:
         unit = self.selected
@@ -339,14 +339,9 @@ class MapScene(Scene):
         self.camera.shake(4, 0.2)
         self.sync()
         self._refresh_selection()
-        if unit.id in self.world.units and not unit.can_act:
-            self._advance_after_action(unit)
+        if unit.id not in self.world.units or not unit.can_act:
+            self.select_unit(None)
         self._check_game_over()
-
-    def _advance_after_action(self, unit: Unit) -> None:
-        if self.world.unit_at(unit.pos) is unit and self.world.can_capture(unit):
-            return
-        self.select_unit(None)
 
     def capture(self) -> None:
         unit = self.selected
