@@ -492,7 +492,7 @@ class World:
             city.level += 1
             self._claim_territory(city)
             self.explore(city.tribe, city.pos, city.radius)
-            self.log.append(f"{city.name} grew to level {city.level}")
+            self.log.append(f"{self.tribes[city.tribe].name}'s {city.name} grew to level {city.level}")
 
     # -- Research ----------------------------------------------------------------
 

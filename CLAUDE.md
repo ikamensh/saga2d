@@ -1,98 +1,50 @@
 # Saga2D — Project Instructions
 
-## Visual Verification is MANDATORY — Not Optional
+Framework in `saga2d/`, reference game in `tribes/`, tests in `tests/`.
+Read `DESIGN.md` before changing the framework.
 
-Mock backend tests prove logic (scene stack, navigation, text content) but say
-**nothing** about actual rendering. Screenshot tests that auto-generate golden
-images prove consistency, not quality. **You must actually render and LOOK at
-the output to verify visual quality.**
+## Commands
 
-### The render-and-look protocol
+```bash
+uv run python -m pytest tests -q        # headless suite (mock backend)
+uv run python -m tribes --seed 7        # play
+```
 
-**Every** visual change requires this loop:
+## Visual changes must be looked at
 
-1. Render to PNG using the screenshot harness
-2. **Open the PNG and examine it with your vision** — read the file
-3. Ask: "Would a game developer ship this?" If no → iterate
-4. Only then update golden images or mark the task done
+Mock tests prove logic, not pixels.  After any change to rendering, the
+pyglet backend, UI components or the Tribes scene, render a real frame
+and open the PNG:
 
 ```python
-from tests.screenshot.harness import render_scene
+from saga2d.testing import render_scene
 
 def setup(game):
-    # set up your scene, sprites, UI...
-    pass
+    game.push(MyScene())
 
-image = render_scene(setup, tick_count=2, resolution=(800, 600))
-image.save("/tmp/verify.png")
-# NOW READ /tmp/verify.png AND LOOK AT IT
+render_scene(setup, resolution=(1280, 800), tick_count=3).save("/tmp/check.png")
 ```
 
-**Do NOT trust "tests pass" as visual verification.** A screenshot test passing
-means pixels match the golden — it says nothing about whether the golden itself
-looks good. The golden images are auto-generated on first run.
+Ask "would a game developer ship this?" before marking the task done.
+Real input can be exercised through pyglet's dispatch on the hidden
+window: `game.backend.window.dispatch_event("on_key_press", key.TAB, 0)`.
+Never rely on the mock path alone for event handling — pyglet handlers
+must return `True` or ESC closes the window.
 
-### What to verify visually
+The display must be awake for pyglet to open windows; a
+`get_default_screen` IndexError means it is asleep.
 
-- Overlay panels occlude content below them (text bleed-through = z-order bug)
-- Layout centering and spacing look correct
-- Background colors apply per-scene
-- Buttons have visible backgrounds with readable text
-- Transparent overlays show the scene below
-- **Text is readable** — right size, good contrast, no overlap with other elements
-- **Tiles are seamless** — no visible gaps or seams between adjacent tiles
-- **Colors are attractive** — not just "renders something"
-- **Spacing feels right** — padding, margins, element separation
+## Testing conventions
 
-### Capturing screenshots (low-level alternative)
+- `Game("t", backend="mock")`, `game.tick(dt)`, `backend.inject_key(...)`,
+  `backend.inject_click(x, y)`; assert on `backend.texts/rects/sprites`
+  and on model state.
+- Tests exercise public behaviour through `Game`/`Scene`/`World`; no
+  mocking of internals.  Add a regression test for every bug found.
+- `tribes/model.py` has no saga2d dependency — test rules there directly.
 
-Pyglet double-buffers.  You must capture **after** `batch.draw()` but
-**before** `window.flip()`, otherwise you get stale buffer contents.
+## Style
 
-```python
-import pyglet
-from saga2d import Game
-
-game = Game("Test", resolution=(800, 600), backend="pyglet")
-# Use game.backend.capture_frame() after tick — see harness.py
-```
-
-### Bug we found this way (2026-02)
-
-All `draw_text` and `draw_rect` calls used a single pyglet Group (`order=100`).
-Transparent overlay panels couldn't occlude text from the scene below — text
-from both scenes rendered at the same z-level and overlapped.  Mock tests
-couldn't catch this because they don't test GPU draw ordering.
-
-## Testing
-
-- `uv run python -m pytest tests/ -v` — full suite (1400+ tests)
-- Mock backend: `backend="mock"` — headless, records all operations
-- Use `game.tick(dt=0.016)` to step frames in tests
-- `game.backend.inject_key("escape")` / `inject_click(x, y)` for input
-- `game.backend.texts` — list of `{"text": ...}` dicts rendered this frame
-- `game._scene_stack._stack` — current scene stack for assertions
-
-### Mock tests cannot catch pyglet event dispatch bugs
-
-`inject_key()` adds events directly to the queue, bypassing pyglet's
-`EventDispatcher`.  Pyglet's dispatch checks the instance handler first —
-if it returns a falsy value, **it falls through to the class-level default**.
-For example, `Window.on_key_press` closes the window on ESC by default.
-
-**All pyglet event handlers MUST return `True`** to prevent fallthrough.
-A handler returning `None` (Python's implicit return) lets pyglet's default
-fire.  This caused ESC to close the window instead of being handled by the
-game's scene stack.  Mock tests never caught it because `inject_key` doesn't
-go through pyglet's `dispatch_event`.
-
-## Project Structure
-
-- `saga2d/` — framework source
-- `saga2d/backends/` — backend implementations (base protocol, mock, pyglet)
-- `tests/` — pytest suite
-- `tutorials/` — runnable tutorial demos with companion tests
-- `examples/` — example games
-- `DESIGN.md` — backend-agnostic design document
-- `BACKEND.md` — pyglet implementation specifics
-- `PLAN.md` — 13-stage implementation plan (all stages complete)
+- Clear exceptions over silent fallbacks.  Delete rather than deprecate.
+- Game code imports from `saga2d` only; never from `saga2d.backends`.
+- Commit each working increment.

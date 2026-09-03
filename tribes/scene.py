@@ -4,15 +4,14 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Callable
 
 from saga2d import (
-    Anchor, Button, Camera, Column, InputEvent, Label, MoveTo, Panel, ParticleEmitter, RenderLayer, Row, Scene,
+    Anchor, Button, Camera, Column, InputEvent, Label, Layout, MoveTo, Panel, ParticleEmitter, RenderLayer, Row, Scene,
     Sequence, Sprite, Style,
 )
 from tribes import ai, mapgen, textures
 from tribes.model import City, Pos, RuleError, Unit, World
-from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Resource, Tech, UnitType, tech_cost
+from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Tech, UnitType
 from tribes.textures import TILE
 
 Color = tuple[int, int, int, int]
@@ -115,7 +114,7 @@ class MapScene(Scene):
     def _build_hud(self) -> None:
         world = self.world
         tribe = self.tribe
-        self.ui.add(Panel(anchor=Anchor.TOP_LEFT, margin=10, layout=__import__("saga2d").Layout.HORIZONTAL, spacing=18, style=PANEL_STYLE, children=[
+        self.ui.add(Panel(anchor=Anchor.TOP_LEFT, margin=10, layout=Layout.HORIZONTAL, spacing=18, style=PANEL_STYLE, children=[
             Label(lambda: tribe.name, text_style="title"),
             Label(lambda: f"★ {tribe.stars}  (+{world.income(self.human)})", text_style="hud"),
             Label(lambda: f"Round {world.round}/{MAX_ROUNDS}", text_style="hud"),
@@ -144,8 +143,11 @@ class MapScene(Scene):
             "Click/Enter act · Tab next unit · E end turn · T tech · C capture · H hold · WASD pan · wheel zoom · F1 help",
             text_style="caption", anchor=Anchor.BOTTOM_CENTER, margin=6,
         ))
-        self.log_label = Label(lambda: "   ·   ".join(self.world.log[-2:]), text_style="sub", anchor=Anchor.TOP_RIGHT, margin=14)
-        self.ui.add(self.log_label)
+        self.ui.add(Label(lambda: "   ·   ".join(self.visible_log()[-2:]), text_style="sub", anchor=Anchor.TOP_RIGHT, margin=14))
+
+    def visible_log(self) -> list[str]:
+        """Log lines the player is entitled to see: those naming their tribe."""
+        return [line for line in self.world.log if self.tribe.name in line]
 
     # -- Sprite reconciliation --------------------------------------------------
 
@@ -626,8 +628,9 @@ class MapScene(Scene):
         cx, cy = self.cursor[0] * TILE, self.cursor[1] * TILE
         for line in ((cx, cy, cx + TILE, cy), (cx + TILE, cy, cx + TILE, cy + TILE), (cx + TILE, cy + TILE, cx, cy + TILE), (cx, cy + TILE, cx, cy)):
             self.draw_line(*line, (255, 255, 255, 230), 2.5, space="world", layer=RenderLayer.UI_WORLD)
+        w, h = self.game.resolution
+        self.draw_rect(0, h - 26, w, 26, (0, 0, 0, 150))
         if self.banner_timer > 0:
-            w, h = self.game.resolution
             alpha = int(255 * min(1.0, self.banner_timer / 0.5))
             self.draw_rect(0, h * 0.42, w, 60, (0, 0, 0, int(alpha * 0.55)))
             self.draw_text(self.banner, w / 2, h * 0.42 + 30, style="banner", color=(255, 255, 255, alpha), anchor_x="center", anchor_y="center")
@@ -681,17 +684,16 @@ class TechScene(_Overlay):
         world = self.map_scene.world
         tribe = self.map_scene.tribe
         panel = self.panel(f"Research   ★ {tribe.stars}")
-        self.buttons: list[tuple[str, Tech]] = []
         for index, (tech, info) in enumerate(TECHS.items()):
             key = str((index + 1) % 10)
-            cost = world.tech_cost(tribe.id, tech)
+            known = tech in tribe.techs
             reason = world.can_research(tribe.id, tech)
-            name = tech.value.title()
-            prefix = "✓ " if tech in tribe.techs else ""
-            text = f"{prefix}{name:<13} {cost:>2}★   {info.summary}" if tech not in tribe.techs else f"{prefix}{name:<13}      {info.summary}"
-            button = Button(text, hotkey=f"[{key}]", on_click=lambda t=tech: self.buy(t), style=GHOST_BUTTON, width=520)
+            button = Button(tech.value.title(), hotkey=f"[{key}]", on_click=lambda t=tech: self.buy(t), style=GHOST_BUTTON, width=180)
             button.enabled = reason is None
-            panel.add(button)
+            cost = "known" if known else f"{world.tech_cost(tribe.id, tech)}★"
+            requires = TECHS[tech].requires
+            detail = info.summary if known or requires is None or requires in tribe.techs else f"{info.summary}  (needs {requires.value.title()})"
+            panel.add(Row(button, Label(cost, text_style="hud", width=64, align="right"), Label(detail, text_style="body", width=330), spacing=14))
             self.bind_key(key, lambda t=tech: self.buy(t))
         panel.add(Label("Esc / T to close", text_style="caption"))
 
@@ -752,7 +754,7 @@ class HelpScene(_Overlay):
             "1-5                train in selected city F5 / F9             save / load",
             "Home               jump to capital        Esc                 cancel / menu",
         ):
-            panel.add(Label(line, text_style="body", font="Menlo"))
+            panel.add(Label(line, text_style="body", font="Menlo", width=760))
         panel.add(Label("Esc to close", text_style="caption"))
 
 
@@ -769,7 +771,7 @@ class GameOverScene(_Overlay):
         verdict = "Victory!" if winner.id == self.map_scene.human else f"{winner.name} wins"
         panel = self.panel(verdict)
         for tribe in sorted(world.tribes, key=lambda t: -world.score(t.id)):
-            panel.add(Label(f"{tribe.name:<8} {world.score(tribe.id):>5} points", text_style="body", font="Menlo"))
+            panel.add(Label(f"{tribe.name:<8} {world.score(tribe.id):>5} points", text_style="body", font="Menlo", width=260))
         panel.add(Button("New game", hotkey="[N]", on_click=self.new_game, style=GHOST_BUTTON, width=260))
         panel.add(Button("Quit", hotkey="[Q]", on_click=self.game.quit, style=GHOST_BUTTON, width=260))
 

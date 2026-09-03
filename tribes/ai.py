@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 
 from tribes.model import Pos, RuleError, Unit, World
-from tribes.rules import HARVEST, TECHS, Resource, Tech, UnitType
+from tribes.rules import HARVEST, TECHS, Tech, UnitType
 
 
 def take_turn(world: World, tribe: int, rng: random.Random) -> None:
