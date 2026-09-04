@@ -11,7 +11,7 @@ from saga2d import (
     Anchor, Button, Camera, Column, Delay, InputEvent, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer, Row,
     Scene, Sequence, Sprite, Style,
 )
-from tribes import ai, mapgen
+from tribes import ai, effects, mapgen
 from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, TilePulse, Toast, hop, play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Tech, UnitType
@@ -86,6 +86,7 @@ class MapScene(Scene):
     # -- Lifecycle -------------------------------------------------------------
 
     def on_enter(self) -> None:
+        effects.apply_volumes(self.settings)
         self.view = MapView(self, self.world, self.human, self.rng)
         self.hover_glow = self.add_sprite(Sprite("glow.soft", position=tile_center(self.cursor), size=(TILE * 1.7, TILE * 1.7),
                                                  layer=RenderLayer.OBJECTS, opacity=0))
@@ -894,10 +895,12 @@ class SettingsScene(_Overlay):
 
     def _toggle(self, key: str) -> None:
         self.settings[key] = not self.settings[key]
+        effects.apply_volumes(self.settings)
         self.map_scene.sfx("button")
 
     def _adjust(self, key: str, delta: float) -> None:
         self.settings[key] = round(max(0.0, min(1.0, self.settings[key] + delta)), 2)
+        effects.apply_volumes(self.settings)
         self.map_scene.sfx("button")
 
     def focus_up(self) -> None:

@@ -7,9 +7,8 @@ from tribes import effects
 from tribes.__main__ import build_theme
 from tribes.rules import Tech, Terrain, UnitType
 from tribes.scene import HIT_TIME, GameOverScene, MapScene, PauseScene, SettingsScene, TechScene, new_game
-from tribes.textures import TILE
 from tribes.title import NewGameScene, TitleScene
-from tribes.view import tint
+from tribes.view import tile_center, tint
 
 
 @pytest.fixture
@@ -42,7 +41,7 @@ def texts(game: Game) -> list[str]:
 
 
 def screen_of(scene: MapScene, pos: tuple[int, int]) -> tuple[int, int]:
-    sx, sy = scene.camera.world_to_screen(pos[0] * TILE + TILE / 2, pos[1] * TILE + TILE / 2)
+    sx, sy = scene.camera.world_to_screen(*tile_center(pos))
     return int(sx), int(sy)
 
 
@@ -370,6 +369,7 @@ def test_capture_founds_a_city_with_effects(play) -> None:
 def test_turn_banner_and_away_report_after_the_ai_turns(play) -> None:
     game, scene = play
     unit = scene.world.unit_at(scene.world.capital_of(scene.human).pos)
+    unit.hp = 1  # heals to 5 before the AI moves, still a sure kill: the AI only takes favourable trades
     spawn_enemy_next_to(scene, unit)
     scene.settings["confirm_end_turn"] = False
     press(game, "e")

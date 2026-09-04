@@ -10,7 +10,9 @@ from __future__ import annotations
 import argparse
 
 from saga2d import Game, TextStyle, Theme
-from tribes.scene import new_game
+from tribes import effects
+from tribes.scene import DEFAULT_SETTINGS, new_game
+from tribes.sound import SoundBank
 from tribes.title import TitleScene
 
 
@@ -45,6 +47,11 @@ def main() -> None:
     parser.add_argument("--fullscreen", action="store_true")
     args = parser.parse_args()
     game = Game("Tribes", resolution=None, fullscreen=args.fullscreen, theme=build_theme())
+    bank = SoundBank(game)
+    effects.sound_hook = bank.play
+    effects.volume_hook = bank.set_volume
+    effects.apply_volumes(DEFAULT_SETTINGS)
+    bank.start_music()
     if args.seed is not None:
         game.run(new_game(args.seed, size=args.size, tribes=args.tribes))
     else:

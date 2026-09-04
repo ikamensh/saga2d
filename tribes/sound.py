@@ -371,6 +371,10 @@ def write_wav(path: Path, samples: np.ndarray) -> None:
 # -- Bank --------------------------------------------------------------------
 
 
+#: Scene event names that map onto a differently named effect.
+ALIASES = {"attack_kill": "unit_death", "button": "ui_click"}
+
+
 class SoundBank:
     """The game's sounds, played through its own :class:`AudioManager`.
 
@@ -392,6 +396,7 @@ class SoundBank:
     def play(self, name: str, *, pitch_variation: float = 0.0) -> None:
         """Play effect *name*.  *pitch_variation* 0.05 shifts the pitch by up
         to ±5 % so a repeated effect does not sound stamped out."""
+        name = ALIASES.get(name, name)
         if name not in SOUNDS:
             raise KeyError(f"Unknown sound {name!r}. Sounds: {', '.join(SOUNDS)}")
         pitch = 1.0 + self._rng.uniform(-pitch_variation, pitch_variation) if pitch_variation else 1.0

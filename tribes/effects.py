@@ -13,7 +13,8 @@ Sound goes through :func:`play_sound`; set :data:`sound_hook` to
 from __future__ import annotations
 
 import math
-from typing import Callable
+from collections.abc import Mapping
+from typing import Any, Callable
 
 import random
 
@@ -23,6 +24,14 @@ Color = tuple[int, int, int, int]
 
 #: ``play_sound(name)`` forwards here when set; ``None`` is silent.
 sound_hook: Callable[[str], None] | None = None
+volume_hook: Callable[[str, float], None] | None = None
+
+
+def apply_volumes(settings: Mapping[str, Any]) -> None:
+    """Push the ``music``/``sfx`` levels from a settings dict to the sound bank."""
+    if volume_hook is not None:
+        volume_hook("music", float(settings["music"]))
+        volume_hook("sfx", float(settings["sfx"]))
 
 
 def play_sound(name: str) -> None:
@@ -120,6 +129,10 @@ class Effects:
         self._items: list[Effect] = []
 
     def add(self, effect: Effect) -> Effect:
+        if isinstance(effect, Banner):
+            for old in [e for e in self._items if isinstance(e, Banner)]:
+                old.end()
+                self._items.remove(old)
         self._items.append(effect)
         return effect
 
