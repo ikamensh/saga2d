@@ -10,17 +10,17 @@ import math
 import random
 from typing import Any
 
-from saga2d import Anchor, Button, Camera, Column, Label, Row, Scene, Style
+from saga2d import Anchor, Button, Camera, Column, Label, Row, Scene
 from tribes import mapgen
 from tribes.effects import play_sound
-from tribes.scene import ACTION_BUTTON, GHOST_BUTTON, PANEL_STYLE, HelpScene, load_game, new_game
+from tribes.scene import HelpScene, load_game, new_game
+from tribes.style import ACTION_BUTTON, GHOST_BUTTON, MENU_BUTTON, OVERLAY_STYLE
 from tribes.textures import FOG, TILE
 from tribes.view import MapView, rgba, tile_center
 
 MAP_SIZES: dict[str, int] = {"Small": 11, "Medium": 14, "Large": 18}
 TRIBE_COUNTS = (2, 3, 4)
 OPTION_WIDTH = 180
-MENU_BUTTON = Style(background_color=(36, 44, 68, 225), border_width=1, border_color=(110, 125, 170, 255), padding=10)
 DRIFT_SECONDS = 26.0
 
 
@@ -60,15 +60,15 @@ class TitleScene(Scene):
         has_save = self.game.save_manager.load(1) is not None
         menu = Column(spacing=10, anchor=Anchor.CENTER, margin=0)
         menu.add(Label("", height=150))  # leaves room for the title drawn above
-        menu.add(Button("New game", hotkey="[N]", on_click=self.new_game, style=ACTION_BUTTON, width=300))
-        cont = Button("Continue", hotkey="[C]", on_click=self.continue_game, style=MENU_BUTTON, width=300)
+        menu.add(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=300))
+        cont = Button("Continue", hotkey="C", on_click=self.continue_game, style=MENU_BUTTON, width=300)
         cont.enabled = has_save
         menu.add(cont)
-        menu.add(Button("How to play", hotkey="[H]", on_click=self.how_to_play, style=MENU_BUTTON, width=300))
-        menu.add(Button("Quit", hotkey="[Q]", on_click=self.quit, style=MENU_BUTTON, width=300))
+        menu.add(Button("How to play", hotkey="H", on_click=self.how_to_play, style=MENU_BUTTON, width=300))
+        menu.add(Button("Quit", hotkey="Q", on_click=self.quit, style=MENU_BUTTON, width=300))
         menu.add(Label("Continue resumes save slot 1" if has_save else "No saved game yet — F5 saves during play", text_style="caption"))
         self.ui.add(menu)
-        self.ui.add(Label("Enter starts a new game · every action in the game has a hotkey · F1 in game for help",
+        self.ui.add(Label("Every action in the game has a hotkey — the keycaps show them · F1 in game for help",
                           text_style="caption", anchor=Anchor.BOTTOM_CENTER, margin=12))
 
     def update(self, dt: float) -> None:
@@ -131,24 +131,24 @@ class NewGameScene(Scene):
         self._tribe_buttons: dict[int, Button] = {}
 
     def on_enter(self) -> None:
-        panel = Column(spacing=12, anchor=Anchor.CENTER, style=PANEL_STYLE)
+        panel = Column(spacing=12, anchor=Anchor.CENTER, style=OVERLAY_STYLE)
         panel.add(Label("New game", text_style="title"))
         size_row = Row(Label("Map size", text_style="body", width=90), spacing=8)
         for name, size in MAP_SIZES.items():
-            button = Button(f"{name} {size}×{size}", hotkey=f"[{name[0]}]", on_click=lambda s=size: self.set_size(s), style=GHOST_BUTTON, width=OPTION_WIDTH)
+            button = Button(f"{name} {size}×{size}", hotkey=name[0], on_click=lambda s=size: self.set_size(s), style=GHOST_BUTTON, width=OPTION_WIDTH)
             self._size_buttons[size] = button
             size_row.add(button)
         panel.add(size_row)
         tribe_row = Row(Label("Tribes", text_style="body", width=90), spacing=8)
         for count in TRIBE_COUNTS:
-            button = Button(str(count), hotkey=f"[{count}]", on_click=lambda c=count: self.set_tribes(c), style=GHOST_BUTTON, width=OPTION_WIDTH)
+            button = Button(str(count), hotkey=str(count), on_click=lambda c=count: self.set_tribes(c), style=GHOST_BUTTON, width=OPTION_WIDTH)
             self._tribe_buttons[count] = button
             tribe_row.add(button)
         panel.add(tribe_row)
         panel.add(Row(Label(lambda: f"Seed {self.seed}", text_style="body", width=90 + 8 + OPTION_WIDTH),
-                      Button("Reroll", hotkey="[R]", on_click=self.reroll, style=GHOST_BUTTON, width=OPTION_WIDTH), spacing=8))
-        panel.add(Row(Button("Start", hotkey="[Enter]", on_click=self.start, style=ACTION_BUTTON, width=2 * OPTION_WIDTH + 8),
-                      Button("Back", hotkey="[Esc]", on_click=self.game.pop, style=GHOST_BUTTON, width=OPTION_WIDTH), spacing=8))
+                      Button("Reroll", hotkey="R", on_click=self.reroll, style=GHOST_BUTTON, width=OPTION_WIDTH), spacing=8))
+        panel.add(Row(Button("Start", hotkey="Enter", on_click=self.start, style=ACTION_BUTTON, width=2 * OPTION_WIDTH + 8),
+                      Button("Back", hotkey="Esc", on_click=self.game.pop, style=GHOST_BUTTON, width=OPTION_WIDTH), spacing=8))
         self.ui.add(panel)
         self._restyle()
 
@@ -160,7 +160,7 @@ class NewGameScene(Scene):
 
     def draw(self) -> None:
         w, h = self.game.resolution
-        self.draw_rect(0, 0, w, h, (0, 0, 0, 120))
+        self.draw_rect(0, 0, w, h, (4, 6, 12, 140))
 
     def set_size(self, size: int) -> None:
         self.size = size

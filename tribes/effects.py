@@ -158,7 +158,8 @@ class FloatingText(Effect):
 
     Anchored to a world position but drawn in screen space (font scaled by
     the camera zoom) so it always sits above city labels and health bars;
-    a dark pill behind it keeps it readable on any terrain.
+    a dark pill behind it keeps it readable on any terrain.  Uses the
+    theme's ``"floating"`` text style.
     """
 
     def __init__(
@@ -179,15 +180,14 @@ class FloatingText(Effect):
             return
         camera = scene.camera
         assert camera is not None
+        theme = scene.game.theme
+        style = theme.get_text_style("floating")
         sx, sy = camera.world_to_screen(self.x, self.y - self.rise * ease_out(t))
         size = max(8, round(self.font_size * camera.zoom))
-        tw, th = scene.game.backend.measure_text(self.text, size, scene.game.theme.font)
+        tw, th = scene.game.backend.measure_text(self.text, size, style.font or theme.font)
         pill_h = th + 2
-        pill = (10, 12, 20, _quantize(alpha * 0.55))
-        scene.draw_rect(sx - tw / 2, sy - pill_h / 2, tw, pill_h, pill)
-        scene.draw_circle(sx - tw / 2, sy, pill_h / 2, pill)
-        scene.draw_circle(sx + tw / 2, sy, pill_h / 2, pill)
-        scene.draw_text(self.text, sx, sy, font_size=size, color=(*self.color[:3], alpha), anchor_x="center", anchor_y="center")
+        scene.draw_rect(sx - tw / 2 - pill_h / 2, sy - pill_h / 2, tw + pill_h, pill_h, (10, 12, 20, _quantize(alpha * 0.55)), radius=pill_h / 2)
+        scene.draw_text(self.text, sx, sy, style="floating", font_size=size, color=(*self.color[:3], alpha), anchor_x="center", anchor_y="center")
 
 
 class TilePulse(Effect):
@@ -397,9 +397,9 @@ class Toast(Effect):
         w, _ = scene.game.resolution
         x = w - self.MARGIN - box_w + self._offset(box_w)
         y = self.TOP
-        scene.draw_rect(x, y, box_w, box_h, (22, 26, 40, 240), border_color=(70, 80, 110, 255), border_width=1)
-        scene.draw_rect(x, y, 4, box_h, self.accent)
-        tx = x + self.PAD + 6
+        scene.draw_rect(x, y, box_w, box_h, (16, 20, 32, 240), border_color=(255, 255, 255, 30), border_width=1, radius=10)
+        scene.draw_rect(x + 8, y + 10, 3, box_h - 20, self.accent, radius=1.5)
+        tx = x + self.PAD + 8
         scene.draw_text(self.title, tx, y + self.PAD + heading.font_size / 2, style="heading", anchor_y="center")
         ly = y + self.PAD + heading.font_size + 10
         for line in self.lines:

@@ -1,10 +1,11 @@
 """The isometric map view: projection, sprite ordering and texture registration."""
 
 import pytest
+from PIL import Image
 
 from saga2d import Game
 from tribes import textures
-from tribes.__main__ import build_theme
+from tribes.style import build_theme
 from tribes.rules import Resource, Terrain, UnitType
 from tribes.scene import new_game
 from tribes.view import tile_at, tile_center
@@ -153,7 +154,7 @@ def test_prop_drops_stay_within_one_row_spacing() -> None:
 # -- Unit tokens ---------------------------------------------------------------------
 
 
-def _rendered(key: str) -> tuple["Image", textures.Placement]:
+def _rendered(key: str) -> tuple[Image.Image, textures.Placement]:
     from tribes.rules import UnitType
 
     unit_type = next(u for u in UnitType if f"unit.{u.value}" == key)

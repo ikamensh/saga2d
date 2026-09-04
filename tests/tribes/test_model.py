@@ -6,7 +6,7 @@ import pytest
 
 from tribes import ai, mapgen
 from tribes.model import RuleError, Tile, World
-from tribes.rules import HARVEST, UNITS, Resource, Tech, Terrain, UnitType, tech_cost
+from tribes.rules import HARVEST, Resource, Tech, Terrain, UnitType, tech_cost
 
 
 def flat_world(size: int = 10, tribes: int = 2) -> World:

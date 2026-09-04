@@ -4,7 +4,7 @@ import pytest
 
 from saga2d import Game
 from tribes import effects
-from tribes.__main__ import build_theme
+from tribes.style import build_theme
 from tribes.rules import Tech, Terrain, UnitType
 from tribes.scene import HIT_TIME, GameOverScene, MapScene, PauseScene, SettingsScene, TechScene, new_game
 from tribes.title import NewGameScene, TitleScene

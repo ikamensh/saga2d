@@ -8,26 +8,22 @@ from collections import deque
 from typing import Any
 
 from saga2d import (
-    Anchor, Button, Camera, Column, Delay, InputEvent, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer, Row,
-    Scene, Sequence, Sprite, Style,
+    Anchor, Button, Camera, Column, Delay, InputEvent, KeyHints, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer,
+    Row, Scene, Sequence, Sprite,
 )
 from tribes import ai, effects, mapgen
 from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, TilePulse, Toast, hop, play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Tech, UnitType
+from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE
 from tribes.textures import FOG, TILE
 from tribes.view import MapView, Selection, rgba, tile_at, tile_center, tint
-
-PANEL_BG = (22, 26, 40, 235)
-PANEL_STYLE = Style(background_color=PANEL_BG, border_color=(70, 80, 110, 255), border_width=1, padding=12)
-GHOST_BUTTON = Style(background_color=(40, 48, 72, 255), border_width=1, border_color=(90, 100, 140, 255), padding=8)
-ACTION_BUTTON = Style(background_color=(52, 88, 150, 255), border_width=1, border_color=(120, 165, 235, 255), padding=8)
-DANGER_BUTTON = Style(background_color=(140, 58, 58, 255), border_width=1, border_color=(225, 110, 100, 255), padding=8)
 
 DEFAULT_SETTINGS: dict[str, Any] = {"music": 0.7, "sfx": 0.8, "confirm_end_turn": True}
 DAMAGE_COLOR = (255, 96, 84, 255)
 HEAL_COLOR = (130, 235, 130, 255)
-GOLD = (255, 224, 120, 255)
+HINT_BAR = 30  # height of the keycap strip along the bottom
+PANEL_MARGIN = (16, HINT_BAR + 12)
 
 HIT_TIME = 0.16  # seconds from the start of a lunge until the blow lands
 ZOOM_PER_LINE = 1.06  # zoom factor per wheel line; a trackpad swipe of ~30 lines spans the whole range
@@ -131,15 +127,17 @@ class MapScene(Scene):
     def _build_hud(self) -> None:
         world = self.world
         tribe = self.tribe
-        self.ui.add(Panel(anchor=Anchor.TOP_LEFT, margin=10, layout=Layout.HORIZONTAL, spacing=18, style=PANEL_STYLE, children=[
-            Label(lambda: tribe.name, text_style="title"),
-            Label(lambda: f"★ {tribe.stars}  (+{world.income(self.human)})", text_style="hud"),
+        self.btn_end_turn = Button(lambda: "Confirm end turn" if self._end_turn_armed else "End turn", hotkey="E", on_click=self.end_turn, style=GHOST_BUTTON)
+        self.ui.add(Panel(anchor=Anchor.TOP_LEFT, margin=12, layout=Layout.HORIZONTAL, spacing=18, style=PANEL_STYLE, children=[
+            Label(tribe.name, text_style="title", text_color=rgba(tribe.color)),
+            Row(Label(lambda: f"★ {tribe.stars}", text_style="hud", text_color=GOLD),
+                Label(lambda: f"+{world.income(self.human)}/turn", text_style="sub"), spacing=6),
             Label(lambda: f"Round {world.round}/{MAX_ROUNDS}", text_style="hud"),
             Label(lambda: f"Units {len(world.tribe_units(self.human))}/{world.unit_cap(self.human)}", text_style="sub"),
-            Button("Tech", hotkey="[T]", on_click=self.open_tech, style=GHOST_BUTTON),
-            Button(lambda: "Confirm end turn" if self._end_turn_armed else "End turn", hotkey="[E]", on_click=self.end_turn, style=GHOST_BUTTON),
+            Button("Tech", hotkey="T", on_click=self.open_tech, style=GHOST_BUTTON),
+            self.btn_end_turn,
         ]))
-        self.info_panel = Column(spacing=6, anchor=Anchor.BOTTOM_LEFT, margin=30, style=PANEL_STYLE)
+        self.info_panel = Column(spacing=6, anchor=Anchor.BOTTOM_LEFT, margin=PANEL_MARGIN, style=PANEL_STYLE)
         self.info_title = Label("", text_style="heading")
         self.info_panel.add(self.info_title)
         self.city_bar = ProgressBar(value=lambda: self._city().population if self._city() else 0,
@@ -153,11 +151,11 @@ class MapScene(Scene):
         self.info_lines = [Label("", text_style="body") for _ in range(4)]
         for line in self.info_lines:
             self.info_panel.add(line)
-        self.btn_capture = Button("Capture", hotkey="[C]", on_click=self.capture, style=ACTION_BUTTON)
-        self.btn_hold = Button("Hold", hotkey="[H]", on_click=self.hold_unit, style=GHOST_BUTTON)
+        self.btn_capture = Button("Capture", hotkey="C", on_click=self.capture, style=ACTION_BUTTON)
+        self.btn_hold = Button("Hold", hotkey="H", on_click=self.hold_unit, style=GHOST_BUTTON)
         self.btn_harvest = Button(lambda: HARVEST[world.tile(self._harvest_pos).resource].label if self._harvest_pos else "Harvest",
-                                  hotkey="[Enter]", on_click=self._harvest_button, style=ACTION_BUTTON)
-        self.btn_attack = Button("Attack", hotkey="[Enter]", on_click=self._attack_button, style=DANGER_BUTTON)
+                                  hotkey="Enter", on_click=self._harvest_button, style=ACTION_BUTTON)
+        self.btn_attack = Button("Attack", hotkey="Enter", on_click=self._attack_button, style=DANGER_BUTTON)
         self.action_row = Row(self.btn_capture, self.btn_hold, self.btn_harvest, self.btn_attack, spacing=8)
         for button in (self.btn_capture, self.btn_hold, self.btn_harvest, self.btn_attack):
             button.visible = False
@@ -165,26 +163,27 @@ class MapScene(Scene):
         self.info_panel.add(self.action_row)
         self.ui.add(self.info_panel)
 
-        self.train_panel = Column(spacing=6, anchor=Anchor.BOTTOM_RIGHT, margin=30, style=PANEL_STYLE)
+        self.train_panel = Column(spacing=6, anchor=Anchor.BOTTOM_RIGHT, margin=PANEL_MARGIN, style=PANEL_STYLE)
         self.train_panel.add(Label("Train", text_style="heading"))
         self.train_buttons: dict[UnitType, Button] = {}
         for unit_type, info in UNITS.items():
-            button = Button(f"{unit_type.value.title()}  {info.cost}★", hotkey=f"[{info.hotkey}]",
+            button = Button(f"{unit_type.value.title()}  {info.cost}★", hotkey=info.hotkey,
                             on_click=lambda ut=unit_type: self.train(ut), style=GHOST_BUTTON, width=170)
             self.train_buttons[unit_type] = button
             reason = Label(lambda ut=unit_type: self._train_reason(ut), text_style="caption", width=150)
             self.train_panel.add(Row(button, reason, spacing=8))
         self.train_panel.visible = False
         self.ui.add(self.train_panel)
-        self.ui.add(Label(self._hint, text_style="caption", anchor=Anchor.BOTTOM_CENTER, margin=6))
+        self.ui.add(KeyHints(self._hint, anchor=Anchor.BOTTOM_CENTER, margin=6))
         self.ui.add(Label(lambda: "   ·   ".join(self.visible_log()[-2:]), text_style="sub", anchor=Anchor.TOP_RIGHT, margin=14))
 
-    def _hint(self) -> str:
+    def _hint(self) -> list[tuple[str, str]]:
+        """Keycap hints for the current state; every action stays reachable from the keyboard."""
         if self.selected is not None:
-            return "Enter/click move or attack · C capture · H hold · Tab next unit · Esc deselect · F1 help"
+            return [("Enter", "move / attack"), ("C", "capture"), ("H", "hold"), ("Tab", "next unit"), ("Esc", "deselect"), ("F1", "help")]
         if self._city() is not None:
-            return "1-5 train · click a glowing resource to harvest · Esc deselect · F1 help"
-        return "Click/Enter act · Tab next unit · E end turn · T tech · WASD pan · wheel zoom · Esc menu · F1 help"
+            return [("1-5", "train"), ("Click", "a glowing resource to harvest"), ("Esc", "deselect"), ("F1", "help")]
+        return [("Enter", "act"), ("Tab", "next unit"), ("E", "end turn"), ("T", "tech"), ("WASD", "pan"), ("Wheel", "zoom"), ("Esc", "menu"), ("F1", "help")]
 
     def _city(self) -> City | None:
         return self.world.cities.get(self.selected_city) if self.selected_city is not None else None
@@ -737,6 +736,8 @@ class MapScene(Scene):
         self.btn_harvest.visible = harvestable
         self.btn_attack.visible = self._hover_target is not None
         self.action_row.visible = show_capture or show_hold or harvestable or self._hover_target is not None
+        # End turn is the natural next step once nothing can act; it turns red while it waits for the confirming press.
+        self.btn_end_turn.style = DANGER_BUTTON if self._end_turn_armed else GHOST_BUTTON if self._own_units_with_actions() else ACTION_BUTTON
 
     def draw(self) -> None:
         city = self._city()
@@ -746,7 +747,7 @@ class MapScene(Scene):
         ))
         self._draw_harvest_markers()
         w, h = self.game.resolution
-        self.draw_rect(0, h - 26, w, 26, (0, 0, 0, 150))
+        self.draw_rect(0, h - HINT_BAR, w, HINT_BAR, (8, 10, 18, 175))
         self.effects.draw(self)
 
     def _draw_harvest_markers(self) -> None:
@@ -790,14 +791,14 @@ class _Overlay(Scene):
     pop_on_cancel = True
 
     def panel(self, title: str) -> Column:
-        panel = Column(spacing=8, anchor=Anchor.CENTER, style=PANEL_STYLE)
+        panel = Column(spacing=10, anchor=Anchor.CENTER, style=OVERLAY_STYLE)
         panel.add(Label(title, text_style="title"))
         self.ui.add(panel)
         return panel
 
     def draw(self) -> None:
         w, h = self.game.resolution
-        self.draw_rect(0, 0, w, h, (0, 0, 0, 120))
+        self.draw_rect(0, 0, w, h, (4, 6, 12, 140))
 
 
 def _tech_rows() -> list[tuple[Tech, int]]:
@@ -825,7 +826,7 @@ class TechScene(_Overlay):
             key = str((index + 1) % 10)
             known = tech in tribe.techs
             reason = world.can_research(tribe.id, tech)
-            button = Button(tech.value.title(), hotkey=f"[{key}]", on_click=lambda t=tech: self.buy(t),
+            button = Button(tech.value.title(), hotkey=key, on_click=lambda t=tech: self.buy(t),
                             style=ACTION_BUTTON if reason is None else GHOST_BUTTON, width=170)
             button.enabled = reason is None
             cost = "✓ known" if known else f"{world.tech_cost(tribe.id, tech)}★"
@@ -835,15 +836,15 @@ class TechScene(_Overlay):
             if reason is not None and reason.startswith("Costs"):
                 status = f"need {reason[6:]}, have {tribe.stars}★"
             panel.add(Row(
-                Label("└" if depth else "", text_style="body", font="Menlo", width=22, align="right"),
+                Label("›" if depth else "", text_style="sub", width=22, align="right"),
                 button,
-                Label(cost, text_style="hud", width=80, align="right", text_color=GOLD if not known else (130, 220, 130, 255)),
+                Label(cost, text_style="hud", width=80, align="right", text_color=GOOD if known else GOLD),
                 Label(detail, text_style="body", width=370),
-                Label(status, text_style="sub", width=190, text_color=(230, 150, 130, 255)),
+                Label(status, text_style="sub", width=190, text_color=BAD),
                 spacing=12,
             ))
             self.bind_key(key, lambda t=tech: self.buy(t))
-        panel.add(Label("1-0 research · Esc / T close", text_style="caption"))
+        panel.add(KeyHints([("1-0", "research"), ("Esc", "close")]))
 
     def buy(self, tech: Tech) -> None:
         world = self.map_scene.world
@@ -881,7 +882,7 @@ class SettingsScene(_Overlay):
     def on_enter(self) -> None:
         panel = self.panel("Settings")
         for index, (name, key) in enumerate(self.ROWS):
-            marker = Label(lambda i=index: "▸" if self.focus == i else "", text_style="hud", width=18, text_color=GOLD)
+            marker = Label(lambda i=index: "›" if self.focus == i else "", text_style="hud", width=18, text_color=GOLD)
             label = Label(name, text_style="body", width=170)
             if key == "confirm_end_turn":
                 control = Row(Button(lambda k=key: "On" if self.settings[k] else "Off", on_click=lambda k=key: self._toggle(k), style=GHOST_BUTTON, width=190))
@@ -894,7 +895,7 @@ class SettingsScene(_Overlay):
                 )
             panel.add(Row(marker, label, control, spacing=12))
         panel.add(Label("Skip the end-turn check to end your turn with units still waiting.", text_style="sub"))
-        panel.add(Label("↑↓ select · ←→ adjust · Enter toggle · Esc close", text_style="caption"))
+        panel.add(KeyHints([("↑↓", "select"), ("←→", "adjust"), ("Enter", "toggle"), ("Esc", "close")]))
 
     def _toggle(self, key: str) -> None:
         self.settings[key] = not self.settings[key]
@@ -937,13 +938,13 @@ class PauseScene(_Overlay):
 
     def on_enter(self) -> None:
         panel = self.panel("Paused")
-        panel.add(Button("Resume", hotkey="[Esc]", on_click=self.game.pop, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Save", hotkey="[F5]", on_click=self.save, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Load", hotkey="[F9]", on_click=self.load, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Settings", hotkey="[S]", on_click=self.settings, style=GHOST_BUTTON, width=260))
-        panel.add(Button("New game", hotkey="[N]", on_click=self.new_game, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Back to title", hotkey="[T]", on_click=self.back_to_title, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Quit", hotkey="[Q]", on_click=self.quit, style=GHOST_BUTTON, width=260))
+        panel.add(Button("Resume", hotkey="Esc", on_click=self.game.pop, style=ACTION_BUTTON, width=260))
+        panel.add(Button("Save", hotkey="F5", on_click=self.save, style=GHOST_BUTTON, width=260))
+        panel.add(Button("Load", hotkey="F9", on_click=self.load, style=GHOST_BUTTON, width=260))
+        panel.add(Button("Settings", hotkey="S", on_click=self.settings, style=GHOST_BUTTON, width=260))
+        panel.add(Button("New game", hotkey="N", on_click=self.new_game, style=GHOST_BUTTON, width=260))
+        panel.add(Button("Back to title", hotkey="T", on_click=self.back_to_title, style=GHOST_BUTTON, width=260))
+        panel.add(Button("Quit", hotkey="Q", on_click=self.quit, style=GHOST_BUTTON, width=260))
 
     def save(self) -> None:
         self.game.pop()
@@ -969,29 +970,37 @@ class PauseScene(_Overlay):
         self.game.quit()
 
 
-HELP_LINES = (
+HELP_INTRO = (
     "Capture villages to grow your empire; take every enemy city to win.",
     "Harvest glowing resources inside your borders to level cities up.",
-    "",
-    "Enter / click     act at the cursor: select, move, attack, harvest, capture",
-    "Arrows            move the cursor          WASD / right-drag   pan the map",
-    "Tab / Shift+Tab   next / previous unit     Wheel, + / -        zoom",
-    "E                 end turn (twice while units can still act)",
-    "T                 research                 C                   capture",
-    "H                 hold (unit heals)        1-5                 train in city",
-    "F5 / F9           save / load              Home                jump to capital",
-    "Esc               cancel / pause menu      (settings and title live there)",
+)
+HELP_KEYS = (
+    ("Enter / click", "act at the cursor: select, move, attack, harvest, capture"),
+    ("Arrows", "move the cursor"),
+    ("WASD / right-drag", "pan the map"),
+    ("Tab / Shift+Tab", "next / previous unit"),
+    ("Wheel / + / −", "zoom"),
+    ("E", "end turn (twice while units can still act)"),
+    ("T", "research"),
+    ("C", "capture a village or an enemy city"),
+    ("H", "hold: the unit rests and heals"),
+    ("1-5", "train in the selected city"),
+    ("F5 / F9", "save / load"),
+    ("Home", "jump to the capital"),
+    ("Esc", "cancel, or the pause menu (settings and title live there)"),
 )
 
 
 class HelpScene(_Overlay):
     def on_enter(self) -> None:
         panel = self.panel("How to play")
-        size = self.game.theme.get_text_style("body").font_size
-        width = max(self.game.backend.measure_text(line, size, "Menlo")[0] for line in HELP_LINES)
-        for line in HELP_LINES:
-            panel.add(Label(line, text_style="body", font="Menlo", width=width))
-        panel.add(Label("Esc to close", text_style="caption"))
+        for line in HELP_INTRO:
+            panel.add(Label(line, text_style="body", width=640))
+        table = Column(spacing=4)
+        for keys, what in HELP_KEYS:
+            table.add(Row(Label(keys, text_style="hud", width=190, align="right", text_color=GOLD), Label(what, text_style="body", width=440), spacing=14))
+        panel.add(table)
+        panel.add(KeyHints([("Esc", "close")]))
 
 
 class GameOverScene(_Overlay):
@@ -1015,11 +1024,11 @@ class GameOverScene(_Overlay):
             text_style="body",
         ))
         for tribe in sorted(world.tribes, key=lambda t: -world.score(t.id)):
-            panel.add(Label(f"{tribe.name:<8} {world.score(tribe.id):>5} points", text_style="body", font="Menlo", width=260,
-                            text_color=rgba(tribe.color)))
-        panel.add(Button("New game", hotkey="[N]", on_click=self.new_game, style=ACTION_BUTTON, width=260))
-        panel.add(Button("Back to title", hotkey="[T]", on_click=self.back_to_title, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Quit", hotkey="[Q]", on_click=self.quit, style=GHOST_BUTTON, width=260))
+            panel.add(Row(Label(tribe.name, text_style="heading", width=150, text_color=rgba(tribe.color)),
+                          Label(f"{world.score(tribe.id)} points", text_style="hud", width=110, align="right"), spacing=0))
+        panel.add(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=260))
+        panel.add(Button("Back to title", hotkey="T", on_click=self.back_to_title, style=GHOST_BUTTON, width=260))
+        panel.add(Button("Quit", hotkey="Q", on_click=self.quit, style=GHOST_BUTTON, width=260))
 
     def new_game(self) -> None:
         scene = self.map_scene
