@@ -5,6 +5,10 @@ roofs) are projected with a fixed dimetric camera, lit by one directional
 light with flat shading, sorted back-to-front and rasterised with Pillow
 at a multiple of the target size, then downsampled for anti-aliasing.
 
+Face colours are RGB or RGBA.  Translucent faces (a ground shadow) are
+rasterised first and opaque faces overwrite them, so translucency only
+shows where nothing solid covers it; Pillow does not blend polygons.
+
 Model space: the tile is the unit square ``[-0.5, 0.5]²`` in x/y with
 z up.  The camera sits over the ``(+x, +y)`` corner, so the ``+x`` face
 of a box is its right-hand side on screen and the ``+y`` face its left.
@@ -21,6 +25,8 @@ from PIL import Image, ImageDraw
 
 Vec3 = tuple[float, float, float]
 RGB = tuple[int, int, int]
+RGBA = tuple[int, int, int, int]
+Color = RGB | RGBA
 
 #: Camera elevation above the ground plane.  ``asin(1/2)``: the tile's
 #: top face projects to a diamond exactly twice as wide as it is tall.
@@ -49,7 +55,11 @@ AMBIENT = 0.55
 @dataclass(frozen=True)
 class Face:
     points: tuple[Vec3, ...]
-    color: RGB
+    color: Color
+
+    @property
+    def opaque(self) -> bool:
+        return len(self.color) == 3 or self.color[3] == 255
 
 
 Mesh = list[Face]
@@ -95,7 +105,7 @@ def _centroid(points: tuple[Vec3, ...]) -> Vec3:
     return (sum(p[0] for p in points) / n, sum(p[1] for p in points) / n, sum(p[2] for p in points) / n)
 
 
-def _oriented(faces: list[tuple[list[Vec3], RGB]], inside: Vec3) -> Mesh:
+def _oriented(faces: list[tuple[list[Vec3], Color]], inside: Vec3) -> Mesh:
     """Wind every face so its normal points away from *inside* (a point inside a convex solid)."""
     mesh: Mesh = []
     for points, color in faces:
@@ -206,7 +216,7 @@ def gable_roof(base_center: Vec3, size: tuple[float, float], height: float, colo
     return _oriented(faces, (cx, cy, z0 + height / 3))
 
 
-def flat(points: list[tuple[float, float]], z: float, color: RGB) -> Mesh:
+def flat(points: list[tuple[float, float]], z: float, color: Color) -> Mesh:
     """A single horizontal face facing up (points are x/y, listed in any order)."""
     pts = tuple((x, y, z) for x, y in points)
     if _newell_normal(pts)[2] < 0:
@@ -234,11 +244,12 @@ def ribbon(path: list[Vec3], across: Vec3, width: float, color: RGB) -> Mesh:
 # -- Rendering -----------------------------------------------------------------
 
 
-def shade(color: RGB, normal: Vec3, *, light: Vec3 = LIGHT, ambient: float = AMBIENT) -> RGB:
-    """Flat shading normalised so an upward face shows *color* exactly."""
+def shade(color: Color, normal: Vec3, *, light: Vec3 = LIGHT, ambient: float = AMBIENT) -> RGBA:
+    """Flat shading normalised so an upward face shows *color* exactly; alpha passes through."""
     diffuse = max(0.0, _dot(normal, light)) / light[2]
     intensity = ambient + (1 - ambient) * diffuse
-    return tuple(min(255, round(c * intensity)) for c in color)  # type: ignore[return-value]
+    r, g, b = (min(255, round(c * intensity)) for c in color[:3])
+    return (r, g, b, color[3] if len(color) == 4 else 255)
 
 
 def bounds(mesh: Mesh, projection: Projection) -> tuple[float, float, float, float]:
@@ -290,16 +301,33 @@ def render(
         if _dot(normal, VIEW) <= 1e-9:
             continue
         depth = sum(_dot(p, VIEW) for p in face.points) / len(face.points)
-        visible.append((depth, face, normal))
-    visible.sort(key=lambda item: item[0])
-    for _depth, face, normal in visible:
-        draw.polygon([to_px(p) for p in face.points], fill=(*shade(face.color, normal), 255))
+        visible.append((face.opaque, depth, face, normal))
+    visible.sort(key=lambda item: item[:2])  # translucent faces first, then back to front
+    for _opaque, _depth, face, normal in visible:
+        draw.polygon([to_px(p) for p in face.points], fill=shade(face.color, normal))
     if decorate is not None:
         decorate(draw, to_px, ss)
-    # Box filtering at an exact integer factor averages the samples with no
-    # ringing; Lanczos overshoots at every edge and leaves a bright hairline
-    # along tile boundaries.
-    return _spread_edge_colors(image.resize((round(canvas[0] * scale), round(canvas[1] * scale)), Image.Resampling.BOX))
+    return _spread_edge_colors(_downsample(image, (round(canvas[0] * scale), round(canvas[1] * scale))))
+
+
+def _downsample(image: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """Box-filter *image* to *size* in premultiplied alpha.
+
+    Averaging straight RGBA drags every edge pixel towards the transparent
+    black around it, leaving a dark fringe on each sprite; averaging colour
+    weighted by coverage keeps the edge the colour of the surface.  Box
+    filtering has no ringing (Lanczos overshoots and leaves a bright
+    hairline along tile boundaries).
+    """
+    import numpy as np
+
+    arr = np.asarray(image).astype(np.float32)
+    coverage = arr[..., 3] / 255
+    planes = [arr[..., i] * coverage for i in range(3)] + [arr[..., 3]]
+    small = np.stack([np.asarray(Image.fromarray(plane, "F").resize(size, Image.Resampling.BOX)) for plane in planes], axis=-1)
+    alpha = small[..., 3:4]
+    rgb = np.divide(small[..., :3] * 255, alpha, out=np.zeros_like(small[..., :3]), where=alpha > 0)
+    return Image.fromarray(np.concatenate([rgb, alpha], axis=-1).round().clip(0, 255).astype(np.uint8), "RGBA")
 
 
 def _spread_edge_colors(image: Image.Image, passes: int = 3) -> Image.Image:

@@ -29,7 +29,7 @@ from saga2d import MoveTo, ParticleEmitter, RenderLayer, Scene, Sequence, Sprite
 from tribes import textures
 from tribes.model import Pos, Unit, World
 from tribes.rules import Terrain
-from tribes.textures import DROP_TILE, DROP_UNIT, ISO_H, ISO_W, TILE, TILE_SIZE, WATER_DROP
+from tribes.textures import DROP_TILE, DROP_UNIT, ISO_H, ISO_W, TILE, TILE_SIZE, TOKEN_FRONT, WATER_DROP
 
 Color = tuple[int, int, int, int]
 
@@ -310,8 +310,8 @@ class MapView:
             if sprite is None:
                 continue
             sx, sy = sprite.position
-            feet_y = sy - DROP_UNIT
-            bar_w = 32
-            scene.draw_rect(sx - bar_w / 2, feet_y + 6, bar_w, 5, (0, 0, 0, 160), space="world", layer=RenderLayer.UI_WORLD)
-            scene.draw_rect(sx - bar_w / 2, feet_y + 6, bar_w * u.hp / u.max_hp, 5, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
+            bar_y = sy - DROP_UNIT + TOKEN_FRONT + 3  # just under the token's disc
+            bar_w = 30
+            scene.draw_rect(sx - bar_w / 2, bar_y, bar_w, 5, (0, 0, 0, 160), space="world", layer=RenderLayer.UI_WORLD)
+            scene.draw_rect(sx - bar_w / 2, bar_y, bar_w * u.hp / u.max_hp, 5, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
         self._outline(selection.cursor, (255, 255, 255, 230), 2.5, layer=RenderLayer.UI_WORLD)

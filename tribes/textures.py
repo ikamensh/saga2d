@@ -9,6 +9,11 @@ asset manager under a short key (``"tile.field"``, ``"prop.forest.0"``,
 ``"unit.warrior"``, ``"glow"``…).  Units and city roofs are white so
 sprites can tint them with tribe colours at draw time.
 
+Units are game pieces: a chibi figure on a flat disc that lies on the
+tile top, over a soft contact shadow.  The disc is what tells the eye
+which tile a unit occupies — a tall figure alone reads as standing on
+any of the tiles it overlaps in a dimetric view.
+
 Sprites are anchored at the bottom centre.  :data:`placements` records,
 per key, the sprite size and how far the image bottom lies below the
 tile-centre reference point ("drop"); the drop doubles as the y-sort key
@@ -60,6 +65,11 @@ TRUNK = (112, 82, 54)
 PLASTER = (242, 234, 216)
 ROCK = (138, 138, 150)
 SNOW = (238, 240, 248)
+SHADOW = (0, 0, 0, 96)
+
+TOKEN_RADIUS = 0.30  # base disc of a unit, in tile units
+TOKEN_HEIGHT = 0.06
+TOKEN_FRONT = TOKEN_RADIUS * math.sqrt(2) * ISO_H / 2  # how far below the tile centre the disc's front rim projects
 
 
 @dataclass(frozen=True)
@@ -215,8 +225,22 @@ def _resource(resource: Resource) -> Mesh:
     raise ValueError(resource)
 
 
-def _figure(x: float, y: float, z: float, body_r: float = 0.15, body_h: float = 0.36, head_r: float = 0.15) -> Mesh:
-    return r3.cylinder((x, y, z), body_r, body_h, WHITE, sides=10) + r3.sphere((x, y, z + body_h + head_r * 0.9), head_r, WHITE, rings=5, sides=10)
+def _figure(x: float, y: float, z: float, body_r: float = 0.12, body_h: float = 0.2, head_r: float = 0.13) -> Mesh:
+    """Chibi figure standing at ``(x, y)`` on height *z*: short body, big head."""
+    return r3.cylinder((x, y, z), body_r, body_h, WHITE, sides=10) + r3.sphere((x, y, z + body_h + head_r * 0.85), head_r, WHITE, rings=5, sides=10)
+
+
+FIGURE_TOP = TOKEN_HEIGHT + 0.2 + 0.13 * 1.85  # z of a standard figure's crown
+
+
+def _ellipse(cx: float, cy: float, radius: float, sides: int = 20) -> list[tuple[float, float]]:
+    return [(cx + radius * math.cos(2 * math.pi * i / sides), cy + radius * math.sin(2 * math.pi * i / sides)) for i in range(sides)]
+
+
+def _token_base() -> Mesh:
+    """Contact shadow (offset away from the light) under a flat disc in the tribe colour."""
+    shadow = r3.flat(_ellipse(0.05, -0.04, TOKEN_RADIUS * 1.12), 0.0, SHADOW)
+    return shadow + r3.cylinder((0, 0, 0), TOKEN_RADIUS, TOKEN_HEIGHT, WHITE, sides=20, rotation=math.pi / 20)
 
 
 _SIDE = (1 / math.sqrt(2), -1 / math.sqrt(2), 0.0)  # model direction that projects to screen-right
@@ -232,9 +256,9 @@ def _facing_quad(center: r3.Vec3, half: float) -> list[r3.Vec3]:
     ]
 
 
-def _bow() -> Mesh:
+def _bow(z: float) -> Mesh:
     """An arc in the vertical plane facing the camera, plus its string."""
-    cx, cy, cz, radius, thickness = 0.02, 0.24, 0.34, 0.24, 0.035
+    cx, cy, cz, radius, thickness = 0.02, 0.2, z + 0.26, 0.2, 0.03
     sx, sy, _ = _SIDE
 
     def at(angle: float, r: float) -> r3.Vec3:
@@ -244,32 +268,34 @@ def _bow() -> Mesh:
     mesh: Mesh = []
     for a0, a1 in zip(angles, angles[1:]):
         mesh += r3.facing([at(a0, radius - thickness), at(a1, radius - thickness), at(a1, radius), at(a0, radius)], INK)
-    return mesh + r3.ribbon([at(angles[0], radius), at(angles[-1], radius)], _SIDE, 0.015, INK)
+    return mesh + r3.ribbon([at(angles[0], radius), at(angles[-1], radius)], _SIDE, 0.014, INK)
 
 
 def _unit(unit_type: UnitType) -> Mesh:
-    """White figure plus the ink prop that identifies the unit type."""
+    """Token base plus a white figure and the ink prop that identifies the unit type."""
+    z = TOKEN_HEIGHT
+    base = _token_base()
     if unit_type is UnitType.WARRIOR:
-        sword = r3.box((0.2, -0.06, 0.34), (0.045, 0.045, 0.5), INK) + r3.box((0.2, -0.06, 0.16), (0.17, 0.05, 0.04), INK)
-        return _figure(0, 0, 0) + sword
+        sword = r3.box((0.17, -0.05, z + 0.3), (0.04, 0.04, 0.42), INK) + r3.box((0.17, -0.05, z + 0.14), (0.15, 0.045, 0.035), INK)
+        return base + _figure(0, 0, z) + sword
     if unit_type is UnitType.ARCHER:
-        return _figure(0, 0, 0) + _bow()
+        return base + _figure(0, 0, z) + _bow(z)
     if unit_type is UnitType.RIDER:
-        horse = r3.box((0.02, 0, 0.27), (0.5, 0.2, 0.2), WHITE)
-        for x, y in ((-0.18, -0.06), (-0.18, 0.06), (0.18, -0.06), (0.18, 0.06)):
-            horse += r3.box((x, y, 0.09), (0.05, 0.05, 0.18), WHITE)
-        horse += r3.box((0.27, 0, 0.44), (0.12, 0.1, 0.18), WHITE) + r3.box((0.32, 0, 0.53), (0.17, 0.1, 0.09), WHITE)
-        return horse + _figure(-0.06, 0, 0.36, body_r=0.1, body_h=0.24, head_r=0.11)
+        horse = r3.box((0.02, 0, z + 0.22), (0.42, 0.17, 0.17), WHITE)
+        for x, y in ((-0.15, -0.05), (-0.15, 0.05), (0.15, -0.05), (0.15, 0.05)):
+            horse += r3.box((x, y, z + 0.07), (0.045, 0.045, 0.14), WHITE)
+        horse += r3.box((0.23, 0, z + 0.36), (0.1, 0.09, 0.15), WHITE) + r3.box((0.27, 0, z + 0.44), (0.15, 0.09, 0.08), WHITE)
+        return base + horse + _figure(-0.05, 0, z + 0.3, body_r=0.09, body_h=0.16, head_r=0.1)
     if unit_type is UnitType.DEFENDER:
-        shield = r3.rotate_z(r3.box((0, 0.22, 0.24), (0.32, 0.05, 0.34), WHITE), -45)
-        emblem = r3.facing(_facing_quad((0.2, 0.2, 0.24), 0.08), INK)
-        return _figure(0, 0, 0) + shield + emblem
+        shield = r3.rotate_z(r3.box((0, 0.2, z + 0.2), (0.28, 0.045, 0.3), WHITE), -45)
+        emblem = r3.facing(_facing_quad((0.18, 0.18, z + 0.2), 0.07), INK)
+        return base + _figure(0, 0, z) + shield + emblem
     if unit_type is UnitType.KNIGHT:
-        plume = r3.cone((0, 0, 0.6), 0.075, 0.24, INK, sides=8)
-        lance = r3.box((0.2, -0.06, 0.46), (0.035, 0.035, 0.92), INK)
+        plume = r3.cone((0, 0, FIGURE_TOP - 0.03), 0.07, 0.2, INK, sides=8)
+        lance = r3.box((0.17, -0.05, z + 0.4), (0.03, 0.03, 0.8), INK)
         sx, sy, _ = _SIDE
-        pennant = r3.facing([(0.2, -0.06, 0.9), (0.2 + sx * 0.16, -0.06 + sy * 0.16, 0.85), (0.2, -0.06, 0.78)], INK)
-        return _figure(0, 0, 0) + plume + lance + pennant
+        pennant = r3.facing([(0.17, -0.05, z + 0.78), (0.17 + sx * 0.15, -0.05 + sy * 0.15, z + 0.73), (0.17, -0.05, z + 0.66)], INK)
+        return base + _figure(0, 0, z) + plume + lance + pennant
     raise ValueError(unit_type)
 
 

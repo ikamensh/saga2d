@@ -148,3 +148,51 @@ def test_prop_drops_stay_within_one_row_spacing() -> None:
     drops = [p.drop for p in textures.placements.values()]
     assert max(drops) - min(drops) < textures.ISO_H / 2
     assert textures.DROP_TERRAIN < textures.DROP_RESOURCE <= textures.DROP_SITE < textures.DROP_UNIT
+
+
+# -- Unit tokens ---------------------------------------------------------------------
+
+
+def _rendered(key: str) -> tuple["Image", textures.Placement]:
+    from tribes.rules import UnitType
+
+    unit_type = next(u for u in UnitType if f"unit.{u.value}" == key)
+    return textures._prop(key, textures._unit(unit_type), textures.DROP_UNIT, 1.0), textures.placements[key]
+
+
+def test_every_unit_stands_on_a_disc_that_covers_the_tile_centre() -> None:
+    """The disc lies flat on the tile top: solid pixels span most of the
+    token's width on the rows just below the tile-centre reference point."""
+    from tribes.rules import UnitType
+
+    for unit_type in UnitType:
+        image, placement = _rendered(f"unit.{unit_type.value}")
+        alpha = image.getchannel("A")
+        width, height = image.size
+        centre_row = height - int(placement.drop)
+        disc_half_w = textures.TOKEN_RADIUS * textures.ISO_W / 2
+        for row in (centre_row + 2, centre_row + 6):
+            solid = [x for x in range(width) if alpha.getpixel((x, row)) == 255]
+            assert solid, unit_type
+            assert max(solid) - min(solid) >= 2 * disc_half_w * 0.85, (unit_type, row)
+
+
+def test_tokens_cast_a_translucent_shadow_that_does_not_punch_through_the_disc() -> None:
+    image, placement = _rendered("unit.warrior")
+    alpha = image.getchannel("A")
+    width, height = image.size
+    centre_row = height - int(placement.drop)
+    front = centre_row + int(textures.TOKEN_FRONT)
+    translucent = [alpha.getpixel((x, front + 2)) for x in range(width)]
+    assert any(0 < a < 200 for a in translucent)  # the shadow peeks out below the disc
+    assert all(alpha.getpixel((width // 2, row)) == 255 for row in range(centre_row - 2, centre_row + 6))
+
+
+def test_downsampling_keeps_edge_pixels_the_colour_of_the_surface() -> None:
+    from tribes import render3d as r3
+
+    image = r3.render(r3.box((0, 0, 0.2), (0.6, 0.6, 0.4), (255, 255, 255)), textures.PROJECTION, scale=1.0, canvas=(80, 80), origin=(40, 50))
+    pixels = image.load()
+    edge = [pixels[x, y] for x in range(80) for y in range(80) if 0 < pixels[x, y][3] < 255]
+    assert edge
+    assert all(min(r, g, b) >= 120 for r, g, b, _ in edge), "partial-coverage pixels were dragged towards black"
