@@ -261,7 +261,9 @@ class World:
         return self._next_id
 
     def _claim_territory(self, city: City) -> None:
-        for pos in [city.pos, *self.neighbors(city.pos, city.radius)]:
+        """A city always owns its own tile; around it, it claims only unowned land."""
+        self.tile(city.pos).owner_city = city.id
+        for pos in self.neighbors(city.pos, city.radius):
             tile = self.tile(pos)
             if tile.owner_city is None:
                 tile.owner_city = city.id
@@ -363,6 +365,8 @@ class World:
 
     def attack(self, attacker: Unit, defender: Unit) -> CombatResult:
         self._check_turn(attacker.tribe)
+        if not attacker.can_attack:
+            raise RuleError("Already attacked this turn")
         if defender not in self.attack_targets(attacker):
             raise RuleError("Target out of range")
         dealt, taken = self.combat_preview(attacker, defender)
@@ -384,7 +388,8 @@ class World:
             taken = 0
         attacker.attacked = True
         if defender_killed and attacker.info.persist:
-            attacker.attacked = False  # persist: may strike again
+            attacker.attacked = False  # persist: may strike again, but the kill used up its move
+            attacker.moved = True
         elif not (attacker.info.escape and not attacker.moved):
             attacker.done = True  # escape units may still move away
         self.log.append(f"{self.tribes[attacker.tribe].name} {attacker.type.value} hit {defender.type.value} for {dealt}")
@@ -537,12 +542,12 @@ class World:
         start = self.current
         while True:
             self.current = (self.current + 1) % len(self.tribes)
-            if self.current <= start:
-                self.round += 1
             if self.tribes[self.current].alive:
                 break
+        if self.current <= start:
+            self.round += 1
         if self.round > MAX_ROUNDS:
-            self.winner = max(range(len(self.tribes)), key=self.score)
+            self.winner = max((t.id for t in self.tribes if t.alive), key=self.score)
             self.log.append(f"Round limit reached: {self.tribes[self.winner].name} wins on score")
             return
         self._start_turn(self.current)
@@ -567,9 +572,14 @@ class World:
                     self._kill(unit)
                 self.log.append(f"{t.name} has fallen")
         alive = [t for t in self.tribes if t.alive]
-        if len(alive) == 1 and self.winner is None:
+        if self.winner is not None:
+            return
+        if len(alive) == 1:
             self.winner = alive[0].id
             self.log.append(f"{alive[0].name} rules the land")
+        elif any(t.human for t in self.tribes) and not any(t.human for t in alive):
+            self.winner = max((t.id for t in alive), key=self.score)  # the player is out: the game ends now
+            self.log.append(f"{self.tribes[self.winner].name} wins on score")
 
     # -- Serialisation -----------------------------------------------------------
 
