@@ -136,6 +136,7 @@ class MapView:
 
     @property
     def world_bounds(self) -> tuple[float, float, float, float]:
+        """The projected map plus a margin (the top one also covers props rising above the first row)."""
         size = self.world.size
         return (-size * HALF_W - TILE, -2 * TILE, size * HALF_W + TILE, size * ISO_H + DROP_TILE + TILE)
 

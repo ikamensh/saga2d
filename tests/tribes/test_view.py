@@ -118,7 +118,8 @@ def test_moving_a_unit_re_sorts_it_into_its_new_row(revealed) -> None:
         game.tick(1 / 60)
     after = order_of(game, scene.view.unit_sprite(unit.id))
     assert (after > before) == (dest[0] + dest[1] > path[0][0] + path[0][1])
-    assert scene.view.unit_sprite(unit.id).position == scene.view._anchor(dest, textures.DROP_UNIT)
+    cx, cy = tile_center(dest)
+    assert scene.view.unit_sprite(unit.id).position == (cx, cy + textures.DROP_UNIT)
 
 
 # -- Textures -----------------------------------------------------------------------

@@ -6,7 +6,7 @@ features, resources, buildings and units are separate props standing on
 that face.  Everything is rendered with Pillow at the display's pixel
 density so it stays crisp on HiDPI screens, then registered with the
 asset manager under a short key (``"tile.field"``, ``"prop.forest.0"``,
-``"unit.warrior"``, ``"glow"``…).  Unit and city textures are white so
+``"unit.warrior"``, ``"glow"``…).  Units and city roofs are white so
 sprites can tint them with tribe colours at draw time.
 
 Sprites are anchored at the bottom centre.  :data:`placements` records,
@@ -106,7 +106,7 @@ def _fog(scale: float) -> Image.Image:
 # -- Props -------------------------------------------------------------------
 
 
-def _prop(key: str, mesh: Mesh, drop: float, scale: float, decorate: r3.Decorate | None = None) -> Image.Image:
+def _prop(key: str, mesh: Mesh, drop: float, scale: float) -> Image.Image:
     """Render *mesh* into a canvas symmetric about the model origin whose bottom
     edge is *drop* below it, and record the placement under *key*."""
     min_x, min_y, max_x, max_y = r3.bounds(mesh, PROJECTION)
@@ -116,7 +116,7 @@ def _prop(key: str, mesh: Mesh, drop: float, scale: float, decorate: r3.Decorate
         raise ValueError(f"{key}: mesh extends {max_y:.1f} below the tile centre, more than its drop of {drop}")
     canvas = (2 * half_w, top + drop)
     placements[key] = Placement(canvas, drop)
-    return r3.render(mesh, PROJECTION, scale=scale, canvas=canvas, origin=(half_w, top), decorate=decorate)
+    return r3.render(mesh, PROJECTION, scale=scale, canvas=canvas, origin=(half_w, top))
 
 
 def _tree(x: float, y: float, height: float, color: tuple[int, int, int], rotation: float = 0.0) -> Mesh:
@@ -139,15 +139,21 @@ def _forest(variant: int) -> Mesh:
     return mesh
 
 
+def _peak(x: float, y: float, width: float, height: float, *, color: tuple[int, int, int] = ROCK, snow: float = 0.38, lean: tuple[float, float] = (0.0, 0.0)) -> Mesh:
+    """Square pyramid whose top *snow* fraction is capped in white; *lean* shifts the apex."""
+    rock = r3.pyramid((x, y, 0), (width, width), height, color, apex_shift=lean)
+    if snow == 0:
+        return rock
+    t = 1 - snow
+    cap = r3.pyramid((x + lean[0] * t, y + lean[1] * t, height * t), (width * snow, width * snow), height * snow, SNOW,
+                     apex_shift=(lean[0] * snow, lean[1] * snow))
+    return rock + cap
+
+
 def _mountain(variant: int) -> Mesh:
     if variant == 0:
-        peak = r3.pyramid((0, 0, 0), (0.88, 0.88), 0.82, ROCK, apex_shift=(-0.04, 0.02))
-        cap = r3.pyramid((-0.04 * 0.62, 0.02 * 0.62, 0.82 * 0.62), (0.88 * 0.38, 0.88 * 0.38), 0.82 * 0.38, SNOW, apex_shift=(-0.04 * 0.38, 0.02 * 0.38))
-        return peak + cap
-    main = r3.pyramid((0.1, -0.08, 0), (0.7, 0.7), 0.72, ROCK)
-    main_cap = r3.pyramid((0.1, -0.08, 0.72 * 0.6), (0.7 * 0.4, 0.7 * 0.4), 0.72 * 0.4, SNOW)
-    side = r3.pyramid((-0.2, 0.2, 0), (0.48, 0.48), 0.42, (128, 128, 140))
-    return side + main + main_cap
+        return _peak(0, 0, 0.88, 0.82, lean=(-0.04, 0.02))
+    return _peak(-0.2, 0.2, 0.48, 0.42, color=(128, 128, 140), snow=0) + _peak(0.1, -0.08, 0.7, 0.72, snow=0.4)
 
 
 def _walls(x: float, y: float, w: float, d: float, h: float, color: tuple[int, int, int]) -> Mesh:
@@ -241,33 +247,29 @@ def _bow() -> Mesh:
     return mesh + r3.ribbon([at(angles[0], radius), at(angles[-1], radius)], _SIDE, 0.015, INK)
 
 
-def _unit(unit_type: UnitType) -> tuple[Mesh, r3.Decorate | None]:
+def _unit(unit_type: UnitType) -> Mesh:
+    """White figure plus the ink prop that identifies the unit type."""
     if unit_type is UnitType.WARRIOR:
         sword = r3.box((0.2, -0.06, 0.34), (0.045, 0.045, 0.5), INK) + r3.box((0.2, -0.06, 0.16), (0.17, 0.05, 0.04), INK)
-        return _figure(0, 0, 0) + sword, None
+        return _figure(0, 0, 0) + sword
     if unit_type is UnitType.ARCHER:
-        return _figure(0, 0, 0) + _bow(), None
+        return _figure(0, 0, 0) + _bow()
     if unit_type is UnitType.RIDER:
         horse = r3.box((0.02, 0, 0.27), (0.5, 0.2, 0.2), WHITE)
         for x, y in ((-0.18, -0.06), (-0.18, 0.06), (0.18, -0.06), (0.18, 0.06)):
             horse += r3.box((x, y, 0.09), (0.05, 0.05, 0.18), WHITE)
         horse += r3.box((0.27, 0, 0.44), (0.12, 0.1, 0.18), WHITE) + r3.box((0.32, 0, 0.53), (0.17, 0.1, 0.09), WHITE)
-        rider = _figure(-0.06, 0, 0.36, body_r=0.1, body_h=0.24, head_r=0.11)
-        return horse + rider, None
+        return horse + _figure(-0.06, 0, 0.36, body_r=0.1, body_h=0.24, head_r=0.11)
     if unit_type is UnitType.DEFENDER:
         shield = r3.rotate_z(r3.box((0, 0.22, 0.24), (0.32, 0.05, 0.34), WHITE), -45)
-        glyph = _facing_quad((0.185, 0.185, 0.24), 0.08)
-
-        def emblem(draw: ImageDraw.ImageDraw, to_px, ss: float) -> None:
-            draw.polygon([to_px(p) for p in glyph], fill=(*INK, 255))
-
-        return _figure(0, 0, 0) + shield, emblem
+        emblem = r3.facing(_facing_quad((0.2, 0.2, 0.24), 0.08), INK)
+        return _figure(0, 0, 0) + shield + emblem
     if unit_type is UnitType.KNIGHT:
         plume = r3.cone((0, 0, 0.6), 0.075, 0.24, INK, sides=8)
         lance = r3.box((0.2, -0.06, 0.46), (0.035, 0.035, 0.92), INK)
         sx, sy, _ = _SIDE
         pennant = r3.facing([(0.2, -0.06, 0.9), (0.2 + sx * 0.16, -0.06 + sy * 0.16, 0.85), (0.2, -0.06, 0.78)], INK)
-        return _figure(0, 0, 0) + plume + lance + pennant, None
+        return _figure(0, 0, 0) + plume + lance + pennant
     raise ValueError(unit_type)
 
 
@@ -318,8 +320,7 @@ def register_all(game: Game) -> None:
         assets.image_from_pil(f"city.{size}", _prop(f"city.{size}", roofs, DROP_SITE + 1, scale))
     for unit_type in UnitType:
         key = f"unit.{unit_type.value}"
-        mesh, decorate = _unit(unit_type)
-        assets.image_from_pil(key, _prop(key, mesh, DROP_UNIT, scale, decorate))
+        assets.image_from_pil(key, _prop(key, _unit(unit_type), DROP_UNIT, scale))
     px = int(TILE * scale)
     assets.image_from_pil("glow", _glow(px * 2, 0.24, (*WHITE, 255)))
     assets.image_from_pil("glow.soft", _glow(px * 2, 0.3, (255, 255, 255, 160), 0.22))

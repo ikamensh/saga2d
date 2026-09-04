@@ -109,10 +109,6 @@ def _oriented(faces: list[tuple[list[Vec3], RGB]], inside: Vec3) -> Mesh:
     return mesh
 
 
-def translate(mesh: Mesh, dx: float, dy: float, dz: float) -> Mesh:
-    return [Face(tuple((x + dx, y + dy, z + dz) for x, y, z in f.points), f.color) for f in mesh]
-
-
 def rotate_z(mesh: Mesh, degrees: float, about: tuple[float, float] = (0.0, 0.0)) -> Mesh:
     """Rotate about a vertical axis through *about* (counter-clockwise seen from above)."""
     a = math.radians(degrees)
