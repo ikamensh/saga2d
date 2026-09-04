@@ -56,31 +56,30 @@ def _time(seconds: float) -> np.ndarray:
     return np.arange(int(round(seconds * SAMPLE_RATE))) / SAMPLE_RATE
 
 
-def envelope(seconds: float, attack: float, tau: float, *, hold: float = 0.0) -> np.ndarray:
-    """Raised-cosine attack, optional hold, exponential decay with time
-    constant *tau*, and a 5 ms fade at the very end so no clip ends mid-cycle."""
+def envelope(seconds: float, attack: float, tau: float) -> np.ndarray:
+    """Raised-cosine attack, exponential decay with time constant *tau*,
+    and a 5 ms fade at the very end so no clip ends mid-cycle."""
     t = _time(seconds)
     env = np.ones_like(t)
     rising = t < attack
     env[rising] = 0.5 - 0.5 * np.cos(np.pi * t[rising] / attack)
-    decaying = t > attack + hold
-    env[decaying] = np.exp(-(t[decaying] - attack - hold) / tau)
+    env[~rising] = np.exp(-(t[~rising] - attack) / tau)
     tail = min(len(t), int(0.005 * SAMPLE_RATE))
     env[-tail:] *= np.linspace(1.0, 0.0, tail)
     return env
 
 
-def tone(note: str | float, seconds: float, *, attack: float = 0.005, tau: float = 0.1, partials=SOFT, hold: float = 0.0) -> np.ndarray:
+def tone(note: str, seconds: float, *, attack: float = 0.005, tau: float = 0.1, partials=SOFT) -> np.ndarray:
     """A decaying note; higher partials die faster, as on a plucked string."""
-    freq = hz(note) if isinstance(note, str) else note
+    freq = hz(note)
     t = _time(seconds)
     out = np.zeros_like(t)
     for k, amp in partials:
-        out += amp * envelope(seconds, attack, tau / (1 + 0.6 * (k - 1)), hold=hold) * np.sin(2 * np.pi * freq * k * t)
+        out += amp * envelope(seconds, attack, tau / (1 + 0.6 * (k - 1))) * np.sin(2 * np.pi * freq * k * t)
     return out / sum(amp for _, amp in partials)
 
 
-def noise(seconds: float, low: float, high: float, *, attack: float = 0.002, tau: float = 0.03, seed: int = 0, hold: float = 0.0) -> np.ndarray:
+def noise(seconds: float, low: float, high: float, *, attack: float = 0.002, tau: float = 0.03, seed: int = 0) -> np.ndarray:
     """Band-limited noise burst between *low* and *high* Hz (soft 8th-order edges)."""
     n = int(round(seconds * SAMPLE_RATE))
     spectrum = np.fft.rfft(np.random.default_rng(seed).standard_normal(n))
@@ -89,7 +88,7 @@ def noise(seconds: float, low: float, high: float, *, attack: float = 0.002, tau
     f = freqs[1:]
     mask[1:] = 1 / (1 + (f / high) ** 8) / (1 + (low / f) ** 8)
     burst = np.fft.irfft(spectrum * mask, n)
-    return burst / np.max(np.abs(burst)) * envelope(seconds, attack, tau, hold=hold)
+    return burst / np.max(np.abs(burst)) * envelope(seconds, attack, tau)
 
 
 def thump(f0: float, f1: float, seconds: float, *, attack: float = 0.002, tau: float = 0.05) -> np.ndarray:
