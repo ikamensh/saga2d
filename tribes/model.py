@@ -365,6 +365,8 @@ class World:
 
     def attack(self, attacker: Unit, defender: Unit) -> CombatResult:
         self._check_turn(attacker.tribe)
+        if not attacker.can_attack:
+            raise RuleError("Already attacked this turn")
         if defender not in self.attack_targets(attacker):
             raise RuleError("Target out of range")
         dealt, taken = self.combat_preview(attacker, defender)

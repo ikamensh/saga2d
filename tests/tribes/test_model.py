@@ -134,10 +134,14 @@ def test_attacking_out_of_range_or_out_of_turn_is_refused() -> None:
     world.tribes[0].explored.update(world.neighbors((4, 4), 3))
     a = world.spawn_unit(0, UnitType.WARRIOR, (4, 4))
     far = world.spawn_unit(1, UnitType.WARRIOR, (7, 4))
-    with pytest.raises(RuleError):
+    with pytest.raises(RuleError, match="out of range"):
         world.attack(a, far)
-    with pytest.raises(RuleError):
+    with pytest.raises(RuleError, match="Not your turn"):
         world.move(far, (6, 4))
+    near = world.spawn_unit(1, UnitType.WARRIOR, (5, 4))
+    world.attack(a, near)
+    with pytest.raises(RuleError, match="Already attacked"):
+        world.attack(a, near)
 
 
 # -- Cities -------------------------------------------------------------------------

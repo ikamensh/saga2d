@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import random
 from collections import deque
+from typing import Iterator
 
 from tribes.model import Pos, Unit, World
 from tribes.rules import HARVEST, TECHS, Tech, Terrain, UnitType
@@ -21,13 +22,18 @@ def take_turn(world: World, tribe: int, rng: random.Random) -> None:
     _research(world, tribe)
     _harvest(world, tribe)
     _train(world, tribe, rng)
-    for unit in list(world.tribe_units(tribe)):
-        if world.winner is None and unit.id in world.units:
-            _act(world, unit, rng)
-    for unit in list(world.tribe_units(tribe)):
-        if world.winner is None and unit.id in world.units:
-            _attack(world, unit)  # second pass: units that moved into place this turn can now gang up
+    for unit in _units_in_play(world, tribe):
+        _act(world, unit, rng)
+    for unit in _units_in_play(world, tribe):
+        _attack(world, unit)  # second pass: units that moved into place this turn can now gang up
     world.end_turn()
+
+
+def _units_in_play(world: World, tribe: int) -> Iterator[Unit]:
+    """The tribe's units still alive when their turn comes, while the game is on."""
+    for unit in list(world.tribe_units(tribe)):
+        if world.winner is None and unit.id in world.units:
+            yield unit
 
 
 def _research(world: World, tribe: int) -> None:
