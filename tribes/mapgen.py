@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import random
 from collections import deque
+from itertools import combinations
 
 from tribes.model import Pos, Tile, World
 from tribes.rules import Resource, Terrain, UnitType
 
 _VILLAGE_SPACING = 3
+_CAPITAL_OPEN_NEIGHBOURS = 4  # walkable tiles around a capital, so nobody starts boxed in
+_CAPITAL_RESOURCES = ((1, 2), (2, 4))  # (radius, at least this many resources within it)
 
 
 def generate(seed: int, size: int = 14, tribe_count: int = 2, human: int | None = 0) -> World:
@@ -23,14 +26,17 @@ def generate(seed: int, size: int = 14, tribe_count: int = 2, human: int | None 
         villages = _place_villages(rng, world, land, tribe_count)
         if len(villages) < tribe_count + 2:
             continue
-        capitals = _pick_capitals(rng, villages, tribe_count)
+        capitals = _pick_capitals(rng, world, villages, tribe_count)
+        if capitals is None:
+            continue
         for i, pos in enumerate(capitals):
             city = world.found_city(i, pos, world._city_name(), capital=True)
             world.spawn_unit(i, UnitType.WARRIOR, city.pos)
         for pos in villages:
             if pos not in capitals:
                 world.tile(pos).village = True
-        _place_resources(rng, world, land)
+        _place_resources(rng, world)
+        _stock_capitals(rng, world)
         world._start_turn(0)
         return world
     raise RuntimeError(f"could not generate a playable map for seed {seed}")
@@ -97,26 +103,70 @@ def _place_villages(rng: random.Random, world: World, land: set[Pos], tribe_coun
     return villages
 
 
-def _pick_capitals(rng: random.Random, villages: list[Pos], tribe_count: int) -> list[Pos]:
-    """Greedy farthest-point choice so tribes start far apart."""
-    capitals = [rng.choice(villages)]
-    while len(capitals) < tribe_count:
-        capitals.append(max(villages, key=lambda v: min(World.distance(v, c) for c in capitals)))
+def _pick_capitals(rng: random.Random, world: World, villages: list[Pos], tribe_count: int) -> list[Pos] | None:
+    """The set of open villages that keeps tribes farthest apart, dealt out in random order.
+
+    Dealing them out randomly matters: growing the set greedily from a random
+    first pick left tribe 0 central and pushed everyone else to the coast.
+    """
+    open_villages = [v for v in villages if _walkable_neighbours(world, v) >= _CAPITAL_OPEN_NEIGHBOURS]
+    if len(open_villages) < tribe_count:
+        return None
+
+    def spread(combo: tuple[Pos, ...]) -> int:
+        return min((World.distance(a, b) for a, b in combinations(combo, 2)), default=world.size)
+
+    best = max(combinations(open_villages, tribe_count), key=spread)
+    if spread(best) < world.size // 3 + 1:
+        return None
+    capitals = list(best)
+    rng.shuffle(capitals)
     return capitals
 
 
-def _place_resources(rng: random.Random, world: World, land: set[Pos]) -> None:
+def _walkable_neighbours(world: World, pos: Pos) -> int:
+    return sum(1 for n in world.neighbors(pos) if world.tile(n).terrain in (Terrain.FIELD, Terrain.FOREST))
+
+
+_RESOURCE_CHANCE = {Terrain.FIELD: 0.25, Terrain.FOREST: 0.35, Terrain.MOUNTAIN: 0.5, Terrain.WATER: 0.25}
+
+
+def _place_resources(rng: random.Random, world: World) -> None:
     near_village = {n for tile in world.all_tiles() if tile.village or tile.city_id is not None for n in world.neighbors(tile.pos)}
     for tile in world.all_tiles():
         if tile.village or tile.city_id is not None:
             continue
-        boost = 0.35 if tile.pos in near_village else 0.0
-        if tile.terrain is Terrain.FIELD and rng.random() < 0.25 + boost:
-            tile.resource = Resource.CROP if rng.random() < 0.3 else Resource.FRUIT
-        elif tile.terrain is Terrain.FOREST and rng.random() < 0.35 + boost:
-            tile.resource = Resource.GAME
-        elif tile.terrain is Terrain.MOUNTAIN and rng.random() < 0.5:
-            tile.resource = Resource.METAL
-        elif tile.terrain is Terrain.WATER and rng.random() < 0.25 + boost:
-            if any(world.tile(n).terrain is not Terrain.WATER for n in world.neighbors(tile.pos)):
-                tile.resource = Resource.FISH
+        boost = 0.35 if tile.pos in near_village and tile.terrain is not Terrain.MOUNTAIN else 0.0
+        if rng.random() < _RESOURCE_CHANCE[tile.terrain] + boost:
+            tile.resource = _resource_for(rng, world, tile.pos)
+
+
+def _stock_capitals(rng: random.Random, world: World) -> None:
+    """Every capital starts with something to harvest, and more to grow into."""
+    for city in world.cities.values():
+        for radius, wanted in _CAPITAL_RESOURCES:
+            ring = world.neighbors(city.pos, radius)
+            have = sum(1 for p in ring if world.tile(p).resource is not None)
+            spots = [p for p in ring if world.tile(p).resource is None and not world.tile(p).village and world.tile(p).city_id is None]
+            rng.shuffle(spots)
+            for pos in spots:
+                if have >= wanted:
+                    break
+                resource = _resource_for(rng, world, pos)
+                if resource is not None:
+                    world.tile(pos).resource = resource
+                    have += 1
+
+
+def _resource_for(rng: random.Random, world: World, pos: Pos) -> Resource | None:
+    """What could grow at *pos* given its terrain (fish only along the shore)."""
+    terrain = world.tile(pos).terrain
+    if terrain is Terrain.FIELD:
+        return Resource.CROP if rng.random() < 0.3 else Resource.FRUIT
+    if terrain is Terrain.FOREST:
+        return Resource.GAME
+    if terrain is Terrain.MOUNTAIN:
+        return Resource.METAL
+    if any(world.tile(n).terrain is not Terrain.WATER for n in world.neighbors(pos)):
+        return Resource.FISH
+    return None

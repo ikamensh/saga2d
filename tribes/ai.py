@@ -1,28 +1,37 @@
-"""A straightforward computer opponent: grow, arm, expand, fight."""
+"""A straightforward computer opponent: grow, arm, expand, fight.
+
+Deterministic for a given ``rng``.  Every action is checked with the
+corresponding ``can_*`` query first, so the model never raises here.
+"""
 
 from __future__ import annotations
 
 import random
+from collections import deque
 
-from tribes.model import Pos, RuleError, Unit, World
-from tribes.rules import HARVEST, TECHS, Tech, UnitType
+from tribes.model import Pos, Unit, World
+from tribes.rules import HARVEST, TECHS, Tech, Terrain, UnitType
+
+_UNREACHABLE = 10**6
 
 
 def take_turn(world: World, tribe: int, rng: random.Random) -> None:
     """Play the whole turn for *tribe* (which must be current), then end it."""
-    assert world.current == tribe
+    assert world.current == tribe and world.winner is None
     _research(world, tribe)
     _harvest(world, tribe)
     _train(world, tribe, rng)
     for unit in list(world.tribe_units(tribe)):
-        if unit.id in world.units:
+        if world.winner is None and unit.id in world.units:
             _act(world, unit, rng)
+    for unit in list(world.tribe_units(tribe)):
+        if world.winner is None and unit.id in world.units:
+            _attack(world, unit)  # second pass: units that moved into place this turn can now gang up
     world.end_turn()
 
 
 def _research(world: World, tribe: int) -> None:
-    wanted = _wanted_techs(world, tribe)
-    for tech in wanted:
+    for tech in _wanted_techs(world, tribe):
         if world.can_research(tribe, tech) is None and world.tribes[tribe].stars - world.tech_cost(tribe, tech) >= 2:
             world.research(tribe, tech)
             return
@@ -55,52 +64,93 @@ def _act(world: World, unit: Unit, rng: random.Random) -> None:
     if world.can_capture(unit):
         world.capture(unit)
         return
-    if _attack_best(world, unit):
-        if not unit.can_move:
-            return
-    if unit.can_move:
+    _attack(world, unit)
+    if unit.id in world.units and unit.can_move:
         target = _target_for(world, unit)
         if target is not None:
             _move_toward(world, unit, target, rng)
-    _attack_best(world, unit)
 
 
-def _attack_best(world: World, unit: Unit) -> bool:
-    targets = world.attack_targets(unit)
-    if not targets:
-        return False
-    target = min(targets, key=lambda t: (t.hp, -t.info.cost))
-    try:
+def _attack(world: World, unit: Unit) -> None:
+    """Strike every favourable target in reach (a knight keeps going after kills)."""
+    while unit.id in world.units and unit.can_attack:
+        target = _best_target(world, unit)
+        if target is None:
+            return
         world.attack(unit, target)
-    except RuleError:
-        return False
-    return True
+
+
+def _best_target(world: World, unit: Unit) -> Unit | None:
+    """Prefer kills, then the target left weakest; refuse suicidal or losing trades.
+
+    A trade that loses on its own is still taken when friends already in range
+    can finish the target this turn — that is how cities fall.
+    """
+    options: list[tuple[tuple[bool, int, int], Unit]] = []
+    for target in world.attack_targets(unit):
+        dealt, taken = world.combat_preview(unit, target)
+        support = sum(
+            world.combat_preview(ally, target)[0]
+            for ally in world.tribe_units(unit.tribe)
+            if ally is not unit and ally.can_attack and target in world.attack_targets(ally)
+        )
+        solo_kill = dealt >= target.hp
+        retaliation = 0 if solo_kill or world.distance(unit.pos, target.pos) > target.info.range else taken
+        if retaliation >= unit.hp:
+            continue
+        kill = dealt + support >= target.hp
+        if not kill and retaliation > dealt:
+            continue
+        options.append(((not kill, target.hp - dealt, -target.info.cost), target))
+    return min(options, key=lambda o: o[0])[1] if options else None
 
 
 def _target_for(world: World, unit: Unit) -> Pos | None:
+    """Nearest (by walking distance) free village or enemy city, else enemy unit, else unexplored edge."""
     explored = world.tribes[unit.tribe].explored
-    goals: list[tuple[int, Pos]] = []
+    dist = _distances(world, unit, unit.pos)
+    goals: list[tuple[int, int, Pos]] = []
     for tile in world.all_tiles():
-        if tile.pos not in explored:
+        if tile.pos not in explored or tile.pos not in dist:
             continue
         city = world.city_at(tile.pos)
-        if tile.village or (city is not None and city.tribe != unit.tribe):
-            goals.append((0, tile.pos))
+        occupant = world.unit_at(tile.pos)
+        claimable = tile.village or (city is not None and city.tribe != unit.tribe)
+        if claimable and (occupant is None or occupant.tribe != unit.tribe):
+            goals.append((0, dist[tile.pos], tile.pos))
     for other in world.units.values():
-        if other.tribe != unit.tribe and other.pos in explored:
-            goals.append((1, other.pos))
+        if other.tribe != unit.tribe and other.pos in explored and other.pos in dist:
+            goals.append((1, dist[other.pos], other.pos))
     if not goals:
-        frontier = [p for p in explored if any(n not in explored for n in world.neighbors(p))]
-        goals = [(2, p) for p in frontier]
-    if not goals:
-        return None
-    return min(goals, key=lambda g: (g[0], world.distance(unit.pos, g[1])))[1]
+        goals = [(2, dist[p], p) for p in explored if p in dist and any(n not in explored for n in world.neighbors(p))]
+    return min(goals)[2] if goals else None
 
 
 def _move_toward(world: World, unit: Unit, target: Pos, rng: random.Random) -> None:
     reachable = world.reachable(unit)
     if not reachable:
         return
-    best = min(reachable, key=lambda p: (world.distance(p, target), rng.random()))
-    if world.distance(best, target) < world.distance(unit.pos, target) or rng.random() < 0.3:
+    dist = _distances(world, unit, target)
+    best = min(reachable, key=lambda p: (dist.get(p, _UNREACHABLE), rng.random()))
+    if dist.get(best, _UNREACHABLE) < dist.get(unit.pos, _UNREACHABLE):
         world.move(unit, best)
+
+
+def _distances(world: World, unit: Unit, origin: Pos) -> dict[Pos, int]:
+    """Walking distance from *origin* to every tile *unit*'s tribe can traverse, ignoring units."""
+    dist = {origin: 0}
+    queue = deque([origin])
+    while queue:
+        pos = queue.popleft()
+        for nxt in world.neighbors(pos):
+            if nxt not in dist and _passable(world, unit, nxt):
+                dist[nxt] = dist[pos] + 1
+                queue.append(nxt)
+    return dist
+
+
+def _passable(world: World, unit: Unit, pos: Pos) -> bool:
+    terrain = world.tile(pos).terrain
+    if terrain is Terrain.WATER:
+        return False
+    return terrain is not Terrain.MOUNTAIN or world.has_tech(unit.tribe, Tech.CLIMBING)

@@ -314,3 +314,128 @@ def test_ai_plays_a_full_game_to_a_winner(seed: int) -> None:
         turns += 1
         assert turns < 500
     assert world.tribes[world.winner].alive
+
+
+# -- Regressions ---------------------------------------------------------------------
+
+
+def _three_tribe_world() -> World:
+    """Three computer tribes; tests that need a human set ``human`` themselves."""
+    world = flat_world(tribes=3)
+    world.tribes[0].human = False
+    world.found_city(2, (8, 1), "Third", capital=True)
+    return world
+
+
+def _eliminate(world: World, tribe: int, heir: int) -> None:
+    for city in world.tribe_cities(tribe):
+        city.tribe = heir
+    world._check_elimination()
+
+
+@pytest.mark.parametrize("dead", [0, 1, 2])
+def test_round_advances_exactly_once_per_lap_whatever_tribe_is_dead(dead: int) -> None:
+    world = _three_tribe_world()
+    _eliminate(world, dead, (dead + 1) % 3)
+    world.current = next(t.id for t in world.tribes if t.alive)
+    first = world.current
+    world.end_turn()
+    assert world.round == 1 and world.tribes[world.current].alive and world.current != dead
+    world.end_turn()
+    assert world.current == first and world.round == 2
+
+
+def test_knight_that_killed_may_strike_again_but_neither_moves_nor_heals() -> None:
+    world, knight, weak = _duel(UnitType.KNIGHT, UnitType.WARRIOR, defender_hp=1)
+    knight.hp = 6
+    world.attack(knight, weak)
+    assert knight.pos == weak.pos and knight.can_attack and not knight.can_move
+    world.end_turn()
+    assert knight.hp == 6
+
+
+def test_eliminating_the_human_ends_the_game_with_the_strongest_ai_as_winner() -> None:
+    world = _three_tribe_world()
+    world.tribes[0].human = True
+    world.tribes[2].techs.update({Tech.RIDING, Tech.CLIMBING})
+    world.end_turn()
+    raider = world.spawn_unit(1, UnitType.WARRIOR, (1, 1))
+    world.capture(raider)
+    assert not world.tribes[0].alive and world.tribe_units(0) == []
+    assert world.winner == max((1, 2), key=world.score)
+    with pytest.raises(RuleError):
+        world.move(raider, (2, 2))
+
+
+def test_round_limit_winner_is_chosen_among_living_tribes() -> None:
+    from tribes.rules import MAX_ROUNDS
+
+    world = _three_tribe_world()
+    world.tribes[2].techs.update(Tech)  # a dead tribe's techs must not win it the game
+    _eliminate(world, 2, 1)
+    world.round = MAX_ROUNDS
+    world.end_turn()
+    world.end_turn()
+    assert world.winner in (0, 1)
+
+
+def test_a_city_founded_inside_foreign_borders_owns_its_own_tile() -> None:
+    world = flat_world()
+    world._grow(world.capital_of(0), 5)  # level 3: radius-2 border reaches (3, 3)
+    world.tile((3, 3)).village = True
+    settler = world.spawn_unit(1, UnitType.WARRIOR, (3, 3))
+    world.end_turn()
+    city = world.capture(settler)
+    assert world.owner_of((3, 3)) == 1 and world.tile((3, 3)).owner_city == city.id
+    assert world.owner_of((2, 2)) == 0  # but it steals nothing else
+
+
+def test_json_save_round_trip_mid_turn_keeps_unit_flags_and_the_winner() -> None:
+    import json
+
+    world = mapgen.generate(seed=5, size=12, tribe_count=3)
+    rng = random.Random(0)
+    for _ in range(3):
+        ai.take_turn(world, world.current, rng)
+    home = world.capital_of(0)
+    field = next(t for t in world.all_tiles() if t.resource and not t.harvested and world.owner_of(t.pos) == 0)
+    world.tribes[0].techs.update({Tech.CLIMBING, HARVEST[field.resource].tech})
+    world.tribes[0].stars = 10
+    world.harvest(0, field.pos)
+    camp = next(p for p in world.neighbors(home.pos) if world.unit_at(p) is None and world.tile(p).terrain is not Terrain.WATER)
+    scout = world.spawn_unit(0, UnitType.WARRIOR, camp, fresh=False)
+    world.winner = 2
+    copy = World.from_dict(json.loads(json.dumps(world.to_dict())))
+    assert copy.to_dict() == world.to_dict()
+    twin = copy.units[scout.id]
+    assert (twin.moved, twin.attacked, twin.done, twin.pos) == (True, True, True, scout.pos)
+    assert copy.tile(field.pos).harvested and copy.capital_of(0).capital and copy.winner == 2
+    assert copy.tribes[0].techs == world.tribes[0].techs and copy.tribes[0].explored == world.tribes[0].explored
+
+
+@pytest.mark.parametrize("seed", range(1, 21))
+def test_generated_capitals_have_room_to_move_and_resources_to_harvest(seed: int) -> None:
+    world = mapgen.generate(seed=seed, size=14, tribe_count=3)
+    for tribe in range(3):
+        capital = world.capital_of(tribe)
+        walkable = [p for p in world.neighbors(capital.pos) if world.tile(p).terrain in (Terrain.FIELD, Terrain.FOREST)]
+        assert len(walkable) >= 4, f"tribe {tribe} is boxed in"
+        assert sum(1 for p in world.neighbors(capital.pos, 1) if world.tile(p).resource) >= 2
+        assert sum(1 for p in world.neighbors(capital.pos, 2) if world.tile(p).resource) >= 4
+        assert not world.tile(capital.pos).village and world.tile(capital.pos).resource is None
+    villages = [t.pos for t in world.all_tiles() if t.village]
+    assert len(villages) >= 2
+    for a in villages:
+        for b in villages:
+            assert a == b or World.distance(a, b) >= 3
+
+
+def test_capital_placement_does_not_favour_the_first_tribe() -> None:
+    """Farthest-point picking used to leave tribe 0 central and push the others to the map edge."""
+    edge_sum = [0, 0, 0]
+    for seed in range(1, 41):
+        world = mapgen.generate(seed=seed, size=14, tribe_count=3)
+        for tribe in range(3):
+            c = world.capital_of(tribe)
+            edge_sum[tribe] += min(c.x, c.y, world.size - 1 - c.x, world.size - 1 - c.y)
+    assert max(edge_sum) - min(edge_sum) <= 25, edge_sum
