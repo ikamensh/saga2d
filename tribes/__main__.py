@@ -1,12 +1,17 @@
-"""Run Tribes: ``python -m tribes [--seed N] [--size N] [--tribes N] [--fullscreen]``."""
+"""Run Tribes: ``python -m tribes [--seed N] [--size N] [--tribes N] [--fullscreen]``.
+
+Without ``--seed`` the game opens on the title screen (``--size`` and
+``--tribes`` pre-fill the new-game options).  With ``--seed`` it skips the
+title and starts that map directly, so a seed reproduces a game in one step.
+"""
 
 from __future__ import annotations
 
 import argparse
-import random
 
 from saga2d import Game, TextStyle, Theme
 from tribes.scene import new_game
+from tribes.title import TitleScene
 
 
 def build_theme() -> Theme:
@@ -21,7 +26,10 @@ def build_theme() -> Theme:
             "sub": TextStyle(13, (190, 196, 214, 255)),
             "caption": TextStyle(12, (150, 156, 176, 255)),
             "city": TextStyle(12, (255, 255, 255, 255)),
-            "banner": TextStyle(30, (255, 255, 255, 255)),
+            "banner": TextStyle(38, (255, 255, 255, 255)),
+            "banner_sub": TextStyle(17, (255, 255, 255, 255)),
+            "hero": TextStyle(84, (255, 224, 120, 255)),
+            "hero_sub": TextStyle(19, (210, 216, 235, 255)),
         },
         button_font_size=15,
         button_min_width=90,
@@ -31,14 +39,16 @@ def build_theme() -> Theme:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Tribes — a small Polytopia-style strategy game")
-    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--seed", type=int, default=None, help="start this map directly, skipping the title screen")
     parser.add_argument("--size", type=int, default=14)
     parser.add_argument("--tribes", type=int, default=3)
     parser.add_argument("--fullscreen", action="store_true")
     args = parser.parse_args()
-    seed = args.seed if args.seed is not None else random.randrange(1, 10_000)
     game = Game("Tribes", resolution=None, fullscreen=args.fullscreen, theme=build_theme())
-    game.run(new_game(seed, size=args.size, tribes=args.tribes))
+    if args.seed is not None:
+        game.run(new_game(args.seed, size=args.size, tribes=args.tribes))
+    else:
+        game.run(TitleScene(size=args.size, tribes=args.tribes))
 
 
 if __name__ == "__main__":
