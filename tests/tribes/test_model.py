@@ -430,6 +430,99 @@ def test_generated_capitals_have_room_to_move_and_resources_to_harvest(seed: int
             assert a == b or World.distance(a, b) >= 3
 
 
+@pytest.mark.parametrize("seed", [21, 22, 23])
+def test_every_path_on_a_generated_map_is_a_legal_walk(seed: int) -> None:
+    world = mapgen.generate(seed=seed, size=14, tribe_count=3, human=None)
+    rng = random.Random(seed)
+    for _ in range(9):
+        ai.take_turn(world, world.current, rng)
+    world.tribes[world.current].techs.add(Tech.RIDING)
+    world.tribes[world.current].stars = 30
+    for city in world.tribe_cities(world.current):
+        if world.can_train(city, UnitType.RIDER) is None:
+            world.train(city, UnitType.RIDER)
+    world.end_turn()
+    for _ in range(len(world.tribes) - 1):
+        world.end_turn()
+    checked = 0
+    for unit in world.tribe_units(world.current):
+        for dest in world.reachable(unit):
+            path = world.path_to(unit, dest)
+            assert path[0] == unit.pos and path[-1] == dest and len(path) - 1 <= unit.info.movement
+            for a, b in zip(path, path[1:]):
+                assert World.distance(a, b) == 1 and world.can_enter(unit, b)
+            for step in path[1:-1]:
+                assert world.tile(step).terrain is Terrain.FIELD, "forest and mountains end a move"
+                assert not any((n := world.unit_at(p)) and n.tribe != unit.tribe for p in world.neighbors(step)), "zone of control"
+            checked += 1
+    assert checked > 0
+
+
+def test_fog_hides_targets_until_the_tile_is_explored() -> None:
+    world = flat_world()
+    archer = world.spawn_unit(0, UnitType.ARCHER, (4, 4))
+    lurker = world.spawn_unit(1, UnitType.WARRIOR, (6, 4))
+    assert not world.explored(0, (6, 4)) and lurker not in world.attack_targets(archer)
+    world.explore(0, (6, 4), 0)
+    assert lurker in world.attack_targets(archer)
+
+
+def test_retaliation_only_within_the_defenders_range() -> None:
+    world = flat_world()
+    world.tribes[0].explored.update(world.neighbors((4, 4), 3))
+    archer = world.spawn_unit(0, UnitType.ARCHER, (4, 4))
+    enemy_archer = world.spawn_unit(1, UnitType.ARCHER, (6, 4))
+    result = world.attack(archer, enemy_archer)
+    assert result.damage_taken > 0, "an archer two tiles away shoots back"
+    warrior = world.spawn_unit(0, UnitType.WARRIOR, (5, 5))
+    enemy_archer.hp = 10
+    result = world.attack(warrior, enemy_archer)
+    assert result.damage_taken > 0, "an adjacent archer shoots back too"
+    world.end_turn()
+    world.end_turn()
+    far = world.spawn_unit(1, UnitType.WARRIOR, (2, 4))
+    result = world.attack(archer, far)
+    assert result.damage_taken == 0, "a warrior cannot reach an archer two tiles away"
+
+
+def test_melee_kill_advances_into_a_village_that_can_be_captured_next_turn() -> None:
+    world = flat_world()
+    world.tribes[0].explored.update(world.neighbors((4, 4), 3))
+    world.tile((5, 4)).village = True
+    attacker = world.spawn_unit(0, UnitType.WARRIOR, (4, 4))
+    squatter = world.spawn_unit(1, UnitType.WARRIOR, (5, 4))
+    squatter.hp = 1
+    world.attack(attacker, squatter)
+    assert attacker.pos == (5, 4) and not world.can_capture(attacker)
+    world.end_turn()
+    world.end_turn()
+    assert world.can_capture(attacker)
+    assert world.capture(attacker).tribe == 0
+
+
+def test_capturing_an_enemy_city_transfers_its_territory_and_income() -> None:
+    world = flat_world(tribes=3)
+    world.tribes[0].human = False
+    world.found_city(2, (8, 1), "Third", capital=True)
+    away = world.capital_of(1)
+    world._grow(away, 5)  # level 3, radius 2
+    income_before = world.income(0)
+    raider = world.spawn_unit(0, UnitType.WARRIOR, away.pos)
+    world.capture(raider)
+    assert world.owner_of((6, 6)) == 0 and world.owner_of((8, 8)) == 0
+    assert world.income(0) == income_before + 3 and world.income(1) == 0
+    assert not world.tribes[1].alive and world.winner is None
+    assert world.unit_cap(0) == 2 + 4
+
+
+def test_growth_can_climb_several_levels_at_once() -> None:
+    world = flat_world()
+    home = world.capital_of(0)
+    world._grow(home, 2 + 3 + 4)
+    assert (home.level, home.population, home.radius, home.has_wall) == (4, 0, 2, True)
+    assert world.owner_of((3, 3)) == 0 and world.explored(0, (3, 3))
+
+
 def test_capital_placement_does_not_favour_the_first_tribe() -> None:
     """Farthest-point picking used to leave tribe 0 central and push the others to the map edge."""
     edge_sum = [0, 0, 0]
