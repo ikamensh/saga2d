@@ -424,3 +424,41 @@ def test_sound_events_reach_the_hook_and_respect_the_volume(play, monkeypatch) -
     press(game, "escape")
     press(game, "tab")
     assert heard == ["select"]
+
+
+# -- Zoom ------------------------------------------------------------------------
+
+
+def test_a_light_trackpad_scroll_zooms_smoothly_and_a_flick_is_bounded(play) -> None:
+    game, scene = play
+    camera = scene.camera
+    start = camera.zoom
+    under_pointer = camera.screen_to_world(500, 300)
+    for _ in range(10):  # ten fractional lines, as a slow two-finger scroll delivers them
+        game.backend.inject_scroll(500, 300, 0, 0.3)
+        game.tick(1 / 60)
+    assert camera.zoom_target == pytest.approx(start * 1.06 ** 3)
+    assert start < camera.zoom < camera.zoom_target  # easing, not jumping
+    tick(game, 0.5)
+    assert camera.zoom == pytest.approx(camera.zoom_target)
+    assert camera.screen_to_world(500, 300) == pytest.approx(under_pointer, abs=1e-6)
+
+    before = camera.zoom_target
+    game.backend.inject_scroll(500, 300, 0, 40)  # one momentum event with a huge delta
+    game.tick(1 / 60)
+    assert camera.zoom_target == pytest.approx(min(before * 1.06 ** 4, 2.5))
+
+
+def test_plus_and_minus_keys_step_the_zoom_about_the_screen_centre(play) -> None:
+    game, scene = play
+    camera = scene.camera
+    w, h = game.resolution
+    centre = camera.screen_to_world(w / 2, h / 2)
+    press(game, "equal")
+    assert camera.zoom_target == pytest.approx(min(camera.zoom * 1.25, 2.5), rel=0.05)
+    tick(game, 0.5)
+    assert camera.screen_to_world(w / 2, h / 2) == pytest.approx(centre, abs=1e-6)
+    press(game, "minus")
+    press(game, "minus")
+    tick(game, 0.5)
+    assert camera.zoom < 1.0 or camera.zoom == pytest.approx(0.5)

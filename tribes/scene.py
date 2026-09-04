@@ -30,6 +30,9 @@ HEAL_COLOR = (130, 235, 130, 255)
 GOLD = (255, 224, 120, 255)
 
 HIT_TIME = 0.16  # seconds from the start of a lunge until the blow lands
+ZOOM_PER_LINE = 1.06  # zoom factor per wheel line; a trackpad swipe of ~30 lines spans the whole range
+ZOOM_PER_KEY = 1.25
+MAX_LINES_PER_EVENT = 4.0  # a flick delivers big deltas: cap each event so momentum cannot overshoot
 
 
 def _plural(count: int, noun: str) -> str:
@@ -577,12 +580,17 @@ class MapScene(Scene):
             self.camera.pan_to(*tile_center(capital.pos), duration=0.3)
 
     def zoom_in(self) -> None:
-        w, h = self.game.resolution
-        self.camera.zoom_at(1.25, w / 2, h / 2)
+        self._zoom_by(ZOOM_PER_KEY)
 
     def zoom_out(self) -> None:
-        w, h = self.game.resolution
-        self.camera.zoom_at(0.8, w / 2, h / 2)
+        self._zoom_by(1 / ZOOM_PER_KEY)
+
+    def _zoom_by(self, factor: float, at: tuple[float, float] | None = None) -> None:
+        """Ease the zoom target by *factor* about screen point *at* (default: the centre)."""
+        if at is None:
+            w, h = self.game.resolution
+            at = (w / 2, h / 2)
+        self.camera.zoom_toward(self.camera.zoom_target * factor, *at)
 
     def _move_cursor(self, dx: int, dy: int) -> None:
         x, y = self.cursor
@@ -638,7 +646,8 @@ class MapScene(Scene):
                     self.cursor = pos
                 return True
             if event.type == "scroll":
-                self.camera.zoom_at(1.1 if event.dy > 0 else 1 / 1.1, event.x, event.y)
+                lines = max(-MAX_LINES_PER_EVENT, min(MAX_LINES_PER_EVENT, event.dy))
+                self._zoom_by(ZOOM_PER_LINE ** lines, (event.x, event.y))
                 return True
         return False
 
