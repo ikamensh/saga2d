@@ -139,9 +139,6 @@ class Effects:
     def __len__(self) -> int:
         return len(self._items)
 
-    def __iter__(self):
-        return iter(self._items)
-
 
 class FloatingText(Effect):
     """Text that rises and fades: damage numbers, "+1 pop", "Level 2!".

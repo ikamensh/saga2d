@@ -16,7 +16,7 @@ from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitRe
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Tech, UnitType
 from tribes.textures import FOG, TILE
-from tribes.view import Color, MapView, Selection, rgba, tile_at, tile_center, tint
+from tribes.view import MapView, Selection, rgba, tile_at, tile_center, tint
 
 PANEL_BG = (22, 26, 40, 235)
 PANEL_STYLE = Style(background_color=PANEL_BG, border_color=(70, 80, 110, 255), border_width=1, padding=12)
@@ -521,7 +521,7 @@ class MapScene(Scene):
 
     def _snapshot(self) -> dict[str, Any]:
         return {
-            "units": {u.id: (u.type, u.hp, u.pos) for u in self.world.tribe_units(self.human)},
+            "units": {u.id: (u.type, u.hp) for u in self.world.tribe_units(self.human)},
             "cities": {c.id: c.name for c in self.world.tribe_cities(self.human)},
             "log": len(self.world.log),
         }
@@ -534,11 +534,10 @@ class MapScene(Scene):
             city = world.cities[city_id]
             if city.tribe != self.human:
                 news.append(f"Lost {name} to {world.tribes[city.tribe].name}")
-        lost = [t for uid, (t, _hp, _pos) in before["units"].items() if uid not in world.units]
-        for unit_type in sorted({t for t in lost}, key=lambda t: t.value):
-            n = sum(1 for t in lost if t is unit_type)
-            news.append(f"Lost {_plural(n, unit_type.value)}")
-        for uid, (unit_type, hp, pos) in before["units"].items():
+        lost = [t for uid, (t, _hp) in before["units"].items() if uid not in world.units]
+        for unit_type in sorted(set(lost), key=lambda t: t.value):
+            news.append(f"Lost {_plural(lost.count(unit_type), unit_type.value)}")
+        for uid, (unit_type, hp) in before["units"].items():
             unit = world.units.get(uid)
             if unit is not None and unit.hp < hp:
                 where = world.city_at(unit.pos)
@@ -726,7 +725,7 @@ class MapScene(Scene):
         if self.status_timer > 0:
             lines.append(self.status)
         self.info_title.text = title
-        for label, text in zip(self.info_lines, lines + [""] * 4):
+        for label, text in zip(self.info_lines, lines + [""] * 4, strict=False):
             label.text = text
             self._set_visible(label, bool(text))
         self._set_visible(self.btn_capture, show_capture)
