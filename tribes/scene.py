@@ -2,40 +2,24 @@
 
 from __future__ import annotations
 
-import math
 import random
 
-from saga2d import (
-    Anchor, Button, Camera, Column, InputEvent, Label, Layout, MoveTo, Panel, ParticleEmitter, RenderLayer, Row, Scene,
-    Sequence, Sprite, Style,
-)
-from tribes import ai, mapgen, textures
+from saga2d import Anchor, Button, Camera, Column, InputEvent, Label, Layout, Panel, Row, Scene, Style
+from tribes import ai, mapgen
 from tribes.model import City, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Tech, UnitType
-from tribes.textures import TILE
+from tribes.textures import FOG, TILE
+from tribes.view import Color, MapView, Selection, rgba, tile_at, tile_center
 
-Color = tuple[int, int, int, int]
 PANEL_BG = (22, 26, 40, 235)
 PANEL_STYLE = Style(background_color=PANEL_BG, border_color=(70, 80, 110, 255), border_width=1, padding=12)
 GHOST_BUTTON = Style(background_color=(40, 48, 72, 255), border_width=1, border_color=(90, 100, 140, 255), padding=8)
 
 
-def rgba(color: tuple[int, int, int], alpha: int = 255) -> Color:
-    return (color[0], color[1], color[2], alpha)
-
-
-def tint(color: tuple[int, int, int]) -> tuple[float, float, float]:
-    return (color[0] / 255, color[1] / 255, color[2] / 255)
-
-
-def tile_center(pos: Pos) -> tuple[float, float]:
-    return (pos[0] * TILE + TILE / 2, pos[1] * TILE + TILE / 2)
-
-
 class MapScene(Scene):
     """The whole game: map, HUD, selection, and the turn loop."""
 
-    background_color = rgba(textures.FOG)
+    background_color = rgba(FOG)
     controls = {
         "e": "end_turn",
         ("tab", "n"): "next_unit",
@@ -72,38 +56,32 @@ class MapScene(Scene):
         self.pulse = 0.0
         self.banner = ""
         self.banner_timer = 0.0
-        self._tile_sprites: dict[Pos, Sprite] = {}
-        self._resource_sprites: dict[Pos, Sprite] = {}
-        self._site_sprites: dict[Pos, Sprite] = {}
-        self._unit_sprites: dict[int, Sprite] = {}
-        self._unit_targets: dict[int, Pos] = {}
         self._dragging = False
 
     # -- Lifecycle -------------------------------------------------------------
 
     def on_enter(self) -> None:
-        textures.register_all(self.game)
-        w, h = self.game.resolution
-        extent = self.world.size * TILE
-        fit = min(w, h) / (extent + TILE)
-        self.camera = Camera((w, h), world_bounds=(-TILE, -TILE, extent + TILE, extent + TILE),
-                             zoom=max(0.75, min(1.25, fit)), min_zoom=0.5, max_zoom=2.5)
-        self.camera.enable_key_scroll(speed=700, bindings={"left": ("a",), "right": ("d",), "up": ("w",), "down": ("s",)})
+        self.view = MapView(self, self.world, self.human, self.rng)
+        self._setup_camera()
         self._build_hud()
-        for tile in self.world.all_tiles():
-            self._tile_sprites[tile.pos] = self.add_sprite(Sprite(
-                "tile.fog", position=tile_center(tile.pos), size=(TILE, TILE), layer=RenderLayer.BACKGROUND,
-            ))
-        self.sync()
         capital = self.world.capital_of(self.human)
         if capital is not None:
             self.cursor = capital.pos
             self.camera.center_on(*tile_center(capital.pos))
         self._show_banner(f"Round {self.world.round} — {self.tribe.name}")
 
+    def _setup_camera(self) -> None:
+        w, h = self.game.resolution
+        left, top, right, bottom = self.view.world_bounds
+        fit = min(w, h) / (right - left)
+        self.camera = Camera((w, h), world_bounds=self.view.world_bounds, zoom=max(0.75, min(1.25, fit)), min_zoom=0.5, max_zoom=2.5)
+        self.camera.enable_key_scroll(speed=700, bindings={"left": ("a",), "right": ("d",), "up": ("w",), "down": ("s",)})
+
     def on_reveal(self) -> None:
-        self.sync()
         self._refresh_selection()
+
+    def sync(self) -> None:
+        self.view.sync()
 
     @property
     def tribe(self):
@@ -149,66 +127,6 @@ class MapScene(Scene):
         """Log lines the player is entitled to see: those naming their tribe."""
         return [line for line in self.world.log if self.tribe.name in line]
 
-    # -- Sprite reconciliation --------------------------------------------------
-
-    def sync(self) -> None:
-        """Make sprites match the model (idempotent)."""
-        world = self.world
-        explored = self.tribe.explored
-        for pos in explored:
-            tile = world.tile(pos)
-            tile_sprite = self._tile_sprites[pos]
-            if tile_sprite.image != f"tile.{tile.terrain.value}":
-                tile_sprite.image = f"tile.{tile.terrain.value}"
-            has_resource = tile.resource is not None and not tile.harvested
-            if has_resource and pos not in self._resource_sprites:
-                self._resource_sprites[pos] = self.add_sprite(Sprite(
-                    f"resource.{tile.resource.value}", position=tile_center(pos), size=(TILE, TILE), layer=RenderLayer.OBJECTS,
-                ))
-            elif not has_resource and pos in self._resource_sprites:
-                self._resource_sprites.pop(pos).remove()
-            city = world.city_at(pos)
-            want = "city" if city is not None else "village" if tile.village else None
-            sprite = self._site_sprites.get(pos)
-            if want is None and sprite is not None:
-                self._site_sprites.pop(pos).remove()
-            elif want is not None:
-                if sprite is None or sprite.image != want:
-                    if sprite is not None:
-                        sprite.remove()
-                    sprite = self.add_sprite(Sprite(want, position=tile_center(pos), size=(TILE, TILE), layer=RenderLayer.OBJECTS))
-                    self._site_sprites[pos] = sprite
-                sprite.tint = tint(world.tribes[city.tribe].color) if city is not None else (1.0, 1.0, 1.0)
-        for unit_id, sprite in list(self._unit_sprites.items()):
-            unit = world.units.get(unit_id)
-            if unit is None or unit.pos not in explored:
-                sprite.remove()
-                del self._unit_sprites[unit_id]
-                self._unit_targets.pop(unit_id, None)
-        for unit in world.units.values():
-            if unit.pos not in explored:
-                continue
-            sprite = self._unit_sprites.get(unit.id)
-            if sprite is None:
-                sprite = self.add_sprite(Sprite(
-                    f"unit.{unit.type.value}", position=tile_center(unit.pos), size=(TILE, TILE),
-                    layer=RenderLayer.UNITS, tint=tint(world.tribes[unit.tribe].color),
-                ))
-                self._unit_sprites[unit.id] = sprite
-                self._unit_targets[unit.id] = unit.pos
-            elif self._unit_targets[unit.id] != unit.pos:
-                sprite.stop_actions()
-                sprite.position = tile_center(unit.pos)
-                self._unit_targets[unit.id] = unit.pos
-            sprite.opacity = 255 if unit.tribe != self.human or unit.can_act else 150
-
-    def _animate_move(self, unit: Unit, path: list[Pos]) -> None:
-        sprite = self._unit_sprites.get(unit.id)
-        if sprite is None:
-            return
-        self._unit_targets[unit.id] = path[-1]
-        sprite.do(Sequence(*[MoveTo(tile_center(p), speed=420) for p in path[1:]]))
-
     # -- Selection ---------------------------------------------------------------
 
     def _refresh_selection(self) -> None:
@@ -226,7 +144,7 @@ class MapScene(Scene):
         if city is not None:
             for unit_type, button in self.train_buttons.items():
                 button.enabled = self.world.can_train(city, unit_type) is None
-        self.sync()
+        self.view.sync()
 
     def select_unit(self, unit: Unit | None) -> None:
         self.selected_unit = unit.id if unit is not None else None
@@ -319,7 +237,7 @@ class MapScene(Scene):
         unit = self.selected
         assert unit is not None
         path = self.world.move(unit, pos)
-        self._animate_move(unit, path)
+        self.view.animate_move(unit, path)
         self.cursor = pos
         self._refresh_selection()
         if not unit.can_act:
@@ -329,15 +247,15 @@ class MapScene(Scene):
         unit = self.selected
         assert unit is not None
         result = self.world.attack(unit, target)
-        self._burst(target.pos, rgba(self.world.tribes[target.tribe].color), 14)
+        self.view.burst(target.pos, rgba(self.world.tribes[target.tribe].color), 14)
         if result.defender_killed:
             self.say(f"{unit.type.value.title()} destroyed the {target.type.value}")
         else:
             self.say(f"Dealt {result.damage_dealt}, took {result.damage_taken}")
         if result.attacker_killed:
-            self._burst(unit.pos, rgba(self.tribe.color), 14)
+            self.view.burst(unit.pos, rgba(self.tribe.color), 14)
         self.camera.shake(4, 0.2)
-        self.sync()
+        self.view.sync()
         self._refresh_selection()
         if unit.id not in self.world.units or not unit.can_act:
             self.select_unit(None)
@@ -355,7 +273,7 @@ class MapScene(Scene):
         except RuleError as exc:
             self.say(str(exc))
             return
-        self._burst(city.pos, rgba(self.tribe.color), 24)
+        self.view.burst(city.pos, rgba(self.tribe.color), 24)
         self.say(f"{city.name} is yours")
         self.select_unit(None)
         self._check_game_over()
@@ -388,7 +306,7 @@ class MapScene(Scene):
         except RuleError as exc:
             self.say(str(exc))
             return
-        self._burst(pos, (255, 230, 120, 255), 12)
+        self.view.burst(pos, (255, 230, 120, 255), 12)
         self.say(f"{city.name}: {city.population}/{city.next_level_population} to level {city.level + 1}")
         self._refresh_selection()
 
@@ -399,18 +317,13 @@ class MapScene(Scene):
         self.world.end_turn()
         while self.world.winner is None and not self.world.current_tribe.human:
             ai.take_turn(self.world, self.world.current, self.rng)
-        self.sync()
+        self.view.sync()
         self._show_banner(f"Round {self.world.round} — {self.tribe.name}")
         self._check_game_over()
 
     def _check_game_over(self) -> None:
         if self.world.winner is not None:
             self.game.push(GameOverScene(self))
-
-    def _burst(self, pos: Pos, color: Color, count: int) -> None:
-        emitter = ParticleEmitter("spark", position=tile_center(pos), speed=(60, 220), lifetime=(0.25, 0.6),
-                                  size=(14, 14), shrink=True, tint=tint(color[:3]), rng=self.rng)
-        emitter.burst(count)
 
     # -- Overlays / navigation -----------------------------------------------------
 
@@ -502,7 +415,7 @@ class MapScene(Scene):
     def _tile_at(self, wx: float | None, wy: float | None) -> Pos | None:
         if wx is None or wy is None:
             return None
-        pos = (int(math.floor(wx / TILE)), int(math.floor(wy / TILE)))
+        pos = tile_at(wx, wy)
         return pos if self.world.in_bounds(pos) else None
 
     # -- Frame -------------------------------------------------------------------
@@ -563,66 +476,11 @@ class MapScene(Scene):
             label.visible = bool(text)
 
     def draw(self) -> None:
-        world = self.world
-        explored = self.tribe.explored
-        cam = self.camera
-        left, top, right, bottom = cam.visible_world_rect()
-        x0, y0 = max(0, int(left // TILE)), max(0, int(top // TILE))
-        x1, y1 = min(world.size - 1, int(right // TILE)), min(world.size - 1, int(bottom // TILE))
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                pos = (x, y)
-                if pos not in explored:
-                    continue
-                owner = world.owner_of(pos)
-                if owner is None:
-                    continue
-                color = world.tribes[owner].color
-                px, py = x * TILE, y * TILE
-                self.draw_rect(px, py, TILE, TILE, rgba(color, 40), space="world", layer=RenderLayer.BACKGROUND)
-                for dx, dy, line in ((0, -1, (px, py, px + TILE, py)), (0, 1, (px, py + TILE, px + TILE, py + TILE)),
-                                     (-1, 0, (px, py, px, py + TILE)), (1, 0, (px + TILE, py, px + TILE, py + TILE))):
-                    n = (x + dx, y + dy)
-                    if not world.in_bounds(n) or world.owner_of(n) != owner:
-                        self.draw_line(*line, rgba(color, 210), 3, space="world", layer=RenderLayer.BACKGROUND)
-        for pos in self.reachable:
-            self.draw_rect(pos[0] * TILE + 4, pos[1] * TILE + 4, TILE - 8, TILE - 8, (255, 255, 255, 70), space="world", layer=RenderLayer.OBJECTS)
-        for target in self.targets:
-            cx, cy = tile_center(target.pos)
-            self.draw_circle(cx, cy, TILE * 0.44, (255, 70, 70, 90), space="world", layer=RenderLayer.OBJECTS)
-        unit = self.selected
-        if unit is not None:
-            cx, cy = tile_center(unit.pos)
-            glow = 0.55 + 0.45 * math.sin(self.pulse * 6)
-            self.draw_circle(cx, cy, TILE * 0.46, rgba(self.tribe.color, int(120 * glow)), space="world", layer=RenderLayer.OBJECTS)
-        city_sel = world.cities.get(self.selected_city) if self.selected_city is not None else None
-        if city_sel is not None:
-            cx, cy = tile_center(city_sel.pos)
-            self.draw_rect(cx - TILE / 2, cy - TILE / 2, TILE, TILE, rgba(self.tribe.color, 70), space="world", layer=RenderLayer.OBJECTS)
-        for city in world.cities.values():
-            if city.pos not in explored:
-                continue
-            cx, cy = tile_center(city.pos)
-            color = world.tribes[city.tribe].color
-            self.draw_text(city.name, cx + 1, cy - TILE * 0.42 + 1, style="city", color=(0, 0, 0, 200), anchor_x="center", anchor_y="bottom", space="world", layer=RenderLayer.UI_WORLD)
-            self.draw_text(city.name, cx, cy - TILE * 0.42, style="city", anchor_x="center", anchor_y="bottom", space="world", layer=RenderLayer.UI_WORLD)
-            pip_w = 8
-            total = city.level * (pip_w + 3) - 3
-            for i in range(city.level):
-                self.draw_rect(cx - total / 2 + i * (pip_w + 3), cy + TILE * 0.32, pip_w, 6, rgba(color, 255), space="world", layer=RenderLayer.UI_WORLD)
-        for u in world.units.values():
-            if u.pos not in explored or u.hp >= u.max_hp:
-                continue
-            sprite = self._unit_sprites.get(u.id)
-            if sprite is None:
-                continue
-            sx, sy = sprite.position
-            bar_w = TILE * 0.5
-            self.draw_rect(sx - bar_w / 2, sy + TILE * 0.36, bar_w, 5, (0, 0, 0, 160), space="world", layer=RenderLayer.UI_WORLD)
-            self.draw_rect(sx - bar_w / 2, sy + TILE * 0.36, bar_w * u.hp / u.max_hp, 5, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
-        cx, cy = self.cursor[0] * TILE, self.cursor[1] * TILE
-        for line in ((cx, cy, cx + TILE, cy), (cx + TILE, cy, cx + TILE, cy + TILE), (cx + TILE, cy + TILE, cx, cy + TILE), (cx, cy + TILE, cx, cy)):
-            self.draw_line(*line, (255, 255, 255, 230), 2.5, space="world", layer=RenderLayer.UI_WORLD)
+        city = self.world.cities.get(self.selected_city) if self.selected_city is not None else None
+        self.view.draw(Selection(
+            cursor=self.cursor, unit=self.selected, city_pos=city.pos if city is not None else None,
+            reachable=self.reachable, targets=self.targets, pulse=self.pulse,
+        ))
         w, h = self.game.resolution
         self.draw_rect(0, h - 26, w, 26, (0, 0, 0, 150))
         if self.banner_timer > 0:
@@ -638,17 +496,13 @@ class MapScene(Scene):
     def load_save_state(self, state: dict) -> None:
         self.world = World.from_dict(state["world"])
         self.seed = state["seed"]
-        for sprite in [*self._resource_sprites.values(), *self._site_sprites.values(), *self._unit_sprites.values()]:
-            sprite.remove()
-        for sprite in self._tile_sprites.values():
-            sprite.image = "tile.fog"
-        self._resource_sprites.clear()
-        self._site_sprites.clear()
-        self._unit_sprites.clear()
-        self._unit_targets.clear()
+        self.view.reset(self.world)
+        self._setup_camera()
         self.ui.clear()
         self._build_hud()
+        self.cursor = (0, 0)
         self.select_unit(None)
+        self.center_capital()
         self.say("Loaded slot 1")
 
 
