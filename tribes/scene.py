@@ -201,12 +201,6 @@ class MapScene(Scene):
         """Log lines the player is entitled to see: those naming their tribe."""
         return [line for line in self.world.log if self.tribe.name in line]
 
-    @staticmethod
-    def _set_visible(component, visible: bool) -> None:
-        if component.visible != visible:
-            component.visible = visible
-            component.invalidate_layout()
-
     def _over_ui(self, x: float, y: float) -> bool:
         return any(child.visible and child.hit_test(x, y) for child in self.ui.children)
 
@@ -225,8 +219,8 @@ class MapScene(Scene):
         if city is None or city.tribe != self.human:
             self.selected_city = None
             city = None
-        self._set_visible(self.train_panel, city is not None)
-        self._set_visible(self.city_bar_row, city is not None)
+        self.train_panel.visible = city is not None
+        self.city_bar_row.visible = city is not None
         if city is not None:
             for unit_type, button in self.train_buttons.items():
                 button.enabled = self.world.can_train(city, unit_type) is None
@@ -728,12 +722,12 @@ class MapScene(Scene):
         self.info_title.text = title
         for label, text in zip(self.info_lines, lines + [""] * 4, strict=False):
             label.text = text
-            self._set_visible(label, bool(text))
-        self._set_visible(self.btn_capture, show_capture)
-        self._set_visible(self.btn_hold, show_hold)
-        self._set_visible(self.btn_harvest, harvestable)
-        self._set_visible(self.btn_attack, self._hover_target is not None)
-        self._set_visible(self.action_row, show_capture or show_hold or harvestable or self._hover_target is not None)
+            label.visible = bool(text)
+        self.btn_capture.visible = show_capture
+        self.btn_hold.visible = show_hold
+        self.btn_harvest.visible = harvestable
+        self.btn_attack.visible = self._hover_target is not None
+        self.action_row.visible = show_capture or show_hold or harvestable or self._hover_target is not None
 
     def draw(self) -> None:
         city = self._city()
