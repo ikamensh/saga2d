@@ -83,6 +83,22 @@ def test_ai_does_not_throw_a_warrior_at_a_walled_city() -> None:
     assert attacker.id in world.units and guard.hp == guard.max_hp
 
 
+def test_ai_refuses_an_even_duel_alone_but_flanks_and_kills_with_a_friend() -> None:
+    """Striking first in an even trade loses (the counter-strike kills); two units together win it."""
+    world = flat_world()
+    world.tribes[0].explored.difference_update(world.neighbors((8, 8), 2))  # the enemy capital is not a known goal
+    enemy = world.spawn_unit(1, UnitType.WARRIOR, (6, 6))
+    front = world.spawn_unit(0, UnitType.WARRIOR, (5, 5))
+    behind = world.spawn_unit(0, UnitType.WARRIOR, (4, 4))
+    rng = random.Random(1)
+    ai.take_turn(world, 0, rng)
+    assert enemy.hp == 10 and front.hp == 10, "attacked into an even trade alone"
+    assert behind.pos in {(5, 4), (4, 5)}, "the second unit should route around the first"
+    world.end_turn()
+    ai.take_turn(world, 0, rng)
+    assert enemy.id not in world.units
+
+
 def test_ai_finishes_off_a_weak_unit_and_advances() -> None:
     world = flat_world()
     victim = world.spawn_unit(1, UnitType.WARRIOR, (5, 5))

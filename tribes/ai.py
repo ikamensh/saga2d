@@ -66,7 +66,7 @@ def _act(world: World, unit: Unit, rng: random.Random) -> None:
         return
     _attack(world, unit)
     if unit.id in world.units and unit.can_move:
-        target = _target_for(world, unit)
+        target = _target_for(world, unit, rng)
         if target is not None:
             _move_toward(world, unit, target, rng)
 
@@ -81,10 +81,12 @@ def _attack(world: World, unit: Unit) -> None:
 
 
 def _best_target(world: World, unit: Unit) -> Unit | None:
-    """Prefer kills, then the target left weakest; refuse suicidal or losing trades.
+    """Prefer kills, then the target left weakest; refuse suicidal, losing and even trades.
 
-    A trade that loses on its own is still taken when friends already in range
-    can finish the target this turn — that is how cities fall.
+    Even trades are refused because the side striking second wins them (both
+    end on half health and the counter-strike kills).  A trade that does not
+    win on its own is still taken when friends already in range can finish
+    the target this turn — that is how cities fall.
     """
     options: list[tuple[tuple[bool, int, int], Unit]] = []
     for target in world.attack_targets(unit):
@@ -99,14 +101,18 @@ def _best_target(world: World, unit: Unit) -> Unit | None:
         if retaliation >= unit.hp:
             continue
         kill = dealt + support >= target.hp
-        if not kill and retaliation > dealt:
+        if not kill and retaliation >= dealt:
             continue
         options.append(((not kill, target.hp - dealt, -target.info.cost), target))
     return min(options, key=lambda o: o[0])[1] if options else None
 
 
-def _target_for(world: World, unit: Unit) -> Pos | None:
-    """Nearest (by walking distance) free village or enemy city, else enemy unit, else unexplored edge."""
+def _target_for(world: World, unit: Unit, rng: random.Random) -> Pos | None:
+    """Nearest (by walking distance) free village or enemy city, else enemy unit, else unexplored edge.
+
+    Ties go to the tile nearest the map's centre, then to chance: breaking
+    them on coordinates sent one corner's tribe exploring along the map edge.
+    """
     explored = world.tribes[unit.tribe].explored
     dist = _distances(world, unit, unit.pos)
     goals: list[tuple[int, int, Pos]] = []
@@ -123,7 +129,10 @@ def _target_for(world: World, unit: Unit) -> Pos | None:
             goals.append((1, dist[other.pos], other.pos))
     if not goals:
         goals = [(2, dist[p], p) for p in explored if p in dist and any(n not in explored for n in world.neighbors(p))]
-    return min(goals)[2] if goals else None
+    if not goals:
+        return None
+    centre = (world.size - 1) / 2
+    return min(goals, key=lambda g: (g[0], g[1], abs(g[2][0] - centre) + abs(g[2][1] - centre), rng.random()))[2]
 
 
 def _move_toward(world: World, unit: Unit, target: Pos, rng: random.Random) -> None:
@@ -137,14 +146,22 @@ def _move_toward(world: World, unit: Unit, target: Pos, rng: random.Random) -> N
 
 
 def _distances(world: World, unit: Unit, origin: Pos) -> dict[Pos, int]:
-    """Walking distance from *origin* to every tile *unit*'s tribe can traverse, ignoring units."""
+    """Walking distance from *origin* to every tile *unit*'s tribe can traverse.
+
+    Occupied tiles can be reached (they are targets) but not walked through,
+    so friends queued behind a unit that is holding its ground fan out
+    around it instead of waiting forever.
+    """
+    occupied = {u.pos for u in world.units.values()}
     dist = {origin: 0}
     queue = deque([origin])
     while queue:
         pos = queue.popleft()
         for nxt in world.neighbors(pos):
-            if nxt not in dist and _passable(world, unit, nxt):
-                dist[nxt] = dist[pos] + 1
+            if nxt in dist or not _passable(world, unit, nxt):
+                continue
+            dist[nxt] = dist[pos] + 1
+            if nxt not in occupied:
                 queue.append(nxt)
     return dist
 
