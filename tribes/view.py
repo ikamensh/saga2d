@@ -1,10 +1,22 @@
 """MapView — everything drawn in world space for the Tribes map.
 
-The view owns the sprites for tiles, resources, villages/cities and units,
-keeps them in step with the model (:meth:`sync`), converts between grid
-positions and world coordinates, and draws the per-frame overlays
-(territory, move/attack highlights, city names, health bars, cursor).
-The scene owns input, selection state and the HUD.
+The map is laid out in a fixed dimetric view: grid ``(x, y)`` maps to a
+diamond ``ISO_W`` wide and ``ISO_H`` tall (:func:`tile_center`), rows
+of constant ``x + y`` run across the screen, and larger ``x + y`` is
+nearer the camera.  Draw order uses the render layer bands:
+
+* ``BACKGROUND`` — tile blocks, y-sorted so nearer rows overlap the sides
+  of the row behind.
+* ``OBJECTS`` — per-frame overlay shapes on the tile tops (territory,
+  move range, attack targets, selection, cursor).
+* ``UNITS`` — every prop standing on a tile (trees, mountains, resources,
+  houses, units), y-sorted by row; within a row the per-class *drop* from
+  :mod:`tribes.textures` puts terrain first and units last.
+* ``UI_WORLD`` — city names, level pips, health bars.
+
+The view owns the sprites, keeps them in step with the model
+(:meth:`sync`), converts between grid and world coordinates and draws the
+overlays.  The scene owns input, selection state and the HUD.
 """
 
 from __future__ import annotations
@@ -13,12 +25,15 @@ import math
 import random
 from dataclasses import dataclass, field
 
-from saga2d import MoveTo, ParticleEmitter, RenderLayer, Scene, Sequence, Sprite
+from saga2d import MoveTo, ParticleEmitter, RenderLayer, Scene, Sequence, Sprite, SpriteAnchor
 from tribes import textures
 from tribes.model import Pos, Unit, World
-from tribes.textures import TILE
+from tribes.rules import Terrain
+from tribes.textures import DROP_TILE, DROP_UNIT, ISO_H, ISO_W, TILE, TILE_SIZE, WATER_DROP
 
 Color = tuple[int, int, int, int]
+
+HALF_W, HALF_H = ISO_W / 2, ISO_H / 2
 
 
 def rgba(color: tuple[int, int, int], alpha: int = 255) -> Color:
@@ -30,13 +45,31 @@ def tint(color: tuple[int, int, int]) -> tuple[float, float, float]:
 
 
 def tile_center(pos: Pos) -> tuple[float, float]:
-    """World coordinates of the centre of grid tile *pos*."""
-    return (pos[0] * TILE + TILE / 2, pos[1] * TILE + TILE / 2)
+    """World coordinates of the centre of tile *pos*'s top face (land level).
+
+    Tile ``(0, 0)`` has its top corner at the origin; ``x`` runs down-right
+    and ``y`` down-left.
+    """
+    x, y = pos
+    return ((x - y) * HALF_W, (x + y) * HALF_H + HALF_H)
 
 
 def tile_at(wx: float, wy: float) -> Pos:
-    """Grid position under world point ``(wx, wy)`` (may be out of bounds)."""
-    return (int(math.floor(wx / TILE)), int(math.floor(wy / TILE)))
+    """Grid position whose top-face diamond contains world point ``(wx, wy)``
+    (may be out of bounds).  Inverse of :func:`tile_center`."""
+    u = wx / HALF_W
+    v = (wy - HALF_H) / HALF_H
+    return (int(math.floor((u + v) / 2 + 0.5)), int(math.floor((v - u) / 2 + 0.5)))
+
+
+def diamond(cx: float, cy: float, scale: float = 1.0) -> list[tuple[float, float]]:
+    """Top, right, bottom and left corners of a tile-top diamond centred on ``(cx, cy)``."""
+    hw, hh = HALF_W * scale, HALF_H * scale
+    return [(cx, cy - hh), (cx + hw, cy), (cx, cy + hh), (cx - hw, cy)]
+
+
+#: Neighbour offset → which diamond edge (corner indices into :func:`diamond`) the two tiles share.
+_SHARED_EDGES: tuple[tuple[Pos, tuple[int, int]], ...] = (((0, -1), (0, 1)), ((1, 0), (1, 2)), ((0, 1), (2, 3)), ((-1, 0), (3, 0)))
 
 
 @dataclass
@@ -58,43 +91,81 @@ class MapView:
         self.human = human
         self.rng = rng
         self._tile_sprites: dict[Pos, Sprite] = {}
+        self._terrain_sprites: dict[Pos, Sprite] = {}
         self._resource_sprites: dict[Pos, Sprite] = {}
-        self._site_sprites: dict[Pos, Sprite] = {}
+        self._site_sprites: dict[Pos, Sprite] = {}  # village, or city walls
+        self._roof_sprites: dict[Pos, Sprite] = {}  # city roofs, tinted with the tribe colour
         self._unit_sprites: dict[int, Sprite] = {}
         self._unit_targets: dict[int, Pos] = {}
         textures.register_all(scene.game)
-        for tile in world.all_tiles():
-            self._tile_sprites[tile.pos] = scene.add_sprite(Sprite(
-                "tile.fog", position=tile_center(tile.pos), size=(TILE, TILE), layer=RenderLayer.BACKGROUND,
-            ))
+        self._build_tiles()
         self.sync()
+
+    def _build_tiles(self) -> None:
+        for tile in self.world.all_tiles():
+            self._tile_sprites[tile.pos] = self.scene.add_sprite(Sprite(
+                "tile.fog", position=self._anchor(tile.pos, DROP_TILE), size=TILE_SIZE, anchor=SpriteAnchor.BOTTOM_CENTER,
+                layer=RenderLayer.BACKGROUND, y_sort=True,
+            ))
+
+    @staticmethod
+    def _anchor(pos: Pos, drop: float) -> tuple[float, float]:
+        """Bottom-centre position of a sprite whose image bottom is *drop* below the tile centre."""
+        cx, cy = tile_center(pos)
+        return (cx, cy + drop)
+
+    def _prop(self, key: str, pos: Pos, **kwargs) -> Sprite:
+        placement = textures.placements[key]
+        return self.scene.add_sprite(Sprite(
+            key, position=self._anchor(pos, placement.drop), size=placement.size, anchor=SpriteAnchor.BOTTOM_CENTER,
+            layer=RenderLayer.UNITS, y_sort=True, **kwargs,
+        ))
+
+    def _reconcile(self, sprites: dict[Pos, Sprite], pos: Pos, key: str | None) -> Sprite | None:
+        """Make ``sprites[pos]`` show *key* (or nothing); returns the sprite."""
+        sprite = sprites.get(pos)
+        if key is None:
+            if sprite is not None:
+                sprites.pop(pos).remove()
+            return None
+        if sprite is None or sprite.image != key:
+            if sprite is not None:
+                sprite.remove()
+            sprite = sprites[pos] = self._prop(key, pos)
+        return sprite
 
     @property
     def world_bounds(self) -> tuple[float, float, float, float]:
-        extent = self.world.size * TILE
-        return (-TILE, -TILE, extent + TILE, extent + TILE)
+        size = self.world.size
+        return (-size * HALF_W - TILE, -2 * TILE, size * HALF_W + TILE, size * ISO_H + DROP_TILE + TILE)
 
     @property
     def explored(self) -> set[Pos]:
         return self.world.tribes[self.human].explored
 
+    def tile_sprite(self, pos: Pos) -> Sprite:
+        return self._tile_sprites[pos]
+
+    def surface_center(self, pos: Pos) -> tuple[float, float]:
+        """Like :func:`tile_center`, but on the water surface for explored water tiles."""
+        cx, cy = tile_center(pos)
+        if pos in self.explored and self.world.tile(pos).terrain is Terrain.WATER:
+            cy += WATER_DROP
+        return (cx, cy)
+
     def reset(self, world: World) -> None:
         """Point the view at a different world (after loading a save)."""
-        for sprite in [*self._resource_sprites.values(), *self._site_sprites.values(), *self._unit_sprites.values()]:
-            sprite.remove()
-        self._resource_sprites.clear()
-        self._site_sprites.clear()
-        self._unit_sprites.clear()
+        for group in (self._terrain_sprites, self._resource_sprites, self._site_sprites, self._roof_sprites, self._unit_sprites):
+            for sprite in group.values():
+                sprite.remove()
+            group.clear()
         self._unit_targets.clear()
         if world.size != self.world.size:
             for sprite in self._tile_sprites.values():
                 sprite.remove()
             self._tile_sprites.clear()
             self.world = world
-            for tile in world.all_tiles():
-                self._tile_sprites[tile.pos] = self.scene.add_sprite(Sprite(
-                    "tile.fog", position=tile_center(tile.pos), size=(TILE, TILE), layer=RenderLayer.BACKGROUND,
-                ))
+            self._build_tiles()
         else:
             for sprite in self._tile_sprites.values():
                 sprite.image = "tile.fog"
@@ -102,6 +173,15 @@ class MapView:
         self.sync()
 
     # -- Sprite reconciliation -------------------------------------------------
+
+    @staticmethod
+    def _terrain_key(pos: Pos, terrain: Terrain) -> str | None:
+        seed = pos[0] * 7 + pos[1] * 13
+        if terrain is Terrain.FOREST:
+            return f"prop.forest.{seed % textures.FOREST_VARIANTS}"
+        if terrain is Terrain.MOUNTAIN:
+            return f"prop.mountain.{seed % textures.MOUNTAIN_VARIANTS}"
+        return None
 
     def sync(self) -> None:
         """Make sprites match the model (idempotent)."""
@@ -112,25 +192,18 @@ class MapView:
             tile_sprite = self._tile_sprites[pos]
             if tile_sprite.image != f"tile.{tile.terrain.value}":
                 tile_sprite.image = f"tile.{tile.terrain.value}"
+            self._reconcile(self._terrain_sprites, pos, self._terrain_key(pos, tile.terrain))
             has_resource = tile.resource is not None and not tile.harvested
-            if has_resource and pos not in self._resource_sprites:
-                self._resource_sprites[pos] = self.scene.add_sprite(Sprite(
-                    f"resource.{tile.resource.value}", position=tile_center(pos), size=(TILE, TILE), layer=RenderLayer.OBJECTS,
-                ))
-            elif not has_resource and pos in self._resource_sprites:
-                self._resource_sprites.pop(pos).remove()
+            self._reconcile(self._resource_sprites, pos, f"resource.{tile.resource.value}" if has_resource else None)
             city = world.city_at(pos)
-            want = "city" if city is not None else "village" if tile.village else None
-            sprite = self._site_sprites.get(pos)
-            if want is None and sprite is not None:
-                self._site_sprites.pop(pos).remove()
-            elif want is not None:
-                if sprite is None or sprite.image != want:
-                    if sprite is not None:
-                        sprite.remove()
-                    sprite = self.scene.add_sprite(Sprite(want, position=tile_center(pos), size=(TILE, TILE), layer=RenderLayer.OBJECTS))
-                    self._site_sprites[pos] = sprite
-                sprite.tint = tint(world.tribes[city.tribe].color) if city is not None else (1.0, 1.0, 1.0)
+            if city is not None:
+                size = min(city.level, textures.CITY_SIZES)
+                self._reconcile(self._site_sprites, pos, f"city.{size}.base")
+                roofs = self._reconcile(self._roof_sprites, pos, f"city.{size}")
+                roofs.tint = tint(world.tribes[city.tribe].color)
+            else:
+                self._reconcile(self._site_sprites, pos, "village" if tile.village else None)
+                self._reconcile(self._roof_sprites, pos, None)
         for unit_id, sprite in list(self._unit_sprites.items()):
             unit = world.units.get(unit_id)
             if unit is None or unit.pos not in explored:
@@ -142,15 +215,12 @@ class MapView:
                 continue
             sprite = self._unit_sprites.get(unit.id)
             if sprite is None:
-                sprite = self.scene.add_sprite(Sprite(
-                    f"unit.{unit.type.value}", position=tile_center(unit.pos), size=(TILE, TILE),
-                    layer=RenderLayer.UNITS, tint=tint(world.tribes[unit.tribe].color),
-                ))
+                sprite = self._prop(f"unit.{unit.type.value}", unit.pos, tint=tint(world.tribes[unit.tribe].color))
                 self._unit_sprites[unit.id] = sprite
                 self._unit_targets[unit.id] = unit.pos
             elif self._unit_targets[unit.id] != unit.pos:
                 sprite.stop_actions()
-                sprite.position = tile_center(unit.pos)
+                sprite.position = self._anchor(unit.pos, DROP_UNIT)
                 self._unit_targets[unit.id] = unit.pos
             sprite.opacity = 255 if unit.tribe != self.human or unit.can_act else 150
 
@@ -162,63 +232,76 @@ class MapView:
         if sprite is None:
             return
         self._unit_targets[unit.id] = path[-1]
-        sprite.do(Sequence(*[MoveTo(tile_center(p), speed=420) for p in path[1:]]))
+        sprite.do(Sequence(*[MoveTo(self._anchor(p, DROP_UNIT), speed=420) for p in path[1:]]))
 
     def burst(self, pos: Pos, color: Color, count: int) -> None:
-        emitter = ParticleEmitter("spark", position=tile_center(pos), speed=(60, 220), lifetime=(0.25, 0.6),
+        cx, cy = self.surface_center(pos)
+        emitter = ParticleEmitter("spark", position=(cx, cy - 12), speed=(60, 220), lifetime=(0.25, 0.6),
                                   size=(14, 14), shrink=True, tint=tint(color[:3]), rng=self.rng)
         emitter.burst(count)
 
     # -- Per-frame overlays ------------------------------------------------------
 
+    def _fill(self, pos: Pos, color: Color, scale: float = 1.0) -> None:
+        cx, cy = self.surface_center(pos)
+        self.scene.draw_polygon(diamond(cx, cy, scale), color, space="world", layer=RenderLayer.OBJECTS)
+
+    def _outline(self, pos: Pos, color: Color, width: float, scale: float = 1.0, layer: RenderLayer = RenderLayer.OBJECTS) -> None:
+        cx, cy = self.surface_center(pos)
+        corners = diamond(cx, cy, scale)
+        for i in range(4):
+            (x1, y1), (x2, y2) = corners[i], corners[(i + 1) % 4]
+            self.scene.draw_line(x1, y1, x2, y2, color, width, space="world", layer=layer)
+
+    def _draw_territory(self) -> None:
+        scene, world = self.scene, self.world
+        left, top, right, bottom = scene.camera.visible_world_rect()
+        for pos in self.explored:
+            owner = world.owner_of(pos)
+            if owner is None:
+                continue
+            cx, cy = self.surface_center(pos)
+            if not (left - ISO_W < cx < right + ISO_W and top - ISO_H < cy < bottom + ISO_H):
+                continue
+            color = world.tribes[owner].color
+            corners = diamond(cx, cy)
+            scene.draw_polygon(corners, rgba(color, 40), space="world", layer=RenderLayer.OBJECTS)
+            for (dx, dy), (a, b) in _SHARED_EDGES:
+                n = (pos[0] + dx, pos[1] + dy)
+                if not world.in_bounds(n) or world.owner_of(n) != owner:
+                    scene.draw_line(*corners[a], *corners[b], rgba(color, 210), 3, space="world", layer=RenderLayer.OBJECTS)
+
     def draw(self, selection: Selection) -> None:
         scene = self.scene
         world = self.world
         explored = self.explored
-        cam = scene.camera
-        left, top, right, bottom = cam.visible_world_rect()
-        x0, y0 = max(0, int(left // TILE)), max(0, int(top // TILE))
-        x1, y1 = min(world.size - 1, int(right // TILE)), min(world.size - 1, int(bottom // TILE))
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                pos = (x, y)
-                if pos not in explored:
-                    continue
-                owner = world.owner_of(pos)
-                if owner is None:
-                    continue
-                color = world.tribes[owner].color
-                px, py = x * TILE, y * TILE
-                scene.draw_rect(px, py, TILE, TILE, rgba(color, 40), space="world", layer=RenderLayer.BACKGROUND)
-                for dx, dy, line in ((0, -1, (px, py, px + TILE, py)), (0, 1, (px, py + TILE, px + TILE, py + TILE)),
-                                     (-1, 0, (px, py, px, py + TILE)), (1, 0, (px + TILE, py, px + TILE, py + TILE))):
-                    n = (x + dx, y + dy)
-                    if not world.in_bounds(n) or world.owner_of(n) != owner:
-                        scene.draw_line(*line, rgba(color, 210), 3, space="world", layer=RenderLayer.BACKGROUND)
+        self._draw_territory()
         for pos in selection.reachable:
-            scene.draw_rect(pos[0] * TILE + 4, pos[1] * TILE + 4, TILE - 8, TILE - 8, (255, 255, 255, 70), space="world", layer=RenderLayer.OBJECTS)
+            self._fill(pos, (255, 255, 255, 70), 0.86)
         for target in selection.targets:
-            cx, cy = tile_center(target.pos)
-            scene.draw_circle(cx, cy, TILE * 0.44, (255, 70, 70, 90), space="world", layer=RenderLayer.OBJECTS)
+            self._fill(target.pos, (255, 70, 70, 80), 0.86)
+            self._outline(target.pos, (255, 80, 80, 230), 2.5, 0.86)
         human_color = world.tribes[self.human].color
         if selection.unit is not None:
-            cx, cy = tile_center(selection.unit.pos)
             glow = 0.55 + 0.45 * math.sin(selection.pulse * 6)
-            scene.draw_circle(cx, cy, TILE * 0.46, rgba(human_color, int(120 * glow)), space="world", layer=RenderLayer.OBJECTS)
+            self._fill(selection.unit.pos, rgba(human_color, int(140 * glow)), 0.9)
         if selection.city_pos is not None:
-            cx, cy = tile_center(selection.city_pos)
-            scene.draw_rect(cx - TILE / 2, cy - TILE / 2, TILE, TILE, rgba(human_color, 70), space="world", layer=RenderLayer.OBJECTS)
+            self._fill(selection.city_pos, rgba(human_color, 70))
+            self._outline(selection.city_pos, rgba(human_color, 230), 2.5)
         for city in world.cities.values():
             if city.pos not in explored:
                 continue
+            # Name and level pips sit on the front half of the tile, clear of the
+            # houses behind the centre and of any unit standing there.
             cx, cy = tile_center(city.pos)
             color = world.tribes[city.tribe].color
-            scene.draw_text(city.name, cx + 1, cy - TILE * 0.42 + 1, style="city", color=(0, 0, 0, 200), anchor_x="center", anchor_y="bottom", space="world", layer=RenderLayer.UI_WORLD)
-            scene.draw_text(city.name, cx, cy - TILE * 0.42, style="city", anchor_x="center", anchor_y="bottom", space="world", layer=RenderLayer.UI_WORLD)
-            pip_w = 8
-            total = city.level * (pip_w + 3) - 3
+            pip_w, pip_gap, pip_y = 8, 3, cy + 18
+            total = city.level * (pip_w + pip_gap) - pip_gap
             for i in range(city.level):
-                scene.draw_rect(cx - total / 2 + i * (pip_w + 3), cy + TILE * 0.32, pip_w, 6, rgba(color, 255), space="world", layer=RenderLayer.UI_WORLD)
+                scene.draw_rect(cx - total / 2 + i * (pip_w + pip_gap), pip_y, pip_w, 5, rgba(color, 255), space="world", layer=RenderLayer.UI_WORLD)
+            name_y = pip_y + 7
+            scene.draw_text(city.name, cx + 1, name_y + 1, style="city", color=(0, 0, 0, 200), anchor_x="center", anchor_y="top", space="world", layer=RenderLayer.UI_WORLD)
+            scene.draw_text(city.name, cx, name_y, style="city", anchor_x="center", anchor_y="top", space="world", layer=RenderLayer.UI_WORLD)
         for u in world.units.values():
             if u.pos not in explored or u.hp >= u.max_hp:
                 continue
@@ -226,9 +309,8 @@ class MapView:
             if sprite is None:
                 continue
             sx, sy = sprite.position
-            bar_w = TILE * 0.5
-            scene.draw_rect(sx - bar_w / 2, sy + TILE * 0.36, bar_w, 5, (0, 0, 0, 160), space="world", layer=RenderLayer.UI_WORLD)
-            scene.draw_rect(sx - bar_w / 2, sy + TILE * 0.36, bar_w * u.hp / u.max_hp, 5, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
-        cx, cy = selection.cursor[0] * TILE, selection.cursor[1] * TILE
-        for line in ((cx, cy, cx + TILE, cy), (cx + TILE, cy, cx + TILE, cy + TILE), (cx + TILE, cy + TILE, cx, cy + TILE), (cx, cy + TILE, cx, cy)):
-            scene.draw_line(*line, (255, 255, 255, 230), 2.5, space="world", layer=RenderLayer.UI_WORLD)
+            feet_y = sy - DROP_UNIT
+            bar_w = 32
+            scene.draw_rect(sx - bar_w / 2, feet_y + 6, bar_w, 5, (0, 0, 0, 160), space="world", layer=RenderLayer.UI_WORLD)
+            scene.draw_rect(sx - bar_w / 2, feet_y + 6, bar_w * u.hp / u.max_hp, 5, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
+        self._outline(selection.cursor, (255, 255, 255, 230), 2.5, layer=RenderLayer.UI_WORLD)

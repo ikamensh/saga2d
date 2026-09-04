@@ -1,170 +1,328 @@
-"""Procedural textures: flat geometric shapes with soft glows.
+"""Procedural textures: low-poly props pre-rendered with :mod:`tribes.render3d`.
 
-Every texture is drawn with Pillow at the display's pixel density so it
-stays crisp on HiDPI screens, then registered with the asset manager
-under a short key (``"tile.field"``, ``"unit.warrior"``, ``"glow"``…).
-Sprites tint the white textures with tribe colours at draw time.
+The map is drawn in a fixed dimetric view: every tile is a block whose
+top face is a 2:1 diamond ``ISO_W`` wide and ``ISO_H`` tall; terrain
+features, resources, buildings and units are separate props standing on
+that face.  Everything is rendered with Pillow at the display's pixel
+density so it stays crisp on HiDPI screens, then registered with the
+asset manager under a short key (``"tile.field"``, ``"prop.forest.0"``,
+``"unit.warrior"``, ``"glow"``…).  Unit and city textures are white so
+sprites can tint them with tribe colours at draw time.
+
+Sprites are anchored at the bottom centre.  :data:`placements` records,
+per key, the sprite size and how far the image bottom lies below the
+tile-centre reference point ("drop"); the drop doubles as the y-sort key
+within a row, so on one tile terrain props draw first and units last.
 """
 
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 from PIL import Image, ImageDraw, ImageFilter
 
 from saga2d import Game
+from tribes import render3d as r3
+from tribes.render3d import Mesh
 from tribes.rules import Resource, Terrain, UnitType
 
-TILE = 64  # logical units per tile
+TILE = 64  # base size: the top-face diamond is 2×TILE wide and TILE tall
+ISO_W = 2 * TILE
+ISO_H = TILE
+PROJECTION = r3.Projection(ISO_W)
+
+BLOCK_Z = 0.28  # land block thickness in tile units
+WATER_Z = 0.14  # how far the water surface sits below the land top
+BLOCK_H = math.ceil(BLOCK_Z * PROJECTION.z_scale)
+WATER_DROP = WATER_Z * PROJECTION.z_scale
+PAD = 2  # transparent margin around every image, in logical units
+TILE_SIZE = (ISO_W + 2 * PAD, PAD + ISO_H + BLOCK_H + PAD)
+TILE_ORIGIN = (TILE_SIZE[0] / 2, PAD + ISO_H / 2)
+DROP_TILE = TILE_SIZE[1] - TILE_ORIGIN[1]
+#: Drop per prop class; all within one row spacing (ISO_H / 2) of each other.
+DROP_TERRAIN, DROP_RESOURCE, DROP_SITE, DROP_UNIT = 32, 36, 36, 44
+FOREST_VARIANTS = 3
+MOUNTAIN_VARIANTS = 2
 
 TERRAIN_COLORS: dict[Terrain, tuple[int, int, int]] = {
-    Terrain.WATER: (36, 78, 140),
-    Terrain.FIELD: (124, 176, 92),
-    Terrain.FOREST: (78, 132, 76),
-    Terrain.MOUNTAIN: (142, 142, 150),
+    Terrain.WATER: (46, 104, 178),
+    Terrain.FIELD: (132, 186, 98),
+    Terrain.FOREST: (92, 148, 84),
+    Terrain.MOUNTAIN: (152, 152, 160),
 }
 FOG = (24, 26, 38)
-WHITE = (255, 255, 255, 255)
-INK = (24, 28, 40, 255)
+FOG_TOP = (31, 34, 48)
+WHITE = (255, 255, 255)
+INK = (34, 38, 52)
+TREE_GREENS = ((50, 112, 66), (64, 128, 72), (44, 100, 60))
+TRUNK = (112, 82, 54)
+PLASTER = (242, 234, 216)
+ROCK = (138, 138, 150)
+SNOW = (238, 240, 248)
 
 
-def _canvas(size: int) -> tuple[Image.Image, ImageDraw.ImageDraw]:
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    return img, ImageDraw.Draw(img)
+@dataclass(frozen=True)
+class Placement:
+    """How to place a prop sprite: its logical size and the image bottom's
+    distance below the tile-centre reference point."""
+
+    size: tuple[float, float]
+    drop: float
+
+
+placements: dict[str, Placement] = {}
+
+
+# -- Tiles ---------------------------------------------------------------------
+
+
+def _block(top_color: tuple[int, int, int], top_z: float, scale: float) -> Mesh:
+    """Tile block from the base plane up to *top_z*, widened by two device pixels
+    so neighbouring blocks overlap instead of showing an anti-aliased seam."""
+    bleed = 4 / (ISO_W * scale)
+    return r3.box((0, 0, (top_z - BLOCK_Z) / 2), (1 + bleed, 1 + bleed, BLOCK_Z + top_z), top_color)
+
+
+def _waves(draw: ImageDraw.ImageDraw, to_px, ss: float) -> None:
+    color = (118, 168, 226, 255)
+    for x0, y0 in ((-0.28, 0.02), (0.05, -0.25), (0.02, 0.22)):
+        pts = [(x0 + i * 0.06, y0 + (0.03 if i % 2 else 0.0), -WATER_Z) for i in range(5)]
+        draw.line([to_px(p) for p in pts], fill=color, width=max(1, round(1.4 * ss)))
+
+
+def _tile(terrain: Terrain, scale: float) -> Image.Image:
+    top_z = -WATER_Z if terrain is Terrain.WATER else 0.0
+    return r3.render(
+        _block(TERRAIN_COLORS[terrain], top_z, scale), PROJECTION, scale=scale, canvas=TILE_SIZE, origin=TILE_ORIGIN,
+        decorate=_waves if terrain is Terrain.WATER else None,
+    )
+
+
+def _fog(scale: float) -> Image.Image:
+    return r3.render(_block(FOG_TOP, 0.0, scale), PROJECTION, scale=scale, canvas=TILE_SIZE, origin=TILE_ORIGIN)
+
+
+# -- Props -------------------------------------------------------------------
+
+
+def _prop(key: str, mesh: Mesh, drop: float, scale: float, decorate: r3.Decorate | None = None) -> Image.Image:
+    """Render *mesh* into a canvas symmetric about the model origin whose bottom
+    edge is *drop* below it, and record the placement under *key*."""
+    min_x, min_y, max_x, max_y = r3.bounds(mesh, PROJECTION)
+    half_w = math.ceil(max(-min_x, max_x) + PAD)
+    top = math.ceil(-min_y + PAD)
+    if max_y + PAD > drop:
+        raise ValueError(f"{key}: mesh extends {max_y:.1f} below the tile centre, more than its drop of {drop}")
+    canvas = (2 * half_w, top + drop)
+    placements[key] = Placement(canvas, drop)
+    return r3.render(mesh, PROJECTION, scale=scale, canvas=canvas, origin=(half_w, top), decorate=decorate)
+
+
+def _tree(x: float, y: float, height: float, color: tuple[int, int, int], rotation: float = 0.0) -> Mesh:
+    radius = height * 0.36
+    return (
+        r3.cylinder((x, y, 0), radius * 0.22, 0.06, TRUNK, sides=6)
+        + r3.cone((x, y, 0.05), radius, height, color, sides=7, rotation=rotation)
+    )
+
+
+def _forest(variant: int) -> Mesh:
+    layouts = (
+        ((-0.2, 0.12, 0.44), (0.18, -0.14, 0.38), (0.1, 0.24, 0.34)),
+        ((0.05, -0.2, 0.46), (-0.22, 0.16, 0.36), (0.22, 0.14, 0.4)),
+        ((-0.16, -0.16, 0.4), (0.2, 0.02, 0.46), (-0.1, 0.24, 0.32)),
+    )
+    mesh: Mesh = []
+    for i, (x, y, h) in enumerate(layouts[variant]):
+        mesh += _tree(x, y, h, TREE_GREENS[(i + variant) % 3], rotation=0.4 * i)
+    return mesh
+
+
+def _mountain(variant: int) -> Mesh:
+    if variant == 0:
+        peak = r3.pyramid((0, 0, 0), (0.88, 0.88), 0.82, ROCK, apex_shift=(-0.04, 0.02))
+        cap = r3.pyramid((-0.04 * 0.62, 0.02 * 0.62, 0.82 * 0.62), (0.88 * 0.38, 0.88 * 0.38), 0.82 * 0.38, SNOW, apex_shift=(-0.04 * 0.38, 0.02 * 0.38))
+        return peak + cap
+    main = r3.pyramid((0.1, -0.08, 0), (0.7, 0.7), 0.72, ROCK)
+    main_cap = r3.pyramid((0.1, -0.08, 0.72 * 0.6), (0.7 * 0.4, 0.7 * 0.4), 0.72 * 0.4, SNOW)
+    side = r3.pyramid((-0.2, 0.2, 0), (0.48, 0.48), 0.42, (128, 128, 140))
+    return side + main + main_cap
+
+
+def _walls(x: float, y: float, w: float, d: float, h: float, color: tuple[int, int, int]) -> Mesh:
+    return r3.box((x, y, h / 2), (w, d, h), color)
+
+
+def _roof(x: float, y: float, w: float, d: float, h: float, color: tuple[int, int, int]) -> Mesh:
+    return r3.gable_roof((x, y, h), (w + 0.05, d + 0.06), h * 0.7, color)
+
+
+def _village() -> Mesh:
+    return _walls(0, 0, 0.34, 0.3, 0.22, PLASTER) + _roof(0, 0, 0.34, 0.3, 0.22, (192, 114, 82))
+
+
+#: House footprints per city size, kept to the back half of the tile so a
+#: unit standing in the centre is not hidden.
+_CITY_HOUSES = (
+    ((-0.12, -0.12, 0.36, 0.3, 0.26),),
+    ((-0.18, -0.18, 0.36, 0.3, 0.26), (0.24, -0.24, 0.2, 0.18, 0.16)),
+    ((-0.18, -0.18, 0.36, 0.3, 0.26), (0.26, -0.26, 0.2, 0.18, 0.16), (-0.26, 0.26, 0.18, 0.2, 0.15)),
+)
+CITY_SIZES = len(_CITY_HOUSES)
+
+
+def _city(size: int) -> tuple[Mesh, Mesh]:
+    """``(walls, roofs)`` for a city of *size* houses; the roofs are white so
+    the view can tint them with the tribe colour."""
+    houses = _CITY_HOUSES[size - 1]
+    walls = [f for x, y, w, d, h in houses for f in _walls(x, y, w, d, h, PLASTER)]
+    roofs = [f for x, y, w, d, h in houses for f in _roof(x, y, w, d, h, WHITE)]
+    return walls, roofs
+
+
+def _resource(resource: Resource) -> Mesh:
+    if resource is Resource.FRUIT:
+        bush = r3.sphere((0, 0, 0.12), 0.15, (72, 138, 78), rings=4, sides=8)
+        berries = [(0.09, 0.07, 0.2), (0.12, -0.04, 0.12), (-0.02, 0.14, 0.14), (0.02, 0.02, 0.27)]
+        return bush + [f for x, y, z in berries for f in r3.sphere((x, y, z), 0.055, (232, 74, 86), rings=3, sides=6)]
+    if resource is Resource.CROP:
+        mesh: Mesh = []
+        for x, y in ((-0.1, -0.1), (0.1, -0.1), (-0.1, 0.1), (0.1, 0.1)):
+            mesh += r3.cylinder((x, y, 0), 0.03, 0.18, (214, 182, 76), sides=6)
+            mesh += r3.cylinder((x, y, 0.18), 0.05, 0.1, (240, 214, 112), sides=6)
+        return mesh
+    if resource is Resource.GAME:
+        top = r3.pyramid((0, 0, 0.2), (0.26, 0.26), 0.18, (156, 104, 62))
+        bottom = r3.pyramid((0, 0, 0.2), (0.26, 0.26), -0.18, (156, 104, 62))
+        return r3.rotate_z(bottom + top, 20)
+    if resource is Resource.FISH:
+        z = -WATER_Z + 0.004
+        body = [(-0.14, 0.0), (-0.08, 0.07), (0.04, 0.08), (0.14, 0.02), (0.14, -0.02), (0.04, -0.08), (-0.08, -0.07)]
+        tail = [(-0.12, 0.0), (-0.22, 0.07), (-0.22, -0.07)]
+        return r3.rotate_z(r3.flat(body, z, (150, 220, 255)) + r3.flat(tail, z, (150, 220, 255)), -30)
+    if resource is Resource.METAL:
+        return (
+            r3.cylinder((0, 0, 0), 0.16, 0.13, (198, 204, 216), sides=6, rotation=0.3)
+            + r3.cylinder((0.02, -0.02, 0.13), 0.08, 0.08, (242, 246, 254), sides=6, rotation=0.3)
+        )
+    raise ValueError(resource)
+
+
+def _figure(x: float, y: float, z: float, body_r: float = 0.15, body_h: float = 0.36, head_r: float = 0.15) -> Mesh:
+    return r3.cylinder((x, y, z), body_r, body_h, WHITE, sides=10) + r3.sphere((x, y, z + body_h + head_r * 0.9), head_r, WHITE, rings=5, sides=10)
+
+
+_SIDE = (1 / math.sqrt(2), -1 / math.sqrt(2), 0.0)  # model direction that projects to screen-right
+
+
+def _facing_quad(center: r3.Vec3, half: float) -> list[r3.Vec3]:
+    """Corners of a square facing the camera, centred on *center*."""
+    cx, cy, cz = center
+    sx, sy, _ = _SIDE
+    return [
+        (cx - sx * half, cy - sy * half, cz - half), (cx + sx * half, cy + sy * half, cz - half),
+        (cx + sx * half, cy + sy * half, cz + half), (cx - sx * half, cy - sy * half, cz + half),
+    ]
+
+
+def _bow() -> Mesh:
+    """An arc in the vertical plane facing the camera, plus its string."""
+    cx, cy, cz, radius, thickness = 0.02, 0.24, 0.34, 0.24, 0.035
+    sx, sy, _ = _SIDE
+
+    def at(angle: float, r: float) -> r3.Vec3:
+        return (cx + sx * r * math.cos(angle), cy + sy * r * math.cos(angle), cz + r * math.sin(angle))
+
+    angles = [math.radians(a) for a in range(95, 266, 10)]
+    mesh: Mesh = []
+    for a0, a1 in zip(angles, angles[1:]):
+        mesh += r3.facing([at(a0, radius - thickness), at(a1, radius - thickness), at(a1, radius), at(a0, radius)], INK)
+    return mesh + r3.ribbon([at(angles[0], radius), at(angles[-1], radius)], _SIDE, 0.015, INK)
+
+
+def _unit(unit_type: UnitType) -> tuple[Mesh, r3.Decorate | None]:
+    if unit_type is UnitType.WARRIOR:
+        sword = r3.box((0.2, -0.06, 0.34), (0.045, 0.045, 0.5), INK) + r3.box((0.2, -0.06, 0.16), (0.17, 0.05, 0.04), INK)
+        return _figure(0, 0, 0) + sword, None
+    if unit_type is UnitType.ARCHER:
+        return _figure(0, 0, 0) + _bow(), None
+    if unit_type is UnitType.RIDER:
+        horse = r3.box((0.02, 0, 0.27), (0.5, 0.2, 0.2), WHITE)
+        for x, y in ((-0.18, -0.06), (-0.18, 0.06), (0.18, -0.06), (0.18, 0.06)):
+            horse += r3.box((x, y, 0.09), (0.05, 0.05, 0.18), WHITE)
+        horse += r3.box((0.27, 0, 0.44), (0.12, 0.1, 0.18), WHITE) + r3.box((0.32, 0, 0.53), (0.17, 0.1, 0.09), WHITE)
+        rider = _figure(-0.06, 0, 0.36, body_r=0.1, body_h=0.24, head_r=0.11)
+        return horse + rider, None
+    if unit_type is UnitType.DEFENDER:
+        shield = r3.rotate_z(r3.box((0, 0.22, 0.24), (0.32, 0.05, 0.34), WHITE), -45)
+        glyph = _facing_quad((0.185, 0.185, 0.24), 0.08)
+
+        def emblem(draw: ImageDraw.ImageDraw, to_px, ss: float) -> None:
+            draw.polygon([to_px(p) for p in glyph], fill=(*INK, 255))
+
+        return _figure(0, 0, 0) + shield, emblem
+    if unit_type is UnitType.KNIGHT:
+        plume = r3.cone((0, 0, 0.6), 0.075, 0.24, INK, sides=8)
+        lance = r3.box((0.2, -0.06, 0.46), (0.035, 0.035, 0.92), INK)
+        sx, sy, _ = _SIDE
+        pennant = r3.facing([(0.2, -0.06, 0.9), (0.2 + sx * 0.16, -0.06 + sy * 0.16, 0.85), (0.2, -0.06, 0.78)], INK)
+        return _figure(0, 0, 0) + plume + lance + pennant, None
+    raise ValueError(unit_type)
+
+
+# -- 2-D effects -------------------------------------------------------------------
 
 
 def _glow(size: int, radius_frac: float, color: tuple[int, int, int, int], blur_frac: float = 0.18) -> Image.Image:
-    img, draw = _canvas(size)
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
     r = size * radius_frac
     c = size / 2
     draw.ellipse([c - r, c - r, c + r, c + r], fill=color)
     return img.filter(ImageFilter.GaussianBlur(size * blur_frac))
 
 
-def _regular_polygon(draw: ImageDraw.ImageDraw, cx: float, cy: float, r: float, sides: int, rotation: float, fill) -> None:
-    pts = [(cx + r * math.cos(rotation + 2 * math.pi * i / sides), cy + r * math.sin(rotation + 2 * math.pi * i / sides)) for i in range(sides)]
-    draw.polygon(pts, fill=fill)
-
-
-def _tile(px: int, terrain: Terrain, scale: float) -> Image.Image:
-    base = TERRAIN_COLORS[terrain]
-    img = Image.new("RGBA", (px, px), (*base, 255))
-    draw = ImageDraw.Draw(img)
-    dark = tuple(max(0, c - 22) for c in base)
-    light = tuple(min(255, c + 18) for c in base)
-    draw.rectangle([0, 0, px - 1, px - 1], outline=(*dark, 255), width=max(1, round(1.5 * scale)))
-    if terrain is Terrain.FOREST:
-        for fx, fy, s in ((0.3, 0.62, 0.22), (0.62, 0.7, 0.26), (0.5, 0.36, 0.2)):
-            cx, cy, r = fx * px, fy * px, s * px
-            draw.polygon([(cx, cy - r), (cx - r * 0.8, cy + r * 0.6), (cx + r * 0.8, cy + r * 0.6)], fill=(*dark, 255))
-    elif terrain is Terrain.MOUNTAIN:
-        cx, cy = px * 0.5, px * 0.72
-        draw.polygon([(cx, px * 0.2), (cx - px * 0.34, cy), (cx + px * 0.34, cy)], fill=(*dark, 255))
-        draw.polygon([(cx, px * 0.2), (cx - px * 0.11, px * 0.36), (cx + px * 0.11, px * 0.36)], fill=(235, 238, 245, 255))
-    elif terrain is Terrain.WATER:
-        for wy in (0.3, 0.55, 0.8):
-            y = wy * px
-            draw.line([(px * 0.2, y), (px * 0.45, y - px * 0.03), (px * 0.7, y)], fill=(*light, 255), width=max(1, round(1.5 * scale)))
-    elif terrain is Terrain.FIELD:
-        for fx, fy in ((0.25, 0.3), (0.7, 0.25), (0.5, 0.65), (0.2, 0.75), (0.8, 0.8)):
-            x, y = fx * px, fy * px
-            draw.line([(x, y), (x + px * 0.06, y - px * 0.04)], fill=(*light, 255), width=max(1, round(1.2 * scale)))
-    return img
-
-
-def _fog(px: int, scale: float) -> Image.Image:
-    img = Image.new("RGBA", (px, px), (*FOG, 255))
-    draw = ImageDraw.Draw(img)
-    draw.rectangle([0, 0, px - 1, px - 1], outline=(34, 37, 52, 255), width=max(1, round(1.5 * scale)))
-    return img
-
-
-def _resource(px: int, resource: Resource, scale: float) -> Image.Image:
-    img, draw = _canvas(px)
-    c = px / 2
-    if resource is Resource.FRUIT:
-        for dx, dy in ((-0.14, 0.06), (0.14, 0.06), (0, -0.12)):
-            r = px * 0.11
-            draw.ellipse([c + dx * px - r, c + dy * px - r, c + dx * px + r, c + dy * px + r], fill=(235, 80, 90, 255))
-    elif resource is Resource.CROP:
-        for i in range(3):
-            x = c + (i - 1) * px * 0.14
-            draw.line([(x, c + px * 0.2), (x, c - px * 0.2)], fill=(245, 210, 90, 255), width=max(2, round(3 * scale)))
-            draw.ellipse([x - px * 0.06, c - px * 0.26, x + px * 0.06, c - px * 0.14], fill=(250, 225, 120, 255))
-    elif resource is Resource.GAME:
-        _regular_polygon(draw, c, c, px * 0.2, 4, 0, (150, 100, 60, 255))
-        _regular_polygon(draw, c, c, px * 0.1, 4, 0, (220, 180, 130, 255))
-    elif resource is Resource.FISH:
-        draw.polygon([(c - px * 0.2, c), (c + px * 0.08, c - px * 0.12), (c + px * 0.08, c + px * 0.12)], fill=(150, 220, 255, 255))
-        draw.polygon([(c + px * 0.06, c), (c + px * 0.22, c - px * 0.12), (c + px * 0.22, c + px * 0.12)], fill=(150, 220, 255, 255))
-    elif resource is Resource.METAL:
-        _regular_polygon(draw, c, c, px * 0.2, 6, math.pi / 6, (200, 205, 215, 255))
-        _regular_polygon(draw, c, c, px * 0.1, 6, math.pi / 6, (245, 248, 255, 255))
-    return img
-
-
-def _house(px: int, scale: float, color: tuple[int, int, int, int], roof: tuple[int, int, int, int]) -> Image.Image:
-    img, draw = _canvas(px)
-    c = px / 2
-    w, h = px * 0.42, px * 0.3
-    draw.rectangle([c - w / 2, c - h * 0.1, c + w / 2, c + h * 0.9], fill=color)
-    draw.polygon([(c - w * 0.65, c - h * 0.1), (c, c - h * 1.1), (c + w * 0.65, c - h * 0.1)], fill=roof)
-    return img
-
-
-def _unit(px: int, unit_type: UnitType, scale: float) -> Image.Image:
-    """White disc (tinted with the tribe colour at draw time) with an ink glyph."""
-    img, draw = _canvas(px)
-    c = px / 2
-    body = px * 0.34
-    draw.ellipse([c - body, c - body, c + body, c + body], fill=WHITE)
-    r = px * 0.17
-    width = max(2, round(2.5 * scale))
-    if unit_type is UnitType.WARRIOR:
-        draw.polygon([(c, c - r * 1.1), (c - r, c + r * 0.8), (c + r, c + r * 0.8)], fill=INK)
-    elif unit_type is UnitType.ARCHER:
-        draw.arc([c - r, c - r, c + r, c + r], start=300, end=60, fill=INK, width=width)
-        draw.line([(c - r * 0.2, c), (c + r * 1.1, c)], fill=INK, width=width)
-    elif unit_type is UnitType.RIDER:
-        _regular_polygon(draw, c, c, r * 1.15, 4, 0, INK)
-    elif unit_type is UnitType.DEFENDER:
-        draw.rounded_rectangle([c - r, c - r, c + r, c + r], radius=r * 0.3, fill=INK)
-    elif unit_type is UnitType.KNIGHT:
-        pts = []
-        for i in range(10):
-            rr = r * 1.2 if i % 2 == 0 else r * 0.5
-            a = -math.pi / 2 + i * math.pi / 5
-            pts.append((c + rr * math.cos(a), c + rr * math.sin(a)))
-        draw.polygon(pts, fill=INK)
-    return img
-
-
 def _ring(px: int, scale: float) -> Image.Image:
-    img, draw = _canvas(px)
+    img = Image.new("RGBA", (px, px), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
     c = px / 2
     r = px * 0.42
-    draw.ellipse([c - r, c - r, c + r, c + r], outline=WHITE, width=max(2, round(3 * scale)))
+    draw.ellipse([c - r, c - r, c + r, c + r], outline=(*WHITE, 255), width=max(2, round(3 * scale)))
     return img
+
+
+# -- Registration --------------------------------------------------------------------
 
 
 def register_all(game: Game) -> None:
     """Generate every texture at the backend's pixel density and register it."""
     scale = game.backend.scale_factor
-    px = int(TILE * scale)
     assets = game.assets
     if assets.has_image("glow"):
         return
     for terrain in Terrain:
-        assets.image_from_pil(f"tile.{terrain.value}", _tile(px, terrain, scale))
-    assets.image_from_pil("tile.fog", _fog(px, scale))
+        assets.image_from_pil(f"tile.{terrain.value}", _tile(terrain, scale))
+    assets.image_from_pil("tile.fog", _fog(scale))
+    for i in range(FOREST_VARIANTS):
+        assets.image_from_pil(f"prop.forest.{i}", _prop(f"prop.forest.{i}", _forest(i), DROP_TERRAIN, scale))
+    for i in range(MOUNTAIN_VARIANTS):
+        assets.image_from_pil(f"prop.mountain.{i}", _prop(f"prop.mountain.{i}", _mountain(i), DROP_TERRAIN, scale))
     for resource in Resource:
-        assets.image_from_pil(f"resource.{resource.value}", _resource(px, resource, scale))
-    assets.image_from_pil("village", _house(px, scale, (240, 236, 224, 255), (200, 190, 170, 255)))
-    assets.image_from_pil("city", _house(px, scale, WHITE, (225, 225, 235, 255)))
+        key = f"resource.{resource.value}"
+        assets.image_from_pil(key, _prop(key, _resource(resource), DROP_RESOURCE, scale))
+    assets.image_from_pil("village", _prop("village", _village(), DROP_SITE, scale))
+    for size in range(1, CITY_SIZES + 1):
+        walls, roofs = _city(size)
+        assets.image_from_pil(f"city.{size}.base", _prop(f"city.{size}.base", walls, DROP_SITE, scale))
+        assets.image_from_pil(f"city.{size}", _prop(f"city.{size}", roofs, DROP_SITE + 1, scale))
     for unit_type in UnitType:
-        assets.image_from_pil(f"unit.{unit_type.value}", _unit(px, unit_type, scale))
-    assets.image_from_pil("glow", _glow(px * 2, 0.24, WHITE))
+        key = f"unit.{unit_type.value}"
+        mesh, decorate = _unit(unit_type)
+        assets.image_from_pil(key, _prop(key, mesh, DROP_UNIT, scale, decorate))
+    px = int(TILE * scale)
+    assets.image_from_pil("glow", _glow(px * 2, 0.24, (*WHITE, 255)))
     assets.image_from_pil("glow.soft", _glow(px * 2, 0.3, (255, 255, 255, 160), 0.22))
     assets.image_from_pil("ring", _ring(px, scale))
-    assets.image_from_pil("blank", Image.new("RGBA", (px, px), WHITE))
-    assets.image_from_pil("spark", _glow(int(px * 0.5), 0.3, WHITE, 0.15))
+    assets.image_from_pil("blank", Image.new("RGBA", (px, px), (*WHITE, 255)))
+    assets.image_from_pil("spark", _glow(int(px * 0.5), 0.3, (*WHITE, 255), 0.15))
