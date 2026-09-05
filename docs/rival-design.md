@@ -58,10 +58,36 @@ losing hero assault, excludes that province from the whole route, and seeks
 other territory. This prevents both repeated safe experience rewards and a
 route loop where it repeatedly approaches a target it will refuse to attack.
 It is a compact AI decision rule, not an assurance that auto-play predicts
-optimal human tactics. A fortified capital can still accumulate a small
-positive net income while the rival watches; siege pressure or paid rival
-army development remains necessary before claiming G06's economic-farm
-requirement is met.
+optimal human tactics.
+
+## Encirclement and unpaid upkeep
+
+`state.encircled` is true while Westwatch is player-owned and all three of its
+neighboring provinces are rival-owned. Capturing the last open neighbor logs
+the warning; reclaiming any neighbor logs restored supply. The income and
+recovery effects apply on the player's next end-turn, allowing a breakout
+before another bill falls due.
+
+Encirclement stops Westwatch's gold and crystal production, including the
+Marketplace bonus. `income` and `crystal_income` expose effective production;
+other controlled provinces continue producing. A hero inside encircled
+Westwatch receives no army/hero health or mana recovery, including Temple,
+relic and skill recovery bonuses. Recovery outside Westwatch continues.
+
+`upkeep_shortfall` reports how much of the next army bill cannot be covered
+by current gold plus effective income. If the player ends that turn without
+restoring supply or earning funds, troops desert until the remaining army's
+upkeep is affordable. Departures prioritize lowest level, then lowest XP,
+then highest upkeep, then newest identity. Each departure is logged, and
+the remaining bill is paid normally. The treasury never becomes negative
+and is not silently clamped. These are derived rules; no save fields or
+schema version change are needed.
+
+A passive Marketplace camper now loses production, exhausts its treasury,
+suffers lasting desertions, and can lose to the rival's real expedition.
+Winning a breakout restores production and recovery. The rival still avoids
+a well-funded army it expects to lose against; taking other land creates
+the pressure rather than free reinforcements or automatic health damage.
 
 ## Persistence and evidence
 
@@ -75,9 +101,10 @@ or soldier identities raise `SaveFormatError` before loading a live campaign.
 Public-command regressions in `tests/eador/test_rival.py` cover neutral
 attrition, saved interception/retreat/reengagement, paid return/recovery,
 replacement identities, defense counterattack windows, legacy pending choices
-and battles, and damaged saves. A 120-turn fortified-capital scenario earns
-only its first defense reward while the rival conquers the other provinces
-and eventually watches. The existing 32 seeded economic campaigns across all
+and battles, and damaged saves. A funded fortified-capital save from the
+pre-pressure rules isolates the routing regression: while its treasury
+lasts, it earns no repeat defense reward and the rival conquers the other
+provinces before watching. The existing 32 seeded economic campaigns across all
 four classes still win by exploring, investing and intercepting the announced
 threat; leaving Westwatch undefended still loses. Those are bounded regression
 strategies, not a claim of broad balance or release readiness.
@@ -88,8 +115,22 @@ model state checks, 2,096 paired saved battle rounds, 511 saved choices, 3,092
 unchanged rejected commands, and 2,153 random scene inputs. Forced cleanup
 departures are counted separately because the rival deliberately avoids
 repeatedly attacking an unbeatable camper. The source fingerprint and actual
-metrics are in `docs/evidence/shardbound-rival-stress-2026-09-05.json`. Root-owned
-UI work must still communicate the expedition, target, countdown and resource
-changes clearly, and validate manual interception/counterattack through real
-input. This increment advances G06/G13; it does not complete the Early Access
-acceptance criteria or replace the previous baseline's stress evidence.
+metrics are in `docs/evidence/shardbound-rival-stress-2026-09-05.json`.
+
+At pressure source `2f6451a`, the full suite passed 437 tests. The pressure
+regressions play blockade, Marketplace starvation, an injured breakout,
+remaining outpost production, saved shortfall/departures, and capital defeat.
+The existing economic journey also completed 400 victories (seeds 0–99 across
+all four classes). That is one proactive policy across four classes, not
+three distinct economic strategies or a complete G07 balance audit. Reproduce
+with `runpy.run_path('tests/eador/test_model.py')` and call
+`test_each_hero_can_complete_a_campaign_by_exploring_and_investing(seed, hero_class)`
+for those seeds/classes.
+
+A fresh pressure stress run passed 100 random model campaigns and 12 scene
+runs, including 2,088 random scene inputs, saved decisions/battle continuations,
+and separately counted forced cleanup. Its source hashes and actual metrics
+are in `docs/evidence/shardbound-pressure-stress-2026-09-05.json`. Root-owned
+UI still needs the pressure/shortfall warning and real-input breakout check.
+These increments advance G06/G13; they do not complete the Early Access
+criteria or replace the previous baseline's larger stress evidence.
