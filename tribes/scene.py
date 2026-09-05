@@ -28,6 +28,7 @@ PANEL_MARGIN = (16, HINT_BAR + 12)
 HIT_TIME = 0.16  # seconds from the start of a lunge until the blow lands
 ZOOM_PER_LINE = 1.06  # zoom factor per wheel line; a trackpad swipe of ~30 lines spans the whole range
 ZOOM_PER_KEY = 1.25
+START_ZOOM = 1.3  # a game opens close on the capital; the whole map is a wheel-flick away
 MAX_LINES_PER_EVENT = 4.0  # a flick delivers big deltas: cap each event so momentum cannot overshoot
 
 
@@ -100,10 +101,9 @@ class MapScene(Scene):
     def _setup_camera(self) -> None:
         w, h = self.game.resolution
         left, top, right, bottom = self.view.world_bounds
-        fit = min(w, h) / (right - left)
         pad = TILE * 3.5  # slack so any tile can be scrolled out from under the HUD panels
         bounds = (left - pad, top - pad, right + pad, bottom + pad)
-        self.camera = Camera((w, h), world_bounds=bounds, zoom=max(0.75, min(1.25, fit)), min_zoom=0.5, max_zoom=2.5)
+        self.camera = Camera((w, h), world_bounds=bounds, zoom=START_ZOOM, min_zoom=0.5, max_zoom=2.5)
         self.camera.enable_key_scroll(speed=700, bindings={"left": ("a",), "right": ("d",), "up": ("w",), "down": ("s",)})
 
     def on_reveal(self) -> None:

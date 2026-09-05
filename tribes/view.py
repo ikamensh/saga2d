@@ -29,7 +29,7 @@ from saga2d import MoveTo, ParticleEmitter, RenderLayer, Scene, Sequence, Sprite
 from tribes import textures
 from tribes.model import Pos, Unit, World
 from tribes.rules import Terrain
-from tribes.textures import DROP_TILE, DROP_UNIT, ISO_H, ISO_W, TILE, TILE_SIZE, TOKEN_FRONT, WATER_DROP
+from tribes.textures import DROP_TILE, DROP_UNIT, ISO_H, ISO_W, TILE, TILE_SIZE, TOKEN_FRONT, WATER_DROP, tile_key
 
 Color = tuple[int, int, int, int]
 
@@ -93,8 +93,10 @@ class MapView:
         self._tile_sprites: dict[Pos, Sprite] = {}
         self._terrain_sprites: dict[Pos, Sprite] = {}
         self._resource_sprites: dict[Pos, Sprite] = {}
-        self._site_sprites: dict[Pos, Sprite] = {}  # village, or city walls
+        self._site_sprites: dict[Pos, Sprite] = {}  # village, or city houses
         self._roof_sprites: dict[Pos, Sprite] = {}  # city roofs, tinted with the tribe colour
+        self._wall_sprites: dict[Pos, Sprite] = {}  # ring of walls around a fortified city
+        self._flag_sprites: dict[Pos, Sprite] = {}  # capital pennant, tinted with the tribe colour
         self._unit_sprites: dict[int, Sprite] = {}
         self._unit_targets: dict[int, Pos] = {}
         textures.register_all(scene.game)
@@ -156,7 +158,8 @@ class MapView:
 
     def reset(self, world: World) -> None:
         """Point the view at a different world (after loading a save)."""
-        for group in (self._terrain_sprites, self._resource_sprites, self._site_sprites, self._roof_sprites, self._unit_sprites):
+        for group in (self._terrain_sprites, self._resource_sprites, self._site_sprites, self._roof_sprites, self._wall_sprites,
+                      self._flag_sprites, self._unit_sprites):
             for sprite in group.values():
                 sprite.remove()
             group.clear()
@@ -191,20 +194,25 @@ class MapView:
         for pos in explored:
             tile = world.tile(pos)
             tile_sprite = self._tile_sprites[pos]
-            if tile_sprite.image != f"tile.{tile.terrain.value}":
-                tile_sprite.image = f"tile.{tile.terrain.value}"
+            if tile_sprite.image != tile_key(pos, tile.terrain):
+                tile_sprite.image = tile_key(pos, tile.terrain)
             self._reconcile(self._terrain_sprites, pos, self._terrain_key(pos, tile.terrain))
             has_resource = tile.resource is not None and not tile.harvested
             self._reconcile(self._resource_sprites, pos, f"resource.{tile.resource.value}" if has_resource else None)
             city = world.city_at(pos)
             if city is not None:
                 size = min(city.level, textures.CITY_SIZES)
+                color = tint(world.tribes[city.tribe].color)
                 self._reconcile(self._site_sprites, pos, f"city.{size}.base")
-                roofs = self._reconcile(self._roof_sprites, pos, f"city.{size}")
-                roofs.tint = tint(world.tribes[city.tribe].color)
+                self._reconcile(self._roof_sprites, pos, f"city.{size}").tint = color
+                self._reconcile(self._wall_sprites, pos, "walls" if city.has_wall else None)
+                flag = self._reconcile(self._flag_sprites, pos, "flag" if city.capital else None)
+                if flag is not None:
+                    flag.tint = color
             else:
+                for group in (self._site_sprites, self._roof_sprites, self._wall_sprites, self._flag_sprites):
+                    self._reconcile(group, pos, None)
                 self._reconcile(self._site_sprites, pos, "village" if tile.village else None)
-                self._reconcile(self._roof_sprites, pos, None)
         for unit_id, sprite in list(self._unit_sprites.items()):
             unit = world.units.get(unit_id)
             if unit is None or unit.pos not in explored:
@@ -223,7 +231,7 @@ class MapView:
                 sprite.stop_actions()
                 sprite.position = self._anchor(unit.pos, DROP_UNIT)
                 self._unit_targets[unit.id] = unit.pos
-            sprite.opacity = 255 if unit.tribe != self.human or unit.can_act else 150
+            sprite.opacity = 255 if unit.tribe != self.human or unit.can_act else 165
 
     def unit_sprite(self, unit_id: int) -> Sprite | None:
         return self._unit_sprites.get(unit_id)
@@ -311,7 +319,7 @@ class MapView:
                 continue
             sx, sy = sprite.position
             bar_y = sy - DROP_UNIT + TOKEN_FRONT + 3  # just under the token's disc
-            bar_w = 30
-            scene.draw_rect(sx - bar_w / 2, bar_y, bar_w, 5, (0, 0, 0, 160), space="world", layer=RenderLayer.UI_WORLD)
-            scene.draw_rect(sx - bar_w / 2, bar_y, bar_w * u.hp / u.max_hp, 5, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
+            bar_w, bar_h = 26, 4
+            scene.draw_rect(sx - bar_w / 2, bar_y, bar_w, bar_h, (0, 0, 0, 170), space="world", layer=RenderLayer.UI_WORLD)
+            scene.draw_rect(sx - bar_w / 2, bar_y, bar_w * u.hp / u.max_hp, bar_h, (110, 230, 110, 255), space="world", layer=RenderLayer.UI_WORLD)
         self._outline(selection.cursor, (255, 255, 255, 230), 2.5, layer=RenderLayer.UI_WORLD)

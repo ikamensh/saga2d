@@ -330,7 +330,7 @@ class Banner(Effect):
 
     SLIDE = 0.35
 
-    def __init__(self, text: str, *, subtitle: str = "", accent: Color = (255, 255, 255, 255), hold: float = 1.5) -> None:
+    def __init__(self, text: str, *, subtitle: str = "", accent: Color = (255, 255, 255, 255), hold: float = 1.2) -> None:
         super().__init__(hold + 2 * self.SLIDE)
         self.text = text
         self.subtitle = subtitle

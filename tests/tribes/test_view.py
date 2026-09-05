@@ -96,7 +96,7 @@ def test_every_explored_tile_shows_its_terrain_and_props(revealed) -> None:
     world = scene.world
     images = {s["image"] for s in game.backend.sprites.values()}
     for tile in world.all_tiles():
-        assert scene.view.tile_sprite(tile.pos).image == f"tile.{tile.terrain.value}"
+        assert scene.view.tile_sprite(tile.pos).image == textures.tile_key(tile.pos, tile.terrain)
     assert game.assets.image("prop.forest.0") in images
     assert any(t.terrain is Terrain.MOUNTAIN for t in world.all_tiles())
     assert any(game.assets.image(f"prop.mountain.{i}") in images for i in range(textures.MOUNTAIN_VARIANTS))
@@ -123,6 +123,36 @@ def test_moving_a_unit_re_sorts_it_into_its_new_row(revealed) -> None:
     assert scene.view.unit_sprite(unit.id).position == (cx, cy + textures.DROP_UNIT)
 
 
+def test_fields_use_several_shades_chosen_by_position(revealed) -> None:
+    game, scene = revealed
+    keys = {scene.view.tile_sprite(t.pos).image for t in scene.world.all_tiles() if t.terrain is Terrain.FIELD}
+    assert len(keys) == len(textures.TERRAIN_SHADES[Terrain.FIELD])
+    assert all(k.startswith("tile.field.") for k in keys)
+
+
+def test_capitals_fly_a_tinted_flag_and_walled_cities_show_walls(revealed) -> None:
+    game, scene = revealed
+    world = scene.world
+    capital = world.capital_of(scene.human)
+    flags = [s for s in game.backend.sprites.values() if s["image"] == game.assets.image("flag")]
+    assert len(flags) == len([c for c in world.cities.values() if c.capital])
+    from tribes.view import tile_center, tint
+
+    cx, cy = tile_center(capital.pos)
+    ours = [f for f in flags if abs(f["x"] + f["width"] / 2 - cx) < 1]
+    assert ours and tuple(round(v, 3) for v in ours[0]["tint"]) == tuple(round(v, 3) for v in tint(world.tribes[scene.human].color))
+    assert not any(s["image"] == game.assets.image("walls") for s in game.backend.sprites.values())
+    capital.level = 4
+    scene.view.sync()
+    game.tick(1 / 60)
+    assert any(s["image"] == game.assets.image("walls") for s in game.backend.sprites.values())
+    capital.tribe = next(t.id for t in world.tribes if t.id != scene.human)
+    capital.capital = False
+    scene.view.sync()
+    game.tick(1 / 60)
+    assert len([s for s in game.backend.sprites.values() if s["image"] == game.assets.image("flag")]) == len(flags) - 1
+
+
 # -- Textures -----------------------------------------------------------------------
 
 
@@ -130,8 +160,10 @@ def test_textures_register_every_key_with_a_placement() -> None:
     game = Game("Textures", backend="mock")
     try:
         textures.register_all(game)
-        for terrain in Terrain:
-            assert game.assets.has_image(f"tile.{terrain.value}")
+        for terrain, shades in textures.TERRAIN_SHADES.items():
+            for shade in range(len(shades)):
+                assert game.assets.has_image(f"tile.{terrain.value}.{shade}")
+        assert game.assets.has_image("flag") and game.assets.has_image("walls")
         assert game.assets.has_image("tile.fog")
         for key in [f"resource.{r.value}" for r in Resource] + [f"unit.{u.value}" for u in UnitType] + ["village"]:
             assert game.assets.has_image(key)

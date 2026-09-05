@@ -46,15 +46,16 @@ TILE_SIZE = (ISO_W + 2 * PAD, PAD + ISO_H + BLOCK_H + PAD)
 TILE_ORIGIN = (TILE_SIZE[0] / 2, PAD + ISO_H / 2)
 DROP_TILE = TILE_SIZE[1] - TILE_ORIGIN[1]
 #: Drop per prop class; all within one row spacing (ISO_H / 2) of each other.
-DROP_TERRAIN, DROP_RESOURCE, DROP_SITE, DROP_UNIT = 32, 36, 36, 44
+DROP_TERRAIN, DROP_WALL, DROP_RESOURCE, DROP_SITE, DROP_UNIT = 32, 34, 36, 36, 44
 FOREST_VARIANTS = 3
 MOUNTAIN_VARIANTS = 2
 
-TERRAIN_COLORS: dict[Terrain, tuple[int, int, int]] = {
-    Terrain.WATER: (46, 104, 178),
-    Terrain.FIELD: (132, 186, 98),
-    Terrain.FOREST: (92, 148, 84),
-    Terrain.MOUNTAIN: (152, 152, 160),
+#: Top-face shades per terrain; a tile picks one by position so fields are not one flat sheet.
+TERRAIN_SHADES: dict[Terrain, tuple[tuple[int, int, int], ...]] = {
+    Terrain.WATER: ((46, 104, 178),),
+    Terrain.FIELD: ((132, 186, 98), (124, 180, 92), (140, 192, 106)),
+    Terrain.FOREST: ((92, 148, 84), (86, 140, 78)),
+    Terrain.MOUNTAIN: ((152, 152, 160),),
 }
 FOG = (24, 26, 38)
 FOG_TOP = (31, 34, 48)
@@ -70,6 +71,7 @@ SHADOW = (0, 0, 0, 96)
 TOKEN_RADIUS = 0.30  # base disc of a unit, in tile units
 TOKEN_HEIGHT = 0.06
 TOKEN_FRONT = TOKEN_RADIUS * math.sqrt(2) * ISO_H / 2  # how far below the tile centre the disc's front rim projects
+_SIDE = (1 / math.sqrt(2), -1 / math.sqrt(2), 0.0)  # model direction that projects to screen-right
 
 
 @dataclass(frozen=True)
@@ -101,10 +103,22 @@ def _waves(draw: ImageDraw.ImageDraw, to_px, ss: float) -> None:
         draw.line([to_px(p) for p in pts], fill=color, width=max(1, round(1.4 * ss)))
 
 
-def _tile(terrain: Terrain, scale: float) -> Image.Image:
+def tile_key(pos: tuple[int, int], terrain: Terrain) -> str:
+    """Texture key of the block for *terrain* at *pos* (the shade varies by position)."""
+    return f"tile.{terrain.value}.{_scatter(pos) % len(TERRAIN_SHADES[terrain])}"
+
+
+def _scatter(pos: tuple[int, int]) -> int:
+    """A small integer hash of a grid position with no visible stripes or checkers."""
+    x, y = pos
+    h = (x * 0x27D4EB2D ^ (y + 0x165667B1) * 0x9E3779B1) & 0xFFFFFFFF
+    return (h ^ (h >> 15)) & 0xFFFF
+
+
+def _tile(terrain: Terrain, shade: int, scale: float) -> Image.Image:
     top_z = -WATER_Z if terrain is Terrain.WATER else 0.0
     return r3.render(
-        _block(TERRAIN_COLORS[terrain], top_z, scale), PROJECTION, scale=scale, canvas=TILE_SIZE, origin=TILE_ORIGIN,
+        _block(TERRAIN_SHADES[terrain][shade], top_z, scale), PROJECTION, scale=scale, canvas=TILE_SIZE, origin=TILE_ORIGIN,
         decorate=_waves if terrain is Terrain.WATER else None,
     )
 
@@ -178,6 +192,28 @@ def _village() -> Mesh:
     return _walls(0, 0, 0.34, 0.3, 0.22, PLASTER) + _roof(0, 0, 0.34, 0.3, 0.22, (192, 114, 82))
 
 
+def _flag() -> Mesh:
+    """Capital marker: an ink pole at the back corner of the tile with a white (tinted) pennant."""
+    x, y = 0.0, -0.42
+    sx, sy, _ = _SIDE
+    pole = r3.box((x, y, 0.38), (0.03, 0.03, 0.76), INK)
+    pennant = r3.facing([(x, y, 0.75), (x + sx * 0.26, y + sy * 0.26, 0.68), (x, y, 0.6)], WHITE)
+    return pole + pennant
+
+
+def _city_walls() -> Mesh:
+    """A ring of stone along the tile's edges with a post at each corner."""
+    stone, cap = (146, 148, 160), (170, 172, 184)
+    edge, thick, height = 0.43, 0.06, 0.13
+    mesh: Mesh = []
+    for x, y, w, d in ((0, -edge, 2 * edge, thick), (0, edge, 2 * edge, thick), (-edge, 0, thick, 2 * edge), (edge, 0, thick, 2 * edge)):
+        mesh += r3.box((x, y, height / 2), (w, d, height), stone)
+    for x in (-edge, edge):
+        for y in (-edge, edge):
+            mesh += r3.box((x, y, 0.1), (0.1, 0.1, 0.2), cap)
+    return mesh
+
+
 #: House footprints per city size, kept to the back half of the tile so a
 #: unit standing in the centre is not hidden.
 _CITY_HOUSES = (
@@ -242,8 +278,6 @@ def _token_base() -> Mesh:
     shadow = r3.flat(_ellipse(0.05, -0.04, TOKEN_RADIUS * 1.12), 0.0, SHADOW)
     return shadow + r3.cylinder((0, 0, 0), TOKEN_RADIUS, TOKEN_HEIGHT, WHITE, sides=20, rotation=math.pi / 20)
 
-
-_SIDE = (1 / math.sqrt(2), -1 / math.sqrt(2), 0.0)  # model direction that projects to screen-right
 
 
 def _facing_quad(center: r3.Vec3, half: float) -> list[r3.Vec3]:
@@ -329,8 +363,9 @@ def register_all(game: Game) -> None:
     assets = game.assets
     if assets.has_image("glow"):
         return
-    for terrain in Terrain:
-        assets.image_from_pil(f"tile.{terrain.value}", _tile(terrain, scale))
+    for terrain, shades in TERRAIN_SHADES.items():
+        for shade in range(len(shades)):
+            assets.image_from_pil(f"tile.{terrain.value}.{shade}", _tile(terrain, shade, scale))
     assets.image_from_pil("tile.fog", _fog(scale))
     for i in range(FOREST_VARIANTS):
         assets.image_from_pil(f"prop.forest.{i}", _prop(f"prop.forest.{i}", _forest(i), DROP_TERRAIN, scale))
@@ -340,6 +375,8 @@ def register_all(game: Game) -> None:
         key = f"resource.{resource.value}"
         assets.image_from_pil(key, _prop(key, _resource(resource), DROP_RESOURCE, scale))
     assets.image_from_pil("village", _prop("village", _village(), DROP_SITE, scale))
+    assets.image_from_pil("flag", _prop("flag", _flag(), DROP_SITE + 2, scale))
+    assets.image_from_pil("walls", _prop("walls", _city_walls(), DROP_WALL, scale))
     for size in range(1, CITY_SIZES + 1):
         walls, roofs = _city(size)
         assets.image_from_pil(f"city.{size}.base", _prop(f"city.{size}.base", walls, DROP_SITE, scale))

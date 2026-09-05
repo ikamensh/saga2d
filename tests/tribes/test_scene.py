@@ -6,7 +6,7 @@ from saga2d import Game
 from tribes import effects
 from tribes.style import build_theme
 from tribes.rules import Tech, Terrain, UnitType
-from tribes.scene import HIT_TIME, GameOverScene, MapScene, PauseScene, SettingsScene, TechScene, new_game
+from tribes.scene import HIT_TIME, START_ZOOM, GameOverScene, MapScene, PauseScene, SettingsScene, TechScene, new_game
 from tribes.title import NewGameScene, TitleScene
 from tribes.view import tile_center, tint
 
@@ -476,4 +476,4 @@ def test_plus_and_minus_keys_step_the_zoom_about_the_screen_centre(play) -> None
     press(game, "minus")
     press(game, "minus")
     tick(game, 0.5)
-    assert camera.zoom < 1.0 or camera.zoom == pytest.approx(0.5)
+    assert camera.zoom == pytest.approx(min(START_ZOOM * 1.25, 2.5) / 1.25 ** 2)

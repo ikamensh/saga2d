@@ -76,7 +76,7 @@ class TitleScene(Scene):
 
     def draw(self) -> None:
         w, h = self.game.resolution
-        self.draw_rect(0, 0, w, h, (10, 12, 22, 165))
+        self.draw_rect(0, 0, w, h, (10, 12, 22, 150))
         cy = h / 2 - 120
         glow = 0.5 + 0.5 * math.sin(self.time * 1.6)
         for spread, alpha in ((3, 40), (2, 70)):
