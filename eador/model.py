@@ -371,6 +371,8 @@ class State:
             if destination == (2, 0):
                 self.status = 'victory'
                 self.rival.plan(self)
+            elif destination == self.rival.target:
+                self.rival.plan(self, delay=self.rival.turns_until_action)
 
     def explore(self) -> None:
         self._ready(action=True)
@@ -486,6 +488,8 @@ class State:
         if casualties:
             self.log.append('Fallen: ' + ', '.join(casualties) + '.')
         self.log.append(message)
+        if victory and self.battle_kind == 'conquest' and province.pos == self.rival.target:
+            self.rival.plan(self, delay=self.rival.turns_until_action)
         self.battle = None
         self.battle_kind = None
         self.battle_province = None

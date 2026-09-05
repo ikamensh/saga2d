@@ -229,3 +229,32 @@ def test_save_rejects_duplicate_or_missing_expedition_soldiers():
     data['rival']['next_troop_id'] += 1
     with pytest.raises(SaveFormatError, match='Expedition'):
         State.from_json(json.dumps(data))
+
+
+def test_capturing_an_announced_route_updates_it_without_postponing_the_operation():
+    """Taking a marching destination refreshes the warning while preserving elapsed preparation."""
+    state = State.new(7)
+    state.build('barracks')
+    state.recruit('swordsman')
+    for _ in range(100):
+        if 'temple' not in state.buildings and state.gold >= 65:
+            state.build('temple')
+        while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
+            state.recruit('swordsman')
+        if (state.rival.defeats and state.rival.intent == 'march'
+                and state.rival.target in state.grid.neighbors(state.hero.pos)):
+            break
+        state.end_turn()
+        if state.battle:
+            resolve(state)
+    else:
+        raise AssertionError('No interceptable march was announced.')
+    target, countdown = state.rival.target, state.rival.turns_until_action
+    state.travel(target)
+    if state.battle:
+        resolve(state)
+    assert state.hero.pos == target
+    assert state.rival.target != target or state.rival.intent == 'attack'
+    assert state.rival.turns_until_action <= countdown
+    assert State.from_json(state.to_json()).to_json() == state.to_json()
+    state.end_turn()
