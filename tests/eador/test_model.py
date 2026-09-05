@@ -1,7 +1,7 @@
 """Campaign behavior exercised through the same commands as the game scenes."""
 import pytest
 
-from eador.model import RuleError, State
+from eador.model import BUILDINGS, UNITS, RuleError, State
 
 
 def test_a_seeded_shard_can_build_recruit_and_survive_a_save():
@@ -52,20 +52,50 @@ def test_exploration_and_conquest_preserve_wounds_and_reward_advancement():
     assert State.from_json(restored.to_json()).to_json() == restored.to_json()
 
 
+def provision_army(state):
+    """Invest site rewards in healing, a Wizard's tower, and durable troops."""
+    priorities = ['mage_tower', 'temple'] if state.hero.hero_class == 'Wizard' else ['temple']
+    for building in priorities:
+        spec = BUILDINGS[building]
+        if building not in state.buildings and state.gold >= spec.cost and state.crystals >= spec.crystals:
+            state.build(building)
+    while state.gold >= UNITS['swordsman'].cost and len(state.hero.army) < state.hero.max_army:
+        state.recruit('swordsman')
+
+
+def rest(state):
+    state.end_turn()
+    if state.battle:
+        finish_battle(state)
+
+
 @pytest.mark.parametrize('hero_class', ['Commander', 'Warrior', 'Scout', 'Wizard'])
 @pytest.mark.parametrize('seed', range(8))
-def test_each_hero_can_complete_a_seeded_campaign_with_public_commands(seed, hero_class):
-    """The documented build/recruit/conquer/rest loop reaches the win condition."""
+def test_each_hero_can_complete_a_campaign_by_exploring_and_investing(seed, hero_class):
+    """A tutorial strategy explores sites, recruits veterans and rests before Duskspire."""
     state = State.new(seed=seed, hero_class=hero_class)
     state.build('barracks')
     state.recruit('swordsman')
-    for _ in range(16):
+    for province in state.grid.path(state.hero.pos, (2, 0))[:-1]:
+        if province != state.hero.pos:
+            state.travel(province)
+            finish_battle(state)
+            rest(state)
+            provision_army(state)
+        state.explore()
+        finish_battle(state)
+        rest(state)
+        provision_army(state)
+    for _ in range(24):
         if state.status != 'playing':
             break
-        while state.gold >= 45 and len(state.hero.army) < state.hero.max_army:
-            state.recruit('swordsman')
-        next_province = state.grid.path(state.hero.pos, (2, 0))[1]
-        state.travel(next_province)
+        provision_army(state)
+        missing_health = max([state.hero.max_hp - state.hero.hp] +
+                             [troop.max_hp - troop.hp for troop in state.hero.army])
+        if missing_health > 6:
+            rest(state)
+            continue
+        state.travel(state.grid.path(state.hero.pos, (2, 0))[1])
         if state.battle:
             finish_battle(state)
         assert len({t.id for t in state.hero.army}) == len(state.hero.army)
@@ -74,10 +104,10 @@ def test_each_hero_can_complete_a_seeded_campaign_with_public_commands(seed, her
         assert 0 <= state.hero.mana <= state.hero.max_mana
         state = State.from_json(state.to_json())
         if state.status == 'playing':
-            state.end_turn()
-            if state.battle:
-                finish_battle(state)
+            rest(state)
     assert state.status == 'victory'
+    assert state.hero.level > 1
+    assert any(province.explored for province in state.provinces.values())
     with pytest.raises(RuleError, match='ended'):
         state.end_turn()
 
@@ -120,9 +150,25 @@ def test_a_hero_at_the_capital_can_fight_off_the_rival():
     state.build('barracks')
     state.recruit('swordsman')
     while state.battle is None and state.status == 'playing':
+        provision_army(state)
         state.end_turn()
     assert state.battle_kind == 'defense'
     assert state.battle_province == (-2, 0)
     finish_battle(state)
     assert state.status == 'playing'
     assert state.provinces[(-2, 0)].owner == 'player'
+
+
+def test_an_unprepared_starting_army_cannot_overrun_the_entire_shard():
+    """A bare rush fails, leaving recruitment and exploration meaningful choices."""
+    state = State.new(seed=7)
+    for _ in range(30):
+        if state.status != 'playing':
+            break
+        state.travel(state.grid.path(state.hero.pos, (2, 0))[1])
+        finish_battle(state)
+        if state.status == 'playing':
+            state.end_turn()
+            if state.battle:
+                finish_battle(state)
+    assert state.status == 'defeat'

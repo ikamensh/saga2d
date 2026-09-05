@@ -44,7 +44,7 @@ UNITS = {
     'brigand': UnitSpec('Brigand', 20, 7, 1, 3, 1, 0, 0, None, (185, 102, 91)),
     'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
     'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
-    'guard': UnitSpec('Dread Guard', 32, 10, 4, 3, 1, 0, 0, None, (173, 130, 196)),
+    'guard': UnitSpec('Dread Guard', 42, 12, 4, 3, 1, 0, 0, None, (173, 130, 196)),
 }
 RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer')
 
@@ -76,7 +76,7 @@ HERO_CLASSES = {
     'Commander': HeroClass('Commander', 'Army +1 attack; command six troops.'),
     'Warrior': HeroClass('Warrior', '+12 health and +4 attack in battle.'),
     'Scout': HeroClass('Scout', 'Three campaign actions; ranged hero attacks.'),
-    'Wizard': HeroClass('Wizard', '+6 mana; begin with Arcane Bolt and Heal.'),
+    'Wizard': HeroClass('Wizard', '+6 mana; ranged attacks; begin with Bolt and Heal.'),
 }
 
 
@@ -156,14 +156,21 @@ class State:
             terrain = rng.choice(('plains', 'forest', 'hills', 'marsh'))
             guards = [rng.choice(('brigand', 'goblin', 'wolf'))
                       for _ in range(1 if pos[0] < 0 else 2)]
-            provinces[pos] = Province(pos, name, terrain, 'neutral',
+            if pos[0] == 0:
+                guards = ['brigand', 'goblin', 'wolf']
+            elif pos[0] == 1:
+                guards = ['guard', 'guard', 'brigand', 'goblin']
+            elif pos[0] == 2:
+                guards = ['guard', 'guard', 'archer']
+            owner = 'rival' if pos[0] == 2 else 'neutral'
+            provinces[pos] = Province(pos, name, terrain, owner,
                                       rng.randint(5, 9), int(terrain == 'hills'),
                                       guards, rng.choice(('Buried Shrine', 'Forgotten Tower', 'Old Barrow')))
         home, rival = provinces[(-2, 0)], provinces[(2, 0)]
         home.name, home.owner, home.capital, home.income = 'Westwatch', 'player', True, 16
         home.guards, home.site = [], 'Buried Shrine'
         rival.name, rival.owner, rival.capital, rival.income = 'Duskspire', 'rival', True, 16
-        rival.guards, rival.site = ['guard', 'guard', 'archer', 'brigand'], None
+        rival.guards, rival.site = ['guard'] * 5 + ['archer'] * 2, None
         max_hp = 48 if hero_class == 'Warrior' else 36
         mana = 16 if hero_class == 'Wizard' else 10
         army = [Troop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
@@ -359,7 +366,7 @@ class State:
                 troop.hp = min(troop.max_hp, troop.hp + recovery)
         self.hero.mana = min(self.hero.max_mana, self.hero.mana + 4)
         self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; army rests.')
-        if self.turn >= 9 and (self.turn - 9) % 4 == 0:
+        if self.turn >= 5 and (self.turn - 5) % 4 == 0:
             self._rival_turn()
 
     def _rival_turn(self) -> None:

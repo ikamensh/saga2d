@@ -72,7 +72,7 @@ class Battle:
         hero_attack = 10 + (hero.level - 1) * 2 + (4 if hero.hero_class == 'Warrior' else 0)
         units = [BattleUnit(0, 'player', 'hero', player_positions[0], hero.hp,
                             hero.max_hp, hero_attack, 3 + hero.level // 2, 3,
-                            3 if hero.hero_class == 'Scout' else 1, level=hero.level)]
+                            3 if hero.hero_class == 'Scout' else 2 if hero.hero_class == 'Wizard' else 1, level=hero.level)]
         for troop, pos in zip(hero.army, player_positions[1:]):
             spec = UNITS[troop.kind]
             units.append(BattleUnit(troop.id, 'player', troop.kind, pos, troop.hp,
