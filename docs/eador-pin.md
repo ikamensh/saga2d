@@ -73,7 +73,7 @@ battle.
 
 ## Evidence and limits
 
-The complete suite passes **628 tests**. Twenty Pin tests cover both teams,
+The complete suite passes **629 tests**. Twenty Pin tests cover both teams,
 movement/attack/Guard choices, no stacking or extension, cooldown boundaries,
 exact lethal/retaliation forecasts, ranged Brace counterplay, malformed
 saves, and a genuine v6 battle's unchanged continued result and log.
@@ -99,3 +99,10 @@ Pin orders and 2,420 rejected ones, including matching saved continuations
 and forecasts. All reported game/framework/harness hashes match `c21124e`;
 no source changed during the run. These are model Pin commands; native Pin
 input is not claimed before root connects its UI.
+
+After merging the visible objective brief/HUD from main, the complete suite
+passed again and [20 additional scene runs](evidence/shardbound-pin-integration-2026-09-06.json)
+completed 10,006 random input activations, including the new EncounterScene,
+in 48.0 seconds. This clean integration snapshot is `8b91a62`; its battle,
+model, content and world-generation rules match the earlier route/model
+stress snapshot. Native Pin controls remain a separate integration step.
