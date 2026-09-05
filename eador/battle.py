@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, field
 from saga2d import HexGrid
 
 from eador.model import Hero, Pos, RuleError, UNITS
+from eador.encounters import ENCOUNTERS
 
 
 @dataclass(frozen=True)
@@ -63,6 +64,15 @@ class BattleUnit:
 
 
 @dataclass
+class BattleObjective:
+    kind: str = 'rout'
+    target: Pos | None = None
+    progress: int = 0
+    required: int = 0
+    deadline: int | None = None
+
+
+@dataclass
 class Battle:
     units: list[BattleUnit]
     terrain: dict[Pos, str]
@@ -74,12 +84,17 @@ class Battle:
     spell_costs: dict[str, int] = field(default_factory=lambda: {'bolt': 4, 'heal': 4})
     spell_power: dict[str, int] = field(default_factory=lambda: {'bolt': 14, 'heal': 16})
     hero_id: int | None = 0
+    objective: BattleObjective = field(default_factory=BattleObjective)
+    outcome_reason: str | None = None
 
     @classmethod
     def create(cls, hero: Hero, enemies: list[str], terrain: str,
-               spells: set[str], seed: int = 0, *, enemy_hp: list[int] | None = None) -> Battle:
-        tiles = cls._terrain(terrain, seed)
-        player_positions, enemy_positions = PLAYER_POSITIONS, ENEMY_POSITIONS
+               spells: set[str], seed: int = 0, *, enemy_hp: list[int] | None = None,
+               encounter: str | None = None) -> Battle:
+        definition = ENCOUNTERS[encounter] if encounter is not None else None
+        tiles = dict(definition.terrain) if definition else cls._terrain(terrain, seed)
+        player_positions = definition.player_positions if definition else PLAYER_POSITIONS
+        enemy_positions = definition.enemy_positions if definition else ENEMY_POSITIONS
         hero_attack = 10 + (hero.level - 1) * 2 + (4 if hero.hero_class == 'Warrior' else 0)
         units = [BattleUnit(0, 'player', 'hero', player_positions[0], hero.hp,
                             hero.max_hp, hero_attack, 3 + hero.level // 2, 3,
@@ -107,8 +122,9 @@ class Battle:
         costs = {'bolt': max(1, 4 - ranks.get('channeling', 0)), 'heal': max(1, 4 - ranks.get('restoration', 0))}
         power = {'bolt': 14 + (6 if hero.relic == 'ember_lens' else 0),
                  'heal': 16 + 4 * ranks.get('restoration', 0) + (6 if hero.relic == 'moonstone' else 0)}
+        objective = BattleObjective('hold', definition.seal, 0, definition.hold_turns, definition.deadline) if definition else BattleObjective()
         return cls(units, tiles, hero.mana, set(spells), log=['Advance, use cover, and protect your wounded.'],
-                   spell_costs=costs, spell_power=power)
+                   spell_costs=costs, spell_power=power, objective=objective)
 
     @staticmethod
     def _terrain(terrain: str, seed: int) -> dict[Pos, str]:
@@ -281,8 +297,39 @@ class Battle:
     def _check_outcome(self) -> None:
         if (self.hero_id is not None and not self.unit(self.hero_id).alive) or not any(u.alive and u.team == 'player' for u in self.units):
             self.outcome = 'enemy'
+            self.outcome_reason = 'hero_death' if self.hero_id is not None else 'rout'
         elif not any(u.alive and u.team == 'enemy' for u in self.units):
             self.outcome = 'player'
+            self.outcome_reason = 'rout'
+
+    def _objective_turn(self) -> None:
+        objective = self.objective
+        if objective.kind != 'hold':
+            return
+        holding = any(unit.alive and unit.team == 'player' and unit.pos == objective.target for unit in self.units)
+        contested = any(unit.alive and unit.team == 'enemy' and HexGrid.distance(unit.pos, objective.target) <= 1 for unit in self.units)
+        objective.progress = objective.progress + 1 if holding and not contested else 0
+        if objective.progress >= objective.required:
+            self.outcome, self.outcome_reason = 'player', 'hold'
+            self.log.append('The seal is secured. The surviving defenders withdraw.')
+        elif self.round >= objective.deadline:
+            self.outcome, self.outcome_reason = 'enemy', 'deadline'
+            self.log.append('Time ran out before the seal could be secured.')
+
+    def _contest_seal(self, unit: BattleUnit) -> None:
+        """Defenders close on the seal unless they can immediately kill its holder or hero."""
+        target = self.objective.target
+        critical = [other for other in self.targets(unit.id)
+                    if other.id == self.hero_id or other.pos == target]
+        if any(self.preview(unit.id, other.id)[0] == other.hp for other in critical):
+            return
+        if unit.moved or self.grid.distance(unit.pos, target) <= 1:
+            return
+        choices = self.reachable(unit.id) | {unit.pos}
+        destination = min(choices, key=lambda pos: (self.grid.distance(pos, target),
+                          self.terrain[pos] not in ('forest', 'hills'), pos))
+        if destination != unit.pos:
+            self._move(unit, destination)
 
     def _play_team(self, team: str) -> None:
         for unit in self.units:
@@ -300,8 +347,11 @@ class Battle:
                 if 'bolt' in self.spells and self.mana >= self.spell_cost('bolt') and enemies:
                     self.cast('bolt', min(enemies, key=lambda u: u.hp).id)
                     continue
+            defending_seal = team == 'enemy' and self.objective.kind == 'hold'
+            if defending_seal:
+                self._contest_seal(unit)
             targets = self.targets(unit.id)
-            if not targets and not unit.moved:
+            if not targets and not unit.moved and not defending_seal:
                 enemies = [u for u in self.units if u.alive and u.team != team]
                 reachable = self.reachable(unit.id)
                 if reachable and enemies:
@@ -320,7 +370,12 @@ class Battle:
                             self._move(unit, destination)
                 targets = self.targets(unit.id)
             if targets:
-                target = min(targets, key=lambda u: (u.hp, u.id))
+                if defending_seal:
+                    target = min(targets, key=lambda other: (
+                        not (other.id == self.hero_id and self.preview(unit.id, other.id)[0] == other.hp),
+                        other.pos != self.objective.target, other.hp, other.id))
+                else:
+                    target = min(targets, key=lambda u: (u.hp, u.id))
                 if team == 'player':
                     self.attack(unit.id, target.id)
                 else:
@@ -338,6 +393,8 @@ class Battle:
                 unit.stance = None
         self._play_team('enemy')
         if not self.outcome:
+            self._objective_turn()
+        if not self.outcome:
             self.round += 1
             for unit in self.units:
                 unit.moved = unit.acted = unit.retaliated = False
@@ -345,6 +402,7 @@ class Battle:
                     unit.stance = None
             if self.round > 80:
                 self.outcome = 'enemy'
+                self.outcome_reason = 'exhaustion'
                 self.log.append('The exhausted army must retreat.')
 
     def auto_turn(self) -> None:
@@ -359,7 +417,8 @@ class Battle:
                 'terrain': [{'pos': list(pos), 'kind': kind} for pos, kind in self.terrain.items()],
                 'mana': self.mana, 'spells': sorted(self.spells), 'round': self.round,
                 'outcome': self.outcome, 'log': list(self.log),
-                'spell_costs': dict(self.spell_costs), 'spell_power': dict(self.spell_power), 'hero_id': self.hero_id}
+                'spell_costs': dict(self.spell_costs), 'spell_power': dict(self.spell_power), 'hero_id': self.hero_id,
+                'objective': asdict(self.objective), 'outcome_reason': self.outcome_reason}
 
     @classmethod
     def from_dict(cls, data: dict) -> Battle:
@@ -367,4 +426,6 @@ class Battle:
                    terrain={tuple(t['pos']): t['kind'] for t in data['terrain']},
                    mana=data['mana'], spells=set(data['spells']), round=data['round'],
                    outcome=data['outcome'], log=list(data['log']),
-                   spell_costs=dict(data['spell_costs']), spell_power=dict(data['spell_power']), hero_id=data['hero_id'])
+                   spell_costs=dict(data['spell_costs']), spell_power=dict(data['spell_power']), hero_id=data['hero_id'],
+                   objective=BattleObjective(**{**data['objective'], 'target': tuple(data['objective']['target']) if data['objective']['target'] is not None else None}),
+                   outcome_reason=data['outcome_reason'])

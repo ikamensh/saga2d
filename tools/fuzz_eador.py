@@ -78,7 +78,17 @@ def check_state(state: State) -> None:
         assert 0 <= battle.mana <= hero.max_mana
         assert battle.outcome in (None, 'player', 'enemy')
         if battle.outcome == 'player':
-            assert battle.unit(0).alive and not any(u.alive and u.team == 'enemy' for u in battle.units)
+            assert battle.unit(0).alive
+            if battle.outcome_reason == 'hold':
+                objective = battle.objective
+                assert state.battle_kind == 'site' and objective.kind == 'hold'
+                assert objective.progress == objective.required and battle.round <= objective.deadline
+                assert any(u.alive and u.team == 'player' and u.pos == objective.target for u in battle.units)
+                assert not any(u.alive and u.team == 'enemy' and battle.grid.distance(u.pos, objective.target) <= 1 for u in battle.units)
+                assert any(u.alive and u.team == 'enemy' for u in battle.units)
+            else:
+                assert battle.outcome_reason == 'rout'
+                assert not any(u.alive and u.team == 'enemy' for u in battle.units)
     saved = state.to_json()
     assert State.from_json(saved).to_json() == saved, 'save roundtrip changed state'
 
