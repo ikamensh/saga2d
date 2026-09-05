@@ -1,5 +1,8 @@
 """Themed shards change strategic routes while preserving a fair, portable opening."""
-from eador.model import State
+import pytest
+
+from eador.model import HERO_CLASSES, State
+from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
 
 
 def test_elderwild_offers_a_richer_dry_detour_through_a_wolf_and_goblin_shard():
@@ -144,5 +147,23 @@ def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_eve
                     state.recruit('swordsman')
                     state.explore() if target is None else state.travel(target)
                     finish_battle(state)
-                    assert state.provinces[(-2, 0)].explored if target is None else state.hero.pos == target
+                    if target is None:
+                        assert state.provinces[(-2, 0)].explored
+                    else:
+                        assert state.hero.pos == target
                     assert state.status == 'playing'
+
+
+@pytest.mark.parametrize('theme', THEMES)
+@pytest.mark.parametrize('hero_class', HERO_CLASSES)
+@pytest.mark.parametrize('route', [None, NORTH_ROAD, SOUTH_ROAD], ids=['direct', 'north', 'south'])
+def test_each_theme_and_hero_can_finish_by_exploring_either_flank_or_the_direct_road(theme, hero_class, route):
+    """The route audit uses the same public campaign commands as this executable journey."""
+    from tools.eador_campaign import CampaignMetrics, play_campaign
+    metrics = CampaignMetrics()
+    state = play_campaign(State.new(7, hero_class, theme=theme), route, metrics)
+    assert state.status == 'victory' and state.theme == theme
+    assert state.hero.level > 1 and state.inventory
+    assert metrics.end_turns == state.turn - 1
+    assert metrics.battles > 0 and metrics.recruitment_gold > 0
+    assert metrics.battle_hp_attrition > 0 and metrics.hp_recovered > 0
