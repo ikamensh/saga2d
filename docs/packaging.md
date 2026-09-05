@@ -101,6 +101,25 @@ manifest for the current archive hash and exact inputs.
 and every bundle symlink resolved. No signing identity or certificate was
 used, and no notarization or distribution approval was performed.
 
+## Refreshed playable checkpoint — 2026-09-06
+
+Source `b061ea8` was rebuilt with the codex, progression/save browser and
+finite rival. The extracted frozen app passed the expanded native input
+journey: new campaign, campaign save/load, codex and rival inspection,
+province location, invasion, automatic battle round, battle restoration
+and retreat. The same journey passed through macOS LaunchServices with
+working directory `/`. Packaged rival and battle screenshots were inspected;
+local ad-hoc signature verification passed.
+
+The archive is **20,329,496 bytes**, SHA-256
+`e907254c311f4a6629fd0164eb58a95e57b8ca3b011574994a4be274e4a693f3`.
+[The retained evidence](evidence/shardbound-package-2026-09-06.json) records
+source hashes, runtime versions, extracted/LaunchServices reports and
+screenshot hashes. The manifest's dirty flag reflects unrelated `.gitignore`
+work; game/framework/packaging sources were committed at the named snapshot.
+This is a development checkpoint on the same macOS host. The clean-account,
+Windows and full packaged-campaign gates remain open.
+
 ## Windows x64 plan — untested
 
 Build on a Windows x64 host using x64 CPython 3.13.2. Run the same uv build
