@@ -1,14 +1,14 @@
 # Executed by PyInstaller. Build inputs are snapshotted by tools/build_eador.py.
 import os
+import json
 from pathlib import Path
 import sys
 
 source = Path(os.environ["SHARDBOUND_BUILD_SOURCE"])
 datas = [(str(source / "release"), "release")]
-for package in ("eador", "saga2d"):
-    for path in sorted((source / package).rglob("*")):
-        if path.is_file() and path.suffix not in (".py", ".pyc"):
-            datas.append((str(path), str(path.parent.relative_to(source))))
+for name in json.loads((source / "package-data.json").read_text(encoding="utf-8")):
+    path = source / name
+    datas.append((str(path), str(path.parent.relative_to(source))))
 
 a = Analysis(
     [str(source / "entry.py")],

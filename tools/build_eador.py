@@ -37,6 +37,53 @@ def write_json(path: Path, value) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def collect_package_data(source: Path) -> dict:
+    """Return the exact, ordered non-Python package files the artifact will ship."""
+    return {path.relative_to(source).as_posix():
+            {"bytes": path.stat().st_size, "sha256": sha256(path)}
+            for package in ("eador", "saga2d")
+            for path in sorted((source / package).rglob("*"))
+            if path.is_file() and path.suffix not in (".py", ".pyc")
+            and "__pycache__" not in path.parts}
+
+
+def validate_audio(source: Path) -> None:
+    """Reject missing, unrecorded or stale shipping WAVs and their generator inputs."""
+    assets = source / "eador" / "assets"
+    manifest = json.loads((assets / "audio-manifest.json").read_text(encoding="utf-8"))
+    actual = {path.relative_to(assets).as_posix() for path in assets.rglob("*.wav")}
+    expected = set(manifest["files"])
+    if actual != expected:
+        raise RuntimeError(f"Audio catalogue differs from manifest: missing={sorted(expected - actual)}, "
+                           f"unrecorded={sorted(actual - expected)}")
+    for name, record in manifest["files"].items():
+        path = assets / name
+        if path.stat().st_size != record["bytes"] or sha256(path) != record["sha256"]:
+            raise RuntimeError(f"Audio asset differs from manifest: {name}; rebuild audio before packaging")
+    for name, expected_hash in manifest["source_sha256"].items():
+        if sha256(source / name) != expected_hash:
+            raise RuntimeError(f"Audio generator differs from manifest: {name}; rebuild audio before packaging")
+
+
+def snapshot_sources(source: Path) -> dict:
+    """Freeze application, build recipe and verified package-data inputs before PyInstaller runs."""
+    if source.exists():
+        shutil.rmtree(source)
+    source.mkdir(parents=True)
+    for package in ("saga2d", "eador"):
+        shutil.copytree(ROOT / package, source / package,
+                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    for name in ("entry.py", "shardbound.spec"):
+        shutil.copyfile(ROOT / "packaging" / name, source / name)
+    (source / "tools").mkdir()
+    for name in ("build_eador.py", "build_eador_audio.py"):
+        shutil.copyfile(ROOT / "tools" / name, source / "tools" / name)
+    validate_audio(source)
+    data = collect_package_data(source)
+    write_json(source / "package-data.json", data)
+    return data
+
+
 def copy_licenses(destination: Path) -> None:
     for name in (*RUNTIME_PACKAGES, "pyinstaller"):
         distribution = metadata.distribution(name)
@@ -56,13 +103,7 @@ def copy_licenses(destination: Path) -> None:
 
 
 def snapshot(source: Path) -> dict:
-    if source.exists():
-        shutil.rmtree(source)
-    source.mkdir(parents=True)
-    for package in ("saga2d", "eador"):
-        shutil.copytree(ROOT / package, source / package,
-                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    shutil.copyfile(ROOT / "packaging" / "entry.py", source / "entry.py")
+    data = snapshot_sources(source)
     release = source / "release"
     release.mkdir()
     for origin, name in [(ROOT / "LICENSE", "LICENSE"),
@@ -84,7 +125,8 @@ def snapshot(source: Path) -> dict:
         "python": platform.python_version(),
         "packages": {name: metadata.version(name) for name in (*RUNTIME_PACKAGES, *TOOL_VERSIONS)},
         "source_sha256": source_hashes,
-        "spec_sha256": sha256(ROOT / "packaging" / "shardbound.spec"),
+        "package_data": data,
+        "spec_sha256": sha256(source / "shardbound.spec"),
         "validation_scope": "Local host only; no clean account, Windows, signing or notarization claim.",
     }
     write_json(release / "build-info.json", info)
@@ -102,7 +144,7 @@ def inventory(folder: Path) -> dict:
     return contents
 
 
-def smoke_archive(archive: Path, output: Path, macos: bool) -> dict:
+def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict) -> dict:
     with TemporaryDirectory(prefix="shardbound-outside-repo-") as temporary:
         folder = Path(temporary)
         if macos:
@@ -119,10 +161,20 @@ def smoke_archive(archive: Path, output: Path, macos: bool) -> dict:
         run([executable, "--smoke-image", image], cwd=folder, env=env, timeout=90)
         report = json.loads(image.with_suffix(".json").read_text())
         if not all(report[key] for key in ("frozen", "save_load_roundtrip", "codex_and_rival_rendered",
-                                          "battle_save_load_roundtrip", "native_input_journey")):
+                                          "battle_save_load_roundtrip", "guard_save_load_roundtrip",
+                                          "settings_apply_cancel_restart", "audio_catalogue_decoded_and_played",
+                                          "audio_live_mix_and_cleanup", "native_input_journey")):
             raise RuntimeError(f"Packaged smoke verification failed: {report}")
         if Path(report["executable"]).resolve() != executable.resolve():
             raise RuntimeError("Smoke verification did not run the extracted executable")
+        if not Path(report["asset_path"]).resolve().is_relative_to(folder.resolve()):
+            raise RuntimeError("Smoke verification loaded audio from outside the extracted archive")
+        expected_audio = {name.removeprefix("eador/assets/"): record for name, record in package_data.items()
+                          if name.startswith("eador/assets/") and name.endswith(".wav")}
+        actual_audio = {name: {key: record[key] for key in ("bytes", "sha256")}
+                        for name, record in report["audio_files"].items()}
+        if actual_audio != expected_audio:
+            raise RuntimeError("Packaged audio bytes differ from the build source snapshot")
         return report
 
 
@@ -148,7 +200,7 @@ def main() -> None:
     env = {**os.environ, "SHARDBOUND_BUILD_SOURCE": str(source)}
     run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean",
          "--distpath", output, "--workpath", work / "pyinstaller",
-         ROOT / "packaging" / "shardbound.spec"], cwd=source, env=env)
+         source / "shardbound.spec"], cwd=source, env=env)
     artifact = output / ("Shardbound.app" if macos else "Shardbound")
     target = "macos-" + platform.machine() if macos else "windows-x64"
     archive = output / f"Shardbound-{target}.zip"
@@ -158,7 +210,7 @@ def main() -> None:
         shutil.make_archive(str(archive.with_suffix("")), "zip", output, artifact.name)
     info["artifact"] = {"file": archive.name, "sha256": sha256(archive), "bytes": archive.stat().st_size}
     info["files"] = inventory(artifact)
-    info["smoke"] = None if args.skip_smoke else smoke_archive(archive, output, macos)
+    info["smoke"] = None if args.skip_smoke else smoke_archive(archive, output, macos, info["package_data"])
     write_json(output / "build-manifest.json", info)
     print(f"Built {archive}\nSHA256 {info['artifact']['sha256']}\nManifest {output / 'build-manifest.json'}", flush=True)
 
