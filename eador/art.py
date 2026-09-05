@@ -138,6 +138,19 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False)
                             (x - 33 * s, y - 25 * s)], INK)
 
 
+def expedition(scene, grid, pos, troops):
+    """A numbered diamond distinguishes the moving army from province ownership."""
+    x, y = grid.center(pos)
+    scale = grid.size / 78
+    x, y = x - 40 * scale, y - 29 * scale
+    points = [(x, y - 19 * scale), (x + 19 * scale, y),
+              (x, y + 19 * scale), (x - 19 * scale, y)]
+    scene.draw_polygon(points, INK)
+    outline(scene, points, RED, 2)
+    scene.draw_text(str(troops), x, y, font_size=12, color=RED,
+                    anchor_x="center", anchor_y="center")
+
+
 def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
     """Distinct silhouettes for ranged troops, casters, infantry and heroes."""
     s = scale
