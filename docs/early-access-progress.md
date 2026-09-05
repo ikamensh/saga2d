@@ -214,3 +214,50 @@ Encirclement and unpaid upkeep are the next isolated rules increment.
 G01–G19 remain incomplete. The next content increments are an authored hold
 objective and three worlds with different route/resource decisions, followed
 by further active abilities, adventure choices and linked-campaign progression.
+
+## World, objective, capability and audio integration — 2026-09-06
+
+- `cc14670` makes Border Watch a visible expedition: inspect the actual layout,
+  defenders, reward and one-action cost; return without spending; aim at its
+  seal with O; save after the first holding turn; win or reach the deadline.
+  The full native manual journey, terminal reload and one-time reward passed.
+  See [eador-hold.md](eador-hold.md).
+- Three generated themes are merged, with title/CLI selection in `a926b54`.
+  Frontier, Elderwild and Ruins expose different terrain, route rewards and
+  defenders. The model audit completed 720 prepared victories across heroes,
+  themes and three routes, plus 100-seed-per-theme random campaigns. These
+  show viable policies, not balanced difficulty or all viable builds. Title,
+  save, replay and map headings preserve the selected world. See
+  [eador-worlds.md](eador-worlds.md).
+- `5d5842b` exposes Archer/Storm Quiver Pin with an exact forecast, legal target
+  markers, a movement-status badge and visible cooldown. Watch Bell heroes use
+  the Brace button through their capability. The native input journey also
+  earns the Bell and uses it in a subsequent saved battle. There are five
+  recruit roles, four active capabilities plus Guard, eight relics and eight
+  site definitions; Explorer's Camp is not an authored encounter pattern.
+  See [eador-pin.md](eador-pin.md).
+- `c2299dd` connects two original music loops and twelve cues through the
+  existing game audio manager. A tiny game-owned app factory supplies asset,
+  theme and save defaults; no rule or content ID entered Saga2D. Preferences
+  apply before playback, overlays retain music, disabled orders stay silent,
+  and saved terminal results do not replay victory cues. The source packaging
+  smoke decodes and plays every installed WAV and tests live mix/cleanup.
+  Human listening approval is still outstanding. See
+  [eador-audio.md](eador-audio.md).
+- Packaging now snapshots its spec and deterministic package-data list,
+  verifies all audio against provenance, and records installed data hashes.
+  Source and relocated-snapshot smoke pass. The old frozen macOS artifact is
+  unchanged and does not represent these additions; Windows remains untested.
+- Latest full suite passed **643 tests**; an additional manual movement,
+  attack, Bolt, Heal and refused-cast audio journey also passed. Both fuzz
+  drivers passed after integration, including random visible Pin orders.
+  General native scenes, settings, Pin and Watch journeys passed. Screenshots
+  were inspected; fixes include briefing overlap, cramped title controls,
+  battle-header placement and overflowing help text.
+
+G01–G19 remain incomplete. Linked-stage rules and a minimal shared native
+window API are developing independently. Next acceptance work includes the
+complete linked UI, broader content/build/economy choices, settings and
+presentation, then a new packaged candidate and candidate-specific stress.
+The shipping logical canvas uses letterboxing for smaller windows; arbitrary
+logical resizing and text scaling are not established by that evidence.
