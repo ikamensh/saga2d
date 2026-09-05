@@ -21,7 +21,7 @@ def smoke(image_path: Path) -> None:
     image_path.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-smoke-saves-") as saves:
         game = Game("Shardbound package verification", resolution=(1280, 800),
-                    visible=False, save_dir=saves, theme=build_theme())
+                    visible=False, save_dir=Path(saves) / "saves", theme=build_theme())
         from pyglet.window import key
 
         def press(symbol):

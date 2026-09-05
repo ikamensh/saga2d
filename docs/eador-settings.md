@@ -5,7 +5,7 @@ to one) and `muted` (an actual boolean). Defaults are 80% master, 50% music,
 80% effects and unmuted. These preferences live in `settings.json` alongside
 the save directory; campaign checkpoints contain no preferences.
 
-The launcher should load/apply preferences before starting any audio:
+Title and direct-shard entry load/apply preferences before starting any audio:
 
 ```python
 from eador.preferences import load_preferences
@@ -15,8 +15,9 @@ preferences = load_preferences(game)
 # Safe defaults are usable in memory; the damaged file remains intact.
 ```
 
-Title and guide actions can open the ordinary overlay with a method-local
-import, following the existing Codex/Rival scene pattern:
+The title and in-game guide offer a visible Settings button with shortcut O.
+They open the ordinary overlay with a method-local import, following the
+existing Codex/Rival scene pattern:
 
 ```python
 from eador.settings_scene import SettingsScene
@@ -38,8 +39,9 @@ file mechanism, preserving the exact displaced bytes. Write failures show an
 actionable reason; the scene retains the full exception as `last_error` for
 diagnostics without rendering potentially enormous filesystem paths.
 
-This increment provides the screen and early-loading helper. Launcher/title/
-guide wiring is a separate integration step. It adds no audio assets,
+Invalid startup preferences show a recovery hint on the title or shard;
+the hint clears after successful recovery. Applying preferences stays
+independent of quickloading a campaign. This increment adds no audio assets,
 fullscreen, text scaling or reduced-motion control. Reduced motion should ship
 with actual motion feedback, not as an inert toggle. This work alone does not
 close the presentation/settings release gates.
@@ -53,7 +55,8 @@ uv run python tools/verify_eador_settings.py --out /tmp/shardbound-settings
 
 The integration journeys use real files and public keyboard/mouse input to
 check preview, cancel, restart, wrong types/ranges, corrupt-file recovery,
-failed Apply and campaign independence. The native checker pushes Settings
-directly over the title, verifies real pyglet key routing, and captures normal
+failed Apply and campaign independence. The native checker opens Settings
+from the title and in-game guide, verifies real pyglet key routing and
+preference persistence through quickload, and captures normal
 1280×800, compact 1280×720, damaged-file and write-error screens. Screenshot
 inspection caught and removed raw-error footer overflow.

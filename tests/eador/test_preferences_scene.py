@@ -219,3 +219,38 @@ def test_reopening_settings_reloads_a_file_repaired_outside_the_game(tmp_path):
         assert game.audio.get_volume("master") == .6
     finally:
         game._teardown()
+
+
+def test_title_and_guide_settings_preserve_campaign_and_survive_quickload(tmp_path):
+    """Both visible entry points edit the same preferences without changing saved progress."""
+    from eador.scene import HelpScene, ShardScene, TitleScene
+
+    game = Game("Shardbound", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        title = TitleScene(seed=7)
+        game.push(title)
+        press(game, "o")
+        assert isinstance(game.scene, SettingsScene)
+        press(game, "left")
+        press(game, "return")
+        assert game.scene is title
+        assert game.audio.get_volume("master") == pytest.approx(.7)
+        press(game, "return")
+        assert isinstance(game.scene, ShardScene)
+        press(game, "f5")
+        saved = game.scene.state.to_json()
+        press(game, "f1")
+        guide = game.scene
+        assert isinstance(guide, HelpScene)
+        click_button(game, "Settings")
+        assert isinstance(game.scene, SettingsScene)
+        click_button(game, "Mute")
+        click_button(game, "Apply")
+        assert game.scene is guide
+        press(game, "escape")
+        press(game, "f9")
+        assert game.scene.state.to_json() == saved
+        assert game.audio.muted and game.audio.get_volume("master") == pytest.approx(.7)
+        assert Settings(tmp_path / "settings.json", DEFAULTS)["muted"]
+    finally:
+        game._teardown()

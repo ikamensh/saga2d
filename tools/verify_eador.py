@@ -22,7 +22,7 @@ from eador.scene import BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroS
 def verify(output: Path):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-verify-") as saves:
-        game = Game("Shardbound verification", resolution=(1280, 800), visible=False, save_dir=saves)
+        game = Game("Shardbound verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
         from pyglet.window import key, mouse
 
         window = game.backend.window
@@ -141,7 +141,7 @@ def verify(output: Path):
             assert game.scene.state.to_json() == root.state.to_json()
             root = game.scene
             # A damaged current file is visible and does not replace live play.
-            (Path(saves) / "save_1.json").write_text("interrupted write")
+            (Path(saves) / "saves" / "save_1.json").write_text("interrupted write")
             press(key.F9)
             assert game.scene is root and root.message
             press(key.F6)
