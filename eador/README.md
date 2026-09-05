@@ -11,13 +11,16 @@ From the repository root:
 uv sync --extra dev
 uv run python -m eador                       # title and hero selection
 uv run python -m eador --seed 7              # start immediately as Commander
-uv run python -m eador --seed 7 --hero Wizard
+uv run python -m eador --seed 7 --hero Wizard --theme elderwild
 uv run python -m pytest tests/eador -q
 ```
 
-`--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard` when starting
-directly with `--seed`. The title screen has its own class selection and
-New seed button. Saves live in `~/.shardbound/saves`. **F6** opens three
+`--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard`; `--theme` accepts
+`frontier`, `elderwild` or `ruins`. With `--seed` they start that world directly;
+otherwise they preselect the title choices. Frontier has mixed borders,
+Elderwild a wet interior and a longer merchant road, and Ruins defended
+checkpoints with weaker, poorer flanks. The title explains these choices and
+provides hero, world and seed controls. Saves live in `~/.shardbound/saves`. **F6** opens three
 manual slots and three rolling autosaves. **F5/F9** quickly save/load Manual
 1. Campaign actions and battle rounds checkpoint automatically; pending
 battles and reward decisions resume exactly where saved. Each slot also
@@ -80,6 +83,7 @@ adds mana to support the two spells already learned.
 | Screen | Input | Action |
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
+| Title | Left / Right / click world | Choose Frontier, Elderwild or Ruins |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
 | Title / guide | O | Open sound settings |

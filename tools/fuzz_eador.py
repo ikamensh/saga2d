@@ -323,7 +323,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     break
                 scene = game.scene
                 if isinstance(scene, TitleScene):
-                    press(rng.choice(('tab', 'return', 'f9', 'f6', 'o')))
+                    press(rng.choice(('tab', 'left', 'right', 'return', 'f9', 'f6', 'o')))
                 elif isinstance(scene, HelpScene):
                     button(rng.choice(('Save & title', 'Codex', 'Settings', 'Return to game', 'Return to game')))
                 elif isinstance(scene, SettingsScene):

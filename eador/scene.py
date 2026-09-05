@@ -16,6 +16,7 @@ from eador.content import RELICS, SITES, SKILLS
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, State
 from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
+from eador.worldgen import THEMES
 
 
 class Screen(Scene):
@@ -96,12 +97,14 @@ class Screen(Scene):
 
 
 class TitleScene(Screen):
-    controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves"}
+    controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves",
+                "left": "previous_theme", "right": "next_theme"}
 
-    def __init__(self, seed=7):
+    def __init__(self, seed=7, *, theme="frontier", hero_class="Commander"):
         super().__init__()
         self.seed = seed
-        self.hero_class = "Commander"
+        self.hero_class = hero_class
+        self.world_theme = theme
 
     def on_enter(self):
         from eador.preferences import load_preferences
@@ -111,12 +114,16 @@ class TitleScene(Screen):
     def refresh(self):
         super().refresh()
         w, h = self.game.resolution
+        x, width = w / 2 - 100, w / 2 + 40
         for i, name in enumerate(HERO_CLASSES):
-            self.button(name, w / 2 - 302 + i * 154, h - 240, 142,
+            self.button(name, x + i * (width + 12) / 4, 280, (width - 36) / 4,
                         lambda name=name: self.choose(name), primary=name == self.hero_class)
+        for i, (ident, theme) in enumerate(THEMES.items()):
+            self.button(theme.name, x + i * (width + 12) / 3, 418, (width - 24) / 3,
+                        lambda ident=ident: self.choose_theme(ident), primary=ident == self.world_theme)
         self.button("Enter the shard", w / 2 - 170, h - 124, 340, self.start, hotkey="Enter", primary=True)
-        self.button("Load shard", w / 2 - 170, h - 72, 164, self.browse_saves, hotkey="F6")
-        self.button("New seed", w / 2 + 6, h - 72, 164, self.next_seed, shortcut="N")
+        self.button("Load shard", w / 2 - 202, h - 72, 196, self.browse_saves, hotkey="F6")
+        self.button("New seed", w / 2 + 6, h - 72, 196, self.next_seed, shortcut="N")
         self.button("Settings", w - 178, 26, 152, self.open_settings, shortcut="O")
 
     def choose(self, name):
@@ -130,8 +137,20 @@ class TitleScene(Screen):
     def next_seed(self):
         self.seed += 1
 
+    def choose_theme(self, theme):
+        self.world_theme = theme
+        self.refresh()
+
+    def next_theme(self):
+        themes = list(THEMES)
+        self.choose_theme(themes[(themes.index(self.world_theme) + 1) % len(themes)])
+
+    def previous_theme(self):
+        themes = list(THEMES)
+        self.choose_theme(themes[(themes.index(self.world_theme) - 1) % len(themes)])
+
     def start(self):
-        state = State.new(self.seed, self.hero_class)
+        state = State.new(self.seed, self.hero_class, theme=self.world_theme)
         root = ShardScene(state)
         if not self.checkpoint(state):
             root.message = self.message
@@ -146,15 +165,22 @@ class TitleScene(Screen):
         self.text("C H R O N I C L E S   O F   T H E   S H A R D S", w / 2, 56, size=11, color=GOLD, center=True)
         self.text("SHARDBOUND", w / 2, 88, size=64, serif=True, center=True)
         self.text("One broken world. A kingdom to build.", w / 2, 169, size=17, color=MUTED, center=True)
+        x, width = w / 2 - 100, w / 2 + 40
+        self.text(THEMES[self.world_theme].name.upper(), w * .245, 244, size=12, color=GOLD, center=True)
         cells = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
-        grid = HexGrid(cells, size=53, origin=(w / 2, 340))
+        grid = HexGrid(cells, size=42, origin=(w * .245, 385))
         from types import SimpleNamespace
+        terrains = {"frontier": ("forest", "hills", "plains"), "elderwild": ("forest", "marsh", "forest"),
+                    "ruins": ("hills", "plains", "hills")}[self.world_theme]
         for i, pos in enumerate(sorted(cells, key=lambda c: grid.center(c)[1])):
-            data = SimpleNamespace(terrain=("forest", "hills", "plains")[i % 3], owner="player" if pos == (0, 0) else "neutral",
+            data = SimpleNamespace(terrain=terrains[i % 3], owner="player" if pos == (0, 0) else "neutral",
                                    capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
             art.province(self, grid, pos, data)
-        self.text("CHOOSE YOUR HERO", w / 2, h - 277, size=11, color=GOLD, center=True)
-        self.text(HERO_CLASSES[self.hero_class].description, w / 2, h - 181, size=14, color=MUTED, center=True)
+        self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
+        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 244, size=11, color=GOLD)
+        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 336, width=width, size=13)
+        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 382, size=11, color=GOLD)
+        self.paragraph(THEMES[self.world_theme].description, x, 476, width=width, size=13)
         notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
                                   if self.preferences.error else "")
         self.text(notice or f"Shard {self.seed}  ·  Conquer provinces, explore ruins, command every battle.",
@@ -319,7 +345,7 @@ class ShardScene(Screen):
         self.rule(24, 90, self.edge - 48)
         header_center = (338 + self.edge - 177) / 2
         self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
-        self.text(f"THE VERDANT REACH   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
+        self.text(f"{THEMES[s.theme].name.upper()}   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
         self.text("WESTWATCH ENCIRCLED" if s.encircled else "YOUR DOMINION", x, 24,
                   size=10, color=RED if s.encircled else MUTED)
         self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
@@ -817,7 +843,8 @@ class SaveScene(Screen):
             else:
                 self.message = f"Saved to {entry.label}."
                 if self.return_to_title:
-                    self.game.clear_and_push(TitleScene(self.root.state.seed))
+                    self.game.clear_and_push(TitleScene(self.root.state.seed, theme=self.root.state.theme,
+                                                       hero_class=self.root.state.hero.hero_class))
                     return
             self.refresh()
 
@@ -1013,7 +1040,8 @@ class ResultScene(Screen):
             game.pop()  # result overlay
             game.pop()  # tactical battlefield; reveal the existing campaign
         else:
-            self.game.clear_and_push(TitleScene(self.root.state.seed + 1))
+            self.game.clear_and_push(TitleScene(self.root.state.seed + 1, theme=self.root.state.theme,
+                                               hero_class=self.root.state.hero.hero_class))
 
     def save_game(self):
         self.root.save_game()
@@ -1040,7 +1068,7 @@ class ResultScene(Screen):
             title = "The shard is yours" if s.status == "victory" else "Westwatch has fallen"
             detail = f"Turn {s.turn}  ·  Hero level {s.hero.level}"
             subtitle = "Begin another world with a different hero."
-        self.text("CHRONICLE OF THE VERDANT REACH", x + 270, y + 23, size=10, color=MUTED, center=True)
+        self.text(f"CHRONICLE OF {THEMES[s.theme].name.upper()}", x + 270, y + 23, size=10, color=MUTED, center=True)
         self.text(title, x + 270, y + 59, size=34, serif=True, color=GOLD, center=True)
         self.text(detail, x + 270, y + 117, size=13, center=True)
         self.text(self.message or subtitle, x + 270, y + 157, size=12, color=MUTED, center=True)
