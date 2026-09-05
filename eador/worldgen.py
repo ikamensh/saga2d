@@ -71,6 +71,10 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
     home.site_kind, home.site_guards, home.site_relic = 'shrine', list(SITES['shrine'].guards), 'moonstone'
     home.site_gold, home.site_crystals = SITES['shrine'].gold, SITES['shrine'].crystals
     rival.name, rival.owner, rival.capital, rival.income = 'Duskspire', 'rival', True, 16
+    watch, spec = provinces[(0, -2)], SITES['border_watch']
+    watch.site, watch.site_kind = spec.name, 'border_watch'
+    watch.site_guards, watch.site_relic = list(spec.guards), spec.relic
+    watch.site_gold, watch.site_crystals = spec.gold, spec.crystals
     rival.guards, rival.site = ['guard'] * 5 + ['archer'] * 2, None
     rival.site_kind, rival.site_guards, rival.site_relic = None, [], None
     rival.site_gold = rival.site_crystals = 0
