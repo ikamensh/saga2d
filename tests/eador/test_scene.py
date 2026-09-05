@@ -381,6 +381,45 @@ def test_keyboard_only_tactics_move_cast_attack_reload_and_retreat(tmp_path):
         game._teardown()
 
 
+def test_codex_is_reachable_from_campaign_guide_and_battle_without_advancing_play(tmp_path):
+    from eador.codex import CodexScene
+    from eador.model import State
+    from eador.scene import BattleScene, HelpScene, ShardScene
+
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        root = ShardScene(State.new(7, "Wizard"))
+        game.push(root)
+        before = root.state.to_json()
+        press(game, "c")
+        assert isinstance(game.scene, CodexScene)
+        press(game, "4")
+        press(game, "right")
+        press(game, "escape")
+        assert game.scene is root
+        assert root.state.to_json() == before
+        press(game, "f1")
+        button(game, "Codex")
+        assert isinstance(game.scene, CodexScene)
+        press(game, "escape")
+        assert isinstance(game.scene, HelpScene)
+        press(game, "escape")
+        click(game, *root.grid.center((-1, 0)))
+        press(game, "return")
+        assert isinstance(game.scene, BattleScene)
+        battle = game.scene
+        before = root.state.to_json()
+        press(game, "c")
+        press(game, "2")
+        assert isinstance(game.scene, CodexScene)
+        press(game, "e")
+        assert root.state.to_json() == before
+        press(game, "escape")
+        assert game.scene is battle
+    finally:
+        game._teardown()
+
+
 def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
     """Explore, invest, conquer, replay and restore a finished shard through UI."""
     from eador.model import BUILDINGS, UNITS

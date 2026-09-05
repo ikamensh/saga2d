@@ -72,6 +72,7 @@ adds mana to support the two spells already learned.
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
 | Title | Enter / Space | Start the selected shard |
+| Title | N | Choose a new shard seed |
 | Shard | Click province | Select and inspect it |
 | Shard | Tab | Cycle provinces adjacent to the hero |
 | Shard | Home | Select the hero's current province |
@@ -79,6 +80,9 @@ adds mana to support the two spells already learned.
 | Shard | X | Explore the hero's current province |
 | Shard | B / R | Open construction / recruitment |
 | Shard / decision | H | Inspect skills and equip relics |
+| Shard, battle, guide, hero or decision | C | Open the rules codex |
+| Codex | 1–6 / Tab / Shift+Tab | Select / cycle categories |
+| Codex | Arrows / Page Up / Page Down | Turn pages |
 | Decision | 1 / 2 | Choose the corresponding skill or reward |
 | Hero | 1–4 / U | Equip a visible relic / unequip |
 | Hero | Left / Right | Previous / next inventory page |
@@ -98,6 +102,7 @@ adds mana to support the two spells already learned.
 | Saves | 1–6 / Shift + 1–6 | Load a slot / recover its previous version |
 | Saves | Tab | Switch Save / Load; only manual slots can be overwritten |
 | Shard or battle | F1 | Open guide, including Save & title |
+| Guide | S | Choose a save slot before returning to the title |
 | Shard | Esc | Open guide |
 | Battle | Esc | Cancel spell targeting, otherwise open guide |
 | Catalogue or guide | Esc | Close overlay |
