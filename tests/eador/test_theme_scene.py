@@ -2,7 +2,9 @@
 
 import pytest
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.scene import ShardScene, TitleScene
 from eador.worldgen import THEMES
 
@@ -16,7 +18,7 @@ def press(game, name):
 @pytest.mark.parametrize('theme', THEMES)
 def test_selected_world_and_hero_survive_title_save_and_reload(tmp_path, theme):
     """Each advertised theme starts its actual generator and returns intact from Saves."""
-    game = Game('Theme journey', backend='mock', save_dir=tmp_path / 'saves')
+    game = create_game('Theme journey', backend='mock', save_dir=tmp_path / 'saves')
     try:
         game.push(TitleScene(seed=17))
         for _ in range(list(THEMES).index(theme)):

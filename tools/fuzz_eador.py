@@ -27,7 +27,9 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from saga2d import Button, Game  # noqa: E402
+from saga2d import Button# noqa: E402
+
+from eador.app import create_game# noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.encounter_scene import EncounterScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
@@ -215,7 +217,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
     """Mix purposeful input with random clicks/keys, checking each rendered tick."""
     rng = random.Random(seed)
     with tempfile.TemporaryDirectory(prefix='shardbound-fuzz-') as save_dir:
-        game = Game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=Path(save_dir) / 'saves')
+        game = create_game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=Path(save_dir) / 'saves')
         random_phase = False
         history = deque(maxlen=25)
 

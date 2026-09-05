@@ -33,7 +33,9 @@ manual slot. **Save & title** asks for a slot and leaves only after writing it.
 visible buttons adjust volume and mute; **Enter** applies, **Esc** cancels.
 Preferences live separately in `~/.shardbound/settings.json` and survive
 loading another campaign. Damaged settings are reported and kept until you
-explicitly choose retained recovery. Audio content is still in development.
+explicitly choose retained recovery. Original campaign/battle music and action
+cues are included; settings affect music and effects already playing. Listening
+and mix review remain part of release preparation.
 
 ## Your first turns
 

@@ -2,7 +2,9 @@
 
 import pytest
 
-from saga2d import Button, Game, Scene, Settings
+from saga2d import Button, Scene, Settings
+
+from eador.app import create_game
 from eador.preferences import DEFAULTS, load_preferences
 from eador.settings_scene import SettingsScene
 
@@ -22,7 +24,7 @@ def click_button(game, label):
 
 def test_keyboard_preview_cancel_and_apply_survive_restart(tmp_path):
     """Preview affects runtime only; Cancel restores it and Apply persists before closing."""
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         preferences = load_preferences(game)
         underlying = Scene()
@@ -41,7 +43,7 @@ def test_keyboard_preview_cancel_and_apply_survive_restart(tmp_path):
         assert preferences["master"] == pytest.approx(DEFAULTS["master"] - .1)
     finally:
         game._teardown()
-    restarted = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    restarted = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         load_preferences(restarted)
         assert restarted.audio.get_volume("master") == pytest.approx(DEFAULTS["master"] - .1)
@@ -51,7 +53,7 @@ def test_keyboard_preview_cancel_and_apply_survive_restart(tmp_path):
 
 def test_mouse_and_keyboard_edit_the_same_rows_and_mute(tmp_path):
     """Row keys and visible controls produce the same draft and previewed gains."""
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         load_preferences(game)
         game.push(Scene())
@@ -81,7 +83,7 @@ def test_mouse_and_keyboard_edit_the_same_rows_and_mute(tmp_path):
 
 def test_cancel_and_external_close_restore_exact_entry_audio_without_writing(tmp_path):
     """Runtime overrides are restored exactly, even when another scene closes Settings."""
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         prefs = load_preferences(game)
         prefs.save()
@@ -107,7 +109,7 @@ def test_load_applies_safe_defaults_and_reports_invalid_game_values(tmp_path, ra
     """Only actual booleans and finite 0–1 volumes can reach live game audio."""
     path = tmp_path / "settings.json"
     path.write_text(raw)
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         prefs = load_preferences(game)
         assert prefs.error is not None
@@ -123,7 +125,7 @@ def test_damaged_preferences_require_explicit_recovery_and_cancel_does_not_autho
     path = tmp_path / "settings.json"
     damaged = b"\xffdamaged audio settings"
     path.write_bytes(damaged)
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         prefs = load_preferences(game)
         underlying = Scene()
@@ -153,7 +155,7 @@ def test_damaged_preferences_require_explicit_recovery_and_cancel_does_not_autho
 
 def test_failed_apply_stays_open_and_cancel_preserves_disk_and_shared_preferences(tmp_path):
     """A real filesystem conflict cannot announce success or leak draft values into memory."""
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         prefs = load_preferences(game)
         prefs.save()
@@ -182,7 +184,7 @@ def test_campaign_load_does_not_change_preferences_or_store_them_in_progress(tmp
     from eador.model import State
     from eador.persistence import CampaignSaves
 
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         prefs = load_preferences(game)
         state = State.new(7)
@@ -204,7 +206,7 @@ def test_reopening_settings_reloads_a_file_repaired_outside_the_game(tmp_path):
     """A previous loading error does not trap a repaired preferences file behind recovery."""
     path = tmp_path / "settings.json"
     path.write_text('{broken')
-    game = Game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound settings test", backend="mock", save_dir=tmp_path / "saves")
     try:
         load_preferences(game)
         game.push(Scene())
@@ -225,7 +227,7 @@ def test_title_and_guide_settings_preserve_campaign_and_survive_quickload(tmp_pa
     """Both visible entry points edit the same preferences without changing saved progress."""
     from eador.scene import HelpScene, ShardScene, TitleScene
 
-    game = Game("Shardbound", backend="mock", save_dir=tmp_path / "saves")
+    game = create_game("Shardbound", backend="mock", save_dir=tmp_path / "saves")
     try:
         title = TitleScene(seed=7)
         game.push(title)

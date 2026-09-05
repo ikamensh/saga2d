@@ -9,7 +9,9 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault('SAGA2D_SILENT', '1')
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.model import State
 from eador.scene import BattleScene, ShardScene, TitleScene
 from tools.eador_campaign import finish_battle, march_to, provision_army, rest
@@ -20,7 +22,7 @@ def verify(output):
 
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='shardbound-pin-') as directory:
-        game = Game('Shardbound Pin', resolution=(1280, 800), visible=False,
+        game = create_game('Shardbound Pin', resolution=(1280, 800), visible=False,
                     save_dir=Path(directory) / 'saves')
         window = game.backend.window
 

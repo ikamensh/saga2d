@@ -1,6 +1,8 @@
 """A player can aim Pin, inspect its result and resume the cooldown through real input."""
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.scene import BattleScene, ShardScene, TitleScene
 
 
@@ -19,7 +21,7 @@ def click_hex(game, pos):
 
 def test_pin_targeting_save_and_cooldown_are_playable_without_private_commands(tmp_path):
     """Movement and a keyboard-aimed shot produce the forecast; saved cooldown gates the button."""
-    game = Game('Pin input', backend='mock', save_dir=tmp_path / 'saves')
+    game = create_game('Pin input', backend='mock', save_dir=tmp_path / 'saves')
     try:
         game.push(TitleScene())
         press(game, 'return')

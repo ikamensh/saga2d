@@ -17,6 +17,7 @@ from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, 
 from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
 from eador.worldgen import THEMES
+from eador.sound import set_music
 
 
 class Screen(Scene):
@@ -81,13 +82,16 @@ class Screen(Scene):
         self.draw_rect(x, y, width, 4, (9, 20, 24, 255), radius=2)
         self.draw_rect(x, y, width * max(0, min(1, value / maximum)), 4, color, radius=2)
 
-    def command(self, callback):
+    def command(self, callback, *, cue="confirm"):
         try:
             callback()
         except RuleError as error:
             self.message = str(error)
+            self.game.audio.play_sound("refuse")
             return False
         self.message = ""
+        if cue:
+            self.game.audio.play_sound(cue)
         self.refresh()
         return True
 
@@ -109,6 +113,7 @@ class TitleScene(Screen):
     def on_enter(self):
         from eador.preferences import load_preferences
         self.preferences = load_preferences(self.game)
+        set_music(self.game, "campaign")
         super().on_enter()
 
     def refresh(self):
@@ -217,6 +222,8 @@ class ShardScene(Screen):
         self.follow_state()
 
     def follow_state(self):
+        set_music(self.game, "battle" if self.state.battle and not self.state.battle.outcome else
+                  None if self.state.battle or self.state.status != "playing" else "campaign")
         if self.state.battle is not None:
             self.game.push(BattleScene(self))
         elif self.state.choice is not None:
@@ -278,13 +285,16 @@ class ShardScene(Screen):
         from eador.rival_scene import RivalScene
         self.game.push(RivalScene(self))
 
-    def act(self, callback):
-        if self.command(callback):
+    def act(self, callback, *, cue="confirm"):
+        before = self.state.status
+        if self.command(callback, cue=cue):
+            if self.state.status != before and self.state.status != "playing":
+                self.game.audio.play_sound("victory" if self.state.status == "victory" else "defeat")
             self.checkpoint(self.state)
             self.follow_state()
 
     def travel(self):
-        self.act(lambda: self.state.travel(self.selected))
+        self.act(lambda: self.state.travel(self.selected), cue="move")
 
     def explore(self):
         province = self.state.provinces[self.state.hero.pos]
@@ -297,7 +307,7 @@ class ShardScene(Screen):
 
     def end_turn(self):
         before = {troop.id: troop.kind for troop in self.state.hero.army}
-        self.act(self.state.end_turn)
+        self.act(self.state.end_turn, cue="end_turn")
         surviving = {troop.id for troop in self.state.hero.army}
         deserted = Counter(kind for ident, kind in before.items() if ident not in surviving)
         if deserted:
@@ -576,9 +586,9 @@ class BattleScene(Screen):
     def locate_objective(self):
         self.cursor = self.hover = self.battle.objective.target
 
-    def act(self, callback, *, checkpoint=False):
+    def act(self, callback, *, checkpoint=False, cue="attack_hit"):
         before = {u.id: u.hp for u in self.battle.units}
-        if self.command(callback):
+        if self.command(callback, cue=cue):
             for u in self.battle.units:
                 change = u.hp - before[u.id]
                 if change:
@@ -588,16 +598,18 @@ class BattleScene(Screen):
             if checkpoint or self.battle.outcome:
                 self.checkpoint(self.root.state)
             if self.battle.outcome:
+                set_music(self.game, None)
+                self.game.audio.play_sound("victory" if self.battle.outcome == "player" else "defeat")
                 self.game.push(ResultScene(self.root, battle=True))
 
     def end_turn(self):
-        self.act(self.battle.end_turn, checkpoint=True)
+        self.act(self.battle.end_turn, checkpoint=True, cue="end_turn")
 
     def auto_round(self):
-        self.act(self.battle.auto_turn, checkpoint=True)
+        self.act(self.battle.auto_turn, checkpoint=True, cue="end_turn")
 
     def guard(self):
-        self.act(lambda: self.battle.guard(self.selected))
+        self.act(lambda: self.battle.guard(self.selected), cue="guard")
 
     def retreat(self):
         try:
@@ -605,6 +617,7 @@ class BattleScene(Screen):
         except RuleError as error:
             self.message = str(error)
         else:
+            self.game.audio.play_sound("defeat")
             if not self.checkpoint(self.root.state):
                 self.root.message = self.message
             self.game.pop()
@@ -702,7 +715,7 @@ class BattleScene(Screen):
                 if self.targeting == "pin":
                     self.act(lambda: self.battle.pin(self.selected, unit.id))
                 else:
-                    self.act(lambda: self.battle.cast(self.targeting, unit.id))
+                    self.act(lambda: self.battle.cast(self.targeting, unit.id), cue=self.targeting)
             else:
                 self.message = "Aim at a unit. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
@@ -711,7 +724,7 @@ class BattleScene(Screen):
         elif unit and self.selected is not None:
             self.act(lambda: self.battle.attack(self.selected, unit.id))
         elif self.selected is not None:
-            self.act(lambda: self.battle.move(self.selected, pos))
+            self.act(lambda: self.battle.move(self.selected, pos), cue="move")
 
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
@@ -927,12 +940,15 @@ class ChoiceScene(Screen):
         self.button("Codex", self.x + 216, self.y + 405, 154, self.root.codex, shortcut="C")
 
     def choose(self, option_id):
+        kind = self.root.state.choice.kind
         try:
             self.root.state.choose(option_id)
         except RuleError as error:
             self.message = str(error)
+            self.game.audio.play_sound("refuse")
             return
         self.message = ""
+        self.game.audio.play_sound("level_up" if kind == "skill" else "reward")
         self.checkpoint(self.root.state)
         if self.root.state.choice is not None:
             self.refresh()

@@ -1,6 +1,8 @@
 """Codex journeys use the same input and visible content as players."""
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.model import State, UNITS
 from eador.scene import ShardScene
 
@@ -28,7 +30,7 @@ def test_keyboard_browses_categories_and_pages_then_returns_without_changing_sta
     """Browsing can reach entries beyond page one without spending, saving, or ending a turn."""
     from eador.codex import CodexScene
 
-    game = Game("Codex test", backend="mock", save_dir=tmp_path)
+    game = create_game("Codex test", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(State.new(7))
         game.push(root)
@@ -60,7 +62,7 @@ def test_mouse_tabs_and_paging_show_every_reference_category_without_mutating_th
     """Every tab and paging/close control is reachable through visible mouse bounds."""
     from eador.codex import CodexScene
 
-    game = Game("Codex mouse test", backend="mock", save_dir=tmp_path)
+    game = create_game("Codex mouse test", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(State.new(7))
         game.push(root)
@@ -87,7 +89,7 @@ def test_reference_prices_include_current_hero_recruitment_discounts(tmp_path):
     """The displayed purchase price matches the campaign's actual discounted quote."""
     from eador.codex import CodexScene
 
-    game = Game("Codex price test", backend="mock", save_dir=tmp_path)
+    game = create_game("Codex price test", backend="mock", save_dir=tmp_path)
     try:
         state = State.new(7)
         state.hero.level = 3
@@ -111,7 +113,7 @@ def test_spell_reference_uses_current_skills_and_equipped_relic_without_starting
     from eador.battle import Battle
     from eador.codex import CodexScene
 
-    game = Game("Codex spell test", backend="mock", save_dir=tmp_path)
+    game = create_game("Codex spell test", backend="mock", save_dir=tmp_path)
     try:
         state = State.new(7, "Wizard")
         state.hero.level = 3

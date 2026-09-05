@@ -98,3 +98,30 @@ and inspect loop seam steps and neighboring samples. The optional native
 checker plays every cue to completion and each music stream through one full
 loop with Pyglet's silent driver. It exercises live mute/mix, unchanged track
 selection and teardown of a still-active music player.
+
+## Connected game playback — 2026-09-06
+
+The launcher and scene verification now share `eador.app.create_game`, a small
+game-owned configuration that returns an ordinary Saga2D Game with the shipped
+asset root, theme and save location. It makes source and installed launch paths
+independent of the working directory. Tools can override visibility, backend
+and save_dir through the existing Game options. No audio manager or synthesis
+cache was added. Composition/manifest source files are unchanged.
+
+Title and campaign use the campaign loop, active battles use the battle loop,
+and terminal results stop music. Reopening overlays preserves the track.
+Confirmed construction/equipment uses the confirmation cue; movement, attacks,
+Pin, defensive orders, spells, end turns, reward/skill choices and newly reached
+battle outcomes use their corresponding shipped cues. Rejected model commands
+use refusal; disabled shortcuts remain silent. Loading a saved terminal result
+does not replay its earned victory cue. Preferences apply before first playback.
+
+Public input tests drive a complete prepared battle/reward/save journey and
+manual movement, attack, Bolt, Heal and rejected casts. They verify cue routing,
+first-track and live volumes, muted input, disabled orders, saved results and
+resource cleanup through the normal game manager. The complete suite passed
+643 tests before the additional manual-cue journey, which also passes. Native
+Pin/Watch journeys and the source packaged-entry smoke passed with the silent
+driver; the latter decoded/played all fourteen files and verified live mix,
+cleanup and settings restart. No frozen candidate was rebuilt in this step,
+and this evidence still does not constitute artistic listening approval.
