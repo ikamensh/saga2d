@@ -250,7 +250,13 @@ class ShardScene(Screen):
         self.act(self.state.explore)
 
     def end_turn(self):
+        before = {troop.id: troop.kind for troop in self.state.hero.army}
         self.act(self.state.end_turn)
+        surviving = {troop.id for troop in self.state.hero.army}
+        deserted = Counter(kind for ident, kind in before.items() if ident not in surviving)
+        if deserted:
+            names = ", ".join(f"{count} {UNITS[kind].name}" for kind, count in deserted.items())
+            self.message = f"Unpaid upkeep: {names} deserted. Reopen supply or capture income before the next bill."
 
     def buildings(self):
         self.game.push(CatalogScene(self, "build"))
@@ -294,10 +300,12 @@ class ShardScene(Screen):
         header_center = (338 + self.edge - 177) / 2
         self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
         self.text(f"THE VERDANT REACH   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
-        self.text("YOUR DOMINION", x, 24, size=10, color=MUTED)
+        self.text("WESTWATCH ENCIRCLED" if s.encircled else "YOUR DOMINION", x, 24,
+                  size=10, color=RED if s.encircled else MUTED)
         self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
         self.text(f"{s.crystals} crystals", x + 160, 52, size=15, color=BLUE)
-        self.text(f"Income +{s.income}   ·   Upkeep −{s.upkeep}   / turn", x, 84, size=11, color=MUTED)
+        self.text(f"Income +{s.income}   ·   Upkeep −{s.upkeep}   / turn", x, 84, size=11,
+                  color=RED if s.upkeep_shortfall else MUTED)
         self.rule(x, 112, 300)
         self.text(f"{s.hero.name}, the {s.hero.hero_class}", x, 132, size=21, serif=True)
         self.text(f"LEVEL {s.hero.level}  ·  {s.hero.xp} XP  ·  {s.actions_left} ACTIONS LEFT", x, 166, size=10, color=GOLD)
@@ -310,7 +318,9 @@ class ShardScene(Screen):
         p = s.provinces[self.selected]
         self.text("SELECTED PROVINCE", x, 279, size=10, color=MUTED)
         self.text(p.name, x, 302, size=27, serif=True)
-        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  +{p.income} gold", x, 344, size=12, color=art.OWNERS[p.owner])
+        province_income = 0 if s.encircled and p.pos == (-2, 0) else p.income
+        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  +{province_income} gold", x, 344,
+                  size=12, color=art.OWNERS[p.owner])
         if s.rival.army and self.selected == s.rival.pos:
             self.text(f"Expedition: {len(s.rival.army)} troops · V for strengths", x, 369, size=11, color=RED)
         elif p.owner != "player":
@@ -320,12 +330,16 @@ class ShardScene(Screen):
             self.text("Ruins cleared" if p.explored else p.site or "No ruins in this province", x, 369, size=12, color=GOLD)
         hint = "Select a neighboring province to travel."
         if not s.actions_left:
-            hint = "No hero actions left. End the turn to recover."
+            hint = "No hero actions left. End the turn to continue."
         elif self.selected != s.hero.pos and self.selected not in self.grid.neighbors(s.hero.pos):
             hint = "This province is not adjacent to your hero."
         self.text(hint, x, 395, size=11, color=MUTED)
         self.text("YOUR STRONGHOLD", x, 531, size=10, color=MUTED)
         self.text(f"{len(s.buildings)}/{len(BUILDINGS)} buildings  ·  {len(s.hero.army)}/{s.hero.max_army} troops", x, 662, size=11, color=MUTED)
+        if s.upkeep_shortfall:
+            self.text(f"{s.upkeep_shortfall} gold short: unpaid troops will leave.", x, h - 118, size=10, color=RED)
+        elif s.encircled:
+            self.text("Capital supply blocked · V for breakout routes", x, h - 118, size=10, color=RED)
         self.text(f"TURN {s.turn}  ·  Rival expedition: {len(s.rival.army)} troops", x, h - 37, size=10, color=MUTED)
         # Back-to-front relief keeps the southern edge of the shard continuous.
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
