@@ -9,3 +9,4 @@ dist/
 *.png
 *.gif
 .claude/
+tools/warband_entry.py
