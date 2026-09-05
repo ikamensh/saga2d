@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from saga2d import Button, Game  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
-from eador.scene import BattleScene, CatalogScene, HelpScene, ShardScene, TitleScene  # noqa: E402
+from eador.scene import BattleScene, CatalogScene, HelpScene, ResultScene, ShardScene, TitleScene  # noqa: E402
 
 
 def check_state(state: State) -> None:
@@ -129,6 +129,11 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                 battles = [s for s in game.scenes if isinstance(s, BattleScene)]
                 assert bool(battles) == (shard.state.battle is not None), 'battle and scene stack disagree'
                 assert all(s.root is shard for s in battles)
+                results = [s for s in game.scenes if isinstance(s, ResultScene)]
+                if shard.state.status != 'playing':
+                    assert len(results) == 1 and not results[0].is_battle, 'campaign ended without its result screen'
+                elif shard.state.battle and shard.state.battle.outcome:
+                    assert len(results) == 1 and results[0].is_battle, 'battle ended without its result screen'
             metrics['screen_' + type(game.scene).__name__] += 1
 
         def press(key):
@@ -211,6 +216,15 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                     press(rng.choice(('tab', 'return', 'f9')))
                 elif isinstance(scene, HelpScene):
                     button('Save & title' if rng.random() < .2 else 'Return to game')
+                elif isinstance(scene, ResultScene):
+                    if rng.random() < .25:
+                        press('f5')
+                        saved = root().state.to_json()
+                        press('f9')
+                        assert isinstance(game.scene, ResultScene) and root().state.to_json() == saved
+                        metrics['result_save_load'] += 1
+                    else:
+                        press('e')
                 elif isinstance(scene, CatalogScene):
                     press(rng.choice(('1', '2', '3', '4', '5', 'escape', 'escape')))
                 elif rng.random() < .15:
@@ -220,8 +234,6 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                         press(rng.choice(('f1', 'f5', 'f9', 'tab', 'escape', 'home')))
                 elif isinstance(scene, BattleScene):
                     battle_input()
-                elif scene.state.status != 'playing':
-                    button('New shard')
                 else:
                     roll = rng.random()
                     if roll < .45:
@@ -240,17 +252,20 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                     press('return')
                 elif isinstance(scene, (CatalogScene, HelpScene)):
                     press('escape')
+                elif isinstance(scene, ResultScene):
+                    if scene.is_battle:
+                        press('e')
+                    else:
+                        button('New shard')
+                        press('return')
+                        assert isinstance(game.scene, ShardScene) and game.scene.state.turn == 1
+                        metrics['replays'] += 1
+                        break
                 elif isinstance(scene, BattleScene):
                     if scene.battle.outcome:
                         press('e')
                     else:
                         button('Retreat')
-                elif scene.state.status != 'playing':
-                    button('New shard')
-                    press('return')
-                    assert isinstance(game.scene, ShardScene) and game.scene.state.turn == 1
-                    metrics['replays'] += 1
-                    break
                 else:
                     press('e')
             else:
