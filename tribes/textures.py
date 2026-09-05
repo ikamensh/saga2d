@@ -1,4 +1,4 @@
-"""Procedural textures: low-poly props pre-rendered with :mod:`tribes.render3d`.
+"""Procedural textures: low-poly props pre-rendered with :mod:`saga2d.render3d`.
 
 The map is drawn in a fixed dimetric view: every tile is a block whose
 top face is a 2:1 diamond ``ISO_W`` wide and ``ISO_H`` tall; terrain
@@ -28,14 +28,15 @@ from dataclasses import dataclass
 from PIL import Image, ImageDraw, ImageFilter
 
 from saga2d import Game
-from tribes import render3d as r3
-from tribes.render3d import Mesh
+from saga2d import render3d as r3
+from saga2d.render3d import Mesh
 from tribes.rules import Resource, Terrain, UnitType
 
 TILE = 64  # base size: the top-face diamond is 2×TILE wide and TILE tall
 ISO_W = 2 * TILE
 ISO_H = TILE
-PROJECTION = r3.Projection(ISO_W)
+PROJECTION = r3.Projection.dimetric(ISO_W)
+VIEW = PROJECTION.view
 
 BLOCK_Z = 0.28  # land block thickness in tile units
 WATER_Z = 0.14  # how far the water surface sits below the land top
@@ -199,7 +200,7 @@ def _workshop() -> Mesh:
     body = r3.box((x, y, 0.07), (0.17, 0.15, 0.14), (98, 88, 82))
     roof = r3.gable_roof((x, y, 0.14), (0.2, 0.18), 0.07, (70, 62, 60))
     chimney = r3.box((x - 0.05, y + 0.04, 0.2), (0.04, 0.04, 0.12), (60, 56, 56))
-    ember = r3.facing(_facing_quad((x + 0.09, y + 0.09, 0.06), 0.03), (255, 150, 60))
+    ember = r3.facing(_facing_quad((x + 0.09, y + 0.09, 0.06), 0.03), (255, 150, 60), VIEW)
     return body + roof + chimney + ember
 
 
@@ -219,7 +220,7 @@ def _flag() -> Mesh:
     x, y = 0.0, -0.42
     sx, sy, _ = _SIDE
     pole = r3.box((x, y, 0.38), (0.03, 0.03, 0.76), INK)
-    pennant = r3.facing([(x, y, 0.75), (x + sx * 0.26, y + sy * 0.26, 0.68), (x, y, 0.6)], WHITE)
+    pennant = r3.facing([(x, y, 0.75), (x + sx * 0.26, y + sy * 0.26, 0.68), (x, y, 0.6)], WHITE, VIEW)
     return pole + pennant
 
 
@@ -323,8 +324,8 @@ def _bow(z: float) -> Mesh:
     angles = [math.radians(a) for a in range(95, 266, 10)]
     mesh: Mesh = []
     for a0, a1 in zip(angles, angles[1:]):
-        mesh += r3.facing([at(a0, radius - thickness), at(a1, radius - thickness), at(a1, radius), at(a0, radius)], INK)
-    return mesh + r3.ribbon([at(angles[0], radius), at(angles[-1], radius)], _SIDE, 0.014, INK)
+        mesh += r3.facing([at(a0, radius - thickness), at(a1, radius - thickness), at(a1, radius), at(a0, radius)], INK, VIEW)
+    return mesh + r3.ribbon([at(angles[0], radius), at(angles[-1], radius)], _SIDE, 0.014, INK, VIEW)
 
 
 def _unit(unit_type: UnitType) -> Mesh:
@@ -344,13 +345,13 @@ def _unit(unit_type: UnitType) -> Mesh:
         return base + horse + _figure(-0.05, 0, z + 0.3, body_r=0.09, body_h=0.16, head_r=0.1)
     if unit_type is UnitType.DEFENDER:
         shield = r3.rotate_z(r3.box((0, 0.2, z + 0.2), (0.28, 0.045, 0.3), WHITE), -45)
-        emblem = r3.facing(_facing_quad((0.18, 0.18, z + 0.2), 0.07), INK)
+        emblem = r3.facing(_facing_quad((0.18, 0.18, z + 0.2), 0.07), INK, VIEW)
         return base + _figure(0, 0, z) + shield + emblem
     if unit_type is UnitType.KNIGHT:
         plume = r3.cone((0, 0, FIGURE_TOP - 0.03), 0.07, 0.2, INK, sides=8)
         lance = r3.box((0.17, -0.05, z + 0.4), (0.03, 0.03, 0.8), INK)
         sx, sy, _ = _SIDE
-        pennant = r3.facing([(0.17, -0.05, z + 0.78), (0.17 + sx * 0.15, -0.05 + sy * 0.15, z + 0.73), (0.17, -0.05, z + 0.66)], INK)
+        pennant = r3.facing([(0.17, -0.05, z + 0.78), (0.17 + sx * 0.15, -0.05 + sy * 0.15, z + 0.73), (0.17, -0.05, z + 0.66)], INK, VIEW)
         return base + _figure(0, 0, z) + plume + lance + pennant
     raise ValueError(unit_type)
 

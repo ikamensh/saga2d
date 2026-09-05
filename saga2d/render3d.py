@@ -1,18 +1,22 @@
-"""A tiny software renderer for the Tribes props.
+"""A tiny software renderer for low-poly props.
 
 Low-poly meshes (boxes, pyramids, cones, cylinders, spheres, gable
-roofs) are projected with a fixed dimetric camera, lit by one directional
-light with flat shading, sorted back-to-front and rasterised with Pillow
-at a multiple of the target size, then downsampled for anti-aliasing.
+roofs) are projected by a :class:`Projection` (a fixed camera), lit by
+one directional light with flat shading, sorted back-to-front and
+rasterised with Pillow at a multiple of the target size, then
+downsampled for anti-aliasing.  Games pre-render their tiles, buildings
+and units with it at the display's pixel density and register the images
+with the asset manager.
 
 Face colours are RGB or RGBA.  Translucent faces (a ground shadow) are
 rasterised first and opaque faces overwrite them, so translucency only
 shows where nothing solid covers it; Pillow does not blend polygons.
 
 Model space: the tile is the unit square ``[-0.5, 0.5]²`` in x/y with
-z up.  The camera sits over the ``(+x, +y)`` corner, so the ``+x`` face
-of a box is its right-hand side on screen and the ``+y`` face its left.
-Screen y grows downwards, like everywhere else in saga2d.
+z up.  Screen y grows downwards, like everywhere else in saga2d.  Which
+way the camera looks is the projection's business: :meth:`Projection.dimetric`
+sits over the ``(+x, +y)`` corner (Tribes), :meth:`Projection.front`
+looks from ``+y`` towards ``-y`` with square tile footprints (Warband).
 """
 
 from __future__ import annotations
@@ -27,14 +31,6 @@ Vec3 = tuple[float, float, float]
 RGB = tuple[int, int, int]
 RGBA = tuple[int, int, int, int]
 Color = RGB | RGBA
-
-#: Camera elevation above the ground plane.  ``asin(1/2)``: the tile's
-#: top face projects to a diamond exactly twice as wide as it is tall.
-ELEVATION = math.asin(0.5)
-
-_COS_EL, _SIN_EL = math.cos(ELEVATION), math.sin(ELEVATION)
-#: Unit vector from the scene towards the camera.
-VIEW: Vec3 = (_COS_EL / math.sqrt(2), _COS_EL / math.sqrt(2), _SIN_EL)
 
 
 def _normalized(v: Vec3) -> Vec3:
@@ -67,22 +63,68 @@ Mesh = list[Face]
 
 @dataclass(frozen=True)
 class Projection:
-    """Dimetric projection sized so the unit tile is *tile_w* logical units wide."""
+    """A fixed camera: where it looks from and how model units land on screen.
 
-    tile_w: float
+    *right* and *depth* are unit vectors in the ground plane: *right* maps
+    to screen-right, *depth* to screen-down (towards the camera).  The
+    camera is *elevation* radians above the ground.  Ground distance along
+    *depth* is foreshortened by ``sin(elevation)`` unless *depth_scale*
+    overrides it — a top-down game with square tiles keeps footprints square
+    and still gets lit vertical faces.  *scale* is logical units per model
+    unit along *right*.
+    """
+
+    scale: float
+    right: tuple[float, float]
+    depth: tuple[float, float]
+    elevation: float
+    depth_scale: float | None = None
+
+    @classmethod
+    def dimetric(cls, tile_w: float) -> Projection:
+        """Over the ``(+x, +y)`` corner at ``asin(1/2)``: the unit tile's top
+        face is a diamond *tile_w* wide and exactly half as tall."""
+        s = 1 / math.sqrt(2)
+        return cls(tile_w * s, (s, -s), (s, s), math.asin(0.5))
+
+    @classmethod
+    def front(cls, tile_w: float, elevation_deg: float = 55.0) -> Projection:
+        """From ``+y`` looking towards ``-y``, *elevation_deg* above the ground,
+        with the unit tile a *tile_w* square on screen."""
+        return cls(tile_w, (1.0, 0.0), (0.0, 1.0), math.radians(elevation_deg), depth_scale=1.0)
+
+    @property
+    def view(self) -> Vec3:
+        """Unit vector from the scene towards the camera."""
+        c, s = math.cos(self.elevation), math.sin(self.elevation)
+        return (self.depth[0] * c, self.depth[1] * c, s)
+
+    @property
+    def tile_w(self) -> float:
+        """Screen width of the unit tile."""
+        rx, ry = self.right
+        return self.scale * (abs(rx) + abs(ry))
 
     @property
     def tile_h(self) -> float:
-        return self.tile_w * _SIN_EL
+        """Screen height of the unit tile's top face."""
+        dx, dy = self.depth
+        return self.scale * self._depth_scale * (abs(dx) + abs(dy))
 
     @property
     def z_scale(self) -> float:
         """Logical units per model unit of height."""
-        return self.tile_w / math.sqrt(2) * _COS_EL
+        return self.scale * math.cos(self.elevation)
+
+    @property
+    def _depth_scale(self) -> float:
+        return math.sin(self.elevation) if self.depth_scale is None else self.depth_scale
 
     def project(self, p: Vec3) -> tuple[float, float]:
         x, y, z = p
-        return ((x - y) * self.tile_w / 2, (x + y) * self.tile_h / 2 - z * self.z_scale)
+        sx = (x * self.right[0] + y * self.right[1]) * self.scale
+        sy = (x * self.depth[0] + y * self.depth[1]) * self.scale * self._depth_scale - z * self.z_scale
+        return (sx, sy)
 
 
 # -- Mesh helpers ------------------------------------------------------------
@@ -224,20 +266,20 @@ def flat(points: list[tuple[float, float]], z: float, color: Color) -> Mesh:
     return [Face(pts, color)]
 
 
-def facing(points: list[Vec3], color: RGB) -> Mesh:
-    """A single face wound so it is never back-face culled."""
+def facing(points: list[Vec3], color: RGB, view: Vec3) -> Mesh:
+    """A single face wound towards *view* (see :attr:`Projection.view`) so it is never back-face culled."""
     pts = tuple(points)
-    if _dot(_newell_normal(pts), VIEW) < 0:
+    if _dot(_newell_normal(pts), view) < 0:
         pts = pts[::-1]
     return [Face(pts, color)]
 
 
-def ribbon(path: list[Vec3], across: Vec3, width: float, color: RGB) -> Mesh:
-    """Quads of *width* along *path*, spread in the *across* direction (a unit vector)."""
+def ribbon(path: list[Vec3], across: Vec3, width: float, color: RGB, view: Vec3) -> Mesh:
+    """Quads of *width* along *path*, spread in the *across* direction (a unit vector), facing *view*."""
     hx, hy, hz = (c * width / 2 for c in across)
     mesh: Mesh = []
     for (x0, y0, z0), (x1, y1, z1) in zip(path, path[1:]):
-        mesh += facing([(x0 - hx, y0 - hy, z0 - hz), (x1 - hx, y1 - hy, z1 - hz), (x1 + hx, y1 + hy, z1 + hz), (x0 + hx, y0 + hy, z0 + hz)], color)
+        mesh += facing([(x0 - hx, y0 - hy, z0 - hz), (x1 - hx, y1 - hy, z1 - hz), (x1 + hx, y1 + hy, z1 + hz), (x0 + hx, y0 + hy, z0 + hz)], color, view)
     return mesh
 
 
@@ -295,12 +337,13 @@ def render(
         sx, sy = projection.project(p)
         return ((ox + sx) * ss, (oy + sy) * ss)
 
+    view = projection.view
     visible = []
     for face in mesh:
         normal = _newell_normal(face.points)
-        if _dot(normal, VIEW) <= 1e-9:
+        if _dot(normal, view) <= 1e-9:
             continue
-        depth = sum(_dot(p, VIEW) for p in face.points) / len(face.points)
+        depth = sum(_dot(p, view) for p in face.points) / len(face.points)
         visible.append((face.opaque, depth, face, normal))
     visible.sort(key=lambda item: item[:2])  # translucent faces first, then back to front
     for _opaque, _depth, face, normal in visible:

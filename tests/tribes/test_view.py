@@ -236,7 +236,7 @@ def test_tokens_cast_a_translucent_shadow_that_does_not_punch_through_the_disc()
 
 
 def test_downsampling_keeps_edge_pixels_the_colour_of_the_surface() -> None:
-    from tribes import render3d as r3
+    from saga2d import render3d as r3
 
     image = r3.render(r3.box((0, 0, 0.2), (0.6, 0.6, 0.4), (255, 255, 255)), textures.PROJECTION, scale=1.0, canvas=(80, 80), origin=(40, 50))
     pixels = image.load()
