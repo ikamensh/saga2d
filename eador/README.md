@@ -159,8 +159,17 @@ to this adaptation; they do not reproduce the commercial game's catalogue.
 | Marketplace | 60 gold | Add 8 gold income each turn |
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
-deducted each campaign turn. Ending the turn restores health on friendly
-land and 4 mana. Before skill and relic modifiers, Arcane Bolt deals 14 damage; Heal restores up to 16 health
+deducted each campaign turn. If every province neighboring Westwatch is
+rival-owned, the capital is encircled: its gold, crystals, Marketplace and
+local recovery stop. Reclaim any neighboring province to reopen supply.
+The shard warns before End Turn if gold plus income cannot cover upkeep.
+Unpaid troops leave, preserving higher levels and experience first; among
+equal veterans, more expensive/newer recruits leave first. Outlying owned
+provinces still produce income.
+
+Ending the turn restores health on friendly land and 4 mana, unless the
+hero is inside encircled Westwatch. Before skill and relic modifiers,
+Arcane Bolt deals 14 damage; Heal restores up to 16 health
 to a living ally. Both cost 4 mana, have a range of four hexes and use the
 hero's action. A move can precede an attack or spell; attacking or casting
 ends that unit's movement unless the Scout's Skirmisher discipline allows
