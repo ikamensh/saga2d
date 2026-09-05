@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 from saga2d import HexGrid
 
 from eador.content import Choice, ChoiceOption, RELICS, SITES, SKILLS
+from eador.rival import INTENTS, RivalState, RivalTroop
 
 if TYPE_CHECKING:
     from eador.battle import Battle
@@ -138,6 +139,8 @@ class Province:
     site_relic: str | None = None
     site_gold: int = 0
     site_crystals: int = 0
+    guard_hp: list[int] = field(default_factory=list)
+    site_guard_hp: list[int] = field(default_factory=list)
 
 
 @dataclass
@@ -158,6 +161,7 @@ class State:
     next_troop_id: int = 4
     inventory: list[str] = field(default_factory=list)
     _choices: list[Choice] = field(default_factory=list, repr=False)
+    rival: RivalState = field(default_factory=RivalState)
 
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander') -> State:
@@ -210,6 +214,11 @@ class State:
                 for i, kind in enumerate(('militia', 'militia', 'archer'), 1)]
         hero = Hero('Alden', hero_class, home.pos, max_hp, max_hp, mana, mana, army)
         state = cls(seed, provinces, hero, actions_left=3 if hero_class == 'Scout' else 2)
+        for province in state.provinces.values():
+            province.guard_hp = [UNITS[kind].hp for kind in province.guards]
+            province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
+        state.rival = RivalState.initial()
+        state.rival.plan(state, delay=3)
         state.log.append('Claim the shard: capture Duskspire before Westwatch falls.')
         return state
 
@@ -348,11 +357,20 @@ class State:
             raise RuleError('Travel to an adjacent province.')
         province = self.provinces[destination]
         self.actions_left -= 1
-        if province.owner == 'player':
+        if self.rival.army and self.rival.pos == destination:
+            self._start_battle(destination, 'intercept', [troop.kind for troop in self.rival.army])
+        elif province.owner == 'player':
             self.hero.pos = destination
             self.log.append(f'Travelled to {province.name}.')
-        else:
+        elif province.guards:
             self._start_battle(destination, 'conquest', province.guards)
+        else:
+            province.owner = 'player'
+            self.hero.pos = destination
+            self.log.append(f'Claimed unguarded {province.name}.')
+            if destination == (2, 0):
+                self.status = 'victory'
+                self.rival.plan(self)
 
     def explore(self) -> None:
         self._ready(action=True)
@@ -367,8 +385,15 @@ class State:
     def _start_battle(self, province: Pos, kind: str, enemies: list[str]) -> None:
         from eador.battle import Battle
         self.battle_province, self.battle_kind = province, kind
-        self.battle = Battle.create(self.hero, enemies, self.provinces[province].terrain,
-                                    self.spells, seed=self.seed + self.turn * 37 + province[0] * 7 + province[1])
+        target = self.provinces[province]
+        expedition = kind in ('intercept', 'defense')
+        health = ([troop.hp for troop in self.rival.army] if expedition else
+                  target.site_guard_hp if kind == 'site' else target.guard_hp)
+        self.battle = Battle.create(self.hero, enemies, target.terrain, self.spells,
+                                    seed=self.seed + self.turn * 37 + province[0] * 7 + province[1], enemy_hp=health)
+        if expedition:
+            for unit, troop in zip((u for u in self.battle.units if u.team == 'enemy'), self.rival.army):
+                unit.source_id = troop.id
         title = self.provinces[province].site if kind == 'site' else self.provinces[province].name
         self.log.append(f'Battle at {title}.')
 
@@ -378,6 +403,25 @@ class State:
         battle = self.battle
         province = self.provinces[self.battle_province]
         victory = battle.outcome == 'player'
+        expedition = self.battle_kind in ('intercept', 'defense')
+        expedition_lost = False
+        enemies = [unit for unit in battle.units if unit.team == 'enemy']
+        if expedition:
+            by_source = {unit.source_id: unit for unit in enemies}
+            for troop in self.rival.army:
+                troop.hp = by_source[troop.id].hp
+            self.rival.army = [troop for troop in self.rival.army if troop.hp > 0]
+            if not self.rival.army:
+                expedition_lost = True
+                self.rival.defeated(self)
+        else:
+            survivors = [unit for unit in enemies if unit.hp > 0]
+            if self.battle_kind == 'site':
+                province.site_guards = [unit.kind for unit in survivors]
+                province.site_guard_hp = [unit.hp for unit in survivors]
+            else:
+                province.guards = [unit.kind for unit in survivors]
+                province.guard_hp = [unit.hp for unit in survivors]
         self.hero.hp = battle.unit(0).hp
         self.hero.mana = battle.mana
         casualties = []
@@ -417,11 +461,14 @@ class State:
                 message = f'Explored {province.site}: +{province.site_gold} gold, +{province.site_crystals} crystals.'
                 if province.site_relic:
                     self._choices.append(self._relic_choice(province.site_relic))
+            elif self.battle_kind == 'intercept' and province.guards:
+                self.gold += 25
+                message = f'The rival expedition is broken: +25 gold. {province.name} still has a garrison.'
             else:
-                province.owner, province.guards = 'player', []
+                province.owner, province.guards, province.guard_hp = 'player', [], []
                 self.hero.pos = province.pos
                 self.gold += 25
-                message = f'Claimed {province.name}: +25 gold.'
+                message = f'Defended {province.name}: +25 gold.' if self.battle_kind == 'defense' else f'Claimed {province.name}: +25 gold.'
                 if province.capital and province.pos == (2, 0):
                     self.status = 'victory'
                     message = 'Duskspire has fallen. The shard is yours!'
@@ -431,8 +478,7 @@ class State:
             self.gold -= lost_gold
             message = f'Retreated. Lost {lost_gold} gold; the survivors keep their wounds.'
             if self.battle_kind == 'defense':
-                province.owner = 'rival'
-                province.guards = ['guard', 'brigand']
+                self._occupy_rival(province.pos)
                 self.hero.pos = (-2, 0)
                 if province.capital:
                     self.status = 'defeat'
@@ -443,6 +489,8 @@ class State:
         self.battle = None
         self.battle_kind = None
         self.battle_province = None
+        if self.status != 'playing' or expedition and not expedition_lost:
+            self.rival.plan(self)
         return message
 
     def retreat(self) -> str:
@@ -471,30 +519,55 @@ class State:
                 troop.hp = min(troop.max_hp, troop.hp + recovery)
         self.hero.mana = min(self.hero.max_mana, self.hero.mana + 4)
         self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; army rests.')
-        if self.turn >= 5 and (self.turn - 5) % 4 == 0:
-            self._rival_turn()
+        self.rival.advance(self)
 
-    def _rival_turn(self) -> None:
-        frontier = {neighbor for pos, province in self.provinces.items() if province.owner == 'rival'
-                    for neighbor in self.grid.neighbors(pos) if self.provinces[neighbor].owner != 'rival'}
-        if not frontier:
-            return
-        target = min(frontier, key=lambda pos: (HexGrid.distance(pos, (-2, 0)), pos))
-        province = self.provinces[target]
-        if target == self.hero.pos:
-            self._start_battle(target, 'defense', ['guard', 'brigand', 'archer'])
-            self.log.append(f'The rival attacks your army at {province.name}!')
-            return
-        province.owner, province.guards = 'rival', ['guard', 'brigand']
-        self.log.append(f'The rival seized {province.name}.')
+    def _occupy_rival(self, destination: Pos) -> None:
+        province = self.provinces[destination]
+        self.rival.pos = destination
+        province.owner, province.guards, province.guard_hp = 'rival', [], []
+        # Occupation uses an actual surviving expedition soldier, never a free garrison.
+        if len(self.rival.army) > 3:
+            guard = max(self.rival.army, key=lambda troop: (troop.kind == 'guard', troop.hp))
+            self.rival.army.remove(guard)
+            province.guards, province.guard_hp = [guard.kind], [guard.hp]
+        self.log.append(f'The rival seized {province.name} with its surviving expedition.')
         if province.capital:
             self.status = 'defeat'
             self.log.append('Westwatch has fallen. The rival claims the shard.')
 
+    def _move_rival(self, destination: Pos) -> None:
+        from eador.battle import Battle
+        if destination not in self.grid.neighbors(self.rival.pos):
+            raise RuntimeError('A rival operation must move to an adjacent province.')
+        if destination == self.hero.pos:
+            self._start_battle(destination, 'defense', [troop.kind for troop in self.rival.army])
+            self.log.append(f'The rival expedition attacks your army at {self.provinces[destination].name}!')
+            return
+        province = self.provinces[destination]
+        if province.owner == 'rival':
+            self.rival.pos = destination
+            return
+        if province.guards:
+            battle = Battle.clash([(troop.kind, troop.hp) for troop in self.rival.army],
+                                  list(zip(province.guards, province.guard_hp)), province.terrain,
+                                  seed=self.seed + self.turn * 37 + destination[0] * 7 + destination[1])
+            while battle.outcome is None:
+                battle.auto_turn()
+            for troop, unit in zip(self.rival.army, (u for u in battle.units if u.team == 'player')):
+                troop.hp = unit.hp
+            self.rival.army = [troop for troop in self.rival.army if troop.hp > 0]
+            defenders = [unit for unit in battle.units if unit.team == 'enemy' and unit.hp > 0]
+            province.guards, province.guard_hp = [u.kind for u in defenders], [u.hp for u in defenders]
+            if battle.outcome == 'enemy':
+                self.rival.defeated(self)
+                self.log.append(f'The defenders of {province.name} destroyed the rival expedition.')
+                return
+        self._occupy_rival(destination)
+
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 2
+        data['schema_version'] = 3
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -513,8 +586,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1 and 2.')
+        if type(version) is not int or version not in (1, 2, 3):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2 and 3.')
         _validate_save(data, version)
         data.pop('schema_version', None)
         if version == 1:
@@ -529,6 +602,32 @@ class State:
                 province.update(site_kind=old_sites.get(site), site_relic=None,
                                 site_guards=(['brigand', 'goblin'] if province['pos'][0] < 1 else ['guard', 'goblin']) if site else [],
                                 site_gold=55 if site else 0, site_crystals=2 if site else 0)
+        if version < 3:
+            for province in data['provinces']:
+                province['guard_hp'] = [UNITS[kind].hp for kind in province['guards']]
+                province['site_guard_hp'] = [UNITS[kind].hp for kind in province['site_guards']]
+            rival = RivalState.initial()
+            rival.pos = (2, 0)
+            data['rival'] = asdict(rival)
+            if data['battle'] is not None:
+                data['battle']['hero_id'] = 0
+                for unit in data['battle']['units']:
+                    unit['source_id'] = None
+                if data['battle_kind'] == 'defense':
+                    army = []
+                    for unit in data['battle']['units']:
+                        if unit['team'] == 'enemy':
+                            unit['source_id'] = unit['id']
+                            if unit['hp'] > 0:
+                                army.append(RivalTroop(unit['id'], unit['kind'], unit['hp'], unit['max_hp']))
+                    data['rival'].update(army=[asdict(troop) for troop in army], intent='attack',
+                                         target=data['battle_province'], turns_until_action=0,
+                                         next_troop_id=max((unit['id'] for unit in data['battle']['units']), default=0) + 1)
+        data['rival']['pos'] = tuple(data['rival']['pos'])
+        if data['rival']['target'] is not None:
+            data['rival']['target'] = tuple(data['rival']['target'])
+        data['rival']['army'] = [RivalTroop(**troop) for troop in data['rival']['army']]
+        data['rival'] = RivalState(**data['rival'])
         data['_choices'] = [Choice(**{**choice, 'options': tuple(ChoiceOption(**option) for option in choice['options'])})
                             for choice in data.pop('choices')]
         data['provinces'] = {tuple(p['pos']): Province(**{**p, 'pos': tuple(p['pos'])}) for p in data['provinces']}
@@ -541,7 +640,10 @@ class State:
             data['battle'] = Battle.from_dict(data['battle'])
         if data['battle_province'] is not None:
             data['battle_province'] = tuple(data['battle_province'])
-        return cls(**data)
+        state = cls(**data)
+        if version < 3 and state.battle_kind != 'defense':
+            state.rival.plan(state, delay=3)
+        return state
 
 
 def _validate_save(data: dict, version: int) -> None:
@@ -576,10 +678,12 @@ def _validate_save(data: dict, version: int) -> None:
     def text_fields(value, names, label):
         require(all(isinstance(value[name], str) for name in names), f'{label} contains invalid text.')
 
-    new_state = {'inventory', '_choices'}
+    new_state = {'inventory', '_choices', 'rival'}
     state_keys = {f.name for f in fields(State)} - new_state
-    if version == 2:
+    if version >= 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
+    if version == 3:
+        state_keys.add('rival')
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
     require(type(data['seed']) is int, 'The shard seed must be an integer.')
     for name in ('gold', 'crystals', 'actions_left'):
@@ -621,7 +725,7 @@ def _validate_save(data: dict, version: int) -> None:
     provinces = {}
     site_fields = {'site_kind', 'site_guards', 'site_relic', 'site_gold', 'site_crystals'}
     for province in data['provinces']:
-        object_fields(province, {f.name for f in fields(Province)} - (site_fields if version == 1 else set()), 'Province')
+        object_fields(province, {f.name for f in fields(Province)} - (site_fields if version == 1 else set()) - ({'guard_hp', 'site_guard_hp'} if version < 3 else set()), 'Province')
         pos = position(province['pos'], 'Province position')
         require(pos in expected_cells and pos not in provinces, 'Invalid or duplicate province position.')
         provinces[pos] = province
@@ -645,12 +749,17 @@ def _validate_save(data: dict, version: int) -> None:
             require(province['site_relic'] is None or isinstance(province['site_relic'], str) and province['site_relic'] in RELICS, 'Unknown site relic.')
             integer(province['site_gold'], 'Site gold')
             integer(province['site_crystals'], 'Site crystals')
+        if version == 3:
+            for kinds, health in (('guards', 'guard_hp'), ('site_guards', 'site_guard_hp')):
+                require(isinstance(province[health], list) and len(province[health]) == len(province[kinds]), 'Garrison health does not match its soldiers.')
+                for kind, hp in zip(province[kinds], province[health]):
+                    integer(hp, 'Garrison health', minimum=1, maximum=UNITS[kind].hp)
     require(hero_pos in provinces, 'Hero is outside the shard.')
     require(data['status'] != 'playing' or provinces[hero_pos]['owner'] == 'player', 'The hero must be in a controlled province.')
     require(data['status'] != 'victory' or provinces[(2, 0)]['owner'] == 'player', 'Victory requires capturing Duskspire.')
     require(data['status'] != 'defeat' or provinces[(-2, 0)]['owner'] == 'rival', 'Defeat requires losing Westwatch.')
 
-    if version == 2:
+    if version >= 2:
         strings(data['inventory'], 'Inventory', RELICS, unique=True)
         require(hero['relic'] is None or isinstance(hero['relic'], str) and hero['relic'] in data['inventory'], 'The equipped relic is not owned.')
         require(isinstance(hero['skill_ranks'], dict), 'Skill ranks must be an object.')
@@ -680,22 +789,46 @@ def _validate_save(data: dict, version: int) -> None:
         pending_ranks = sum(choice['kind'] == 'skill' for choice in data['choices'])
         require(sum(hero['skill_ranks'].values()) + pending_ranks <= hero['level'] - 1, 'Pending skill choices exceed earned levels.')
 
+    rival_by_id = {}
+    if version == 3:
+        rival = data['rival']
+        object_fields(rival, {f.name for f in fields(RivalState)}, 'Rival')
+        integer(rival['gold'], 'Rival treasury')
+        integer(rival['next_troop_id'], 'Rival next troop ID', minimum=1)
+        integer(rival['defeats'], 'Rival defeats')
+        integer(rival['turns_until_action'], 'Rival countdown', maximum=4)
+        require(rival['intent'] in INTENTS, 'Unknown rival intent.')
+        require(position(rival['pos'], 'Rival position') in provinces, 'Rival is outside the shard.')
+        if rival['target'] is not None:
+            require(position(rival['target'], 'Rival target') in provinces, 'Rival target is outside the shard.')
+        require(isinstance(rival['army'], list) and len(rival['army']) <= 7, 'Invalid rival army size.')
+        for troop in rival['army']:
+            object_fields(troop, {f.name for f in fields(RivalTroop)}, 'Rival troop')
+            require(isinstance(troop['kind'], str) and troop['kind'] in UNITS, 'Unknown rival troop kind.')
+            integer(troop['id'], 'Rival troop ID', minimum=1, maximum=rival['next_troop_id'] - 1)
+            require(troop['id'] not in rival_by_id, 'Duplicate rival troop ID.')
+            integer(troop['hp'], 'Rival troop health', minimum=1, maximum=UNITS[troop['kind']].hp)
+            require(troop['max_hp'] == UNITS[troop['kind']].hp, 'Rival troop maximum health is inconsistent.')
+            rival_by_id[troop['id']] = troop
+
     battle = data['battle']
     if battle is None:
         require(data['battle_kind'] is None and data['battle_province'] is None, 'Battle context has no battle.')
         return
     require(data['status'] == 'playing', 'An ended campaign cannot contain a battle.')
     require(version == 1 or not data['choices'], 'A battle cannot begin during a reward choice.')
-    require(data['battle_kind'] in ('conquest', 'site', 'defense'), 'Unknown battle context.')
+    require(data['battle_kind'] in (('conquest', 'site', 'defense', 'intercept') if version == 3 else ('conquest', 'site', 'defense')), 'Unknown battle context.')
     require(position(data['battle_province'], 'Battle province') in provinces, 'Battle province is outside the shard.')
     keys = {'units', 'terrain', 'mana', 'spells', 'round', 'outcome', 'log'}
-    object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version == 2 else set()), 'Battle')
+    object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version == 3 else set()), 'Battle')
     integer(battle['mana'], 'Battle mana', maximum=hero['max_mana'])
     integer(battle['round'], 'Battle round', minimum=1, maximum=81)
     require(battle['outcome'] in (None, 'player', 'enemy'), 'Unknown battle outcome.')
     strings(battle['log'], 'Battle log')
     strings(battle['spells'], 'Battle spells', ('bolt', 'heal'), unique=True)
-    if version == 2:
+    if version == 3:
+        require(battle['hero_id'] == 0, 'A campaign battle must identify its hero.')
+    if version >= 2:
         for key in ('spell_costs', 'spell_power'):
             object_fields(battle[key], {'bolt', 'heal'}, key)
             for value in battle[key].values():
@@ -712,7 +845,7 @@ def _validate_save(data: dict, version: int) -> None:
     require(isinstance(battle['units'], list) and 2 <= len(battle['units']) <= 14, 'Invalid battle army size.')
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     for unit in battle['units']:
-        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set())
+        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set())
         object_fields(unit, unit_keys, 'Battle unit')
         integer(unit['id'], 'Battle unit ID')
         require(unit['id'] not in ids, 'Duplicate battle unit ID.')
@@ -726,9 +859,16 @@ def _validate_save(data: dict, version: int) -> None:
         integer(unit['defense'], 'Battle unit defense')
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
-        if version == 2:
+        if version >= 2:
             integer(unit['safe_attacks'], 'Safe attacks')
             require(type(unit['terrain_walk']) is bool and type(unit['skirmisher']) is bool, 'Invalid battle traits.')
+        if version == 3:
+            if unit['team'] == 'enemy' and data['battle_kind'] in ('intercept', 'defense'):
+                integer(unit['source_id'], 'Expedition soldier identity', minimum=1)
+                if unit['hp'] > 0:
+                    require(unit['source_id'] in rival_by_id and rival_by_id[unit['source_id']]['kind'] == unit['kind'], 'Expedition soldier differs from the rival army.')
+            else:
+                require(unit['source_id'] is None, 'A non-expedition combatant has a rival identity.')
         pos = position(unit['pos'], 'Battle unit position')
         require(pos in cells, 'A battle unit is outside the battlefield.')
         if unit['hp'] > 0:

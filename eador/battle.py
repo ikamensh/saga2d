@@ -16,6 +16,10 @@ class SpellSpec:
     description: str
 
 
+PLAYER_POSITIONS = ((-3, 1), (-2, 0), (-3, 2), (-2, 1), (-2, 2), (-3, 0), (-2, 3))
+ENEMY_POSITIONS = ((3, -1), (2, 0), (3, -2), (2, -1), (2, 1), (3, -3), (2, -2))
+
+
 SPELLS = {
     'bolt': SpellSpec('Arcane Bolt', 4, 'Deal 14 damage to an enemy within 4 hexes.'),
     'heal': SpellSpec('Heal', 4, 'Restore 16 health to a living ally within 4 hexes.'),
@@ -41,6 +45,7 @@ class BattleUnit:
     safe_attacks: int = 0
     terrain_walk: bool = False
     skirmisher: bool = False
+    source_id: int | None = None
 
     @property
     def alive(self) -> bool:
@@ -62,18 +67,13 @@ class Battle:
     log: list[str] = field(default_factory=list)
     spell_costs: dict[str, int] = field(default_factory=lambda: {'bolt': 4, 'heal': 4})
     spell_power: dict[str, int] = field(default_factory=lambda: {'bolt': 14, 'heal': 16})
+    hero_id: int | None = 0
 
     @classmethod
     def create(cls, hero: Hero, enemies: list[str], terrain: str,
-               spells: set[str], seed: int = 0) -> Battle:
-        cells = [(q, r) for q in range(-3, 4) for r in range(-3, 4)
-                 if abs(q + r) <= 3]
-        rng = random.Random(seed)
-        tiles = {p: (rng.choice(('plains', terrain, terrain)) if abs(p[0]) < 2 else 'plains')
-                 for p in cells}
-        # A few terrain hexes change route and positioning without isolating deployment.
-        player_positions = [(-3, 1), (-2, 0), (-3, 2), (-2, 1), (-2, 2), (-3, 0), (-2, 3)]
-        enemy_positions = [(3, -1), (2, 0), (3, -2), (2, -1), (2, 1), (3, -3), (2, -2)]
+               spells: set[str], seed: int = 0, *, enemy_hp: list[int] | None = None) -> Battle:
+        tiles = cls._terrain(terrain, seed)
+        player_positions, enemy_positions = PLAYER_POSITIONS, ENEMY_POSITIONS
         hero_attack = 10 + (hero.level - 1) * 2 + (4 if hero.hero_class == 'Warrior' else 0)
         units = [BattleUnit(0, 'player', 'hero', player_positions[0], hero.hp,
                             hero.max_hp, hero_attack, 3 + hero.level // 2, 3,
@@ -84,12 +84,10 @@ class Battle:
                                     troop.max_hp, spec.attack + troop.level - 1 + (hero.hero_class == 'Commander'),
                                     spec.defense + (troop.level - 1) // 2,
                                     spec.move_range, spec.attack_range, level=troop.level))
-        if len(enemies) > len(enemy_positions):
-            raise ValueError('A battlefield holds at most seven enemy units.')
-        for i, (kind, pos) in enumerate(zip(enemies, enemy_positions), 1000):
-            spec = UNITS[kind]
-            units.append(BattleUnit(i, 'enemy', kind, pos, spec.hp, spec.hp,
-                                    spec.attack, spec.defense, spec.move_range, spec.attack_range))
+        health = enemy_hp if enemy_hp is not None else [UNITS[kind].hp for kind in enemies]
+        if len(health) != len(enemies):
+            raise ValueError('Enemy health must match the enemy army.')
+        units += cls._deploy(list(zip(enemies, health)), enemy_positions, 'enemy', max(u.id for u in units) + 1000)
         ranks = hero.skill_ranks
         units[0].safe_attacks = ranks.get('duelist', 0) + (hero.relic == 'iron_crown')
         units[0].attack += 2 * ranks.get('duelist', 0)
@@ -105,6 +103,35 @@ class Battle:
                  'heal': 16 + 4 * ranks.get('restoration', 0) + (6 if hero.relic == 'moonstone' else 0)}
         return cls(units, tiles, hero.mana, set(spells), log=['Advance, use cover, and protect your wounded.'],
                    spell_costs=costs, spell_power=power)
+
+    @staticmethod
+    def _terrain(terrain: str, seed: int) -> dict[Pos, str]:
+        rng = random.Random(seed)
+        return {(q, r): (rng.choice(('plains', terrain, terrain)) if abs(q) < 2 else 'plains')
+                for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3}
+
+    @staticmethod
+    def _deploy(army: list[tuple[str, int]], positions, team: str, first_id: int) -> list[BattleUnit]:
+        if len(army) > len(positions):
+            raise ValueError('A battlefield holds at most seven units per army.')
+        units = []
+        for i, ((kind, hp), pos) in enumerate(zip(army, positions), first_id):
+            spec = UNITS[kind]
+            if not 0 < hp <= spec.hp:
+                raise ValueError('A combatant must have positive health within its maximum.')
+            units.append(BattleUnit(i, team, kind, pos, hp, spec.hp, spec.attack,
+                                    spec.defense, spec.move_range, spec.attack_range))
+        return units
+
+    @classmethod
+    def clash(cls, attackers: list[tuple[str, int]], defenders: list[tuple[str, int]],
+              terrain: str, seed: int = 0) -> Battle:
+        """Create a hero-free encounter for persistent rival and neutral armies."""
+        if not attackers or not defenders:
+            raise ValueError('A clash requires two nonempty armies.')
+        units = cls._deploy(attackers, PLAYER_POSITIONS, 'player', 0)
+        units += cls._deploy(defenders, ENEMY_POSITIONS, 'enemy', 1000)
+        return cls(units, cls._terrain(terrain, seed), 0, set(), hero_id=None)
 
     @property
     def grid(self) -> HexGrid:
@@ -189,7 +216,9 @@ class Battle:
         return self.spell_costs[spell]
 
     def cast(self, spell: str, target_id: int) -> None:
-        hero = self._actor(0)
+        if self.hero_id is None:
+            raise RuleError('This army has no spellcasting hero.')
+        hero = self._actor(self.hero_id)
         if spell not in self.spells or spell not in SPELLS:
             raise RuleError('That spell has not been learned.')
         if hero.acted:
@@ -216,7 +245,7 @@ class Battle:
         self._check_outcome()
 
     def _check_outcome(self) -> None:
-        if not self.unit(0).alive or not any(u.alive and u.team == 'player' for u in self.units):
+        if (self.hero_id is not None and not self.unit(self.hero_id).alive) or not any(u.alive and u.team == 'player' for u in self.units):
             self.outcome = 'enemy'
         elif not any(u.alive and u.team == 'enemy' for u in self.units):
             self.outcome = 'player'
@@ -291,7 +320,7 @@ class Battle:
                 'terrain': [{'pos': list(pos), 'kind': kind} for pos, kind in self.terrain.items()],
                 'mana': self.mana, 'spells': sorted(self.spells), 'round': self.round,
                 'outcome': self.outcome, 'log': list(self.log),
-                'spell_costs': dict(self.spell_costs), 'spell_power': dict(self.spell_power)}
+                'spell_costs': dict(self.spell_costs), 'spell_power': dict(self.spell_power), 'hero_id': self.hero_id}
 
     @classmethod
     def from_dict(cls, data: dict) -> Battle:
@@ -299,4 +328,4 @@ class Battle:
                    terrain={tuple(t['pos']): t['kind'] for t in data['terrain']},
                    mana=data['mana'], spells=set(data['spells']), round=data['round'],
                    outcome=data['outcome'], log=list(data['log']),
-                   spell_costs=dict(data['spell_costs']), spell_power=dict(data['spell_power']))
+                   spell_costs=dict(data['spell_costs']), spell_power=dict(data['spell_power']), hero_id=data['hero_id'])
