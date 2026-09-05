@@ -2,7 +2,7 @@
 
     uv run python tools/verify_eador_settings.py --out /tmp/shardbound-settings
 
-The settings scene is pushed directly; launcher/title wiring is separate.
+Settings is reached through the title and in-game guide using native keys.
 """
 
 import argparse
@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from saga2d import Game  # noqa: E402
 from eador.preferences import DEFAULTS, load_preferences  # noqa: E402
-from eador.scene import TitleScene  # noqa: E402
+from eador.scene import HelpScene, TitleScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
 from pyglet.window import key  # noqa: E402
 
@@ -48,7 +48,10 @@ def main():
                     prefs.path.with_suffix(".backup.json").mkdir()
                 title = TitleScene()
                 game.push(title)
-                game.push(SettingsScene())
+                game.tick(1 / 60)
+                game.backend.capture_frame().save(args.out / f"title-{scenario}.png")
+                press(game, key.O)
+                assert isinstance(game.scene, SettingsScene)
                 game.tick(1 / 60)
                 if scenario in ("normal", "compact"):
                     press(game, key.LEFT)
@@ -71,11 +74,30 @@ def main():
                     press(game, key.ESCAPE)
                     assert game.scene is title
                     assert game.audio.get_volume("master") == DEFAULTS["master"]
+                if scenario == "normal":
+                    press(game, key.ENTER)
+                    root = game.scene
+                    press(game, key.F5)
+                    saved = root.state.to_json()
+                    press(game, key.F1)
+                    assert isinstance(game.scene, HelpScene)
+                    game.backend.capture_frame().save(args.out / "guide-entry.png")
+                    press(game, key.O)
+                    assert isinstance(game.scene, SettingsScene)
+                    for _ in range(3):
+                        press(game, key.DOWN)
+                    press(game, key.RIGHT)
+                    assert game.audio.muted
+                    press(game, key.ENTER)
+                    assert isinstance(game.scene, HelpScene)
+                    press(game, key.ESCAPE)
+                    press(game, key.F9)
+                    assert game.scene.state.to_json() == saved and game.audio.muted
                 assert game.backend.window is not None
             finally:
                 game._teardown()
                 game.backend.quit()
-    print(f"Native settings checks passed; four screenshots in {args.out}")
+    print(f"Native title/guide settings, recovery, preview/cancel and campaign-load independence passed: {args.out}")
 
 
 if __name__ == "__main__":

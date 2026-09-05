@@ -18,7 +18,7 @@ from eador.scene import BattleScene, ChoiceScene, SaveScene, ShardScene, TitleSc
 def verify(output):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-rival-") as saves:
-        game = Game("Shardbound rival verification", resolution=(1280, 800), visible=False, save_dir=saves)
+        game = Game("Shardbound rival verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
         from pyglet.window import key, mouse
 
         window = game.backend.window
