@@ -38,6 +38,9 @@ know about, and read it before touching shared files.
   Presets, saved settings and shortcuts remain game-owned. No Warband
   worktree or game callers were edited. See `docs/framework-display.md` and
   the independent native/pixel/input check `tools/demo_display.py --verify`.
+  The methods occupy Warband's existing lifecycle locations so merging its
+  earlier delegates requires an explicit choice instead of retaining two
+  definitions and silently overriding size restoration or headless checks.
 
 - 2026-09-06 (Shardbound root): adopting the pure `saga2d.synth` sample
   functions from committed Warband `f478e89`, with a public compose → WAV →
