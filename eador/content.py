@@ -47,6 +47,7 @@ class SiteSpec:
     gold: int
     crystals: int
     relic: str
+    encounter: str | None = None
 
 
 SITES = {
@@ -56,6 +57,8 @@ SITES = {
     'den': SiteSpec('Wolf Den', 'A swift pack circles an abandoned explorer’s camp.', ('wolf', 'wolf', 'wolf'), 40, 1, 'wayfarer_boots'),
     'caravan': SiteSpec('Lost Caravan', 'Three raiders hold a merchant’s charter and treasury.', ('brigand', 'brigand', 'brigand'), 65, 0, 'merchant_seal'),
     'grove': SiteSpec('Elder Grove', 'An uneasy band protects a living standard among the roots.', ('goblin', 'wolf', 'brigand'), 35, 3, 'oak_standard'),
+    'border_watch': SiteSpec('Border Watch', 'Secure the watched seal for two uncontested enemy turns by round 8, or rout its defenders.',
+                            ('pikeman', 'archer', 'brigand'), 50, 2, 'oak_standard', 'border_watch'),
 }
 
 
