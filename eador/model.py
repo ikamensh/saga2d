@@ -161,7 +161,9 @@ class State:
 
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander') -> State:
-        if hero_class not in HERO_CLASSES:
+        if type(seed) is not int:
+            raise RuleError('The shard seed must be an integer.')
+        if not isinstance(hero_class, str) or hero_class not in HERO_CLASSES:
             raise RuleError('Choose Commander, Warrior, Scout or Wizard.')
         rng = random.Random(seed)
         cells = [(q, r) for q in range(-2, 3) for r in range(-2, 3)
@@ -577,7 +579,7 @@ def _validate_save(data: dict, version: int) -> None:
     if version == 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
-    integer(data['seed'], 'Seed', minimum=-(2**63))
+    require(type(data['seed']) is int, 'The shard seed must be an integer.')
     for name in ('gold', 'crystals', 'actions_left'):
         integer(data[name], name)
     for name in ('turn', 'next_troop_id'):
@@ -600,6 +602,7 @@ def _validate_save(data: dict, version: int) -> None:
     require(data['actions_left'] <= (3 if hero['hero_class'] == 'Scout' else 2), 'Too many campaign actions.')
     require(isinstance(hero['army'], list) and len(hero['army']) <= (6 if hero['hero_class'] == 'Commander' else 5), 'Invalid army size.')
     troop_ids = set()
+    troops_by_id = {}
     for troop in hero['army']:
         object_fields(troop, {f.name for f in fields(Troop)}, 'Troop')
         require(troop['kind'] in RECRUITABLE, 'Unknown recruited troop kind.')
@@ -609,6 +612,7 @@ def _validate_save(data: dict, version: int) -> None:
         integer(troop['xp'], 'Troop experience', maximum=troop['level'] * 6 - 1)
         require(troop['id'] not in troop_ids and troop['id'] < data['next_troop_id'], 'Invalid or duplicate troop ID.')
         troop_ids.add(troop['id'])
+        troops_by_id[troop['id']] = troop
 
     expected_cells = {(q, r) for q in range(-2, 3) for r in range(-2, 3) if abs(q + r) <= 2}
     require(isinstance(data['provinces'], list) and len(data['provinces']) == len(expected_cells), 'The shard must contain 19 provinces.')
@@ -671,6 +675,8 @@ def _validate_save(data: dict, version: int) -> None:
                 require(choice['context'] in RELICS, 'Choice names an unknown relic.')
                 first = 'distill' if choice['context'] in data['inventory'] else 'take'
                 require(set(option_ids) == {first, 'sell'}, 'Relic choice contains invalid options.')
+        pending_ranks = sum(choice['kind'] == 'skill' for choice in data['choices'])
+        require(sum(hero['skill_ranks'].values()) + pending_ranks <= hero['level'] - 1, 'Pending skill choices exceed earned levels.')
 
     battle = data['battle']
     if battle is None:
@@ -727,6 +733,10 @@ def _validate_save(data: dict, version: int) -> None:
             require(pos not in occupied, 'Living battle units occupy the same hex.')
             occupied.add(pos)
         if unit['team'] == 'player':
+            source = hero if unit['id'] == 0 else troops_by_id.get(unit['id'])
+            require(source is not None, 'Battle contains a troop outside the campaign army.')
+            require(unit['level'] == source['level'] and unit['max_hp'] == source['max_hp'], 'Battle progression does not match the campaign army.')
+            require(unit['id'] == 0 or unit['kind'] == source['kind'], 'Battle troop kind differs from its campaign identity.')
             player_ids.add(unit['id'])
         else:
             enemies.append(unit)
