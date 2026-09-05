@@ -1,16 +1,8 @@
-"""Procedural sound for Tribes.
-
-There are no audio assets.  Every effect and the ambient loop are
-synthesised with numpy the first time the game runs and cached as WAV
-files next to the save games::
-
-    ~/.tribes/sounds/<name>.wav     one file per SoundBank.play() name
-    ~/.tribes/sounds/VERSION        SOUND_VERSION the cached files were made with
-    ~/.tribes/music/ambient.wav     the 40 s stereo loop
-
-Bump ``SOUND_VERSION`` after changing a generator; the bank regenerates
-when the marker differs or a file is missing.  Everything is in D major
-so effects blend with the music.
+"""Procedural sound for Tribes: every effect and the ambient loop are
+synthesised with :mod:`saga2d.synth` the first time the game runs and
+cached as WAV files next to the save games (``~/.tribes/sounds`` and
+``~/.tribes/music``).  Bump ``SOUND_VERSION`` after changing a generator.
+Everything is in D major so effects blend with the music.
 
 ::
 
@@ -22,95 +14,17 @@ so effects blend with the music.
 from __future__ import annotations
 
 import random
-import wave
-from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
 
-from saga2d import AssetManager, AudioManager, Game
+from saga2d import Game
+from saga2d import synth
+from saga2d.synth import BELL, DARK, GLASS, PAD, SAMPLE_RATE, SOFT, hz, level, mix, noise, thump, tone, write_wav
+from saga2d.synth import seconds as sample_times
 
 SOUND_VERSION = "1"
-SAMPLE_RATE = 44_100
 MUSIC = "ambient"
-
-# -- Synthesis ---------------------------------------------------------------
-
-_NOTE_INDEX = {"C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5, "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11}
-
-# Partials as (harmonic multiple, relative amplitude): the timbre of a tone.
-SOFT = ((1, 1.0), (2, 0.3), (3, 0.1))                                # flute-like
-GLASS = ((1, 1.0), (2, 0.5), (3, 0.28), (4, 0.14), (5, 0.07))        # electric-piano pluck
-DARK = ((1, 1.0), (2, 0.15))                                         # muted, almost a sine
-BELL = ((1, 1.0), (2, 0.45), (3, 0.25), (4.16, 0.12), (5.43, 0.05))  # a little inharmonic shimmer
-PAD = ((1, 1.0), (2, 0.5), (3, 0.33), (4, 0.25))                     # saw-like, filtered by the LFO
-
-
-def hz(note: str) -> float:
-    """``"A4"`` → 440.0; sharps as ``"F#5"``."""
-    midi = 12 * (int(note[-1]) + 1) + _NOTE_INDEX[note[:-1]]
-    return 440.0 * 2 ** ((midi - 69) / 12)
-
-
-def _time(seconds: float) -> np.ndarray:
-    return np.arange(int(round(seconds * SAMPLE_RATE))) / SAMPLE_RATE
-
-
-def envelope(seconds: float, attack: float, tau: float) -> np.ndarray:
-    """Raised-cosine attack, exponential decay with time constant *tau*,
-    and a 5 ms fade at the very end so no clip ends mid-cycle."""
-    t = _time(seconds)
-    env = np.ones_like(t)
-    rising = t < attack
-    env[rising] = 0.5 - 0.5 * np.cos(np.pi * t[rising] / attack)
-    env[~rising] = np.exp(-(t[~rising] - attack) / tau)
-    tail = min(len(t), int(0.005 * SAMPLE_RATE))
-    env[-tail:] *= np.linspace(1.0, 0.0, tail)
-    return env
-
-
-def tone(note: str, seconds: float, *, attack: float = 0.005, tau: float = 0.1, partials=SOFT) -> np.ndarray:
-    """A decaying note; higher partials die faster, as on a plucked string."""
-    freq = hz(note)
-    t = _time(seconds)
-    out = np.zeros_like(t)
-    for k, amp in partials:
-        out += amp * envelope(seconds, attack, tau / (1 + 0.6 * (k - 1))) * np.sin(2 * np.pi * freq * k * t)
-    return out / sum(amp for _, amp in partials)
-
-
-def noise(seconds: float, low: float, high: float, *, attack: float = 0.002, tau: float = 0.03, seed: int = 0) -> np.ndarray:
-    """Band-limited noise burst between *low* and *high* Hz (soft 8th-order edges)."""
-    n = int(round(seconds * SAMPLE_RATE))
-    spectrum = np.fft.rfft(np.random.default_rng(seed).standard_normal(n))
-    freqs = np.fft.rfftfreq(n, 1 / SAMPLE_RATE)
-    mask = np.zeros_like(freqs)
-    f = freqs[1:]
-    mask[1:] = 1 / (1 + (f / high) ** 8) / (1 + (low / f) ** 8)
-    burst = np.fft.irfft(spectrum * mask, n)
-    return burst / np.max(np.abs(burst)) * envelope(seconds, attack, tau)
-
-
-def thump(f0: float, f1: float, seconds: float, *, attack: float = 0.002, tau: float = 0.05) -> np.ndarray:
-    """A sine gliding exponentially from *f0* to *f1* Hz: drums and impacts."""
-    t = _time(seconds)
-    freq = f0 * (f1 / f0) ** (t / seconds)
-    return np.sin(2 * np.pi * np.cumsum(freq) / SAMPLE_RATE) * envelope(seconds, attack, tau)
-
-
-def mix(*layers: np.ndarray | tuple[float, np.ndarray]) -> np.ndarray:
-    """Sum mono clips; a ``(start_seconds, clip)`` pair places the clip later."""
-    placed = [(0.0, layer) if isinstance(layer, np.ndarray) else layer for layer in layers]
-    starts = [int(round(start * SAMPLE_RATE)) for start, _ in placed]
-    out = np.zeros(max(start + len(clip) for start, (_, clip) in zip(starts, placed)))
-    for start, (_, clip) in zip(starts, placed):
-        out[start:start + len(clip)] += clip
-    return out
-
-
-def level(clip: np.ndarray, peak: float) -> np.ndarray:
-    return clip * (peak / np.max(np.abs(clip)))
-
 
 # -- Effects (mono, 50–600 ms, D major) --------------------------------------
 
@@ -291,7 +205,7 @@ def _add_wrapped(out: np.ndarray, clip: np.ndarray, start_seconds: float) -> Non
 def _pad(chord: tuple[str, ...], seconds: float, t0: float) -> np.ndarray:
     """Detuned stereo pad with an equal-power crossfade at both ends and a
     brightness LFO (two cycles per loop) that opens and closes the harmonics."""
-    t = _time(seconds)
+    t = sample_times(seconds)
     fade_in = np.sin(np.minimum(1.0, t / _CROSSFADE) * np.pi / 2)
     fade_out = np.sin(np.minimum(1.0, (seconds - t) / _CROSSFADE) * np.pi / 2)
     env = fade_in * fade_out
@@ -331,100 +245,37 @@ def ambient() -> np.ndarray:
             velocity = (1.0 if eighth % 4 == 0 else 0.7) * rng.uniform(0.75, 1.0)
             _add_wrapped(out, 0.28 * _pluck(top[_ARPEGGIO[eighth % 8]], 0.6 * np.sin(eighth * 1.3), velocity), start + eighth * BEAT / 2)
         start += length
-    swell = 0.85 + 0.15 * np.sin(2 * np.pi * _time(LOOP_SECONDS) / (LOOP_SECONDS / 4))
+    swell = 0.85 + 0.15 * np.sin(2 * np.pi * sample_times(LOOP_SECONDS) / (LOOP_SECONDS / 4))
     return level(out * swell[:, None], 0.45)
 
 
-# -- Cache -------------------------------------------------------------------
+# -- Cache and bank ------------------------------------------------------------
 
 
 def sound_files(data_dir: Path) -> list[Path]:
     """Every WAV the bank expects under *data_dir*."""
-    return [data_dir / "sounds" / f"{name}.wav" for name in SOUNDS] + [data_dir / "music" / f"{MUSIC}.wav"]
+    return synth.sound_files(data_dir, SOUNDS, {MUSIC: ambient})
 
 
 def is_generated(data_dir: Path) -> bool:
-    marker = data_dir / "sounds" / "VERSION"
-    return marker.exists() and marker.read_text() == SOUND_VERSION and all(path.exists() for path in sound_files(data_dir))
+    return synth.is_generated(data_dir, SOUND_VERSION, SOUNDS, {MUSIC: ambient})
 
 
 def generate(data_dir: Path) -> None:
-    """Synthesise every effect and the loop into *data_dir*, overwriting.
-    The VERSION marker is written last so an interrupted run regenerates."""
-    for name, make in SOUNDS.items():
-        write_wav(data_dir / "sounds" / f"{name}.wav", make())
-    write_wav(data_dir / "music" / f"{MUSIC}.wav", ambient())
-    (data_dir / "sounds" / "VERSION").write_text(SOUND_VERSION)
-
-
-def write_wav(path: Path, samples: np.ndarray) -> None:
-    """16-bit PCM at SAMPLE_RATE; *samples* in [-1, 1], shape ``(n,)`` or ``(n, channels)``."""
-    pcm = np.clip(np.round(samples * 32767), -32768, 32767).astype("<i2")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with wave.open(str(path), "wb") as out:
-        out.setnchannels(1 if pcm.ndim == 1 else pcm.shape[1])
-        out.setsampwidth(2)
-        out.setframerate(SAMPLE_RATE)
-        out.writeframes(pcm.tobytes())
-
-
-# -- Bank --------------------------------------------------------------------
+    """Synthesise every effect and the loop into *data_dir*, overwriting."""
+    synth.generate(data_dir, SOUND_VERSION, SOUNDS, {MUSIC: ambient})
 
 
 #: Scene event names that map onto a differently named effect.
 ALIASES = {"attack_kill": "unit_death", "button": "ui_click"}
 
 
-class SoundBank:
-    """The game's sounds, played through its own :class:`AudioManager`.
-
-    *data_dir* defaults to ``~/.tribes``; the WAVs are generated there on
-    first use (see the module docstring for the layout).
-    """
+class SoundBank(synth.SynthBank):
+    """Tribes' sounds; *data_dir* defaults to ``~/.tribes``."""
 
     def __init__(self, game: Game, data_dir: Path | str | None = None) -> None:
-        self.data_dir = Path(data_dir) if data_dir is not None else Path.home() / ".tribes"
-        if not is_generated(self.data_dir):
-            generate(self.data_dir)
-        self._audio = AudioManager(game.backend, AssetManager(game.backend, base_path=self.data_dir))
-        self._rng = random.Random(0)
+        super().__init__(game, data_dir if data_dir is not None else Path.home() / ".tribes", version=SOUND_VERSION,
+                         sounds=SOUNDS, music={MUSIC: ambient}, aliases=ALIASES)
 
-    @property
-    def names(self) -> tuple[str, ...]:
-        return tuple(SOUNDS)
-
-    def play(self, name: str, *, pitch_variation: float = 0.0) -> None:
-        """Play effect *name*.  *pitch_variation* 0.05 shifts the pitch by up
-        to ±5 % so a repeated effect does not sound stamped out."""
-        name = ALIASES.get(name, name)
-        if name not in SOUNDS:
-            raise KeyError(f"Unknown sound {name!r}. Sounds: {', '.join(SOUNDS)}")
-        pitch = 1.0 + self._rng.uniform(-pitch_variation, pitch_variation) if pitch_variation else 1.0
-        self._audio.play_sound(name, pitch=pitch)
-
-    def start_music(self) -> None:
-        """Start the ambient loop; a no-op while it is already playing."""
-        if self._audio.music_name != MUSIC:
-            self._audio.play_music(MUSIC, loop=True)
-
-    def stop_music(self) -> None:
-        self._audio.stop_music()
-
-    @property
-    def music_playing(self) -> bool:
-        return self._audio.music_name == MUSIC
-
-    def set_volume(self, channel: str, level: float) -> None:
-        """*channel* is ``"master"``, ``"music"`` or ``"sfx"``; *level* 0–1."""
-        self._audio.set_volume(channel, level)
-
-    def get_volume(self, channel: str) -> float:
-        return self._audio.get_volume(channel)
-
-    @property
-    def muted(self) -> bool:
-        return self._audio.muted
-
-    @muted.setter
-    def muted(self, value: bool) -> None:
-        self._audio.muted = value
+    def start_music(self, name: str = MUSIC) -> None:  # type: ignore[override]
+        super().start_music(name)
