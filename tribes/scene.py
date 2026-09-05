@@ -9,14 +9,14 @@ from typing import Any
 
 from saga2d import (
     Anchor, Button, Camera, Column, Delay, InputEvent, KeyHints, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer,
-    Row, Scene, Sequence, Sprite,
+    Row, Scene, Sequence, Sprite, Style,
 )
 from saga2d.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, Pulse, Toast, hop
 from tribes import ai, effects, mapgen
 from tribes.effects import play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, REWARDS, TECHS, UNITS, Reward, Tech, UnitType
-from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE
+from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE, SEMIBOLD
 from tribes.textures import FOG, TILE
 from tribes.view import MapView, Selection, rgba, tile_at, tile_center, tint
 
@@ -193,7 +193,7 @@ class MapScene(Scene):
         if self.selected is not None:
             return [("Enter", "move / attack"), ("C", "capture"), ("H", "hold"), ("Tab", "next unit"), ("Esc", "deselect"), ("F1", "help")]
         if self._city() is not None:
-            return [("1-5", "train"), ("Click", "a glowing resource to harvest"), ("Esc", "deselect"), ("F1", "help")]
+            return [("1-7", "train"), ("Click", "a glowing resource to harvest"), ("Esc", "deselect"), ("F1", "help")]
         return [("Enter", "act"), ("Tab", "next unit"), ("E", "end turn"), ("T", "tech"), ("WASD", "pan"), ("Wheel", "zoom"), ("Esc", "menu"), ("F1", "help")]
 
     def _city(self) -> City | None:
@@ -493,7 +493,7 @@ class MapScene(Scene):
         except RuleError as exc:
             self.warn(str(exc))
             return
-        gained = HARVEST[tile.resource].population  # type: ignore[index]
+        gained = self.world.harvest_yield(self.human, tile.resource)  # type: ignore[arg-type]
         center = tile_center(pos)
         self.effects.add(Burst(center, (255, 230, 120, 255), 12, rng=self.rng))
         self.effects.add(FloatingText(f"+{gained} pop", (center[0], center[1] - TILE * 0.2), HEAL_COLOR))
@@ -737,7 +737,7 @@ class MapScene(Scene):
                 lines.append(f"Attack {hovered.type.value} ({hovered.hp} hp): deal {dealt}, take {taken if retaliates and dealt < hovered.hp else 0} — {verdict}")
         elif city is not None:
             title = f"{city.name}  level {city.level}" + ("  (capital)" if city.capital else "")
-            lines.append(f"Income +{city.income}★ per turn   Territory radius {city.radius}")
+            lines.append(f"Income +{world.city_income(city)}★ per turn   Territory radius {city.radius}")
             lines.append(f"{city.next_level_population - city.population} more pop to level {city.level + 1}: harvest resources in your borders")
             built = [name for flag, name in ((city.workshop, "Workshop"), (city.walls, "City walls")) if flag]
             built += [f"{city.parks} park{'s' if city.parks > 1 else ''}"] if city.parks else []
@@ -761,9 +761,9 @@ class MapScene(Scene):
         if world.explored(self.human, self.cursor):
             tile = world.tile(self.cursor)
             if tile.resource is not None and not tile.harvested:
-                h = HARVEST[tile.resource]
                 reason = world.can_harvest(self.human, self.cursor)
-                lines.append(f"{tile.resource.value.title()}: {h.label} for {h.cost}★ → +{h.population} pop" + (f"  ({reason})" if reason else ""))
+                cost, pop = world.harvest_cost(self.human, tile.resource), world.harvest_yield(self.human, tile.resource)
+                lines.append(f"{tile.resource.value.title()}: {HARVEST[tile.resource].label} for {cost}★ → +{pop} pop" + (f"  ({reason})" if reason else ""))
         if self.status_timer > 0:
             lines.append(self.status)
         self.info_title.text = title
@@ -840,68 +840,204 @@ class _Overlay(Scene):
         self.draw_rect(0, 0, w, h, (4, 6, 12, 140))
 
 
-def _tech_rows() -> list[tuple[Tech, int]]:
-    """Techs in tree order: each root followed by the techs it unlocks, with depth."""
-    rows: list[tuple[Tech, int]] = []
-    for root, info in TECHS.items():
-        if info.requires is None:
-            rows.append((root, 0))
-            rows.extend((child, 1) for child, child_info in TECHS.items() if child_info.requires is root)
-    return rows
+WHEEL_RADII = (105, 205, 305)  # rings for tiers 1, 2 and 3; 100 px apart leaves room for a node and its label
+NODE = 62  # diameter of a tech node
+
+
+def tech_wheel(center: tuple[float, float], radii: tuple[float, float, float] = WHEEL_RADII) -> dict[Tech, tuple[float, float]]:
+    """Where every tech sits on the research wheel: roots evenly spaced from the
+    top, their children fanned out on the next ring, grandchildren on the outer
+    ring at their parent's angle."""
+    cx, cy = center
+    roots = [t for t, info in TECHS.items() if info.requires is None]
+    step = 2 * math.pi / len(roots)
+    positions: dict[Tech, tuple[float, float]] = {}
+
+    def place(tech: Tech, angle: float, ring: int) -> None:
+        positions[tech] = (cx + radii[ring] * math.cos(angle), cy + radii[ring] * math.sin(angle))
+        children = [t for t, info in TECHS.items() if info.requires is tech]
+        for j, child in enumerate(children):
+            place(child, angle + (j - (len(children) - 1) / 2) * step / 2 ** (ring + 1), ring + 1)
+
+    for i, root in enumerate(roots):
+        place(root, -math.pi / 2 + i * step, 0)
+    return positions
+
+
+_NODE = dict(font=SEMIBOLD, radius=NODE // 2, border_width=2, padding=0)
+KNOWN_NODE = Style(background_color=(46, 128, 84, 255), hover_color=(56, 146, 98, 255), border_color=(130, 225, 140, 210), **_NODE)
+OPEN_NODE = Style(background_color=(58, 122, 224, 255), hover_color=(86, 148, 242, 255), border_color=(160, 200, 255, 220), **_NODE)
+PRICEY_NODE = Style(background_color=(30, 46, 84, 255), hover_color=(40, 60, 104, 255), border_color=(90, 130, 200, 200),
+                    text_color=(170, 190, 230, 255), **_NODE)
+LOCKED_NODE = Style(background_color=(255, 255, 255, 12), hover_color=(255, 255, 255, 24), border_color=(255, 255, 255, 40),
+                    text_color=(140, 148, 172, 255), **_NODE)
 
 
 class TechScene(_Overlay):
-    controls = {"t": "close"}
+    """The research wheel: five branches around the centre, like the original.
+
+    Tab cycles through what can be researched right now, the arrows walk the
+    wheel geometrically, Enter researches the focused tech; clicking a node does
+    the same.  The map's HUD hides while the wheel is up.
+    """
+
+    controls = {
+        ("t", "escape"): "close", "tab": "focus_next", "shift+tab": "focus_prev", ("return", "space"): "buy_focused",
+        "up": "focus_up", "down": "focus_down", "left": "focus_left", "right": "focus_right",
+    }
+    pop_on_cancel = False
 
     def __init__(self, map_scene: MapScene) -> None:
         self.map_scene = map_scene
+        self.focus: Tech = next(iter(TECHS))
+        self.nodes: dict[Tech, Button] = {}
 
     def on_enter(self) -> None:
-        world = self.map_scene.world
+        self.map_scene.ui.visible = False
+        w, h = self.game.resolution
+        self.positions = tech_wheel((w / 2, h / 2 - 5))
+        for tech, (x, y) in self.positions.items():
+            node = Button(lambda t=tech: self._node_text(t), on_click=lambda t=tech: self.activate(t), width=NODE, height=NODE,
+                          anchor=Anchor.TOP_LEFT, margin=(round(x - NODE / 2), round(y - NODE / 2)))
+            self.nodes[tech] = node
+            self.ui.add(node)
+            self.ui.add(Label(tech.value.title(), text_style="sub", width=130, align="center", anchor=Anchor.TOP_LEFT,
+                              margin=(round(x - 65), round(y + NODE / 2 + 1))))
         tribe = self.map_scene.tribe
-        panel = self.panel(f"Research   ★ {tribe.stars}")
-        panel.add(Label("Techs unlock harvests and units; indented techs need the one above them.", text_style="sub"))
-        for index, (tech, depth) in enumerate(_tech_rows()):
-            key = str((index + 1) % 10)
-            known = tech in tribe.techs
-            reason = world.can_research(tribe.id, tech)
-            button = Button(tech.value.title(), hotkey=key, on_click=lambda t=tech: self.buy(t),
-                            style=ACTION_BUTTON if reason is None else GHOST_BUTTON, width=170)
-            button.enabled = reason is None
-            cost = "✓ known" if known else f"{world.tech_cost(tribe.id, tech)}★"
-            leads = [t.value.title() for t, i in TECHS.items() if i.requires is tech]
-            detail = TECHS[tech].summary + (f"  →  {', '.join(leads)}" if leads else "")
-            status = "" if reason is None or known else reason[0].lower() + reason[1:]
-            if reason is not None and reason.startswith("Costs"):
-                status = f"need {reason[6:]}, have {tribe.stars}★"
-            panel.add(Row(
-                Label("›" if depth else "", text_style="sub", width=22, align="right"),
-                button,
-                Label(cost, text_style="hud", width=80, align="right", text_color=GOOD if known else GOLD),
-                Label(detail, text_style="body", width=370),
-                Label(status, text_style="sub", width=190, text_color=BAD),
-                spacing=12,
-            ))
-            self.bind_key(key, lambda t=tech: self.buy(t))
-        panel.add(KeyHints([("1-0", "research"), ("Esc", "close")]))
+        self.ui.add(Panel(anchor=Anchor.TOP_LEFT, margin=12, layout=Layout.HORIZONTAL, spacing=16, style=PANEL_STYLE, children=[
+            Label("Research", text_style="title"), Label(lambda: f"★ {tribe.stars}", text_style="hud", text_color=GOLD),
+        ]))
+        self.ui.add(Label(self._detail_text, text_style="body", anchor=Anchor.BOTTOM_CENTER, margin=(0, HINT_BAR + 12)))
+        self.ui.add(KeyHints([("Tab", "next affordable"), ("↑↓←→", "move"), ("Enter", "research"), ("Esc", "close")],
+                             anchor=Anchor.BOTTOM_CENTER, margin=7))
+        self.focus = next(iter(self._researchable()), self.focus)
+        self._restyle()
+
+    def on_exit(self) -> None:
+        self.map_scene.ui.visible = True
+
+    # -- State ---------------------------------------------------------------------
+
+    @property
+    def world(self) -> World:
+        return self.map_scene.world
+
+    def _researchable(self) -> list[Tech]:
+        return [t for t in TECHS if self.world.can_research(self.map_scene.human, t) is None]
+
+    def _node_text(self, tech: Tech) -> str:
+        if tech in self.map_scene.tribe.techs:
+            return "✓"
+        return f"{self.world.tech_cost(self.map_scene.human, tech)}★"
+
+    def _detail_text(self) -> str:
+        tech, tribe = self.focus, self.map_scene.tribe
+        info = TECHS[tech]
+        if tech in tribe.techs:
+            state = "known"
+        else:
+            reason = self.world.can_research(tribe.id, tech)
+            state = f"{self.world.tech_cost(tribe.id, tech)}★" + (f" · {reason[0].lower()}{reason[1:]}" if reason else " · press Enter to research")
+        return f"{tech.value.title()} — {info.summary} · {state}"
+
+    def _restyle(self) -> None:
+        tribe = self.map_scene.tribe
+        for tech, node in self.nodes.items():
+            reason = self.world.can_research(tribe.id, tech)
+            if tech in tribe.techs:
+                node.style = KNOWN_NODE
+            elif reason is None:
+                node.style = OPEN_NODE
+            elif reason.startswith("Costs"):
+                node.style = PRICEY_NODE
+            else:
+                node.style = LOCKED_NODE
+
+    # -- Actions -------------------------------------------------------------------
+
+    def activate(self, tech: Tech) -> None:
+        """Click or Enter: research when possible, otherwise just focus and explain."""
+        self.focus = tech
+        reason = self.world.can_research(self.map_scene.human, tech)
+        if reason is not None:
+            self.map_scene.sfx("error")
+            return
+        self.buy(tech)
 
     def buy(self, tech: Tech) -> None:
-        world = self.map_scene.world
-        reason = world.can_research(self.map_scene.human, tech)
-        if reason is not None:
-            self.map_scene.warn(reason)
-            return
-        world.research(self.map_scene.human, tech)
-        self.map_scene.say(f"Learned {tech.value.title()}")
-        self.map_scene.sfx("research")
-        capital = world.capital_of(self.map_scene.human)
+        world, scene = self.world, self.map_scene
+        world.research(scene.human, tech)
+        scene.say(f"Learned {tech.value.title()}")
+        scene.sfx("research")
+        capital = world.capital_of(scene.human)
         if capital is not None:
             center = tile_center(capital.pos)
-            self.map_scene.effects.add(FloatingText(f"{tech.value.title()} learned", (center[0], center[1] - TILE * 0.8), GOLD, font_size=20, rise=34, duration=1.4))
-        self.game.pop()
+            scene.effects.add(FloatingText(f"{tech.value.title()} learned", (center[0], center[1] - TILE * 0.8), GOLD, font_size=20, rise=34, duration=1.4))
+        scene.sync()
+        scene._refresh_selection()
+        self._restyle()
+
+    def buy_focused(self) -> None:
+        self.activate(self.focus)
+
+    def focus_next(self, step: int = 1) -> None:
+        order = self._researchable() or [t for t in TECHS if t not in self.map_scene.tribe.techs] or list(TECHS)
+        index = (order.index(self.focus) + step) % len(order) if self.focus in order else (0 if step > 0 else -1)
+        self.focus = order[index]
+
+    def focus_prev(self) -> None:
+        self.focus_next(-1)
+
+    def _focus_toward(self, dx: float, dy: float) -> None:
+        """Move the focus to the nearest node lying roughly in direction ``(dx, dy)``."""
+        fx, fy = self.positions[self.focus]
+        best: tuple[float, Tech] | None = None
+        for tech, (x, y) in self.positions.items():
+            vx, vy = x - fx, y - fy
+            distance = math.hypot(vx, vy)
+            if tech is self.focus or (vx * dx + vy * dy) / distance < 0.5:
+                continue  # behind, or outside a 60° cone
+            score = distance ** 2 / (vx * dx + vy * dy)  # near and well aligned wins
+            if best is None or score < best[0]:
+                best = (score, tech)
+        if best is not None:
+            self.focus = best[1]
+
+    def focus_up(self) -> None:
+        self._focus_toward(0, -1)
+
+    def focus_down(self) -> None:
+        self._focus_toward(0, 1)
+
+    def focus_left(self) -> None:
+        self._focus_toward(-1, 0)
+
+    def focus_right(self) -> None:
+        self._focus_toward(1, 0)
 
     def close(self) -> None:
         self.game.pop()
+
+    # -- Drawing --------------------------------------------------------------------
+
+    def draw(self) -> None:
+        super().draw()
+        w, h = self.game.resolution
+        self.draw_rect(0, 0, w, h, (4, 6, 12, 110))  # the wheel wants a quieter backdrop than a small dialog
+        tribe = self.map_scene.tribe
+        for tech, info in TECHS.items():
+            if info.requires is None:
+                continue
+            (x1, y1), (x2, y2) = self.positions[info.requires], self.positions[tech]
+            if tech in tribe.techs:
+                color = (130, 225, 140, 200)
+            elif info.requires in tribe.techs:
+                color = (150, 195, 255, 200)
+            else:
+                color = (255, 255, 255, 45)
+            self.draw_line(x1, y1, x2, y2, color, 3)
+        fx, fy = self.positions[self.focus]
+        self.draw_circle(fx, fy, NODE / 2 + 7, (255, 255, 255, 110))
 
 
 class SettingsScene(_Overlay):
@@ -1063,10 +1199,10 @@ HELP_KEYS = (
     ("Tab / Shift+Tab", "next / previous unit"),
     ("Wheel / + / −", "zoom"),
     ("E", "end turn (twice while units can still act)"),
-    ("T", "research"),
+    ("T", "research wheel: Tab / arrows pick a tech, Enter learns it"),
     ("C", "capture a village or an enemy city"),
     ("H", "hold: the unit rests and heals"),
-    ("1-5", "train in the selected city"),
+    ("1-7", "train in the selected city"),
     ("F5 / F9", "save / load"),
     ("Home", "jump to the capital"),
     ("Esc", "cancel, or the pause menu (settings and title live there)"),

@@ -1,0 +1,215 @@
+"""Integration journeys through the same scenes and input used by players."""
+
+from saga2d import Game
+
+
+def press(game, key):
+    game.backend.inject_key(key)
+    game.tick(1 / 60)
+
+
+def click(game, x, y):
+    game.backend.inject_click(round(x), round(y))
+    game.tick(1 / 60)
+
+
+def button(game, label):
+    """Click visible public UI bounds, not an implementation callback."""
+    from saga2d import Button
+
+    control = game.scene.ui.find(lambda child: isinstance(child, Button) and child.text == label)
+    assert control is not None, label
+    x, y, w, h = control.bounds
+    click(game, x + w / 2, y + h / 2)
+
+
+def test_new_game_opens_a_seeded_shard_from_title():
+    """The executable's title flow must reach the playable strategy scene."""
+    from eador.scene import ShardScene, TitleScene
+
+    game = Game("Shardbound test", backend="mock")
+    try:
+        game.push(TitleScene(seed=7))
+        game.tick(1 / 60)
+        game.backend.inject_key("return")
+        game.tick(1 / 60)
+        assert isinstance(game.scene, ShardScene)
+        assert len(game.scene.state.provinces) == 19
+        assert game.scene.state.status == "playing"
+    finally:
+        game._teardown()
+
+
+def test_invade_retreat_returns_to_campaign_without_losing_scene_state():
+    """Retreat resolves the real battle and restores the underlying map scene."""
+    from eador.model import State
+    from eador.scene import BattleScene, ShardScene
+
+    game = Game("Shardbound test", backend="mock")
+    try:
+        scene = ShardScene(State.new(7))
+        game.push(scene)
+        game.tick(1 / 60)
+        destination = next(p for p in scene.grid.neighbors(scene.state.hero.pos)
+                           if scene.state.provinces[p].owner == "neutral")
+        click(game, *scene.grid.center(destination))
+        button(game, "Invade province")
+        assert isinstance(game.scene, BattleScene)
+        button(game, "Retreat")
+        assert game.scene is scene
+        assert scene.state.battle is None
+        assert scene.state.provinces[destination].owner == "neutral"
+        assert len(game.scenes) == 1
+    finally:
+        game._teardown()
+
+
+def test_battle_save_restores_playable_tactics_and_returns_wounds_to_map(tmp_path):
+    """Save through F5, change play, restore through F9 and finish the encounter."""
+    from eador.model import State
+    from eador.scene import BattleScene, ShardScene
+
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        state = State.new(7, "Wizard")
+        root = ShardScene(state)
+        game.push(root)
+        game.tick(1 / 60)
+        click(game, *root.grid.center((-1, 0)))
+        press(game, "return")
+        assert isinstance(game.scene, BattleScene)
+        scene = game.scene
+        enemy = next(u for u in state.battle.units if u.team == "enemy")
+        # Let the advancing defender enter spell range before choosing a target.
+        press(game, "e")
+        press(game, "1")
+        click(game, *scene.grid.center(enemy.pos))
+        assert state.battle.unit(0).acted
+        assert state.battle.mana < state.hero.mana
+        press(game, "f5")
+        saved = state.to_json()
+        press(game, "e")
+        press(game, "f9")
+        assert isinstance(game.scene, BattleScene)
+        restored = game.scene.root.state
+        assert restored.to_json() == saved
+        assert len(game.scenes) == 2
+        for _ in range(30):
+            if restored.battle.outcome:
+                break
+            press(game, "a")
+        assert restored.battle.outcome == "player"
+        press(game, "e")
+        assert isinstance(game.scene, ShardScene)
+        assert restored.battle is None
+        assert restored.hero.pos == (-1, 0)
+        assert restored.provinces[(-1, 0)].owner == "player"
+        assert restored.hero.xp > 0 or restored.hero.level > 1
+    finally:
+        game._teardown()
+
+
+def test_stronghold_unlocks_recruitment_through_keyboard_and_mouse():
+    """The displayed building and troop catalogues drive real economy rules."""
+    from eador.model import BUILDINGS, UNITS, State
+    from eador.scene import CatalogScene, ShardScene
+
+    game = Game("Shardbound test", backend="mock")
+    try:
+        state = State.new(7)
+        root = ShardScene(state)
+        game.push(root)
+        game.tick(1 / 60)
+        before = state.gold
+        press(game, "b")
+        assert isinstance(game.scene, CatalogScene)
+        press(game, "1")
+        assert "barracks" in state.buildings
+        assert state.gold == before - BUILDINGS["barracks"].cost
+        press(game, "escape")
+        button(game, "Recruit troops")
+        press(game, "2")
+        assert state.hero.army[-1].kind == "swordsman"
+        assert state.gold == before - BUILDINGS["barracks"].cost - UNITS["swordsman"].cost
+        press(game, "escape")
+        assert game.scene is root
+        assert game.running
+    finally:
+        game._teardown()
+
+
+def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
+    """Explore, invest, conquer, replay and restore a finished shard through UI."""
+    from eador.model import BUILDINGS, UNITS
+    from eador.scene import BattleScene, ResultScene, ShardScene, TitleScene
+
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        game.push(TitleScene(seed=7))
+        game.tick(1 / 60)
+        press(game, "return")
+        root, state = game.scene, game.scene.state
+
+        def battle():
+            assert isinstance(game.scene, BattleScene)
+            for _ in range(80):
+                if state.battle.outcome:
+                    break
+                press(game, "a")
+            assert isinstance(game.scene, ResultScene)
+            assert state.battle.outcome == "player"
+            press(game, "e")
+
+        def prepare():
+            if "temple" not in state.buildings and state.gold >= BUILDINGS["temple"].cost:
+                press(game, "b")
+                press(game, "3")
+                press(game, "escape")
+            press(game, "r")
+            while state.gold >= UNITS["swordsman"].cost and len(state.hero.army) < state.hero.max_army:
+                press(game, "2")
+            press(game, "escape")
+
+        def rest():
+            press(game, "e")
+            if state.battle:
+                battle()
+
+        press(game, "b")
+        press(game, "1")
+        press(game, "escape")
+        press(game, "r")
+        press(game, "2")
+        press(game, "escape")
+        for destination in ((-2, 0), (-1, 0), (0, 0), (1, 0)):
+            if state.hero.pos != destination:
+                click(game, *root.grid.center(destination))
+                press(game, "return")
+                battle()
+                rest()
+                prepare()
+            press(game, "x")
+            battle()
+            rest()
+            prepare()
+        for _ in range(12):
+            if max([state.hero.max_hp - state.hero.hp] + [u.max_hp - u.hp for u in state.hero.army]) <= 6:
+                break
+            rest()
+        click(game, *root.grid.center((2, 0)))
+        press(game, "return")
+        battle()
+        assert state.status == "victory"
+        assert isinstance(game.scene, ResultScene)
+        assert not game.scene.is_battle
+        assert state.battle is None
+        press(game, "f5")
+        won = state.to_json()
+        button(game, "New shard")
+        assert isinstance(game.scene, TitleScene)
+        press(game, "f9")
+        assert isinstance(game.scene, ResultScene)
+        assert game.scene.root.state.to_json() == won
+        assert len(game.scenes) == 2
+    finally:
+        game._teardown()

@@ -16,7 +16,7 @@ from typing import Any, Iterator
 
 from tribes.rules import (
     CITY_BORDER_GROWTH_LEVEL, CITY_DEFENSE_BONUS, EXPLORER_RADIUS, HARVEST, HEAL_IN_TERRITORY, HEAL_OUTSIDE,
-    LEVEL_REWARDS, MAX_ROUNDS, MOUNTAIN_DEFENSE_BONUS, REWARD_PARK_SCORE, REWARD_POPULATION, REWARD_STARS, REWARDS,
+    LEVEL_REWARDS, MAX_ROUNDS, MEDITATION_HEAL, MOUNTAIN_DEFENSE_BONUS, REWARD_PARK_SCORE, REWARD_POPULATION, REWARD_STARS, REWARDS,
     RUIN_POPULATION, RUIN_TREASURE, RUIN_VISION_RADIUS, STARTING_STARS, TECHS, TRIBES, UNITS, WALL_DEFENSE_BONUS,
     Discovery, Resource, Reward, Tech, Terrain, UnitType, tech_cost,
 )
@@ -238,7 +238,17 @@ class World:
         return next((c for c in self.cities.values() if c.tribe == tribe and c.capital), None)
 
     def income(self, tribe: int) -> int:
-        return sum(c.income for c in self.tribe_cities(tribe))
+        return sum(self.city_income(c) for c in self.tribe_cities(tribe))
+
+    def city_income(self, city: City) -> int:
+        """The city's own income plus what its tribe's techs add (Navigation on the coast, Trade everywhere)."""
+        bonus = int(self.has_tech(city.tribe, Tech.TRADE))
+        if self.has_tech(city.tribe, Tech.NAVIGATION) and self.is_coastal(city.pos):
+            bonus += 1
+        return city.income + bonus
+
+    def is_coastal(self, pos: Pos) -> bool:
+        return any(self.tile(n).terrain is Terrain.WATER for n in self.neighbors(pos))
 
     def unit_cap(self, tribe: int) -> int:
         return sum(c.level + 1 for c in self.tribe_cities(tribe))
@@ -312,16 +322,22 @@ class World:
         return self.unit_at(pos) is None
 
     def _stops_movement(self, unit: Unit, pos: Pos) -> bool:
-        if self.tile(pos).terrain in (Terrain.FOREST, Terrain.MOUNTAIN):
+        terrain = self.tile(pos).terrain
+        if terrain is Terrain.MOUNTAIN or (terrain is Terrain.FOREST and not self.has_tech(unit.tribe, Tech.FORESTRY)):
             return True
         return any((n := self.unit_at(p)) is not None and n.tribe != unit.tribe for p in self.neighbors(pos))
+
+    def movement(self, unit: Unit) -> int:
+        """Tiles the unit may cross this turn: its own speed, plus one on roads (own territory)."""
+        roads = self.has_tech(unit.tribe, Tech.ROADS) and self.owner_of(unit.pos) == unit.tribe
+        return unit.info.movement + int(roads)
 
     def reachable(self, unit: Unit) -> dict[Pos, Pos]:
         """Every tile *unit* can move to this turn, mapped to the tile before it on the path."""
         if not unit.can_move:
             return {}
         parents: dict[Pos, Pos] = {}
-        budget_left: dict[Pos, int] = {unit.pos: unit.info.movement}
+        budget_left: dict[Pos, int] = {unit.pos: self.movement(unit)}
         queue: deque[Pos] = deque([unit.pos])
         while queue:
             pos = queue.popleft()
@@ -529,6 +545,12 @@ class World:
         self.tribes[city.tribe].stars -= UNITS[unit_type].cost
         return self.spawn_unit(city.tribe, unit_type, city.pos, fresh=False)
 
+    def harvest_cost(self, tribe: int, resource: Resource) -> int:
+        return max(1, HARVEST[resource].cost - int(self.has_tech(tribe, Tech.CONSTRUCTION)))
+
+    def harvest_yield(self, tribe: int, resource: Resource) -> int:
+        return HARVEST[resource].population + int(resource is Resource.FISH and self.has_tech(tribe, Tech.AQUACULTURE))
+
     def can_harvest(self, tribe: int, pos: Pos) -> str | None:
         tile = self.tile(pos)
         if tile.resource is None or tile.harvested:
@@ -538,8 +560,9 @@ class World:
         info = HARVEST[tile.resource]
         if not self.has_tech(tribe, info.tech):
             return f"Requires {info.tech.value.title()}"
-        if self.tribes[tribe].stars < info.cost:
-            return f"Costs {info.cost}★"
+        cost = self.harvest_cost(tribe, tile.resource)
+        if self.tribes[tribe].stars < cost:
+            return f"Costs {cost}★"
         return None
 
     def harvest(self, tribe: int, pos: Pos) -> City:
@@ -548,11 +571,11 @@ class World:
         if reason is not None:
             raise RuleError(reason)
         tile = self.tile(pos)
-        info = HARVEST[tile.resource]  # type: ignore[index]
-        self.tribes[tribe].stars -= info.cost
+        assert tile.resource is not None
+        self.tribes[tribe].stars -= self.harvest_cost(tribe, tile.resource)
         tile.harvested = True
         city = self.cities[tile.owner_city]  # type: ignore[index]
-        self._grow(city, info.population)
+        self._grow(city, self.harvest_yield(tribe, tile.resource))
         return city
 
     def _grow(self, city: City, population: int) -> None:
@@ -625,6 +648,10 @@ class World:
         self.tribes[tribe].stars -= self.tech_cost(tribe, tech)
         self.tribes[tribe].techs.add(tech)
         self.log.append(f"{self.tribes[tribe].name} learned {tech.value.title()}")
+        if tech is Tech.CARTOGRAPHY:
+            for tile in self.all_tiles():
+                if tile.terrain is Terrain.WATER:
+                    self.explore(tribe, tile.pos, 1)
 
     # -- Turns -------------------------------------------------------------------
 
@@ -659,6 +686,7 @@ class World:
     def _heal_if_idle(self, unit: Unit) -> None:
         if unit.idle and unit.hp < unit.max_hp:
             heal = HEAL_IN_TERRITORY if self.owner_of(unit.pos) == unit.tribe else HEAL_OUTSIDE
+            heal += MEDITATION_HEAL * int(self.has_tech(unit.tribe, Tech.MEDITATION))
             unit.hp = min(unit.max_hp, unit.hp + heal)
 
     def _start_turn(self, tribe: int) -> None:

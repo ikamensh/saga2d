@@ -24,14 +24,24 @@ class Resource(Enum):
 class Tech(Enum):
     ORGANIZATION = "organization"
     FARMING = "farming"
+    CONSTRUCTION = "construction"
     SHIELDS = "shields"
     CLIMBING = "climbing"
     MINING = "mining"
+    SMITHERY = "smithery"
+    MEDITATION = "meditation"
     FISHING = "fishing"
+    AQUACULTURE = "aquaculture"
+    NAVIGATION = "navigation"
+    CARTOGRAPHY = "cartography"
     HUNTING = "hunting"
     ARCHERY = "archery"
+    FORESTRY = "forestry"
+    MATHEMATICS = "mathematics"
     RIDING = "riding"
     CHIVALRY = "chivalry"
+    ROADS = "roads"
+    TRADE = "trade"
 
 
 @dataclass(frozen=True)
@@ -41,18 +51,31 @@ class TechInfo:
     summary: str
 
 
+#: Five branches, each a root with two children and one deeper leaf.  Roots
+#: are listed in the order they sit around the research wheel, from the top.
 TECHS: dict[Tech, TechInfo] = {
     Tech.ORGANIZATION: TechInfo(1, None, "Harvest fruit (2★, +1 pop)"),
     Tech.FARMING: TechInfo(2, Tech.ORGANIZATION, "Farm crops (5★, +2 pop)"),
+    Tech.CONSTRUCTION: TechInfo(3, Tech.FARMING, "Every harvest costs 1★ less"),
     Tech.SHIELDS: TechInfo(2, Tech.ORGANIZATION, "Defender unit"),
     Tech.CLIMBING: TechInfo(1, None, "Cross mountains, see far from peaks"),
     Tech.MINING: TechInfo(2, Tech.CLIMBING, "Mine metal (5★, +2 pop)"),
-    Tech.FISHING: TechInfo(1, None, "Harvest fish (2★, +1 pop)"),
+    Tech.SMITHERY: TechInfo(3, Tech.MINING, "Swordsman unit"),
+    Tech.MEDITATION: TechInfo(2, Tech.CLIMBING, "Idle units heal 2 more"),
+    Tech.FISHING: TechInfo(1, None, "Catch fish (2★, +1 pop)"),
+    Tech.AQUACULTURE: TechInfo(2, Tech.FISHING, "Fish give +2 pop"),
+    Tech.NAVIGATION: TechInfo(2, Tech.FISHING, "Coastal cities earn +1★"),
+    Tech.CARTOGRAPHY: TechInfo(3, Tech.NAVIGATION, "Reveals every coastline"),
     Tech.HUNTING: TechInfo(1, None, "Hunt game (2★, +1 pop)"),
     Tech.ARCHERY: TechInfo(2, Tech.HUNTING, "Archer unit"),
+    Tech.FORESTRY: TechInfo(2, Tech.HUNTING, "Forests no longer end a move"),
+    Tech.MATHEMATICS: TechInfo(3, Tech.FORESTRY, "Catapult unit"),
     Tech.RIDING: TechInfo(1, None, "Rider unit"),
     Tech.CHIVALRY: TechInfo(2, Tech.RIDING, "Knight unit"),
+    Tech.ROADS: TechInfo(2, Tech.RIDING, "+1 move when starting on your land"),
+    Tech.TRADE: TechInfo(3, Tech.ROADS, "Every city earns +1★"),
 }
+MEDITATION_HEAL = 2
 
 
 def tech_cost(tech: Tech, city_count: int) -> int:
@@ -84,6 +107,8 @@ class UnitType(Enum):
     RIDER = "rider"
     DEFENDER = "defender"
     KNIGHT = "knight"
+    SWORDSMAN = "swordsman"
+    CATAPULT = "catapult"
 
 
 @dataclass(frozen=True)
@@ -106,6 +131,8 @@ UNITS: dict[UnitType, UnitInfo] = {
     UnitType.RIDER: UnitInfo(3, 10, 2, 1, 2, 1, Tech.RIDING, escape=True, hotkey="3"),
     UnitType.DEFENDER: UnitInfo(3, 15, 1, 3, 1, 1, Tech.SHIELDS, hotkey="4"),
     UnitType.KNIGHT: UnitInfo(8, 10, 3.5, 1, 3, 1, Tech.CHIVALRY, persist=True, hotkey="5"),
+    UnitType.SWORDSMAN: UnitInfo(5, 15, 3, 3, 1, 1, Tech.SMITHERY, hotkey="6"),
+    UnitType.CATAPULT: UnitInfo(8, 10, 4, 0, 1, 3, Tech.MATHEMATICS, hotkey="7"),
 }
 
 
