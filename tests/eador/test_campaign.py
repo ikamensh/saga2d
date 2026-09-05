@@ -2,6 +2,7 @@
 import pytest
 
 from eador.model import HERO_CLASSES, State
+from tools.eador_linked_campaign import lose_shard
 
 
 def test_linked_start_saves_its_contract_while_standalone_stays_standalone():
@@ -120,23 +121,6 @@ def test_middle_contracts_block_an_early_assault_then_reward_actual_objective_co
         State.from_json(state.to_json())
 
 
-def lose_shard(state):
-    """Leaving the capital and declining tactical defenses permits the finite rival to win."""
-    from tools.eador_campaign import finish_battle
-    if state.hero.pos == (-2, 0):
-        if not state.actions_left:
-            state.end_turn()
-        state.travel((-2, 1))
-        if state.battle:
-            finish_battle(state)
-    for _ in range(120):
-        if state.status == 'defeat':
-            return state
-        state.end_turn()
-        if state.battle:
-            state.retreat()
-    raise AssertionError('Neglect never lost the capital.')
-
 
 def test_recovery_keeps_new_knowledge_and_survivors_in_the_exact_world_then_a_second_loss_ends():
     """Recovery is a single expedition, not a reroll or resurrection of fallen troops."""
@@ -183,7 +167,7 @@ def test_a_three_shard_campaign_reaches_both_final_contracts_and_a_saved_ending(
             assert State.from_json(state.to_json()).to_json() == state.to_json()
 
 
-def final_battle(finale='gate', hero_class='Commander', seed=7):
+def final_battle(finale='gate', hero_class='Commander', seed=7, *, ranged=False):
     """Prepare a final assault by playing two shards and developing the third normally."""
     from tools.eador_campaign import finish_battle, march_to, provision_army, rest
     from tools.eador_linked_campaign import play_stage, travel_selection
@@ -192,8 +176,25 @@ def final_battle(finale='gate', hero_class='Commander', seed=7):
         state = play_stage(state)
         assert state.status == 'victory'
         state.advance(contract, **travel_selection(state))
-    state.build('barracks')
-    state.recruit('swordsman')
+    if ranged:
+        state.build('archery')
+        state.recruit('archer')
+        state.recruit('archer')
+    else:
+        state.build('barracks')
+        state.recruit('swordsman')
+
+    def provision():
+        if not ranged:
+            provision_army(state)
+            return
+        from eador.model import BUILDINGS
+        for kind in ('temple', 'mage_tower'):
+            spec = BUILDINGS[kind]
+            if kind not in state.buildings and state.gold >= spec.cost and state.crystals >= spec.crystals:
+                state.build(kind)
+        while len(state.hero.army) < state.hero.max_army and state.gold >= state.recruit_cost('archer'):
+            state.recruit('archer')
     for destination in ((-2, 0), (-1, 0), (0, 0), (1, 0)):
         march_to(state, destination)
         if not state.actions_left:
@@ -202,11 +203,15 @@ def final_battle(finale='gate', hero_class='Commander', seed=7):
         state.explore()
         finish_battle(state)
         rest(state)
-        provision_army(state)
+        provision()
     for _ in range(24):
+        provision()
         march_to(state, (1, 0))
         if max([state.hero.max_hp - state.hero.hp] + [t.max_hp - t.hp for t in state.hero.army]) > 6:
             rest(state)
+            continue
+        if not state.actions_left:
+            rest(state, defend=False)
             continue
         state.travel((2, 0))
         if state.battle_kind == 'conquest':
@@ -263,6 +268,41 @@ def test_manual_final_control_wins_with_surviving_defenders_and_deadline_failure
     stalled.resolve_battle()
     assert stalled.status == 'playing' and stalled.campaign.phase == 'playing'
     assert stalled.provinces[(2, 0)].owner == 'rival'
+
+
+@pytest.mark.parametrize('hero_class', ('Warrior', 'Scout', 'Wizard'))
+def test_six_body_armies_hold_the_final_seal_with_pin_rotation_and_healing(hero_class):
+    """A smaller army can deny the flank with real recruit choices rather than needing Commander capacity."""
+    state = final_battle(hero_class=hero_class, ranged=True)
+    battle = state.battle
+    by_pos = {u.pos: u.id for u in battle.units if u.team == 'player'}
+    assert len(by_pos) == 6
+    for source, destination in (((-2, 0), (-1, 0)), ((-2, -1), (0, -1)), ((-2, 1), (0, 0)),
+                                ((-3, 2), (-1, 1)), ((-3, 0), (-1, -1)), ((-3, 1), (-2, 0))):
+        battle.move(by_pos[source], destination)
+    for unit in battle.units:
+        if unit.team == 'player':
+            battle.guard(unit.id)
+    battle.end_turn()
+    assert battle.objective.progress == 1
+    state = State.from_json(state.to_json())
+    battle = state.battle
+    battle.move(by_pos[(-3, 1)], (-2, 1))
+    for archer_start, flank in (((-2, 1), (-2, 2)), ((-3, 2), (-1, 2))):
+        defender = next(u for u in battle.units if u.team == 'enemy' and u.pos == flank)
+        battle.pin(by_pos[archer_start], defender.id)
+    battle.cast('heal', by_pos[(-3, 2)])
+    for unit in battle.units:
+        if unit.team == 'player' and not unit.acted:
+            battle.guard(unit.id)
+    battle.end_turn()
+    assert battle.outcome_reason == 'hold' and battle.round == 2
+    assert all(u.alive for u in battle.units)
+    state = State.from_json(state.to_json())
+    state.resolve_battle()
+    while state.choice:
+        state.choose(state.choice.options[0].id)
+    assert state.campaign.phase == 'completed'
 
 
 def test_an_actual_v7_standalone_battle_continues_exactly_after_the_v8_migration():
