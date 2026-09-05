@@ -42,3 +42,43 @@ def test_ruins_trade_a_valuable_pike_checkpoint_for_a_weaker_flank():
     assert checkpoint.income > max(p.income for p in weaker)
     assert any(p.site_kind == 'caravan' for p in weaker)
     assert any('pikeman' in p.guards for p in state.provinces.values() if p.owner == 'rival')
+
+
+def test_theme_identity_and_active_hold_survive_save_migration_without_world_generation():
+    """A legacy world keeps all its recorded terrain, rewards and ongoing hold orders."""
+    import json
+    from pathlib import Path
+    legacy = (Path(__file__).parent / 'fixtures/v5_watch_battle.json').read_text()
+    before = json.loads(legacy)
+    state = State.from_json(legacy)
+    assert state.theme == 'frontier'
+    current = json.loads(state.to_json())
+    assert current['schema_version'] == 6
+    assert current['provinces'] == before['provinces']
+    assert current['battle'] == before['battle']
+    while not state.battle.outcome:
+        state.battle.auto_turn()
+    state.resolve_battle()
+    assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+def test_new_themes_keep_their_identity_through_active_battles_and_reject_unknown_ids():
+    """Theme selection is durable campaign data and invalid IDs fail at the public boundary."""
+    import json
+    import pytest
+    from eador.model import RuleError, SaveFormatError
+    from eador.worldgen import THEMES
+    for theme in THEMES:
+        state = State.new(7, theme=theme)
+        state.explore()
+        saved = state.to_json()
+        restored = State.from_json(saved)
+        assert restored.theme == theme
+        assert restored.to_json() == saved
+        bad = json.loads(saved)
+        bad['theme'] = 'unreleased'
+        with pytest.raises(SaveFormatError, match='theme'):
+            State.from_json(json.dumps(bad))
+    for bad in ('unreleased', None, ['frontier']):
+        with pytest.raises(RuleError, match='Choose'):
+            State.new(theme=bad)

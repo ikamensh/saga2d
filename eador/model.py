@@ -162,6 +162,7 @@ class State:
     inventory: list[str] = field(default_factory=list)
     _choices: list[Choice] = field(default_factory=list, repr=False)
     rival: RivalState = field(default_factory=RivalState)
+    theme: str = 'frontier'
 
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier') -> State:
@@ -177,7 +178,7 @@ class State:
         army = [Troop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
                 for i, kind in enumerate(('militia', 'militia', 'archer'), 1)]
         hero = Hero('Alden', hero_class, home.pos, max_hp, max_hp, mana, mana, army)
-        state = cls(seed, provinces, hero, actions_left=3 if hero_class == 'Scout' else 2)
+        state = cls(seed, provinces, hero, theme=theme, actions_left=3 if hero_class == 'Scout' else 2)
         state.rival = RivalState.initial()
         state.rival.plan(state, delay=3)
         state.log.append('Claim the shard: capture Duskspire before Westwatch falls.')
@@ -568,7 +569,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 5
+        data['schema_version'] = 6
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -587,10 +588,12 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4 and 5.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5 and 6.')
         _validate_save(data, version)
         data.pop('schema_version', None)
+        if version < 6:
+            data['theme'] = 'frontier'
         if version == 1:
             data['inventory'], data['choices'] = [], []
             data['hero']['skill_ranks'], data['hero']['relic'] = {}, None
@@ -694,13 +697,18 @@ def _validate_save(data: dict, version: int) -> None:
     def text_fields(value, names, label):
         require(all(isinstance(value[name], str) for name in names), f'{label} contains invalid text.')
 
-    new_state = {'inventory', '_choices', 'rival'}
+    new_state = {'inventory', '_choices', 'rival', 'theme'}
     state_keys = {f.name for f in fields(State)} - new_state
     if version >= 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
     if version >= 3:
         state_keys.add('rival')
+    if version >= 6:
+        state_keys.add('theme')
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
+    if version >= 6:
+        from eador.worldgen import THEMES
+        require(isinstance(data['theme'], str) and data['theme'] in THEMES, 'Unknown shard theme.')
     require(type(data['seed']) is int, 'The shard seed must be an integer.')
     for name in ('gold', 'crystals', 'actions_left'):
         integer(data[name], name)
