@@ -569,7 +569,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 6
+        data['schema_version'] = 7
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -588,8 +588,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5 and 6.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6 and 7.')
         _validate_save(data, version)
         data.pop('schema_version', None)
         if version < 6:
@@ -642,6 +642,9 @@ class State:
             hero = next(unit for unit in battle['units'] if unit['id'] == 0)
             battle['outcome_reason'] = (None if battle['outcome'] is None else 'rout' if battle['outcome'] == 'player'
                                         else 'hero_death' if hero['hp'] == 0 else 'exhaustion')
+        if version < 7 and data['battle'] is not None:
+            for unit in data['battle']['units']:
+                unit.update(abilities=(), pinned=False, pin_cooldown=0)
         data['rival']['pos'] = tuple(data['rival']['pos'])
         if data['rival']['target'] is not None:
             data['rival']['target'] = tuple(data['rival']['target'])
@@ -900,7 +903,7 @@ def _validate_save(data: dict, version: int) -> None:
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     expedition_ids = set()
     for unit in battle['units']:
-        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set())
+        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set())
         object_fields(unit, unit_keys, 'Battle unit')
         integer(unit['id'], 'Battle unit ID')
         require(unit['id'] not in ids, 'Duplicate battle unit ID.')
@@ -914,9 +917,18 @@ def _validate_save(data: dict, version: int) -> None:
         integer(unit['defense'], 'Battle unit defense')
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
+        if version >= 7:
+            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace'), unique=True)
+            require('pin' not in unit['abilities'] or unit['kind'] == 'archer'
+                    or unit['kind'] == 'hero' and hero['relic'] == 'storm_quiver', 'This unit cannot learn Pin.')
+            require('brace' not in unit['abilities'] or unit['kind'] == 'hero' and hero['relic'] == 'watch_bell',
+                    'Only the Watch Bell grants a Brace ability.')
+            require(type(unit['pinned']) is bool, 'Invalid Pinned status.')
+            integer(unit['pin_cooldown'], 'Pin cooldown', maximum=2)
+            require(unit['pin_cooldown'] == 0 or 'pin' in unit['abilities'], 'Pin cooldown requires the ability.')
         if version >= 4:
             require(unit['stance'] in (None, 'guard', 'brace'), 'Unknown battle stance.')
-            require(unit['stance'] != 'brace' or unit['kind'] == 'pikeman', 'Only a Pikeman can use a Brace stance.')
+            require(unit['stance'] != 'brace' or unit['kind'] == 'pikeman' or version >= 7 and 'brace' in unit['abilities'], 'A Brace stance requires its capability.')
             require(unit['stance'] is None or unit['team'] == 'enemy' or unit['moved'] and unit['acted'],
                     'A defensive stance must spend the player unit’s order.')
         if version >= 2:
