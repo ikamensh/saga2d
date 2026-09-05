@@ -35,7 +35,7 @@ def test_a_v4_battle_with_brace_migrates_as_rout_and_keeps_its_exact_continuatio
     """A new objective does not alter an older saved stance, terrain or automatic outcome."""
     fixtures = Path(__file__).parent / 'fixtures'
     state = State.from_json((fixtures / 'v4_brace_battle.json').read_text())
-    assert json.loads(state.to_json())['schema_version'] == 5
+    assert json.loads(state.to_json())['schema_version'] == 6
     assert state.battle.objective.kind == 'rout'
     assert state.battle.objective.target is None and state.battle.outcome_reason is None
     state = State.from_json(state.to_json())
