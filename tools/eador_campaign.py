@@ -102,7 +102,7 @@ def rest(state, defend=True, metrics=None):
             finish_battle(state, metrics)
 
 
-def play_campaign(state, route=None, metrics=None):
+def play_campaign(state, route=None, metrics=None, *, reload_state=State.from_json):
     """Explore and invest along a route that includes both capitals, then try to win."""
     metrics = metrics or CampaignMetrics()
     if 'barracks' not in state.buildings:
@@ -151,7 +151,7 @@ def play_campaign(state, route=None, metrics=None):
         assert all(0 < t.hp <= t.max_hp for t in state.hero.army)
         assert 0 < state.hero.hp <= state.hero.max_hp
         assert 0 <= state.hero.mana <= state.hero.max_mana
-        state = State.from_json(state.to_json())
+        state = reload_state(state.to_json())
         if state.status == 'playing':
             rest(state, metrics=metrics)
     return state

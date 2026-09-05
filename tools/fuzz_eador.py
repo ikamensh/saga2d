@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from saga2d import Button# noqa: E402
 
 from eador.app import create_game# noqa: E402
+from eador.campaign_scene import CampaignScene  # noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.encounter_scene import EncounterScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
@@ -282,7 +283,10 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 assert all(s.root is shard for s in battles)
                 results = [s for s in game.scenes if isinstance(s, ResultScene)]
                 if shard.state.status != 'playing' and shard.state.choice is None:
-                    assert len(results) == 1 and not results[0].is_battle, 'campaign ended without its result screen'
+                    if shard.state.campaign:
+                        assert any(isinstance(s, CampaignScene) for s in game.scenes), 'linked campaign has no transition screen'
+                    else:
+                        assert len(results) == 1 and not results[0].is_battle, 'campaign ended without its result screen'
                 elif shard.state.battle and shard.state.battle.outcome:
                     assert len(results) == 1 and results[0].is_battle, 'battle ended without its result screen'
                 if shard.state.choice is not None:
@@ -371,7 +375,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
             tick()
             for _ in range(seed % len(HERO_CLASSES)):
                 press('tab')
-            press('return')
+            press('l' if seed % 2 else 'return')
             press('b')
             press('1')
             press('escape')
@@ -401,7 +405,14 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     break
                 scene = game.scene
                 if isinstance(scene, TitleScene):
-                    press(rng.choice(('tab', 'left', 'right', 'return', 'f9', 'f6', 'o')))
+                    press(rng.choice(('tab', 'left', 'right', 'l', 'return', 'f9', 'f6', 'o')))
+                elif isinstance(scene, CampaignScene):
+                    if scene.step == 'offers':
+                        press(rng.choice(('1', '2', 'f5', 'f9', 'f6')))
+                    elif scene.step == 'retinue':
+                        press(rng.choice(('left', 'right', 'up', 'down', 'space', 'return', 'escape', 'q', 'f6')))
+                    else:
+                        press(rng.choice(('return', 'f5', 'f9', 'f6')))
                 elif isinstance(scene, HelpScene):
                     button(rng.choice(('Save & title', 'Codex', 'Settings', 'Return to game', 'Return to game')))
                 elif isinstance(scene, SettingsScene):
@@ -492,6 +503,19 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 scene = game.scene
                 if isinstance(scene, TitleScene):
                     press('return')
+                elif isinstance(scene, CampaignScene):
+                    if scene.phase == 'recovery':
+                        press('q')
+                    elif scene.step == 'offers':
+                        press('1')
+                    elif scene.step == 'retinue':
+                        press('return')
+                    else:
+                        press('return')
+                        press('return')
+                        assert isinstance(game.scene, ShardScene) and game.scene.state.turn == 1
+                        metrics['replays'] += 1
+                        break
                 elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene, SettingsScene, EncounterScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
