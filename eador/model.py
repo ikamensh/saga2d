@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from saga2d import HexGrid
 
 from eador.content import Choice, ChoiceOption, RELICS, SITES, SKILLS
+from eador.campaign import Campaign
 from eador.rival import INTENTS, STRONGHOLD, RivalState, RivalTroop
 
 if TYPE_CHECKING:
@@ -163,6 +164,7 @@ class State:
     _choices: list[Choice] = field(default_factory=list, repr=False)
     rival: RivalState = field(default_factory=RivalState)
     theme: str = 'frontier'
+    campaign: Campaign | None = None
 
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier') -> State:
@@ -183,6 +185,54 @@ class State:
         state.rival.plan(state, delay=3)
         state.log.append('Claim the shard: capture Duskspire before Westwatch falls.')
         return state
+
+    @classmethod
+    def new_campaign(cls, seed: int = 7, hero_class: str = 'Commander') -> State:
+        state = cls.new(seed, hero_class)
+        state.campaign = Campaign(seed)
+        state.campaign.checkpoint(state)
+        return state
+
+    def advance(self, offer_id: str, *, troop_ids=(), relic_ids=()) -> None:
+        from eador.campaign import advance
+        advance(self, offer_id, troop_ids, relic_ids)
+
+    def recover(self, *, troop_ids=(), relic_ids=()) -> None:
+        from eador.campaign import recover
+        recover(self, troop_ids, relic_ids)
+
+    def abandon_campaign(self) -> None:
+        if self.campaign is None or self.campaign.phase != 'recovery':
+            raise RuleError('Choose whether to recover after losing the first shard.')
+        self.campaign.phase = 'lost'
+
+    @property
+    def assault_blocked_reason(self) -> str | None:
+        if self.campaign is None:
+            return None
+        if self.campaign.contract == 'rootward' and not any(
+                p.explored and p.site_kind == 'border_watch' for p in self.provinces.values()):
+            return 'Clear the Border Watch before assaulting Duskspire.'
+        if self.campaign.contract == 'foundries' and not all(
+                self.provinces[pos].owner == 'player' for pos in ((0, -1), (0, 1))):
+            return 'Control both foundries before assaulting Duskspire.'
+        return None
+
+    @property
+    def battle_encounter(self) -> str | None:
+        if self.battle_kind == 'site':
+            return SITES[self.provinces[self.battle_province].site_kind].encounter
+        if self.campaign and self.campaign.contract == 'gate' and self.battle_kind == 'conquest' and self.battle_province == (2, 0):
+            return 'last_gate'
+        return None
+
+    @property
+    def hero_level_cap(self) -> int | None:
+        return self.campaign.stage + 2 if self.campaign else None
+
+    @property
+    def troop_level_cap(self) -> int | None:
+        return 3 if self.campaign else None
 
     @property
     def grid(self) -> HexGrid:
@@ -275,6 +325,8 @@ class State:
         for i, pending in enumerate(self._choices):
             if pending.kind == 'skill':
                 self._choices[i] = self._skill_choice()
+        if self.campaign:
+            self.campaign.sync(self)
 
     def equip(self, relic_id: str | None) -> None:
         if self.battle is not None:
@@ -334,6 +386,8 @@ class State:
         self._ready(action=True)
         if destination not in self.grid.neighbors(self.hero.pos):
             raise RuleError('Travel to an adjacent province.')
+        if destination == (2, 0) and self.assault_blocked_reason:
+            raise RuleError(self.assault_blocked_reason)
         province = self.provinces[destination]
         self.actions_left -= 1
         if self.rival.army and self.rival.pos == destination:
@@ -352,6 +406,8 @@ class State:
                 self.rival.plan(self)
             elif destination == self.rival.target:
                 self.rival.plan(self, delay=self.rival.turns_until_action)
+        if self.campaign:
+            self.campaign.sync(self)
 
     def explore(self) -> None:
         self._ready(action=True)
@@ -372,7 +428,7 @@ class State:
                   target.site_guard_hp if kind == 'site' else target.guard_hp)
         self.battle = Battle.create(self.hero, enemies, target.terrain, self.spells,
                                     seed=self.seed + self.turn * 37 + province[0] * 7 + province[1], enemy_hp=health,
-                                    encounter=SITES[target.site_kind].encounter if kind == 'site' else None)
+                                    encounter=self.battle_encounter)
         if expedition:
             for unit, troop in zip((u for u in self.battle.units if u.team == 'enemy'), self.rival.army):
                 unit.source_id = troop.id
@@ -416,8 +472,9 @@ class State:
                 survivors.append(troop)
         self.hero.army = survivors
         if victory:
-            self.hero.xp += 8
-            while self.hero.xp >= self.hero.level * 12:
+            if self.hero_level_cap is None or self.hero.level < self.hero_level_cap:
+                self.hero.xp += 8
+            while self.hero.xp >= self.hero.level * 12 and (self.hero_level_cap is None or self.hero.level < self.hero_level_cap):
                 self.hero.xp -= self.hero.level * 12
                 self.hero.level += 1
                 self.hero.max_hp += 4
@@ -429,8 +486,9 @@ class State:
                 if choice:
                     self._choices.append(choice)
             for troop in survivors:
-                troop.xp += 3
-                while troop.xp >= troop.level * 6:
+                if self.troop_level_cap is None or troop.level < self.troop_level_cap:
+                    troop.xp += 3
+                while troop.xp >= troop.level * 6 and (self.troop_level_cap is None or troop.level < self.troop_level_cap):
                     troop.xp -= troop.level * 6
                     troop.level += 1
                     troop.max_hp += 4
@@ -476,6 +534,9 @@ class State:
         self.battle_province = None
         if self.status != 'playing' or expedition and not expedition_lost:
             self.rival.plan(self)
+        if self.campaign:
+            self.campaign.casualties += len(casualties)
+            self.campaign.sync(self)
         return message
 
     def retreat(self) -> str:
@@ -511,6 +572,8 @@ class State:
         rest = 'army rests' if can_rest else 'encirclement blocks recovery'
         self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; {rest}.')
         self.rival.advance(self)
+        if self.campaign:
+            self.campaign.sync(self)
 
     def _set_owner(self, province: Province, owner: str) -> None:
         was_encircled = self.encircled
@@ -569,7 +632,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 7
+        data['schema_version'] = 8
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -588,9 +651,14 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6 and 7.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7 and 8.')
         _validate_save(data, version)
+        if version >= 8:
+            from eador.campaign import validate_campaign
+            validate_campaign(data)
+        else:
+            data['campaign'] = None
         data.pop('schema_version', None)
         if version < 6:
             data['theme'] = 'frontier'
@@ -662,6 +730,8 @@ class State:
             data['battle'] = Battle.from_dict(data['battle'])
         if data['battle_province'] is not None:
             data['battle_province'] = tuple(data['battle_province'])
+        if data['campaign'] is not None:
+            data['campaign'] = Campaign.from_dict(data['campaign'])
         state = cls(**data)
         if version < 3 and state.battle_kind != 'defense':
             state.rival.plan(state, delay=3)
@@ -700,7 +770,7 @@ def _validate_save(data: dict, version: int) -> None:
     def text_fields(value, names, label):
         require(all(isinstance(value[name], str) for name in names), f'{label} contains invalid text.')
 
-    new_state = {'inventory', '_choices', 'rival', 'theme'}
+    new_state = {'inventory', '_choices', 'rival', 'theme', 'campaign'}
     state_keys = {f.name for f in fields(State)} - new_state
     if version >= 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
@@ -708,6 +778,8 @@ def _validate_save(data: dict, version: int) -> None:
         state_keys.add('rival')
     if version >= 6:
         state_keys.add('theme')
+    if version >= 8:
+        state_keys.add('campaign')
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
     if version >= 6:
         from eador.worldgen import THEMES
@@ -894,8 +966,10 @@ def _validate_save(data: dict, version: int) -> None:
             integer(objective['deadline'], 'Objective deadline', minimum=objective['required'], maximum=80)
             require(battle['round'] <= objective['deadline'], 'The hold objective is past its deadline.')
             province = provinces[tuple(data['battle_province'])]
-            require(data['battle_kind'] == 'site' and province['site_kind'] is not None
-                    and SITES[province['site_kind']].encounter is not None, 'A hold objective requires an authored site.')
+            authored_site = data['battle_kind'] == 'site' and province['site_kind'] is not None and SITES[province['site_kind']].encounter is not None
+            final_gate = (version >= 8 and isinstance(data['campaign'], dict) and data['campaign'].get('contract') == 'gate'
+                          and data['battle_kind'] == 'conquest' and data['battle_province'] == [2, 0])
+            require(authored_site or final_gate, 'A hold objective requires an authored adventure.')
         reason = battle['outcome_reason']
         require(reason in (None, 'rout', 'hold', 'hero_death', 'deadline', 'exhaustion'), 'Unknown battle outcome reason.')
         require((battle['outcome'] is None) == (reason is None), 'Battle outcome reason is inconsistent.')
