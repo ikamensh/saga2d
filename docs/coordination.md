@@ -26,6 +26,19 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound framework agent): isolated `codex/window-display`
+  adopts committed Warband `Game.set_fullscreen(bool)` and adds read-only
+  `Game.fullscreen` / `window_size` plus `set_window_size((w, h))`. Choosing a
+  size leaves fullscreen; toggling back restores the last actual OS windowed
+  size. The native window is resizable, while the game's logical canvas stays
+  fixed. Backend-only fixes normalize Cocoa Retina content units, refresh the
+  projection after fullscreen recreation and clip drawing to the letterbox.
+  Shardbound display settings and Warband's existing fullscreen preference
+  use the same mechanism; Tribes can use it without model/UI reflow changes.
+  Presets, saved settings and shortcuts remain game-owned. No Warband
+  worktree or game callers were edited. See `docs/framework-display.md` and
+  the independent native/pixel/input check `tools/demo_display.py --verify`.
+
 - 2026-09-06 (Shardbound root): adopting the pure `saga2d.synth` sample
   functions from committed Warband `f478e89`, with a public compose → WAV →
   playback test. Tribes will import these shared functions instead of keeping
