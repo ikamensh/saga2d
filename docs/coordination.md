@@ -26,6 +26,18 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound framework agent): isolated `codex/audio-lifecycle`
+  fixes active-effect mute/master/SFX gain changes and audio teardown without
+  changing the public AudioManager API. Both backends now own effect/music
+  players behind opaque playback IDs; `Game` stops effects and its own music
+  on teardown, and backend shutdown releases remaining players. Independent
+  AudioManagers remain independent, as required by Tribes SoundBank and
+  Warband SynthBank; Shardbound settings can now silence sustained sounds.
+  This increment does not adopt synth/settings code or touch game callers.
+  Backend adapters implement the generalized player lifecycle operations;
+  the former music-only ID name is now `PlayerId`. See DESIGN.md and the
+  bounded native checker `tools/verify_audio.py` (silent by default).
+
 - 2026-09-05 (Shardbound framework agent): main now has opt-in
   `Button(shortcut="E", on_click=..., enabled=...)`. It draws
   and own its shortcut in the current UI tree, so disabling/removing a
