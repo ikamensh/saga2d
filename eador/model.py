@@ -52,8 +52,9 @@ UNITS = {
     'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
     'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
     'guard': UnitSpec('Dread Guard', 42, 12, 4, 3, 1, 0, 0, None, (173, 130, 196)),
+    'pikeman': UnitSpec('Pikeman', 28, 9, 3, 2, 1, 40, 2, 'barracks', (173, 188, 149)),
 }
-RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer')
+RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman')
 
 
 @dataclass(frozen=True)
@@ -65,7 +66,7 @@ class BuildingSpec:
 
 
 BUILDINGS = {
-    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit durable swordsmen.'),
+    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen and defensive pikemen.'),
     'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit ranged archers.'),
     'temple': BuildingSpec('Temple', 65, 0, 'Recruit acolytes; learn Heal; faster recovery.'),
     'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana.'),
@@ -606,7 +607,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 3
+        data['schema_version'] = 4
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -625,8 +626,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2 and 3.')
+        if type(version) is not int or version not in (1, 2, 3, 4):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3 and 4.')
         _validate_save(data, version)
         data.pop('schema_version', None)
         if version == 1:
@@ -667,6 +668,9 @@ class State:
                     data['rival'].update(pos=origin, army=[asdict(troop) for troop in army], intent='attack',
                                          target=data['battle_province'], turns_until_action=0,
                                          next_troop_id=max((unit['id'] for unit in data['battle']['units']), default=0) + 1)
+        if version < 4 and data['battle'] is not None:
+            for unit in data['battle']['units']:
+                unit['stance'] = None
         data['rival']['pos'] = tuple(data['rival']['pos'])
         if data['rival']['target'] is not None:
             data['rival']['target'] = tuple(data['rival']['target'])
@@ -726,7 +730,7 @@ def _validate_save(data: dict, version: int) -> None:
     state_keys = {f.name for f in fields(State)} - new_state
     if version >= 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
-    if version == 3:
+    if version >= 3:
         state_keys.add('rival')
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
     require(type(data['seed']) is int, 'The shard seed must be an integer.')
@@ -793,7 +797,7 @@ def _validate_save(data: dict, version: int) -> None:
             require(province['site_relic'] is None or isinstance(province['site_relic'], str) and province['site_relic'] in RELICS, 'Unknown site relic.')
             integer(province['site_gold'], 'Site gold')
             integer(province['site_crystals'], 'Site crystals')
-        if version == 3:
+        if version >= 3:
             for kinds, health in (('guards', 'guard_hp'), ('site_guards', 'site_guard_hp')):
                 require(isinstance(province[health], list) and len(province[health]) == len(province[kinds]), 'Garrison health does not match its soldiers.')
                 for kind, hp in zip(province[kinds], province[health]):
@@ -834,7 +838,7 @@ def _validate_save(data: dict, version: int) -> None:
         require(sum(hero['skill_ranks'].values()) + pending_ranks <= hero['level'] - 1, 'Pending skill choices exceed earned levels.')
 
     rival_by_id = {}
-    if version == 3:
+    if version >= 3:
         rival = data['rival']
         object_fields(rival, {f.name for f in fields(RivalState)}, 'Rival')
         integer(rival['gold'], 'Rival treasury')
@@ -870,16 +874,16 @@ def _validate_save(data: dict, version: int) -> None:
         return
     require(data['status'] == 'playing', 'An ended campaign cannot contain a battle.')
     require(version == 1 or not data['choices'], 'A battle cannot begin during a reward choice.')
-    require(data['battle_kind'] in (('conquest', 'site', 'defense', 'intercept') if version == 3 else ('conquest', 'site', 'defense')), 'Unknown battle context.')
+    require(data['battle_kind'] in (('conquest', 'site', 'defense', 'intercept') if version >= 3 else ('conquest', 'site', 'defense')), 'Unknown battle context.')
     require(position(data['battle_province'], 'Battle province') in provinces, 'Battle province is outside the shard.')
     keys = {'units', 'terrain', 'mana', 'spells', 'round', 'outcome', 'log'}
-    object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version == 3 else set()), 'Battle')
+    object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version >= 3 else set()), 'Battle')
     integer(battle['mana'], 'Battle mana', maximum=hero['max_mana'])
     integer(battle['round'], 'Battle round', minimum=1, maximum=81)
     require(battle['outcome'] in (None, 'player', 'enemy'), 'Unknown battle outcome.')
     strings(battle['log'], 'Battle log')
     strings(battle['spells'], 'Battle spells', ('bolt', 'heal'), unique=True)
-    if version == 3:
+    if version >= 3:
         require(battle['hero_id'] == 0, 'A campaign battle must identify its hero.')
     if version >= 2:
         for key in ('spell_costs', 'spell_power'):
@@ -899,7 +903,7 @@ def _validate_save(data: dict, version: int) -> None:
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     expedition_ids = set()
     for unit in battle['units']:
-        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set())
+        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set())
         object_fields(unit, unit_keys, 'Battle unit')
         integer(unit['id'], 'Battle unit ID')
         require(unit['id'] not in ids, 'Duplicate battle unit ID.')
@@ -913,10 +917,15 @@ def _validate_save(data: dict, version: int) -> None:
         integer(unit['defense'], 'Battle unit defense')
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
+        if version >= 4:
+            require(unit['stance'] in (None, 'guard', 'brace'), 'Unknown battle stance.')
+            require(unit['stance'] != 'brace' or unit['kind'] == 'pikeman', 'Only a Pikeman can use a Brace stance.')
+            require(unit['stance'] is None or unit['team'] == 'enemy' or unit['moved'] and unit['acted'],
+                    'A defensive stance must spend the player unit’s order.')
         if version >= 2:
             integer(unit['safe_attacks'], 'Safe attacks')
             require(type(unit['terrain_walk']) is bool and type(unit['skirmisher']) is bool, 'Invalid battle traits.')
-        if version == 3:
+        if version >= 3:
             if unit['team'] == 'enemy' and data['battle_kind'] in ('intercept', 'defense'):
                 integer(unit['source_id'], 'Expedition soldier identity', minimum=1)
                 require(unit['source_id'] not in expedition_ids, 'Expedition soldier identity is duplicated.')
@@ -941,7 +950,7 @@ def _validate_save(data: dict, version: int) -> None:
         else:
             enemies.append(unit)
     require(player_ids == troop_ids | {0} and enemies, 'Battle army does not match the campaign army.')
-    if version == 3 and data['battle_kind'] in ('defense', 'intercept'):
+    if version >= 3 and data['battle_kind'] in ('defense', 'intercept'):
         require(rival_by_id.keys() <= expedition_ids, 'Expedition is missing a rival soldier.')
     hero_unit = next(unit for unit in battle['units'] if unit['id'] == 0)
     if battle['outcome'] == 'player':
