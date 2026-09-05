@@ -106,3 +106,12 @@ know about, and read it before touching shared files.
   (units, buildings, upgrades, difficulties), then settings/saves — the
   settings file and autosave/slot browser will be offered as saga2d pieces
   since Shardbound's gates G10/G12 want the same.
+
+- 2026-09-06 (Shardbound framework agent): display previews need a public snapshot
+  even when opened fullscreen. `Game.windowed_size` now reports actual native
+  windowed size or remembered restoration size while fullscreen; no game cache
+  guesses that state. This serves Shardbound and Warband settings cancellation
+  on top of the same reviewed display methods. The Shardbound Sound/Display UI
+  and startup/recovery policy remain in `eador/`, using the existing Settings
+  store. No Warband worktree or game source was changed. See
+  `docs/eador-display-settings.md` for launch overrides and verification.
