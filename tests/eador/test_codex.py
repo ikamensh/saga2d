@@ -140,7 +140,7 @@ def test_ability_pages_explain_pin_timing_and_current_readiness_without_mutation
     archer = next(u for u in state.battle.units if u.team == 'player' and u.can_pin)
     state.battle.move(archer.id, (-1, 0))
     state.battle.pin(archer.id, state.battle.pin_targets(archer.id)[0].id)
-    game = Game('Pin reference', backend='mock', save_dir=tmp_path)
+    game = create_game('Pin reference', backend='mock', save_dir=tmp_path)
     try:
         root = ShardScene(state)
         game.push(root)
@@ -164,7 +164,7 @@ def test_relic_catalog_uses_recorded_sources_in_an_older_saved_shard(tmp_path):
     from pathlib import Path
     from eador.codex import CodexScene
     state = State.from_json((Path(__file__).parent / 'fixtures/v6_archer_battle.json').read_text())
-    game = Game('Saved relic sources', backend='mock', save_dir=tmp_path)
+    game = create_game('Saved relic sources', backend='mock', save_dir=tmp_path)
     try:
         root = ShardScene(state)
         game.push(root)
@@ -186,7 +186,7 @@ def test_current_relic_sources_and_equipped_pin_capability_are_visible_with_mous
     state = State.new(7)
     state.inventory = ['storm_quiver']
     state.equip('storm_quiver')
-    game = Game('Relic ability reference', backend='mock', save_dir=tmp_path)
+    game = create_game('Relic ability reference', backend='mock', save_dir=tmp_path)
     try:
         root = ShardScene(state)
         game.push(root)

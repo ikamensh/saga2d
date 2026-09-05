@@ -123,3 +123,24 @@ status and cooldown, then earns Watch Bell through public campaign commands
 and verifies the hero's visible Brace button in a subsequent saved battle.
 These checks supplement the model evidence; they do not add a new authored
 encounter or establish balance across untested army builds.
+
+## Inspectable ability and source reference
+
+The codex's second tab is now **Abilities**, containing current spell costs,
+Pin and Brace. Pin shows capable, ready and cooling members of the current
+army, including an equipped Storm Quiver hero. Its explanation includes the
+half-damage forecast, minimum movement, following-turn cooldown, non-stacking
+rule and ranged counter to Brace. The next page explains the Watch Bell hero's
+Brace order. These are game-owned descriptions over the public battle model.
+
+Relic sources come from the provinces recorded in the loaded shard. An older
+Wolf Den that still awards Boots remains described that way; a new shard
+identifies Explorer's Camp, Border Watch and Wolf Den as the sources of Boots,
+Watch Bell and Storm Quiver respectively. Site pages explicitly label registry
+rewards as base definitions. Explorer's Camp is a distinct roster/reward source,
+not an additional authored objective pattern.
+
+Seven public codex journeys cover keyboard and mouse navigation, paging,
+current modifiers/readiness and exact state preservation, including a real v6
+save. Hidden native Pyglet captures at 1280 × 800 were inspected for the Pin,
+Brace, source and cooling pages after using the shipped `create_game` setup.
