@@ -46,6 +46,7 @@ class BattleUnit:
     terrain_walk: bool = False
     skirmisher: bool = False
     source_id: int | None = None
+    stance: str | None = None
 
     @property
     def alive(self) -> bool:
@@ -182,9 +183,19 @@ class Battle:
     def attack(self, unit_id: int, target_id: int) -> None:
         self._attack(self._actor(unit_id), self.unit(target_id))
 
+    def guard(self, unit_id: int) -> None:
+        """Spend the unit's remaining order to guard until its next team turn."""
+        unit = self._actor(unit_id)
+        if unit.acted:
+            raise RuleError('That unit has already acted.')
+        unit.stance = 'guard'
+        unit.moved = unit.acted = True
+        self.log.append(f'{unit.name} guards until its next turn.')
+
     def _damage(self, attacker: BattleUnit, target: BattleUnit) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
-        return min(target.hp, max(1, attacker.attack - target.defense - cover))
+        protection = 2 if target.stance == 'guard' else 0
+        return min(target.hp, max(1, attacker.attack - target.defense - cover - protection))
 
     def preview(self, unit_id: int, target_id: int) -> tuple[int, int]:
         """Return actual target and attacker HP loss for a legal attack, without mutation."""
@@ -299,11 +310,14 @@ class Battle:
         for unit in self.units:
             if unit.team == 'enemy':
                 unit.moved = unit.acted = False
+                unit.stance = None
         self._play_team('enemy')
         if not self.outcome:
             self.round += 1
             for unit in self.units:
                 unit.moved = unit.acted = unit.retaliated = False
+                if unit.team == 'player':
+                    unit.stance = None
             if self.round > 80:
                 self.outcome = 'enemy'
                 self.log.append('The exhausted army must retreat.')
