@@ -149,7 +149,7 @@ class CodexScene(Screen):
             "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
             "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
             "Explore an owned, uncleared site using one hero action. Eastern sites have an additional Dread Guard.",
-            "Keep or sell a relic when it is discovered. Equip one at a time between battles; duplicates can become 4 crystals.",
+            "Keep or sell each find. Equip one relic between battles. Distill duplicates for 4 crystals.",
         )
         self.paragraph(introductions[self.category], x + 24, y + 163, width=992, size=13)
         start = self.page * PAGE_SIZE
