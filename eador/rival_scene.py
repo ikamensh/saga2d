@@ -79,7 +79,13 @@ class RivalScene(Screen):
                            "the capital's garrison is a separate force.",
                            x + 28, y + 319, width=790, size=14)
         self.rule(x + 28, y + 464, 824)
-        self.paragraph("Travel into the expedition's province to intercept it. Stand in its target province "
-                       "to defend. Casualties and wounds persist after every fight; a weakened expedition "
-                       "returns home to pay for recovery. Its orders may change after a battle.",
-                       x + 28, y + 483, width=824, size=13)
+        if s.encircled:
+            routes = ", ".join(s.provinces[pos].name for pos in s.grid.neighbors((-2, 0)))
+            advice = ("Westwatch is encircled: its gold, crystals, Marketplace and rest are blocked. "
+                      f"Reclaim any of: {routes}. If gold and income cannot pay upkeep, "
+                      "less experienced troops leave first.")
+        else:
+            advice = ("Travel into the expedition's province to intercept it. Stand in its target province "
+                      "to defend. Casualties and wounds persist after every fight; a weakened expedition "
+                      "returns home to pay for recovery. Its orders may change after a battle.")
+        self.paragraph(advice, x + 28, y + 483, width=824, size=13)

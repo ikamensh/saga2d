@@ -26,6 +26,12 @@ retains its previous version, opened explicitly with **Backup** or
 reported without replacing live play; recover a backup and save to another
 manual slot. **Save & title** asks for a slot and leaves only after writing it.
 
+**O** opens sound settings from the title or field guide. Arrow keys or the
+visible buttons adjust volume and mute; **Enter** applies, **Esc** cancels.
+Preferences live separately in `~/.shardbound/settings.json` and survive
+loading another campaign. Damaged settings are reported and kept until you
+explicitly choose retained recovery. Audio content is still in development.
+
 ## Your first turns
 
 1. Start with Commander. You have 100 gold, two militia, an archer and your
@@ -76,6 +82,9 @@ adds mana to support the two spells already learned.
 | Title | Tab / click class | Choose hero class |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
+| Title / guide | O | Open sound settings |
+| Settings | Up / Down, Left / Right | Select a row, adjust volume or mute |
+| Settings | Enter / Esc | Apply preferences / cancel live preview |
 | Shard | Click province | Select and inspect it |
 | Shard | Tab | Cycle provinces adjacent to the hero |
 | Shard | Home | Select the hero's current province |
@@ -99,6 +108,7 @@ adds mana to support the two spells already learned.
 | Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
 | Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
 | Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
+| Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
 | Battle | T / Retreat button | Withdraw with surviving troops and a gold penalty |
@@ -132,8 +142,9 @@ site per eligible province, resolved in a single expedition.
 
 Other classes have five troop slots. Troops are individual fighters, not
 stacks. Victories improve the hero and surviving veterans; dead troops are
-lost. The four recruitable types are Militia, Swordsman, Archer and Acolyte.
+lost. The five recruitable types are Militia, Swordsman, Archer, Acolyte and Pikeman.
 Acolytes improve campaign recovery; spellcasting belongs to the hero.
+Pikemen share the Barracks with Swordsmen and provide a defensive front line.
 
 Each level offers two class disciplines. Choose a new discipline or deepen
 one already learned, up to rank three. Commander balances recruitment and
@@ -152,21 +163,38 @@ to this adaptation; they do not reproduce the commercial game's catalogue.
 
 | Building | Cost | Benefit |
 |---|---|---|
-| Barracks | 45 gold | Recruit Swordsmen |
+| Barracks | 45 gold | Recruit Swordsmen and Pikemen |
 | Archery Range | 55 gold | Recruit Archers |
 | Temple | 65 gold | Recruit Acolytes, learn Heal, improve recovery |
 | Mage Tower | 75 gold + 2 crystals | Learn Arcane Bolt and gain 4 maximum mana |
 | Marketplace | 60 gold | Add 8 gold income each turn |
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
-deducted each campaign turn. Ending the turn restores health on friendly
-land and 4 mana. Before skill and relic modifiers, Arcane Bolt deals 14 damage; Heal restores up to 16 health
+deducted each campaign turn. If every province neighboring Westwatch is
+rival-owned, the capital is encircled: its gold, crystals, Marketplace and
+local recovery stop. Reclaim any neighboring province to reopen supply.
+The shard warns before End Turn if gold plus income cannot cover upkeep.
+Unpaid troops leave, preserving higher levels and experience first; among
+equal veterans, more expensive/newer recruits leave first. Outlying owned
+provinces still produce income.
+
+Ending the turn restores health on friendly land and 4 mana, unless the
+hero is inside encircled Westwatch. Before skill and relic modifiers,
+Arcane Bolt deals 14 damage; Heal restores up to 16 health
 to a living ally. Both cost 4 mana, have a range of four hexes and use the
 hero's action. A move can precede an attack or spell; attacking or casting
 ends that unit's movement unless the Scout's Skirmisher discipline allows
 an attack followed by movement. Surviving adjacent targets can retaliate once
 per full round. Forest and marsh cost extra movement; forest and hills
 provide cover. Ranged attacks use distance without line-of-sight blocking.
+
+**G** spends a unit's remaining movement and action on **Guard**, adding two
+defense until its next turn. A Pikeman uses **Brace** instead: the first
+adjacent melee attacker takes a spear hit before attacking. A lethal spear
+hit prevents the attack entirely. Brace replaces ordinary retaliation and
+strikes even through retaliation protection. Ranged fire, including adjacent
+ranged attacks, avoids Brace. Stance badges, effective defense and the
+attack preview show the current rules; saves retain stances exactly.
 
 Capture Duskspire to win; taking every province is unnecessary. If the
 rival reaches a province containing your hero, you fight a defensive

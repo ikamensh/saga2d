@@ -1,8 +1,16 @@
-"""Procedural sound for Tribes: every effect and the ambient loop are
-synthesised with :mod:`saga2d.synth` the first time the game runs and
-cached as WAV files next to the save games (``~/.tribes/sounds`` and
-``~/.tribes/music``).  Bump ``SOUND_VERSION`` after changing a generator.
-Everything is in D major so effects blend with the music.
+"""Procedural sound for Tribes.
+
+There are no audio assets.  Every effect and the ambient loop are
+synthesised with numpy the first time the game runs and cached as WAV
+files next to the save games::
+
+    ~/.tribes/sounds/<name>.wav     one file per SoundBank.play() name
+    ~/.tribes/sounds/VERSION        SOUND_VERSION the cached files were made with
+    ~/.tribes/music/ambient.wav     the 40 s stereo loop
+
+Bump ``SOUND_VERSION`` after changing a generator; the bank regenerates
+when the marker differs or a file is missing.  Everything is in D major
+so effects blend with the music.
 
 ::
 
@@ -14,14 +22,14 @@ Everything is in D major so effects blend with the music.
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
 
-from saga2d import Game
-from saga2d import synth
-from saga2d.synth import BELL, DARK, GLASS, PAD, SAMPLE_RATE, SOFT, hz, level, mix, noise, thump, tone, write_wav
-from saga2d.synth import seconds as sample_times
+from saga2d import AssetManager, AudioManager, Game
+from saga2d.synth import (BELL, DARK, GLASS, PAD, SAMPLE_RATE,
+                         hz, level, mix, noise, seconds as _time, thump, tone, write_wav)
 
 SOUND_VERSION = "1"
 MUSIC = "ambient"
@@ -205,7 +213,7 @@ def _add_wrapped(out: np.ndarray, clip: np.ndarray, start_seconds: float) -> Non
 def _pad(chord: tuple[str, ...], seconds: float, t0: float) -> np.ndarray:
     """Detuned stereo pad with an equal-power crossfade at both ends and a
     brightness LFO (two cycles per loop) that opens and closes the harmonics."""
-    t = sample_times(seconds)
+    t = _time(seconds)
     fade_in = np.sin(np.minimum(1.0, t / _CROSSFADE) * np.pi / 2)
     fade_out = np.sin(np.minimum(1.0, (seconds - t) / _CROSSFADE) * np.pi / 2)
     env = fade_in * fade_out
@@ -245,37 +253,88 @@ def ambient() -> np.ndarray:
             velocity = (1.0 if eighth % 4 == 0 else 0.7) * rng.uniform(0.75, 1.0)
             _add_wrapped(out, 0.28 * _pluck(top[_ARPEGGIO[eighth % 8]], 0.6 * np.sin(eighth * 1.3), velocity), start + eighth * BEAT / 2)
         start += length
-    swell = 0.85 + 0.15 * np.sin(2 * np.pi * sample_times(LOOP_SECONDS) / (LOOP_SECONDS / 4))
+    swell = 0.85 + 0.15 * np.sin(2 * np.pi * _time(LOOP_SECONDS) / (LOOP_SECONDS / 4))
     return level(out * swell[:, None], 0.45)
 
 
-# -- Cache and bank ------------------------------------------------------------
+# -- Cache -------------------------------------------------------------------
 
 
 def sound_files(data_dir: Path) -> list[Path]:
     """Every WAV the bank expects under *data_dir*."""
-    return synth.sound_files(data_dir, SOUNDS, {MUSIC: ambient})
+    return [data_dir / "sounds" / f"{name}.wav" for name in SOUNDS] + [data_dir / "music" / f"{MUSIC}.wav"]
 
 
 def is_generated(data_dir: Path) -> bool:
-    return synth.is_generated(data_dir, SOUND_VERSION, SOUNDS, {MUSIC: ambient})
+    marker = data_dir / "sounds" / "VERSION"
+    return marker.exists() and marker.read_text() == SOUND_VERSION and all(path.exists() for path in sound_files(data_dir))
 
 
 def generate(data_dir: Path) -> None:
-    """Synthesise every effect and the loop into *data_dir*, overwriting."""
-    synth.generate(data_dir, SOUND_VERSION, SOUNDS, {MUSIC: ambient})
+    """Synthesise every effect and the loop into *data_dir*, overwriting.
+    The VERSION marker is written last so an interrupted run regenerates."""
+    for name, make in SOUNDS.items():
+        write_wav(data_dir / "sounds" / f"{name}.wav", make())
+    write_wav(data_dir / "music" / f"{MUSIC}.wav", ambient())
+    (data_dir / "sounds" / "VERSION").write_text(SOUND_VERSION)
+
+# -- Bank --------------------------------------------------------------------
 
 
 #: Scene event names that map onto a differently named effect.
 ALIASES = {"attack_kill": "unit_death", "button": "ui_click"}
 
 
-class SoundBank(synth.SynthBank):
-    """Tribes' sounds; *data_dir* defaults to ``~/.tribes``."""
+class SoundBank:
+    """The game's sounds, played through its own :class:`AudioManager`.
+
+    *data_dir* defaults to ``~/.tribes``; the WAVs are generated there on
+    first use (see the module docstring for the layout).
+    """
 
     def __init__(self, game: Game, data_dir: Path | str | None = None) -> None:
-        super().__init__(game, data_dir if data_dir is not None else Path.home() / ".tribes", version=SOUND_VERSION,
-                         sounds=SOUNDS, music={MUSIC: ambient}, aliases=ALIASES)
+        self.data_dir = Path(data_dir) if data_dir is not None else Path.home() / ".tribes"
+        if not is_generated(self.data_dir):
+            generate(self.data_dir)
+        self._audio = AudioManager(game.backend, AssetManager(game.backend, base_path=self.data_dir))
+        self._rng = random.Random(0)
 
-    def start_music(self, name: str = MUSIC) -> None:  # type: ignore[override]
-        super().start_music(name)
+    @property
+    def names(self) -> tuple[str, ...]:
+        return tuple(SOUNDS)
+
+    def play(self, name: str, *, pitch_variation: float = 0.0) -> None:
+        """Play effect *name*.  *pitch_variation* 0.05 shifts the pitch by up
+        to ±5 % so a repeated effect does not sound stamped out."""
+        name = ALIASES.get(name, name)
+        if name not in SOUNDS:
+            raise KeyError(f"Unknown sound {name!r}. Sounds: {', '.join(SOUNDS)}")
+        pitch = 1.0 + self._rng.uniform(-pitch_variation, pitch_variation) if pitch_variation else 1.0
+        self._audio.play_sound(name, pitch=pitch)
+
+    def start_music(self) -> None:
+        """Start the ambient loop; a no-op while it is already playing."""
+        if self._audio.music_name != MUSIC:
+            self._audio.play_music(MUSIC, loop=True)
+
+    def stop_music(self) -> None:
+        self._audio.stop_music()
+
+    @property
+    def music_playing(self) -> bool:
+        return self._audio.music_name == MUSIC
+
+    def set_volume(self, channel: str, level: float) -> None:
+        """*channel* is ``"master"``, ``"music"`` or ``"sfx"``; *level* 0–1."""
+        self._audio.set_volume(channel, level)
+
+    def get_volume(self, channel: str) -> float:
+        return self._audio.get_volume(channel)
+
+    @property
+    def muted(self) -> bool:
+        return self._audio.muted
+
+    @muted.setter
+    def muted(self, value: bool) -> None:
+        self._audio.muted = value

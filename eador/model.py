@@ -6,7 +6,6 @@ geometry and movement search are the reusable Saga2D primitive.
 from __future__ import annotations
 
 import json
-import random
 from dataclasses import asdict, dataclass, field, fields
 from typing import TYPE_CHECKING
 
@@ -170,54 +169,15 @@ class State:
             raise RuleError('The shard seed must be an integer.')
         if not isinstance(hero_class, str) or hero_class not in HERO_CLASSES:
             raise RuleError('Choose Commander, Warrior, Scout or Wizard.')
-        rng = random.Random(seed)
-        cells = [(q, r) for q in range(-2, 3) for r in range(-2, 3)
-                 if abs(q + r) <= 2]
-        names = ['Westwatch', 'Amber Fields', 'Old Hollow', 'Briarwood',
-                 'Silverford', 'Winding Vale', 'Mossfell', 'Raven Hill',
-                 'Greenwater', 'Heartwood', 'Stonecross', 'Sunken Road',
-                 'Ashen Marsh', 'Frostmere', 'Cinderwood', 'High Pass',
-                 'Lost Reach', 'Blackfen', 'Duskspire']
-        provinces = {}
-        for pos, name in zip(cells, names):
-            terrain = rng.choice(('plains', 'forest', 'hills', 'marsh'))
-            guards = [rng.choice(('brigand', 'goblin', 'wolf'))
-                      for _ in range(1 if pos[0] < 0 else 2)]
-            if pos[0] == 0:
-                guards = ['brigand', 'goblin', 'wolf']
-            elif pos[0] == 1:
-                guards = ['guard', 'guard', 'brigand', 'goblin']
-            elif pos[0] == 2:
-                guards = ['guard', 'guard', 'archer']
-            owner = 'rival' if pos[0] == 2 else 'neutral'
-            provinces[pos] = Province(pos, name, terrain, owner,
-                                      rng.randint(5, 9), int(terrain == 'hills'),
-                                      guards, None)
-            kind = rng.choice(tuple(SITES))
-            spec = SITES[kind]
-            province = provinces[pos]
-            province.site, province.site_kind = spec.name, kind
-            province.site_guards = list(spec.guards) + (['guard'] if pos[0] >= 1 else [])
-            province.site_relic = spec.relic
-            province.site_gold, province.site_crystals = spec.gold, spec.crystals
-        home, rival = provinces[(-2, 0)], provinces[(2, 0)]
-        home.name, home.owner, home.capital, home.income = 'Westwatch', 'player', True, 16
-        home.guards, home.site = [], 'Buried Shrine'
-        home.site_kind, home.site_guards, home.site_relic = 'shrine', list(SITES['shrine'].guards), 'moonstone'
-        home.site_gold, home.site_crystals = SITES['shrine'].gold, SITES['shrine'].crystals
-        rival.name, rival.owner, rival.capital, rival.income = 'Duskspire', 'rival', True, 16
-        rival.guards, rival.site = ['guard'] * 5 + ['archer'] * 2, None
-        rival.site_kind, rival.site_guards, rival.site_relic = None, [], None
-        rival.site_gold = rival.site_crystals = 0
+        from eador.worldgen import generate
+        provinces = generate(seed)
+        home = provinces[(-2, 0)]
         max_hp = 48 if hero_class == 'Warrior' else 36
         mana = 16 if hero_class == 'Wizard' else 10
         army = [Troop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
                 for i, kind in enumerate(('militia', 'militia', 'archer'), 1)]
         hero = Hero('Alden', hero_class, home.pos, max_hp, max_hp, mana, mana, army)
         state = cls(seed, provinces, hero, actions_left=3 if hero_class == 'Scout' else 2)
-        for province in state.provinces.values():
-            province.guard_hp = [UNITS[kind].hp for kind in province.guards]
-            province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
         state.rival = RivalState.initial()
         state.rival.plan(state, delay=3)
         state.log.append('Claim the shard: capture Duskspire before Westwatch falls.')
@@ -410,7 +370,8 @@ class State:
         health = ([troop.hp for troop in self.rival.army] if expedition else
                   target.site_guard_hp if kind == 'site' else target.guard_hp)
         self.battle = Battle.create(self.hero, enemies, target.terrain, self.spells,
-                                    seed=self.seed + self.turn * 37 + province[0] * 7 + province[1], enemy_hp=health)
+                                    seed=self.seed + self.turn * 37 + province[0] * 7 + province[1], enemy_hp=health,
+                                    encounter=SITES[target.site_kind].encounter if kind == 'site' else None)
         if expedition:
             for unit, troop in zip((u for u in self.battle.units if u.team == 'enemy'), self.rival.army):
                 unit.source_id = troop.id
@@ -607,7 +568,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 4
+        data['schema_version'] = 5
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -626,8 +587,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3 and 4.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4 and 5.')
         _validate_save(data, version)
         data.pop('schema_version', None)
         if version == 1:
@@ -671,6 +632,13 @@ class State:
         if version < 4 and data['battle'] is not None:
             for unit in data['battle']['units']:
                 unit['stance'] = None
+        if version < 5 and data['battle'] is not None:
+            from eador.battle import BattleObjective
+            battle = data['battle']
+            battle['objective'] = asdict(BattleObjective())
+            hero = next(unit for unit in battle['units'] if unit['id'] == 0)
+            battle['outcome_reason'] = (None if battle['outcome'] is None else 'rout' if battle['outcome'] == 'player'
+                                        else 'hero_death' if hero['hp'] == 0 else 'exhaustion')
         data['rival']['pos'] = tuple(data['rival']['pos'])
         if data['rival']['target'] is not None:
             data['rival']['target'] = tuple(data['rival']['target'])
@@ -696,7 +664,7 @@ class State:
 
 def _validate_save(data: dict, version: int) -> None:
     """Check the serialized public state before constructing mutable game objects."""
-    from eador.battle import BattleUnit
+    from eador.battle import BattleObjective, BattleUnit
 
     def require(condition, message):
         if not condition:
@@ -877,7 +845,8 @@ def _validate_save(data: dict, version: int) -> None:
     require(data['battle_kind'] in (('conquest', 'site', 'defense', 'intercept') if version >= 3 else ('conquest', 'site', 'defense')), 'Unknown battle context.')
     require(position(data['battle_province'], 'Battle province') in provinces, 'Battle province is outside the shard.')
     keys = {'units', 'terrain', 'mana', 'spells', 'round', 'outcome', 'log'}
-    object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version >= 3 else set()), 'Battle')
+    object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version >= 3 else set())
+                  | ({'objective', 'outcome_reason'} if version >= 5 else set()), 'Battle')
     integer(battle['mana'], 'Battle mana', maximum=hero['max_mana'])
     integer(battle['round'], 'Battle round', minimum=1, maximum=81)
     require(battle['outcome'] in (None, 'player', 'enemy'), 'Unknown battle outcome.')
@@ -899,6 +868,26 @@ def _validate_save(data: dict, version: int) -> None:
         cells.add(pos)
         require(tile['kind'] in ('plains', 'forest', 'hills', 'marsh'), 'Unknown battle terrain.')
     require(len(cells) == 37, 'A battlefield must contain 37 hexes.')
+    objective = battle['objective'] if version >= 5 else asdict(BattleObjective())
+    if version >= 5:
+        object_fields(objective, {f.name for f in fields(BattleObjective)}, 'Objective')
+        require(objective['kind'] in ('rout', 'hold'), 'Unknown battle objective.')
+        integer(objective['required'], 'Objective required turns', maximum=80)
+        integer(objective['progress'], 'Objective progress', maximum=objective['required'])
+        if objective['kind'] == 'rout':
+            require(objective['target'] is None and objective['deadline'] is None
+                    and objective['required'] == objective['progress'] == 0, 'Rout objective has hold parameters.')
+        else:
+            require(position(objective['target'], 'Objective target') in cells, 'Objective target is outside the battlefield.')
+            integer(objective['required'], 'Objective required turns', minimum=1, maximum=80)
+            integer(objective['deadline'], 'Objective deadline', minimum=objective['required'], maximum=80)
+            require(battle['round'] <= objective['deadline'], 'The hold objective is past its deadline.')
+            province = provinces[tuple(data['battle_province'])]
+            require(data['battle_kind'] == 'site' and province['site_kind'] is not None
+                    and SITES[province['site_kind']].encounter is not None, 'A hold objective requires an authored site.')
+        reason = battle['outcome_reason']
+        require(reason in (None, 'rout', 'hold', 'hero_death', 'deadline', 'exhaustion'), 'Unknown battle outcome reason.')
+        require((battle['outcome'] is None) == (reason is None), 'Battle outcome reason is inconsistent.')
     require(isinstance(battle['units'], list) and 2 <= len(battle['units']) <= 14, 'Invalid battle army size.')
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     expedition_ids = set()
@@ -954,8 +943,25 @@ def _validate_save(data: dict, version: int) -> None:
         require(rival_by_id.keys() <= expedition_ids, 'Expedition is missing a rival soldier.')
     hero_unit = next(unit for unit in battle['units'] if unit['id'] == 0)
     if battle['outcome'] == 'player':
-        require(hero_unit['hp'] > 0 and all(unit['hp'] == 0 for unit in enemies), 'Battle victory is inconsistent.')
+        if version >= 5 and battle['outcome_reason'] == 'hold':
+            require(hero_unit['hp'] > 0 and objective['kind'] == 'hold'
+                    and objective['progress'] == objective['required'], 'Hold victory is inconsistent.')
+            target = tuple(objective['target'])
+            require(any(unit['team'] == 'player' and unit['hp'] > 0 and tuple(unit['pos']) == target for unit in battle['units'])
+                    and not any(unit['hp'] > 0 and HexGrid.distance(tuple(unit['pos']), target) <= 1 for unit in enemies),
+                    'Hold victory requires uncontested control of the objective.')
+            require(any(unit['hp'] > 0 for unit in enemies), 'Eliminating every defender is a rout victory.')
+        else:
+            require(hero_unit['hp'] > 0 and all(unit['hp'] == 0 for unit in enemies), 'Battle victory is inconsistent.')
+            require(version < 5 or battle['outcome_reason'] == 'rout', 'Rout victory has an inconsistent reason.')
     elif battle['outcome'] is None:
         require(hero_unit['hp'] > 0 and any(unit['hp'] > 0 for unit in enemies), 'Unfinished battle already has a winner.')
+        require(objective['kind'] != 'hold' or objective['progress'] < objective['required'], 'Unfinished hold objective is already complete.')
+    elif version >= 5 and battle['outcome_reason'] == 'deadline':
+        require(hero_unit['hp'] > 0 and objective['kind'] == 'hold' and battle['round'] == objective['deadline']
+                and objective['progress'] < objective['required'] and any(unit['hp'] > 0 for unit in enemies),
+                'Objective deadline defeat is inconsistent.')
     else:
         require(hero_unit['hp'] == 0 or battle['round'] == 81, 'Battle defeat is inconsistent.')
+        require(version < 5 or battle['outcome_reason'] == ('hero_death' if hero_unit['hp'] == 0 else 'exhaustion'),
+                'Battle defeat has an inconsistent reason.')

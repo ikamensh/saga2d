@@ -4,6 +4,8 @@ Criteria: [early-access-criteria.md](early-access-criteria.md).
 All release gates remain incomplete unless evidence below explicitly proves
 them. Last completed development milestone was a single-shard prototype;
 the current goal is substantially broader.
+Entries below are chronological checkpoints; their measurements apply to
+the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Baseline audit — 2026-09-05
 
@@ -149,3 +151,66 @@ walkthroughs, complete display/settings matrix or release readiness.
 G06 remains incomplete: profitable indefinite capital camping still needs
 economic pressure, and broader balance/content evidence remains outstanding.
 Encirclement and unpaid upkeep are the next isolated rules increment.
+
+## Supply pressure and audio lifetime — 2026-09-06
+
+- An encircled Westwatch loses its production, Marketplace income and
+  local recovery until a neighboring province is reclaimed. Outlying
+  provinces retain production. Unaffordable upkeep causes deterministic,
+  logged departures that preserve more experienced troops first.
+- The shard shows the blockade and the next bill's exact gold shortfall
+  before End Turn. The rival report names all three breakout routes and
+  explains the lost supply. Departures also produce a visible campaign
+  message; the selected capital's income display reflects its blockade.
+- A native journey loads an earned older campaign at an unpaid bill,
+  inspects the warning, loses troops, reloads the protected manual slot,
+  and fights a breakout restoring supply. Screenshots were inspected at
+  `/tmp/shardbound-supply`. Model evidence includes 400 proactive victories
+  across 100 seeds and four heroes, plus the passive-camping defeat and
+  wounded-breakout regressions in [rival-design.md](rival-design.md).
+- Active Saga2D sound effects now respond to mute/master/effects volume,
+  preserve their relative gains and release playback resources at completion
+  and shutdown. AudioManager's public game API is unchanged. Real backend
+  checks cover sustained effects, independent managers, natural completion
+  and shutdown; this fixes shared playback mechanics before Shardbound audio
+  content is added.
+- The combined integration suite passed **472 tests** and the native rival,
+  supply and audio checks. G01–G19 remain incomplete; broader strategic
+  balance, content, presentation and release-candidate evidence are still
+  required. Guard/Brace rules are merged and their player controls are the
+  next UI increment.
+
+## Defensive orders and reusable preferences/audio tools — 2026-09-06
+
+- Guard and the fifth recruit, Pikeman, have complete keyboard/mouse controls.
+  G spends the selected unit's order on Guard (+2 defense), or on the Pikeman's
+  pre-attack Brace. Visible stance badges, effective defense and exact HP-loss
+  previews reflect the same rules. Codex, recruitment and guide explain the
+  melee/ranged counterplay. Schema v4 retains stances; independent rule review
+  and source-specific evidence are in [eador-guard.md](eador-guard.md).
+- Native `tools/verify_eador_guard.py` recruits the Pikeman, Guards by keyboard,
+  Braces by mouse, checks disabled-key behavior, expires stances and restores
+  them exactly from manual saves. Screenshots were inspected at
+  `/tmp/shardbound-guard`; a hint/button overlap and crowded codex text were
+  fixed and rerendered. The general native input/window journey and both
+  fuzz drivers passed. This UI checkpoint is `843e763`.
+- Saga2D now has a small `Settings` mapping, adopted and hardened from the
+  committed Warband offering. Known preference types and game-owned validators
+  reject bad values. Ordinary writes refuse damaged files; explicit reset and
+  save retains their exact bytes for recovery. Preferences and campaign saves
+  share private durable file mechanics. See [framework-settings.md](framework-settings.md).
+  The Shardbound options screen is separate work in progress.
+- `saga2d.synth` extracts pure sample composition/WAV export from the existing
+  games. Tribes imports the shared functions and all 18 of its generated WAVs
+  remain byte-identical. An independent native compose → WAV → playback example
+  passed. Invalid audio is rejected before replacing an asset. Sound composition,
+  event selection and caching remain game-owned; Shardbound audio content is
+  still outstanding. See [framework-synth.md](framework-synth.md).
+- The combined main suite passed **515 tests** at `143628c`. This advances the
+  framework and tactical foundations, not a release-candidate claim. The
+  two-hour `31a2c88` real-backend soak remains running; its result cannot validate
+  later rules, UI or framework changes.
+
+G01–G19 remain incomplete. The next content increments are an authored hold
+objective and three worlds with different route/resource decisions, followed
+by further active abilities, adventure choices and linked-campaign progression.

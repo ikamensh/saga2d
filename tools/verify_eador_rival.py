@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
 from saga2d import Game
+from eador.model import State
 from eador.rival_scene import RivalScene
 from eador.scene import BattleScene, ChoiceScene, SaveScene, ShardScene, TitleScene
 
@@ -17,7 +18,7 @@ from eador.scene import BattleScene, ChoiceScene, SaveScene, ShardScene, TitleSc
 def verify(output):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-rival-") as saves:
-        game = Game("Shardbound rival verification", resolution=(1280, 800), visible=False, save_dir=saves)
+        game = Game("Shardbound rival verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
         from pyglet.window import key, mouse
 
         window = game.backend.window
@@ -142,7 +143,45 @@ def verify(output):
             assert len(root.state.rival.army) == 1
             press(key.V)
             capture("rival-paid-recruit")
-            print(f"Real rival inspection, interception, wound/save continuity, defense and paid rebuilding passed. Screenshots: {output}")
+            press(key.ESCAPE)
+
+            # Resume an earned pre-pressure save, advanced with public commands
+            # to the next unpaid bill. The loaded UI journey then warns, loses
+            # troops, reloads and breaks out through actual input.
+            supply = State.from_json((Path(__file__).resolve().parents[1] /
+                                     "tests/eador/fixtures/v3_fortified_capital.json").read_text())
+            for _ in range(100):
+                if supply.upkeep_shortfall:
+                    break
+                supply.end_turn()
+            assert supply.encircled and supply.upkeep_shortfall
+            root.saves.save(supply, 3)
+            press(key.F6)
+            press(key._3)
+            root = game.scene
+            assert root.state.upkeep_shortfall == supply.upkeep_shortfall
+            capture("supply-shortfall")
+            press(key.V)
+            capture("supply-breakout-routes")
+            press(key.ESCAPE)
+            count = len(root.state.hero.army)
+            press(key.E)
+            assert len(root.state.hero.army) < count
+            assert "deserted" in root.message
+            capture("supply-desertion")
+            press(key.F6)
+            press(key._3)
+            root = game.scene
+            assert root.state.to_json() == supply.to_json()
+            destination = min((pos for pos in root.grid.neighbors(root.state.hero.pos)
+                               if pos != root.state.rival.pos),
+                              key=lambda pos: (len(root.state.provinces[pos].guards), pos))
+            travel(destination)
+            if isinstance(game.scene, BattleScene):
+                resolve()
+            assert not root.state.encircled and root.state.income > 0
+            capture("supply-restored")
+            print(f"Real rival inspection, interception, wound/save continuity, defense, paid rebuilding and supply breakout passed. Screenshots: {output}")
         finally:
             game._teardown()
             game.backend.quit()

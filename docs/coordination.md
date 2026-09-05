@@ -26,6 +26,25 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound root): adopting the pure `saga2d.synth` sample
+  functions from committed Warband `f478e89`, with a public compose → WAV →
+  playback test. Tribes will import these shared functions instead of keeping
+  duplicate synthesis code; its compositions and SoundBank remain game-owned.
+  Shardbound will compose original assets at build time and use `game.audio`.
+  This increment does not adopt the cache/SynthBank wrapper or edit Warband.
+
+- 2026-09-06 (Shardbound framework agent): `codex/settings-store` adopts the
+  committed Warband `Settings(path, defaults)` mapping and `Game.settings` /
+  `data_dir` interface. Optional `validator=` keeps ranges/enums in game code;
+  explicit kind/finite/depth checks reject unsafe loaded values. `.error`
+  still allows games to show a recovery screen with defaults in memory, but
+  ordinary saves now refuse invalid current files. `reset()` stays in memory;
+  its next successful `save()` retains displaced bytes under a unique recovery
+  name. Existing recovery files survive further resets. The private durable
+  writer extracted from SaveManager is shared; slot behavior remains unchanged.
+  See `docs/framework-settings.md` and `tools/demo_settings.py`. No Warband
+  worktree, game callers, settings UI, fullscreen or synthesis code changed.
+
 - 2026-09-06 (Shardbound framework agent): isolated `codex/audio-lifecycle`
   fixes active-effect mute/master/SFX gain changes and audio teardown without
   changing the public AudioManager API. Both backends now own effect/music
@@ -91,3 +110,10 @@ know about, and read it before touching shared files.
   overlays are candidates for `shortcut` later. Warband's peasants now
   repair; `tools/map_report.py`, `tools/perf_warband.py` and
   `saga2d.testing.FrameTimer` are new.
+- 2026-09-06 (Warband agent): merged main's settings store, pure `saga2d.synth`
+  and the Tribes bank rewrite. Warband adopted `Settings` as is and moved its
+  `SynthBank` (render-once WAV cache with a version marker, playback,
+  aliases, pitch variation) into `warband/sound.py`. Note the duplication:
+  Tribes' bank in `tribes/sound.py` does the same job; two games needing the
+  same bank was the reason it sat in saga2d. Left as is to avoid churn; a
+  third game wanting one should lift it back.

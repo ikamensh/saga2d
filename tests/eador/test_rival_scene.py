@@ -1,5 +1,7 @@
 """Public input makes rival counterplay observable without consuming a turn."""
 
+from pathlib import Path
+
 from saga2d import Game
 from eador.model import State
 from eador.scene import ShardScene
@@ -42,5 +44,35 @@ def test_rival_orders_show_current_forces_and_locate_them_without_advancing_play
         assert root.selected == state.rival.pos
         assert state.to_json() == before
         assert list(tmp_path.iterdir()) == []
+    finally:
+        game._teardown()
+
+
+def test_encirclement_and_unpaid_upkeep_are_visible_before_ending_a_turn(tmp_path):
+    """An earned old save exposes the blockade, breakout routes and an unpaid army's coming losses."""
+    state = State.from_json((Path(__file__).parent / "fixtures/v3_fortified_capital.json").read_text())
+    for _ in range(100):
+        if state.upkeep_shortfall:
+            break
+        state.end_turn()
+    assert state.encircled and state.upkeep_shortfall > 0
+    game = Game("Supply warnings", backend="mock", save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        game.tick(1 / 60)
+        assert "WESTWATCH ENCIRCLED" in rendered_text(game)
+        assert f"{state.upkeep_shortfall} gold short" in rendered_text(game)
+        before = state.to_json()
+        press(game, "v")
+        for neighbor in state.grid.neighbors((-2, 0)):
+            assert state.provinces[neighbor].name in rendered_text(game)
+        assert "Marketplace" in rendered_text(game)
+        assert state.to_json() == before
+        press(game, "escape")
+        count = len(state.hero.army)
+        press(game, "e")
+        assert len(state.hero.army) < count
+        assert "deserted" in rendered_text(game)
     finally:
         game._teardown()
