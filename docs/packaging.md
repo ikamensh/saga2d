@@ -12,9 +12,21 @@ From the repository root, with uv installed:
 uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py
 ```
 
-The command installs locked runtime dependencies in an isolated environment,
-adds the pinned packaging tools, snapshots the game/framework sources, builds
-the native artifact, archives it, extracts the archive outside the repository,
+Generate shipping audio explicitly before packaging when composition or
+synthesis source changes:
+
+```bash
+uv run python tools/build_eador_audio.py
+```
+
+Generated WAVs and their manifest are committed inputs. Packaging rejects
+missing, changed or unrecorded WAVs and stale generator-source hashes; it never
+generates or caches audio at application launch.
+
+The packaging command installs locked runtime dependencies in an isolated environment,
+adds the pinned packaging tools, snapshots the game/framework sources, entry
+point, spec and audio generator, builds the native artifact, archives it,
+extracts the archive outside the repository,
 and runs its hidden-window smoke check. An awake graphical desktop is required
 for that final real-pyglet check. `--skip-smoke` builds an explicitly unverified
 artifact when only a build machine is available.
@@ -44,29 +56,58 @@ All generated files stay under ignored `build/shardbound/` and
 |---|---|
 | `Shardbound.app` | Normal windowed application; open it in Finder |
 | `Shardbound-macos-arm64.zip` | Local archive preserving bundle symbolic links |
-| `build-manifest.json` | Source hashes, commit/dirty status, versions, platform, file inventory, archive hash and smoke result |
+| `build-manifest.json` | Source and package-data hashes, commit/dirty status, versions, platform, file inventory, archive hash and smoke result |
 | `packaged-smoke.png` | Real title-screen capture from the extracted archive |
 | `packaged-smoke-shard.png` | Real campaign-screen capture from the extracted archive |
 | `packaged-smoke-codex.png` / `-rival.png` | Rules reference and finite expedition inspection |
-| `packaged-smoke-battle.png` | Tactical battle restored from a save |
-| `packaged-smoke.json` | Frozen-runtime, executable path and save/load verification |
+| `packaged-smoke-settings.png` | Native settings preview before Apply |
+| `packaged-smoke-battle.png` | Tactical battle with Guard restored from a save |
+| `packaged-smoke.json` | Runtime, settings/save restoration, installed audio hashes and native playback verification |
 
-The app includes a Python runtime and runtime libraries. Game assets are
-collected from the snapshotted packages; current art is procedural. Bundled
+The app includes a Python runtime and runtime libraries. The source snapshot's
+`package-data.json` freezes the exact ordered collection; the snapshotted spec
+consumes that list. Every collected file has a byte count and SHA-256 in the
+build manifest's `package_data` map. This includes all twelve effects, two music
+loops, `eador/assets/audio-manifest.json`, audio provenance, and other package
+data. The review-only cue sampler under `docs/evidence/` is not shipped.
+Current art is procedural. Bundled
 `Contents/Resources/release/` contains a player guide, credits, original license
 texts found in dependency distributions, the runtime lock and build metadata.
 No change to the Saga2D framework wheel is needed: the game is an application
 that consumes the framework.
 
-The smoke launcher uses temporary saves and writes its result to the requested
-path. Native key events start a game, save/reload campaign state, inspect
-the codex and rival, locate the expedition, invade a province, play a battle
-round, restore that battle and retreat. It renders title, shard, codex,
-rival and battle screens. The
+The smoke launcher uses temporary settings and saves, and writes its result to
+the requested path. Assets resolve from the installed `eador` module, independent
+of the working directory. Native key events apply and cancel settings edits,
+start a game, save/reload campaign state, inspect the codex and rival, locate the
+expedition, invade a province, Guard, play an automatic battle round, restore
+the guarded battle and retreat. A fresh Game reloads the saved sound settings.
+The smoke renders title, settings, shard, codex, rival and battle screens.
+
+All fourteen shipping WAVs are decoded in full and checked against the audio
+manifest. The native silent driver plays every effect to completion and briefly
+starts each looping track, checking live mute/channel gains and player cleanup.
+The builder compares the reported WAV hashes with the frozen input collection
+and requires the asset root to reside inside the extracted archive. This quick
+playback check does not establish listening quality or full-loop continuity;
+the dedicated `tools/build_eador_audio.py --verify-native` checks complete loops,
+and human listening remains required. The
 builder checks that the process is frozen and is the extracted executable,
 with Python environment overrides removed and an OS-only executable search
 path. Its temporary working directory is outside the repository. Inspect the
 PNGs after a build; successful execution alone does not establish visual quality.
+
+For a source-mode preflight without building a frozen artifact, run the same
+entry point from an unrelated working directory with the repository on
+`PYTHONPATH`:
+
+```bash
+cd /tmp
+PYTHONPATH=/absolute/path/to/saga2d /absolute/path/to/saga2d/.venv/bin/python /absolute/path/to/saga2d/packaging/entry.py --smoke-image /tmp/shardbound-source-smoke.png
+```
+
+That report correctly records `frozen: false`. It verifies the recipe's journey
+but cannot pass the standalone executable gate.
 
 You can also exercise the macOS app-launch path without opening a terminal
 window for the application:
@@ -119,6 +160,11 @@ screenshot hashes. The manifest's dirty flag reflects unrelated `.gitignore`
 work; game/framework/packaging sources were committed at the named snapshot.
 This is a development checkpoint on the same macOS host. The clean-account,
 Windows and full packaged-campaign gates remain open.
+
+This historical archive predates the Guard/settings/audio packaging checks
+above. Updating the recipe or passing a source-mode smoke does not update that
+artifact or its evidence. Build and inspect a new frozen candidate only after
+the intended game and audio integration commits are assembled.
 
 ## Windows x64 plan — untested
 

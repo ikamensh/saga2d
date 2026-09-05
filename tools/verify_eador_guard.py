@@ -9,14 +9,16 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.scene import BattleScene, TitleScene
 
 
 def verify(output):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-guard-") as saves:
-        game = Game("Shardbound defensive orders", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
+        game = create_game("Shardbound defensive orders", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
         from pyglet.window import key, mouse
 
         window = game.backend.window

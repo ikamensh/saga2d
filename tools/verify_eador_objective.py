@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
-from saga2d import Game
+from eador.app import create_game
 from eador.encounter_scene import EncounterScene
 from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
 
@@ -17,7 +17,7 @@ from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, Title
 def verify(output, *, backend="pyglet"):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-watch-") as directory:
-        game = Game("Shardbound Watch verification", resolution=(1280, 800), backend=backend,
+        game = create_game("Shardbound Watch verification", resolution=(1280, 800), backend=backend,
                     visible=False, save_dir=Path(directory) / "saves")
         if backend == "pyglet":
             from pyglet.window import key, mouse

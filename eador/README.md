@@ -11,13 +11,16 @@ From the repository root:
 uv sync --extra dev
 uv run python -m eador                       # title and hero selection
 uv run python -m eador --seed 7              # start immediately as Commander
-uv run python -m eador --seed 7 --hero Wizard
+uv run python -m eador --seed 7 --hero Wizard --theme elderwild
 uv run python -m pytest tests/eador -q
 ```
 
-`--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard` when starting
-directly with `--seed`. The title screen has its own class selection and
-New seed button. Saves live in `~/.shardbound/saves`. **F6** opens three
+`--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard`; `--theme` accepts
+`frontier`, `elderwild` or `ruins`. With `--seed` they start that world directly;
+otherwise they preselect the title choices. Frontier has mixed borders,
+Elderwild a wet interior and a longer merchant road, and Ruins defended
+checkpoints with weaker, poorer flanks. The title explains these choices and
+provides hero, world and seed controls. Saves live in `~/.shardbound/saves`. **F6** opens three
 manual slots and three rolling autosaves. **F5/F9** quickly save/load Manual
 1. Campaign actions and battle rounds checkpoint automatically; pending
 battles and reward decisions resume exactly where saved. Each slot also
@@ -30,7 +33,9 @@ manual slot. **Save & title** asks for a slot and leaves only after writing it.
 visible buttons adjust volume and mute; **Enter** applies, **Esc** cancels.
 Preferences live separately in `~/.shardbound/settings.json` and survive
 loading another campaign. Damaged settings are reported and kept until you
-explicitly choose retained recovery. Audio content is still in development.
+explicitly choose retained recovery. Original campaign/battle music and action
+cues are included; settings affect music and effects already playing. Listening
+and mix review remain part of release preparation.
 
 ## Your first turns
 
@@ -80,6 +85,7 @@ adds mana to support the two spells already learned.
 | Screen | Input | Action |
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
+| Title | Left / Right / click world | Choose Frontier, Elderwild or Ruins |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
 | Title / guide | O | Open sound settings |
@@ -110,6 +116,7 @@ adds mana to support the two spells already learned.
 | Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
 | Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
 | Objective battle | O | Aim at the seal |
+| Battle | P, then F / click target / Enter | Aim Pin with an Archer or Storm Quiver hero |
 | Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
@@ -155,11 +162,11 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Seven sites have different defending parties and gold/crystal rewards:
+Eight sites have different defending parties and gold/crystal rewards:
 Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove, plus Border Watch. The Watch shows its layout and rewards before you commit
+Grove, Border Watch and Explorer's Camp. The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
-defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of six
+defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of eight
 relics to gain healing or damage spells, avoid retaliation, cross difficult
 terrain, improve army recovery or reduce recruitment costs. Duplicate
 relics can instead be distilled into four crystals. These choices belong
@@ -239,3 +246,14 @@ The [research and scope notes](../docs/eador-research.md) cite the official
 [Eador manual](https://store.steampowered.com/manual/232050) and
 [Genesis store page](https://store.steampowered.com/app/235660/Eador_Genesis/),
 and distinguish source mechanics from this adaptation's choices.
+
+Archers and heroes carrying Storm Quiver can **Pin**: a ranged shot within
+three hexes for half normal damage, slowing a surviving target by two
+movement (minimum one) during its next turn. The target can still attack or
+Guard. Pin does not stack, and the shooter must skip Pin on its following
+turn. The targeting forecast shows both sides' actual HP loss; a **P** badge
+marks the slowed unit. **Esc** cancels targeting without spending an order.
+Watch Bell grants the hero Brace through **G**, even for a ranged hero.
+New worlds place Storm Quiver in Wolf Den, Watch Bell at Border Watch, and
+Wayfarer Boots at Explorer's Camp. Older saves retain their recorded rewards
+and active battles.

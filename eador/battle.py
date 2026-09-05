@@ -48,6 +48,21 @@ class BattleUnit:
     skirmisher: bool = False
     source_id: int | None = None
     stance: str | None = None
+    abilities: tuple[str, ...] = ()
+    pinned: bool = False
+    pin_cooldown: int = 0
+
+    @property
+    def can_pin(self) -> bool:
+        return 'pin' in self.abilities
+
+    @property
+    def can_brace(self) -> bool:
+        return self.kind == 'pikeman' or 'brace' in self.abilities
+
+    @property
+    def effective_move_range(self) -> int:
+        return max(1, self.move_range - (2 if self.pinned else 0))
 
     @property
     def alive(self) -> bool:
@@ -104,11 +119,12 @@ class Battle:
             units.append(BattleUnit(troop.id, 'player', troop.kind, pos, troop.hp,
                                     troop.max_hp, spec.attack + troop.level - 1 + (hero.hero_class == 'Commander'),
                                     spec.defense + (troop.level - 1) // 2,
-                                    spec.move_range, spec.attack_range, level=troop.level))
+                                    spec.move_range, spec.attack_range, level=troop.level, abilities=('pin',) if troop.kind == 'archer' else ()))
         health = enemy_hp if enemy_hp is not None else [UNITS[kind].hp for kind in enemies]
         if len(health) != len(enemies):
             raise ValueError('Enemy health must match the enemy army.')
         units += cls._deploy(list(zip(enemies, health)), enemy_positions, 'enemy', max(u.id for u in units) + 1000)
+        units[0].abilities = ('pin',) if hero.relic == 'storm_quiver' else ('brace',) if hero.relic == 'watch_bell' else ()
         ranks = hero.skill_ranks
         units[0].safe_attacks = ranks.get('duelist', 0) + (hero.relic == 'iron_crown')
         units[0].attack += 2 * ranks.get('duelist', 0)
@@ -142,7 +158,7 @@ class Battle:
             if not 0 < hp <= spec.hp:
                 raise ValueError('A combatant must have positive health within its maximum.')
             units.append(BattleUnit(i, team, kind, pos, hp, spec.hp, spec.attack,
-                                    spec.defense, spec.move_range, spec.attack_range))
+                                    spec.defense, spec.move_range, spec.attack_range, abilities=('pin',) if kind == 'archer' else ()))
         return units
 
     @classmethod
@@ -180,7 +196,7 @@ class Battle:
         if not unit.alive or unit.moved or (unit.acted and not unit.skirmisher) or self.outcome:
             return set()
         occupied = {other.pos for other in self.units if other.alive and other.id != unit_id}
-        cells = self.grid.reachable(unit.pos, unit.move_range, blocked=occupied,
+        cells = self.grid.reachable(unit.pos, unit.effective_move_range, blocked=occupied,
                                     cost=lambda pos: 2 if self.terrain[pos] in ('forest', 'marsh') and not unit.terrain_walk else 1)
         return set(cells) - {unit.pos}
 
@@ -204,6 +220,22 @@ class Battle:
     def attack(self, unit_id: int, target_id: int) -> None:
         self._attack(self._actor(unit_id), self.unit(target_id))
 
+    def pin_targets(self, unit_id: int) -> list[BattleUnit]:
+        unit = self.unit(unit_id)
+        if not unit.alive or not unit.can_pin or unit.pin_cooldown or unit.acted or self.outcome:
+            return []
+        return [other for other in self.units if other.alive and other.team != unit.team
+                and not other.pinned and HexGrid.distance(unit.pos, other.pos) <= 3]
+
+    def pin_preview(self, unit_id: int, target_id: int) -> tuple[int, int]:
+        """Forecast actual Pin damage and any adjacent defensive reaction, without mutation."""
+        damage, spear, retaliation = self._attack_effects(self.unit(unit_id), self.unit(target_id), pin=True)
+        return damage, spear + retaliation
+
+    def pin(self, unit_id: int, target_id: int) -> None:
+        """Spend an action on a ranged slowing shot, then skip the next turn's Pin."""
+        self._attack(self._actor(unit_id), self.unit(target_id), pin=True)
+
     def guard(self, unit_id: int) -> None:
         """Spend the remaining order to Guard, or Brace for a Pikeman, until its next turn."""
         self._guard(self._actor(unit_id))
@@ -211,49 +243,55 @@ class Battle:
     def _guard(self, unit: BattleUnit) -> None:
         if unit.acted:
             raise RuleError('That unit has already acted.')
-        unit.stance = 'brace' if unit.kind == 'pikeman' else 'guard'
+        unit.stance = 'brace' if unit.can_brace else 'guard'
         unit.moved = unit.acted = True
         self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
 
-    def _damage(self, attacker: BattleUnit, target: BattleUnit) -> int:
+    def _damage(self, attacker: BattleUnit, target: BattleUnit, *, pin: bool = False) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
-        return min(target.hp, max(1, attacker.attack - target.effective_defense - cover))
+        damage = max(1, attacker.attack - target.effective_defense - cover)
+        return min(target.hp, (damage + 1) // 2 if pin else damage)
 
     def preview(self, unit_id: int, target_id: int) -> tuple[int, int]:
         """Return actual target and attacker HP loss for a legal attack, without mutation."""
         damage, spear, retaliation = self._attack_effects(self.unit(unit_id), self.unit(target_id))
         return damage, spear + retaliation
 
-    def _attack_effects(self, unit: BattleUnit, target: BattleUnit) -> tuple[int, int, int]:
+    def _attack_effects(self, unit: BattleUnit, target: BattleUnit, *, pin: bool = False) -> tuple[int, int, int]:
         """Resolve the ordered damage once for both forecasts and attacks."""
-        if target not in self.targets(unit.id):
+        if pin and target not in self.pin_targets(unit.id):
+            raise RuleError('Pin needs a ready ability and an unpinned enemy within 3 hexes.')
+        if not pin and target not in self.targets(unit.id):
             raise RuleError('Choose an enemy within attack range; each unit attacks once.')
         adjacent = HexGrid.distance(unit.pos, target.pos) == 1
-        braces = target.stance == 'brace' and adjacent and unit.attack_range == 1
+        braces = target.stance == 'brace' and adjacent and unit.attack_range == 1 and not pin
         spear = self._damage(target, unit) if braces else 0
         if spear == unit.hp:
             return 0, spear, 0
-        damage = self._damage(unit, target)
+        damage = self._damage(unit, target, pin=pin)
         # Brace reserves its one reaction for melee; ranged contact cannot
         # take an ordinary retaliation first and leave the spear ready too.
         retaliates = target.stance != 'brace' and unit.safe_attacks == 0 and target.hp > damage and not target.retaliated and adjacent
         return damage, spear, self._damage(target, unit) if retaliates else 0
 
-    def _attack(self, unit: BattleUnit, target: BattleUnit) -> None:
-        damage, spear, retaliation = self._attack_effects(unit, target)
+    def _attack(self, unit: BattleUnit, target: BattleUnit, *, pin: bool = False) -> None:
+        damage, spear, retaliation = self._attack_effects(unit, target, pin=pin)
         if spear:
             unit.hp -= spear
             target.stance = None
             target.retaliated = True
             self.log.append(f'{target.name} braces and strikes {unit.name} for {spear} before the attack.')
         target.hp -= damage
+        if pin:
+            unit.pin_cooldown = 2
+            target.pinned = target.alive
         unit.acted = True
         if not unit.skirmisher:
             unit.moved = True
         if unit.safe_attacks:
             unit.safe_attacks -= 1
         if unit.alive:
-            self.log.append(f'{unit.name} hits {target.name} for {damage}.')
+            self.log.append(f'{unit.name} {"pins" if pin else "hits"} {target.name} for {damage}.')
         if retaliation:
             unit.hp -= retaliation
             target.retaliated = True
@@ -376,7 +414,21 @@ class Battle:
                         other.pos != self.objective.target, other.hp, other.id))
                 else:
                     target = min(targets, key=lambda u: (u.hp, u.id))
-                if team == 'player':
+                # Trade damage for control only when it prevents this target's
+                # next melee approach. A kill or an occupied seal takes priority.
+                distance = min(HexGrid.distance(ally.pos, target.pos) for ally in self.units
+                               if ally.alive and ally.team == team)
+                slow_stops_approach = (target.attack_range + max(1, target.move_range - 2) < distance
+                                       <= target.attack_range + target.move_range)
+                use_pin = (target in self.pin_targets(unit.id) and slow_stops_approach
+                           and self.preview(unit.id, target.id)[0] < target.hp
+                           and not (defending_seal and target.pos == self.objective.target))
+                if use_pin:
+                    if team == 'player':
+                        self.pin(unit.id, target.id)
+                    else:
+                        self._attack(unit, target, pin=True)
+                elif team == 'player':
                     self.attack(unit.id, target.id)
                 else:
                     self._attack(unit, target)
@@ -388,10 +440,16 @@ class Battle:
             raise RuleError('The battle is over.')
         # Enemy actions begin fresh; retaliation refreshes once per full round.
         for unit in self.units:
-            if unit.team == 'enemy':
+            if unit.team == 'player':
+                unit.pinned = False
+            else:
+                unit.pin_cooldown = max(0, unit.pin_cooldown - 1)
                 unit.moved = unit.acted = False
                 unit.stance = None
         self._play_team('enemy')
+        for unit in self.units:
+            if unit.team == 'enemy':
+                unit.pinned = False
         if not self.outcome:
             self._objective_turn()
         if not self.outcome:
@@ -400,6 +458,7 @@ class Battle:
                 unit.moved = unit.acted = unit.retaliated = False
                 if unit.team == 'player':
                     unit.stance = None
+                    unit.pin_cooldown = max(0, unit.pin_cooldown - 1)
             if self.round > 80:
                 self.outcome = 'enemy'
                 self.outcome_reason = 'exhaustion'
@@ -422,7 +481,7 @@ class Battle:
 
     @classmethod
     def from_dict(cls, data: dict) -> Battle:
-        return cls(units=[BattleUnit(**{**u, 'pos': tuple(u['pos'])}) for u in data['units']],
+        return cls(units=[BattleUnit(**{**u, 'pos': tuple(u['pos']), 'abilities': tuple(u['abilities'])}) for u in data['units']],
                    terrain={tuple(t['pos']): t['kind'] for t in data['terrain']},
                    mana=data['mana'], spells=set(data['spells']), round=data['round'],
                    outcome=data['outcome'], log=list(data['log']),

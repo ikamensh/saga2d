@@ -258,7 +258,7 @@ def soak(args):
               "platform": platform.platform(), "architecture": platform.machine(),
               "latency_measurement": "Game.tick only: input dispatch, updates and real rendering; excludes pacing, driver setup, screenshots and report I/O",
               "latency_file": "latency-ms.f64", "latency_byte_order": sys.byteorder,
-              "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, one persistent hidden Pyglet window; audio disabled. Not full campaigns or human playtesting."}
+              "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, one persistent hidden Pyglet window; silent audio driver. Not full campaigns or human playtesting."}
     for name in ("hw.model", "machdep.cpu.brand_string", "hw.memsize"):
         report[name] = subprocess.check_output(["sysctl", "-n", name], text=True).strip()
     awake = subprocess.Popen(["/usr/bin/caffeinate", "-dims", "-w", str(os.getpid())])
@@ -285,7 +285,8 @@ def soak(args):
     try:
         with tempfile.TemporaryDirectory(prefix="shardbound-soak-saves-") as saves, (output / "latency-ms.f64").open("wb") as timing:
             report["temporary_save_directory"] = saves
-            game = Game("Shardbound real-backend soak", resolution=(1280, 800), visible=False, save_dir=saves)
+            game = Game("Shardbound real-backend soak", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves",
+                        asset_path=ROOT / "eador" / "assets")
             # Pyglet's Cocoa event loop installs its own SIGTERM handler at startup.
             signal.signal(signal.SIGTERM, cancel_run)
             signal.signal(signal.SIGINT, cancel_run)
