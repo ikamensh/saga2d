@@ -422,7 +422,9 @@ class HelpScene(Screen):
 class BattleScene(Screen):
     controls = {"e": "end_turn", "tab": "next_unit", "1": "bolt", "2": "heal",
                 "a": "auto_round", "f5": "save_game", "f9": "load_game", "f6": "browse_saves",
-                "escape": "cancel", "f1": "help"}
+                "escape": "cancel", "f1": "help", "t": "retreat", "f": "next_target",
+                ("return", "space"): "activate_cursor",
+                ("left", "right", "up", "down", "pageup", "pagedown"): "aim"}
 
     def __init__(self, root):
         super().__init__()
@@ -430,6 +432,7 @@ class BattleScene(Screen):
         self.selected = None
         self.spell = None
         self.hover = None
+        self.cursor = self.battle.unit(0).pos
         self.floats = []
         self.clock = 0.0
 
@@ -467,7 +470,7 @@ class BattleScene(Screen):
         self.button(f"Healing light · {b.spell_cost('heal')} mana", x, 428, 300, self.heal, hotkey="2",
                     enabled="heal" in b.spells and b.mana >= b.spell_cost("heal") and hero_ready)
         self.button("Auto-play one round", x, 518, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
-        self.button("Retreat", x, 568, 300, self.retreat, danger=True, enabled=b.outcome is None)
+        self.button("Retreat", x, 568, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
         self.button("End battle round", x, h - 93, 300, self.end_turn,
                     hotkey="E", primary=True, enabled=b.outcome is None)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
@@ -536,7 +539,27 @@ class BattleScene(Screen):
         if units:
             ids = [u.id for u in units]
             self.selected = ids[(ids.index(self.selected) + 1) % len(ids)] if self.selected in ids else ids[0]
+            self.cursor = self.hover = self.battle.unit(self.selected).pos
             self.spell = None
+
+    def aim(self, event):
+        directions = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "down": (0, 1),
+                      "pageup": (1, -1), "pagedown": (-1, 1)}
+        dq, dr = directions[event.key]
+        pos = self.cursor[0] + dq, self.cursor[1] + dr
+        if pos in self.battle.terrain:
+            self.cursor = self.hover = pos
+
+    def next_target(self):
+        team = "player" if self.spell == "heal" else "enemy"
+        targets = [u.pos for u in self.battle.units if u.hp > 0 and u.team == team]
+        if targets:
+            index = (targets.index(self.cursor) + 1) % len(targets) if self.cursor in targets else 0
+            self.cursor = self.hover = targets[index]
+
+    def activate_cursor(self):
+        self.hover = self.cursor
+        self.act_at(self.cursor)
 
     def update(self, dt):
         self.clock += dt
@@ -545,21 +568,32 @@ class BattleScene(Screen):
     def handle_input(self, event):
         if event.type == "move":
             self.hover = self.grid.cell_at(event.x, event.y)
+            if self.hover is not None:
+                self.cursor = self.hover
         if event.type != "click" or event.button != "left" or self.battle.outcome:
             return False
         pos = self.grid.cell_at(event.x, event.y)
         if pos is None:
             return False
+        self.cursor = self.hover = pos
+        self.act_at(pos)
+        return True
+
+    def act_at(self, pos):
+        if self.battle.outcome is not None:
+            return
         unit = next((u for u in self.battle.units if u.hp > 0 and u.pos == pos), None)
-        if self.spell and unit:
-            self.act(lambda: self.battle.cast(self.spell, unit.id))
+        if self.spell:
+            if unit:
+                self.act(lambda: self.battle.cast(self.spell, unit.id))
+            else:
+                self.message = "Aim at a unit to cast. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
             self.selected = unit.id
         elif unit and self.selected is not None:
             self.act(lambda: self.battle.attack(self.selected, unit.id))
         elif self.selected is not None:
             self.act(lambda: self.battle.move(self.selected, pos))
-        return True
 
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
@@ -602,7 +636,7 @@ class BattleScene(Screen):
         else:
             self.paragraph("Forest and hills grant cover. Marsh slows movement. Melee defenders retaliate once per round.",
                            x, 630, size=11)
-        self.text("Click unit → move → attack  /  Tab next unit", x, h - 37, size=10, color=MUTED)
+        self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
         reachable = b.reachable(self.selected) if selected and not selected.acted and b.outcome is None else set()
         targets = {u.id for u in b.targets(self.selected)} if selected and not selected.acted and b.outcome is None else set()
         for pos in sorted(b.terrain, key=lambda p: self.grid.center(p)[1]):

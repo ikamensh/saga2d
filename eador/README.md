@@ -86,10 +86,13 @@ adds mana to support the two spells already learned.
 | Shard | E | End campaign turn |
 | Battle | Click friendly unit / Tab | Select unit / cycle units that can still act |
 | Battle | Click empty hex / enemy | Move / attack with selected unit |
+| Battle | Arrows / Page Up / Page Down | Aim at neighboring hexes (Page keys provide the other two diagonals) |
+| Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
+| Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
 | Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
-| Battle | Retreat button | Withdraw with surviving troops and a gold penalty |
+| Battle | T / Retreat button | Withdraw with surviving troops and a gold penalty |
 | Shard, battle or decision | F5 / F9 | Quicksave / quickload Manual 1 |
 | Title, shard, battle or decision | F6 | Open all saves |
 | Saves | 1–6 / Shift + 1–6 | Load a slot / recover its previous version |

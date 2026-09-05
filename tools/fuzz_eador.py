@@ -225,7 +225,14 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
             elif roll < .28:
                 press('e')
             elif roll < .34:
-                button('Retreat')
+                if rng.random() < .5:
+                    press('t')
+                else:
+                    button('Retreat')
+            elif roll < .5:
+                press(rng.choice(('left', 'right', 'up', 'down', 'pageup', 'pagedown', 'f', '1', '2')))
+                press('return')
+                metrics['keyboard_tactical_inputs'] += 1
             else:
                 players = [u for u in battle.units if u.team == 'player' and u.alive]
                 unit = rng.choice(players)

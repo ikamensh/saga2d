@@ -151,7 +151,59 @@ def verify(output: Path):
             press(key.F6)
             press(key._3)
             assert isinstance(game.scene, BattleScene)
-            print(f"Real input, battles, choices, equipment, slots, autosaves and damaged-save recovery passed. Screenshots: {output}")
+            # A new launch fixture, then a complete aimed keyboard sequence.
+            game.clear_and_push(TitleScene(seed=7))
+            game.tick(1 / 60)
+            for _ in range(3):
+                press(key.TAB)
+            press(key.ENTER)
+            root = game.scene
+            assert root.state.hero.hero_class == "Wizard"
+            for _ in range(6):
+                press(key.TAB)
+                if root.selected == (-1, 0):
+                    break
+            press(key.ENTER)
+            assert isinstance(game.scene, BattleScene)
+            b = root.state.battle
+            before = root.state.to_json()
+            press(key._1)
+            press(key.UP)
+            press(key.ENTER)
+            assert root.state.to_json() == before  # Empty spell target.
+            press(key.ESCAPE)
+            press(key.ENTER)
+            assert b.unit(0).pos == (-3, 0) and b.unit(0).moved
+            press(key.E)
+            mana = b.mana
+            press(key._1)
+            press(key.F)
+            capture("keyboard-spell-target")
+            press(key.ENTER)
+            assert b.mana < mana
+            archer = next(u for u in b.units if u.team == "player" and u.kind == "archer")
+            for _ in range(6):
+                press(key.TAB)
+                if game.scene.selected == archer.id:
+                    break
+            press(key.F6)
+            press(key.TAB)
+            press(key._2)
+            press(key.ESCAPE)
+            saved = root.state.to_json()
+            press(key.F)
+            for width, height in ((1280, 720), (1280, 800), (1920, 1080)):
+                window.set_size(width, height)
+                capture(f"keyboard-target-{width}x{height}")
+            press(key.ENTER)
+            assert archer.acted
+            press(key.F6)
+            press(key._2)
+            assert isinstance(game.scene, BattleScene)
+            assert game.scene.root.state.to_json() == saved
+            press(key.T)
+            assert isinstance(game.scene, ShardScene)
+            print(f"Real mouse/keyboard tactics, choices, equipment, slots, autosaves, recovery and window-size matrix passed. Screenshots: {output}")
         finally:
             game._teardown()
             game.backend.quit()
