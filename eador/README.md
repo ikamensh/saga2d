@@ -17,8 +17,14 @@ uv run python -m pytest tests/eador -q
 
 `--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard` when starting
 directly with `--seed`. The title screen has its own class selection and
-New seed button. Saves use slot 1 in `~/.shardbound/saves`; saving replaces
-that slot and loading restores the campaign, including an unfinished battle.
+New seed button. Saves live in `~/.shardbound/saves`. **F6** opens three
+manual slots and three rolling autosaves. **F5/F9** quickly save/load Manual
+1. Campaign actions and battle rounds checkpoint automatically; pending
+battles and reward decisions resume exactly where saved. Each slot also
+retains its previous version, opened explicitly with **Backup** or
+**Shift + the slot's displayed number**. Damaged or incompatible files are
+reported without replacing live play; recover a backup and save to another
+manual slot. **Save & title** asks for a slot and leaves only after writing it.
 
 ## Your first turns
 
@@ -33,8 +39,10 @@ that slot and loading restores the campaign, including an unfinished battle.
 4. Press **E** after your units act to let the enemy take its turn. **A**
    plays your remaining actions and the enemy turn automatically for one
    round; repeat it if you want assistance with the encounter.
-5. After victory, press **E** to return to the shard with treasure and
-   experience. Press **E** again to end the campaign turn, collect income,
+5. After victory, press **E** to return with treasure and experience.
+   Resolve any skill or relic decisions with **1/2**. Keeping a relic adds
+   it to your inventory; **H**, then its number equips it. Press **E**
+   on the shard to end the campaign turn, collect income,
    pay upkeep, heal and regain mana. Build a Temple when you can afford
    its 65 gold, then fill free troop slots with Swordsmen.
 6. Move east through Silverford, Heartwood and Cinderwood: select an
@@ -54,7 +62,7 @@ The starting army is usable immediately; Barracks is one possible opening,
 not a required build. Marketplace provides income instead, while Wizard
 starts with both spells and can invest elsewhere.
 The investment-and-exploration route above wins the seed-7 Commander
-campaign on turn 9 using automatic battles; manual decisions and different
+campaign in the integration journey using automatic battles; manual decisions and different
 seeds can change the outcome. For Wizard, a Mage Tower before the Temple
 adds mana to support the two spells already learned.
 
@@ -70,6 +78,10 @@ adds mana to support the two spells already learned.
 | Shard | Enter / Space | Travel to or invade the selected adjacent province |
 | Shard | X | Explore the hero's current province |
 | Shard | B / R | Open construction / recruitment |
+| Shard / decision | H | Inspect skills and equip relics |
+| Decision | 1 / 2 | Choose the corresponding skill or reward |
+| Hero | 1–4 / U | Equip a visible relic / unequip |
+| Hero | Left / Right | Previous / next inventory page |
 | Catalogue | Number key / click | Buy the corresponding building or troop |
 | Shard | E | End campaign turn |
 | Battle | Click friendly unit / Tab | Select unit / cycle units that can still act |
@@ -78,7 +90,10 @@ adds mana to support the two spells already learned.
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
 | Battle | Retreat button | Withdraw with surviving troops and a gold penalty |
-| Shard or battle | F5 / F9 | Save / load |
+| Shard, battle or decision | F5 / F9 | Quicksave / quickload Manual 1 |
+| Title, shard, battle or decision | F6 | Open all saves |
+| Saves | 1–6 / Shift + 1–6 | Load a slot / recover its previous version |
+| Saves | Tab | Switch Save / Load; only manual slots can be overwritten |
 | Shard or battle | F1 | Open guide, including Save & title |
 | Shard | Esc | Open guide |
 | Battle | Esc | Cancel spell targeting, otherwise open guide |
@@ -107,6 +122,21 @@ stacks. Victories improve the hero and surviving veterans; dead troops are
 lost. The four recruitable types are Militia, Swordsman, Archer and Acolyte.
 Acolytes improve campaign recovery; spellcasting belongs to the hero.
 
+Each level offers two class disciplines. Choose a new discipline or deepen
+one already learned, up to rank three. Commander balances recruitment and
+recovery against retaliation-free troop attacks; Warrior chooses safe,
+stronger strikes or healing; Scout chooses terrain traversal or attacking
+before moving away; Wizard specializes in cheaper Bolt or stronger,
+cheaper Heal. **H** shows learned effects.
+
+Six sites have different defending parties and gold/crystal rewards:
+Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
+Grove. Winning offers a relic or its gold value. Keep and equip one of six
+relics to gain healing or damage spells, avoid retaliation, cross difficult
+terrain, improve army recovery or reduce recruitment costs. Duplicate
+relics can instead be distilled into four crystals. These choices belong
+to this adaptation; they do not reproduce the commercial game's catalogue.
+
 | Building | Cost | Benefit |
 |---|---|---|
 | Barracks | 45 gold | Recruit Swordsmen |
@@ -117,10 +147,11 @@ Acolytes improve campaign recovery; spellcasting belongs to the hero.
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
 deducted each campaign turn. Ending the turn restores health on friendly
-land and 4 mana. Arcane Bolt deals 14 damage; Heal restores up to 16 health
+land and 4 mana. Before skill and relic modifiers, Arcane Bolt deals 14 damage; Heal restores up to 16 health
 to a living ally. Both cost 4 mana, have a range of four hexes and use the
 hero's action. A move can precede an attack or spell; attacking or casting
-ends that unit's movement. Surviving adjacent targets can retaliate once
+ends that unit's movement unless the Scout's Skirmisher discipline allows
+an attack followed by movement. Surviving adjacent targets can retaliate once
 per full round. Forest and marsh cost extra movement; forest and hills
 provide cover. Ranged attacks use distance without line-of-sight blocking.
 
@@ -132,7 +163,7 @@ survivors' wounds and costs up to 20 gold; defending territory is lost on
 retreat. New shard becomes available after victory or defeat.
 
 This slice has no astral metacampaign, diplomatic simulation, karma,
-rebellions, equipment inventory, multiclassing, multiplayer, fog of war or
+rebellions, multiclassing, multiplayer, fog of war or
 the original games' large content catalogue. The rival's scheduled
 expansion is a pressure system, not a second fully simulated player
 economy. Tactical morale, stamina and spell preparation are simplified
@@ -144,6 +175,8 @@ here fund construction rather than individual casts.
 `model.py` owns campaign commands, income, progression, opponent expansion
 and serialization. `battle.py` owns movement permissions, combat and enemy
 decisions. `scene.py` turns input into commands; `art.py` draws the world.
+`content.py` holds authored skills, sites and relics. `persistence.py`
+owns the campaign schema boundary, manual slot policy and autosave rotation.
 The rule modules are usable without a window and import Saga2D's general
 `HexGrid` geometry/navigation primitive.
 

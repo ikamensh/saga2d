@@ -14,8 +14,8 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
-from saga2d import Game
-from eador.scene import BattleScene, CatalogScene, HelpScene, ShardScene, TitleScene
+from saga2d import Button, Game
+from eador.scene import BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene, SaveScene, ShardScene, TitleScene
 
 
 def verify(output: Path):
@@ -26,9 +26,9 @@ def verify(output: Path):
 
         window = game.backend.window
 
-        def press(symbol):
-            window.dispatch_event("on_key_press", symbol, 0)
-            window.dispatch_event("on_key_release", symbol, 0)
+        def press(symbol, modifiers=0):
+            window.dispatch_event("on_key_press", symbol, modifiers)
+            window.dispatch_event("on_key_release", symbol, modifiers)
             game.tick(1 / 60)
 
         def click(x, y):
@@ -42,6 +42,12 @@ def verify(output: Path):
         def capture(name):
             game.tick(1 / 60)
             game.backend.capture_frame().save(output / f"{name}.png")
+
+        def button(label):
+            control = game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == label)
+            assert control is not None, label
+            x, y, w, h = control.bounds
+            click(x + w / 2, y + h / 2)
 
         try:
             game.push(TitleScene(seed=7))
@@ -87,7 +93,65 @@ def verify(output: Path):
             press(key.E)
             assert game.scene is root and root.state.hero.pos == (-1, 0)
             capture("conquest")
-            print(f"Real keyboard, mouse, overlays, battle, save/load and conquest passed. Screenshots: {output}")
+            press(key.E)
+            press(key.X)
+            assert isinstance(game.scene, BattleScene)
+            for _ in range(40):
+                if root.state.battle.outcome:
+                    break
+                press(key.A)
+            assert root.state.battle.outcome == "player"
+            press(key.E)
+            assert isinstance(game.scene, ChoiceScene)
+            capture("hero-choice")
+            press(key.F5)
+            pending = root.state.to_json()
+            press(key._1)
+            press(key.F9)
+            assert isinstance(game.scene, ChoiceScene)
+            root = game.scene.root
+            assert root.state.to_json() == pending
+            press(key._1)
+            if isinstance(game.scene, ChoiceScene):
+                capture("relic-choice")
+                press(key._1)
+            assert game.scene is root
+            press(key.H)
+            assert isinstance(game.scene, HeroScene)
+            button("Equip")
+            assert root.state.hero.relic == root.state.inventory[0]
+            capture("hero-relics")
+            press(key.ESCAPE)
+            button("Save")
+            assert isinstance(game.scene, SaveScene)
+            press(key._2)
+            capture("save-browser")
+            button("Load slots")
+            press(key._2)
+            assert isinstance(game.scene, ShardScene)
+            assert game.scene.state.to_json() == root.state.to_json()
+            root = game.scene
+            # A damaged current file is visible and does not replace live play.
+            (Path(saves) / "save_1.json").write_text("interrupted write")
+            press(key.F9)
+            assert game.scene is root and root.message
+            press(key.F6)
+            capture("damaged-save")
+            press(key._1, key.MOD_SHIFT)
+            assert isinstance(game.scene, BattleScene)
+            press(key.F1)
+            button("Save & title")
+            assert isinstance(game.scene, SaveScene)
+            capture("save-before-title")
+            press(key._1)
+            assert isinstance(game.scene, SaveScene) and game.scene.message
+            capture("save-error")
+            press(key._3)
+            assert isinstance(game.scene, TitleScene)
+            press(key.F6)
+            press(key._3)
+            assert isinstance(game.scene, BattleScene)
+            print(f"Real input, battles, choices, equipment, slots, autosaves and damaged-save recovery passed. Screenshots: {output}")
         finally:
             game._teardown()
             game.backend.quit()

@@ -4,6 +4,9 @@ Research date: 2026-09-05. This is an independently implemented, compact
 Eador-inspired game and a second demanding client of Saga2D. The target is
 a complete, replayable single-shard campaign with original presentation;
 content parity with the commercial series is outside this increment.
+This document records the original playable-slice scope. The broader
+release target is defined in [Early Access criteria](early-access-criteria.md),
+with current evidence and gaps in [the progress log](early-access-progress.md).
 
 ## What the reference establishes
 
