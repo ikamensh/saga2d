@@ -92,6 +92,14 @@ A seed-222 cleanup regression was fixed in the driver: it now leaves a defended
 capital by a safe flank instead of repeatedly challenging the same expedition.
 No game rule changed for that fix.
 
+After merging the current CampaignScene, input reload seam and display/settings
+work at `29325df`, **721 full tests** passed. The integrated linked smoke passed
+12 model runs plus 12 scene runs with 2,010 random input activations, including
+CampaignScene and recovery. The unchanged second-client check also passed 60
+Tribes AI games and 20 monkey runs. These checks complement the larger retained
+model reports; the UI owner's native-chain evidence is recorded separately in
+[eador-linked-ui.md](eador-linked-ui.md).
+
 ## Scope still to assess
 
 The capped retinue prevents importing a finished economy, but it does not prove
