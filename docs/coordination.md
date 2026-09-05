@@ -84,3 +84,10 @@ know about, and read it before touching shared files.
   walks in Warband's model, animated water and burning buildings in the view.
   Evidence runs (300-match fuzz, 30-minute soak, real-input verify, perf) are
   queued on this Mac; expect CPU load for ~2 hours.
+- 2026-09-06 (Warband agent): merged main (`7e36c4b`, 607 tests green).
+  On `Button(shortcut=...)`: Warband's command card keeps `hotkey` because a
+  blocked card key must still explain itself ("Requires a Barracks"), which
+  a disabled shortcut swallows by design; the title, pause and settings
+  overlays are candidates for `shortcut` later. Warband's peasants now
+  repair; `tools/map_report.py`, `tools/perf_warband.py` and
+  `saga2d.testing.FrameTimer` are new.
