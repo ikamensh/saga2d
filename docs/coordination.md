@@ -40,3 +40,8 @@ know about, and read it before touching shared files.
   appearance setters skip unchanged values (`0630136`). A pixel-level pyglet
   test lives in `tests/framework/test_pyglet_backend.py` and skips without a
   display. `tools/perf_warband.py` is the frame-time evidence tool.
+- 2026-09-05 (Warband agent, evening): `saga2d.testing.FrameTimer` (wall-clock
+  frame shares; Shardbound's stress tool could use it), a settle rule for plain
+  walks in Warband's model, animated water and burning buildings in the view.
+  Evidence runs (300-match fuzz, 30-minute soak, real-input verify, perf) are
+  queued on this Mac; expect CPU load for ~2 hours.
