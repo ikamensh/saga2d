@@ -46,24 +46,27 @@ manual slot. **Save & title** asks for a slot and leaves only after writing it.
    pay upkeep, heal and regain mana. Build a Temple when you can afford
    its 65 gold, then fill free troop slots with Swordsmen.
 6. Move east through Silverford, Heartwood and Cinderwood: select an
-   adjacent province and press **Enter** to invade. Rest after each
-   conquest, explore its site with **X**, then rest again. Invest the
-   rewards in recovery and reinforcements; every conquered province also
-   adds income.
+   adjacent province and press **Enter** to invade. Check **V** before
+   spending turns on recovery or exploration. Meet the rival's expedition
+   in its province to intercept it, or stand in its announced target to
+   defend. Invest your rewards in recovery and reinforcements; each
+   conquered province also adds income.
 7. Before attacking Duskspire, restore every unit to within about 6 health
    of its maximum. Its five Dread Guards and two Archers demand a prepared
    army. A direct rush with the starting troops is unlikely to succeed.
-8. The rival starts with three eastern provinces and first advances when
-   turn 5 begins, then on turns 9, 13, 17 and every four turns thereafter.
-   An unopposed advance can reach Westwatch on turn 17. Save with **F5**
-   before a difficult expedition.
+8. The rival's numbered diamond marks its moving army. **V** reveals its
+   troops, wounds, gold, next target and countdown. It loses actual troops
+   in battles and pays to heal/recruit at Duskspire. Breaking its expedition
+   gives you a counterattack window while it rebuilds; Duskspire's garrison
+   remains a separate force. Save with **F5** before a difficult expedition.
 
 The starting army is usable immediately; Barracks is one possible opening,
 not a required build. Marketplace provides income instead, while Wizard
 starts with both spells and can invest elsewhere.
-The investment-and-exploration route above wins the seed-7 Commander
-campaign in the integration journey using automatic battles; manual decisions and different
-seeds can change the outcome. For Wizard, a Mage Tower before the Temple
+Investment, exploration and responding to the announced expedition win the
+seed-7 Commander campaign in the integration journey using automatic
+battles; manual decisions and different seeds can change the outcome.
+For Wizard, a Mage Tower before the Temple
 adds mana to support the two spells already learned.
 
 ## Controls
@@ -72,13 +75,19 @@ adds mana to support the two spells already learned.
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
 | Title | Enter / Space | Start the selected shard |
+| Title | N | Choose a new shard seed |
 | Shard | Click province | Select and inspect it |
 | Shard | Tab | Cycle provinces adjacent to the hero |
 | Shard | Home | Select the hero's current province |
+| Shard | V | Inspect the rival's expedition and next order |
+| Rival plan | L / Esc | Locate its province / close the report |
 | Shard | Enter / Space | Travel to or invade the selected adjacent province |
 | Shard | X | Explore the hero's current province |
 | Shard | B / R | Open construction / recruitment |
 | Shard / decision | H | Inspect skills and equip relics |
+| Shard, battle, guide, hero or decision | C | Open the rules codex |
+| Codex | 1–6 / Tab / Shift+Tab | Select / cycle categories |
+| Codex | Arrows / Page Up / Page Down | Turn pages |
 | Decision | 1 / 2 | Choose the corresponding skill or reward |
 | Hero | 1–4 / U | Equip a visible relic / unequip |
 | Hero | Left / Right | Previous / next inventory page |
@@ -86,15 +95,19 @@ adds mana to support the two spells already learned.
 | Shard | E | End campaign turn |
 | Battle | Click friendly unit / Tab | Select unit / cycle units that can still act |
 | Battle | Click empty hex / enemy | Move / attack with selected unit |
+| Battle | Arrows / Page Up / Page Down | Aim at neighboring hexes (Page keys provide the other two diagonals) |
+| Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
+| Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
 | Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
-| Battle | Retreat button | Withdraw with surviving troops and a gold penalty |
+| Battle | T / Retreat button | Withdraw with surviving troops and a gold penalty |
 | Shard, battle or decision | F5 / F9 | Quicksave / quickload Manual 1 |
 | Title, shard, battle or decision | F6 | Open all saves |
 | Saves | 1–6 / Shift + 1–6 | Load a slot / recover its previous version |
 | Saves | Tab | Switch Save / Load; only manual slots can be overwritten |
 | Shard or battle | F1 | Open guide, including Save & title |
+| Guide | S | Choose a save slot before returning to the title |
 | Shard | Esc | Open guide |
 | Battle | Esc | Cancel spell targeting, otherwise open guide |
 | Catalogue or guide | Esc | Close overlay |
@@ -157,16 +170,17 @@ provide cover. Ranged attacks use distance without line-of-sight blocking.
 
 Capture Duskspire to win; taking every province is unnecessary. If the
 rival reaches a province containing your hero, you fight a defensive
-battle. Other targeted provinces change hands immediately. Losing
+battle. Other guarded provinces fight its expedition using the same
+tactical rules, with lasting losses on both sides. Losing
 Westwatch ends the campaign. Retreating or losing an ordinary battle keeps
 survivors' wounds and costs up to 20 gold; defending territory is lost on
 retreat. New shard becomes available after victory or defeat.
 
 This slice has no astral metacampaign, diplomatic simulation, karma,
 rebellions, multiclassing, multiplayer, fog of war or
-the original games' large content catalogue. The rival's scheduled
-expansion is a pressure system, not a second fully simulated player
-economy. Tactical morale, stamina and spell preparation are simplified
+the original games' large content catalogue. The rival has a finite
+expedition and treasury, with a fixed recruitment plan. Tactical morale,
+stamina and spell preparation are simplified
 away. Hero mana replaces Eador's prepared spells and gem costs; crystals
 here fund construction rather than individual casts.
 

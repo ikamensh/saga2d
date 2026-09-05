@@ -47,6 +47,8 @@ All generated files stay under ignored `build/shardbound/` and
 | `build-manifest.json` | Source hashes, commit/dirty status, versions, platform, file inventory, archive hash and smoke result |
 | `packaged-smoke.png` | Real title-screen capture from the extracted archive |
 | `packaged-smoke-shard.png` | Real campaign-screen capture from the extracted archive |
+| `packaged-smoke-codex.png` / `-rival.png` | Rules reference and finite expedition inspection |
+| `packaged-smoke-battle.png` | Tactical battle restored from a save |
 | `packaged-smoke.json` | Frozen-runtime, executable path and save/load verification |
 
 The app includes a Python runtime and runtime libraries. Game assets are
@@ -57,7 +59,10 @@ No change to the Saga2D framework wheel is needed: the game is an application
 that consumes the framework.
 
 The smoke launcher uses temporary saves and writes its result to the requested
-path. It renders the title and shard and saves/reloads campaign state. The
+path. Native key events start a game, save/reload campaign state, inspect
+the codex and rival, locate the expedition, invade a province, play a battle
+round, restore that battle and retreat. It renders title, shard, codex,
+rival and battle screens. The
 builder checks that the process is frozen and is the extracted executable,
 with Python environment overrides removed and an OS-only executable search
 path. Its temporary working directory is outside the repository. Inspect the
@@ -95,6 +100,25 @@ manifest for the current archive hash and exact inputs.
 `codesign --verify --deep --strict` passed for the local ad-hoc signature,
 and every bundle symlink resolved. No signing identity or certificate was
 used, and no notarization or distribution approval was performed.
+
+## Refreshed playable checkpoint — 2026-09-06
+
+Source `b061ea8` was rebuilt with the codex, progression/save browser and
+finite rival. The extracted frozen app passed the expanded native input
+journey: new campaign, campaign save/load, codex and rival inspection,
+province location, invasion, automatic battle round, battle restoration
+and retreat. The same journey passed through macOS LaunchServices with
+working directory `/`. Packaged rival and battle screenshots were inspected;
+local ad-hoc signature verification passed.
+
+The archive is **20,329,496 bytes**, SHA-256
+`e907254c311f4a6629fd0164eb58a95e57b8ca3b011574994a4be274e4a693f3`.
+[The retained evidence](evidence/shardbound-package-2026-09-06.json) records
+source hashes, runtime versions, extracted/LaunchServices reports and
+screenshot hashes. The manifest's dirty flag reflects unrelated `.gitignore`
+work; game/framework/packaging sources were committed at the named snapshot.
+This is a development checkpoint on the same macOS host. The clean-account,
+Windows and full packaged-campaign gates remain open.
 
 ## Windows x64 plan — untested
 

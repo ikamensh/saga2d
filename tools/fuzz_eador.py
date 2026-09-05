@@ -28,7 +28,9 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from saga2d import Button, Game  # noqa: E402
+from eador.codex import CodexScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
+from eador.rival_scene import RivalScene  # noqa: E402
 from eador.scene import (BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene,
                          ResultScene, SaveScene, ShardScene, TitleScene)  # noqa: E402
 
@@ -46,6 +48,13 @@ def check_state(state: State) -> None:
     assert all(0 < t.hp <= t.max_hp and 0 <= t.xp < t.level * 6 for t in hero.army)
     assert 0 <= hero.xp < hero.level * 12
     assert state.gold >= 0 and state.crystals >= 0
+    assert state.rival.gold >= 0
+    assert state.rival.pos in state.provinces
+    assert len({troop.id for troop in state.rival.army}) == len(state.rival.army)
+    assert all(0 < troop.hp <= troop.max_hp for troop in state.rival.army)
+    for province in state.provinces.values():
+        assert len(province.guards) == len(province.guard_hp)
+        assert len(province.site_guards) == len(province.site_guard_hp)
     assert 0 <= state.actions_left <= (3 if hero.hero_class == 'Scout' else 2)
     assert all(pos == p.pos and p.owner in ('player', 'neutral', 'rival')
                for pos, p in state.provinces.items())
@@ -58,7 +67,7 @@ def check_state(state: State) -> None:
         assert state.battle_kind is None and state.battle_province is None
     else:
         battle = state.battle
-        assert state.battle_kind in ('site', 'conquest', 'defense')
+        assert state.battle_kind in ('site', 'conquest', 'defense', 'intercept')
         assert state.battle_province in state.provinces
         alive = [u for u in battle.units if u.alive]
         assert len({u.pos for u in alive}) == len(alive)
@@ -142,9 +151,16 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
         elif state.battle:
             if state.battle.outcome:
                 state.resolve_battle()
+            elif state.hero.pos == (-2, 0) and state.rival.defeats and state.battle_kind in ('conquest', 'intercept'):
+                state.battle.auto_turn()
             else:
                 state.retreat()
             metrics['cleanup_battles'] += 1
+        elif state.hero.pos == (-2, 0) and state.rival.defeats and state.actions_left:
+            # An opponent that learned to avoid a fortified hero will not keep
+            # donating assaults. Leave the capital exposed through real play.
+            state.travel(state.grid.neighbors(state.hero.pos)[0])
+            metrics['cleanup_departures'] += 1
         else:
             state.end_turn()
             metrics['cleanup_turns'] += 1
@@ -225,7 +241,14 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
             elif roll < .28:
                 press('e')
             elif roll < .34:
-                button('Retreat')
+                if rng.random() < .5:
+                    press('t')
+                else:
+                    button('Retreat')
+            elif roll < .5:
+                press(rng.choice(('left', 'right', 'up', 'down', 'pageup', 'pagedown', 'f', '1', '2')))
+                press('return')
+                metrics['keyboard_tactical_inputs'] += 1
             else:
                 players = [u for u in battle.units if u.team == 'player' and u.alive]
                 unit = rng.choice(players)
@@ -284,7 +307,11 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 if isinstance(scene, TitleScene):
                     press(rng.choice(('tab', 'return', 'f9', 'f6')))
                 elif isinstance(scene, HelpScene):
-                    button('Save & title' if rng.random() < .2 else 'Return to game')
+                    button(rng.choice(('Save & title', 'Codex', 'Return to game', 'Return to game')))
+                elif isinstance(scene, CodexScene):
+                    press(rng.choice(('1', '2', '3', '4', '5', '6', 'tab', 'left', 'right', 'escape', 'escape')))
+                elif isinstance(scene, RivalScene):
+                    press(rng.choice(('l', 'escape', 'e')))
                 elif isinstance(scene, ResultScene):
                     if rng.random() < .25:
                         press('f5')
@@ -335,7 +362,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(x + width / 2, y + height / 2)
                         metrics['equip_inputs'] += 1
                     else:
-                        press(rng.choice(('left', 'right', 'u', 'escape', 'escape')))
+                        press(rng.choice(('left', 'right', 'u', 'c', 'escape', 'escape')))
                 elif isinstance(scene, CatalogScene):
                     press(rng.choice(('1', '2', '3', '4', '5', 'escape', 'escape')))
                 elif rng.random() < .15:
@@ -345,7 +372,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     elif roll < .6:
                         hover(rng.randrange(game.width), rng.randrange(game.height))
                     else:
-                        press(rng.choice(('f1', 'f5', 'f9', 'f6', 'tab', 'escape', 'home')))
+                        press(rng.choice(('f1', 'f5', 'f9', 'f6', 'tab', 'escape', 'home', 'c')))
                 elif isinstance(scene, BattleScene):
                     battle_input()
                 else:
@@ -355,7 +382,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(*scene.grid.center(destination))
                         press('return')
                     else:
-                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6')))
+                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6', 'c', 'v')))
 
             random_phase = False
             # Complete a real losing campaign, then use the replay control.
@@ -365,7 +392,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 scene = game.scene
                 if isinstance(scene, TitleScene):
                     press('return')
-                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene)):
+                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
                     press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))
@@ -381,8 +408,16 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 elif isinstance(scene, BattleScene):
                     if scene.battle.outcome:
                         press('e')
+                    elif (scene.root.state.hero.pos == (-2, 0) and scene.root.state.rival.defeats
+                          and scene.root.state.battle_kind in ('conquest', 'intercept')):
+                        press('a')
                     else:
                         button('Retreat')
+                elif (scene.state.hero.pos == (-2, 0) and scene.state.rival.defeats
+                      and scene.state.actions_left):
+                    click(*scene.grid.center(scene.grid.neighbors(scene.state.hero.pos)[0]))
+                    press('return')
+                    metrics['cleanup_departures'] += 1
                 else:
                     press('e')
             else:

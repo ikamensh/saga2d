@@ -68,10 +68,27 @@ def provision_army(state):
         state.recruit('swordsman')
 
 
-def rest(state):
-    state.end_turn()
-    if state.battle:
-        finish_battle(state)
+def march_to(state, destination):
+    """Follow a route, resolving real encounters and refilling actions when needed."""
+    for _ in range(24):
+        if state.hero.pos == destination or state.status != 'playing':
+            return
+        if not state.actions_left:
+            rest(state, defend=False)
+        state.travel(state.grid.path(state.hero.pos, destination)[1])
+        if state.battle:
+            finish_battle(state)
+    raise AssertionError('The army could not reach its destination.')
+
+
+def rest(state, defend=True):
+    """A visible approaching army calls for interception before another leisurely rest."""
+    if defend and state.rival.army and state.grid.distance(state.rival.pos, (-2, 0)) <= 2:
+        march_to(state, state.rival.pos)
+    if state.status == 'playing':
+        state.end_turn()
+        if state.battle:
+            finish_battle(state)
 
 
 @pytest.mark.parametrize('hero_class', ['Commander', 'Warrior', 'Scout', 'Wizard'])
@@ -83,12 +100,16 @@ def test_each_hero_can_complete_a_campaign_by_exploring_and_investing(seed, hero
     state.recruit('swordsman')
     for province in state.grid.path(state.hero.pos, (2, 0))[:-1]:
         if province != state.hero.pos:
-            state.travel(province)
-            finish_battle(state)
+            march_to(state, province)
             rest(state)
             provision_army(state)
-        state.explore()
-        finish_battle(state)
+        march_to(state, province)
+        if not state.provinces[province].explored:
+            if not state.actions_left:
+                rest(state)
+                march_to(state, province)
+            state.explore()
+            finish_battle(state)
         rest(state)
         provision_army(state)
     for _ in range(24):
@@ -171,7 +192,8 @@ def test_an_unprepared_starting_army_cannot_overrun_the_entire_shard():
         if state.status != 'playing':
             break
         state.travel(state.grid.path(state.hero.pos, (2, 0))[1])
-        finish_battle(state)
+        if state.battle:
+            finish_battle(state)
         if state.status == 'playing':
             state.end_turn()
             if state.battle:

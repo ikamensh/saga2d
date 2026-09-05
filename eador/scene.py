@@ -55,8 +55,8 @@ class Screen(Scene):
         self.game.clear_and_push(ShardScene(state))
         return True
 
-    def button(self, text, x, y, width, callback, *, hotkey=None, primary=False, danger=False, enabled=True):
-        button = Button(text, on_click=callback, hotkey=hotkey, width=width, height=40,
+    def button(self, text, x, y, width, callback, *, hotkey=None, shortcut=None, primary=False, danger=False, enabled=True):
+        button = Button(text, on_click=callback, hotkey=hotkey, shortcut=shortcut, width=width, height=40,
                         anchor=Anchor.TOP_LEFT, margin=(round(x), round(y)), enabled=enabled,
                         style=PRIMARY if primary else DANGER if danger else None)
         self.ui.add(button)
@@ -107,7 +107,7 @@ class TitleScene(Screen):
                         lambda name=name: self.choose(name), primary=name == self.hero_class)
         self.button("Enter the shard", w / 2 - 170, h - 124, 340, self.start, hotkey="Enter", primary=True)
         self.button("Load shard", w / 2 - 170, h - 72, 164, self.browse_saves, hotkey="F6")
-        self.button("New seed", w / 2 + 6, h - 72, 164, self.next_seed)
+        self.button("New seed", w / 2 + 6, h - 72, 164, self.next_seed, shortcut="N")
 
     def choose(self, name):
         self.hero_class = name
@@ -133,7 +133,7 @@ class TitleScene(Screen):
     def draw(self):
         w, h = self.game.resolution
         art.backdrop(self, w, h)
-        self.text("E A D O R   /   A  S A G A 2 D  G A M E", w / 2, 56, size=11, color=GOLD, center=True)
+        self.text("C H R O N I C L E S   O F   T H E   S H A R D S", w / 2, 56, size=11, color=GOLD, center=True)
         self.text("SHARDBOUND", w / 2, 88, size=64, serif=True, center=True)
         self.text("One broken world. A kingdom to build.", w / 2, 169, size=17, color=MUTED, center=True)
         cells = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
@@ -159,6 +159,7 @@ class ShardScene(Screen):
         super().__init__()
         self.state = state
         self.selected = state.hero.pos
+        self._last_hero_pos = state.hero.pos
         self.hover = None
 
     @property
@@ -170,7 +171,8 @@ class ShardScene(Screen):
         self.follow_state()
 
     def on_reveal(self):
-        self.selected = self.state.hero.pos
+        if self.state.hero.pos != self._last_hero_pos:
+            self.selected = self.state.hero.pos
         self.refresh()
         self.follow_state()
 
@@ -184,6 +186,7 @@ class ShardScene(Screen):
 
     def refresh(self):
         super().refresh()
+        self._last_hero_pos = self.state.hero.pos
         w, h = self.game.resolution
         self.grid = HexGrid(self.state.provinces, size=min((h - 246) / 8, (self.edge - 130) / 8.67),
                             origin=(self.edge / 2, (h - 30) / 2))
@@ -193,7 +196,9 @@ class ShardScene(Screen):
         here = self.selected == self.state.hero.pos
         adjacent = self.selected in self.grid.neighbors(self.state.hero.pos)
         can_act = playing and self.state.actions_left > 0
-        self.button("Hero is here" if here else "Travel here" if province.owner == "player" else "Invade province",
+        expedition_here = self.state.rival.army and self.selected == self.state.rival.pos
+        self.button("Hero is here" if here else "Intercept expedition" if expedition_here else
+                    "Travel here" if province.owner == "player" else "Invade province",
                     x, 423, 300, self.travel, hotkey="Enter", primary=True, enabled=can_act and adjacent)
         current = self.state.provinces[self.state.hero.pos]
         self.button("Explore current province", x, 473, 300, self.explore, hotkey="X",
@@ -203,8 +208,10 @@ class ShardScene(Screen):
         self.button("End turn", x, h - 93, 300, self.end_turn, hotkey="E", primary=True, enabled=playing)
         self.button("Guide", 26, 30, 94, self.help, hotkey="F1")
         self.button("Hero", 130, 30, 88, self.hero_details, hotkey="H")
+        self.button("Codex", 228, 30, 110, self.codex, shortcut="C")
         self.button("Save", self.edge - 177, 30, 72, lambda: self.browse_saves("save"))
         self.button("Load", self.edge - 97, 30, 72, self.browse_saves)
+        self.button("Rival plan", self.edge - 185, 180, 160, self.rival_details, shortcut="V")
 
     def get_save_state(self):
         return {"campaign": self.state.to_json()}
@@ -222,6 +229,14 @@ class ShardScene(Screen):
 
     def hero_details(self):
         self.game.push(HeroScene(self))
+
+    def codex(self):
+        from eador.codex import CodexScene
+        self.game.push(CodexScene(self))
+
+    def rival_details(self):
+        from eador.rival_scene import RivalScene
+        self.game.push(RivalScene(self))
 
     def act(self, callback):
         if self.command(callback):
@@ -268,14 +283,17 @@ class ShardScene(Screen):
         return False
 
     def draw(self):
+        from eador.rival_scene import rival_order
+
         s, h, x = self.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
         self.draw_rect(self.edge, 0, 344, h, PANEL)
         self.draw_line(self.edge, 0, self.edge, h, LINE)
         self.draw_rect(0, 0, self.edge, 91, INK)
         self.rule(24, 90, self.edge - 48)
-        self.text("SHARDBOUND", self.edge / 2, 24, size=27, serif=True, center=True)
-        self.text(f"THE VERDANT REACH   /   SHARD {s.seed}", self.edge / 2, 61, size=10, color=GOLD, center=True)
+        header_center = (338 + self.edge - 177) / 2
+        self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
+        self.text(f"THE VERDANT REACH   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
         self.text("YOUR DOMINION", x, 24, size=10, color=MUTED)
         self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
         self.text(f"{s.crystals} crystals", x + 160, 52, size=15, color=BLUE)
@@ -293,7 +311,9 @@ class ShardScene(Screen):
         self.text("SELECTED PROVINCE", x, 279, size=10, color=MUTED)
         self.text(p.name, x, 302, size=27, serif=True)
         self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  +{p.income} gold", x, 344, size=12, color=art.OWNERS[p.owner])
-        if p.owner != "player":
+        if s.rival.army and self.selected == s.rival.pos:
+            self.text(f"Expedition: {len(s.rival.army)} troops · V for strengths", x, 369, size=11, color=RED)
+        elif p.owner != "player":
             guards = ", ".join(f"{n} {UNITS[kind].name}" for kind, n in Counter(p.guards).items())
             self.text(textwrap.shorten(guards, width=40, placeholder="…"), x, 369, size=11, color=RED)
         else:
@@ -306,14 +326,17 @@ class ShardScene(Screen):
         self.text(hint, x, 395, size=11, color=MUTED)
         self.text("YOUR STRONGHOLD", x, 531, size=10, color=MUTED)
         self.text(f"{len(s.buildings)}/{len(BUILDINGS)} buildings  ·  {len(s.hero.army)}/{s.hero.max_army} troops", x, 662, size=11, color=MUTED)
-        self.text(f"TURN {s.turn}  ·  Rival expands every few turns", x, h - 37, size=10, color=MUTED)
+        self.text(f"TURN {s.turn}  ·  Rival expedition: {len(s.rival.army)} troops", x, h - 37, size=10, color=MUTED)
         # Back-to-front relief keeps the southern edge of the shard continuous.
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
                          hero=pos == s.hero.pos, hover=pos == self.hover)
+        if s.rival.army:
+            art.expedition(self, self.grid, s.rival.pos, len(s.rival.army))
         art.compass(self, 75, 162)
         self.text("Capture Duskspire", self.edge - 185, 122, size=13, color=GOLD, serif=True)
         self.text("Protect Westwatch", self.edge - 185, 146, size=11, color=MUTED)
+        self.paragraph(rival_order(s), self.edge - 185, 232, width=160, size=11, color=RED)
         self.text("YOUR ARMY", 28, h - 112, size=10, color=MUTED)
         for i, troop in enumerate(s.hero.army):
             xx = 100 + i * 124
@@ -349,9 +372,8 @@ class CatalogScene(Screen):
             cost = spec.cost if self.kind == "build" else s.recruit_cost(name)
             affordable = s.gold >= cost and (self.kind != "build" or s.crystals >= spec.crystals)
             self.button("Built" if built else "Locked" if locked else f"{cost} gold", self.x + 548,
-                        self.y + 123 + i * 77, 143, lambda name=name: self.purchase(name), hotkey=str(i + 1),
+                        self.y + 123 + i * 77, 143, lambda name=name: self.purchase(name), shortcut=str(i + 1),
                         enabled=not built and not locked and affordable and available)
-            self.bind_key(str(i + 1), lambda name=name: self.purchase(name))
         self.button("Back to shard", self.x + 22, self.y + 535, 676, self.game.pop, hotkey="Esc")
 
     def purchase(self, name):
@@ -394,8 +416,9 @@ class HelpScene(Screen):
     def refresh(self):
         super().refresh()
         self.x, self.y = self.game.width / 2 - 340, self.game.height / 2 - 280
-        self.button("Return to game", self.x + 26, self.y + 481, 306, self.game.pop, hotkey="Esc", primary=True)
-        self.button("Save & title", self.x + 346, self.y + 481, 308, self.title)
+        self.button("Return to game", self.x + 26, self.y + 481, 212, self.game.pop, shortcut="Esc", primary=True)
+        self.button("Codex", self.x + 249, self.y + 481, 192, self.root.codex, shortcut="C")
+        self.button("Save & title", self.x + 452, self.y + 481, 202, self.title, shortcut="S")
 
     def title(self):
         self.game.push(SaveScene(self.root, mode="save", return_to_title=True))
@@ -410,7 +433,7 @@ class HelpScene(Screen):
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
             ("03   Command the battle", "Select a unit, move to a blue hex, then attack a marked enemy. Terrain gives cover. Spells cost mana and the hero's action."),
-            ("04   Develop your hero", "Win battles to choose skills. H equips relics. End campaign turns to recover. Keep your troops alive as the rival advances toward Westwatch."),
+            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
         ]
         for i, (title, body) in enumerate(sections):
             yy = y + 119 + i * 84
@@ -422,7 +445,9 @@ class HelpScene(Screen):
 class BattleScene(Screen):
     controls = {"e": "end_turn", "tab": "next_unit", "1": "bolt", "2": "heal",
                 "a": "auto_round", "f5": "save_game", "f9": "load_game", "f6": "browse_saves",
-                "escape": "cancel", "f1": "help"}
+                "escape": "cancel", "f1": "help", "t": "retreat", "f": "next_target",
+                ("return", "space"): "activate_cursor",
+                ("left", "right", "up", "down", "pageup", "pagedown"): "aim"}
 
     def __init__(self, root):
         super().__init__()
@@ -430,6 +455,7 @@ class BattleScene(Screen):
         self.selected = None
         self.spell = None
         self.hover = None
+        self.cursor = self.battle.unit(0).pos
         self.floats = []
         self.clock = 0.0
 
@@ -467,10 +493,11 @@ class BattleScene(Screen):
         self.button(f"Healing light · {b.spell_cost('heal')} mana", x, 428, 300, self.heal, hotkey="2",
                     enabled="heal" in b.spells and b.mana >= b.spell_cost("heal") and hero_ready)
         self.button("Auto-play one round", x, 518, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
-        self.button("Retreat", x, 568, 300, self.retreat, danger=True, enabled=b.outcome is None)
+        self.button("Retreat", x, 568, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
         self.button("End battle round", x, h - 93, 300, self.end_turn,
                     hotkey="E", primary=True, enabled=b.outcome is None)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
+        self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
 
     def act(self, callback, *, checkpoint=False):
@@ -536,7 +563,27 @@ class BattleScene(Screen):
         if units:
             ids = [u.id for u in units]
             self.selected = ids[(ids.index(self.selected) + 1) % len(ids)] if self.selected in ids else ids[0]
+            self.cursor = self.hover = self.battle.unit(self.selected).pos
             self.spell = None
+
+    def aim(self, event):
+        directions = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "down": (0, 1),
+                      "pageup": (1, -1), "pagedown": (-1, 1)}
+        dq, dr = directions[event.key]
+        pos = self.cursor[0] + dq, self.cursor[1] + dr
+        if pos in self.battle.terrain:
+            self.cursor = self.hover = pos
+
+    def next_target(self):
+        team = "player" if self.spell == "heal" else "enemy"
+        targets = [u.pos for u in self.battle.units if u.hp > 0 and u.team == team]
+        if targets:
+            index = (targets.index(self.cursor) + 1) % len(targets) if self.cursor in targets else 0
+            self.cursor = self.hover = targets[index]
+
+    def activate_cursor(self):
+        self.hover = self.cursor
+        self.act_at(self.cursor)
 
     def update(self, dt):
         self.clock += dt
@@ -545,21 +592,32 @@ class BattleScene(Screen):
     def handle_input(self, event):
         if event.type == "move":
             self.hover = self.grid.cell_at(event.x, event.y)
+            if self.hover is not None:
+                self.cursor = self.hover
         if event.type != "click" or event.button != "left" or self.battle.outcome:
             return False
         pos = self.grid.cell_at(event.x, event.y)
         if pos is None:
             return False
+        self.cursor = self.hover = pos
+        self.act_at(pos)
+        return True
+
+    def act_at(self, pos):
+        if self.battle.outcome is not None:
+            return
         unit = next((u for u in self.battle.units if u.hp > 0 and u.pos == pos), None)
-        if self.spell and unit:
-            self.act(lambda: self.battle.cast(self.spell, unit.id))
+        if self.spell:
+            if unit:
+                self.act(lambda: self.battle.cast(self.spell, unit.id))
+            else:
+                self.message = "Aim at a unit to cast. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
             self.selected = unit.id
         elif unit and self.selected is not None:
             self.act(lambda: self.battle.attack(self.selected, unit.id))
         elif self.selected is not None:
             self.act(lambda: self.battle.move(self.selected, pos))
-        return True
 
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
@@ -602,7 +660,7 @@ class BattleScene(Screen):
         else:
             self.paragraph("Forest and hills grant cover. Marsh slows movement. Melee defenders retaliate once per round.",
                            x, 630, size=11)
-        self.text("Click unit → move → attack  /  Tab next unit", x, h - 37, size=10, color=MUTED)
+        self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
         reachable = b.reachable(self.selected) if selected and not selected.acted and b.outcome is None else set()
         targets = {u.id for u in b.targets(self.selected)} if selected and not selected.acted and b.outcome is None else set()
         for pos in sorted(b.terrain, key=lambda p: self.grid.center(p)[1]):
@@ -646,7 +704,6 @@ class SaveScene(Screen):
 
     transparent = True
     pop_on_cancel = True
-    controls = {"tab": "toggle"}
 
     def __init__(self, root=None, *, mode="load", return_to_title=False):
         super().__init__()
@@ -661,16 +718,14 @@ class SaveScene(Screen):
         for i, entry in enumerate(self.entries):
             can_save = self.mode == "save" and entry.slot in MANUAL_SLOTS
             can_load = self.mode == "load" and entry.exists
-            self.button("Save" if can_save else "Load", x + 595, y + 100 + i * 70, 86,
-                        lambda i=i: self.activate(i), hotkey=str(i + 1), enabled=can_save or can_load)
-            self.button("Backup", x + 693, y + 100 + i * 70, 98,
-                        lambda i=i: self.recover(i),
+            self.button("Save" if can_save else "Load", x + 540, y + 100 + i * 70, 92,
+                        lambda i=i: self.activate(i), shortcut=str(i + 1), enabled=can_save or can_load)
+            self.button("Backup", x + 642, y + 100 + i * 70, 150,
+                        lambda i=i: self.recover(i), shortcut=f"Shift+{i + 1}",
                         enabled=entry.backup_available and self.mode == "load")
-            self.bind_key(str(i + 1), lambda i=i: self.activate(i))
-            self.bind_key(f"shift+{i + 1}", lambda i=i: self.recover(i))
         if self.root is not None and not self.return_to_title:
-            self.button("Save slots" if self.mode == "load" else "Load slots", x + 28, y + 590, 164, self.toggle)
-        self.button("Close", x + 650, y + 590, 140, self.game.pop, hotkey="Esc")
+            self.button("Save slots" if self.mode == "load" else "Load slots", x + 28, y + 590, 164, self.toggle, shortcut="Tab")
+        self.button("Close", x + 650, y + 590, 140, self.game.pop, shortcut="Esc")
 
     def toggle(self):
         if self.root is None or self.return_to_title:
@@ -716,12 +771,15 @@ class SaveScene(Screen):
                 self.text(entry.timestamp[:19].replace("T", "  ") + " UTC", x + 168, top + 2, size=10, color=MUTED)
             detail = entry.detail
             if entry.error:
-                detail += " · Choose Backup or another slot."
+                detail += (" · Choose Backup or another slot." if self.mode == "load" and entry.backup_available else
+                           " · Choose another slot.")
             elif entry.backup_error:
                 detail += " · Previous version is damaged."
-            self.paragraph(detail, x + 28, top + 24, width=545, size=10, color=RED if entry.error else MUTED)
+            self.paragraph(detail, x + 28, top + 24, width=500, size=10, color=RED if entry.error else MUTED)
         hint = ("Choose 1–3 to save and return to the title. Esc keeps your current game open." if self.return_to_title else
                 "Shift + 1–6 opens a slot’s previous version. Tab switches Save / Load. Loading never overwrites a file.")
+        if self.root is None:
+            hint = "1–6 opens a saved campaign. Shift + 1–6 opens its previous version. Loading never overwrites a file."
         self.paragraph(self.message or hint,
                        x + 28, y + 523, width=764, size=11, color=GOLD if self.message else MUTED)
 
@@ -730,7 +788,7 @@ class ChoiceScene(Screen):
     """A saved decision must be resolved before continuing campaign actions."""
 
     transparent = True
-    controls = {"1": "first", "2": "second", "h": "hero_details", "f5": "save_game", "f9": "load_game", "f6": "browse_saves"}
+    controls = {"h": "hero_details", "f5": "save_game", "f9": "load_game", "f6": "browse_saves"}
 
     def __init__(self, root):
         super().__init__()
@@ -742,10 +800,11 @@ class ChoiceScene(Screen):
         for i, option in enumerate(self.root.state.choice.options):
             self.button("Choose this path" if self.root.state.choice.kind == "skill" else "Choose reward",
                         self.x + 28 + i * 382, self.y + 310, 362,
-                        lambda option=option: self.choose(option.id), hotkey=str(i + 1), primary=True)
+                        lambda option=option: self.choose(option.id), shortcut=str(i + 1), primary=True)
         self.button("Hero & relics", self.x + 28, self.y + 405, 174,
                     self.hero_details, hotkey="H")
         self.button("Saves", self.x + 612, self.y + 405, 160, self.browse_saves, hotkey="F6")
+        self.button("Codex", self.x + 216, self.y + 405, 154, self.root.codex, shortcut="C")
 
     def choose(self, option_id):
         try:
@@ -760,13 +819,6 @@ class ChoiceScene(Screen):
         else:
             self.root.message = self.message
             self.game.pop()
-
-    def first(self):
-        self.choose(self.root.state.choice.options[0].id)
-
-    def second(self):
-        if len(self.root.state.choice.options) > 1:
-            self.choose(self.root.state.choice.options[1].id)
 
     def save_game(self):
         self.root.save_game()
@@ -797,7 +849,7 @@ class ChoiceScene(Screen):
 class HeroScene(Screen):
     transparent = True
     pop_on_cancel = True
-    controls = {"left": "previous_page", "right": "next_page", "u": "unequip"}
+    controls = {"left": "previous_page", "right": "next_page"}
 
     def __init__(self, root):
         super().__init__()
@@ -811,17 +863,15 @@ class HeroScene(Screen):
         super().refresh()
         self.x, self.y = self.game.width / 2 - 410, self.game.height / 2 - 326
         x, y, s = self.x, self.y, self.root.state
-        for number in range(1, 5):
-            self.unbind_key(str(number))
         for i, relic in enumerate(s.inventory[self.page * 4:self.page * 4 + 4]):
             equipped = s.hero.relic == relic
             self.button("Equipped" if equipped else "Equip", x + 637, y + 260 + i * 75, 152,
-                        lambda relic=relic: self.equip(relic), hotkey=str(i + 1), enabled=not equipped)
-            self.bind_key(str(i + 1), lambda relic=relic: self.equip(relic))
-        self.button("Unequip", x + 637, y + 208, 152, self.unequip, hotkey="U", enabled=s.hero.relic is not None)
+                        lambda relic=relic: self.equip(relic), shortcut=str(i + 1), enabled=not equipped)
+        self.button("Unequip", x + 637, y + 208, 152, self.unequip, shortcut="U", enabled=s.hero.relic is not None)
         self.button("Previous", x + 28, y + 589, 138, self.previous_page, enabled=self.page > 0)
         self.button("Next", x + 177, y + 589, 110, self.next_page, enabled=self.page + 1 < self.pages)
         self.button("Close", x + 650, y + 589, 140, self.game.pop, hotkey="Esc")
+        self.button("Codex", x + 449, y + 589, 170, self.root.codex, shortcut="C")
 
     def previous_page(self):
         self.page = max(0, self.page - 1)

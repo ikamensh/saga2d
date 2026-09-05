@@ -118,7 +118,8 @@ def smoke_archive(archive: Path, output: Path, macos: bool) -> dict:
         image = output / "packaged-smoke.png"
         run([executable, "--smoke-image", image], cwd=folder, env=env, timeout=90)
         report = json.loads(image.with_suffix(".json").read_text())
-        if not report["frozen"] or not report["save_load_roundtrip"]:
+        if not all(report[key] for key in ("frozen", "save_load_roundtrip", "codex_and_rival_rendered",
+                                          "battle_save_load_roundtrip", "native_input_journey")):
             raise RuntimeError(f"Packaged smoke verification failed: {report}")
         if Path(report["executable"]).resolve() != executable.resolve():
             raise RuntimeError("Smoke verification did not run the extracted executable")
