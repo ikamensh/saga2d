@@ -42,6 +42,8 @@ The display must be awake for pyglet to open windows; a
 - Tests exercise public behaviour through `Game`/`Scene`/`World`; no
   mocking of internals.  Add a regression test for every bug found.
 - `tribes/model.py` has no saga2d dependency — test rules there directly.
+- After changing rules, the AI or scene input, run `uv run python tools/fuzz.py`:
+  AI-vs-AI games with invariant checks plus random-input runs through the scene.
 
 ## Style
 

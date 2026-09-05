@@ -28,8 +28,7 @@ def take_turn(world: World, tribe: int, rng: random.Random) -> None:
     for unit in _units_in_play(world, tribe):
         _attack(world, unit)  # second pass: units that moved into place this turn can now gang up
     _choose_rewards(world, tribe)  # ruins found on the march can level a city too
-    if world.winner is None:
-        world.end_turn()
+    world.end_turn()
 
 
 def _units_in_play(world: World, tribe: int) -> Iterator[Unit]:
