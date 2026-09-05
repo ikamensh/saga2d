@@ -159,6 +159,7 @@ class ShardScene(Screen):
         super().__init__()
         self.state = state
         self.selected = state.hero.pos
+        self._last_hero_pos = state.hero.pos
         self.hover = None
 
     @property
@@ -170,7 +171,8 @@ class ShardScene(Screen):
         self.follow_state()
 
     def on_reveal(self):
-        self.selected = self.state.hero.pos
+        if self.state.hero.pos != self._last_hero_pos:
+            self.selected = self.state.hero.pos
         self.refresh()
         self.follow_state()
 
@@ -184,6 +186,7 @@ class ShardScene(Screen):
 
     def refresh(self):
         super().refresh()
+        self._last_hero_pos = self.state.hero.pos
         w, h = self.game.resolution
         self.grid = HexGrid(self.state.provinces, size=min((h - 246) / 8, (self.edge - 130) / 8.67),
                             origin=(self.edge / 2, (h - 30) / 2))
@@ -193,7 +196,9 @@ class ShardScene(Screen):
         here = self.selected == self.state.hero.pos
         adjacent = self.selected in self.grid.neighbors(self.state.hero.pos)
         can_act = playing and self.state.actions_left > 0
-        self.button("Hero is here" if here else "Travel here" if province.owner == "player" else "Invade province",
+        expedition_here = self.state.rival.army and self.selected == self.state.rival.pos
+        self.button("Hero is here" if here else "Intercept expedition" if expedition_here else
+                    "Travel here" if province.owner == "player" else "Invade province",
                     x, 423, 300, self.travel, hotkey="Enter", primary=True, enabled=can_act and adjacent)
         current = self.state.provinces[self.state.hero.pos]
         self.button("Explore current province", x, 473, 300, self.explore, hotkey="X",
@@ -206,6 +211,7 @@ class ShardScene(Screen):
         self.button("Codex", 228, 30, 110, self.codex, shortcut="C")
         self.button("Save", self.edge - 177, 30, 72, lambda: self.browse_saves("save"))
         self.button("Load", self.edge - 97, 30, 72, self.browse_saves)
+        self.button("Rival plan", self.edge - 185, 180, 160, self.rival_details, shortcut="V")
 
     def get_save_state(self):
         return {"campaign": self.state.to_json()}
@@ -227,6 +233,10 @@ class ShardScene(Screen):
     def codex(self):
         from eador.codex import CodexScene
         self.game.push(CodexScene(self))
+
+    def rival_details(self):
+        from eador.rival_scene import RivalScene
+        self.game.push(RivalScene(self))
 
     def act(self, callback):
         if self.command(callback):
@@ -273,6 +283,8 @@ class ShardScene(Screen):
         return False
 
     def draw(self):
+        from eador.rival_scene import rival_order
+
         s, h, x = self.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
         self.draw_rect(self.edge, 0, 344, h, PANEL)
@@ -299,7 +311,9 @@ class ShardScene(Screen):
         self.text("SELECTED PROVINCE", x, 279, size=10, color=MUTED)
         self.text(p.name, x, 302, size=27, serif=True)
         self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  +{p.income} gold", x, 344, size=12, color=art.OWNERS[p.owner])
-        if p.owner != "player":
+        if s.rival.army and self.selected == s.rival.pos:
+            self.text(f"Expedition: {len(s.rival.army)} troops · V for strengths", x, 369, size=11, color=RED)
+        elif p.owner != "player":
             guards = ", ".join(f"{n} {UNITS[kind].name}" for kind, n in Counter(p.guards).items())
             self.text(textwrap.shorten(guards, width=40, placeholder="…"), x, 369, size=11, color=RED)
         else:
@@ -312,14 +326,17 @@ class ShardScene(Screen):
         self.text(hint, x, 395, size=11, color=MUTED)
         self.text("YOUR STRONGHOLD", x, 531, size=10, color=MUTED)
         self.text(f"{len(s.buildings)}/{len(BUILDINGS)} buildings  ·  {len(s.hero.army)}/{s.hero.max_army} troops", x, 662, size=11, color=MUTED)
-        self.text(f"TURN {s.turn}  ·  Rival expands every few turns", x, h - 37, size=10, color=MUTED)
+        self.text(f"TURN {s.turn}  ·  Rival expedition: {len(s.rival.army)} troops", x, h - 37, size=10, color=MUTED)
         # Back-to-front relief keeps the southern edge of the shard continuous.
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
                          hero=pos == s.hero.pos, hover=pos == self.hover)
+        if s.rival.army:
+            art.expedition(self, self.grid, s.rival.pos, len(s.rival.army))
         art.compass(self, 75, 162)
         self.text("Capture Duskspire", self.edge - 185, 122, size=13, color=GOLD, serif=True)
         self.text("Protect Westwatch", self.edge - 185, 146, size=11, color=MUTED)
+        self.paragraph(rival_order(s), self.edge - 185, 232, width=160, size=11, color=RED)
         self.text("YOUR ARMY", 28, h - 112, size=10, color=MUTED)
         for i, troop in enumerate(s.hero.army):
             xx = 100 + i * 124
@@ -416,7 +433,7 @@ class HelpScene(Screen):
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
             ("03   Command the battle", "Select a unit, move to a blue hex, then attack a marked enemy. Terrain gives cover. Spells cost mana and the hero's action."),
-            ("04   Develop your hero", "Win battles to choose skills. H equips relics. End campaign turns to recover. Keep your troops alive as the rival advances toward Westwatch."),
+            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
         ]
         for i, (title, body) in enumerate(sections):
             yy = y + 119 + i * 84
