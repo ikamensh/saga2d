@@ -8,3 +8,4 @@ dist/
 .idea/
 *.png
 *.gif
+.claude/
