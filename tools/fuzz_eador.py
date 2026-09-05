@@ -88,7 +88,7 @@ def check_state(state: State) -> None:
             assert battle.unit(0).alive
             if battle.outcome_reason == 'hold':
                 objective = battle.objective
-                assert state.battle_kind == 'site' and objective.kind == 'hold'
+                assert state.battle_encounter is not None and objective.kind == 'hold'
                 assert objective.progress == objective.required and battle.round <= objective.deadline
                 assert any(u.alive and u.team == 'player' and u.pos == objective.target for u in battle.units)
                 assert not any(u.alive and u.team == 'enemy' and battle.grid.distance(u.pos, objective.target) <= 1 for u in battle.units)
@@ -100,11 +100,23 @@ def check_state(state: State) -> None:
     assert State.from_json(saved).to_json() == saved, 'save roundtrip changed state'
 
 
-def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
+def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = False) -> None:
     """Random commands include rejections, which must leave the save unchanged."""
     rng = random.Random(seed)
     theme = tuple(THEMES)[seed % len(THEMES)]
-    state = State.new(seed, list(HERO_CLASSES)[seed % len(HERO_CLASSES)], theme=theme)
+    hero_class = list(HERO_CLASSES)[seed % len(HERO_CLASSES)]
+    state = State.new_campaign(seed, hero_class) if linked else State.new(seed, hero_class, theme=theme)
+    if linked:
+        # Start an equal share at each stage using real completed prior shards;
+        # short random prefixes alone almost never discover a departure.
+        from tools.eador_linked_campaign import play_stage, travel_selection
+        for _ in range(seed % 3):
+            state = play_stage(state)
+            assert state.campaign.phase == 'departure', 'linked setup did not win its prior shard'
+            state.advance(state.campaign.offers[(seed // 3) % 2].id, **travel_selection(state))
+            metrics['setup_completed_shards'] += 1
+        metrics[f'linked_start_stage.{state.campaign.stage}'] += 1
+    theme = state.theme
     metrics[f'campaign_theme.{theme}'] += 1
     for _ in range(steps):
         check_state(state)
@@ -117,6 +129,20 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
             restored.choose(option.id)
             assert state.to_json() == restored.to_json(), 'save changed choice consequences'
             metrics['choice_' + kind] += 1
+            continue
+        if state.campaign and state.campaign.phase in ('departure', 'recovery'):
+            phase = state.campaign.phase
+            selection = dict(troop_ids=tuple(rng.sample([t.id for t in state.hero.army], min(2, len(state.hero.army)))),
+                             relic_ids=tuple(rng.sample(state.inventory, min(2, len(state.inventory)))))
+            restored = State.from_json(state.to_json())
+            offer = rng.choice(state.campaign.offers).id if phase == 'departure' else None
+            for current in (state, restored):
+                if phase == 'departure':
+                    current.advance(offer, **selection)
+                else:
+                    current.recover(**selection)
+            assert state.to_json() == restored.to_json(), 'save changed linked transition consequences'
+            metrics['linked_' + phase] += 1
             continue
         if state.status != 'playing':
             break
@@ -182,6 +208,8 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
         else:
             metrics[command] += 1
     metrics['random_phase_' + state.status] += 1
+    if state.campaign:
+        metrics['random_linked_phase_' + state.campaign.phase] += 1
     # A bounded random prefix is not a completed campaign. Finish every case
     # through public commands, recording these forced actions separately.
     for _ in range(160):
@@ -190,6 +218,12 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
         if state.choice:
             state.choose(rng.choice(state.choice.options).id)
             metrics['cleanup_choices'] += 1
+        elif state.campaign and state.campaign.phase == 'departure':
+            state.advance(state.campaign.offers[0].id)
+            metrics['cleanup_linked_departures'] += 1
+        elif state.campaign and state.campaign.phase == 'recovery':
+            state.abandon_campaign()
+            metrics['cleanup_declined_recovery'] += 1
         elif state.status != 'playing':
             metrics['completed_' + state.status] += 1
             break
@@ -204,7 +238,11 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
         elif state.hero.pos == (-2, 0) and state.rival.defeats and state.actions_left:
             # An opponent that learned to avoid a fortified hero will not keep
             # donating assaults. Leave the capital exposed through real play.
-            state.travel(state.grid.neighbors(state.hero.pos)[0])
+            destination = min(state.grid.neighbors(state.hero.pos),
+                              key=lambda pos: (pos == state.rival.pos,
+                                               state.provinces[pos].owner != 'player',
+                                               sum(state.provinces[pos].guard_hp)))
+            state.travel(destination)
             metrics['cleanup_departures'] += 1
         else:
             state.end_turn()
@@ -495,6 +533,7 @@ def main() -> None:
     parser.add_argument('--seed', type=int, default=0, help='first reproducible seed')
     parser.add_argument('--seeds', type=int, default=12, help='number of campaign and scene runs')
     parser.add_argument('--steps', type=int, default=120, help='random commands per campaign and scene')
+    parser.add_argument('--linked', action='store_true', help='exercise linked model campaigns (scene runs keep their current title flow)')
     parser.add_argument('--campaigns', type=int, help='model runs; defaults to --seeds')
     parser.add_argument('--scenes', type=int, help='scene runs; defaults to --seeds')
     parser.add_argument('--events', type=int, help='minimum total random input activations, excluding setup/cleanup/releases')
@@ -520,7 +559,7 @@ def main() -> None:
         if index % 25 == 0 or index + 1 == campaign_count:
             print(f'Campaign seed {seed} ({index + 1}/{campaign_count})', flush=True)
         try:
-            campaign_run(seed, args.steps, campaigns)
+            campaign_run(seed, args.steps, campaigns, linked=args.linked)
         finally:
             if sys.exc_info()[0] is not None:
                 print(f'Failed campaign seed {seed}', file=sys.stderr, flush=True)
@@ -534,7 +573,7 @@ def main() -> None:
     elapsed = time.perf_counter() - started
     print(f'Passed {campaign_count} model campaigns and {scene_count} scene runs in {elapsed:.1f}s.')
     if args.report:
-        report = {'revision': revision, 'dirty_at_start': dirty, 'seed': args.seed, 'campaigns': campaign_count,
+        report = {'revision': revision, 'linked': args.linked, 'dirty_at_start': dirty, 'seed': args.seed, 'campaigns': campaign_count,
                   'scenes': scene_count, 'steps': args.steps, 'requested_random_events': args.events,
                   'platform': platform.platform(), 'machine': platform.machine(), 'python': platform.python_version(),
                   'elapsed_seconds': elapsed, 'campaign_seconds': campaign_seconds,
