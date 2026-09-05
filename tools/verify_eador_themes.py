@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault('SAGA2D_SILENT', '1')
 
-from saga2d import Game
+from eador.app import create_game
 from eador.scene import ShardScene, TitleScene
 from eador.worldgen import THEMES
 
@@ -20,7 +20,7 @@ def verify(output):
     output.mkdir(parents=True, exist_ok=True)
     for height in (720, 800):
         with TemporaryDirectory(prefix='shardbound-themes-') as directory:
-            game = Game('Shardbound worlds', resolution=(1280, 800), visible=False,
+            game = create_game('Shardbound worlds', resolution=(1280, 800), visible=False,
                         save_dir=Path(directory) / 'saves')
             game.backend.window.set_size(1280, height)
 

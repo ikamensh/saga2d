@@ -14,7 +14,7 @@ from tempfile import TemporaryDirectory
 os.environ.setdefault("SAGA2D_SILENT", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from saga2d import Game  # noqa: E402
+from eador.app import create_game# noqa: E402
 from eador.preferences import DEFAULTS, load_preferences  # noqa: E402
 from eador.scene import HelpScene, TitleScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
@@ -39,7 +39,7 @@ def main():
             data = Path(directory)
             if scenario == "damaged":
                 (data / "settings.json").write_bytes(b"\xffdamaged")
-            game = Game("Shardbound settings verification", resolution=resolution,
+            game = create_game("Shardbound settings verification", resolution=resolution,
                         visible=False, save_dir=data / "saves")
             try:
                 prefs = load_preferences(game)

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from saga2d import Game
+from eador.app import create_game
 from eador.model import State
 from eador.scene import ShardScene
 
@@ -24,7 +24,7 @@ def test_rival_orders_show_current_forces_and_locate_them_without_advancing_play
     state = State.new(7)
     for _ in range(state.rival.turns_until_action):
         state.end_turn()
-    game = Game("Rival inspection", backend="mock", save_dir=tmp_path)
+    game = create_game("Rival inspection", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(state)
         game.push(root)
@@ -56,7 +56,7 @@ def test_encirclement_and_unpaid_upkeep_are_visible_before_ending_a_turn(tmp_pat
             break
         state.end_turn()
     assert state.encircled and state.upkeep_shortfall > 0
-    game = Game("Supply warnings", backend="mock", save_dir=tmp_path)
+    game = create_game("Supply warnings", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(state)
         game.push(root)
