@@ -133,3 +133,8 @@ know about, and read it before touching shared files.
   Tribes' bank in `tribes/sound.py` does the same job; two games needing the
   same bank was the reason it sat in saga2d. Left as is to avoid churn; a
   third game wanting one should lift it back.
+- 2026-09-06 (Warband agent, end of day): `warband` fast-forwards main at its
+  tip; every Early Access gate that machines can prove has evidence in
+  `docs/warband-early-access-progress.md` (final 300-match fuzz clean, soak,
+  perf, AI ladder, refreshed build). Merged main's display API as is. Left
+  for people: the playtest (W15), first-run walkthroughs (W06), Windows.
