@@ -1,6 +1,8 @@
 """Players can recruit, order and restore defensive stances through actual UI input."""
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.scene import BattleScene, TitleScene
 
 
@@ -21,7 +23,7 @@ def click_button(game, label):
 
 def test_guard_and_recruited_pikeman_brace_use_visible_controls_and_restore_exactly(tmp_path):
     """Keyboard Guard and mouse Brace spend the correct order, expire next turn and survive a save."""
-    game = Game("Defensive orders", backend="mock", save_dir=tmp_path)
+    game = create_game("Defensive orders", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
         for key in ("return", "b", "1", "escape", "r", "5", "escape"):

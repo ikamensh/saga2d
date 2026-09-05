@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from saga2d import Game
+from eador.app import create_game
 
 
 def press(game, key):
@@ -31,7 +31,7 @@ def test_new_game_opens_a_seeded_shard_from_title(tmp_path):
     """The executable's title flow must reach the playable strategy scene."""
     from eador.scene import ShardScene, TitleScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
         game.tick(1 / 60)
@@ -49,7 +49,7 @@ def test_invade_retreat_returns_to_campaign_without_losing_scene_state(tmp_path)
     from eador.model import State
     from eador.scene import BattleScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         scene = ShardScene(State.new(7))
         game.push(scene)
@@ -73,7 +73,7 @@ def test_battle_save_restores_playable_tactics_and_returns_wounds_to_map(tmp_pat
     from eador.model import State
     from eador.scene import BattleScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         state = State.new(7, "Wizard")
         root = ShardScene(state)
@@ -118,7 +118,7 @@ def test_stronghold_unlocks_recruitment_through_keyboard_and_mouse(tmp_path):
     from eador.model import BUILDINGS, UNITS, State
     from eador.scene import CatalogScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         state = State.new(7)
         root = ShardScene(state)
@@ -147,7 +147,7 @@ def test_adventure_choices_restore_then_equip_a_relic_through_input(tmp_path):
     from eador.persistence import AUTO_SLOTS, CampaignSaves
     from eador.scene import BattleScene, ChoiceScene, HeroScene, ShardScene, TitleScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
         press(game, "return")
@@ -216,7 +216,7 @@ def test_damaged_quickload_keeps_live_game_and_browser_recovers_backup(tmp_path,
     from eador.persistence import CampaignSaves
     from eador.scene import SaveScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(State.new(7))
         game.push(root)
@@ -259,7 +259,7 @@ def test_unavailable_autosaves_report_failure_and_allow_manual_play(tmp_path):
 
     for slot in AUTO_SLOTS:
         (tmp_path / f"save_{slot}.json").write_text("damaged autosave")
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
         press(game, "return")
@@ -278,7 +278,7 @@ def test_save_and_title_keeps_progress_until_a_usable_slot_is_written(tmp_path):
     from eador.persistence import CampaignSaves
     from eador.scene import SaveScene, ShardScene, TitleScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(State.new(7))
         game.push(root)
@@ -307,7 +307,7 @@ def test_repeated_equipment_hotkeys_preserve_autosave_history(tmp_path):
     state = State.new(7)
     state.inventory = ["moonstone"]
     state.equip("moonstone")
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(ShardScene(state))
         for _ in range(3):
@@ -331,7 +331,7 @@ def test_keyboard_only_tactics_move_cast_attack_reload_and_retreat(tmp_path):
     from eador.model import State
     from eador.scene import BattleScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(State.new(7, "Wizard"))
         game.push(root)
@@ -386,7 +386,7 @@ def test_codex_is_reachable_from_campaign_guide_and_battle_without_advancing_pla
     from eador.model import State
     from eador.scene import BattleScene, HelpScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         root = ShardScene(State.new(7, "Wizard"))
         game.push(root)
@@ -425,7 +425,7 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
     from eador.model import BUILDINGS, UNITS
     from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
 
-    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
         game.tick(1 / 60)

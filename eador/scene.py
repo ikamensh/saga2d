@@ -16,6 +16,8 @@ from eador.content import RELICS, SITES, SKILLS
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, State
 from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
+from eador.worldgen import THEMES
+from eador.sound import set_music
 
 
 class Screen(Scene):
@@ -80,13 +82,16 @@ class Screen(Scene):
         self.draw_rect(x, y, width, 4, (9, 20, 24, 255), radius=2)
         self.draw_rect(x, y, width * max(0, min(1, value / maximum)), 4, color, radius=2)
 
-    def command(self, callback):
+    def command(self, callback, *, cue="confirm"):
         try:
             callback()
         except RuleError as error:
             self.message = str(error)
+            self.game.audio.play_sound("refuse")
             return False
         self.message = ""
+        if cue:
+            self.game.audio.play_sound(cue)
         self.refresh()
         return True
 
@@ -96,27 +101,34 @@ class Screen(Scene):
 
 
 class TitleScene(Screen):
-    controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves"}
+    controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves",
+                "left": "previous_theme", "right": "next_theme"}
 
-    def __init__(self, seed=7):
+    def __init__(self, seed=7, *, theme="frontier", hero_class="Commander"):
         super().__init__()
         self.seed = seed
-        self.hero_class = "Commander"
+        self.hero_class = hero_class
+        self.world_theme = theme
 
     def on_enter(self):
         from eador.preferences import load_preferences
         self.preferences = load_preferences(self.game)
+        set_music(self.game, "campaign")
         super().on_enter()
 
     def refresh(self):
         super().refresh()
         w, h = self.game.resolution
+        x, width = w / 2 - 100, w / 2 + 40
         for i, name in enumerate(HERO_CLASSES):
-            self.button(name, w / 2 - 302 + i * 154, h - 240, 142,
+            self.button(name, x + i * (width + 12) / 4, 280, (width - 36) / 4,
                         lambda name=name: self.choose(name), primary=name == self.hero_class)
+        for i, (ident, theme) in enumerate(THEMES.items()):
+            self.button(theme.name, x + i * (width + 12) / 3, 418, (width - 24) / 3,
+                        lambda ident=ident: self.choose_theme(ident), primary=ident == self.world_theme)
         self.button("Enter the shard", w / 2 - 170, h - 124, 340, self.start, hotkey="Enter", primary=True)
-        self.button("Load shard", w / 2 - 170, h - 72, 164, self.browse_saves, hotkey="F6")
-        self.button("New seed", w / 2 + 6, h - 72, 164, self.next_seed, shortcut="N")
+        self.button("Load shard", w / 2 - 202, h - 72, 196, self.browse_saves, hotkey="F6")
+        self.button("New seed", w / 2 + 6, h - 72, 196, self.next_seed, shortcut="N")
         self.button("Settings", w - 178, 26, 152, self.open_settings, shortcut="O")
 
     def choose(self, name):
@@ -130,8 +142,20 @@ class TitleScene(Screen):
     def next_seed(self):
         self.seed += 1
 
+    def choose_theme(self, theme):
+        self.world_theme = theme
+        self.refresh()
+
+    def next_theme(self):
+        themes = list(THEMES)
+        self.choose_theme(themes[(themes.index(self.world_theme) + 1) % len(themes)])
+
+    def previous_theme(self):
+        themes = list(THEMES)
+        self.choose_theme(themes[(themes.index(self.world_theme) - 1) % len(themes)])
+
     def start(self):
-        state = State.new(self.seed, self.hero_class)
+        state = State.new(self.seed, self.hero_class, theme=self.world_theme)
         root = ShardScene(state)
         if not self.checkpoint(state):
             root.message = self.message
@@ -146,15 +170,22 @@ class TitleScene(Screen):
         self.text("C H R O N I C L E S   O F   T H E   S H A R D S", w / 2, 56, size=11, color=GOLD, center=True)
         self.text("SHARDBOUND", w / 2, 88, size=64, serif=True, center=True)
         self.text("One broken world. A kingdom to build.", w / 2, 169, size=17, color=MUTED, center=True)
+        x, width = w / 2 - 100, w / 2 + 40
+        self.text(THEMES[self.world_theme].name.upper(), w * .245, 244, size=12, color=GOLD, center=True)
         cells = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
-        grid = HexGrid(cells, size=53, origin=(w / 2, 340))
+        grid = HexGrid(cells, size=42, origin=(w * .245, 385))
         from types import SimpleNamespace
+        terrains = {"frontier": ("forest", "hills", "plains"), "elderwild": ("forest", "marsh", "forest"),
+                    "ruins": ("hills", "plains", "hills")}[self.world_theme]
         for i, pos in enumerate(sorted(cells, key=lambda c: grid.center(c)[1])):
-            data = SimpleNamespace(terrain=("forest", "hills", "plains")[i % 3], owner="player" if pos == (0, 0) else "neutral",
+            data = SimpleNamespace(terrain=terrains[i % 3], owner="player" if pos == (0, 0) else "neutral",
                                    capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
             art.province(self, grid, pos, data)
-        self.text("CHOOSE YOUR HERO", w / 2, h - 277, size=11, color=GOLD, center=True)
-        self.text(HERO_CLASSES[self.hero_class].description, w / 2, h - 181, size=14, color=MUTED, center=True)
+        self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
+        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 244, size=11, color=GOLD)
+        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 336, width=width, size=13)
+        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 382, size=11, color=GOLD)
+        self.paragraph(THEMES[self.world_theme].description, x, 476, width=width, size=13)
         notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
                                   if self.preferences.error else "")
         self.text(notice or f"Shard {self.seed}  ·  Conquer provinces, explore ruins, command every battle.",
@@ -191,6 +222,8 @@ class ShardScene(Screen):
         self.follow_state()
 
     def follow_state(self):
+        set_music(self.game, "battle" if self.state.battle and not self.state.battle.outcome else
+                  None if self.state.battle or self.state.status != "playing" else "campaign")
         if self.state.battle is not None:
             self.game.push(BattleScene(self))
         elif self.state.choice is not None:
@@ -252,13 +285,16 @@ class ShardScene(Screen):
         from eador.rival_scene import RivalScene
         self.game.push(RivalScene(self))
 
-    def act(self, callback):
-        if self.command(callback):
+    def act(self, callback, *, cue="confirm"):
+        before = self.state.status
+        if self.command(callback, cue=cue):
+            if self.state.status != before and self.state.status != "playing":
+                self.game.audio.play_sound("victory" if self.state.status == "victory" else "defeat")
             self.checkpoint(self.state)
             self.follow_state()
 
     def travel(self):
-        self.act(lambda: self.state.travel(self.selected))
+        self.act(lambda: self.state.travel(self.selected), cue="move")
 
     def explore(self):
         province = self.state.provinces[self.state.hero.pos]
@@ -271,7 +307,7 @@ class ShardScene(Screen):
 
     def end_turn(self):
         before = {troop.id: troop.kind for troop in self.state.hero.army}
-        self.act(self.state.end_turn)
+        self.act(self.state.end_turn, cue="end_turn")
         surviving = {troop.id for troop in self.state.hero.army}
         deserted = Counter(kind for ident, kind in before.items() if ident not in surviving)
         if deserted:
@@ -319,7 +355,7 @@ class ShardScene(Screen):
         self.rule(24, 90, self.edge - 48)
         header_center = (338 + self.edge - 177) / 2
         self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
-        self.text(f"THE VERDANT REACH   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
+        self.text(f"{THEMES[s.theme].name.upper()}   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
         self.text("WESTWATCH ENCIRCLED" if s.encircled else "YOUR DOMINION", x, 24,
                   size=10, color=RED if s.encircled else MUTED)
         self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
@@ -491,7 +527,7 @@ class BattleScene(Screen):
         super().__init__()
         self.root = root
         self.selected = None
-        self.spell = None
+        self.targeting = None
         self.hover = None
         self.cursor = self.battle.unit(0).pos
         self.floats = []
@@ -527,8 +563,11 @@ class BattleScene(Screen):
         if self.selected is None or not any(u.id == self.selected for u in alive):
             self.selected = alive[0].id if alive else None
         selected = b.unit(self.selected) if self.selected is not None else None
-        self.button("Brace" if selected and selected.kind == "pikeman" else "Guard", x + 184, 291, 116,
+        self.button("Brace" if selected and selected.can_brace else "Guard", x + 184, 291, 116,
                     self.guard, shortcut="G", enabled=selected is not None and not selected.acted and b.outcome is None)
+        if selected and selected.can_pin:
+            self.button("Pin · wait" if selected.pin_cooldown else "Pin", x, 291, 172, self.pin, shortcut="P",
+                        primary=self.targeting == "pin", enabled=not selected.acted and not selected.pin_cooldown and b.outcome is None)
         hero_ready = b.unit(0).hp > 0 and not b.unit(0).acted and b.outcome is None
         self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 378, 300, self.bolt, hotkey="1",
                     enabled="bolt" in b.spells and b.mana >= b.spell_cost("bolt") and hero_ready)
@@ -547,27 +586,30 @@ class BattleScene(Screen):
     def locate_objective(self):
         self.cursor = self.hover = self.battle.objective.target
 
-    def act(self, callback, *, checkpoint=False):
+    def act(self, callback, *, checkpoint=False, cue="attack_hit"):
         before = {u.id: u.hp for u in self.battle.units}
-        if self.command(callback):
+        if self.command(callback, cue=cue):
             for u in self.battle.units:
                 change = u.hp - before[u.id]
                 if change:
                     self.floats.append((self.clock, u.pos, change))
-            self.spell = None
+            self.targeting = None
+            self.refresh()
             if checkpoint or self.battle.outcome:
                 self.checkpoint(self.root.state)
             if self.battle.outcome:
+                set_music(self.game, None)
+                self.game.audio.play_sound("victory" if self.battle.outcome == "player" else "defeat")
                 self.game.push(ResultScene(self.root, battle=True))
 
     def end_turn(self):
-        self.act(self.battle.end_turn, checkpoint=True)
+        self.act(self.battle.end_turn, checkpoint=True, cue="end_turn")
 
     def auto_round(self):
-        self.act(self.battle.auto_turn, checkpoint=True)
+        self.act(self.battle.auto_turn, checkpoint=True, cue="end_turn")
 
     def guard(self):
-        self.act(lambda: self.battle.guard(self.selected))
+        self.act(lambda: self.battle.guard(self.selected), cue="guard")
 
     def retreat(self):
         try:
@@ -575,6 +617,7 @@ class BattleScene(Screen):
         except RuleError as error:
             self.message = str(error)
         else:
+            self.game.audio.play_sound("defeat")
             if not self.checkpoint(self.root.state):
                 self.root.message = self.message
             self.game.pop()
@@ -590,17 +633,26 @@ class BattleScene(Screen):
         self.game.push(HelpScene(self.root))
 
     def cancel(self):
-        if self.spell:
-            self.spell = None
+        if self.targeting:
+            self.targeting = None
+            self.message = ""
+            self.refresh()
         else:
             self.help()
+
+    def pin(self):
+        self.targeting = None if self.targeting == "pin" else "pin"
+        self.message = ("Pin: choose an unpinned enemy within 3 hexes. F aims; Enter shoots; Esc cancels."
+                        if self.targeting else "")
+        self.refresh()
 
     def choose_spell(self, name):
         if name not in self.battle.spells:
             self.message = "Build a Temple for Heal or a Mage Tower for Arcane Bolt."
             return
-        self.spell = None if self.spell == name else name
+        self.targeting = None if self.targeting == name else name
         self.message = ("Choose a wounded ally" if name == "heal" else "Choose an enemy") + " within 4 hexes of your hero."
+        self.refresh()
 
     def bolt(self):
         self.choose_spell("bolt")
@@ -614,7 +666,7 @@ class BattleScene(Screen):
             ids = [u.id for u in units]
             self.selected = ids[(ids.index(self.selected) + 1) % len(ids)] if self.selected in ids else ids[0]
             self.cursor = self.hover = self.battle.unit(self.selected).pos
-            self.spell = None
+            self.targeting = None
             self.refresh()
 
     def aim(self, event):
@@ -626,7 +678,7 @@ class BattleScene(Screen):
             self.cursor = self.hover = pos
 
     def next_target(self):
-        team = "player" if self.spell == "heal" else "enemy"
+        team = "player" if self.targeting == "heal" else "enemy"
         targets = [u.pos for u in self.battle.units if u.hp > 0 and u.team == team]
         if targets:
             index = (targets.index(self.cursor) + 1) % len(targets) if self.cursor in targets else 0
@@ -658,27 +710,31 @@ class BattleScene(Screen):
         if self.battle.outcome is not None:
             return
         unit = next((u for u in self.battle.units if u.hp > 0 and u.pos == pos), None)
-        if self.spell:
+        if self.targeting:
             if unit:
-                self.act(lambda: self.battle.cast(self.spell, unit.id))
+                if self.targeting == "pin":
+                    self.act(lambda: self.battle.pin(self.selected, unit.id))
+                else:
+                    self.act(lambda: self.battle.cast(self.targeting, unit.id), cue=self.targeting)
             else:
-                self.message = "Aim at a unit to cast. F cycles targets; Esc cancels targeting."
+                self.message = "Aim at a unit. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
             self.selected = unit.id
             self.refresh()
         elif unit and self.selected is not None:
             self.act(lambda: self.battle.attack(self.selected, unit.id))
         elif self.selected is not None:
-            self.act(lambda: self.battle.move(self.selected, pos))
+            self.act(lambda: self.battle.move(self.selected, pos), cue="move")
 
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
         self.draw_rect(self.edge, 0, 344, h, PANEL)
         self.draw_line(self.edge, 0, self.edge, h, LINE)
-        self.text("BATTLE FOR " + s.provinces[s.battle_province].name.upper(), self.edge / 2, 26,
+        header_center = (self.edge + 135) / 2
+        self.text("BATTLE FOR " + s.provinces[s.battle_province].name.upper(), header_center, 26,
                   size=25, serif=True, center=True)
-        self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", self.edge / 2, 63, size=10, color=GOLD, center=True)
+        self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", header_center, 63, size=10, color=GOLD, center=True)
         self.rule(26, 90, self.edge - 52)
         if b.objective.kind == "hold":
             objective = b.objective
@@ -696,35 +752,41 @@ class BattleScene(Screen):
         if selected:
             self.text(s.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name,
                       x, 159, size=25, serif=True)
-            self.text(f"Health {selected.hp} / {selected.max_hp}", x, 198, size=13, color=TEAL)
+            self.text(f"{selected.hp} / {selected.max_hp} HP", x, 198, size=13, color=TEAL)
             self.bar(x, 225, 300, selected.hp, selected.max_hp)
             self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 246, size=13)
-            self.text(f"Movement {selected.move_range}   Range {selected.attack_range}", x, 272, size=13, color=MUTED)
-            status = ("Guard · +2 defense" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
-                      "Action spent" if selected.acted else "Moved · action ready" if selected.moved else "Ready")
-            self.text(status,
-                      x, 301, size=12, color=GOLD)
+            movement = f"Move {selected.effective_move_range}" + (" (Pinned)" if selected.pinned else "")
+            self.text(f"{movement}   Range {selected.attack_range}", x, 272, size=12, color=MUTED)
+            status = ("Guard +2" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
+                      "Spent" if selected.acted else "Moved" if selected.moved else "Ready")
+            self.text(status, x + 193, 199, size=12, color=GOLD)
         self.rule(x, 336, 300)
         self.text(f"SPELLBOOK   /   {b.mana} MANA", x, 353, size=10, color=BLUE)
         self.text("Spells use mana and the hero's action.", x, 479, size=11, color=MUTED)
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
         if hovered:
             self.text(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", x, 630, size=13, color=GOLD)
-            if selected and hovered in b.targets(selected.id):
+            pin_target = selected and self.targeting == "pin" and hovered in b.pin_targets(selected.id)
+            if pin_target:
+                damage, retaliation = b.pin_preview(selected.id, hovered.id)
+                self.text(f"Pin {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
+            elif selected and self.targeting != "pin" and hovered in b.targets(selected.id):
                 damage, retaliation = b.preview(selected.id, hovered.id)
                 self.text(f"Deal {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
             else:
                 self.text(f"Attack {hovered.attack}  ·  Defense {hovered.effective_defense}  ·  Range {hovered.attack_range}",
                           x, 655, size=11, color=MUTED)
-            detail = ("Brace strikes first against melee." if hovered.stance == "brace" else
+            detail = (f"Next turn: Move {max(1, hovered.move_range - 2)} · may still attack." if pin_target else
+                      f"Pinned: Move {hovered.effective_move_range} · may still attack." if hovered.pinned else
+                      "Brace strikes first against melee." if hovered.stance == "brace" else
                       f"Terrain: {b.terrain[hovered.pos].title()}" + (" · Guard +2 defense" if hovered.stance == "guard" else ""))
             self.text(detail, x, 679, size=11, color=MUTED)
         else:
-            self.paragraph("G: Guard (+2 defense) or Brace (Pikemen strike first against melee). Ranged fire avoids Brace.",
+            self.paragraph("G: Guard / Brace. P: Pin with an Archer or Storm Quiver. Pin halves damage and slows movement for one turn.",
                            x, 630, size=11)
         self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
-        reachable = b.reachable(self.selected) if selected and not selected.acted and b.outcome is None else set()
-        targets = {u.id for u in b.targets(self.selected)} if selected and not selected.acted and b.outcome is None else set()
+        reachable = b.reachable(self.selected) if selected and not selected.acted and b.outcome is None and not self.targeting else set()
+        targets = {u.id for u in (b.pin_targets(self.selected) if self.targeting == "pin" else b.targets(self.selected))} if selected and not selected.acted and b.outcome is None else set()
         for pos in sorted(b.terrain, key=lambda p: self.grid.center(p)[1]):
             cx, cy = self.grid.center(pos)
             points = [(cx + (px - cx) * .95, cy + (py - cy) * .95) for px, py in self.grid.corners(pos)]
@@ -751,6 +813,9 @@ class BattleScene(Screen):
             if u.stance:
                 self.draw_circle(cx + 30, cy - 17, 9, INK)
                 self.text("B" if u.stance == "brace" else "G", cx + 30, cy - 24, size=10, color=GOLD, center=True)
+            if u.pinned:
+                self.draw_circle(cx - 30, cy - 17, 9, INK)
+                self.text("P", cx - 30, cy - 24, size=10, color=BLUE, center=True)
             self.draw_rect(cx - 29, cy + 29, 58, 16, INK, radius=3)
             self.text(f"{u.hp}/{u.max_hp}", cx, cy + 29, size=10, center=True)
             self.bar(cx - 26, cy + 46, 52, u.hp, u.max_hp, TEAL if u.team == "player" else RED)
@@ -762,7 +827,7 @@ class BattleScene(Screen):
         for i, line in enumerate(b.log[-3:]):
             self.text(textwrap.shorten(line, width=105, placeholder="…"), 30, h - 102 + i * 24,
                       size=11, color=MUTED)
-        self.text(self.message or ("Click a target for " + self.spell if self.spell else "Select a unit. Blue hexes are reachable; red rings are attack targets."),
+        self.text(self.message or ("Click a target for " + self.targeting if self.targeting else "Select a unit. Blue hexes are reachable; red rings are attack targets."),
                   30, h - 26, size=11, color=GOLD)
 
 
@@ -817,7 +882,8 @@ class SaveScene(Screen):
             else:
                 self.message = f"Saved to {entry.label}."
                 if self.return_to_title:
-                    self.game.clear_and_push(TitleScene(self.root.state.seed))
+                    self.game.clear_and_push(TitleScene(self.root.state.seed, theme=self.root.state.theme,
+                                                       hero_class=self.root.state.hero.hero_class))
                     return
             self.refresh()
 
@@ -874,12 +940,15 @@ class ChoiceScene(Screen):
         self.button("Codex", self.x + 216, self.y + 405, 154, self.root.codex, shortcut="C")
 
     def choose(self, option_id):
+        kind = self.root.state.choice.kind
         try:
             self.root.state.choose(option_id)
         except RuleError as error:
             self.message = str(error)
+            self.game.audio.play_sound("refuse")
             return
         self.message = ""
+        self.game.audio.play_sound("level_up" if kind == "skill" else "reward")
         self.checkpoint(self.root.state)
         if self.root.state.choice is not None:
             self.refresh()
@@ -1013,7 +1082,8 @@ class ResultScene(Screen):
             game.pop()  # result overlay
             game.pop()  # tactical battlefield; reveal the existing campaign
         else:
-            self.game.clear_and_push(TitleScene(self.root.state.seed + 1))
+            self.game.clear_and_push(TitleScene(self.root.state.seed + 1, theme=self.root.state.theme,
+                                               hero_class=self.root.state.hero.hero_class))
 
     def save_game(self):
         self.root.save_game()
@@ -1040,7 +1110,7 @@ class ResultScene(Screen):
             title = "The shard is yours" if s.status == "victory" else "Westwatch has fallen"
             detail = f"Turn {s.turn}  ·  Hero level {s.hero.level}"
             subtitle = "Begin another world with a different hero."
-        self.text("CHRONICLE OF THE VERDANT REACH", x + 270, y + 23, size=10, color=MUTED, center=True)
+        self.text(f"CHRONICLE OF {THEMES[s.theme].name.upper()}", x + 270, y + 23, size=10, color=MUTED, center=True)
         self.text(title, x + 270, y + 59, size=34, serif=True, color=GOLD, center=True)
         self.text(detail, x + 270, y + 117, size=13, center=True)
         self.text(self.message or subtitle, x + 270, y + 157, size=12, color=MUTED, center=True)

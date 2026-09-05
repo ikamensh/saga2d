@@ -82,7 +82,7 @@ def test_preversioned_campaign_and_active_battle_migrate_without_new_rewards():
         assert restored.hero.skills == set() and restored.choice is None
         assert restored.provinces[restored.hero.pos].site_gold == 55
         assert restored.provinces[restored.hero.pos].site_relic is None
-        assert json.loads(restored.to_json())['schema_version'] == 6
+        assert json.loads(restored.to_json())['schema_version'] == 8
         if restored.battle:
             assert restored.battle.to_dict()['units'][0]['hp'] == old['battle']['units'][0]['hp']
             win(restored)
@@ -166,7 +166,7 @@ def test_each_site_pattern_is_reachable_playable_and_awards_its_own_reward(kind)
             spell = 'heal' if kind == 'shrine' else 'bolt'
             assert powered.spell_power[spell] > ordinary.spell_power[spell]
         elif kind == 'den':
-            assert ordinary.reachable(0) < powered.reachable(0)
+            assert powered.unit(0).can_pin and not ordinary.unit(0).can_pin
         else:
             for battle in (powered, ordinary):
                 for _ in range(2):

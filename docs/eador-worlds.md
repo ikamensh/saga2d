@@ -114,3 +114,20 @@ All recorded source fingerprints still matched after the runs.
 The title/CLI theme picker and its native visual verification belong to the UI
 integration checkpoint. This model report makes no claim that those controls
 already exist, nor that G02 or the Early Access criteria are complete.
+
+## Playable selection — 2026-09-06
+
+The title offers all three worlds with their route tradeoffs and a terrain
+illustration. Left/Right cycles worlds, Tab cycles heroes, and mouse buttons
+provide the same choices. `--theme`/`--hero` preselect the title or start directly
+with `--seed`. The active map and results name the saved theme, and Save & title
+retains it for the next selection. Loading restores the recorded world even
+after choosing a different title theme.
+
+Three public-input integration journeys cover that selection/save/load path.
+The native verifier `tools/verify_eador_themes.py` exercises the same paths and
+captures all theme titles/maps at the shipping 1280×800 logical canvas, displayed
+in 1280×720 and 1280×800 windows. This verifies letterboxing, not arbitrary
+logical layouts or text scaling. A 720-pixel *logical* campaign layout was also
+inspected and exposed overlapping lower sidebar controls; that layout remains
+unsupported and must be addressed before claiming arbitrary UI scaling.

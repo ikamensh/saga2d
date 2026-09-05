@@ -10,7 +10,7 @@ from eador.scene import Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
 
 
-CATEGORIES = ("Troops", "Spells", "Buildings", "Skills", "Sites", "Relics")
+CATEGORIES = ("Troops", "Abilities", "Buildings", "Skills", "Sites", "Relics")
 PAGE_SIZE = 3
 
 
@@ -99,6 +99,8 @@ class CodexScene(Screen):
                                    f"upkeep {spec.upkeep} gold/turn. {requirement}")
                     if kind == "healer":
                         description += " An acolyte adds 2 army recovery each resting turn."
+                    elif kind == "archer":
+                        description += " Pin trades half damage for -2 movement on the target’s next turn. See Abilities for timing and counters."
                     elif kind == "pikeman":
                         description = (f"Costs {state.recruit_cost(kind)} gold (base {spec.cost}); upkeep {spec.upkeep}. "
                                        "Requires Barracks. Brace hits once before melee, through retaliation protection. "
@@ -107,17 +109,34 @@ class CodexScene(Screen):
                     description = f"{role} Encountered as a guardian; cannot be recruited."
                 entries.append(_Entry(spec.name, facts, description))
             return entries
-        if category == "Spells":
+        if category == "Abilities":
             # The public battle factory applies current skills/equipment without mutating the hero.
             battle = state.battle or Battle.create(state.hero, [], "plains", state.spells)
             sources = {"bolt": "Wizard, Mage Tower or equipped Ember Lens",
                        "heal": "Wizard, Temple or equipped Moonstone"}
-            return [_Entry(spec.name,
+            entries = [_Entry(spec.name,
                           f"Your hero: {battle.spell_cost(kind)} mana · {battle.spell_power[kind]} "
                           f"{'damage' if kind == 'bolt' else 'healing'} · {'Learned' if kind in battle.spells else 'Not learned'}",
                           f"Base cost: {spec.cost} mana. {spec.description} Requires {sources[kind]}. "
                           "Casting spends the hero's action and movement.")
                     for kind, spec in SPELLS.items()]
+            capable = [unit for unit in battle.units if unit.team == 'player' and unit.alive and unit.can_pin]
+            ready = sum(not unit.acted and unit.pin_cooldown == 0 for unit in capable)
+            cooling = sum(unit.pin_cooldown > 0 for unit in capable)
+            hero = battle.unit(0)
+            pin_hero = "Hero equipped" if hero.can_pin else "Hero needs Storm Quiver"
+            brace_hero = "Hero equipped" if hero.can_brace else "Hero needs Watch Bell"
+            entries += [
+                _Entry("Pin", f"Range 3 · No mana · Army: {len(capable)} capable / {ready} ready · {cooling} cooling · {pin_hero}",
+                       "Half damage after defense/cover (round up); forecast includes reactions. "
+                       "-2 movement (minimum 1) next own turn; attacks and Guard still work. "
+                       "Cannot stack or extend; skip the following turn before reuse. Avoids Brace."),
+                _Entry("Brace", f"Pikemen and Watch Bell heroes · No mana · {brace_hero}",
+                       "Use Guard to spend the remaining order. The first adjacent melee attacker takes a normal hit before striking; "
+                       "a lethal hit cancels its attack. One reaction, expiring next own turn. Ranged attacks avoid it. "
+                       "Other units Guard for +2 defense instead."),
+            ]
+            return entries
         if category == "Buildings":
             return [_Entry(spec.name, f"{spec.cost} gold · {spec.crystals} crystals · "
                           f"{'Built' if kind in state.buildings else 'Not built'}", spec.description)
@@ -127,15 +146,20 @@ class CodexScene(Screen):
                           f"Your rank: {state.hero.skill_ranks.get(kind, 0)}", spec.description)
                     for kind, spec in SKILLS.items()]
         if category == "Sites":
-            return [_Entry(spec.name, f"Reward: {spec.gold} gold · {spec.crystals} "
+            return [_Entry(spec.name, f"Base reward: {spec.gold} gold · {spec.crystals} "
                           f"{'crystal' if spec.crystals == 1 else 'crystals'} · {RELICS[spec.relic].name}",
                           f"{spec.description} Base guardians: " + ", ".join(
                               f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items()) + ".")
                     for spec in SITES.values()]
         return [_Entry(spec.name, f"Sell when found: {spec.value} gold · "
                       f"{'Equipped' if state.hero.relic == kind else 'Owned' if kind in state.inventory else 'Not owned'}",
-                      spec.description)
+                      spec.description + " " + self.relic_sources(kind))
                 for kind, spec in RELICS.items()]
+
+    def relic_sources(self, kind):
+        sources = sorted({province.site for province in self.root.state.provinces.values()
+                          if province.site_relic == kind and province.site})
+        return "Recorded sources: " + ", ".join(sources) + "." if sources else "No recorded source on this shard."
 
     def draw(self):
         x, y = self.x, self.y
@@ -147,12 +171,12 @@ class CodexScene(Screen):
         self.text(f"{state.hero.hero_class} · {HERO_CLASSES[state.hero.hero_class].description}",
                   x + 24, y + 81, size=12, color=MUTED)
         introductions = (
-            "G Guards (+2 defense until next turn); Pikemen Brace. Base stats exclude veteran and hero bonuses.",
-            "Current mana costs and power include your hero's skills and equipped relic. Spell range is four hexes.",
+            "Guard grants +2 defense; Pikemen and Watch Bell heroes Brace. Archers can Pin. Stats exclude veteran and hero bonuses.",
+            "Spell costs and power include skills and relics. Pin and Brace cost no mana; readiness reflects your current army.",
             "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
             "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
-            "Explore an owned, uncleared site using one hero action. Eastern sites have an additional Dread Guard.",
-            "Keep or sell each find. Equip one relic between battles. Distill duplicates for 4 crystals.",
+            "Explore an owned, uncleared site using one action. These are base definitions; map briefs show saved rewards and surviving guards.",
+            "Equip one relic between battles. Recorded sources belong to this saved shard; cleared sites cannot award their reward again.",
         )
         self.paragraph(introductions[self.category], x + 24, y + 163, width=992, size=13)
         start = self.page * PAGE_SIZE

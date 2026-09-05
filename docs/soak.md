@@ -136,3 +136,56 @@ Pyglet 2.1.13, at 1280×800 logical / 2560×1600 physical pixels:
   recorded in subsequent reports.
 
 These checks validate the harness; they are not the two-hour G15 result.
+
+
+## Completed two-hour baseline: 2026-09-06
+
+[The retained report](evidence/shardbound-soak-31a2c88-2026-09-06/report.json)
+records **7,200.08 monotonic seconds**, **429,506 real rendered frames** and
+**577 completed prepared opening journeys**. It ran from 21:12:33 to 23:12:33
+UTC on 2026-09-05 (ending September 6 in the local timezone), against frozen
+source `31a2c88873bcfb7c27224a793aecf364e08e2822`.
+
+On Apple M4 / Mac16,13 / 24 GiB RAM, macOS 26.6.2, Python 3.13.2,
+Pyglet 2.1.13, at 1280×800 logical / 2560×1600 physical pixels:
+
+| Measurement | Observed result |
+| --- | --- |
+| Tick p50 / p95 / p99 | 6.263 / 11.988 / 16.719 ms |
+| Maximum tick | 149.823 ms; retained in the distribution |
+| First five post-startup RSS samples | 254.409 MiB mean |
+| Last five RSS samples | 262.853 MiB mean |
+| Difference between those windows | +8.444 MiB / +3.319% |
+| Sampled peak / process peak RSS | 276.422 / 281.344 MiB |
+| Battle save/reload and result journeys | 1,154 each |
+| Reward-choice save/reloads | 1,154 |
+| Browser save/reloads | 577 |
+| Automatic rounds / manual tactical moves | 2,236 / 1,154 |
+
+The p95 target of 33 ms was met. The complete minute series shows cache
+warmup, repeated drops and bounded plateaus: RSS reached 276 MiB before
+minute 56, dropped around minute 75, and ended below that earlier peak.
+The +3.3% window difference is not a monotonic growth pattern; this run
+shows no sustained unexplained upward baseline. This does not exclude
+slower growth or different behavior during long campaigns. Concurrent
+coding and test jobs ran on the same host during the measurement.
+
+The source snapshot remained unchanged and every loaded game/framework
+module came from it. The process exited successfully; the window closed,
+temporary saves were removed, and caffeinate exited. Late screenshots at
+60, 90, 100 and 110 minutes plus the [final frame](evidence/shardbound-soak-31a2c88-2026-09-06/final.png)
+were inspected and showed no rendering corruption. Earlier harness checks
+also inspected the battle, choice, relic and save-browser screens.
+
+The evidence directory retains the full report, source/dependency manifest,
+minute records, all 429,506 raw float64 timing samples, selected inspected
+captures and artifact SHA-256 hashes. The ignored `dist/soak/baseline-31a2c88`
+directory also retains the complete source snapshot and every screenshot.
+
+**This is baseline evidence only.** It covers eight fixed seed/class
+pairings, repeated opening journeys and one persistent hidden window with
+audio disabled. It predates finite-rival, pressure, Guard/Pin, authored
+objectives, themes, settings and linked-campaign growth. It supplies the
+completed two-hour component for that recorded revision; it does not
+satisfy G15 for the current game or close the release gate. A later release
+candidate requires its own full matrix and sustained real-backend run.

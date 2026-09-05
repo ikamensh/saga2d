@@ -14,7 +14,9 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
-from saga2d import Button, Game
+from saga2d import Button
+
+from eador.app import create_game
 from eador.codex import CodexScene
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene, SaveScene, ShardScene, TitleScene
 
@@ -22,7 +24,7 @@ from eador.scene import BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroS
 def verify(output: Path):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-verify-") as saves:
-        game = Game("Shardbound verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
+        game = create_game("Shardbound verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
         from pyglet.window import key, mouse
 
         window = game.backend.window

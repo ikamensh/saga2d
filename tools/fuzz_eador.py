@@ -27,7 +27,9 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from saga2d import Button, Game  # noqa: E402
+from saga2d import Button# noqa: E402
+
+from eador.app import create_game# noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.encounter_scene import EncounterScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
@@ -76,6 +78,9 @@ def check_state(state: State) -> None:
         assert len({u.pos for u in alive}) == len(alive)
         assert len({u.id for u in battle.units}) == len(battle.units)
         assert all(u.pos in battle.grid.cells and 0 <= u.hp <= u.max_hp for u in battle.units)
+        assert all(type(u.pinned) is bool and 0 <= u.pin_cooldown <= 2 for u in battle.units)
+        assert all(not u.pin_cooldown or u.can_pin for u in battle.units)
+        assert all(u.effective_move_range == max(1, u.move_range - (2 if u.pinned else 0)) for u in battle.units)
         assert {u.id for u in battle.units if u.team == 'player'} == {0, *(t.id for t in hero.army)}
         assert 0 <= battle.mana <= hero.max_mana
         assert battle.outcome in (None, 'player', 'enemy')
@@ -119,6 +124,31 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
             if state.battle.outcome:
                 metrics['battle_' + state.battle.outcome] += 1
                 state.resolve_battle()
+            elif rng.random() < .20:
+                battle = state.battle
+                shooter = rng.choice([u for u in battle.units if u.alive and u.team == 'player'])
+                target = rng.choice([u for u in battle.units if u.alive and u.team == 'enemy'])
+                before = state.to_json()
+                try:
+                    expected = battle.pin_preview(shooter.id, target.id)
+                except RuleError:
+                    assert state.to_json() == before, 'rejected Pin preview mutated state'
+                    try:
+                        battle.pin(shooter.id, target.id)
+                    except RuleError:
+                        pass
+                    else:
+                        raise AssertionError('Pin command accepted a rejected forecast')
+                    assert state.to_json() == before, 'rejected Pin mutated state'
+                    metrics['rejected_pin_orders'] += 1
+                else:
+                    restored = State.from_json(before)
+                    health = target.hp, shooter.hp
+                    battle.pin(shooter.id, target.id)
+                    restored.battle.pin(shooter.id, target.id)
+                    assert (health[0] - target.hp, health[1] - shooter.hp) == expected
+                    assert state.to_json() == restored.to_json(), 'save changed Pin consequences'
+                    metrics['pin_orders'] += 1
             elif rng.random() < .06:
                 state.retreat()
                 metrics['retreats'] += 1
@@ -187,7 +217,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
     """Mix purposeful input with random clicks/keys, checking each rendered tick."""
     rng = random.Random(seed)
     with tempfile.TemporaryDirectory(prefix='shardbound-fuzz-') as save_dir:
-        game = Game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=Path(save_dir) / 'saves')
+        game = create_game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=Path(save_dir) / 'saves')
         random_phase = False
         history = deque(maxlen=25)
 
@@ -263,6 +293,16 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
             elif roll < .40:
                 press('g')
                 metrics['defensive_order_inputs'] += 1
+            elif roll < .45:
+                shooters = [u for u in battle.units if u.team == 'player' and battle.pin_targets(u.id)]
+                if shooters:
+                    unit = rng.choice(shooters)
+                    press('tab')  # Cancel an earlier aimed action before selecting the shooter.
+                    click(*scene.grid.center(unit.pos))
+                    press('p')
+                    target = rng.choice(battle.pin_targets(unit.id))
+                    click(*scene.grid.center(target.pos))
+                    metrics['pin_inputs'] += 1
             elif roll < .5:
                 press(rng.choice(('left', 'right', 'up', 'down', 'pageup', 'pagedown', 'f', '1', '2')))
                 press('return')
@@ -323,7 +363,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     break
                 scene = game.scene
                 if isinstance(scene, TitleScene):
-                    press(rng.choice(('tab', 'return', 'f9', 'f6', 'o')))
+                    press(rng.choice(('tab', 'left', 'right', 'return', 'f9', 'f6', 'o')))
                 elif isinstance(scene, HelpScene):
                     button(rng.choice(('Save & title', 'Codex', 'Settings', 'Return to game', 'Return to game')))
                 elif isinstance(scene, SettingsScene):

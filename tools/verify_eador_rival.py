@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
-from saga2d import Game
+from eador.app import create_game
 from eador.model import State
 from eador.rival_scene import RivalScene
 from eador.scene import BattleScene, ChoiceScene, SaveScene, ShardScene, TitleScene
@@ -18,7 +18,7 @@ from eador.scene import BattleScene, ChoiceScene, SaveScene, ShardScene, TitleSc
 def verify(output):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix="shardbound-rival-") as saves:
-        game = Game("Shardbound rival verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
+        game = create_game("Shardbound rival verification", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves")
         from pyglet.window import key, mouse
 
         window = game.backend.window
