@@ -1,0 +1,199 @@
+{
+  "composition": "Original E-minor shard motif, explicit game-owned voicings and rhythms; deterministic seeded noise.",
+  "encoding": "16-bit PCM WAV",
+  "files": {
+    "music/battle.wav": {
+      "bytes": 5644844,
+      "channels": 2,
+      "description": "32 seconds: sixteen 4/4 bars at 120 BPM, felt in half-time with sparse toms.",
+      "frames": 1411200,
+      "peak": 0.17999817,
+      "rms": 0.03412405,
+      "seam_step": 0.00109867,
+      "seconds": 32.0,
+      "sha256": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2"
+    },
+    "music/campaign.wav": {
+      "bytes": 8467244,
+      "channels": 2,
+      "description": "48 seconds: twelve slow 4/4 bars, overlapping low reeds and sparse glass answers.",
+      "frames": 2116800,
+      "peak": 0.16000855,
+      "rms": 0.02609247,
+      "seam_step": 0.00222785,
+      "seconds": 48.0,
+      "sha256": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a"
+    },
+    "sounds/attack_hit.wav": {
+      "bytes": 22094,
+      "channels": 1,
+      "description": "A quick edged impact above a short low body, not a musical reward.",
+      "frames": 11025,
+      "peak": 0.62001404,
+      "rms": 0.11743877,
+      "seam_step": 0.0,
+      "seconds": 0.25,
+      "sha256": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d"
+    },
+    "sounds/bolt.wav": {
+      "bytes": 36206,
+      "channels": 1,
+      "description": "A rising electric streak releases into a high, short spark.",
+      "frames": 18081,
+      "peak": 0.58000427,
+      "rms": 0.10786681,
+      "seam_step": 0.0,
+      "seconds": 0.41,
+      "sha256": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df"
+    },
+    "sounds/confirm.wav": {
+      "bytes": 23418,
+      "channels": 1,
+      "description": "A small E\u2013B answering chime: clear, brief and affirmative.",
+      "frames": 11687,
+      "peak": 0.41999573,
+      "rms": 0.09821549,
+      "seam_step": 0.0,
+      "seconds": 0.265011,
+      "sha256": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d"
+    },
+    "sounds/defeat.wav": {
+      "bytes": 151748,
+      "channels": 1,
+      "description": "An unhurried descent to B, leaving the tonic unresolved.",
+      "frames": 75852,
+      "peak": 0.46000549,
+      "rms": 0.13151416,
+      "seam_step": 0.0,
+      "seconds": 1.72,
+      "sha256": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf"
+    },
+    "sounds/end_turn.wav": {
+      "bytes": 52964,
+      "channels": 1,
+      "description": "A wooden tick and an answering downward fifth close the command phase.",
+      "frames": 26460,
+      "peak": 0.4000061,
+      "rms": 0.12338226,
+      "seam_step": 0.0,
+      "seconds": 0.6,
+      "sha256": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552"
+    },
+    "sounds/guard.wav": {
+      "bytes": 41850,
+      "channels": 1,
+      "description": "A hollow shield knock followed by a muted metallic ring.",
+      "frames": 20903,
+      "peak": 0.50001526,
+      "rms": 0.08501204,
+      "seam_step": 0.0,
+      "seconds": 0.473991,
+      "sha256": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945"
+    },
+    "sounds/heal.wav": {
+      "bytes": 70604,
+      "channels": 1,
+      "description": "A soft opening minor triad, with a quiet breath rather than an impact.",
+      "frames": 35280,
+      "peak": 0.46998505,
+      "rms": 0.12269647,
+      "seam_step": 0.0,
+      "seconds": 0.8,
+      "sha256": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c"
+    },
+    "sounds/level_up.wav": {
+      "bytes": 106766,
+      "channels": 1,
+      "description": "A wider, longer ascent than reward, resolving a second into the high tonic.",
+      "frames": 53361,
+      "peak": 0.56001465,
+      "rms": 0.12654004,
+      "seam_step": 0.0,
+      "seconds": 1.21,
+      "sha256": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968"
+    },
+    "sounds/move.wav": {
+      "bytes": 28268,
+      "channels": 1,
+      "description": "Two weighted bootfalls with distinct gravel grains.",
+      "frames": 14112,
+      "peak": 0.4300058,
+      "rms": 0.05633255,
+      "seam_step": 0.0,
+      "seconds": 0.32,
+      "sha256": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f"
+    },
+    "sounds/refuse.wav": {
+      "bytes": 26062,
+      "channels": 1,
+      "description": "A dry descending semitone, without an alarming buzzer.",
+      "frames": 13009,
+      "peak": 0.37998596,
+      "rms": 0.13206551,
+      "seam_step": 0.0,
+      "seconds": 0.294989,
+      "sha256": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6"
+    },
+    "sounds/reward.wav": {
+      "bytes": 59138,
+      "channels": 1,
+      "description": "Three lightly struck upper notes: a small material reward.",
+      "frames": 29547,
+      "peak": 0.49000519,
+      "rms": 0.11362185,
+      "seam_step": 0.0,
+      "seconds": 0.67,
+      "sha256": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700"
+    },
+    "sounds/victory.wav": {
+      "bytes": 191438,
+      "channels": 1,
+      "description": "The E\u2013F#\u2013B\u2013G shard motif settles into an open minor-add-nine chord.",
+      "frames": 95697,
+      "peak": 0.5999939,
+      "rms": 0.09268421,
+      "seam_step": 0.0,
+      "seconds": 2.17,
+      "sha256": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274"
+    }
+  },
+  "generator_version": "1",
+  "license": "Repository MIT license; see LICENSE.",
+  "product": "Shardbound",
+  "provenance": "Generated solely from project source. No recordings, sampled instruments, Eador assets, or externally sourced melodies were used.",
+  "review_status": "Technical verification only; listening and artistic approval remain required.",
+  "runtime": {
+    "numpy": "2.4.2",
+    "python": "3.13.2"
+  },
+  "sample_rate": 44100,
+  "sampler": {
+    "bytes": 1224612,
+    "channels": 1,
+    "frames": 612284,
+    "order": {
+      "attack_hit": 2.18,
+      "bolt": 3.603991,
+      "confirm": 0.25,
+      "defeat": 10.613991,
+      "end_turn": 12.683991,
+      "guard": 2.78,
+      "heal": 4.363991,
+      "level_up": 6.533991,
+      "move": 1.51,
+      "refuse": 0.865011,
+      "reward": 5.513991,
+      "victory": 8.093991
+    },
+    "peak": 0.62001404,
+    "rms": 0.09217166,
+    "seam_step": 0.0,
+    "seconds": 13.883991,
+    "sha256": "42cf1cdd75d08327d8cfea845f17a4d6731fa117619cf64898488f61aca92d69"
+  },
+  "source_sha256": {
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "tools/build_eador_audio.py": "452ba80db8687fe243482093c19a1acbeaa83f38b29f0fc84e2276ee8a5720e7"
+  }
+}
