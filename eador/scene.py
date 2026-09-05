@@ -12,7 +12,7 @@ from collections import Counter
 from saga2d import Anchor, Button, HexGrid, InputEvent, SaveError, Scene
 
 from eador import art
-from eador.content import RELICS, SKILLS
+from eador.content import RELICS, SITES, SKILLS
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, State
 from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
@@ -261,7 +261,13 @@ class ShardScene(Screen):
         self.act(lambda: self.state.travel(self.selected))
 
     def explore(self):
-        self.act(self.state.explore)
+        province = self.state.provinces[self.state.hero.pos]
+        if (province.site_kind and SITES[province.site_kind].encounter and not province.explored
+                and province.owner == "player"):
+            from eador.encounter_scene import EncounterScene
+            self.game.push(EncounterScene(self))
+        else:
+            self.act(self.state.explore)
 
     def end_turn(self):
         before = {troop.id: troop.kind for troop in self.state.hero.army}
@@ -513,8 +519,9 @@ class BattleScene(Screen):
         centers = [geometry.center(p) for p in b.terrain]
         left, right = min(p[0] for p in centers) - .866, max(p[0] for p in centers) + .866
         top, bottom = min(p[1] for p in centers) - 1, max(p[1] for p in centers) + 1
-        size = min((self.edge - 100) / (right - left), (h - 288) / (bottom - top))
-        origin = (self.edge / 2 - (left + right) / 2 * size, (h - 50) / 2 - (top + bottom) / 2 * size)
+        objective_space = 52 if b.objective.kind == "hold" else 0
+        size = min((self.edge - 100) / (right - left), (h - 288 - objective_space) / (bottom - top))
+        origin = (self.edge / 2 - (left + right) / 2 * size, (h - 50 + objective_space) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
         alive = [u for u in b.units if u.team == "player" and u.hp > 0]
         if self.selected is None or not any(u.id == self.selected for u in alive):
@@ -534,6 +541,11 @@ class BattleScene(Screen):
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
         self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
+        if b.objective.kind == "hold":
+            self.button("Locate seal", self.edge - 188, 109, 162, self.locate_objective, shortcut="O")
+
+    def locate_objective(self):
+        self.cursor = self.hover = self.battle.objective.target
 
     def act(self, callback, *, checkpoint=False):
         before = {u.id: u.hp for u in self.battle.units}
@@ -668,6 +680,12 @@ class BattleScene(Screen):
                   size=25, serif=True, center=True)
         self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", self.edge / 2, 63, size=10, color=GOLD, center=True)
         self.rule(26, 90, self.edge - 52)
+        if b.objective.kind == "hold":
+            objective = b.objective
+            self.box(26, 100, self.edge - 52, 60)
+            self.text(f"HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}",
+                      38, 108, size=12, color=GOLD)
+            self.text("End enemy turns on the seal with no adjacent enemy; rout also wins.", 38, 137, size=10, color=MUTED)
         self.text("TACTICAL COMMAND", x, 30, size=10, color=GOLD)
         self.text("Your army", x, 57, size=30, serif=True)
         allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
@@ -720,6 +738,8 @@ class BattleScene(Screen):
                 self.draw_circle(cx, cy, 2, (168, 223, 211, 255))
             if b.terrain[pos] in ("forest", "hills", "marsh"):
                 art.terrain_detail(self, b.terrain[pos], cx, cy + 12, pos[0] * 23 + pos[1], .35)
+            if pos == b.objective.target:
+                art.seal(self, self.grid, pos, label=not any(unit.alive and unit.pos == pos for unit in b.units))
             if pos == self.hover:
                 art.outline(self, points, GOLD, 2)
         for u in sorted((u for u in b.units if u.hp > 0), key=lambda u: self.grid.center(u.pos)[1]):
@@ -1008,11 +1028,14 @@ class ResultScene(Screen):
         self.box(x, y, 540, 270)
         if self.is_battle:
             b = s.battle
-            title = "Victory" if b.outcome == "player" else "The army is broken"
+            title = ("The seal is secured" if b.outcome_reason == "hold" else "Time has run out" if b.outcome_reason == "deadline"
+                     else "Victory" if b.outcome == "player" else "The army is broken")
             standing = sum(u.hp > 0 for u in b.units if u.team == "player")
             lost = sum(u.hp == 0 for u in b.units if u.team == "player" and u.id != 0)
             detail = f"{standing} standing  ·  {lost} troops lost  ·  {b.round} battle rounds"
-            subtitle = "Survivors carry their wounds and experience home."
+            subtitle = ("Surviving defenders withdraw. Claim the site's reward." if b.outcome_reason == "hold" else
+                        "The seal was not secured. Withdraw without a site reward." if b.outcome_reason == "deadline" else
+                        "Survivors carry their wounds and experience home.")
         else:
             title = "The shard is yours" if s.status == "victory" else "Westwatch has fallen"
             detail = f"Turn {s.turn}  ·  Hero level {s.hero.level}"
