@@ -41,7 +41,7 @@ def test_keyboard_browses_categories_and_pages_then_returns_without_changing_sta
         press(game, "right")
         assert UNITS["goblin"].name in rendered_text(game)
         press(game, "end")
-        assert UNITS["guard"].name in rendered_text(game)
+        assert list(UNITS.values())[-1].name in rendered_text(game)
         press(game, "tab")
         assert "Arcane Bolt" in rendered_text(game)
         press(game, "tab", shift=True)

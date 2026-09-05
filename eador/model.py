@@ -42,6 +42,7 @@ class UnitSpec:
     building: str | None
     color: tuple[int, int, int]
     abilities: tuple[str, ...] = ()
+    skirmisher: bool = False
 
 
 UNITS = {
@@ -53,9 +54,11 @@ UNITS = {
     'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
     'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
     'guard': UnitSpec('Dread Guard', 42, 12, 4, 3, 1, 0, 0, None, (173, 130, 196)),
+    'warden': UnitSpec('Warden', 38, 8, 4, 2, 1, 55, 2, 'barracks', (140, 164, 203), ('swap',)),
+    'ranger': UnitSpec('Ranger', 22, 7, 1, 3, 3, 50, 2, 'archery', (118, 185, 157), skirmisher=True),
     'pikeman': UnitSpec('Pikeman', 28, 9, 3, 2, 1, 40, 2, 'barracks', (173, 188, 149)),
 }
-RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman')
+RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman', 'ranger', 'warden')
 
 
 @dataclass(frozen=True)
@@ -67,8 +70,8 @@ class BuildingSpec:
 
 
 BUILDINGS = {
-    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen and defensive pikemen.'),
-    'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit ranged archers.'),
+    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen, defensive pikemen and extracting wardens.'),
+    'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit pinning archers and mobile rangers.'),
     'temple': BuildingSpec('Temple', 65, 0, 'Recruit acolytes; learn Heal; faster recovery.'),
     'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana.'),
     'market': BuildingSpec('Marketplace', 60, 0, '+8 gold income each turn.'),
@@ -1005,7 +1008,8 @@ def _validate_save(data: dict, version: int) -> None:
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
         if version >= 7:
-            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal') if version >= 9 else ('pin', 'brace'), unique=True)
+            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
+            require('swap' not in unit['abilities'] or unit['kind'] == 'warden', 'Only Wardens can swap allies.')
             require('heal' not in unit['abilities'] or unit['kind'] == 'healer', 'Only Acolytes gain troop Heal.')
             require('pin' not in unit['abilities'] or unit['kind'] == 'archer'
                     or unit['kind'] == 'hero' and hero['relic'] == 'storm_quiver', 'This unit cannot learn Pin.')

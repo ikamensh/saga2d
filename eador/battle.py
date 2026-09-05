@@ -57,6 +57,10 @@ class BattleUnit:
         return 'pin' in self.abilities
 
     @property
+    def can_swap(self) -> bool:
+        return 'swap' in self.abilities
+
+    @property
     def can_heal(self) -> bool:
         return 'heal' in self.abilities
 
@@ -123,7 +127,7 @@ class Battle:
             units.append(BattleUnit(troop.id, 'player', troop.kind, pos, troop.hp,
                                     troop.max_hp, spec.attack + troop.level - 1 + (hero.hero_class == 'Commander'),
                                     spec.defense + (troop.level - 1) // 2,
-                                    spec.move_range, spec.attack_range, level=troop.level, abilities=spec.abilities))
+                                    spec.move_range, spec.attack_range, level=troop.level, abilities=spec.abilities, skirmisher=spec.skirmisher))
         health = enemy_hp if enemy_hp is not None else [UNITS[kind].hp for kind in enemies]
         if len(health) != len(enemies):
             raise ValueError('Enemy health must match the enemy army.')
@@ -162,7 +166,7 @@ class Battle:
             if not 0 < hp <= spec.hp:
                 raise ValueError('A combatant must have positive health within its maximum.')
             units.append(BattleUnit(i, team, kind, pos, hp, spec.hp, spec.attack,
-                                    spec.defense, spec.move_range, spec.attack_range, abilities=spec.abilities))
+                                    spec.defense, spec.move_range, spec.attack_range, abilities=spec.abilities, skirmisher=spec.skirmisher))
         return units
 
     @classmethod
@@ -250,6 +254,25 @@ class Battle:
         unit.stance = 'brace' if unit.can_brace else 'guard'
         unit.moved = unit.acted = True
         self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
+
+    def swap_targets(self, unit_id: int) -> list[BattleUnit]:
+        """Adjacent living allies a ready Warden may replace, including spent allies."""
+        unit = self.unit(unit_id)
+        if not unit.alive or not unit.can_swap or unit.acted or self.outcome:
+            return []
+        return [other for other in self.units if other.alive and other.team == unit.team
+                and self.grid.distance(unit.pos, other.pos) == 1]
+
+    def swap(self, unit_id: int, target_id: int) -> None:
+        """Exchange places, spending the Warden's order and the ally's remaining move."""
+        self._swap(self._actor(unit_id), self.unit(target_id))
+
+    def _swap(self, unit: BattleUnit, target: BattleUnit) -> None:
+        if target not in self.swap_targets(unit.id):
+            raise RuleError('A ready Warden can swap with an adjacent living ally.')
+        unit.pos, target.pos = target.pos, unit.pos
+        unit.acted = unit.moved = target.moved = True
+        self.log.append(f'{unit.name} swaps places with {target.name}.')
 
     def _damage(self, attacker: BattleUnit, target: BattleUnit, *, pin: bool = False) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
@@ -391,6 +414,22 @@ class Battle:
         if destination != unit.pos:
             self._move(unit, destination)
 
+    def _withdraw(self, unit: BattleUnit) -> None:
+        """Mobile ranged troops spend their unused move to reduce immediate exposure."""
+        if self.objective.kind == 'hold' and (unit.team == 'enemy' or unit.pos == self.objective.target):
+            return
+        reachable = self.reachable(unit.id)
+        enemies = [other for other in self.units if other.alive and other.team != unit.team]
+        if not reachable or not enemies:
+            return
+        def exposure(pos):
+            distances = [(other, self.grid.distance(pos, other.pos)) for other in enemies]
+            return (sum(distance <= other.attack_range + other.effective_move_range for other, distance in distances),
+                    -min(distance for _, distance in distances), self.terrain[pos] not in ('forest', 'hills'), pos)
+        destination = min(reachable | {unit.pos}, key=exposure)
+        if destination != unit.pos:
+            self._move(unit, destination)
+
     def _play_team(self, team: str) -> None:
         for unit in self.units:
             if self.outcome:
@@ -406,6 +445,16 @@ class Battle:
                 enemies = [u for u in self.units if u.alive and u.team != team and HexGrid.distance(unit.pos, u.pos) <= 4]
                 if 'bolt' in self.spells and self.mana >= self.spell_cost('bolt') and enemies:
                     self.cast('bolt', min(enemies, key=lambda u: u.hp).id)
+                    continue
+            if unit.can_swap:
+                enemies = [other for other in self.units if other.alive and other.team != team]
+                endangered = [ally for ally in self.swap_targets(unit.id)
+                              if ally.hp * 2 <= ally.max_hp and ally.hp < unit.hp
+                              and any(self.grid.distance(ally.pos, enemy.pos) < self.grid.distance(unit.pos, enemy.pos)
+                                      and self.grid.distance(ally.pos, enemy.pos) <= enemy.attack_range + enemy.effective_move_range
+                                      for enemy in enemies)]
+                if endangered:
+                    self._swap(unit, min(endangered, key=lambda ally: (ally.hp / ally.max_hp, ally.id)))
                     continue
             if unit.can_heal:
                 injured = [target for target in self.spell_targets('heal', caster_id=unit.id)
@@ -449,7 +498,7 @@ class Battle:
                                if ally.alive and ally.team == team)
                 slow_stops_approach = (target.attack_range + max(1, target.move_range - 2) < distance
                                        <= target.attack_range + target.move_range)
-                use_pin = (target in self.pin_targets(unit.id) and slow_stops_approach
+                use_pin = (target in self.pin_targets(unit.id) and (slow_stops_approach or target.kind == 'ranger' and distance > 1)
                            and self.preview(unit.id, target.id)[0] < target.hp
                            and not (defending_seal and target.pos == self.objective.target))
                 if use_pin:
@@ -461,6 +510,8 @@ class Battle:
                     self.attack(unit.id, target.id)
                 else:
                     self._attack(unit, target)
+                if unit.kind == 'ranger':
+                    self._withdraw(unit)
             elif unit.kind == 'pikeman':
                 self._guard(unit)
 
