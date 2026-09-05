@@ -218,13 +218,25 @@ class State:
             return 'Control both foundries before assaulting Duskspire.'
         return None
 
-    @property
-    def battle_encounter(self) -> str | None:
-        if self.battle_kind == 'site':
-            return SITES[self.provinces[self.battle_province].site_kind].encounter
-        if self.campaign and self.campaign.contract == 'gate' and self.battle_kind == 'conquest' and self.battle_province == (2, 0):
+    def encounter_at(self, destination: Pos, *, kind: str = 'conquest') -> str | None:
+        if kind not in ('conquest', 'site'):
+            raise RuleError('Inspect a conquest or site encounter.')
+        if not isinstance(destination, tuple) or len(destination) != 2 or not all(type(n) is int for n in destination) or destination not in self.provinces:
+            raise RuleError('Inspect a province on this shard.')
+        if kind == 'site':
+            site = self.provinces[destination].site_kind
+            return SITES[site].encounter if site else None
+        if self.rival.army and self.rival.pos == destination:
+            return None
+        if self.campaign and self.campaign.contract == 'gate' and destination == (2, 0):
             return 'last_gate'
         return None
+
+    @property
+    def battle_encounter(self) -> str | None:
+        if self.battle_kind not in ('conquest', 'site'):
+            return None
+        return self.encounter_at(self.battle_province, kind=self.battle_kind)
 
     @property
     def hero_level_cap(self) -> int | None:

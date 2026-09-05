@@ -173,6 +173,10 @@ def validate_campaign(data: dict) -> None:
         latest = campaign['completed'][-1]
         require((latest['theme'], latest['contract'], latest['turns']) == (data['theme'], contract, data['turn'] + campaign['prior_attempt_turns']),
                 'The completed shard record differs from its result.')
+    if contract == 'gate' and data['battle_kind'] == 'conquest' and data['battle_province'] == [2, 0]:
+        objective = data['battle']['objective']
+        require((objective['kind'], objective['target'], objective['required'], objective['deadline'])
+                == ('hold', [-1, 0], 2, 8), 'The final ritual differs from its offered contract.')
     entry = campaign['entry']
     require(isinstance(entry, dict) and entry.keys() == {'provinces', 'rival'}, 'Invalid entry-world checkpoint.')
     checkpoint = deepcopy(data)
@@ -180,6 +184,10 @@ def validate_campaign(data: dict) -> None:
                       choices=[], status='playing', turn=1, provinces=entry['provinces'], rival=entry['rival'])
     checkpoint['hero']['pos'] = [-2, 0]
     _validate_save(checkpoint, 8)
+    if contract == 'rootward':
+        for provinces in (data['provinces'], entry['provinces']):
+            require(sum(p['site_kind'] == 'border_watch' for p in provinces) == 1,
+                    'Rootward requires its Border Watch in both the active and recovery worlds.')
     require(all(not p['explored'] and p['owner'] == ('player' if p['pos'] == [-2, 0] else 'rival' if p['pos'][0] == 2 else 'neutral')
                 for p in entry['provinces']), 'Entry checkpoint is not an initial world.')
 
