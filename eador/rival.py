@@ -102,15 +102,17 @@ class RivalState:
         if not self.army:
             self.intent, self.target, self.turns_until_action = 'watch', STRONGHOLD, 1
             return
-        goals = [pos for pos, province in state.provinces.items() if province.owner != 'rival']
+        avoid_hero = bool(self.defeats) and not self._can_defeat_hero(state, state.hero.pos)
+        blocked = (state.hero.pos,) if avoid_hero else ()
+        goals = [pos for pos, province in state.provinces.items()
+                 if province.owner != 'rival' and pos not in blocked]
         goals.sort(key=lambda pos: (HexGrid.distance(pos, (-2, 0)), HexGrid.distance(self.pos, pos), pos))
         for goal in goals:
-            path = state.grid.path(self.pos, goal, cost=lambda pos: 1 if state.provinces[pos].owner == 'rival' else 1 + len(state.provinces[pos].guards) / 2)
+            path = state.grid.path(self.pos, goal, blocked=blocked,
+                                   cost=lambda pos: 1 if state.provinces[pos].owner == 'rival' else 1 + len(state.provinces[pos].guards) / 2)
             if len(path) < 2:
                 continue
             step = path[1]
-            if step == state.hero.pos and self.defeats and not self._can_defeat_hero(state, step):
-                continue
             self.target = step
             self.intent = 'attack' if state.provinces[step].owner != 'rival' else 'march'
             self.turns_until_action = (1 if self.intent == 'march' else 2) if delay is None else delay

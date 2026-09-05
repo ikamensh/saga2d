@@ -62,3 +62,134 @@ def test_previous_saves_keep_pending_choices_and_exact_defense_continuations():
     assert [[u.id, u.hp, list(u.pos)] for u in defense.battle.units] == expected['units']
     defense.resolve_battle()
     assert State.from_json(defense.to_json()).to_json() == defense.to_json()
+
+
+def central_hero():
+    """A three-turn expedition meets the rival after its first neutral conquest."""
+    state = State.new(7)
+    state.build('barracks')
+    state.recruit('swordsman')
+    state.explore()
+    resolve(state)
+    state.equip('moonstone')
+    state.end_turn()
+    for destination in ((-1, 0), (0, 0)):
+        state.travel(destination)
+        if state.battle:
+            resolve(state)
+        state.end_turn()
+    return state
+
+
+def test_interception_and_retreat_preserve_rival_casualties_and_saved_reengagement():
+    """Retreat cannot restore dead or wounded enemies before a second engagement."""
+    state = central_hero()
+    target = state.rival.pos
+    before = {troop.id: troop.hp for troop in state.rival.army}
+    state.travel(target)
+    assert state.battle_kind == 'intercept'
+    for _ in range(2):
+        state.battle.auto_turn()
+    wounded = {unit.source_id: unit.hp for unit in state.battle.units if unit.team == 'enemy' and unit.alive}
+    assert wounded.keys() < before.keys()
+    assert any(hp < before[ident] for ident, hp in wounded.items())
+    state.retreat()
+    assert {troop.id: troop.hp for troop in state.rival.army} == wounded
+    assert state.rival.pos == target
+    assert state.rival.intent == 'return'
+    restored = State.from_json(state.to_json())
+    for campaign in (state, restored):
+        campaign.travel(target)
+        assert {unit.source_id: unit.hp for unit in campaign.battle.units if unit.team == 'enemy'} == wounded
+    assert resolve(state) == resolve(restored)
+    assert state.to_json() == restored.to_json()
+
+
+def test_refitting_requires_a_return_to_stronghold_and_pays_for_actual_health_and_recruits():
+    """Survivors march home wounded, then spend treasury gold on healing and fresh IDs."""
+    from eador.rival import RECRUIT_COSTS, STRONGHOLD
+
+    state = central_hero()
+    original_ids = {troop.id for troop in state.rival.army}
+    state.travel(state.rival.pos)
+    for _ in range(2):
+        state.battle.auto_turn()
+    state.retreat()
+    health = {troop.id: troop.hp for troop in state.rival.army}
+    for _ in range(6):
+        if state.rival.pos == STRONGHOLD:
+            break
+        gold = state.rival.gold + state.rival.income(state) - state.rival.upkeep
+        state.end_turn()
+        assert state.rival.gold == gold
+        assert {troop.id: troop.hp for troop in state.rival.army} == health
+    assert state.rival.pos == STRONGHOLD
+    assert state.rival.intent == 'recover'
+    gold = state.rival.gold + state.rival.income(state) - state.rival.upkeep
+    missing = sum(troop.max_hp - troop.hp for troop in state.rival.army)
+    state.end_turn()
+    assert all(troop.hp == troop.max_hp for troop in state.rival.army)
+    assert state.rival.gold == gold - missing
+    assert state.rival.intent == 'recruit'
+    gold = state.rival.gold + state.rival.income(state) - state.rival.upkeep
+    previous_ids = {troop.id for troop in state.rival.army}
+    state.end_turn()
+    recruits = [troop for troop in state.rival.army if troop.id not in previous_ids]
+    assert len(recruits) == 1
+    assert recruits[0].id not in original_ids
+    assert state.rival.gold == gold - RECRUIT_COSTS[recruits[0].kind]
+
+
+def test_winning_an_announced_defense_opens_a_persistent_counterattack_window():
+    """The defeated army stays gone until a delayed, paid stronghold recruitment."""
+    from eador.rival import RECRUIT_COSTS, STRONGHOLD
+
+    state = central_hero()
+    assert state.rival.intent == 'attack'
+    assert state.rival.target == state.hero.pos
+    starting_ids = {troop.id for troop in state.rival.army}
+    for _ in range(state.rival.turns_until_action):
+        state.end_turn()
+    assert state.battle_kind == 'defense'
+    assert resolve(state).startswith('Defended')
+    assert state.provinces[state.hero.pos].owner == 'player'
+    assert not state.rival.army
+    assert state.rival.defeats == 1
+    window = state.rival.turns_until_action
+    assert window >= 3
+    for remaining in range(window - 1, 0, -1):
+        state = State.from_json(state.to_json())
+        state.end_turn()
+        assert not state.rival.army
+        assert state.rival.turns_until_action == remaining
+    gold = state.rival.gold + state.rival.income(state)
+    state.end_turn()
+    assert state.rival.pos == STRONGHOLD
+    assert len(state.rival.army) == 1
+    recruit = state.rival.army[0]
+    assert recruit.id not in starting_ids
+    assert state.rival.gold == gold - RECRUIT_COSTS[recruit.kind]
+
+
+def test_camping_does_not_farm_repeat_victories_or_make_the_rival_oscillate():
+    """After losing to a fortified hero, the rival takes other land instead of retrying or pacing."""
+    from eador.model import BUILDINGS
+
+    state = State.new(7)
+    state.build('barracks')
+    state.recruit('swordsman')
+    victories = 0
+    for _ in range(120):
+        if 'temple' not in state.buildings and state.gold >= BUILDINGS['temple'].cost:
+            state.build('temple')
+        while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
+            state.recruit('swordsman')
+        state.end_turn()
+        if state.battle:
+            assert resolve(state).startswith('Defended')
+            victories += 1
+    assert state.status == 'playing'
+    assert victories == 1
+    assert state.hero.level == 1 and state.hero.xp == 8
+    assert all(province.owner == 'rival' for pos, province in state.provinces.items() if pos != state.hero.pos)
+    assert state.rival.intent == 'watch'
