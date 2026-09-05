@@ -153,6 +153,17 @@ def test_capitals_fly_a_tinted_flag_and_walled_cities_show_walls(revealed) -> No
     assert len([s for s in game.backend.sprites.values() if s["image"] == game.assets.image("flag")]) == len(flags) - 1
 
 
+def test_a_workshop_reward_puts_a_smithy_on_the_city_tile(revealed) -> None:
+    game, scene = revealed
+    capital = scene.world.capital_of(scene.human)
+    smithies = lambda: [s for s in game.backend.sprites.values() if s["image"] == game.assets.image("workshop")]  # noqa: E731
+    assert not smithies()
+    capital.workshop = True
+    scene.view.sync()
+    game.tick(1 / 60)
+    assert len(smithies()) == 1
+
+
 # -- Textures -----------------------------------------------------------------------
 
 

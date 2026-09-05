@@ -134,6 +134,7 @@ class MapScene(Scene):
                 Label(lambda: f"+{world.income(self.human)}/turn", text_style="sub"), spacing=6),
             Label(lambda: f"Round {world.round}/{MAX_ROUNDS}", text_style="hud"),
             Label(lambda: f"Units {len(world.tribe_units(self.human))}/{world.unit_cap(self.human)}", text_style="sub"),
+            Label(self._score_text, text_style="sub"),
             Button("Tech", hotkey="T", on_click=self.open_tech, style=GHOST_BUTTON),
             self.btn_end_turn,
         ]))
@@ -176,6 +177,15 @@ class MapScene(Scene):
         self.ui.add(self.train_panel)
         self.ui.add(KeyHints(self._hint, anchor=Anchor.BOTTOM_CENTER, margin=6))
         self.ui.add(Label(lambda: "   ·   ".join(self.visible_log()[-2:]), text_style="sub", anchor=Anchor.TOP_RIGHT, margin=14))
+
+    def _score_text(self) -> str:
+        """Score and standing: the round limit decides most games, so it stays in view."""
+        world = self.world
+        scores = sorted((world.score(t.id) for t in world.tribes if t.alive), reverse=True)
+        mine = world.score(self.human)
+        rank = scores.index(mine) + 1
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(rank, "th")
+        return f"Score {mine} · {rank}{suffix} of {len(scores)}"
 
     def _hint(self) -> list[tuple[str, str]]:
         """Keycap hints for the current state; every action stays reachable from the keyboard."""

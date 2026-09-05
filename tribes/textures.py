@@ -192,6 +192,16 @@ def _village() -> Mesh:
     return _walls(0, 0, 0.34, 0.3, 0.22, PLASTER) + _roof(0, 0, 0.34, 0.3, 0.22, (192, 114, 82))
 
 
+def _workshop() -> Mesh:
+    """A dark smithy with a chimney at the front corner of a city tile."""
+    x, y = 0.3, 0.3
+    body = r3.box((x, y, 0.07), (0.17, 0.15, 0.14), (98, 88, 82))
+    roof = r3.gable_roof((x, y, 0.14), (0.2, 0.18), 0.07, (70, 62, 60))
+    chimney = r3.box((x - 0.05, y + 0.04, 0.2), (0.04, 0.04, 0.12), (60, 56, 56))
+    ember = r3.facing(_facing_quad((x + 0.09, y + 0.09, 0.06), 0.03), (255, 150, 60))
+    return body + roof + chimney + ember
+
+
 def _ruin() -> Mesh:
     """Three broken columns of different heights and a toppled block."""
     stone, dark = (176, 172, 168), (150, 146, 144)
@@ -387,6 +397,7 @@ def register_all(game: Game) -> None:
         assets.image_from_pil(key, _prop(key, _resource(resource), DROP_RESOURCE, scale))
     assets.image_from_pil("village", _prop("village", _village(), DROP_SITE, scale))
     assets.image_from_pil("ruin", _prop("ruin", _ruin(), DROP_SITE, scale))
+    assets.image_from_pil("workshop", _prop("workshop", _workshop(), DROP_SITE + 1, scale))
     assets.image_from_pil("flag", _prop("flag", _flag(), DROP_SITE + 2, scale))
     assets.image_from_pil("walls", _prop("walls", _city_walls(), DROP_WALL, scale))
     for size in range(1, CITY_SIZES + 1):

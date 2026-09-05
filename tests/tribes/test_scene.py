@@ -539,3 +539,15 @@ def test_new_game_screen_cycles_the_tribe_to_play(game) -> None:
     game.tick(1 / 60)
     scene = game.scene
     assert isinstance(scene, MapScene) and scene.tribe.name == "Ember" and scene.tribe.techs == {Tech.HUNTING}
+
+
+def test_hud_shows_the_score_and_standing(play) -> None:
+    game, scene = play
+    world = scene.world
+    mine = world.score(scene.human)
+    assert any(t.startswith(f"Score {mine} · ") and t.endswith(f"of {len(world.tribes)}") for t in texts(game))
+    for tribe in world.tribes:
+        if tribe.id != scene.human:
+            tribe.techs.update(Tech)  # everyone else races ahead
+    game.tick(1 / 60)
+    assert any(f"Score {mine} · {len(world.tribes)}" in t for t in texts(game))

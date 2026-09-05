@@ -97,6 +97,7 @@ class MapView:
         self._roof_sprites: dict[Pos, Sprite] = {}  # city roofs, tinted with the tribe colour
         self._wall_sprites: dict[Pos, Sprite] = {}  # ring of walls around a fortified city
         self._flag_sprites: dict[Pos, Sprite] = {}  # capital pennant, tinted with the tribe colour
+        self._workshop_sprites: dict[Pos, Sprite] = {}
         self._unit_sprites: dict[int, Sprite] = {}
         self._unit_targets: dict[int, Pos] = {}
         textures.register_all(scene.game)
@@ -159,7 +160,7 @@ class MapView:
     def reset(self, world: World) -> None:
         """Point the view at a different world (after loading a save)."""
         for group in (self._terrain_sprites, self._resource_sprites, self._site_sprites, self._roof_sprites, self._wall_sprites,
-                      self._flag_sprites, self._unit_sprites):
+                      self._flag_sprites, self._workshop_sprites, self._unit_sprites):
             for sprite in group.values():
                 sprite.remove()
             group.clear()
@@ -206,11 +207,12 @@ class MapView:
                 self._reconcile(self._site_sprites, pos, f"city.{size}.base")
                 self._reconcile(self._roof_sprites, pos, f"city.{size}").tint = color
                 self._reconcile(self._wall_sprites, pos, "walls" if city.has_wall else None)
+                self._reconcile(self._workshop_sprites, pos, "workshop" if city.workshop else None)
                 flag = self._reconcile(self._flag_sprites, pos, "flag" if city.capital else None)
                 if flag is not None:
                     flag.tint = color
             else:
-                for group in (self._site_sprites, self._roof_sprites, self._wall_sprites, self._flag_sprites):
+                for group in (self._site_sprites, self._roof_sprites, self._wall_sprites, self._flag_sprites, self._workshop_sprites):
                     self._reconcile(group, pos, None)
                 self._reconcile(self._site_sprites, pos, "village" if tile.village else "ruin" if tile.ruin else None)
         for unit_id, sprite in list(self._unit_sprites.items()):
