@@ -106,7 +106,9 @@ class RivalState:
         blocked = (state.hero.pos,) if avoid_hero else ()
         goals = [pos for pos, province in state.provinces.items()
                  if province.owner != 'rival' and pos not in blocked]
-        goals.sort(key=lambda pos: (HexGrid.distance(pos, (-2, 0)), HexGrid.distance(self.pos, pos), pos))
+        foundries = ((0, -1), (0, 1)) if state.campaign and state.campaign.contract == 'foundries' else ()
+        goals.sort(key=lambda pos: (not (pos in foundries and state.provinces[pos].owner == 'player'),
+                                   HexGrid.distance(pos, (-2, 0)), HexGrid.distance(self.pos, pos), pos))
         for goal in goals:
             path = state.grid.path(self.pos, goal, blocked=blocked,
                                    cost=lambda pos: 1 if state.provinces[pos].owner == 'rival' else 1 + len(state.provinces[pos].guards) / 2)

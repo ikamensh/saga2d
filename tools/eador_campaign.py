@@ -105,11 +105,13 @@ def rest(state, defend=True, metrics=None):
 def play_campaign(state, route=None, metrics=None):
     """Explore and invest along a route that includes both capitals, then try to win."""
     metrics = metrics or CampaignMetrics()
-    state.build('barracks')
-    metrics.building_gold += BUILDINGS['barracks'].cost
-    before = state.gold
-    state.recruit('swordsman')
-    metrics.recruitment_gold += before - state.gold
+    if 'barracks' not in state.buildings:
+        state.build('barracks')
+        metrics.building_gold += BUILDINGS['barracks'].cost
+    if state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
+        before = state.gold
+        state.recruit('swordsman')
+        metrics.recruitment_gold += before - state.gold
     for province in (route or state.grid.path(state.hero.pos, (2, 0)))[:-1]:
         if state.status != 'playing':
             return state

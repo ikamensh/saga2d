@@ -55,6 +55,7 @@ class Campaign:
     phase: str = 'playing'
     recovery_used: bool = False
     casualties: int = 0
+    prior_attempt_turns: int = 0
     completed: list[ShardRecord] = field(default_factory=list)
     offers: tuple[Offer, ...] = ()
     entry: dict = field(default_factory=dict, repr=False)
@@ -78,7 +79,7 @@ class Campaign:
             self.phase = 'lost' if self.recovery_used else 'recovery'
         elif state.status == 'victory' and self.phase == 'playing':
             self.completed.append(ShardRecord(self.stage, state.theme, self.contract,
-                                  state.turn, state.hero.level, self.casualties))
+                                  state.turn + self.prior_attempt_turns, state.hero.level, self.casualties))
             self.phase = 'completed' if self.stage == 3 else 'departure'
             if self.stage == 1:
                 destinations = (('rootward', 'elderwild'), ('foundries', 'ruins'))
@@ -117,6 +118,8 @@ def validate_campaign(data: dict) -> None:
     require(campaign['phase'] in ('playing', 'departure', 'recovery', 'completed', 'lost'), 'Unknown linked campaign phase.')
     require(type(campaign['recovery_used']) is bool, 'Invalid campaign recovery flag.')
     require(type(campaign['casualties']) is int and campaign['casualties'] >= 0, 'Invalid campaign casualty count.')
+    require(type(campaign['prior_attempt_turns']) is int and campaign['prior_attempt_turns'] >= 0
+            and (campaign['recovery_used'] or campaign['prior_attempt_turns'] == 0), 'Invalid recovery turn history.')
     require(isinstance(campaign['completed'], list) and len(campaign['completed']) <= 3, 'Invalid completed shard records.')
     require(isinstance(campaign['offers'], list) and len(campaign['offers']) <= 2, 'Invalid campaign offers.')
     stage, phase, contract = campaign['stage'], campaign['phase'], campaign['contract']
@@ -168,7 +171,7 @@ def validate_campaign(data: dict) -> None:
         require(data['theme'] != campaign['completed'][1]['theme'], 'The finale must visit the remaining theme.')
     if finished:
         latest = campaign['completed'][-1]
-        require((latest['theme'], latest['contract'], latest['turns']) == (data['theme'], contract, data['turn']),
+        require((latest['theme'], latest['contract'], latest['turns']) == (data['theme'], contract, data['turn'] + campaign['prior_attempt_turns']),
                 'The completed shard record differs from its result.')
     entry = campaign['entry']
     require(isinstance(entry, dict) and entry.keys() == {'provinces', 'rival'}, 'Invalid entry-world checkpoint.')
@@ -221,7 +224,8 @@ def _arrive(state: State, candidate: State, troops, relics) -> None:
 
 def advance(state: State, offer_id: str, troop_ids, relic_ids) -> None:
     from dataclasses import replace
-    from eador.model import RuleError, State
+    from eador.model import RuleError, State, UNITS
+    from eador.rival import RivalTroop
     if state.campaign is None or state.campaign.phase != 'departure' or state.battle or state.choice:
         raise RuleError('Finish this linked shard and its rewards before departing.')
     offer = next((offer for offer in state.campaign.offers if offer.id == offer_id), None)
@@ -235,9 +239,37 @@ def advance(state: State, offer_id: str, troop_ids, relic_ids) -> None:
         troop.kind for troop in state.hero.army if troop.id not in troop_ids))
     campaign.stage += 1
     campaign.contract, campaign.phase, campaign.offers = offer.contract, 'playing', ()
-    campaign.casualties = 0
+    campaign.casualties = campaign.prior_attempt_turns = 0
     candidate.gold, candidate.crystals = 100 + min(40, state.gold), 4 + min(2, state.crystals)
     candidate.rival.gold = 80 if campaign.stage == 2 else 90
+    if campaign.contract == 'foundries':
+        candidate.provinces[FOUNDRIES[0]].name = 'North Foundry'
+        candidate.provinces[FOUNDRIES[1]].name = 'South Foundry'
+    if campaign.stage == 3:
+        candidate.rival.army = [RivalTroop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
+                                for i, kind in enumerate(['guard'] * 4 + ['archer'] * 2, 1)]
+        candidate.rival.next_troop_id = 7
     _arrive(state, candidate, troops, relics)
     campaign.checkpoint(candidate)
+    state.__dict__.update(candidate.__dict__)
+
+
+def recover(state: State, troop_ids, relic_ids) -> None:
+    import json
+    from eador.model import RuleError, State
+    if state.campaign is None or state.campaign.phase != 'recovery' or state.battle or state.choice:
+        raise RuleError('A recovery expedition is available only after the first lost shard.')
+    troops, relics = _retinue(state, troop_ids, relic_ids)
+    data = json.loads(state.to_json())
+    data.update(deepcopy(state.campaign.entry))
+    data.update(campaign=None, battle=None, battle_kind=None, battle_province=None,
+                status='playing', choices=[], buildings=[], turn=1, gold=60, crystals=2)
+    data['hero']['pos'] = [-2, 0]
+    data['actions_left'] = 3 if state.hero.hero_class == 'Scout' else 2
+    candidate = State.from_json(json.dumps(data))
+    candidate.campaign = deepcopy(state.campaign)
+    candidate.campaign.phase, candidate.campaign.recovery_used = 'playing', True
+    candidate.campaign.prior_attempt_turns += state.turn
+    _arrive(state, candidate, troops, relics)
+    candidate.log.append('The recovery expedition is spent. Another lost capital ends this campaign.')
     state.__dict__.update(candidate.__dict__)

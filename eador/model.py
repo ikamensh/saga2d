@@ -197,6 +197,35 @@ class State:
         from eador.campaign import advance
         advance(self, offer_id, troop_ids, relic_ids)
 
+    def recover(self, *, troop_ids=(), relic_ids=()) -> None:
+        from eador.campaign import recover
+        recover(self, troop_ids, relic_ids)
+
+    def abandon_campaign(self) -> None:
+        if self.campaign is None or self.campaign.phase != 'recovery':
+            raise RuleError('Choose whether to recover after losing the first shard.')
+        self.campaign.phase = 'lost'
+
+    @property
+    def assault_blocked_reason(self) -> str | None:
+        if self.campaign is None:
+            return None
+        if self.campaign.contract == 'rootward' and not any(
+                p.explored and p.site_kind == 'border_watch' for p in self.provinces.values()):
+            return 'Clear the Border Watch before assaulting Duskspire.'
+        if self.campaign.contract == 'foundries' and not all(
+                self.provinces[pos].owner == 'player' for pos in ((0, -1), (0, 1))):
+            return 'Control both foundries before assaulting Duskspire.'
+        return None
+
+    @property
+    def battle_encounter(self) -> str | None:
+        if self.battle_kind == 'site':
+            return SITES[self.provinces[self.battle_province].site_kind].encounter
+        if self.campaign and self.campaign.contract == 'gate' and self.battle_kind == 'conquest' and self.battle_province == (2, 0):
+            return 'last_gate'
+        return None
+
     @property
     def hero_level_cap(self) -> int | None:
         return self.campaign.stage + 2 if self.campaign else None
@@ -357,6 +386,8 @@ class State:
         self._ready(action=True)
         if destination not in self.grid.neighbors(self.hero.pos):
             raise RuleError('Travel to an adjacent province.')
+        if destination == (2, 0) and self.assault_blocked_reason:
+            raise RuleError(self.assault_blocked_reason)
         province = self.provinces[destination]
         self.actions_left -= 1
         if self.rival.army and self.rival.pos == destination:
@@ -397,7 +428,7 @@ class State:
                   target.site_guard_hp if kind == 'site' else target.guard_hp)
         self.battle = Battle.create(self.hero, enemies, target.terrain, self.spells,
                                     seed=self.seed + self.turn * 37 + province[0] * 7 + province[1], enemy_hp=health,
-                                    encounter=SITES[target.site_kind].encounter if kind == 'site' else None)
+                                    encounter=self.battle_encounter)
         if expedition:
             for unit, troop in zip((u for u in self.battle.units if u.team == 'enemy'), self.rival.army):
                 unit.source_id = troop.id
@@ -935,8 +966,10 @@ def _validate_save(data: dict, version: int) -> None:
             integer(objective['deadline'], 'Objective deadline', minimum=objective['required'], maximum=80)
             require(battle['round'] <= objective['deadline'], 'The hold objective is past its deadline.')
             province = provinces[tuple(data['battle_province'])]
-            require(data['battle_kind'] == 'site' and province['site_kind'] is not None
-                    and SITES[province['site_kind']].encounter is not None, 'A hold objective requires an authored site.')
+            authored_site = data['battle_kind'] == 'site' and province['site_kind'] is not None and SITES[province['site_kind']].encounter is not None
+            final_gate = (version >= 8 and isinstance(data['campaign'], dict) and data['campaign'].get('contract') == 'gate'
+                          and data['battle_kind'] == 'conquest' and data['battle_province'] == [2, 0])
+            require(authored_site or final_gate, 'A hold objective requires an authored adventure.')
         reason = battle['outcome_reason']
         require(reason in (None, 'rout', 'hold', 'hero_death', 'deadline', 'exhaustion'), 'Unknown battle outcome reason.')
         require((battle['outcome'] is None) == (reason is None), 'Battle outcome reason is inconsistent.')
