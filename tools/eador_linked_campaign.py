@@ -30,3 +30,22 @@ def play_linked(seed=7, hero_class='Commander', middle='rootward', finale='thron
             state.advance(destination, **travel_selection(state))
             state = State.from_json(state.to_json())
     return state
+
+
+def lose_shard(state):
+    """Leaving the capital and declining tactical defenses permits the finite rival to win."""
+    from tools.eador_campaign import finish_battle
+    if state.hero.pos == (-2, 0):
+        if not state.actions_left:
+            state.end_turn()
+        state.travel((-2, 1))
+        if state.battle:
+            finish_battle(state)
+    for _ in range(120):
+        if state.status == 'defeat':
+            return state
+        state.end_turn()
+        if state.battle:
+            state.retreat()
+    raise AssertionError('Neglect never lost the capital.')
+
