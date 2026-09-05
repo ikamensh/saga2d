@@ -48,6 +48,8 @@ The display must be awake for pyglet to open windows; a
 - After changing rules, the AI or scene input, run `uv run python tools/fuzz.py`
   (Tribes) or `uv run python tools/fuzz_warband.py` (Warband): AI-vs-AI games
   with invariant checks plus random-input runs through the scene.
+- `uv run python tools/perf_warband.py` times a 150-unit battle on the real backend
+  (W10 wants p95 < 16 ms); never time frames under a profiler or tracemalloc.
 - `uv run python tools/verify_warband.py DIR` plays a match through real pyglet
   events and saves frames to look at.
 
