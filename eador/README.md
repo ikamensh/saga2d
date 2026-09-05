@@ -26,6 +26,12 @@ retains its previous version, opened explicitly with **Backup** or
 reported without replacing live play; recover a backup and save to another
 manual slot. **Save & title** asks for a slot and leaves only after writing it.
 
+**O** opens sound settings from the title or field guide. Arrow keys or the
+visible buttons adjust volume and mute; **Enter** applies, **Esc** cancels.
+Preferences live separately in `~/.shardbound/settings.json` and survive
+loading another campaign. Damaged settings are reported and kept until you
+explicitly choose retained recovery. Audio content is still in development.
+
 ## Your first turns
 
 1. Start with Commander. You have 100 gold, two militia, an archer and your
@@ -76,6 +82,9 @@ adds mana to support the two spells already learned.
 | Title | Tab / click class | Choose hero class |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
+| Title / guide | O | Open sound settings |
+| Settings | Up / Down, Left / Right | Select a row, adjust volume or mute |
+| Settings | Enter / Esc | Apply preferences / cancel live preview |
 | Shard | Click province | Select and inspect it |
 | Shard | Tab | Cycle provinces adjacent to the hero |
 | Shard | Home | Select the hero's current province |
