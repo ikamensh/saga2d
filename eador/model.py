@@ -164,13 +164,13 @@ class State:
     rival: RivalState = field(default_factory=RivalState)
 
     @classmethod
-    def new(cls, seed: int = 7, hero_class: str = 'Commander') -> State:
+    def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier') -> State:
         if type(seed) is not int:
             raise RuleError('The shard seed must be an integer.')
         if not isinstance(hero_class, str) or hero_class not in HERO_CLASSES:
             raise RuleError('Choose Commander, Warrior, Scout or Wizard.')
         from eador.worldgen import generate
-        provinces = generate(seed)
+        provinces = generate(seed, theme)
         home = provinces[(-2, 0)]
         max_hp = 48 if hero_class == 'Warrior' else 36
         mana = 16 if hero_class == 'Wizard' else 10

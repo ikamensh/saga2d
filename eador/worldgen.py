@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from eador.content import SITES
@@ -13,10 +14,27 @@ if TYPE_CHECKING:
 FRONTIER_SITES = ('shrine', 'tower', 'barrow', 'den', 'caravan', 'grove')
 
 
-def generate(seed: int) -> dict[Pos, Province]:
-    """Return a fresh shard whose full generated contents are stored in campaign saves."""
-    from eador.model import Province, UNITS
+@dataclass(frozen=True)
+class ThemeSpec:
+    name: str
+    description: str
 
+
+THEMES = {
+    'frontier': ThemeSpec('Frontier', 'Open borders, mixed guardians, and a familiar route to Duskspire.'),
+    'elderwild': ThemeSpec('Elderwild', 'Wolf packs stalk the wet interior. A longer dry road offers gold and merchant relics.'),
+}
+
+NORTH_ROAD = ((-2, 0), (-1, -1), (0, -1), (1, -1), (2, -1), (2, 0))
+SOUTH_ROAD = ((-2, 0), (-2, 1), (-1, 1), (0, 1), (1, 1), (2, 0))
+
+
+def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
+    """Return a fresh shard whose full generated contents are stored in campaign saves."""
+    from eador.model import Province, RuleError, UNITS
+
+    if not isinstance(theme, str) or theme not in THEMES:
+        raise RuleError('Choose Frontier or Elderwild.')
     rng = random.Random(seed)
     cells = [(q, r) for q in range(-2, 3) for r in range(-2, 3)
              if abs(q + r) <= 2]
@@ -56,7 +74,45 @@ def generate(seed: int) -> dict[Pos, Province]:
     rival.guards, rival.site = ['guard'] * 5 + ['archer'] * 2, None
     rival.site_kind, rival.site_guards, rival.site_relic = None, [], None
     rival.site_gold = rival.site_crystals = 0
+    if theme == 'elderwild':
+        _elderwild(provinces, seed)
     for province in provinces.values():
         province.guard_hp = [UNITS[kind].hp for kind in province.guards]
         province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
     return provinces
+
+
+def _site(province: Province, kind: str) -> None:
+    spec = SITES[kind]
+    province.site, province.site_kind = spec.name, kind
+    province.site_guards = list(spec.guards) + (['guard'] if province.pos[0] >= 1 else [])
+    province.site_relic = spec.relic
+    province.site_gold, province.site_crystals = spec.gold, spec.crystals
+
+
+def _elderwild(provinces: dict[Pos, Province], seed: int) -> None:
+    rng = random.Random(seed ^ 0xE1DE)
+    road = set(rng.choice((NORTH_ROAD, SOUTH_ROAD)))
+    for pos, province in provinces.items():
+        if pos == (-2, 0):
+            continue
+        on_road = pos in road
+        province.terrain = 'plains' if on_road else rng.choice(('forest', 'forest', 'forest', 'marsh'))
+        if province.capital:
+            province.terrain = 'forest'
+            province.guards = ['guard'] * 4 + ['wolf', 'wolf', 'archer']
+            continue
+        province.income = rng.randint(10, 12) if on_road else rng.randint(4, 6)
+        province.crystals = int(not on_road and province.terrain == 'forest')
+        q = pos[0]
+        if q < 0:
+            province.guards = ['brigand'] if on_road else [rng.choice(('wolf', 'goblin'))]
+        elif q == 0:
+            province.guards = ['brigand', 'archer'] if on_road else ['wolf', 'wolf', 'wolf', 'goblin']
+        else:
+            province.guards = ['guard', 'wolf', 'archer'] if on_road else ['guard', 'guard', 'wolf', 'goblin']
+        _site(province, 'caravan' if on_road else rng.choice(('grove', 'den', 'shrine', 'tower')))
+    provinces[(0, 0)].name = 'Mire Crossing'
+    for pos in road:
+        if pos[0] == 0:
+            provinces[pos].name = 'Old Causeway'
