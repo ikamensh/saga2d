@@ -28,7 +28,9 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from saga2d import Button, Game  # noqa: E402
+from eador.codex import CodexScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
+from eador.rival_scene import RivalScene  # noqa: E402
 from eador.scene import (BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene,
                          ResultScene, SaveScene, ShardScene, TitleScene)  # noqa: E402
 
@@ -305,7 +307,11 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 if isinstance(scene, TitleScene):
                     press(rng.choice(('tab', 'return', 'f9', 'f6')))
                 elif isinstance(scene, HelpScene):
-                    button('Save & title' if rng.random() < .2 else 'Return to game')
+                    button(rng.choice(('Save & title', 'Codex', 'Return to game', 'Return to game')))
+                elif isinstance(scene, CodexScene):
+                    press(rng.choice(('1', '2', '3', '4', '5', '6', 'tab', 'left', 'right', 'escape', 'escape')))
+                elif isinstance(scene, RivalScene):
+                    press(rng.choice(('l', 'escape', 'e')))
                 elif isinstance(scene, ResultScene):
                     if rng.random() < .25:
                         press('f5')
@@ -356,7 +362,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(x + width / 2, y + height / 2)
                         metrics['equip_inputs'] += 1
                     else:
-                        press(rng.choice(('left', 'right', 'u', 'escape', 'escape')))
+                        press(rng.choice(('left', 'right', 'u', 'c', 'escape', 'escape')))
                 elif isinstance(scene, CatalogScene):
                     press(rng.choice(('1', '2', '3', '4', '5', 'escape', 'escape')))
                 elif rng.random() < .15:
@@ -366,7 +372,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     elif roll < .6:
                         hover(rng.randrange(game.width), rng.randrange(game.height))
                     else:
-                        press(rng.choice(('f1', 'f5', 'f9', 'f6', 'tab', 'escape', 'home')))
+                        press(rng.choice(('f1', 'f5', 'f9', 'f6', 'tab', 'escape', 'home', 'c')))
                 elif isinstance(scene, BattleScene):
                     battle_input()
                 else:
@@ -376,7 +382,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(*scene.grid.center(destination))
                         press('return')
                     else:
-                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6')))
+                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6', 'c', 'v')))
 
             random_phase = False
             # Complete a real losing campaign, then use the replay control.
@@ -386,7 +392,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 scene = game.scene
                 if isinstance(scene, TitleScene):
                     press('return')
-                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene)):
+                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
                     press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))

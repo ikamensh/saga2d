@@ -173,24 +173,17 @@ def test_winning_an_announced_defense_opens_a_persistent_counterattack_window():
 
 
 def test_camping_does_not_farm_repeat_victories_or_make_the_rival_oscillate():
-    """After losing to a fortified hero, the rival takes other land instead of retrying or pacing."""
-    from eador.model import BUILDINGS
+    """A funded defender makes the rival pursue other land while the treasury lasts."""
+    from pathlib import Path
 
-    state = State.new(7)
-    state.build('barracks')
-    state.recruit('swordsman')
-    victories = 0
-    for _ in range(120):
-        if 'temple' not in state.buildings and state.gold >= BUILDINGS['temple'].cost:
-            state.build('temple')
-        while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
-            state.recruit('swordsman')
+    # Produced through public commands at 915dd40, before encirclement pressure.
+    # Keeping this earned treasury isolates routing from the starvation regression.
+    state = State.from_json((Path(__file__).parent / 'fixtures' / 'v3_fortified_capital.json').read_text())
+    assert state.hero.level == 1 and state.hero.xp == 8
+    for _ in range(state.gold // state.upkeep - 1):
         state.end_turn()
-        if state.battle:
-            assert resolve(state).startswith('Defended')
-            victories += 1
+        assert state.battle is None
     assert state.status == 'playing'
-    assert victories == 1
     assert state.hero.level == 1 and state.hero.xp == 8
     assert all(province.owner == 'rival' for pos, province in state.provinces.items() if pos != state.hero.pos)
     assert state.rival.intent == 'watch'

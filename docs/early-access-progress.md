@@ -113,3 +113,39 @@ not yet been merged or accepted. G01–G19 remain incomplete.
 
 This advances G09, G10 and G17. It does not establish the first-time human
 walkthroughs, complete display/settings matrix or release readiness.
+
+## Finite rival and visible counterplay — 2026-09-05
+
+- The finite rival is merged. It moves a persistent army, fights province
+  guards with ordinary tactical rules, retains casualties and wounds, and
+  spends its treasury to recover/recruit at Duskspire. Interception and
+  defense use that same expedition. A defeated expedition needs four turns
+  before its first paid replacement, creating a saved counterattack window.
+  See [rival-design.md](rival-design.md) for rules and measured model evidence.
+- The map marks the army with a numbered diamond. V opens its current
+  orders, target/countdown, individual health, treasury, income, upkeep and
+  refit costs. Locate selects its province without advancing play. Returning
+  from inspection preserves a selected province; resolving movement still
+  follows the hero.
+- Schema v3 preserves rival operations, soldier identities and wounded
+  garrisons. Captured v1/v2 fixtures migrate without rerolling pending
+  decisions or changing an existing defense's tactical continuation.
+  Independent review found routing oscillation and inconsistent saved
+  orders/identities; targeted regressions and fixes are included.
+- Full integration passed **432 tests**, plus both games' fuzz drivers.
+  Native `tools/verify_eador_rival.py` passed inspection, interception,
+  retreat with lasting wounds, saved reengagement, defense and the paid
+  remustering window through actual mouse/keyboard input. Initial, wounded,
+  located and defeated-expedition screenshots were inspected at
+  `/tmp/shardbound-rival-first`. The regular native save/input/window-size
+  journey also passed after integration. Final guide review found its
+  longer counterattack copy touching the footer; shortened copy was
+  rerendered and inspected at `/tmp/shardbound-rival-final`.
+- The expanded UI stress run includes the codex and rival report: 20 scene
+  runs, 6,007 random activations, 534 codex ticks and 48 rival-report ticks
+  passed, alongside 12 model campaigns. This remains a bounded increment
+  check, separate from the earlier large baseline report.
+
+G06 remains incomplete: profitable indefinite capital camping still needs
+economic pressure, and broader balance/content evidence remains outstanding.
+Encirclement and unpaid upkeep are the next isolated rules increment.

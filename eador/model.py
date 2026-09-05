@@ -228,12 +228,29 @@ class State:
         return HexGrid(self.provinces)
 
     @property
+    def encircled(self) -> bool:
+        return self.provinces[(-2, 0)].owner == 'player' and all(
+            self.provinces[pos].owner == 'rival' for pos in self.grid.neighbors((-2, 0)))
+
+    @property
     def income(self) -> int:
-        return sum(p.income for p in self.provinces.values() if p.owner == 'player') + (8 if 'market' in self.buildings else 0)
+        blocked = self.encircled
+        income = sum(p.income for p in self.provinces.values() if p.owner == 'player')
+        return income - (self.provinces[(-2, 0)].income if blocked else 0) + (
+            8 if 'market' in self.buildings and not blocked else 0)
+
+    @property
+    def crystal_income(self) -> int:
+        income = sum(p.crystals for p in self.provinces.values() if p.owner == 'player')
+        return income - (self.provinces[(-2, 0)].crystals if self.encircled else 0)
 
     @property
     def upkeep(self) -> int:
         return sum(UNITS[t.kind].upkeep for t in self.hero.army)
+
+    @property
+    def upkeep_shortfall(self) -> int:
+        return max(0, self.upkeep - self.gold - self.income)
 
     @property
     def spells(self) -> set[str]:
@@ -366,7 +383,7 @@ class State:
         elif province.guards:
             self._start_battle(destination, 'conquest', province.guards)
         else:
-            province.owner = 'player'
+            self._set_owner(province, 'player')
             self.hero.pos = destination
             self.log.append(f'Claimed unguarded {province.name}.')
             if destination == (2, 0):
@@ -468,7 +485,8 @@ class State:
                 self.gold += 25
                 message = f'The rival expedition is broken: +25 gold. {province.name} still has a garrison.'
             else:
-                province.owner, province.guards, province.guard_hp = 'player', [], []
+                self._set_owner(province, 'player')
+                province.guards, province.guard_hp = [], []
                 self.hero.pos = province.pos
                 self.gold += 25
                 message = f'Defended {province.name}: +25 gold.' if self.battle_kind == 'defense' else f'Claimed {province.name}: +25 gold.'
@@ -508,12 +526,17 @@ class State:
 
     def end_turn(self) -> None:
         self._ready()
+        while self.upkeep_shortfall:
+            deserter = min(self.hero.army, key=lambda troop: (troop.level, troop.xp, -UNITS[troop.kind].upkeep, -troop.id))
+            self.hero.army.remove(deserter)
+            self.log.append(f'Unpaid upkeep: level {deserter.level} {UNITS[deserter.kind].name} deserted.')
         earnings = self.income - self.upkeep
         self.gold += earnings
-        self.crystals += sum(p.crystals for p in self.provinces.values() if p.owner == 'player')
+        self.crystals += self.crystal_income
         self.turn += 1
         self.actions_left = 3 if self.hero.hero_class == 'Scout' else 2
-        if self.provinces[self.hero.pos].owner == 'player':
+        can_rest = not (self.encircled and self.hero.pos == (-2, 0))
+        if can_rest:
             recovery = 6 + (3 if 'temple' in self.buildings else 0) + self.hero.skill_ranks.get('quartermaster', 0)
             if self.hero.relic == 'oak_standard':
                 recovery += 3
@@ -522,14 +545,26 @@ class State:
             self.hero.hp = min(self.hero.max_hp, self.hero.hp + recovery + 2 + 2 * self.hero.skill_ranks.get('vigor', 0))
             for troop in self.hero.army:
                 troop.hp = min(troop.max_hp, troop.hp + recovery)
-        self.hero.mana = min(self.hero.max_mana, self.hero.mana + 4)
-        self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; army rests.')
+            self.hero.mana = min(self.hero.max_mana, self.hero.mana + 4)
+        rest = 'army rests' if can_rest else 'encirclement blocks recovery'
+        self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; {rest}.')
         self.rival.advance(self)
+
+    def _set_owner(self, province: Province, owner: str) -> None:
+        was_encircled = self.encircled
+        province.owner = owner
+        if self.provinces[(-2, 0)].owner != 'player' or self.encircled == was_encircled:
+            return
+        if self.encircled:
+            self.log.append('Westwatch is encircled: capital production, Marketplace and recovery are blocked. Reclaim a neighboring province to reopen supply.')
+        else:
+            self.log.append('Westwatch has an open supply route: capital production, Marketplace and recovery resume.')
 
     def _occupy_rival(self, destination: Pos) -> None:
         province = self.provinces[destination]
         self.rival.pos = destination
-        province.owner, province.guards, province.guard_hp = 'rival', [], []
+        self._set_owner(province, 'rival')
+        province.guards, province.guard_hp = [], []
         # Occupation uses an actual surviving expedition soldier, never a free garrison.
         if len(self.rival.army) > 3:
             guard = max(self.rival.army, key=lambda troop: (troop.kind == 'guard', troop.hp))

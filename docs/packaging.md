@@ -47,6 +47,8 @@ All generated files stay under ignored `build/shardbound/` and
 | `build-manifest.json` | Source hashes, commit/dirty status, versions, platform, file inventory, archive hash and smoke result |
 | `packaged-smoke.png` | Real title-screen capture from the extracted archive |
 | `packaged-smoke-shard.png` | Real campaign-screen capture from the extracted archive |
+| `packaged-smoke-codex.png` / `-rival.png` | Rules reference and finite expedition inspection |
+| `packaged-smoke-battle.png` | Tactical battle restored from a save |
 | `packaged-smoke.json` | Frozen-runtime, executable path and save/load verification |
 
 The app includes a Python runtime and runtime libraries. Game assets are
@@ -57,7 +59,10 @@ No change to the Saga2D framework wheel is needed: the game is an application
 that consumes the framework.
 
 The smoke launcher uses temporary saves and writes its result to the requested
-path. It renders the title and shard and saves/reloads campaign state. The
+path. Native key events start a game, save/reload campaign state, inspect
+the codex and rival, locate the expedition, invade a province, play a battle
+round, restore that battle and retreat. It renders title, shard, codex,
+rival and battle screens. The
 builder checks that the process is frozen and is the extracted executable,
 with Python environment overrides removed and an OS-only executable search
 path. Its temporary working directory is outside the repository. Inspect the
