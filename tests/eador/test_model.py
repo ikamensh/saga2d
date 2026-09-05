@@ -25,7 +25,12 @@ def finish_battle(state):
         if state.battle.outcome:
             break
         state.battle.auto_turn()
-    return state.resolve_battle()
+    result = state.resolve_battle()
+    while state.choice:
+        state.choose(state.choice.options[0].id)
+    if state.inventory and state.hero.relic is None:
+        state.equip(state.inventory[0])
+    return result
 
 
 def test_exploration_and_conquest_preserve_wounds_and_reward_advancement():
@@ -59,7 +64,7 @@ def provision_army(state):
         spec = BUILDINGS[building]
         if building not in state.buildings and state.gold >= spec.cost and state.crystals >= spec.crystals:
             state.build(building)
-    while state.gold >= UNITS['swordsman'].cost and len(state.hero.army) < state.hero.max_army:
+    while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
         state.recruit('swordsman')
 
 
@@ -92,7 +97,7 @@ def test_each_hero_can_complete_a_campaign_by_exploring_and_investing(seed, hero
         provision_army(state)
         missing_health = max([state.hero.max_hp - state.hero.hp] +
                              [troop.max_hp - troop.hp for troop in state.hero.army])
-        if missing_health > 6:
+        if missing_health > 6 or state.hero.mana < state.hero.max_mana - 4:
             rest(state)
             continue
         state.travel(state.grid.path(state.hero.pos, (2, 0))[1])
