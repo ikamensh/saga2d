@@ -27,3 +27,18 @@ def test_an_elderwild_campaign_can_win_by_developing_and_defending_a_realm():
     assert state.status == 'victory'
     assert state.hero.level > 1
     assert any(province.explored for province in state.provinces.values())
+
+
+def test_ruins_trade_a_valuable_pike_checkpoint_for_a_weaker_flank():
+    """Both paths are playable, but the short road asks for Brace counters and pays more income."""
+    from eador.worldgen import NORTH_ROAD, SOUTH_ROAD
+    state = State.new(7, theme='ruins')
+    checkpoint = state.provinces[(0, 0)]
+    assert {'pikeman', 'archer'} <= set(checkpoint.guards)
+    assert checkpoint.site_kind == 'tower'
+    flanks = [[state.provinces[pos] for pos in road[1:-1]] for road in (NORTH_ROAD, SOUTH_ROAD)]
+    weaker = min(flanks, key=lambda provinces: sum(sum(p.guard_hp) for p in provinces))
+    assert sum(sum(p.guard_hp) for p in weaker) < sum(sum(p.guard_hp) for p in max(flanks, key=lambda ps: sum(sum(p.guard_hp) for p in ps)))
+    assert checkpoint.income > max(p.income for p in weaker)
+    assert any(p.site_kind == 'caravan' for p in weaker)
+    assert any('pikeman' in p.guards for p in state.provinces.values() if p.owner == 'rival')
