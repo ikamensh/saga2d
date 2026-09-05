@@ -31,6 +31,7 @@ from saga2d import Button, Game  # noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.encounter_scene import EncounterScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
+from eador.worldgen import THEMES
 from eador.rival_scene import RivalScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
 from eador.scene import (BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene,
@@ -97,7 +98,9 @@ def check_state(state: State) -> None:
 def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
     """Random commands include rejections, which must leave the save unchanged."""
     rng = random.Random(seed)
-    state = State.new(seed, list(HERO_CLASSES)[seed % len(HERO_CLASSES)])
+    theme = tuple(THEMES)[seed % len(THEMES)]
+    state = State.new(seed, list(HERO_CLASSES)[seed % len(HERO_CLASSES)], theme=theme)
+    metrics[f'campaign_theme.{theme}'] += 1
     for _ in range(steps):
         check_state(state)
         metrics['state_checks'] += 1
