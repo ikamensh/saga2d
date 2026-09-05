@@ -41,13 +41,14 @@ class UnitSpec:
     upkeep: int
     building: str | None
     color: tuple[int, int, int]
+    abilities: tuple[str, ...] = ()
 
 
 UNITS = {
     'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127)),
     'swordsman': UnitSpec('Swordsman', 34, 11, 4, 3, 1, 45, 2, 'barracks', (131, 177, 185)),
-    'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112)),
-    'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233)),
+    'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112), ('pin',)),
+    'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233), ('heal',)),
     'brigand': UnitSpec('Brigand', 20, 7, 1, 3, 1, 0, 0, None, (185, 102, 91)),
     'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
     'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
@@ -632,7 +633,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 8
+        data['schema_version'] = 9
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -651,8 +652,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7 and 8.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8 and 9.')
         _validate_save(data, version)
         if version >= 8:
             from eador.campaign import validate_campaign
@@ -992,7 +993,8 @@ def _validate_save(data: dict, version: int) -> None:
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
         if version >= 7:
-            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace'), unique=True)
+            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal') if version >= 9 else ('pin', 'brace'), unique=True)
+            require('heal' not in unit['abilities'] or unit['kind'] == 'healer', 'Only Acolytes gain troop Heal.')
             require('pin' not in unit['abilities'] or unit['kind'] == 'archer'
                     or unit['kind'] == 'hero' and hero['relic'] == 'storm_quiver', 'This unit cannot learn Pin.')
             require('brace' not in unit['abilities'] or unit['kind'] == 'hero' and hero['relic'] == 'watch_bell',

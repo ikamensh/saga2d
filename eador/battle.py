@@ -57,6 +57,10 @@ class BattleUnit:
         return 'pin' in self.abilities
 
     @property
+    def can_heal(self) -> bool:
+        return 'heal' in self.abilities
+
+    @property
     def can_brace(self) -> bool:
         return self.kind == 'pikeman' or 'brace' in self.abilities
 
@@ -119,7 +123,7 @@ class Battle:
             units.append(BattleUnit(troop.id, 'player', troop.kind, pos, troop.hp,
                                     troop.max_hp, spec.attack + troop.level - 1 + (hero.hero_class == 'Commander'),
                                     spec.defense + (troop.level - 1) // 2,
-                                    spec.move_range, spec.attack_range, level=troop.level, abilities=('pin',) if troop.kind == 'archer' else ()))
+                                    spec.move_range, spec.attack_range, level=troop.level, abilities=spec.abilities))
         health = enemy_hp if enemy_hp is not None else [UNITS[kind].hp for kind in enemies]
         if len(health) != len(enemies):
             raise ValueError('Enemy health must match the enemy army.')
@@ -158,7 +162,7 @@ class Battle:
             if not 0 < hp <= spec.hp:
                 raise ValueError('A combatant must have positive health within its maximum.')
             units.append(BattleUnit(i, team, kind, pos, hp, spec.hp, spec.attack,
-                                    spec.defense, spec.move_range, spec.attack_range, abilities=('pin',) if kind == 'archer' else ()))
+                                    spec.defense, spec.move_range, spec.attack_range, abilities=spec.abilities))
         return units
 
     @classmethod
@@ -303,33 +307,51 @@ class Battle:
             raise RuleError('Unknown spell.')
         return self.spell_costs[spell]
 
-    def cast(self, spell: str, target_id: int) -> None:
+    def _caster(self, spell: str, caster_id: int | None) -> BattleUnit:
         if self.hero_id is None:
-            raise RuleError('This army has no spellcasting hero.')
-        hero = self._actor(self.hero_id)
-        if spell not in self.spells or spell not in SPELLS:
-            raise RuleError('That spell has not been learned.')
-        if hero.acted:
-            raise RuleError('Your hero has already acted.')
+            raise RuleError('This army has no spellcasting hero or shared mana.')
+        caster = self._actor(self.hero_id if caster_id is None else caster_id)
+        learned = spell in self.spells if caster.id == self.hero_id else spell == 'heal' and caster.can_heal
+        if spell not in SPELLS or not learned:
+            raise RuleError('That spell has not been learned by this unit.')
+        if caster.acted:
+            raise RuleError('That unit has already acted.')
         if self.mana < self.spell_cost(spell):
             raise RuleError('Not enough mana.')
+        return caster
+
+    def spell_targets(self, spell: str, *, caster_id: int | None = None) -> list[BattleUnit]:
+        """Legal targets for this ready caster, using the army's shared mana pool."""
+        try:
+            caster = self._caster(spell, caster_id)
+        except RuleError:
+            return []
+        return [target for target in self.units if target.alive
+                and HexGrid.distance(caster.pos, target.pos) <= 4
+                and (target.team != caster.team if spell == 'bolt'
+                     else target.team == caster.team and target.hp < target.max_hp)]
+
+    def spell_preview(self, spell: str, target_id: int, *, caster_id: int | None = None) -> int:
+        """Actual health restored or removed by a legal spell, without spending it."""
+        self._caster(spell, caster_id)
         target = self.unit(target_id)
-        if not target.alive or HexGrid.distance(hero.pos, target.pos) > 4:
-            raise RuleError('Choose a living target within 4 hexes.')
-        if spell == 'bolt' and target.team != 'enemy':
-            raise RuleError('Arcane Bolt targets enemies.')
-        if spell == 'heal' and (target.team != 'player' or target.hp == target.max_hp):
-            raise RuleError('Heal targets a wounded ally.')
+        if target not in self.spell_targets(spell, caster_id=caster_id):
+            raise RuleError('Choose a wounded ally for Heal or an enemy for Bolt within 4 hexes.')
+        return min(self.spell_power[spell], target.max_hp - target.hp if spell == 'heal' else target.hp)
+
+    def cast(self, spell: str, target_id: int, *, caster_id: int | None = None) -> None:
+        """Cast with the hero, or let a capable Acolyte spend the same mana on Heal."""
+        caster = self._caster(spell, caster_id)
+        amount = self.spell_preview(spell, target_id, caster_id=caster.id)
+        target = self.unit(target_id)
         self.mana -= self.spell_cost(spell)
-        hero.acted = hero.moved = True
+        caster.acted = caster.moved = True
         if spell == 'bolt':
-            damage = min(target.hp, self.spell_power['bolt'])
-            target.hp -= damage
-            self.log.append(f'Arcane Bolt strikes {target.name} for {damage}.')
+            target.hp -= amount
+            self.log.append(f'Arcane Bolt strikes {target.name} for {amount}.')
         else:
-            healed = min(self.spell_power['heal'], target.max_hp - target.hp)
-            target.hp += healed
-            self.log.append(f'Heal restores {healed} health to {target.name}.')
+            target.hp += amount
+            self.log.append(f'Heal restores {amount} health to {target.name}.')
         self._check_outcome()
 
     def _check_outcome(self) -> None:
@@ -384,6 +406,13 @@ class Battle:
                 enemies = [u for u in self.units if u.alive and u.team != team and HexGrid.distance(unit.pos, u.pos) <= 4]
                 if 'bolt' in self.spells and self.mana >= self.spell_cost('bolt') and enemies:
                     self.cast('bolt', min(enemies, key=lambda u: u.hp).id)
+                    continue
+            if unit.can_heal:
+                injured = [target for target in self.spell_targets('heal', caster_id=unit.id)
+                           if target.max_hp - target.hp >= 8]
+                if injured:
+                    self.cast('heal', min(injured, key=lambda target: (target.hp / target.max_hp, target.id)).id,
+                              caster_id=unit.id)
                     continue
             defending_seal = team == 'enemy' and self.objective.kind == 'hold'
             if defending_seal:
