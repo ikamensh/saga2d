@@ -83,6 +83,8 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _elderwild(provinces, seed)
     elif theme == 'ruins':
         _ruins(provinces, seed)
+    _site(provinces[(-2, 2)], 'den')
+    _site(provinces[(-1, 2)], 'explorer_camp')
     for province in provinces.values():
         province.guard_hp = [UNITS[kind].hp for kind in province.guards]
         province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]

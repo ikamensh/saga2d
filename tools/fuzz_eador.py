@@ -76,6 +76,9 @@ def check_state(state: State) -> None:
         assert len({u.pos for u in alive}) == len(alive)
         assert len({u.id for u in battle.units}) == len(battle.units)
         assert all(u.pos in battle.grid.cells and 0 <= u.hp <= u.max_hp for u in battle.units)
+        assert all(type(u.pinned) is bool and 0 <= u.pin_cooldown <= 2 for u in battle.units)
+        assert all(not u.pin_cooldown or u.can_pin for u in battle.units)
+        assert all(u.effective_move_range == max(1, u.move_range - (2 if u.pinned else 0)) for u in battle.units)
         assert {u.id for u in battle.units if u.team == 'player'} == {0, *(t.id for t in hero.army)}
         assert 0 <= battle.mana <= hero.max_mana
         assert battle.outcome in (None, 'player', 'enemy')
@@ -119,6 +122,31 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
             if state.battle.outcome:
                 metrics['battle_' + state.battle.outcome] += 1
                 state.resolve_battle()
+            elif rng.random() < .20:
+                battle = state.battle
+                shooter = rng.choice([u for u in battle.units if u.alive and u.team == 'player'])
+                target = rng.choice([u for u in battle.units if u.alive and u.team == 'enemy'])
+                before = state.to_json()
+                try:
+                    expected = battle.pin_preview(shooter.id, target.id)
+                except RuleError:
+                    assert state.to_json() == before, 'rejected Pin preview mutated state'
+                    try:
+                        battle.pin(shooter.id, target.id)
+                    except RuleError:
+                        pass
+                    else:
+                        raise AssertionError('Pin command accepted a rejected forecast')
+                    assert state.to_json() == before, 'rejected Pin mutated state'
+                    metrics['rejected_pin_orders'] += 1
+                else:
+                    restored = State.from_json(before)
+                    health = target.hp, shooter.hp
+                    battle.pin(shooter.id, target.id)
+                    restored.battle.pin(shooter.id, target.id)
+                    assert (health[0] - target.hp, health[1] - shooter.hp) == expected
+                    assert state.to_json() == restored.to_json(), 'save changed Pin consequences'
+                    metrics['pin_orders'] += 1
             elif rng.random() < .06:
                 state.retreat()
                 metrics['retreats'] += 1
