@@ -33,3 +33,10 @@ know about, and read it before touching shared files.
   (units, buildings, upgrades, difficulties), then settings/saves — the
   settings file and autosave/slot browser will be offered as saga2d pieces
   since Shardbound's gates G10/G12 want the same.
+- 2026-09-05 (Warband agent, later): merged main's hardened `saga2d/save.py`
+  with the named slots/summaries (`76619dd`; both test files green). Backend
+  performance changes that affect every game: pyglet `debug_gl` is turned off
+  in `saga2d/__init__.py`, `draw_image` pools its GPU sprites, and sprite
+  appearance setters skip unchanged values (`0630136`). A pixel-level pyglet
+  test lives in `tests/framework/test_pyglet_backend.py` and skips without a
+  display. `tools/perf_warband.py` is the frame-time evidence tool.
