@@ -58,6 +58,15 @@ enemy phase evaluates control.
 boundary cases. The complete suite passed **544 tests** after merging the
 current Guard UI and framework settings.
 
+[The random stress report](evidence/shardbound-hold-stress-2026-09-06.json)
+records 100 model campaigns and 20 scene runs, including 10,003 random
+input activations and 113 defensive orders, in 78.3 seconds. No source
+changed during execution. The report preserves the original dirty-at-start
+metadata; every recorded game/framework/harness hash was subsequently
+checked against clean commit `e03715d`. These random runs exercise general
+state and UI stability; the public objective journeys below supply the
+specific hold evidence.
+
 A Commander journey builds Barracks/Swordsman, explores the home Shrine,
 buys Temple, conquers `(-1, -1)` then `(0, -2)`, rests and fills the roster.
 At the Watch it screens the approaches, weakens the forward Pikeman, then
