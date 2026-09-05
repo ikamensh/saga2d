@@ -88,3 +88,24 @@ army composition can win by holding. Root integration supplies the visible
 pre-entry explanation, seal marker, progress and result wording; native
 UI verification is separate from these model checks. Wider encounter and
 build diversity still needs subsequent authored content and playtesting.
+
+## Playable briefing and battle UI — 2026-09-06
+
+The Watch now shows its exact deployment, surviving defenders, reward and
+one-action cost before entry. Returning leaves the campaign unchanged. A
+named seal marker and a progress/deadline banner remain visible in combat;
+**O** aims at the objective without spending a unit order. Hold victory and
+deadline loss have distinct result explanations.
+
+`tools/verify_eador_objective.py` drives the full Commander preparation,
+briefing cancellation, manual formation, saved first holding turn, terminal
+reload, one-time reward and deadline loss through visible controls. The same
+journey runs as a recording-backend integration test. Real Pyglet execution
+passed and its briefing, objective, progress and both result screenshots were
+inspected at 1280×800 logical resolution on macOS HiDPI. The briefing was
+reflowed after visual inspection caught overlapping map and reward text.
+
+The complete suite passed **565 tests**, with both game fuzz drivers passing
+after the input changes. This establishes one playable objective encounter;
+the authored encounter count, pre-entry decisions and broader build diversity
+required by G05/G08 remain unfinished.

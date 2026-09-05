@@ -28,6 +28,18 @@ def outline(scene, points, color, width=1):
         scene.draw_line(*a, *b, color, width)
 
 
+def seal(scene, grid, pos, *, label=True):
+    """An engraved objective with a distinct ring and name, also visible without color."""
+    x, y = grid.center(pos)
+    outline(scene, grid.corners(pos), GOLD, 3)
+    scene.draw_circle(x, y, grid.size * .34, INK)
+    ring = [(x + math.cos(i * math.tau / 24) * grid.size * .34,
+             y + math.sin(i * math.tau / 24) * grid.size * .34) for i in range(24)]
+    outline(scene, ring, GOLD, 2)
+    if label:
+        scene.text("SEAL" if grid.size >= 30 else "S", x, y - 6, size=8, color=GOLD, center=True)
+
+
 def backdrop(scene, width, height):
     """Quiet star field and engraved orbit lines around the floating shard."""
     rng = random.Random(918)

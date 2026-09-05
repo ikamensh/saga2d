@@ -91,7 +91,8 @@ adds mana to support the two spells already learned.
 | Shard | V | Inspect the rival's expedition and next order |
 | Rival plan | L / Esc | Locate its province / close the report |
 | Shard | Enter / Space | Travel to or invade the selected adjacent province |
-| Shard | X | Explore the hero's current province |
+| Shard | X | Explore the hero's current province; preview authored expeditions |
+| Expedition briefing | Enter / Esc | Enter for one action / return without spending |
 | Shard | B / R | Open construction / recruitment |
 | Shard / decision | H | Inspect skills and equip relics |
 | Shard, battle, guide, hero or decision | C | Open the rules codex |
@@ -108,6 +109,7 @@ adds mana to support the two spells already learned.
 | Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
 | Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
 | Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
+| Objective battle | O | Aim at the seal |
 | Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
@@ -153,9 +155,11 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Six sites have different defending parties and gold/crystal rewards:
+Seven sites have different defending parties and gold/crystal rewards:
 Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove. Winning offers a relic or its gold value. Keep and equip one of six
+Grove, plus Border Watch. The Watch shows its layout and rewards before you commit
+an action. Hold its seal for two uncontested enemy turns by round eight, or
+defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of six
 relics to gain healing or damage spells, avoid retaliation, cross difficult
 terrain, improve army recovery or reduce recruitment costs. Duplicate
 relics can instead be distilled into four crystals. These choices belong
