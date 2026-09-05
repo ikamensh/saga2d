@@ -26,6 +26,18 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound framework agent): `codex/settings-store` adopts the
+  committed Warband `Settings(path, defaults)` mapping and `Game.settings` /
+  `data_dir` interface. Optional `validator=` keeps ranges/enums in game code;
+  explicit kind/finite/depth checks reject unsafe loaded values. `.error`
+  still allows games to show a recovery screen with defaults in memory, but
+  ordinary saves now refuse invalid current files. `reset()` stays in memory;
+  its next successful `save()` retains displaced bytes under a unique recovery
+  name. Existing recovery files survive further resets. The private durable
+  writer extracted from SaveManager is shared; slot behavior remains unchanged.
+  See `docs/framework-settings.md` and `tools/demo_settings.py`. No Warband
+  worktree, game callers, settings UI, fullscreen or synthesis code changed.
+
 - 2026-09-06 (Shardbound framework agent): isolated `codex/audio-lifecycle`
   fixes active-effect mute/master/SFX gain changes and audio teardown without
   changing the public AudioManager API. Both backends now own effect/music
