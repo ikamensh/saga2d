@@ -200,6 +200,28 @@ def test_a_ranged_player_attack_leaves_the_enemy_brace_unspent():
     assert battle.unit(1000).stance is None
 
 
+def test_brace_reserves_one_reaction_when_adjacent_ranged_fire_precedes_melee():
+    """An Archer cannot draw ordinary retaliation and leave a second spear reaction available."""
+    battle = encounter('archer', 'pikeman')
+    spec = UNITS['swordsman']
+    swordsman = BattleUnit(1, 'player', 'swordsman', (1, -1), spec.hp, spec.hp,
+                           spec.attack, spec.defense, spec.move_range, spec.attack_range)
+    battle.units.append(swordsman)
+    data = battle.to_dict()
+    data['units'][1]['stance'] = 'brace'
+    battle = Battle.from_dict(data)
+    pikeman = battle.unit(1000)
+    assert battle.preview(0, pikeman.id)[1] == 0
+    battle.attack(0, pikeman.id)
+    assert battle.unit(0).hp == UNITS['archer'].hp
+    assert pikeman.stance == 'brace' and not pikeman.retaliated
+    prediction = battle.preview(swordsman.id, pikeman.id)
+    health = pikeman.hp
+    battle.attack(swordsman.id, pikeman.id)
+    assert (health - pikeman.hp, spec.hp - battle.unit(swordsman.id).hp) == prediction
+    assert pikeman.stance is None and pikeman.retaliated
+
+
 def test_an_enemy_guard_protects_the_player_phase_and_expires_before_its_own_order():
     """A restored enemy Guard has the same armor and own-turn lifetime as a player's Guard."""
     battle = encounter(enemy='guard')

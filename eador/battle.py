@@ -218,7 +218,9 @@ class Battle:
         if spear == unit.hp:
             return 0, spear, 0
         damage = self._damage(unit, target)
-        retaliates = not braces and unit.safe_attacks == 0 and target.hp > damage and not target.retaliated and adjacent
+        # Brace reserves its one reaction for melee; ranged contact cannot
+        # take an ordinary retaliation first and leave the spear ready too.
+        retaliates = target.stance != 'brace' and unit.safe_attacks == 0 and target.hp > damage and not target.retaliated and adjacent
         return damage, spear, self._damage(target, unit) if retaliates else 0
 
     def _attack(self, unit: BattleUnit, target: BattleUnit) -> None:
