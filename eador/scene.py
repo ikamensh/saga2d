@@ -414,6 +414,8 @@ class CatalogScene(Screen):
                 description = f"{spec.hp} HP  /  {spec.attack} attack  /  range {spec.attack_range}  /  upkeep {spec.upkeep}"
                 if spec.building and spec.building not in s.buildings:
                     description = f"Requires {BUILDINGS[spec.building].name}. " + description
+                elif name == "pikeman":
+                    description += ". G: Brace strikes first against melee."
             self.paragraph(description, x + 26, yy + 29, width=500, size=11)
         self.text(textwrap.shorten(self.message or "Buildings are permanent. Recruit in any province you control.", width=93, placeholder="…"),
                   x + 24, y + 507, size=11, color=GOLD)
@@ -446,7 +448,7 @@ class HelpScene(Screen):
         sections = [
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
-            ("03   Command the battle", "Select a unit, move to a blue hex, then attack a marked enemy. Terrain gives cover. Spells cost mana and the hero's action."),
+            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace against melee. Terrain grants cover. Spells cost mana and the hero's action."),
             ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
         ]
         for i, (title, body) in enumerate(sections):
@@ -501,6 +503,9 @@ class BattleScene(Screen):
         alive = [u for u in b.units if u.team == "player" and u.hp > 0]
         if self.selected is None or not any(u.id == self.selected for u in alive):
             self.selected = alive[0].id if alive else None
+        selected = b.unit(self.selected) if self.selected is not None else None
+        self.button("Brace" if selected and selected.kind == "pikeman" else "Guard", x + 184, 291, 116,
+                    self.guard, shortcut="G", enabled=selected is not None and not selected.acted and b.outcome is None)
         hero_ready = b.unit(0).hp > 0 and not b.unit(0).acted and b.outcome is None
         self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 378, 300, self.bolt, hotkey="1",
                     enabled="bolt" in b.spells and b.mana >= b.spell_cost("bolt") and hero_ready)
@@ -532,6 +537,9 @@ class BattleScene(Screen):
 
     def auto_round(self):
         self.act(self.battle.auto_turn, checkpoint=True)
+
+    def guard(self):
+        self.act(lambda: self.battle.guard(self.selected))
 
     def retreat(self):
         try:
@@ -579,6 +587,7 @@ class BattleScene(Screen):
             self.selected = ids[(ids.index(self.selected) + 1) % len(ids)] if self.selected in ids else ids[0]
             self.cursor = self.hover = self.battle.unit(self.selected).pos
             self.spell = None
+            self.refresh()
 
     def aim(self, event):
         directions = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "down": (0, 1),
@@ -628,6 +637,7 @@ class BattleScene(Screen):
                 self.message = "Aim at a unit to cast. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
             self.selected = unit.id
+            self.refresh()
         elif unit and self.selected is not None:
             self.act(lambda: self.battle.attack(self.selected, unit.id))
         elif self.selected is not None:
@@ -654,9 +664,11 @@ class BattleScene(Screen):
                       x, 159, size=25, serif=True)
             self.text(f"Health {selected.hp} / {selected.max_hp}", x, 198, size=13, color=TEAL)
             self.bar(x, 225, 300, selected.hp, selected.max_hp)
-            self.text(f"Attack {selected.attack}   Defense {selected.defense}", x, 246, size=13)
+            self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 246, size=13)
             self.text(f"Movement {selected.move_range}   Range {selected.attack_range}", x, 272, size=13, color=MUTED)
-            self.text("Action spent" if selected.acted else "Moved · attack available" if selected.moved else "Ready to move and attack",
+            status = ("Guard · +2 defense" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
+                      "Action spent" if selected.acted else "Moved · action ready" if selected.moved else "Ready")
+            self.text(status,
                       x, 301, size=12, color=GOLD)
         self.rule(x, 336, 300)
         self.text(f"SPELLBOOK   /   {b.mana} MANA", x, 353, size=10, color=BLUE)
@@ -666,13 +678,15 @@ class BattleScene(Screen):
             self.text(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", x, 630, size=13, color=GOLD)
             if selected and hovered in b.targets(selected.id):
                 damage, retaliation = b.preview(selected.id, hovered.id)
-                self.text(f"Deal {damage}  /  Take {retaliation} in retaliation", x, 655, size=12, color=RED)
+                self.text(f"Deal {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
             else:
-                self.text(f"Attack {hovered.attack}  ·  Defense {hovered.defense}  ·  Range {hovered.attack_range}",
+                self.text(f"Attack {hovered.attack}  ·  Defense {hovered.effective_defense}  ·  Range {hovered.attack_range}",
                           x, 655, size=11, color=MUTED)
-            self.text(f"Terrain: {b.terrain[hovered.pos].title()}", x, 679, size=11, color=MUTED)
+            detail = ("Brace strikes first against melee." if hovered.stance == "brace" else
+                      f"Terrain: {b.terrain[hovered.pos].title()}" + (" · Guard +2 defense" if hovered.stance == "guard" else ""))
+            self.text(detail, x, 679, size=11, color=MUTED)
         else:
-            self.paragraph("Forest and hills grant cover. Marsh slows movement. Melee defenders retaliate once per round.",
+            self.paragraph("G: Guard (+2 defense) or Brace (Pikemen strike first against melee). Ranged fire avoids Brace.",
                            x, 630, size=11)
         self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
         reachable = b.reachable(self.selected) if selected and not selected.acted and b.outcome is None else set()
@@ -698,6 +712,9 @@ class BattleScene(Screen):
                 self.draw_circle(cx, cy + 7, 25, RED)
             art.piece(self, cx, cy - 1, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, self.grid.size / 43),
                       selected=u.id == self.selected, spent=u.acted)
+            if u.stance:
+                self.draw_circle(cx + 30, cy - 17, 9, INK)
+                self.text("B" if u.stance == "brace" else "G", cx + 30, cy - 24, size=10, color=GOLD, center=True)
             self.draw_rect(cx - 29, cy + 29, 58, 16, INK, radius=3)
             self.text(f"{u.hp}/{u.max_hp}", cx, cy + 29, size=10, center=True)
             self.bar(cx - 26, cy + 46, 52, u.hp, u.max_hp, TEAL if u.team == "player" else RED)

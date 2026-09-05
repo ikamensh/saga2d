@@ -99,6 +99,10 @@ class CodexScene(Screen):
                                    f"upkeep {spec.upkeep} gold/turn. {requirement}")
                     if kind == "healer":
                         description += " An acolyte adds 2 army recovery each resting turn."
+                    elif kind == "pikeman":
+                        description = (f"Costs {state.recruit_cost(kind)} gold (base {spec.cost}); upkeep {spec.upkeep}. "
+                                       "Requires Barracks. Brace hits once before melee, through retaliation protection. "
+                                       "Replaces retaliation; ranged fire avoids it. Expires next turn.")
                 else:
                     description = f"{role} Encountered as a guardian; cannot be recruited."
                 entries.append(_Entry(spec.name, facts, description))
@@ -143,7 +147,7 @@ class CodexScene(Screen):
         self.text(f"{state.hero.hero_class} · {HERO_CLASSES[state.hero.hero_class].description}",
                   x + 24, y + 81, size=12, color=MUTED)
         introductions = (
-            "Level-one base stats. Veterans and your hero's abilities can improve them. Recruit in a province you control.",
+            "G Guards (+2 defense until next turn); Pikemen Brace. Base stats exclude veteran and hero bonuses.",
             "Current mana costs and power include your hero's skills and equipped relic. Spell range is four hexes.",
             "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
             "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
