@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
 from saga2d import Button, Game
+from eador.codex import CodexScene
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene, SaveScene, ShardScene, TitleScene
 
 
@@ -56,6 +57,14 @@ def verify(output: Path):
             assert isinstance(game.scene, ShardScene)
             root = game.scene
             capture("shard")
+            press(key.C)
+            assert isinstance(game.scene, CodexScene)
+            for symbol, name in ((key._1, "troops"), (key._2, "spells"), (key._3, "buildings"),
+                                 (key._4, "skills"), (key._5, "sites"), (key._6, "relics")):
+                press(symbol)
+                capture("codex-" + name)
+            press(key.ESCAPE)
+            assert game.scene is root
             press(key.B)
             assert isinstance(game.scene, CatalogScene)
             capture("buildings")

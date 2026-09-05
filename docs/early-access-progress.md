@@ -92,3 +92,24 @@ No release claim or publication is authorized by this progress log.
 
 Finite rival development is isolated on `codex/shardbound-rival`; it has
 not yet been merged or accepted. G01–G19 remain incomplete.
+
+## Codex and button-owned shortcuts — 2026-09-05
+
+- The field codex is reachable from the shard, battle, guide, hero and
+  decision screens. Its six categories describe the current troops,
+  spells, buildings, skills, sites and relics using the actual rule tables.
+  Inspecting it preserves the underlying scene and campaign state.
+- Saga2D buttons can own an optional shortcut, including modifiers and
+  aliases. Keycap, activation and disabled/visible state share one
+  declaration. Shardbound's catalogues, choices, paged inventory and save
+  browser now use it; separate dynamic bindings were removed. The
+  independent example and behavior contract are documented in
+  [framework-button-shortcuts.md](framework-button-shortcuts.md).
+- The full suite passed **421 tests**; both games' fuzz drivers passed.
+  Native Pyglet verification exercised the codex, campaign/battle input,
+  choices, equipment, save slots and backup recovery, plus resized windows.
+  Screenshots were inspected at `/tmp/shardbound-codex-final`; a crowded
+  shard header found during review was corrected before this checkpoint.
+
+This advances G09, G10 and G17. It does not establish the first-time human
+walkthroughs, complete display/settings matrix or release readiness.

@@ -51,13 +51,12 @@ class CodexScene(Screen):
         self.x, self.y = self.game.width / 2 - 520, self.game.height / 2 - 350
         for i, category in enumerate(CATEGORIES):
             self.button(category, self.x + 24 + i * 167, self.y + 104, 157,
-                        lambda i=i: self.select_category(i), hotkey=str(i + 1), primary=i == self.category)
-            self.bind_key(str(i + 1), lambda i=i: self.select_category(i))
+                        lambda i=i: self.select_category(i), shortcut=str(i + 1), primary=i == self.category)
         self.button("Previous", self.x + 24, self.y + 634, 150, self.previous_page,
                     hotkey="←", enabled=self.page > 0)
         self.button("Next", self.x + 184, self.y + 634, 150, self.next_page,
                     hotkey="→", enabled=self.page + 1 < self.pages)
-        self.button("Close codex", self.x + 830, self.y + 634, 186, self.game.pop, hotkey="Esc")
+        self.button("Close codex", self.x + 830, self.y + 634, 186, self.game.pop, shortcut="Esc")
 
     def select_category(self, index):
         self.category, self.page = index, 0
