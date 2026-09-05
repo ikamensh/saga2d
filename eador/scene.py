@@ -433,7 +433,7 @@ class HelpScene(Screen):
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
             ("03   Command the battle", "Select a unit, move to a blue hex, then attack a marked enemy. Terrain gives cover. Spells cost mana and the hero's action."),
-            ("04   Grow and counterattack", "Win battles to choose skills; H equips relics. V reveals the rival's army and next order. Intercept it or defend its target, then advance while it pays to rebuild."),
+            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
         ]
         for i, (title, body) in enumerate(sections):
             yy = y + 119 + i * 84

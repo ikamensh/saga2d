@@ -138,7 +138,13 @@ walkthroughs, complete display/settings matrix or release readiness.
   remustering window through actual mouse/keyboard input. Initial, wounded,
   located and defeated-expedition screenshots were inspected at
   `/tmp/shardbound-rival-first`. The regular native save/input/window-size
-  journey also passed after integration.
+  journey also passed after integration. Final guide review found its
+  longer counterattack copy touching the footer; shortened copy was
+  rerendered and inspected at `/tmp/shardbound-rival-final`.
+- The expanded UI stress run includes the codex and rival report: 20 scene
+  runs, 6,007 random activations, 534 codex ticks and 48 rival-report ticks
+  passed, alongside 12 model campaigns. This remains a bounded increment
+  check, separate from the earlier large baseline report.
 
 G06 remains incomplete: profitable indefinite capital camping still needs
 economic pressure, and broader balance/content evidence remains outstanding.
