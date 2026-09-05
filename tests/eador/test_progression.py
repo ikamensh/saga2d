@@ -329,3 +329,21 @@ def test_new_shards_reject_invalid_seeds_instead_of_creating_unloadable_saves():
         State.new(seed=7.5)
     state = State.new(seed=-(2**80))
     assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+@pytest.mark.parametrize('payload', [
+    '1' + '0' * 5000,
+    '[' * 20000 + '0' + ']' * 20000,
+    '{"nested":' * 20000 + '0' + '}' * 20000,
+], ids=('large_integer', 'deep_array', 'deep_object'))
+def test_json_parser_limits_become_save_errors_and_leave_live_progress_intact(payload):
+    """Large integers and deep JSON fail through the same recoverable save boundary as syntax errors."""
+    from eador.model import SaveFormatError
+
+    state = advancement('Commander')
+    before = state.to_json()
+    with pytest.raises(SaveFormatError, match='supported size|nested too deeply'):
+        State.from_json(payload)
+    assert state.to_json() == before
+    state.choose('tactician')
+    assert state.hero.skills == {'tactician'}

@@ -506,8 +506,10 @@ class State:
             raise SaveFormatError('Save data must be JSON text.')
         try:
             data = json.loads(text)
-        except json.JSONDecodeError as error:
-            raise SaveFormatError('The save file is not valid JSON.') from error
+        except ValueError as error:
+            raise SaveFormatError('The save file contains invalid JSON or a number beyond the supported size.') from error
+        except RecursionError as error:
+            raise SaveFormatError('The save file is nested too deeply to read.') from error
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
