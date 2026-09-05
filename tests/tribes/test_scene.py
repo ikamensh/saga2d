@@ -6,7 +6,7 @@ from saga2d import Game
 from tribes import effects
 from tribes.style import build_theme
 from tribes.rules import Tech, Terrain, UnitType
-from tribes.scene import HIT_TIME, START_ZOOM, GameOverScene, MapScene, PauseScene, SettingsScene, TechScene, new_game
+from tribes.scene import HIT_TIME, START_ZOOM, GameOverScene, MapScene, PauseScene, RewardScene, SettingsScene, TechScene, new_game
 from tribes.title import NewGameScene, TitleScene
 from tribes.view import tile_center, tint
 
@@ -122,7 +122,7 @@ def test_tech_overlay_buys_a_tech_with_a_number_key(play) -> None:
     assert isinstance(game.scene, TechScene)
     press(game, "1")
     assert isinstance(game.scene, MapScene)
-    assert len(scene.tribe.techs) == 1
+    assert scene.tribe.techs == {Tech.FISHING, Tech.ORGANIZATION}  # Azure starts with Fishing
 
 
 def test_city_selection_trains_a_unit_with_a_number_key(play) -> None:
@@ -477,3 +477,65 @@ def test_plus_and_minus_keys_step_the_zoom_about_the_screen_centre(play) -> None
     press(game, "minus")
     tick(game, 0.5)
     assert camera.zoom == pytest.approx(min(START_ZOOM * 1.25, 2.5) / 1.25 ** 2)
+
+
+# -- Rewards, ruins and tribes -------------------------------------------------------
+
+
+def test_a_level_up_opens_the_reward_choice_and_a_hotkey_picks_one(play) -> None:
+    game, scene = play
+    world = scene.world
+    home = world.capital_of(scene.human)
+    world._grow(home, 2)
+    game.tick(1 / 60)
+    game.tick(1 / 60)
+    assert isinstance(game.scene, RewardScene)
+    shown = texts(game)
+    assert any("reached level 2" in t for t in shown) and "Workshop" in shown and "Explorer" in shown
+    press(game, "escape")  # cannot be skipped
+    assert isinstance(game.scene, RewardScene)
+    income = world.income(scene.human)
+    press(game, "1")
+    game.tick(1 / 60)
+    assert game.scene is scene and home.workshop and world.income(scene.human) == income + 1
+    scene.settings["confirm_end_turn"] = False
+    press(game, "e")
+    assert world.round == 2  # the turn ends normally once the reward is chosen
+
+
+def test_ending_the_turn_with_a_reward_pending_opens_the_choice_instead(play) -> None:
+    game, scene = play
+    scene.settings["confirm_end_turn"] = False
+    scene.world._grow(scene.world.capital_of(scene.human), 2)
+    press(game, "e")
+    assert isinstance(game.scene, RewardScene) and scene.world.round == 1
+
+
+def test_walking_onto_ruins_shows_the_finding(play) -> None:
+    game, scene = play
+    world = scene.world
+    unit = next(u for u in world.tribe_units(scene.human))
+    dest = next(p for p in world.reachable(unit) if world.city_at(p) is None)
+    world.tile(dest).ruin = True
+    scene.sync()
+    assert any(s["image"] == game.assets.image("ruin") for s in game.backend.sprites.values())
+    scene.select_unit(unit)
+    click_tile(game, scene, dest)
+    tick(game, 0.3)
+    shown = texts(game)
+    assert any(t.startswith(("Treasure", "Ancient knowledge", "Settlers", "A map")) for t in shown)
+    assert not world.tile(dest).ruin
+    assert not any(s["image"] == game.assets.image("ruin") for s in game.backend.sprites.values())
+
+
+def test_new_game_screen_cycles_the_tribe_to_play(game) -> None:
+    game.push(TitleScene())
+    game.tick(1 / 60)
+    press(game, "n")
+    assert isinstance(game.scene, NewGameScene)
+    press(game, "tab")
+    assert game.scene.first_tribe == 1 and any("Ember" in t and "Hunting" in t for t in texts(game))
+    press(game, "return")
+    game.tick(1 / 60)
+    scene = game.scene
+    assert isinstance(scene, MapScene) and scene.tribe.name == "Ember" and scene.tribe.techs == {Tech.HUNTING}

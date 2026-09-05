@@ -113,19 +113,74 @@ UNITS: dict[UnitType, UnitInfo] = {
 class TribeInfo:
     name: str
     color: tuple[int, int, int]
+    tech: Tech  # known from the start; the tribe's flavour
 
 
 TRIBES: list[TribeInfo] = [
-    TribeInfo("Azure", (70, 150, 255)),
-    TribeInfo("Ember", (255, 110, 70)),
-    TribeInfo("Moss", (110, 210, 110)),
-    TribeInfo("Amber", (250, 200, 70)),
+    TribeInfo("Azure", (70, 150, 255), Tech.FISHING),
+    TribeInfo("Ember", (255, 110, 70), Tech.HUNTING),
+    TribeInfo("Moss", (110, 210, 110), Tech.ORGANIZATION),
+    TribeInfo("Amber", (250, 200, 70), Tech.CLIMBING),
 ]
+
+
+class Reward(Enum):
+    """What a city may pick when it reaches a new level."""
+
+    WORKSHOP = "workshop"
+    EXPLORER = "explorer"
+    WALLS = "walls"
+    RESOURCES = "resources"
+    BORDER = "border"
+    POPULATION = "population"
+    PARK = "park"
+
+
+@dataclass(frozen=True)
+class RewardInfo:
+    name: str
+    summary: str
+
+
+REWARDS: dict[Reward, RewardInfo] = {
+    Reward.WORKSHOP: RewardInfo("Workshop", "+1★ income every turn"),
+    Reward.EXPLORER: RewardInfo("Explorer", "Reveals the land around the city"),
+    Reward.WALLS: RewardInfo("City walls", "Units in the city defend at ×4"),
+    Reward.RESOURCES: RewardInfo("Resources", "+5★ now"),
+    Reward.BORDER: RewardInfo("Border growth", "Territory radius +1"),
+    Reward.POPULATION: RewardInfo("Population", "+3 population"),
+    Reward.PARK: RewardInfo("Park", "+250 score"),
+}
+
+#: The pair of rewards offered at a level; higher levels repeat the last pair.
+LEVEL_REWARDS: dict[int, tuple[Reward, Reward]] = {
+    2: (Reward.WORKSHOP, Reward.EXPLORER),
+    3: (Reward.WALLS, Reward.RESOURCES),
+    4: (Reward.BORDER, Reward.POPULATION),
+    5: (Reward.PARK, Reward.RESOURCES),
+}
+REWARD_STARS = 5
+REWARD_POPULATION = 3
+REWARD_PARK_SCORE = 250
+EXPLORER_RADIUS = 4
+
+
+class Discovery(Enum):
+    """What a unit finds when it walks onto ruins."""
+
+    TREASURE = "treasure"
+    KNOWLEDGE = "knowledge"
+    GROWTH = "growth"
+    VISION = "vision"
+
+
+RUIN_TREASURE = 6
+RUIN_POPULATION = 2
+RUIN_VISION_RADIUS = 3
 
 STARTING_STARS = 5
 MAX_ROUNDS = 30
 CITY_BORDER_GROWTH_LEVEL = 3  # territory radius grows 1 → 2 at this level
-CITY_WALL_LEVEL = 4  # units in the city defend at ×4 from this level
 CITY_DEFENSE_BONUS = 1.5
 WALL_DEFENSE_BONUS = 4.0
 MOUNTAIN_DEFENSE_BONUS = 1.5

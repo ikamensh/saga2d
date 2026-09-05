@@ -8,11 +8,13 @@ from __future__ import annotations
 
 import math
 import random
+from dataclasses import replace
 from typing import Any
 
 from saga2d import Anchor, Button, Camera, Column, Label, Row, Scene
 from tribes import mapgen
 from tribes.effects import play_sound
+from tribes.rules import TRIBES
 from tribes.scene import HelpScene, load_game, new_game
 from tribes.style import ACTION_BUTTON, GHOST_BUTTON, MENU_BUTTON, OVERLAY_STYLE
 from tribes.textures import FOG, TILE
@@ -111,7 +113,7 @@ class TitleScene(Scene):
 
 
 class NewGameScene(Scene):
-    """Map size, tribe count and seed, then Start."""
+    """Map size, tribe count, which tribe to play, the seed, then Start."""
 
     transparent = True
     pause_below = False
@@ -119,13 +121,14 @@ class NewGameScene(Scene):
     controls = {
         "s": "size_small", "m": "size_medium", "l": "size_large",
         "2": "tribes_2", "3": "tribes_3", "4": "tribes_4",
-        "r": "reroll", ("return", "space"): "start",
+        "tab": "next_tribe", "r": "reroll", ("return", "space"): "start",
     }
 
     def __init__(self, title: TitleScene) -> None:
         self.title = title
         self.size = title.size
         self.tribes = title.tribes
+        self.first_tribe = 0
         self.seed = random.randrange(1, 10_000)
         self._size_buttons: dict[int, Button] = {}
         self._tribe_buttons: dict[int, Button] = {}
@@ -145,6 +148,9 @@ class NewGameScene(Scene):
             self._tribe_buttons[count] = button
             tribe_row.add(button)
         panel.add(tribe_row)
+        self._play_as = Button(lambda: f"{TRIBES[self.first_tribe].name} — starts with {TRIBES[self.first_tribe].tech.value.title()}",
+                               hotkey="Tab", on_click=self.next_tribe, width=2 * OPTION_WIDTH + 8)
+        panel.add(Row(Label("Play as", text_style="body", width=90), self._play_as, spacing=8))
         panel.add(Row(Label(lambda: f"Seed {self.seed}", text_style="body", width=90 + 8 + OPTION_WIDTH),
                       Button("Reroll", hotkey="R", on_click=self.reroll, style=GHOST_BUTTON, width=OPTION_WIDTH), spacing=8))
         panel.add(Row(Button("Start", hotkey="Enter", on_click=self.start, style=ACTION_BUTTON, width=2 * OPTION_WIDTH + 8),
@@ -157,6 +163,12 @@ class NewGameScene(Scene):
             button.style = ACTION_BUTTON if size == self.size else GHOST_BUTTON
         for count, button in self._tribe_buttons.items():
             button.style = ACTION_BUTTON if count == self.tribes else GHOST_BUTTON
+        self._play_as.style = replace(GHOST_BUTTON, text_color=rgba(TRIBES[self.first_tribe].color))
+
+    def next_tribe(self) -> None:
+        self.first_tribe = (self.first_tribe + 1) % len(TRIBES)
+        self.title.sfx("button")
+        self._restyle()
 
     def draw(self) -> None:
         w, h = self.game.resolution
@@ -196,4 +208,4 @@ class NewGameScene(Scene):
 
     def start(self) -> None:
         self.title.sfx("button")
-        self.game.clear_and_push(new_game(self.seed, size=self.size, tribes=self.tribes, settings=self.title.settings))
+        self.game.clear_and_push(new_game(self.seed, size=self.size, tribes=self.tribes, settings=self.title.settings, first_tribe=self.first_tribe))

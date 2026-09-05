@@ -142,7 +142,7 @@ def test_capitals_fly_a_tinted_flag_and_walled_cities_show_walls(revealed) -> No
     ours = [f for f in flags if abs(f["x"] + f["width"] / 2 - cx) < 1]
     assert ours and tuple(round(v, 3) for v in ours[0]["tint"]) == tuple(round(v, 3) for v in tint(world.tribes[scene.human].color))
     assert not any(s["image"] == game.assets.image("walls") for s in game.backend.sprites.values())
-    capital.level = 4
+    capital.walls = True
     scene.view.sync()
     game.tick(1 / 60)
     assert any(s["image"] == game.assets.image("walls") for s in game.backend.sprites.values())

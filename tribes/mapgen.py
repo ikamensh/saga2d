@@ -10,15 +10,16 @@ from tribes.model import Pos, Tile, World
 from tribes.rules import Resource, Terrain, UnitType
 
 _VILLAGE_SPACING = 3
+_RUIN_SPACING = 3
 _CAPITAL_OPEN_NEIGHBOURS = 4  # walkable tiles around a capital, so nobody starts boxed in
 _CAPITAL_RESOURCES = ((1, 2), (2, 4))  # (radius, at least this many resources within it)
 
 
-def generate(seed: int, size: int = 14, tribe_count: int = 2, human: int | None = 0) -> World:
+def generate(seed: int, size: int = 14, tribe_count: int = 2, human: int | None = 0, *, first_tribe: int = 0) -> World:
     rng = random.Random(seed)
     for _attempt in range(50):
         tiles = _terrain(rng, size)
-        world = World(size, tiles, tribe_count, human=human)
+        world = World(size, tiles, tribe_count, human=human, first_tribe=first_tribe)
         land = _largest_landmass(world)
         for tile in world.all_tiles():
             if tile.terrain is not Terrain.WATER and tile.pos not in land:
@@ -37,6 +38,7 @@ def generate(seed: int, size: int = 14, tribe_count: int = 2, human: int | None 
                 world.tile(pos).village = True
         _place_resources(rng, world)
         _stock_capitals(rng, world)
+        _place_ruins(rng, world, land, villages)
         world._start_turn(0)
         return world
     raise RuntimeError(f"could not generate a playable map for seed {seed}")
@@ -126,6 +128,25 @@ def _pick_capitals(rng: random.Random, world: World, villages: list[Pos], tribe_
 
 def _walkable_neighbours(world: World, pos: Pos) -> int:
     return sum(1 for n in world.neighbors(pos) if world.tile(n).terrain in (Terrain.FIELD, Terrain.FOREST))
+
+
+def _place_ruins(rng: random.Random, world: World, land: set[Pos], villages: list[Pos]) -> None:
+    """A few ruins on empty land, clear of villages and capitals, spread out."""
+    wanted = max(2, world.size * world.size // 45)
+    candidates = [
+        p for p in land
+        if world.tile(p).resource is None and not world.tile(p).village and world.tile(p).city_id is None
+        and all(World.distance(p, v) >= 2 for v in villages)
+        and all(World.distance(p, c.pos) >= 3 for c in world.cities.values())
+    ]
+    rng.shuffle(candidates)
+    ruins: list[Pos] = []
+    for pos in candidates:
+        if all(World.distance(pos, r) >= _RUIN_SPACING for r in ruins):
+            world.tile(pos).ruin = True
+            ruins.append(pos)
+            if len(ruins) >= wanted:
+                break
 
 
 _RESOURCE_CHANCE = {Terrain.FIELD: 0.25, Terrain.FOREST: 0.35, Terrain.MOUNTAIN: 0.5, Terrain.WATER: 0.25}

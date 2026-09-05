@@ -15,9 +15,10 @@ from dataclasses import dataclass, field
 from typing import Any, Iterator
 
 from tribes.rules import (
-    CITY_BORDER_GROWTH_LEVEL, CITY_DEFENSE_BONUS, CITY_WALL_LEVEL, HARVEST, HEAL_IN_TERRITORY, HEAL_OUTSIDE,
-    MAX_ROUNDS, MOUNTAIN_DEFENSE_BONUS, STARTING_STARS, TECHS, TRIBES, UNITS, WALL_DEFENSE_BONUS, Resource, Tech,
-    Terrain, UnitType, tech_cost,
+    CITY_BORDER_GROWTH_LEVEL, CITY_DEFENSE_BONUS, EXPLORER_RADIUS, HARVEST, HEAL_IN_TERRITORY, HEAL_OUTSIDE,
+    LEVEL_REWARDS, MAX_ROUNDS, MOUNTAIN_DEFENSE_BONUS, REWARD_PARK_SCORE, REWARD_POPULATION, REWARD_STARS, REWARDS,
+    RUIN_POPULATION, RUIN_TREASURE, RUIN_VISION_RADIUS, STARTING_STARS, TECHS, TRIBES, UNITS, WALL_DEFENSE_BONUS,
+    Discovery, Resource, Reward, Tech, Terrain, UnitType, tech_cost,
 )
 
 Pos = tuple[int, int]
@@ -41,6 +42,7 @@ class Tile:
     village: bool = False
     city_id: int | None = None
     owner_city: int | None = None
+    ruin: bool = False  # ancient ruins: the first unit to walk here finds something
 
     @property
     def pos(self) -> Pos:
@@ -57,6 +59,11 @@ class City:
     level: int = 1
     population: int = 0
     capital: bool = False
+    workshop: bool = False
+    walls: bool = False
+    border_bonus: int = 0
+    parks: int = 0
+    pending_reward: bool = False  # reached a new level; its owner must pick a reward before ending the turn
 
     @property
     def pos(self) -> Pos:
@@ -64,7 +71,7 @@ class City:
 
     @property
     def radius(self) -> int:
-        return 2 if self.level >= CITY_BORDER_GROWTH_LEVEL else 1
+        return (2 if self.level >= CITY_BORDER_GROWTH_LEVEL else 1) + self.border_bonus
 
     @property
     def next_level_population(self) -> int:
@@ -72,11 +79,11 @@ class City:
 
     @property
     def income(self) -> int:
-        return self.level + (1 if self.capital else 0)
+        return self.level + (1 if self.capital else 0) + (1 if self.workshop else 0)
 
     @property
     def has_wall(self) -> bool:
-        return self.level >= CITY_WALL_LEVEL
+        return self.walls
 
 
 @dataclass
@@ -146,17 +153,35 @@ class CombatResult:
     attacker_killed: bool
 
 
+@dataclass(frozen=True)
+class Finding:
+    """What a unit found in ruins; collected by the UI with :meth:`World.take_findings`."""
+
+    pos: Pos
+    kind: Discovery
+    text: str
+
+
 class World:
-    def __init__(self, size: int, tiles: list[list[Tile]], tribe_count: int, human: int | None = 0) -> None:
+    """Parameters:
+        tribe_count: How many tribes play; tribe ``i`` takes its name, colour
+                     and starting tech from ``TRIBES`` rotated by *first_tribe*,
+                     so the player (always tribe 0) can play any of them.
+        human:       Index of the human tribe, or ``None`` for AI-only games.
+    """
+
+    def __init__(self, size: int, tiles: list[list[Tile]], tribe_count: int, human: int | None = 0, *, first_tribe: int = 0) -> None:
         self.size = size
         self.tiles = tiles
-        self.tribes = [Tribe(i, TRIBES[i].name, TRIBES[i].color, human=(i == human)) for i in range(tribe_count)]
+        infos = [TRIBES[(first_tribe + i) % len(TRIBES)] for i in range(tribe_count)]
+        self.tribes = [Tribe(i, info.name, info.color, human=(i == human), techs={info.tech}) for i, info in enumerate(infos)]
         self.cities: dict[int, City] = {}
         self.units: dict[int, Unit] = {}
         self.current = 0
         self.round = 1
         self.winner: int | None = None
         self.log: list[str] = []
+        self.findings: list[Finding] = []
         self._next_id = 1
 
     # -- Queries -----------------------------------------------------------------
@@ -228,7 +253,7 @@ class World:
         t = self.tribes[tribe]
         territory = sum(1 for tile in self.all_tiles() if self.owner_of(tile.pos) == tribe)
         return (
-            sum(100 * c.level for c in self.tribe_cities(tribe))
+            sum(100 * c.level + REWARD_PARK_SCORE * c.parks for c in self.tribe_cities(tribe))
             + 20 * len(t.techs)
             + sum(5 * u.info.cost for u in self.tribe_units(tribe))
             + 5 * territory
@@ -333,7 +358,46 @@ class World:
             unit.done = True
         for pos in path:
             self.explore(unit.tribe, pos, self._vision(unit) if pos == dest else 1)
+        self._arrive(unit)
         return path
+
+    def _arrive(self, unit: Unit) -> None:
+        if self.tile(unit.pos).ruin:
+            self._explore_ruin(unit)
+
+    def _explore_ruin(self, unit: Unit) -> None:
+        """The ruins vanish and the tribe gains something; which thing depends on
+        the spot and the round, so it is unknowable in advance but reproducible."""
+        tile = self.tile(unit.pos)
+        tile.ruin = False
+        tribe = self.tribes[unit.tribe]
+        kind = list(Discovery)[(unit.x * 31 + unit.y * 17 + self.round * 7) % len(Discovery)]
+        learnable = sorted(
+            (t for t in TECHS if t not in tribe.techs and (TECHS[t].requires is None or TECHS[t].requires in tribe.techs)),
+            key=lambda t: (TECHS[t].tier, t.value),
+        )
+        if kind is Discovery.KNOWLEDGE and not learnable:
+            kind = Discovery.TREASURE
+        if kind is Discovery.KNOWLEDGE:
+            tribe.techs.add(learnable[0])
+            text = f"Ancient knowledge: {learnable[0].value.title()}"
+        elif kind is Discovery.GROWTH:
+            city = min(self.tribe_cities(unit.tribe), key=lambda c: self.distance(c.pos, unit.pos))
+            self._grow(city, RUIN_POPULATION)
+            text = f"Settlers join {city.name}: +{RUIN_POPULATION} pop"
+        elif kind is Discovery.VISION:
+            self.explore(unit.tribe, unit.pos, RUIN_VISION_RADIUS)
+            text = "A map of the surrounding land"
+        else:
+            tribe.stars += RUIN_TREASURE
+            text = f"Treasure: +{RUIN_TREASURE}★"
+        self.findings.append(Finding(unit.pos, kind, text))
+        self.log.append(f"{tribe.name} explored ruins: {text}")
+
+    def take_findings(self) -> list[Finding]:
+        """Findings since the last call (the UI shows them once)."""
+        found, self.findings = self.findings, []
+        return found
 
     # -- Combat ------------------------------------------------------------------
 
@@ -400,6 +464,7 @@ class World:
         """Relocate without spending movement (used when a melee kill advances)."""
         unit.x, unit.y = pos
         self.explore(unit.tribe, pos, self._vision(unit))
+        self._arrive(unit)
 
     def _kill(self, unit: Unit) -> None:
         del self.units[unit.id]
@@ -495,9 +560,45 @@ class World:
         while city.population >= city.next_level_population:
             city.population -= city.next_level_population
             city.level += 1
+            city.pending_reward = True
             self._claim_territory(city)
             self.explore(city.tribe, city.pos, city.radius)
             self.log.append(f"{self.tribes[city.tribe].name}'s {city.name} grew to level {city.level}")
+
+    # -- Level rewards -------------------------------------------------------------
+
+    def reward_options(self, city: City) -> tuple[Reward, Reward]:
+        """The two rewards a city of this level picks between."""
+        return LEVEL_REWARDS[min(city.level, max(LEVEL_REWARDS))]
+
+    def pending_rewards(self, tribe: int) -> list[City]:
+        return [c for c in self.tribe_cities(tribe) if c.pending_reward]
+
+    def choose_reward(self, city: City, reward: Reward) -> None:
+        self._check_turn(city.tribe)
+        if not city.pending_reward:
+            raise RuleError(f"{city.name} has no reward to choose")
+        if reward not in self.reward_options(city):
+            raise RuleError(f"{REWARDS[reward].name} is not on offer at level {city.level}")
+        city.pending_reward = False
+        tribe = self.tribes[city.tribe]
+        if reward is Reward.WORKSHOP:
+            city.workshop = True
+        elif reward is Reward.EXPLORER:
+            self.explore(city.tribe, city.pos, EXPLORER_RADIUS)
+        elif reward is Reward.WALLS:
+            city.walls = True
+        elif reward is Reward.RESOURCES:
+            tribe.stars += REWARD_STARS
+        elif reward is Reward.BORDER:
+            city.border_bonus += 1
+            self._claim_territory(city)
+            self.explore(city.tribe, city.pos, city.radius)
+        elif reward is Reward.POPULATION:
+            self._grow(city, REWARD_POPULATION)  # may reach the next level, and offer again
+        elif reward is Reward.PARK:
+            city.parks += 1
+        self.log.append(f"{tribe.name}'s {city.name} chose {REWARDS[reward].name}")
 
     # -- Research ----------------------------------------------------------------
 
@@ -537,6 +638,9 @@ class World:
         """Finish the current tribe's turn and start the next living tribe's."""
         if self.winner is not None:
             return
+        pending = self.pending_rewards(self.current)
+        if pending:
+            raise RuleError(f"{pending[0].name} reached a new level: choose its reward first")
         for unit in self.tribe_units(self.current):
             self._heal_if_idle(unit)
         start = self.current
@@ -591,12 +695,12 @@ class World:
             "winner": self.winner,
             "next_id": self._next_id,
             "tiles": [
-                [t.terrain.value, t.resource.value if t.resource else None, t.harvested, t.village, t.city_id, t.owner_city]
+                [t.terrain.value, t.resource.value if t.resource else None, t.harvested, t.village, t.city_id, t.owner_city, t.ruin]
                 for t in self.all_tiles()
             ],
             "tribes": [
-                {"id": t.id, "human": t.human, "stars": t.stars, "techs": sorted(x.value for x in t.techs),
-                 "explored": sorted(t.explored), "alive": t.alive}
+                {"id": t.id, "name": t.name, "color": list(t.color), "human": t.human, "stars": t.stars,
+                 "techs": sorted(x.value for x in t.techs), "explored": sorted(t.explored), "alive": t.alive}
                 for t in self.tribes
             ],
             "cities": [vars(c) for c in self.cities.values()],
@@ -625,6 +729,8 @@ class World:
         world._next_id = data["next_id"]
         world.log = list(data["log"])
         for t, saved in zip(world.tribes, data["tribes"]):
+            t.name = saved["name"]
+            t.color = tuple(saved["color"])
             t.stars = saved["stars"]
             t.techs = {Tech(v) for v in saved["techs"]}
             t.explored = {tuple(p) for p in saved["explored"]}

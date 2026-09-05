@@ -14,7 +14,7 @@ from saga2d import (
 from tribes import ai, effects, mapgen
 from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, TilePulse, Toast, hop, play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
-from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, UNITS, Tech, UnitType
+from tribes.rules import HARVEST, MAX_ROUNDS, REWARDS, TECHS, UNITS, Reward, Tech, UnitType
 from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE
 from tribes.textures import FOG, TILE
 from tribes.view import MapView, Selection, rgba, tile_at, tile_center, tint
@@ -335,8 +335,19 @@ class MapScene(Scene):
         self.sfx("move")
         self.cursor = pos
         self._refresh_selection()
+        self._show_findings()
         if not unit.can_act:
             self.select_unit(None)
+
+    def _show_findings(self) -> None:
+        """Celebrate whatever the player's units just found in ruins."""
+        for finding in self.world.take_findings():
+            center = tile_center(finding.pos)
+            self.effects.add(Burst(center, GOLD, 22, rng=self.rng))
+            self.effects.add(TilePulse(center, GOLD, radius=(10, TILE), rings=2, duration=0.9))
+            self.effects.add(FloatingText(finding.text, (center[0], center[1] - TILE * 0.7), GOLD, font_size=20, rise=36, duration=1.8))
+            self.say(f"Ruins explored: {finding.text}")
+            self.sfx("level_up")
 
     def _attack_selected(self, target: Unit) -> None:
         unit = self.selected
@@ -347,6 +358,7 @@ class MapScene(Scene):
         result = self.world.attack(unit, target)
         self._animate_attack(result, origin, target_pos, attacker_sprite, target_sprite)
         self.view.sync()
+        self._show_findings()  # a melee kill can carry the attacker onto ruins
         if result.defender_killed:
             self.stats["units_killed"] += 1
             self.say(f"{unit.type.value.title()} destroyed the {target.type.value}")
@@ -495,6 +507,9 @@ class MapScene(Scene):
     def end_turn(self) -> None:
         if self.world.winner is not None:
             return
+        if self.world.pending_rewards(self.human):
+            self._offer_reward()  # the rules refuse to end a turn with a reward unpicked
+            return
         waiting = self._own_units_with_actions()
         if waiting and self.settings["confirm_end_turn"] and not self._end_turn_armed:
             self._end_turn_armed_until = self.pulse + 3.5
@@ -507,6 +522,7 @@ class MapScene(Scene):
         self.world.end_turn()
         while self.world.winner is None and not self.world.current_tribe.human:
             ai.take_turn(self.world, self.world.current, self.rng)
+        self.world.take_findings()  # the AI's finds stay in the log only
         self.view.sync()
         lost, news = self._while_away(before)
         self.stats["units_lost"] += lost
@@ -662,6 +678,14 @@ class MapScene(Scene):
         self.effects.update(dt)
         self._update_hover()
         self._update_info()
+        self._offer_reward()
+
+    def _offer_reward(self) -> None:
+        """A city that reached a new level asks for its reward as soon as the map is on top."""
+        if self.game.scene is self and self.world.winner is None:
+            pending = self.world.pending_rewards(self.human)
+            if pending:
+                self.game.push(RewardScene(self, pending[0]))
 
     def _update_hover(self) -> None:
         glow = self.hover_glow
@@ -704,6 +728,10 @@ class MapScene(Scene):
             title = f"{city.name}  level {city.level}" + ("  (capital)" if city.capital else "")
             lines.append(f"Income +{city.income}★ per turn   Territory radius {city.radius}")
             lines.append(f"{city.next_level_population - city.population} more pop to level {city.level + 1}: harvest resources in your borders")
+            built = [name for flag, name in ((city.workshop, "Workshop"), (city.walls, "City walls")) if flag]
+            built += [f"{city.parks} park{'s' if city.parks > 1 else ''}"] if city.parks else []
+            if built:
+                lines.append(" · ".join(built))
         else:
             tile = world.tile(self.cursor)
             title = f"{tile.terrain.value.title()} ({self.cursor[0]}, {self.cursor[1]})"
@@ -715,6 +743,8 @@ class MapScene(Scene):
                     lines.append(f"Territory of {world.tribes[owner].name}")
                 if tile.village:
                     lines.append("Village — capture with a unit that starts its turn here")
+                if tile.ruin:
+                    lines.append("Ancient ruins — walk a unit onto them to see what they hold")
                 if hovered is not None:
                     lines.append(f"{world.tribes[hovered.tribe].name} {hovered.type.value} {hovered.hp}/{hovered.max_hp} hp")
         if world.explored(self.human, self.cursor):
@@ -928,6 +958,48 @@ class SettingsScene(_Overlay):
         self._step(0.1)
 
 
+class RewardScene(_Overlay):
+    """A city reached a new level: pick one of two rewards.  Escape does not skip it."""
+
+    pop_on_cancel = False
+    controls = {"1": "pick_first", "2": "pick_second"}
+
+    def __init__(self, map_scene: MapScene, city: City) -> None:
+        self.map_scene = map_scene
+        self.city = city
+
+    def on_enter(self) -> None:
+        self.options = self.map_scene.world.reward_options(self.city)
+        panel = self.panel(f"{self.city.name} reached level {self.city.level}")
+        panel.add(Label("Choose a reward", text_style="sub"))
+        row = Row(spacing=14)
+        for index, reward in enumerate(self.options):
+            info = REWARDS[reward]
+            row.add(Column(
+                Button(info.name, hotkey=str(index + 1), on_click=lambda r=reward: self.pick(r), style=ACTION_BUTTON, width=240),
+                Label(info.summary, text_style="sub", width=240, align="center"),
+                spacing=6,
+            ))
+        panel.add(row)
+
+    def pick(self, reward: Reward) -> None:
+        scene = self.map_scene
+        scene.world.choose_reward(self.city, reward)
+        center = tile_center(self.city.pos)
+        scene.effects.add(TilePulse(center, rgba(scene.tribe.color), radius=(12, TILE * 1.3), rings=3, duration=1.0))
+        scene.say(f"{self.city.name}: {REWARDS[reward].name}")
+        scene.sfx("research")
+        scene.sync()
+        scene._refresh_selection()
+        self.game.pop()
+
+    def pick_first(self) -> None:
+        self.pick(self.options[0])
+
+    def pick_second(self) -> None:
+        self.pick(self.options[1])
+
+
 class PauseScene(_Overlay):
     controls = {"n": "new_game", "q": "quit", "f5": "save", "f9": "load", "s": "settings", "t": "back_to_title"}
 
@@ -970,7 +1042,8 @@ class PauseScene(_Overlay):
 
 HELP_INTRO = (
     "Capture villages to grow your empire; take every enemy city to win.",
-    "Harvest glowing resources inside your borders to level cities up.",
+    "Harvest glowing resources inside your borders to level cities up; each new level offers a reward.",
+    "Walk onto ruins to find treasure, knowledge, settlers or a map of the land.",
 )
 HELP_KEYS = (
     ("Enter / click", "act at the cursor: select, move, attack, harvest, capture"),
@@ -1041,8 +1114,8 @@ class GameOverScene(_Overlay):
         self.game.quit()
 
 
-def new_game(seed: int, size: int = 14, tribes: int = 3, *, settings: dict[str, Any] | None = None) -> MapScene:
-    return MapScene(mapgen.generate(seed=seed, size=size, tribe_count=tribes), seed, settings=settings)
+def new_game(seed: int, size: int = 14, tribes: int = 3, *, settings: dict[str, Any] | None = None, first_tribe: int = 0) -> MapScene:
+    return MapScene(mapgen.generate(seed=seed, size=size, tribe_count=tribes, first_tribe=first_tribe), seed, settings=settings)
 
 
 def load_game(state: dict[str, Any], *, settings: dict[str, Any] | None = None) -> MapScene:

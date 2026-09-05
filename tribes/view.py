@@ -212,7 +212,7 @@ class MapView:
             else:
                 for group in (self._site_sprites, self._roof_sprites, self._wall_sprites, self._flag_sprites):
                     self._reconcile(group, pos, None)
-                self._reconcile(self._site_sprites, pos, "village" if tile.village else None)
+                self._reconcile(self._site_sprites, pos, "village" if tile.village else "ruin" if tile.ruin else None)
         for unit_id, sprite in list(self._unit_sprites.items()):
             unit = world.units.get(unit_id)
             if unit is None or unit.pos not in explored:

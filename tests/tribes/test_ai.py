@@ -75,7 +75,8 @@ def test_ai_walks_around_water_to_reach_a_village() -> None:
 def test_ai_does_not_throw_a_warrior_at_a_walled_city() -> None:
     world = flat_world()
     fort = world.capital_of(1)
-    world._grow(fort, 9)  # level 4: walls
+    world._grow(fort, 9)  # level 4
+    fort.walls = True
     guard = world.spawn_unit(1, UnitType.DEFENDER, fort.pos)
     attacker = world.spawn_unit(0, UnitType.WARRIOR, (7, 7))
     world.tribes[0].stars = 0

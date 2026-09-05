@@ -192,6 +192,17 @@ def _village() -> Mesh:
     return _walls(0, 0, 0.34, 0.3, 0.22, PLASTER) + _roof(0, 0, 0.34, 0.3, 0.22, (192, 114, 82))
 
 
+def _ruin() -> Mesh:
+    """Three broken columns of different heights and a toppled block."""
+    stone, dark = (176, 172, 168), (150, 146, 144)
+    mesh: Mesh = []
+    for (x, y), height in (((-0.16, -0.12), 0.34), ((0.14, -0.18), 0.22), ((0.18, 0.12), 0.14)):
+        mesh += r3.cylinder((x, y, 0), 0.06, height, stone, sides=8)
+        mesh += r3.cylinder((x, y, 0), 0.09, 0.04, dark, sides=8)
+    mesh += r3.rotate_z(r3.box((-0.12, 0.2, 0.05), (0.3, 0.1, 0.1), dark), 25)
+    return mesh
+
+
 def _flag() -> Mesh:
     """Capital marker: an ink pole at the back corner of the tile with a white (tinted) pennant."""
     x, y = 0.0, -0.42
@@ -375,6 +386,7 @@ def register_all(game: Game) -> None:
         key = f"resource.{resource.value}"
         assets.image_from_pil(key, _prop(key, _resource(resource), DROP_RESOURCE, scale))
     assets.image_from_pil("village", _prop("village", _village(), DROP_SITE, scale))
+    assets.image_from_pil("ruin", _prop("ruin", _ruin(), DROP_SITE, scale))
     assets.image_from_pil("flag", _prop("flag", _flag(), DROP_SITE + 2, scale))
     assets.image_from_pil("walls", _prop("walls", _city_walls(), DROP_WALL, scale))
     for size in range(1, CITY_SIZES + 1):

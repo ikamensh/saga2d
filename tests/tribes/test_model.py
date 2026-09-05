@@ -6,7 +6,10 @@ import pytest
 
 from tribes import ai, mapgen
 from tribes.model import RuleError, Tile, World
-from tribes.rules import HARVEST, Resource, Tech, Terrain, UnitType, tech_cost
+from tribes.rules import (
+    HARVEST, REWARD_PARK_SCORE, REWARD_STARS, RUIN_POPULATION, RUIN_TREASURE, RUIN_VISION_RADIUS, Discovery, Resource, Reward,
+    Tech, Terrain, UnitType, tech_cost,
+)
 
 
 def flat_world(size: int = 10, tribes: int = 2) -> World:
@@ -386,6 +389,7 @@ def test_round_limit_winner_is_chosen_among_living_tribes() -> None:
 def test_a_city_founded_inside_foreign_borders_owns_its_own_tile() -> None:
     world = flat_world()
     world._grow(world.capital_of(0), 5)  # level 3: radius-2 border reaches (3, 3)
+    world.capital_of(0).pending_reward = False  # rewards are not the subject here
     world.tile((3, 3)).village = True
     settler = world.spawn_unit(1, UnitType.WARRIOR, (3, 3))
     world.end_turn()
@@ -523,7 +527,8 @@ def test_growth_can_climb_several_levels_at_once() -> None:
     world = flat_world()
     home = world.capital_of(0)
     world._grow(home, 2 + 3 + 4)
-    assert (home.level, home.population, home.radius, home.has_wall) == (4, 0, 2, True)
+    assert (home.level, home.population, home.radius, home.has_wall) == (4, 0, 2, False)
+    assert home.pending_reward  # walls are a reward now, not a level
     assert world.owner_of((3, 3)) == 0 and world.explored(0, (3, 3))
 
 
@@ -536,3 +541,146 @@ def test_capital_placement_does_not_favour_the_first_tribe() -> None:
             c = world.capital_of(tribe)
             edge_sum[tribe] += min(c.x, c.y, world.size - 1 - c.x, world.size - 1 - c.y)
     assert max(edge_sum) - min(edge_sum) <= 25, edge_sum
+
+
+# -- Tribes, ruins and rewards ---------------------------------------------------------
+
+
+def test_tribes_start_with_their_own_tech_and_the_player_can_be_any_tribe() -> None:
+    world = flat_world(tribes=2)
+    assert world.tribes[0].techs == {Tech.FISHING} and world.tribes[1].techs == {Tech.HUNTING}
+    tiles = [[Tile(x, y, Terrain.FIELD) for x in range(6)] for y in range(6)]
+    rotated = World(6, tiles, 3, first_tribe=2)
+    assert [t.name for t in rotated.tribes] == ["Moss", "Amber", "Azure"]
+    assert rotated.tribes[0].human and rotated.tribes[0].techs == {Tech.ORGANIZATION}
+    copy = World.from_dict(rotated.to_dict())
+    assert [(t.name, t.color) for t in copy.tribes] == [(t.name, t.color) for t in rotated.tribes]
+
+
+def test_maps_scatter_a_few_ruins_on_empty_land_clear_of_villages_and_capitals() -> None:
+    for seed in range(1, 6):
+        world = mapgen.generate(seed=seed, size=14, tribe_count=3)
+        ruins = [t for t in world.all_tiles() if t.ruin]
+        assert 2 <= len(ruins) <= 14 * 14 // 45
+        for tile in ruins:
+            assert tile.terrain is not Terrain.WATER and tile.resource is None and not tile.village and tile.city_id is None
+            assert all(World.distance(tile.pos, c.pos) >= 3 for c in world.cities.values())
+            assert all(World.distance(tile.pos, o.pos) >= 3 for o in ruins if o is not tile)
+        assert World.from_dict(world.to_dict()).tile(ruins[0].pos).ruin
+
+
+def _ruin_kind(pos: tuple[int, int], round_: int) -> Discovery:
+    return list(Discovery)[(pos[0] * 31 + pos[1] * 17 + round_ * 7) % len(Discovery)]
+
+
+def _walk_onto_ruin(world: World, kind: Discovery):
+    """Spawn a warrior next to a fresh ruin whose finding will be *kind*, and step on it."""
+    for pos in world.neighbors((5, 5), 3):
+        step = (pos[0] + 1, pos[1])
+        if _ruin_kind(pos, world.round) is kind and world.unit_at(pos) is None and world.unit_at(step) is None and world.city_at(pos) is None:
+            world.tile(pos).ruin = True
+            unit = world.spawn_unit(0, UnitType.WARRIOR, step)
+            world.move(unit, pos)
+            return pos
+    raise AssertionError(f"no spot for {kind}")
+
+
+def test_ruins_yield_treasure_knowledge_settlers_or_a_map_and_then_vanish() -> None:
+    world = flat_world()
+    tribe = world.tribes[0]
+    home = world.capital_of(0)
+    stars = tribe.stars
+    pos = _walk_onto_ruin(world, Discovery.TREASURE)
+    assert tribe.stars == stars + RUIN_TREASURE and not world.tile(pos).ruin
+    _walk_onto_ruin(world, Discovery.KNOWLEDGE)
+    assert tribe.techs == {Tech.FISHING, Tech.CLIMBING}  # the cheapest tech we could research
+    _walk_onto_ruin(world, Discovery.GROWTH)
+    assert home.level == 2 and home.pending_reward  # +2 pop levels a fresh capital
+    pos = _walk_onto_ruin(world, Discovery.VISION)
+    assert all(world.explored(0, p) for p in world.neighbors(pos, RUIN_VISION_RADIUS))
+    kinds = [f.kind for f in world.take_findings()]
+    assert kinds == [Discovery.TREASURE, Discovery.KNOWLEDGE, Discovery.GROWTH, Discovery.VISION]
+    assert world.take_findings() == []
+    assert any("explored ruins" in line for line in world.log)
+
+
+def test_knowledge_falls_back_to_treasure_when_nothing_is_left_to_learn() -> None:
+    world = flat_world()
+    world.tribes[0].techs.update(Tech)
+    stars = world.tribes[0].stars
+    _walk_onto_ruin(world, Discovery.KNOWLEDGE)
+    assert world.tribes[0].stars == stars + RUIN_TREASURE
+
+
+def test_a_new_level_offers_two_rewards_and_blocks_the_turn_until_one_is_picked() -> None:
+    world = flat_world()
+    home = world.capital_of(0)
+    world._grow(home, 2)
+    assert home.pending_reward and world.reward_options(home) == (Reward.WORKSHOP, Reward.EXPLORER)
+    with pytest.raises(RuleError, match="choose its reward"):
+        world.end_turn()
+    with pytest.raises(RuleError, match="not on offer"):
+        world.choose_reward(home, Reward.WALLS)
+    income = world.income(0)
+    world.choose_reward(home, Reward.WORKSHOP)
+    assert not home.pending_reward and world.income(0) == income + 1
+    with pytest.raises(RuleError, match="no reward"):
+        world.choose_reward(home, Reward.WORKSHOP)
+    world.end_turn()
+    assert world.current == 1
+
+
+def test_every_reward_does_what_it_says() -> None:
+    world = flat_world()
+    home = world.capital_of(0)
+    tribe = world.tribes[0]
+    world._grow(home, 2)
+    world.choose_reward(home, Reward.EXPLORER)
+    assert world.explored(0, (5, 5))
+    world._grow(home, 3)
+    world.choose_reward(home, Reward.WALLS)
+    guard = world.spawn_unit(0, UnitType.WARRIOR, home.pos)
+    assert home.has_wall and world.defense_bonus(guard) == 4.0
+    world._grow(home, 4)
+    assert world.reward_options(home) == (Reward.BORDER, Reward.POPULATION)
+    world.choose_reward(home, Reward.BORDER)
+    assert home.radius == 3 and world.owner_of((4, 4)) == 0
+    world._grow(home, 5)
+    score = world.score(0)
+    world.choose_reward(home, Reward.PARK)
+    assert world.score(0) == score + REWARD_PARK_SCORE
+    world._grow(home, 6)
+    assert world.reward_options(home) == (Reward.PARK, Reward.RESOURCES)
+    stars = tribe.stars
+    world.choose_reward(home, Reward.RESOURCES)
+    assert tribe.stars == stars + REWARD_STARS
+
+
+def test_the_population_reward_can_reach_the_next_level_and_offer_again() -> None:
+    world = flat_world()
+    home = world.capital_of(0)
+    world._grow(home, 2 + 3 + 4)
+    home.population = 2
+    world.choose_reward(home, Reward.POPULATION)
+    assert home.level == 5 and home.population == 0 and home.pending_reward
+    assert world.reward_options(home) == (Reward.PARK, Reward.RESOURCES)
+
+
+def test_ai_picks_rewards_and_marches_on_ruins() -> None:
+    world = flat_world()
+    world.tribes[0].human = False
+    home = world.capital_of(0)
+    world._grow(home, 2)
+    world.tile((6, 1)).ruin = True
+    world.explore(0, (6, 1), 0)  # the ruins are in sight
+    scout = world.spawn_unit(0, UnitType.WARRIOR, (3, 1))
+    world.tribes[0].stars = 0
+    rng = random.Random(4)
+    ai.take_turn(world, 0, rng)
+    assert not home.pending_reward and home.workshop
+    assert World.distance(scout.pos, (6, 1)) < 3
+    world.end_turn()
+    ai.take_turn(world, 0, rng)
+    world.end_turn()
+    ai.take_turn(world, 0, rng)
+    assert not world.tile((6, 1)).ruin and any("explored ruins" in line for line in world.log)

@@ -10,8 +10,8 @@ import random
 from collections import deque
 from typing import Iterator
 
-from tribes.model import Pos, Unit, World
-from tribes.rules import HARVEST, TECHS, Tech, Terrain, UnitType
+from tribes.model import City, Pos, Unit, World
+from tribes.rules import HARVEST, MAX_ROUNDS, TECHS, Reward, Tech, Terrain, UnitType
 
 _UNREACHABLE = 10**6
 
@@ -21,12 +21,15 @@ def take_turn(world: World, tribe: int, rng: random.Random) -> None:
     assert world.current == tribe and world.winner is None
     _research(world, tribe)
     _harvest(world, tribe)
+    _choose_rewards(world, tribe)
     _train(world, tribe, rng)
     for unit in _units_in_play(world, tribe):
         _act(world, unit, rng)
     for unit in _units_in_play(world, tribe):
         _attack(world, unit)  # second pass: units that moved into place this turn can now gang up
-    world.end_turn()
+    _choose_rewards(world, tribe)  # ruins found on the march can level a city too
+    if world.winner is None:
+        world.end_turn()
 
 
 def _units_in_play(world: World, tribe: int) -> Iterator[Unit]:
@@ -57,6 +60,25 @@ def _harvest(world: World, tribe: int) -> None:
     for tile in options:
         if world.can_harvest(tribe, tile.pos) is None:
             world.harvest(tribe, tile.pos)
+
+
+def _choose_rewards(world: World, tribe: int) -> None:
+    while (pending := world.pending_rewards(tribe)) and world.winner is None:
+        world.choose_reward(pending[0], _pick_reward(world, pending[0]))
+
+
+def _pick_reward(world: World, city: City) -> Reward:
+    """Walls when enemies are near, borders when they reach new resources, parks late; else the first offer."""
+    first, second = world.reward_options(city)
+    if first is Reward.WALLS:
+        threatened = any(u.tribe != city.tribe and world.distance(u.pos, city.pos) <= 4 for u in world.units.values())
+        return first if threatened else second
+    if first is Reward.BORDER:
+        ring = [p for p in world.neighbors(city.pos, city.radius + 1) if world.distance(p, city.pos) == city.radius + 1]
+        return first if any(world.tile(p).resource is not None and world.owner_of(p) is None for p in ring) else second
+    if first is Reward.PARK:
+        return first if world.round > MAX_ROUNDS * 2 // 3 else second
+    return first
 
 
 def _train(world: World, tribe: int, rng: random.Random) -> None:
@@ -114,7 +136,7 @@ def _best_target(world: World, unit: Unit) -> Unit | None:
 
 
 def _target_for(world: World, unit: Unit, rng: random.Random) -> Pos | None:
-    """Nearest (by walking distance) free village or enemy city, else enemy unit, else unexplored edge.
+    """Nearest (by walking distance) village, ruin or enemy city, else enemy unit, else unexplored edge.
 
     Ties go to the tile nearest the map's centre, then to chance: breaking
     them on coordinates sent one corner's tribe exploring along the map edge.
@@ -127,7 +149,7 @@ def _target_for(world: World, unit: Unit, rng: random.Random) -> Pos | None:
             continue
         city = world.city_at(tile.pos)
         occupant = world.unit_at(tile.pos)
-        claimable = tile.village or (city is not None and city.tribe != unit.tribe)
+        claimable = tile.village or tile.ruin or (city is not None and city.tribe != unit.tribe)
         if claimable and (occupant is None or occupant.tribe != unit.tribe):
             goals.append((0, dist[tile.pos], tile.pos))
     for other in world.units.values():
