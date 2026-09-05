@@ -147,12 +147,33 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
     scene.draw_circle(x, y + 14 * s, 22 * s, (11, 21, 25, 140))
     scene.draw_circle(x, y + 10 * s, 21 * s, GOLD if selected else shade(color, -26))
     scene.draw_circle(x, y + 7 * s, 18 * s, INK)
+    lower = kind.lower()
+    if lower == "wolf":
+        fur = (177, 184, 174, 255)
+        scene.draw_polygon([(x - 18 * s, y - 7 * s), (x - 10 * s, y - 20 * s),
+                            (x + 11 * s, y - 18 * s), (x + 20 * s, y - 7 * s),
+                            (x + 10 * s, y), (x - 12 * s, y)], fur)
+        for dx in (-12, -4, 8, 15):
+            scene.draw_line(x + dx * s, y - 2 * s, x + (dx - 2) * s, y + 10 * s, fur, 3 * s)
+        scene.draw_polygon([(x + 7 * s, y - 14 * s), (x + 11 * s, y - 34 * s),
+                            (x + 17 * s, y - 27 * s), (x + 26 * s, y - 21 * s),
+                            (x + 22 * s, y - 15 * s)], (207, 211, 193, 255))
+        scene.draw_line(x - 14 * s, y - 12 * s, x - 26 * s, y - 24 * s, fur, 5 * s)
+        scene.draw_circle(x + 18 * s, y - 23 * s, 1.5 * s, INK)
+        return
+    if lower == "commander":
+        scene.draw_polygon([(x - 11 * s, y - 21 * s), (x - 23 * s, y + 6 * s),
+                            (x + 19 * s, y + 7 * s), (x + 8 * s, y - 21 * s)], GOLD)
+    armor = (82, 77, 97, 255) if lower == "guard" else color
     scene.draw_polygon([(x - 13 * s, y + 4 * s), (x - 7 * s, y - 20 * s),
-                        (x + 7 * s, y - 20 * s), (x + 13 * s, y + 4 * s)], color)
+                        (x + 7 * s, y - 20 * s), (x + 13 * s, y + 4 * s)], armor)
     scene.draw_line(x - 5 * s, y + 3 * s, x - 7 * s, y + 12 * s, (209, 207, 174, 255), 4 * s)
     scene.draw_line(x + 5 * s, y + 3 * s, x + 7 * s, y + 12 * s, (209, 207, 174, 255), 4 * s)
-    scene.draw_circle(x, y - 24 * s, 8 * s, (220, 199, 157, 255))
-    lower = kind.lower()
+    skin = (145, 176, 92, 255) if lower == "goblin" else (220, 199, 157, 255)
+    scene.draw_circle(x, y - 24 * s, 8 * s, skin)
+    if lower == "goblin":
+        scene.draw_polygon([(x - 7 * s, y - 29 * s), (x - 19 * s, y - 32 * s), (x - 7 * s, y - 21 * s)], skin)
+        scene.draw_polygon([(x + 7 * s, y - 29 * s), (x + 19 * s, y - 32 * s), (x + 7 * s, y - 21 * s)], skin)
     if any(name in lower for name in ("archer", "scout", "bow")):
         outline(scene, [(x + 13 * s, y - 28 * s), (x + 24 * s, y - 11 * s),
                         (x + 13 * s, y + 5 * s)], GOLD, 2 * s)
@@ -164,13 +185,26 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
         scene.draw_polygon([(x - 11 * s, y - 28 * s), (x + 1 * s, y - 48 * s),
                             (x + 9 * s, y - 28 * s)], color)
     else:
-        scene.draw_rect(x - 9 * s, y - 32 * s, 18 * s, 9 * s, (187, 198, 184, 255))
+        if lower != "goblin":
+            helmet = (111, 117, 129, 255) if lower == "guard" else (187, 198, 184, 255)
+            scene.draw_rect(x - 9 * s, y - 32 * s, 18 * s, 9 * s, helmet)
         scene.draw_line(x + 19 * s, y - 2 * s, x + 19 * s, y - 42 * s, TEXT, 3 * s)
         scene.draw_line(x + 13 * s, y - 9 * s, x + 25 * s, y - 9 * s, GOLD, 3 * s)
         scene.draw_polygon([(x - 24 * s, y - 17 * s), (x - 9 * s, y - 17 * s),
                             (x - 10 * s, y - 1 * s), (x - 17 * s, y + 5 * s),
                             (x - 24 * s, y - 1 * s)], color)
         scene.draw_line(x - 17 * s, y - 14 * s, x - 17 * s, y, GOLD, 2)
+        if lower in ("commander", "guard"):
+            scene.draw_polygon([(x - 9 * s, y - 31 * s), (x - 11 * s, y - 42 * s),
+                                (x - 3 * s, y - 36 * s), (x, y - 43 * s),
+                                (x + 3 * s, y - 36 * s), (x + 11 * s, y - 42 * s),
+                                (x + 9 * s, y - 31 * s)], GOLD if lower == "commander" else RED)
+        elif lower in ("swordsman", "warrior"):
+            scene.draw_rect(x - 3 * s, y - 42 * s, 6 * s, 13 * s, color)
+        elif lower == "militia":
+            scene.draw_line(x + 19 * s, y - 3 * s, x + 19 * s, y - 45 * s, (194, 159, 102, 255), 2 * s)
+            scene.draw_polygon([(x + 15 * s, y - 40 * s), (x + 19 * s, y - 51 * s),
+                                (x + 23 * s, y - 40 * s)], TEXT)
 
 
 def compass(scene, x, y):

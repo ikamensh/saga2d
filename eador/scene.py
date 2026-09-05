@@ -436,8 +436,8 @@ class BattleScene(Screen):
                     enabled="heal" in b.spells and b.mana >= SPELLS["heal"].cost and hero_ready)
         self.button("Auto-play one round", x, 518, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
         self.button("Retreat", x, 568, 300, self.retreat, danger=True, enabled=b.outcome is None)
-        self.button("Return to shard" if b.outcome else "End battle round", x, h - 93, 300,
-                    self.finish if b.outcome else self.end_turn, hotkey="E", primary=True)
+        self.button("End battle round", x, h - 93, 300, self.end_turn,
+                    hotkey="E", primary=True, enabled=b.outcome is None)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
 
@@ -453,18 +453,10 @@ class BattleScene(Screen):
                 self.game.push(ResultScene(self.root, battle=True))
 
     def end_turn(self):
-        if self.battle.outcome:
-            self.finish()
-        else:
-            self.act(self.battle.end_turn)
+        self.act(self.battle.end_turn)
 
     def auto_round(self):
         self.act(self.battle.auto_turn)
-
-    def finish(self):
-        if self.battle.outcome is not None:
-            self.root.state.resolve_battle()
-            self.game.pop()
 
     def retreat(self):
         try:
