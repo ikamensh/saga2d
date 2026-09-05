@@ -18,3 +18,12 @@ def test_elderwild_offers_a_richer_dry_detour_through_a_wolf_and_goblin_shard():
     assert state.provinces[(0, 0)].guards.count('wolf') > 1
     restored = State.from_json(state.to_json())
     assert restored.provinces == state.provinces
+
+
+def test_an_elderwild_campaign_can_win_by_developing_and_defending_a_realm():
+    """New guarding parties remain beatable through the ordinary campaign commands."""
+    from tools.eador_campaign import play_campaign
+    state = play_campaign(State.new(7, theme='elderwild'))
+    assert state.status == 'victory'
+    assert state.hero.level > 1
+    assert any(province.explored for province in state.provinces.values())
