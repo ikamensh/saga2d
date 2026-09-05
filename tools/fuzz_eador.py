@@ -245,6 +245,9 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     press('t')
                 else:
                     button('Retreat')
+            elif roll < .40:
+                press('g')
+                metrics['defensive_order_inputs'] += 1
             elif roll < .5:
                 press(rng.choice(('left', 'right', 'up', 'down', 'pageup', 'pagedown', 'f', '1', '2')))
                 press('return')

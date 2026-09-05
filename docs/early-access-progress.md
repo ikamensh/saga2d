@@ -149,3 +149,31 @@ walkthroughs, complete display/settings matrix or release readiness.
 G06 remains incomplete: profitable indefinite capital camping still needs
 economic pressure, and broader balance/content evidence remains outstanding.
 Encirclement and unpaid upkeep are the next isolated rules increment.
+
+## Supply pressure and audio lifetime — 2026-09-06
+
+- An encircled Westwatch loses its production, Marketplace income and
+  local recovery until a neighboring province is reclaimed. Outlying
+  provinces retain production. Unaffordable upkeep causes deterministic,
+  logged departures that preserve more experienced troops first.
+- The shard shows the blockade and the next bill's exact gold shortfall
+  before End Turn. The rival report names all three breakout routes and
+  explains the lost supply. Departures also produce a visible campaign
+  message; the selected capital's income display reflects its blockade.
+- A native journey loads an earned older campaign at an unpaid bill,
+  inspects the warning, loses troops, reloads the protected manual slot,
+  and fights a breakout restoring supply. Screenshots were inspected at
+  `/tmp/shardbound-supply`. Model evidence includes 400 proactive victories
+  across 100 seeds and four heroes, plus the passive-camping defeat and
+  wounded-breakout regressions in [rival-design.md](rival-design.md).
+- Active Saga2D sound effects now respond to mute/master/effects volume,
+  preserve their relative gains and release playback resources at completion
+  and shutdown. AudioManager's public game API is unchanged. Real backend
+  checks cover sustained effects, independent managers, natural completion
+  and shutdown; this fixes shared playback mechanics before Shardbound audio
+  content is added.
+- The combined integration suite passed **472 tests** and the native rival,
+  supply and audio checks. G01–G19 remain incomplete; broader strategic
+  balance, content, presentation and release-candidate evidence are still
+  required. Guard/Brace rules are merged and their player controls are the
+  next UI increment.
