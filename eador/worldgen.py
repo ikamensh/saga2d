@@ -119,6 +119,7 @@ def _elderwild(provinces: dict[Pos, Province], seed: int) -> None:
         else:
             province.guards = ['guard', 'wolf', 'archer'] if on_road else ['guard', 'guard', 'wolf', 'goblin']
         _site(province, 'caravan' if on_road else rng.choice(('grove', 'den', 'shrine', 'tower')))
+    _site(provinces[(0, 2 if (0, -1) in road else -2)], 'border_watch')
     provinces[(0, 0)].name = 'Mire Crossing'
     for pos in road:
         if pos[0] == 0:
@@ -142,17 +143,18 @@ def _ruins(provinces: dict[Pos, Province], seed: int) -> None:
             province.income, province.crystals = 12, 2
             province.guards = (['pikeman'] if q < 0 else ['pikeman', 'archer', 'goblin'] if q == 0
                                else ['guard', 'pikeman', 'pikeman', 'archer'])
-            _site(province, 'tower')
+            _site(province, 'barrow')
         elif pos in flank:
             province.income, province.crystals = rng.randint(7, 9), 0
             province.guards = (['brigand'] if q < 0 else ['brigand', 'goblin'] if q == 0
                                else ['brigand', 'goblin', 'archer'])
-            _site(province, 'caravan' if q <= 0 else 'barrow')
+            _site(province, 'caravan' if q < 0 else 'tower' if q == 0 else 'barrow')
         else:
             province.income, province.crystals = rng.randint(4, 6), 1
             province.guards = (['goblin'] if q < 0 else ['pikeman', 'pikeman', 'archer'] if q == 0
                                else ['guard', 'guard', 'pikeman', 'archer'])
             _site(province, rng.choice(('tower', 'barrow', 'shrine')))
+    _site(provinces[(0, 2 if (0, -1) in flank else -2)], 'border_watch')
     provinces[(0, 0)].name = 'Broken Checkpoint'
     for pos in flank:
         if pos[0] == 0:

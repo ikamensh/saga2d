@@ -35,12 +35,13 @@ def test_ruins_trade_a_valuable_pike_checkpoint_for_a_weaker_flank():
     state = State.new(7, theme='ruins')
     checkpoint = state.provinces[(0, 0)]
     assert {'pikeman', 'archer'} <= set(checkpoint.guards)
-    assert checkpoint.site_kind == 'tower'
+    assert checkpoint.site_kind == 'barrow'
     flanks = [[state.provinces[pos] for pos in road[1:-1]] for road in (NORTH_ROAD, SOUTH_ROAD)]
     weaker = min(flanks, key=lambda provinces: sum(sum(p.guard_hp) for p in provinces))
     assert sum(sum(p.guard_hp) for p in weaker) < sum(sum(p.guard_hp) for p in max(flanks, key=lambda ps: sum(sum(p.guard_hp) for p in ps)))
     assert checkpoint.income > max(p.income for p in weaker)
     assert any(p.site_kind == 'caravan' for p in weaker)
+    assert any(p.site_kind == 'tower' for p in weaker)
     assert any('pikeman' in p.guards for p in state.provinces.values() if p.owner == 'rival')
 
 
@@ -82,3 +83,64 @@ def test_new_themes_keep_their_identity_through_active_battles_and_reject_unknow
     for bad in ('unreleased', None, ['frontier']):
         with pytest.raises(RuleError, match='Choose'):
             State.new(theme=bad)
+
+
+def test_every_theme_places_one_optional_watch_away_from_the_home_shrine():
+    """The timed encounter is an authored flank adventure, never a surprise opening fight."""
+    from eador.worldgen import THEMES
+    for theme in THEMES:
+        state = State.new(7, theme=theme)
+        watches = [p for p in state.provinces.values() if p.site_kind == 'border_watch']
+        assert len(watches) == 1
+        watch = watches[0]
+        assert watch.owner == 'neutral' and watch.pos[0] == 0 and abs(watch.pos[1]) == 2
+        assert state.grid.path(state.hero.pos, watch.pos)
+        assert state.provinces[state.hero.pos].site_kind == 'shrine'
+
+
+def test_a_hundred_seeds_per_theme_keep_connected_capitals_variety_and_valid_content():
+    """Random placement cannot erase routes, break saved rosters or strand the opening."""
+    from eador.content import SITES
+    from eador.model import UNITS
+    from eador.worldgen import THEMES
+    for theme in THEMES:
+        worlds, flank_sides = set(), set()
+        for seed in range(100):
+            state = State.new(seed, theme=theme)
+            assert len(state.provinces) == 19
+            assert set(state.grid.reachable(state.hero.pos, 19)) == state.grid.cells
+            assert state.grid.path(state.hero.pos, (2, 0))
+            assert state.provinces[(2, 0)].owner == 'rival'
+            for province in state.provinces.values():
+                assert len(province.guards) <= 7 and len(province.site_guards) <= 7
+                assert province.guard_hp == [UNITS[kind].hp for kind in province.guards]
+                assert province.site_guard_hp == [UNITS[kind].hp for kind in province.site_guards]
+                assert province.site_kind is None or province.site_kind in SITES
+            saved = state.to_json()
+            assert State.from_json(saved).to_json() == saved
+            worlds.add(tuple((p.terrain, p.income, tuple(p.guards), p.site_kind)
+                             for p in state.provinces.values()))
+            if theme != 'frontier':
+                flank_sides.add(next(p.pos[1] for p in state.provinces.values()
+                                     if p.name in ('Old Causeway', 'Salvager’s Track')))
+        assert len(worlds) > 90
+        if theme != 'frontier':
+            assert flank_sides == {-1, 1}
+
+
+def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_every_theme():
+    """A sensible first purchase leaves every opening direction viable, across 100 seeds."""
+    from eador.model import HERO_CLASSES
+    from eador.worldgen import THEMES
+    from tools.eador_campaign import finish_battle
+    for theme in THEMES:
+        for seed in range(100):
+            for hero_class in HERO_CLASSES:
+                for target in (None, (-2, 1), (-1, -1), (-1, 0)):
+                    state = State.new(seed, hero_class, theme=theme)
+                    state.build('barracks')
+                    state.recruit('swordsman')
+                    state.explore() if target is None else state.travel(target)
+                    finish_battle(state)
+                    assert state.provinces[(-2, 0)].explored if target is None else state.hero.pos == target
+                    assert state.status == 'playing'
