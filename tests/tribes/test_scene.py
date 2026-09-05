@@ -115,14 +115,51 @@ def test_end_turn_runs_the_ai_and_returns_to_the_player(play) -> None:
     assert all(u.can_act for u in scene.world.tribe_units(scene.human))
 
 
-def test_tech_overlay_buys_a_tech_with_a_number_key(play) -> None:
+def test_research_wheel_shows_every_tech_and_tab_enter_researches(play) -> None:
+    from tribes.rules import TECHS
+
     game, scene = play
     scene.tribe.stars = 20
     press(game, "t")
-    assert isinstance(game.scene, TechScene)
-    press(game, "1")
-    assert isinstance(game.scene, MapScene)
-    assert scene.tribe.techs == {Tech.FISHING, Tech.ORGANIZATION}  # Azure starts with Fishing
+    wheel = game.scene
+    assert isinstance(wheel, TechScene) and not scene.ui.visible
+    shown = texts(game)
+    assert all(tech.value.title() in shown for tech in TECHS)
+    assert shown.count("✓") == 1  # Fishing is known from the start
+    assert wheel.focus in wheel._researchable()
+    press(game, "tab")
+    target = wheel.focus
+    assert target in wheel._researchable()
+    press(game, "return")
+    assert target in scene.tribe.techs and scene.tribe.stars == 20 - 5
+    assert game.scene is wheel  # stays open for more research
+    press(game, "escape")
+    assert game.scene is scene and scene.ui.visible
+
+
+def test_research_wheel_arrows_walk_the_wheel_and_clicks_research(play) -> None:
+    from tribes.rules import TECHS
+
+    game, scene = play
+    scene.tribe.stars = 30
+    press(game, "t")
+    wheel = game.scene
+    wheel.focus = Tech.ORGANIZATION  # the top node
+    press(game, "down")
+    assert wheel.positions[wheel.focus][1] > wheel.positions[Tech.ORGANIZATION][1]
+    wheel.focus = Tech.RIDING
+    press(game, "return")
+    assert Tech.RIDING in scene.tribe.techs
+    x, y = wheel.positions[Tech.CHIVALRY]
+    game.backend.inject_click(int(x), int(y))
+    game.tick(1 / 60)
+    assert Tech.CHIVALRY in scene.tribe.techs
+    x, y = wheel.positions[Tech.TRADE]  # locked: needs Roads
+    game.backend.inject_click(int(x), int(y))
+    game.tick(1 / 60)
+    assert Tech.TRADE not in scene.tribe.techs and wheel.focus is Tech.TRADE
+    assert any("requires Roads" in t for t in texts(game))
+    assert len({pos for pos in wheel.positions.values()}) == len(TECHS)
 
 
 def test_city_selection_trains_a_unit_with_a_number_key(play) -> None:

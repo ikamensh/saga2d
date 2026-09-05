@@ -684,3 +684,91 @@ def test_ai_picks_rewards_and_marches_on_ruins() -> None:
     world.end_turn()
     ai.take_turn(world, 0, rng)
     assert not world.tile((6, 1)).ruin and any("explored ruins" in line for line in world.log)
+
+
+# -- The wider tech tree -----------------------------------------------------------
+
+
+def test_forestry_lets_units_keep_moving_through_forests() -> None:
+    world = flat_world()
+    for x in range(10):
+        world.tile((x, 3)).terrain = Terrain.FOREST
+    rider = world.spawn_unit(0, UnitType.RIDER, (4, 4))
+    assert (4, 2) not in world.reachable(rider)  # the forest belt ends the move
+    world.tribes[0].techs.add(Tech.FORESTRY)
+    assert (4, 2) in world.reachable(rider)
+
+
+def test_roads_add_a_move_when_starting_on_home_soil() -> None:
+    world = flat_world()
+    home_guard = world.spawn_unit(0, UnitType.WARRIOR, (1, 2))
+    abroad = world.spawn_unit(0, UnitType.WARRIOR, (6, 6))
+    assert (1, 4) not in world.reachable(home_guard)
+    world.tribes[0].techs.add(Tech.ROADS)
+    assert (1, 4) in world.reachable(home_guard)
+    assert (6, 8) not in world.reachable(abroad)
+
+
+def test_meditation_heals_idle_units_more() -> None:
+    world = flat_world()
+    hurt = world.spawn_unit(0, UnitType.WARRIOR, (1, 2))
+    hurt.hp = 1
+    world.end_turn()
+    assert hurt.hp == 5
+    hurt.hp = 1
+    world.tribes[0].techs.add(Tech.MEDITATION)
+    world.end_turn()
+    world.end_turn()
+    assert hurt.hp == 7
+
+
+def test_navigation_pays_coastal_cities_and_trade_pays_every_city() -> None:
+    world = flat_world()
+    home = world.capital_of(0)
+    assert world.city_income(home) == 2
+    world.tribes[0].techs.add(Tech.NAVIGATION)
+    assert world.city_income(home) == 2  # no water nearby
+    world.tile((0, 0)).terrain = Terrain.WATER
+    assert world.city_income(home) == 3
+    world.tribes[0].techs.add(Tech.TRADE)
+    assert world.city_income(home) == 4 and world.income(0) == 4
+
+
+def test_construction_cheapens_harvests_and_aquaculture_fattens_fish() -> None:
+    world = flat_world()
+    world.tile((2, 1)).resource = Resource.FISH
+    world.tile((1, 2)).resource = Resource.FISH
+    world.tribes[0].stars = 10
+    home = world.capital_of(0)
+    world.harvest(0, (2, 1))
+    assert world.tribes[0].stars == 8 and home.population == 1
+    world.tribes[0].techs.update({Tech.CONSTRUCTION, Tech.AQUACULTURE})
+    assert world.harvest_cost(0, Resource.FISH) == 1 and world.harvest_yield(0, Resource.FISH) == 2
+    world.harvest(0, (1, 2))
+    assert world.tribes[0].stars == 7 and home.level == 2  # 1 + 2 pop reaches level 2
+
+
+def test_cartography_reveals_every_coastline() -> None:
+    world = flat_world()
+    world.tile((8, 2)).terrain = Terrain.WATER
+    world.tribes[0].techs.update({Tech.NAVIGATION})
+    world.tribes[0].stars = 100
+    assert not world.explored(0, (8, 2))
+    world.research(0, Tech.CARTOGRAPHY)
+    assert world.explored(0, (8, 2)) and world.explored(0, (7, 3)) and not world.explored(0, (5, 5))
+
+
+def test_catapults_strike_from_three_tiles_and_never_hit_back() -> None:
+    world = flat_world()
+    world.tribes[0].techs.update({Tech.MATHEMATICS, Tech.SMITHERY})
+    catapult = world.spawn_unit(0, UnitType.CATAPULT, (4, 4))
+    swordsman = world.spawn_unit(0, UnitType.SWORDSMAN, (5, 5))
+    target = world.spawn_unit(1, UnitType.WARRIOR, (7, 4))
+    world.explore(0, (7, 4), 0)  # in sight
+    result = world.attack(catapult, target)
+    assert result.damage_dealt >= 8 and result.damage_taken == 0
+    world.end_turn()
+    raider = world.spawn_unit(1, UnitType.WARRIOR, (3, 4))
+    hit = world.attack(raider, catapult)
+    assert hit.damage_taken == 0 and hit.damage_dealt == 9  # no defence at all
+    assert swordsman.max_hp == 15 and world.can_train(world.capital_of(0), UnitType.SWORDSMAN) != "Requires Smithery"

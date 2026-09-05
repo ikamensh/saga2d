@@ -353,7 +353,28 @@ def _unit(unit_type: UnitType) -> Mesh:
         sx, sy, _ = _SIDE
         pennant = r3.facing([(0.17, -0.05, z + 0.78), (0.17 + sx * 0.15, -0.05 + sy * 0.15, z + 0.73), (0.17, -0.05, z + 0.66)], INK, VIEW)
         return base + _figure(0, 0, z) + plume + lance + pennant
+    if unit_type is UnitType.SWORDSMAN:
+        blade = r3.box((0.18, -0.06, z + 0.34), (0.06, 0.06, 0.46), INK) + r3.box((0.18, -0.06, z + 0.13), (0.2, 0.06, 0.04), INK)
+        shield = r3.facing(_facing_octagon((0.14, 0.14, z + 0.22), 0.12), INK, VIEW) + r3.facing(_facing_octagon((0.15, 0.15, z + 0.22), 0.08), WHITE, VIEW)
+        return base + _figure(0, 0, z, body_r=0.13) + blade + shield
+    if unit_type is UnitType.CATAPULT:
+        frame = r3.box((0, 0, z + 0.05), (0.42, 0.24, 0.1), WHITE)
+        wheels = [f for x, y in ((-0.16, -0.1), (-0.16, 0.1), (0.16, -0.1), (0.16, 0.1)) for f in r3.box((x, y, z + 0.05), (0.08, 0.05, 0.1), INK)]
+        arm = r3.box((-0.1, 0, z + 0.36), (0.05, 0.05, 0.54), INK)
+        bucket = r3.box((-0.1, 0, z + 0.65), (0.14, 0.14, 0.08), WHITE)
+        crossbar = r3.box((0.06, 0, z + 0.2), (0.05, 0.28, 0.2), WHITE)
+        return base + frame + wheels + arm + bucket + crossbar
     raise ValueError(unit_type)
+
+
+def _facing_octagon(center: r3.Vec3, radius: float) -> list[r3.Vec3]:
+    """Corners of a regular octagon facing the camera, centred on *center*."""
+    cx, cy, cz = center
+    sx, sy, _ = _SIDE
+    return [
+        (cx + sx * radius * math.cos(a), cy + sy * radius * math.cos(a), cz + radius * math.sin(a))
+        for a in (math.radians(22.5 + 45 * i) for i in range(8))
+    ]
 
 
 # -- 2-D effects -------------------------------------------------------------------
