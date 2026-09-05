@@ -52,8 +52,9 @@ UNITS = {
     'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
     'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
     'guard': UnitSpec('Dread Guard', 42, 12, 4, 3, 1, 0, 0, None, (173, 130, 196)),
+    'pikeman': UnitSpec('Pikeman', 28, 9, 3, 2, 1, 40, 2, 'barracks', (173, 188, 149)),
 }
-RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer')
+RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman')
 
 
 @dataclass(frozen=True)
@@ -65,7 +66,7 @@ class BuildingSpec:
 
 
 BUILDINGS = {
-    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit durable swordsmen.'),
+    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen and defensive pikemen.'),
     'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit ranged archers.'),
     'temple': BuildingSpec('Temple', 65, 0, 'Recruit acolytes; learn Heal; faster recovery.'),
     'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana.'),
@@ -882,7 +883,8 @@ def _validate_save(data: dict, version: int) -> None:
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
         if version >= 4:
-            require(unit['stance'] in (None, 'guard'), 'Unknown battle stance.')
+            require(unit['stance'] in (None, 'guard', 'brace'), 'Unknown battle stance.')
+            require(unit['stance'] != 'brace' or unit['kind'] == 'pikeman', 'Only a Pikeman can use a Brace stance.')
             require(unit['stance'] is None or unit['team'] == 'enemy' or unit['moved'] and unit['acted'],
                     'A defensive stance must spend the player unit’s order.')
         if version >= 2:

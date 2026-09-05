@@ -53,6 +53,11 @@ class BattleUnit:
         return self.hp > 0
 
     @property
+    def effective_defense(self) -> int:
+        """Armor including the current stance, before terrain cover."""
+        return self.defense + (2 if self.stance == 'guard' else 0)
+
+    @property
     def name(self) -> str:
         return 'Hero' if self.kind == 'hero' else UNITS[self.kind].name
 
@@ -184,37 +189,53 @@ class Battle:
         self._attack(self._actor(unit_id), self.unit(target_id))
 
     def guard(self, unit_id: int) -> None:
-        """Spend the unit's remaining order to guard until its next team turn."""
-        unit = self._actor(unit_id)
+        """Spend the remaining order to Guard, or Brace for a Pikeman, until its next turn."""
+        self._guard(self._actor(unit_id))
+
+    def _guard(self, unit: BattleUnit) -> None:
         if unit.acted:
             raise RuleError('That unit has already acted.')
-        unit.stance = 'guard'
+        unit.stance = 'brace' if unit.kind == 'pikeman' else 'guard'
         unit.moved = unit.acted = True
-        self.log.append(f'{unit.name} guards until its next turn.')
+        self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
 
     def _damage(self, attacker: BattleUnit, target: BattleUnit) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
-        protection = 2 if target.stance == 'guard' else 0
-        return min(target.hp, max(1, attacker.attack - target.defense - cover - protection))
+        return min(target.hp, max(1, attacker.attack - target.effective_defense - cover))
 
     def preview(self, unit_id: int, target_id: int) -> tuple[int, int]:
         """Return actual target and attacker HP loss for a legal attack, without mutation."""
-        unit, target = self.unit(unit_id), self.unit(target_id)
+        damage, spear, retaliation = self._attack_effects(self.unit(unit_id), self.unit(target_id))
+        return damage, spear + retaliation
+
+    def _attack_effects(self, unit: BattleUnit, target: BattleUnit) -> tuple[int, int, int]:
+        """Resolve the ordered damage once for both forecasts and attacks."""
         if target not in self.targets(unit.id):
             raise RuleError('Choose an enemy within attack range; each unit attacks once.')
+        adjacent = HexGrid.distance(unit.pos, target.pos) == 1
+        braces = target.stance == 'brace' and adjacent and unit.attack_range == 1
+        spear = self._damage(target, unit) if braces else 0
+        if spear == unit.hp:
+            return 0, spear, 0
         damage = self._damage(unit, target)
-        retaliates = unit.safe_attacks == 0 and target.hp > damage and not target.retaliated and HexGrid.distance(unit.pos, target.pos) == 1
-        return damage, self._damage(target, unit) if retaliates else 0
+        retaliates = not braces and unit.safe_attacks == 0 and target.hp > damage and not target.retaliated and adjacent
+        return damage, spear, self._damage(target, unit) if retaliates else 0
 
     def _attack(self, unit: BattleUnit, target: BattleUnit) -> None:
-        damage, retaliation = self.preview(unit.id, target.id)
+        damage, spear, retaliation = self._attack_effects(unit, target)
+        if spear:
+            unit.hp -= spear
+            target.stance = None
+            target.retaliated = True
+            self.log.append(f'{target.name} braces and strikes {unit.name} for {spear} before the attack.')
         target.hp -= damage
         unit.acted = True
         if not unit.skirmisher:
             unit.moved = True
         if unit.safe_attacks:
             unit.safe_attacks -= 1
-        self.log.append(f'{unit.name} hits {target.name} for {damage}.')
+        if unit.alive:
+            self.log.append(f'{unit.name} hits {target.name} for {damage}.')
         if retaliation:
             unit.hp -= retaliation
             target.retaliated = True
@@ -302,6 +323,8 @@ class Battle:
                     self.attack(unit.id, target.id)
                 else:
                     self._attack(unit, target)
+            elif unit.kind == 'pikeman':
+                self._guard(unit)
 
     def end_turn(self) -> None:
         if self.outcome:
