@@ -82,7 +82,7 @@ def test_preversioned_campaign_and_active_battle_migrate_without_new_rewards():
         assert restored.hero.skills == set() and restored.choice is None
         assert restored.provinces[restored.hero.pos].site_gold == 55
         assert restored.provinces[restored.hero.pos].site_relic is None
-        assert json.loads(restored.to_json())['schema_version'] == 4
+        assert json.loads(restored.to_json())['schema_version'] == 5
         if restored.battle:
             assert restored.battle.to_dict()['units'][0]['hp'] == old['battle']['units'][0]['hp']
             win(restored)
