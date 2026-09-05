@@ -82,7 +82,13 @@ four classes still win by exploring, investing and intercepting the announced
 threat; leaving Westwatch undefended still loses. Those are bounded regression
 strategies, not a claim of broad balance or release readiness.
 
-The full client suite after merging main `00ca6cf` passed 429 tests. Root-owned
+The final client suite at `915dd40`, including main `643648a`, passed 431 tests.
+The updated stress driver passed 100 model campaigns and 12 scene runs: 11,730
+model state checks, 2,096 paired saved battle rounds, 511 saved choices, 3,092
+unchanged rejected commands, and 2,153 random scene inputs. Forced cleanup
+departures are counted separately because the rival deliberately avoids
+repeatedly attacking an unbeatable camper. The source fingerprint and actual
+metrics are in `docs/evidence/shardbound-rival-stress-2026-09-05.json`. Root-owned
 UI work must still communicate the expedition, target, countdown and resource
 changes clearly, and validate manual interception/counterattack through real
 input. This increment advances G06/G13; it does not complete the Early Access
