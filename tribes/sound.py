@@ -22,95 +22,17 @@ so effects blend with the music.
 from __future__ import annotations
 
 import random
-import wave
 from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
 
 from saga2d import AssetManager, AudioManager, Game
+from saga2d.synth import (BELL, DARK, GLASS, PAD, SAMPLE_RATE,
+                         hz, level, mix, noise, seconds as _time, thump, tone, write_wav)
 
 SOUND_VERSION = "1"
-SAMPLE_RATE = 44_100
 MUSIC = "ambient"
-
-# -- Synthesis ---------------------------------------------------------------
-
-_NOTE_INDEX = {"C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5, "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11}
-
-# Partials as (harmonic multiple, relative amplitude): the timbre of a tone.
-SOFT = ((1, 1.0), (2, 0.3), (3, 0.1))                                # flute-like
-GLASS = ((1, 1.0), (2, 0.5), (3, 0.28), (4, 0.14), (5, 0.07))        # electric-piano pluck
-DARK = ((1, 1.0), (2, 0.15))                                         # muted, almost a sine
-BELL = ((1, 1.0), (2, 0.45), (3, 0.25), (4.16, 0.12), (5.43, 0.05))  # a little inharmonic shimmer
-PAD = ((1, 1.0), (2, 0.5), (3, 0.33), (4, 0.25))                     # saw-like, filtered by the LFO
-
-
-def hz(note: str) -> float:
-    """``"A4"`` → 440.0; sharps as ``"F#5"``."""
-    midi = 12 * (int(note[-1]) + 1) + _NOTE_INDEX[note[:-1]]
-    return 440.0 * 2 ** ((midi - 69) / 12)
-
-
-def _time(seconds: float) -> np.ndarray:
-    return np.arange(int(round(seconds * SAMPLE_RATE))) / SAMPLE_RATE
-
-
-def envelope(seconds: float, attack: float, tau: float) -> np.ndarray:
-    """Raised-cosine attack, exponential decay with time constant *tau*,
-    and a 5 ms fade at the very end so no clip ends mid-cycle."""
-    t = _time(seconds)
-    env = np.ones_like(t)
-    rising = t < attack
-    env[rising] = 0.5 - 0.5 * np.cos(np.pi * t[rising] / attack)
-    env[~rising] = np.exp(-(t[~rising] - attack) / tau)
-    tail = min(len(t), int(0.005 * SAMPLE_RATE))
-    env[-tail:] *= np.linspace(1.0, 0.0, tail)
-    return env
-
-
-def tone(note: str, seconds: float, *, attack: float = 0.005, tau: float = 0.1, partials=SOFT) -> np.ndarray:
-    """A decaying note; higher partials die faster, as on a plucked string."""
-    freq = hz(note)
-    t = _time(seconds)
-    out = np.zeros_like(t)
-    for k, amp in partials:
-        out += amp * envelope(seconds, attack, tau / (1 + 0.6 * (k - 1))) * np.sin(2 * np.pi * freq * k * t)
-    return out / sum(amp for _, amp in partials)
-
-
-def noise(seconds: float, low: float, high: float, *, attack: float = 0.002, tau: float = 0.03, seed: int = 0) -> np.ndarray:
-    """Band-limited noise burst between *low* and *high* Hz (soft 8th-order edges)."""
-    n = int(round(seconds * SAMPLE_RATE))
-    spectrum = np.fft.rfft(np.random.default_rng(seed).standard_normal(n))
-    freqs = np.fft.rfftfreq(n, 1 / SAMPLE_RATE)
-    mask = np.zeros_like(freqs)
-    f = freqs[1:]
-    mask[1:] = 1 / (1 + (f / high) ** 8) / (1 + (low / f) ** 8)
-    burst = np.fft.irfft(spectrum * mask, n)
-    return burst / np.max(np.abs(burst)) * envelope(seconds, attack, tau)
-
-
-def thump(f0: float, f1: float, seconds: float, *, attack: float = 0.002, tau: float = 0.05) -> np.ndarray:
-    """A sine gliding exponentially from *f0* to *f1* Hz: drums and impacts."""
-    t = _time(seconds)
-    freq = f0 * (f1 / f0) ** (t / seconds)
-    return np.sin(2 * np.pi * np.cumsum(freq) / SAMPLE_RATE) * envelope(seconds, attack, tau)
-
-
-def mix(*layers: np.ndarray | tuple[float, np.ndarray]) -> np.ndarray:
-    """Sum mono clips; a ``(start_seconds, clip)`` pair places the clip later."""
-    placed = [(0.0, layer) if isinstance(layer, np.ndarray) else layer for layer in layers]
-    starts = [int(round(start * SAMPLE_RATE)) for start, _ in placed]
-    out = np.zeros(max(start + len(clip) for start, (_, clip) in zip(starts, placed)))
-    for start, (_, clip) in zip(starts, placed):
-        out[start:start + len(clip)] += clip
-    return out
-
-
-def level(clip: np.ndarray, peak: float) -> np.ndarray:
-    return clip * (peak / np.max(np.abs(clip)))
-
 
 # -- Effects (mono, 50–600 ms, D major) --------------------------------------
 
@@ -355,18 +277,6 @@ def generate(data_dir: Path) -> None:
         write_wav(data_dir / "sounds" / f"{name}.wav", make())
     write_wav(data_dir / "music" / f"{MUSIC}.wav", ambient())
     (data_dir / "sounds" / "VERSION").write_text(SOUND_VERSION)
-
-
-def write_wav(path: Path, samples: np.ndarray) -> None:
-    """16-bit PCM at SAMPLE_RATE; *samples* in [-1, 1], shape ``(n,)`` or ``(n, channels)``."""
-    pcm = np.clip(np.round(samples * 32767), -32768, 32767).astype("<i2")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with wave.open(str(path), "wb") as out:
-        out.setnchannels(1 if pcm.ndim == 1 else pcm.shape[1])
-        out.setsampwidth(2)
-        out.setframerate(SAMPLE_RATE)
-        out.writeframes(pcm.tobytes())
-
 
 # -- Bank --------------------------------------------------------------------
 

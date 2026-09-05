@@ -197,6 +197,14 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
         scene.draw_circle(x + 17 * s, y - 39 * s, 6 * s, BLUE)
         scene.draw_polygon([(x - 11 * s, y - 28 * s), (x + 1 * s, y - 48 * s),
                             (x + 9 * s, y - 28 * s)], color)
+    elif lower == "pikeman":
+        # A long angled pike and broad helmet distinguish the defensive recruit.
+        scene.draw_rect(x - 10 * s, y - 33 * s, 20 * s, 9 * s, (187, 198, 184, 255))
+        scene.draw_line(x - 13 * s, y - 25 * s, x + 13 * s, y - 25 * s, TEXT, 2 * s)
+        scene.draw_line(x + 8 * s, y + 9 * s, x + 23 * s, y - 51 * s, (194, 159, 102, 255), 3 * s)
+        scene.draw_polygon([(x + 17 * s, y - 48 * s), (x + 26 * s, y - 61 * s),
+                            (x + 25 * s, y - 45 * s)], TEXT)
+        scene.draw_line(x - 13 * s, y - 12 * s, x + 15 * s, y - 16 * s, color, 4 * s)
     else:
         if lower != "goblin":
             helmet = (111, 117, 129, 255) if lower == "guard" else (187, 198, 184, 255)
