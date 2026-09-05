@@ -1,0 +1,9 @@
+{
+  "battles": 1000,
+  "first_seed": 0,
+  "last_seed": 999,
+  "seconds": 2.6520928330137394,
+  "source_commit": "d2c51d11e9031d48e9ae3df81d6fd5b5bd01925b",
+  "battle_sha256": "64b7582f5e1d8cf06f0842869aa326daaa0c81bb8b9ce906d9d36d1a218a926c",
+  "scope": "mixed Guard/Brace orders, Pikemen/Swordsmen/Archers, three terrains, both-team automatic actions, exact saved continuations, health/occupancy, bounded outcome"
+}
