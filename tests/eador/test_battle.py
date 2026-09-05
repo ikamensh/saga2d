@@ -64,3 +64,42 @@ def test_tactical_ai_keeps_living_units_on_distinct_legal_hexes(seed):
             break
         battle.auto_turn()
     assert battle.outcome in ('player', 'enemy')
+
+
+def test_attack_previews_match_real_damage_without_changing_battle():
+    """Manual attacks match their forecast, including retaliation and lethal hits."""
+    state = State.new()
+    battle = Battle.create(state.hero, ['guard', 'brigand'], 'forest', set(), seed=5)
+    saw_retaliation = saw_lethal = False
+    for _ in range(40):
+        for unit in battle.units:
+            if battle.outcome or unit.team != 'player' or not unit.alive:
+                continue
+            targets = battle.targets(unit.id)
+            if not targets:
+                enemies = [enemy for enemy in battle.units if enemy.team == 'enemy' and enemy.alive]
+                reachable = battle.reachable(unit.id)
+                if reachable and enemies:
+                    destination = min(reachable, key=lambda pos: min(battle.grid.distance(pos, enemy.pos) for enemy in enemies))
+                    battle.move(unit.id, destination)
+                targets = battle.targets(unit.id)
+            if targets:
+                target = min(targets, key=lambda enemy: enemy.hp)
+                before = battle.to_dict()
+                damage, retaliation = battle.preview(unit.id, target.id)
+                assert battle.to_dict() == before
+                target_hp, attacker_hp = target.hp, unit.hp
+                battle.attack(unit.id, target.id)
+                assert (target_hp - target.hp, attacker_hp - unit.hp) == (damage, retaliation)
+                saw_retaliation |= retaliation > 0
+                if target.hp == 0:
+                    saw_lethal = True
+                    assert retaliation == 0
+        if battle.outcome:
+            break
+        # Enemy previews use the same forecast, without requiring player ownership.
+        for unit in battle.units:
+            if unit.team == 'enemy' and battle.targets(unit.id):
+                battle.preview(unit.id, battle.targets(unit.id)[0].id)
+        battle.end_turn()
+    assert saw_retaliation and saw_lethal

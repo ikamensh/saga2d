@@ -136,18 +136,27 @@ class Battle:
     def attack(self, unit_id: int, target_id: int) -> None:
         self._attack(self._actor(unit_id), self.unit(target_id))
 
-    def _attack(self, unit: BattleUnit, target: BattleUnit) -> None:
+    def _damage(self, attacker: BattleUnit, target: BattleUnit) -> int:
+        cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
+        return min(target.hp, max(1, attacker.attack - target.defense - cover))
+
+    def preview(self, unit_id: int, target_id: int) -> tuple[int, int]:
+        """Return actual target and attacker HP loss for a legal attack, without mutation."""
+        unit, target = self.unit(unit_id), self.unit(target_id)
         if target not in self.targets(unit.id):
             raise RuleError('Choose an enemy within attack range; each unit attacks once.')
-        cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
-        damage = max(1, unit.attack - target.defense - cover)
-        target.hp = max(0, target.hp - damage)
+        damage = self._damage(unit, target)
+        retaliates = target.hp > damage and not target.retaliated and HexGrid.distance(unit.pos, target.pos) == 1
+        return damage, self._damage(target, unit) if retaliates else 0
+
+    def _attack(self, unit: BattleUnit, target: BattleUnit) -> None:
+        damage, retaliation = self.preview(unit.id, target.id)
+        target.hp -= damage
         unit.acted = True
         unit.moved = True
         self.log.append(f'{unit.name} hits {target.name} for {damage}.')
-        if target.alive and not target.retaliated and HexGrid.distance(unit.pos, target.pos) == 1:
-            retaliation = max(1, target.attack - unit.defense - (2 if self.terrain[unit.pos] in ('forest', 'hills') else 0))
-            unit.hp = max(0, unit.hp - retaliation)
+        if retaliation:
+            unit.hp -= retaliation
             target.retaliated = True
             self.log.append(f'{target.name} retaliates for {retaliation}.')
         self._check_outcome()
