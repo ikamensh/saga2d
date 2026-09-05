@@ -2,6 +2,7 @@
 
     uv run python tools/fuzz_eador.py
     uv run python tools/fuzz_eador.py --seed 40 --seeds 100 --steps 250
+    uv run python tools/fuzz_eador.py --campaigns 1000 --scenes 100 --events 100000 --report /tmp/eador-stress.json
 
 Every command checks health, occupancy, ownership and save roundtrips. Scene
 runs use mock-backend input and visible button bounds, including unfinished
@@ -12,9 +13,14 @@ Unexpected exceptions fail immediately; the printed seed reproduces the run.
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, deque
+import hashlib
+import json
+import math
 from pathlib import Path
+import platform
 import random
+import subprocess
 import sys
 import tempfile
 import time
@@ -23,7 +29,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from saga2d import Button, Game  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
-from eador.scene import BattleScene, CatalogScene, HelpScene, ResultScene, ShardScene, TitleScene  # noqa: E402
+from eador.scene import (BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene,
+                         ResultScene, SaveScene, ShardScene, TitleScene)  # noqa: E402
 
 
 def check_state(state: State) -> None:
@@ -34,6 +41,8 @@ def check_state(state: State) -> None:
     assert 0 <= hero.mana <= hero.max_mana
     assert len(hero.army) <= hero.max_army
     assert len({t.id for t in hero.army}) == len(hero.army)
+    assert len(state.inventory) == len(set(state.inventory))
+    assert hero.relic is None or hero.relic in state.inventory
     assert all(0 < t.hp <= t.max_hp and 0 <= t.xp < t.level * 6 for t in hero.army)
     assert 0 <= hero.xp < hero.level * 12
     assert state.gold >= 0 and state.crystals >= 0
@@ -70,6 +79,16 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
     state = State.new(seed, list(HERO_CLASSES)[seed % len(HERO_CLASSES)])
     for _ in range(steps):
         check_state(state)
+        metrics['state_checks'] += 1
+        if state.choice:
+            option = rng.choice(state.choice.options)
+            restored = State.from_json(state.to_json())
+            kind = state.choice.kind
+            state.choose(option.id)
+            restored.choose(option.id)
+            assert state.to_json() == restored.to_json(), 'save changed choice consequences'
+            metrics['choice_' + kind] += 1
+            continue
         if state.status != 'playing':
             break
         if state.battle:
@@ -88,7 +107,7 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
                 assert state.to_json() == restored.to_json(), 'save changed battle continuation'
                 metrics['battle_rounds'] += 1
             continue
-        command = rng.choice(('build', 'recruit', 'travel', 'travel', 'explore', 'end_turn'))
+        command = rng.choice(('build', 'recruit', 'travel', 'travel', 'explore', 'end_turn', 'equip'))
         before = state.to_json()
         try:
             if command == 'build':
@@ -99,6 +118,8 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
                 state.travel(rng.choice(state.grid.neighbors(state.hero.pos)))
             elif command == 'explore':
                 state.explore()
+            elif command == 'equip':
+                state.equip(rng.choice([None, *state.inventory]))
             else:
                 state.end_turn()
         except RuleError:
@@ -106,15 +127,45 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
             metrics['rejected_commands'] += 1
         else:
             metrics[command] += 1
-    check_state(state)
-    metrics['campaign_' + state.status] += 1
+    metrics['random_phase_' + state.status] += 1
+    # A bounded random prefix is not a completed campaign. Finish every case
+    # through public commands, recording these forced actions separately.
+    for _ in range(160):
+        check_state(state)
+        metrics['state_checks'] += 1
+        if state.choice:
+            state.choose(rng.choice(state.choice.options).id)
+            metrics['cleanup_choices'] += 1
+        elif state.status != 'playing':
+            metrics['completed_' + state.status] += 1
+            break
+        elif state.battle:
+            if state.battle.outcome:
+                state.resolve_battle()
+            else:
+                state.retreat()
+            metrics['cleanup_battles'] += 1
+        else:
+            state.end_turn()
+            metrics['cleanup_turns'] += 1
+    else:
+        raise AssertionError(f'seed {seed}: campaign did not end after 160 cleanup commands')
 
 
-def scene_run(seed: int, steps: int, metrics: Counter) -> None:
+def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = None) -> None:
     """Mix purposeful input with random clicks/keys, checking each rendered tick."""
     rng = random.Random(seed)
     with tempfile.TemporaryDirectory(prefix='shardbound-fuzz-') as save_dir:
         game = Game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=save_dir)
+        random_phase = False
+        history = deque(maxlen=25)
+
+        def record(kind, detail):
+            history.append((type(game.scene).__name__, kind, detail))
+            metrics['input_events'] += 1
+            if random_phase:
+                metrics['random_input_events'] += 1
+                metrics['random_' + kind] += 1
 
         def root():
             return next((s for s in game.scenes if isinstance(s, ShardScene)), None)
@@ -122,26 +173,38 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
         def tick():
             game.tick(1 / 60)
             metrics['input_ticks'] += 1
-            assert game.scene is not None and len(game.scenes) <= 3
+            assert game.scene is not None and len(game.scenes) <= 4
             shard = root()
             if shard:
                 check_state(shard.state)
+                metrics['state_checks'] += 1
                 battles = [s for s in game.scenes if isinstance(s, BattleScene)]
                 assert bool(battles) == (shard.state.battle is not None), 'battle and scene stack disagree'
                 assert all(s.root is shard for s in battles)
                 results = [s for s in game.scenes if isinstance(s, ResultScene)]
-                if shard.state.status != 'playing':
+                if shard.state.status != 'playing' and shard.state.choice is None:
                     assert len(results) == 1 and not results[0].is_battle, 'campaign ended without its result screen'
                 elif shard.state.battle and shard.state.battle.outcome:
                     assert len(results) == 1 and results[0].is_battle, 'battle ended without its result screen'
+                if shard.state.choice is not None:
+                    assert any(isinstance(s, ChoiceScene) for s in game.scenes), 'saved choice has no decision screen'
             metrics['screen_' + type(game.scene).__name__] += 1
 
         def press(key):
+            record('key', key)
             game.backend.inject_key(key)
+            game.backend.inject_key(key, type='key_release')
             tick()
 
         def click(x, y):
+            record('click', (round(x), round(y)))
             game.backend.inject_click(round(x), round(y))
+            game.backend.inject_release(round(x), round(y))
+            tick()
+
+        def hover(x, y):
+            record('hover', (round(x), round(y)))
+            game.backend.inject_mouse_move(round(x), round(y))
             tick()
 
         def button(label):
@@ -205,15 +268,21 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
             assert root().state.to_json() == saved, 'battle F9 did not restore F5'
             press('f1')
             button('Save & title')
+            assert isinstance(game.scene, SaveScene) and game.scene.return_to_title
+            press('1')
             assert isinstance(game.scene, TitleScene)
             press('f9')
             assert isinstance(game.scene, BattleScene), 'title load lost the unfinished battle'
             assert root().state.to_json() == saved
             metrics['battle_save_load'] += 1
-            for _ in range(steps):
+            random_phase = True
+            initial_events = metrics['random_input_events']
+            for _ in range(events if events is not None else steps):
+                if events is not None and metrics['random_input_events'] - initial_events >= events:
+                    break
                 scene = game.scene
                 if isinstance(scene, TitleScene):
-                    press(rng.choice(('tab', 'return', 'f9')))
+                    press(rng.choice(('tab', 'return', 'f9', 'f6')))
                 elif isinstance(scene, HelpScene):
                     button('Save & title' if rng.random() < .2 else 'Return to game')
                 elif isinstance(scene, ResultScene):
@@ -225,13 +294,58 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                         metrics['result_save_load'] += 1
                     else:
                         press('e')
+                elif isinstance(scene, ChoiceScene):
+                    roll = rng.random()
+                    if roll < .15:
+                        press('f5')
+                        saved = root().state.to_json()
+                        press('f9')
+                        assert isinstance(game.scene, ChoiceScene) and root().state.to_json() == saved
+                        metrics['choice_save_load'] += 1
+                    elif roll < .25:
+                        button('Hero & relics')
+                    elif roll < .35:
+                        press('f6')
+                    else:
+                        press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))
+                        metrics['choice_inputs'] += 1
+                elif isinstance(scene, SaveScene):
+                    roll = rng.random()
+                    if roll < .25 and scene.root is not None and not scene.return_to_title:
+                        button('Save slots' if scene.mode == 'load' else 'Load slots')
+                    elif roll < .7:
+                        press(str(rng.randrange(6) + 1))
+                        metrics['save_browser_inputs'] += 1
+                    elif roll < .8 and scene.mode == 'load':
+                        backups = scene.ui.find_all(lambda control: isinstance(control, Button)
+                                                    and control.text == 'Backup' and control.enabled)
+                        if backups:
+                            x, y, width, height = rng.choice(backups).bounds
+                            click(x + width / 2, y + height / 2)
+                            metrics['backup_inputs'] += 1
+                        else:
+                            press('escape')
+                    else:
+                        press('escape')
+                elif isinstance(scene, HeroScene):
+                    controls = scene.ui.find_all(lambda control: isinstance(control, Button)
+                                                 and control.text == 'Equip' and control.enabled)
+                    if controls and rng.random() < .4:
+                        x, y, width, height = rng.choice(controls).bounds
+                        click(x + width / 2, y + height / 2)
+                        metrics['equip_inputs'] += 1
+                    else:
+                        press(rng.choice(('left', 'right', 'u', 'escape', 'escape')))
                 elif isinstance(scene, CatalogScene):
                     press(rng.choice(('1', '2', '3', '4', '5', 'escape', 'escape')))
                 elif rng.random() < .15:
-                    if rng.random() < .5:
+                    roll = rng.random()
+                    if roll < .4:
                         click(rng.randrange(game.width), rng.randrange(game.height))
+                    elif roll < .6:
+                        hover(rng.randrange(game.width), rng.randrange(game.height))
                     else:
-                        press(rng.choice(('f1', 'f5', 'f9', 'tab', 'escape', 'home')))
+                        press(rng.choice(('f1', 'f5', 'f9', 'f6', 'tab', 'escape', 'home')))
                 elif isinstance(scene, BattleScene):
                     battle_input()
                 else:
@@ -241,8 +355,9 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                         click(*scene.grid.center(destination))
                         press('return')
                     else:
-                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1')))
+                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6')))
 
+            random_phase = False
             # Complete a real losing campaign, then use the replay control.
             # Every loop makes a turn or removes an overlay; a bound catches
             # broken rival progression or scene-stack loops instead of hanging.
@@ -250,8 +365,10 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
                 scene = game.scene
                 if isinstance(scene, TitleScene):
                     press('return')
-                elif isinstance(scene, (CatalogScene, HelpScene)):
+                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene)):
                     press('escape')
+                elif isinstance(scene, ChoiceScene):
+                    press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))
                 elif isinstance(scene, ResultScene):
                     if scene.is_battle:
                         press('e')
@@ -271,6 +388,8 @@ def scene_run(seed: int, steps: int, metrics: Counter) -> None:
             else:
                 raise AssertionError(f'seed {seed}: no campaign outcome/replay in 160 input steps')
         finally:
+            if sys.exc_info()[0] is not None:
+                print(f'Failed scene seed {seed}; recent input: {list(history)}', file=sys.stderr, flush=True)
             game._teardown()
 
 
@@ -279,18 +398,55 @@ def main() -> None:
     parser.add_argument('--seed', type=int, default=0, help='first reproducible seed')
     parser.add_argument('--seeds', type=int, default=12, help='number of campaign and scene runs')
     parser.add_argument('--steps', type=int, default=120, help='random commands per campaign and scene')
+    parser.add_argument('--campaigns', type=int, help='model runs; defaults to --seeds')
+    parser.add_argument('--scenes', type=int, help='scene runs; defaults to --seeds')
+    parser.add_argument('--events', type=int, help='minimum total random input activations, excluding setup/cleanup/releases')
+    parser.add_argument('--report', type=Path, help='write actual metrics and run metadata to JSON')
     args = parser.parse_args()
     if args.seeds < 1 or args.steps < 1:
         parser.error('--seeds and --steps must be positive')
+    campaign_count = args.seeds if args.campaigns is None else args.campaigns
+    scene_count = args.seeds if args.scenes is None else args.scenes
+    if campaign_count < 0 or scene_count < 0 or not campaign_count + scene_count:
+        parser.error('at least one campaign or scene run is required')
+    if args.events is not None and (args.events < 1 or scene_count == 0):
+        parser.error('--events must be positive and requires scene runs')
     started = time.perf_counter()
     campaigns, scenes = Counter(), Counter()
-    for seed in range(args.seed, args.seed + args.seeds):
-        print(f'Seed {seed}: campaign + scene', flush=True)
-        campaign_run(seed, args.steps, campaigns)
-        scene_run(seed, args.steps, scenes)
+    project = Path(__file__).resolve().parents[1]
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip()
+    dirty = subprocess.check_output(['git', 'status', '--short'], cwd=project, text=True).splitlines()
+    source_files = [*project.joinpath('eador').glob('*.py'), *project.joinpath('saga2d').rglob('*.py'), Path(__file__).resolve()]
+    source_hashes = {str(path.relative_to(project)): hashlib.sha256(path.read_bytes()).hexdigest()
+                     for path in sorted(source_files)}
+    for index, seed in enumerate(range(args.seed, args.seed + campaign_count)):
+        if index % 25 == 0 or index + 1 == campaign_count:
+            print(f'Campaign seed {seed} ({index + 1}/{campaign_count})', flush=True)
+        try:
+            campaign_run(seed, args.steps, campaigns)
+        finally:
+            if sys.exc_info()[0] is not None:
+                print(f'Failed campaign seed {seed}', file=sys.stderr, flush=True)
+    campaign_seconds = time.perf_counter() - started
+    for index, seed in enumerate(range(args.seed, args.seed + scene_count)):
+        print(f'Scene seed {seed} ({index + 1}/{scene_count})', flush=True)
+        scene_run(seed, args.steps, scenes,
+                  events=math.ceil(args.events / scene_count) if args.events is not None else None)
     print(f'Campaign metrics: {dict(sorted(campaigns.items()))}')
     print(f'Scene metrics: {dict(sorted(scenes.items()))}')
-    print(f'Passed {args.seeds} seeds in {time.perf_counter() - started:.1f}s.')
+    elapsed = time.perf_counter() - started
+    print(f'Passed {campaign_count} model campaigns and {scene_count} scene runs in {elapsed:.1f}s.')
+    if args.report:
+        report = {'revision': revision, 'dirty_at_start': dirty, 'seed': args.seed, 'campaigns': campaign_count,
+                  'scenes': scene_count, 'steps': args.steps, 'requested_random_events': args.events,
+                  'platform': platform.platform(), 'machine': platform.machine(), 'python': platform.python_version(),
+                  'elapsed_seconds': elapsed, 'campaign_seconds': campaign_seconds,
+                  'campaign_metrics': dict(campaigns), 'scene_metrics': dict(scenes), 'source_sha256': source_hashes,
+                  'source_files_changed_during_run': [str(path.relative_to(project)) for path in sorted(source_files)
+                                                     if hashlib.sha256(path.read_bytes()).hexdigest() != source_hashes[str(path.relative_to(project))]]}
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+        print(f'Report: {args.report}')
 
 
 if __name__ == '__main__':

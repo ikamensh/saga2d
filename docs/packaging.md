@@ -1,0 +1,133 @@
+# Standalone Shardbound builds
+
+This is the packaging foundation for G14/G18, not a release-readiness claim.
+The local macOS arm64 artifact starts without a repository, installed Python,
+uv or a terminal window. Windows remains an untested build target.
+
+## Build locally
+
+From the repository root, with uv installed:
+
+```bash
+uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py
+```
+
+The command installs locked runtime dependencies in an isolated environment,
+adds the pinned packaging tools, snapshots the game/framework sources, builds
+the native artifact, archives it, extracts the archive outside the repository,
+and runs its hidden-window smoke check. An awake graphical desktop is required
+for that final real-pyglet check. `--skip-smoke` builds an explicitly unverified
+artifact when only a build machine is available.
+
+The foundation pins CPython 3.13.2, PyInstaller 6.22.2 and hooks-contrib 2026.7.
+Runtime versions come from `uv.lock`; build-tool transitive versions and hashes
+are in `packaging/requirements.txt`. Upgrade both PyInstaller packages together,
+as recommended by the [official installation guide](https://pyinstaller.org/en/stable/installation.html).
+
+To regenerate the packaging lock after an intentional tool upgrade:
+
+```bash
+uv pip compile packaging/requirements.in --universal --python-version 3.13 --generate-hashes --output-file packaging/requirements.txt
+```
+
+Update the matching tool-version check in `tools/build_eador.py` and rerun
+the complete build and package checks. Pins make build inputs repeatable;
+the recipe does not promise byte-identical archives across builds. Build
+timestamps, platform tooling and binary signing can affect output hashes.
+
+## Outputs and verification
+
+All generated files stay under ignored `build/shardbound/` and
+`dist/shardbound/`. On macOS:
+
+| Output | Purpose |
+|---|---|
+| `Shardbound.app` | Normal windowed application; open it in Finder |
+| `Shardbound-macos-arm64.zip` | Local archive preserving bundle symbolic links |
+| `build-manifest.json` | Source hashes, commit/dirty status, versions, platform, file inventory, archive hash and smoke result |
+| `packaged-smoke.png` | Real title-screen capture from the extracted archive |
+| `packaged-smoke-shard.png` | Real campaign-screen capture from the extracted archive |
+| `packaged-smoke.json` | Frozen-runtime, executable path and save/load verification |
+
+The app includes a Python runtime and runtime libraries. Game assets are
+collected from the snapshotted packages; current art is procedural. Bundled
+`Contents/Resources/release/` contains a player guide, credits, original license
+texts found in dependency distributions, the runtime lock and build metadata.
+No change to the Saga2D framework wheel is needed: the game is an application
+that consumes the framework.
+
+The smoke launcher uses temporary saves and writes its result to the requested
+path. It renders the title and shard and saves/reloads campaign state. The
+builder checks that the process is frozen and is the extracted executable,
+with Python environment overrides removed and an OS-only executable search
+path. Its temporary working directory is outside the repository. Inspect the
+PNGs after a build; successful execution alone does not establish visual quality.
+
+You can also exercise the macOS app-launch path without opening a terminal
+window for the application:
+
+```bash
+open -W -n dist/shardbound/Shardbound.app --args --smoke-image /tmp/shardbound-launch-check.png
+```
+
+Without smoke arguments, `Shardbound.app` runs the game's ordinary entry point.
+Normal player saves retain the game's configured location; smoke mode never
+uses those saves. The special flag is packaging verification, not a player
+feature or a substitute for a complete packaged campaign test.
+
+## Evidence from the first local artifact
+
+Verified on 2026-09-05: macOS 26.6.2, Apple Silicon arm64, CPython 3.13.2;
+NumPy 2.4.2, Pillow 12.1.1 and pyglet 2.1.13. The extracted app rendered both
+screens, passed save/load, and was inspected visually. The `.app` also passed
+the same smoke check through macOS LaunchServices, which set its working
+directory to `/`. A normal no-argument launch remained running; native UI
+automation timed out, so a normal interactive packaged playthrough remains
+unverified. The test process was closed afterward.
+
+The initial archive was 20,268,428 bytes, SHA-256
+`fd6c807ebd5c5cb0a05709743b15fdeaf44b6c20c08d47bab95f8250377bff37`.
+Its manifest records source commit `bb21793` with a dirty working tree and
+hashes the actual snapshotted files. It is development evidence, not a named
+release candidate. Rebuilding replaces these local outputs; consult the new
+manifest for the current archive hash and exact inputs.
+
+`codesign --verify --deep --strict` passed for the local ad-hoc signature,
+and every bundle symlink resolved. No signing identity or certificate was
+used, and no notarization or distribution approval was performed.
+
+## Windows x64 plan — untested
+
+Build on a Windows x64 host using x64 CPython 3.13.2. Run the same uv build
+command above from PowerShell. It produces `Shardbound/Shardbound.exe` and
+`Shardbound-windows-x64.zip`. Preserve the entire application folder; the
+executable alone is not the package. PyInstaller requires separate native
+builds for each operating system. [Official multi-platform guidance](https://pyinstaller.org/en/stable/usage.html#supporting-multiple-operating-systems)
+
+For future CI, use a Windows x64 runner, check out an exact source commit,
+install a pinned uv release and the pinned x64 Python, and run the command
+with `--skip-smoke`. Treat the generated archive as build output only. Then
+extract and run it on a clean Windows account with an appropriate graphics
+driver, first with `--smoke-image`, then through a real campaign, save/restart,
+display settings and audio checks. Record the host, archive hash and results.
+The build-only CI job cannot pass the Windows runtime gate. No workflow has
+been enabled and no artifact uploaded as part of this foundation.
+
+## Remaining release work
+
+Only the current macOS host was tested; compatibility with older macOS,
+Intel Macs, Windows or Linux is unverified. Build on the oldest intended
+supported macOS before claiming that compatibility. [PyInstaller requirements](https://pyinstaller.org/en/stable/requirements.html)
+
+G14 still needs clean-account/platform validation, a full packaged game
+journey, and verification of all final assets, fonts, audio and saves.
+The game currently requests system Verdana/Georgia and uses a development
+app icon. G11/G18 still need suitable bundled fonts, a product icon, final
+asset/license provenance review, current player documentation, product
+versioning and support information. A local ad-hoc signature does not establish
+Gatekeeper acceptance of a downloaded distribution. Publishing and identity
+signing remain separate decisions.
+
+The bundle uses PyInstaller's recommended one-folder macOS app structure,
+and `ditto` preserves the symbolic links it requires. [App bundle guidance](https://pyinstaller.org/en/stable/usage.html#building-macos-app-bundles),
+[symbolic-link requirements](https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html#requirements-imposed-by-symbolic-links-in-frozen-application)

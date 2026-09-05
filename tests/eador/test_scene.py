@@ -1,5 +1,9 @@
 """Integration journeys through the same scenes and input used by players."""
 
+import json
+
+import pytest
+
 from saga2d import Game
 
 
@@ -23,11 +27,11 @@ def button(game, label):
     click(game, x + w / 2, y + h / 2)
 
 
-def test_new_game_opens_a_seeded_shard_from_title():
+def test_new_game_opens_a_seeded_shard_from_title(tmp_path):
     """The executable's title flow must reach the playable strategy scene."""
     from eador.scene import ShardScene, TitleScene
 
-    game = Game("Shardbound test", backend="mock")
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
         game.tick(1 / 60)
@@ -40,12 +44,12 @@ def test_new_game_opens_a_seeded_shard_from_title():
         game._teardown()
 
 
-def test_invade_retreat_returns_to_campaign_without_losing_scene_state():
+def test_invade_retreat_returns_to_campaign_without_losing_scene_state(tmp_path):
     """Retreat resolves the real battle and restores the underlying map scene."""
     from eador.model import State
     from eador.scene import BattleScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock")
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         scene = ShardScene(State.new(7))
         game.push(scene)
@@ -109,12 +113,12 @@ def test_battle_save_restores_playable_tactics_and_returns_wounds_to_map(tmp_pat
         game._teardown()
 
 
-def test_stronghold_unlocks_recruitment_through_keyboard_and_mouse():
+def test_stronghold_unlocks_recruitment_through_keyboard_and_mouse(tmp_path):
     """The displayed building and troop catalogues drive real economy rules."""
     from eador.model import BUILDINGS, UNITS, State
     from eador.scene import CatalogScene, ShardScene
 
-    game = Game("Shardbound test", backend="mock")
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         state = State.new(7)
         root = ShardScene(state)
@@ -138,10 +142,194 @@ def test_stronghold_unlocks_recruitment_through_keyboard_and_mouse():
         game._teardown()
 
 
+def test_adventure_choices_restore_then_equip_a_relic_through_input(tmp_path):
+    """Decisions are playable saved state; equipment changes the next battle."""
+    from eador.persistence import AUTO_SLOTS, CampaignSaves
+    from eador.scene import BattleScene, ChoiceScene, HeroScene, ShardScene, TitleScene
+
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        game.push(TitleScene(seed=7))
+        press(game, "return")
+        press(game, "b")
+        press(game, "1")
+        press(game, "escape")
+        press(game, "r")
+        press(game, "2")
+        press(game, "escape")
+        press(game, "x")
+        assert isinstance(game.scene, BattleScene)
+        state = game.scene.root.state
+        for _ in range(80):
+            if state.battle.outcome:
+                break
+            press(game, "a")
+        assert state.battle.outcome == "player"
+        press(game, "e")
+        assert isinstance(game.scene, ChoiceScene)
+        saved_choice = state.to_json()
+        press(game, "f5")
+        press(game, "1")
+        press(game, "f9")
+        assert isinstance(game.scene, ChoiceScene)
+        state = game.scene.root.state
+        assert state.to_json() == saved_choice
+        press(game, "escape")
+        assert isinstance(game.scene, ChoiceScene)
+        while isinstance(game.scene, ChoiceScene):
+            press(game, "1")
+        assert isinstance(game.scene, ShardScene)
+        assert state.inventory
+        press(game, "h")
+        assert isinstance(game.scene, HeroScene)
+        button(game, "Equip")
+        assert state.hero.relic == state.inventory[0]
+        snapshots = CampaignSaves(game.save_manager)
+        assert state.to_json() in [snapshots.load(slot).to_json() for slot in AUTO_SLOTS]
+        press(game, "escape")
+        press(game, "e")
+        root = game.scene
+        click(game, *root.grid.center((-1, 0)))
+        press(game, "return")
+        assert isinstance(game.scene, BattleScene)
+        assert "heal" in game.scene.root.state.battle.spells
+        for _ in range(80):
+            if state.battle.outcome:
+                break
+            press(game, "a")
+        assert state.battle.outcome == "player"
+        press(game, "e")
+        assert isinstance(game.scene, ChoiceScene)
+        assert state.choice.kind == "skill"
+        discipline = state.choice.options[1].id
+        press(game, "2")
+        assert isinstance(game.scene, ShardScene)
+        assert state.hero.skill_ranks == {discipline: 1}
+    finally:
+        game._teardown()
+
+
+@pytest.mark.parametrize("campaign", [None, "1" + "0" * 5000, "[" * 2000 + "0" + "]" * 2000],
+                         ids=["broken-envelope", "oversized-number", "deep-json"])
+def test_damaged_quickload_keeps_live_game_and_browser_recovers_backup(tmp_path, campaign):
+    from eador.model import State
+    from eador.persistence import CampaignSaves
+    from eador.scene import SaveScene, ShardScene
+
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        root = ShardScene(State.new(7))
+        game.push(root)
+        press(game, "f5")
+        first = root.state.to_json()
+        press(game, "e")
+        press(game, "f5")
+        press(game, "e")
+        live = root.state.to_json()
+        damaged = tmp_path / "save_1.json"
+        if campaign is None:
+            damaged.write_text("interrupted write")
+        else:
+            payload = json.loads(damaged.read_text())
+            payload["state"]["campaign"] = campaign
+            damaged.write_text(json.dumps(payload))
+        damaged_bytes = damaged.read_bytes()
+        press(game, "f9")
+        assert game.scene is root
+        assert root.state.to_json() == live
+        assert root.message
+        press(game, "f6")
+        assert isinstance(game.scene, SaveScene)
+        assert game.scene.entries[0].error
+        assert game.scene.entries[0].backup_available
+        button(game, "Backup")
+        assert isinstance(game.scene, ShardScene)
+        assert game.scene.state.to_json() == first
+        button(game, "Save")
+        press(game, "2")
+        assert CampaignSaves(game.save_manager).load(2).to_json() == first
+        assert damaged.read_bytes() == damaged_bytes
+    finally:
+        game._teardown()
+
+
+def test_unavailable_autosaves_report_failure_and_allow_manual_play(tmp_path):
+    from eador.persistence import AUTO_SLOTS, CampaignSaves
+    from eador.scene import ShardScene, TitleScene
+
+    for slot in AUTO_SLOTS:
+        (tmp_path / f"save_{slot}.json").write_text("damaged autosave")
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        game.push(TitleScene(seed=7))
+        press(game, "return")
+        assert isinstance(game.scene, ShardScene)
+        assert "Autosave failed" in game.scene.message
+        button(game, "Save")
+        press(game, "2")
+        assert CampaignSaves(game.save_manager).load(2).seed == 7
+        assert all((tmp_path / f"save_{slot}.json").read_text() == "damaged autosave" for slot in AUTO_SLOTS)
+    finally:
+        game._teardown()
+
+
+def test_save_and_title_keeps_progress_until_a_usable_slot_is_written(tmp_path):
+    from eador.model import State
+    from eador.persistence import CampaignSaves
+    from eador.scene import SaveScene, ShardScene, TitleScene
+
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        root = ShardScene(State.new(7))
+        game.push(root)
+        press(game, "e")
+        live = root.state.to_json()
+        (tmp_path / "save_1.json").write_text("damaged current")
+        press(game, "f1")
+        button(game, "Save & title")
+        assert isinstance(game.scene, SaveScene)
+        press(game, "1")
+        assert isinstance(game.scene, SaveScene)
+        assert game.scene.message
+        assert root.state.to_json() == live
+        press(game, "2")
+        assert isinstance(game.scene, TitleScene)
+        assert CampaignSaves(game.save_manager).load(2).to_json() == live
+    finally:
+        game._teardown()
+
+
+def test_repeated_equipment_hotkeys_preserve_autosave_history(tmp_path):
+    from eador.model import State
+    from eador.persistence import AUTO_SLOTS, CampaignSaves
+    from eador.scene import ShardScene
+
+    state = State.new(7)
+    state.inventory = ["moonstone"]
+    state.equip("moonstone")
+    game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
+    try:
+        game.push(ShardScene(state))
+        for _ in range(3):
+            press(game, "e")
+        saves = CampaignSaves(game.save_manager)
+        snapshots = [saves.load(slot).to_json() for slot in AUTO_SLOTS]
+        press(game, "h")
+        for _ in range(3):
+            press(game, "1")
+        assert [saves.load(slot).to_json() for slot in AUTO_SLOTS] == snapshots
+        press(game, "u")
+        snapshots = [saves.load(slot).to_json() for slot in AUTO_SLOTS]
+        press(game, "u")
+        assert [saves.load(slot).to_json() for slot in AUTO_SLOTS] == snapshots
+    finally:
+        game._teardown()
+
+
 def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
     """Explore, invest, conquer, replay and restore a finished shard through UI."""
     from eador.model import BUILDINGS, UNITS
-    from eador.scene import BattleScene, ResultScene, ShardScene, TitleScene
+    from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
 
     game = Game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
@@ -159,6 +347,8 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
             assert isinstance(game.scene, ResultScene)
             assert state.battle.outcome == "player"
             press(game, "e")
+            while isinstance(game.scene, ChoiceScene):
+                press(game, "1")
 
         def prepare():
             if "temple" not in state.buildings and state.gold >= BUILDINGS["temple"].cost:
