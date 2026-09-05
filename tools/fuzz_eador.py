@@ -291,6 +291,16 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
             elif roll < .40:
                 press('g')
                 metrics['defensive_order_inputs'] += 1
+            elif roll < .45:
+                shooters = [u for u in battle.units if u.team == 'player' and battle.pin_targets(u.id)]
+                if shooters:
+                    unit = rng.choice(shooters)
+                    press('tab')  # Cancel an earlier aimed action before selecting the shooter.
+                    click(*scene.grid.center(unit.pos))
+                    press('p')
+                    target = rng.choice(battle.pin_targets(unit.id))
+                    click(*scene.grid.center(target.pos))
+                    metrics['pin_inputs'] += 1
             elif roll < .5:
                 press(rng.choice(('left', 'right', 'up', 'down', 'pageup', 'pagedown', 'f', '1', '2')))
                 press('return')

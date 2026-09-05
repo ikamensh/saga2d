@@ -106,3 +106,20 @@ completed 10,006 random input activations, including the new EncounterScene,
 in 48.0 seconds. This clean integration snapshot is `8b91a62`; its battle,
 model, content and world-generation rules match the earlier route/model
 stress snapshot. Native Pin controls remain a separate integration step.
+
+## Visible commands and native verification
+
+Archer/Storm Quiver selection now exposes **Pin (P)** beside Guard. Targeting
+shows only legal Pin targets and its exact damage/reaction forecast. The result
+marks living pinned units with a letter badge and reports effective movement;
+the button visibly waits through cooldown. Esc cancels aiming, F cycles targets,
+and Enter or a click shoots. A Watch Bell hero displays **Brace** through its
+actual capability rather than a Pikeman type check.
+
+The public input test covers cancellation, movement, keyboard targeting, exact
+forecast, save/reload, disabled cooldown and choosing Guard while waiting.
+`tools/verify_eador_pin.py` repeats it with native Pyglet input, captures forecast,
+status and cooldown, then earns Watch Bell through public campaign commands
+and verifies the hero's visible Brace button in a subsequent saved battle.
+These checks supplement the model evidence; they do not add a new authored
+encounter or establish balance across untested army builds.
