@@ -157,3 +157,11 @@ mute and teardown changes, inspect all options screens and listen to the
 actual cues/loops at player volume. Reduced-motion and normal runs must yield
 the same model state while presenting their intended visual differences.
 Silent backend tests prove routing, not sound quality or audible mixing.
+
+## Implemented display preferences
+
+The game-owned Sound/Display settings transaction now uses the reviewed fixed-
+canvas Game display API, including an actual `windowed_size` snapshot for Cancel.
+Saved display applies once in `create_game`; audio/motion may apply on scene entry.
+See [the implemented behavior and verification](eador-display-settings.md).
+Text scaling and the full G10 screen matrix remain separate work.
