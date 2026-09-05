@@ -84,9 +84,18 @@ save/reload and activate both earned hero capabilities. A normal Shrine
 battle saves after Pin and at both cooldown boundaries. Sixty generated
 shards check source placement and graph reachability.
 
-A separate route audit completed **720/720 victories**: 20 seeds, four
+[The retained route audit](evidence/shardbound-pin-routes-2026-09-06.json)
+completed **720/720 victories**: 20 seeds, four
 heroes, three themes and three itineraries. That demonstrates the existing
 investment/interception policy remains viable; it does not establish
 optimal play, balanced army diversity, or human difficulty. UI controls,
 codex descriptions, markers and native screenshots are root integration
 work, separate from these game-rule checks.
+
+[The clean-source stress run](evidence/shardbound-pin-stress-2026-09-06.json)
+completed 300 model campaigns (100 per theme), 20 scene runs and 10,005
+random input activations in 151.6 seconds. It checked 249 accepted manual
+Pin orders and 2,420 rejected ones, including matching saved continuations
+and forecasts. All reported game/framework/harness hashes match `c21124e`;
+no source changed during the run. These are model Pin commands; native Pin
+input is not claimed before root connects its UI.
