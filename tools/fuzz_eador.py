@@ -31,6 +31,7 @@ from saga2d import Button, Game  # noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
 from eador.rival_scene import RivalScene  # noqa: E402
+from eador.settings_scene import SettingsScene  # noqa: E402
 from eador.scene import (BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene,
                          ResultScene, SaveScene, ShardScene, TitleScene)  # noqa: E402
 
@@ -182,7 +183,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
     """Mix purposeful input with random clicks/keys, checking each rendered tick."""
     rng = random.Random(seed)
     with tempfile.TemporaryDirectory(prefix='shardbound-fuzz-') as save_dir:
-        game = Game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=save_dir)
+        game = Game('Shardbound soak', backend='mock', resolution=(1280, 800), save_dir=Path(save_dir) / 'saves')
         random_phase = False
         history = deque(maxlen=25)
 
@@ -318,9 +319,11 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     break
                 scene = game.scene
                 if isinstance(scene, TitleScene):
-                    press(rng.choice(('tab', 'return', 'f9', 'f6')))
+                    press(rng.choice(('tab', 'return', 'f9', 'f6', 'o')))
                 elif isinstance(scene, HelpScene):
-                    button(rng.choice(('Save & title', 'Codex', 'Return to game', 'Return to game')))
+                    button(rng.choice(('Save & title', 'Codex', 'Settings', 'Return to game', 'Return to game')))
+                elif isinstance(scene, SettingsScene):
+                    press(rng.choice(('up', 'down', 'left', 'right', 'return', 'escape')))
                 elif isinstance(scene, CodexScene):
                     press(rng.choice(('1', '2', '3', '4', '5', '6', 'tab', 'left', 'right', 'escape', 'escape')))
                 elif isinstance(scene, RivalScene):
@@ -405,7 +408,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 scene = game.scene
                 if isinstance(scene, TitleScene):
                     press('return')
-                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene)):
+                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene, SettingsScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
                     press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))

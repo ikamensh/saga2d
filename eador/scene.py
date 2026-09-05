@@ -90,6 +90,10 @@ class Screen(Scene):
         self.refresh()
         return True
 
+    def open_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene())
+
 
 class TitleScene(Screen):
     controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves"}
@@ -98,6 +102,11 @@ class TitleScene(Screen):
         super().__init__()
         self.seed = seed
         self.hero_class = "Commander"
+
+    def on_enter(self):
+        from eador.preferences import load_preferences
+        self.preferences = load_preferences(self.game)
+        super().on_enter()
 
     def refresh(self):
         super().refresh()
@@ -108,6 +117,7 @@ class TitleScene(Screen):
         self.button("Enter the shard", w / 2 - 170, h - 124, 340, self.start, hotkey="Enter", primary=True)
         self.button("Load shard", w / 2 - 170, h - 72, 164, self.browse_saves, hotkey="F6")
         self.button("New seed", w / 2 + 6, h - 72, 164, self.next_seed, shortcut="N")
+        self.button("Settings", w - 178, 26, 152, self.open_settings, shortcut="O")
 
     def choose(self, name):
         self.hero_class = name
@@ -145,8 +155,10 @@ class TitleScene(Screen):
             art.province(self, grid, pos, data)
         self.text("CHOOSE YOUR HERO", w / 2, h - 277, size=11, color=GOLD, center=True)
         self.text(HERO_CLASSES[self.hero_class].description, w / 2, h - 181, size=14, color=MUTED, center=True)
-        self.text(self.message or f"Shard {self.seed}  ·  Conquer provinces, explore ruins, command every battle.",
-                  w / 2, h - 155, size=11, color=RED if self.message else MUTED, center=True)
+        notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
+                                  if self.preferences.error else "")
+        self.text(notice or f"Shard {self.seed}  ·  Conquer provinces, explore ruins, command every battle.",
+                  w / 2, h - 155, size=11, color=RED if notice else MUTED, center=True)
 
 
 class ShardScene(Screen):
@@ -167,6 +179,8 @@ class ShardScene(Screen):
         return self.game.width - 344
 
     def on_enter(self):
+        from eador.preferences import load_preferences
+        self.preferences = load_preferences(self.game)
         super().on_enter()
         self.follow_state()
 
@@ -359,7 +373,8 @@ class ShardScene(Screen):
             self.text(f"Lv{troop.level} · {troop.hp}/{troop.max_hp}", xx + 23, h - 69, size=9, color=MUTED)
             self.bar(xx + 23, h - 50, 66, troop.hp, troop.max_hp)
         self.rule(26, h - 124, self.edge - 52)
-        message = self.message or s.log[-1]
+        message = self.message or ("Sound settings could not be read. Open Guide, then Settings (O) to recover them."
+                                   if self.preferences.error else s.log[-1])
         self.text(textwrap.shorten(message, width=110, placeholder="…"), 28, h - 26, size=11,
                   color=GOLD if self.message else MUTED)
 
@@ -435,6 +450,7 @@ class HelpScene(Screen):
         self.button("Return to game", self.x + 26, self.y + 481, 212, self.game.pop, shortcut="Esc", primary=True)
         self.button("Codex", self.x + 249, self.y + 481, 192, self.root.codex, shortcut="C")
         self.button("Save & title", self.x + 452, self.y + 481, 202, self.title, shortcut="S")
+        self.button("Settings", self.x + 504, self.y + 8, 150, self.open_settings, shortcut="O")
 
     def title(self):
         self.game.push(SaveScene(self.root, mode="save", return_to_title=True))

@@ -26,6 +26,13 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound root): adopting the pure `saga2d.synth` sample
+  functions from committed Warband `f478e89`, with a public compose → WAV →
+  playback test. Tribes will import these shared functions instead of keeping
+  duplicate synthesis code; its compositions and SoundBank remain game-owned.
+  Shardbound will compose original assets at build time and use `game.audio`.
+  This increment does not adopt the cache/SynthBank wrapper or edit Warband.
+
 - 2026-09-06 (Shardbound framework agent): `codex/settings-store` adopts the
   committed Warband `Settings(path, defaults)` mapping and `Game.settings` /
   `data_dir` interface. Optional `validator=` keeps ranges/enums in game code;
