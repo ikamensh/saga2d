@@ -8,8 +8,12 @@ from __future__ import annotations
 import json
 import random
 from dataclasses import asdict, dataclass, field
+from typing import TYPE_CHECKING
 
 from saga2d import HexGrid
+
+if TYPE_CHECKING:
+    from eador.battle import Battle
 
 Pos = tuple[int, int]
 
@@ -130,7 +134,7 @@ class State:
     actions_left: int = 2
     status: str = 'playing'
     log: list[str] = field(default_factory=list)
-    battle: object | None = None
+    battle: Battle | None = None
     battle_province: Pos | None = None
     battle_kind: str | None = None
     next_troop_id: int = 4
@@ -232,6 +236,148 @@ class State:
         self.hero.army.append(Troop(self.next_troop_id, kind, spec.hp, spec.hp))
         self.next_troop_id += 1
         self.log.append(f'Recruited {spec.name}.')
+
+    def travel(self, destination: Pos) -> None:
+        self._ready(action=True)
+        if destination not in self.grid.neighbors(self.hero.pos):
+            raise RuleError('Travel to an adjacent province.')
+        province = self.provinces[destination]
+        self.actions_left -= 1
+        if province.owner == 'player':
+            self.hero.pos = destination
+            self.log.append(f'Travelled to {province.name}.')
+        else:
+            self._start_battle(destination, 'conquest', province.guards)
+
+    def explore(self) -> None:
+        self._ready(action=True)
+        province = self.provinces[self.hero.pos]
+        if province.owner != 'player':
+            raise RuleError('Explore a province you control.')
+        if province.explored or province.site is None:
+            raise RuleError('This province has no unexplored site.')
+        self.actions_left -= 1
+        guards = ['brigand', 'goblin'] if province.pos[0] < 1 else ['guard', 'goblin']
+        self._start_battle(province.pos, 'site', guards)
+
+    def _start_battle(self, province: Pos, kind: str, enemies: list[str]) -> None:
+        from eador.battle import Battle
+        self.battle_province, self.battle_kind = province, kind
+        self.battle = Battle.create(self.hero, enemies, self.provinces[province].terrain,
+                                    self.spells, seed=self.seed + self.turn * 37 + province[0] * 7 + province[1])
+        title = self.provinces[province].site if kind == 'site' else self.provinces[province].name
+        self.log.append(f'Battle at {title}.')
+
+    def resolve_battle(self) -> str:
+        if self.battle is None or self.battle.outcome is None:
+            raise RuleError('The battle is not finished.')
+        battle = self.battle
+        province = self.provinces[self.battle_province]
+        victory = battle.outcome == 'player'
+        self.hero.hp = battle.unit(0).hp
+        self.hero.mana = battle.mana
+        casualties = []
+        survivors = []
+        for troop in self.hero.army:
+            troop.hp = battle.unit(troop.id).hp
+            if troop.hp <= 0:
+                casualties.append(UNITS[troop.kind].name)
+            else:
+                survivors.append(troop)
+        self.hero.army = survivors
+        if victory:
+            self.hero.xp += 8
+            while self.hero.xp >= self.hero.level * 12:
+                self.hero.xp -= self.hero.level * 12
+                self.hero.level += 1
+                self.hero.max_hp += 4
+                self.hero.hp += 4
+                self.hero.max_mana += 2
+                self.hero.mana += 2
+                self.log.append(f'{self.hero.name} reached level {self.hero.level}.')
+            for troop in survivors:
+                troop.xp += 3
+                while troop.xp >= troop.level * 6:
+                    troop.xp -= troop.level * 6
+                    troop.level += 1
+                    troop.max_hp += 4
+                    troop.hp += 4
+            if self.battle_kind == 'site':
+                province.explored = True
+                self.gold += 55
+                self.crystals += 2
+                message = f'Explored {province.site}: +55 gold, +2 crystals.'
+            else:
+                province.owner, province.guards = 'player', []
+                self.hero.pos = province.pos
+                self.gold += 25
+                message = f'Claimed {province.name}: +25 gold.'
+                if province.capital and province.pos == (2, 0):
+                    self.status = 'victory'
+                    message = 'Duskspire has fallen. The shard is yours!'
+        else:
+            self.hero.hp = max(self.hero.hp, self.hero.max_hp // 3)
+            lost_gold = min(max(0, self.gold), 20)
+            self.gold -= lost_gold
+            message = f'Retreated. Lost {lost_gold} gold; the survivors keep their wounds.'
+            if self.battle_kind == 'defense':
+                province.owner = 'rival'
+                province.guards = ['guard', 'brigand']
+                self.hero.pos = (-2, 0)
+                if province.capital:
+                    self.status = 'defeat'
+                    message = 'Westwatch has fallen. The rival claims the shard.'
+        if casualties:
+            self.log.append('Fallen: ' + ', '.join(casualties) + '.')
+        self.log.append(message)
+        self.battle = None
+        self.battle_kind = None
+        self.battle_province = None
+        return message
+
+    def retreat(self) -> str:
+        if self.battle is None:
+            raise RuleError('There is no battle to retreat from.')
+        if self.battle.outcome is not None:
+            raise RuleError('The battle is over; accept its result.')
+        self.battle.outcome = 'enemy'
+        return self.resolve_battle()
+
+    def end_turn(self) -> None:
+        self._ready()
+        earnings = self.income - self.upkeep
+        self.gold += earnings
+        self.crystals += sum(p.crystals for p in self.provinces.values() if p.owner == 'player')
+        self.turn += 1
+        self.actions_left = 3 if self.hero.hero_class == 'Scout' else 2
+        if self.provinces[self.hero.pos].owner == 'player':
+            recovery = 6 + (3 if 'temple' in self.buildings else 0)
+            if any(t.kind == 'healer' for t in self.hero.army):
+                recovery += 2
+            self.hero.hp = min(self.hero.max_hp, self.hero.hp + recovery + 2)
+            for troop in self.hero.army:
+                troop.hp = min(troop.max_hp, troop.hp + recovery)
+        self.hero.mana = min(self.hero.max_mana, self.hero.mana + 4)
+        self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; army rests.')
+        if self.turn >= 9 and (self.turn - 9) % 4 == 0:
+            self._rival_turn()
+
+    def _rival_turn(self) -> None:
+        frontier = {neighbor for pos, province in self.provinces.items() if province.owner == 'rival'
+                    for neighbor in self.grid.neighbors(pos) if self.provinces[neighbor].owner != 'rival'}
+        if not frontier:
+            return
+        target = min(frontier, key=lambda pos: (HexGrid.distance(pos, (-2, 0)), pos))
+        province = self.provinces[target]
+        if target == self.hero.pos:
+            self._start_battle(target, 'defense', ['guard', 'brigand', 'archer'])
+            self.log.append(f'The rival attacks your army at {province.name}!')
+            return
+        province.owner, province.guards = 'rival', ['guard', 'brigand']
+        self.log.append(f'The rival seized {province.name}.')
+        if province.capital:
+            self.status = 'defeat'
+            self.log.append('Westwatch has fallen. The rival claims the shard.')
 
     def to_json(self) -> str:
         data = asdict(self)
