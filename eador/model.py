@@ -6,7 +6,6 @@ geometry and movement search are the reusable Saga2D primitive.
 from __future__ import annotations
 
 import json
-import random
 from dataclasses import asdict, dataclass, field, fields
 from typing import TYPE_CHECKING
 
@@ -170,54 +169,15 @@ class State:
             raise RuleError('The shard seed must be an integer.')
         if not isinstance(hero_class, str) or hero_class not in HERO_CLASSES:
             raise RuleError('Choose Commander, Warrior, Scout or Wizard.')
-        rng = random.Random(seed)
-        cells = [(q, r) for q in range(-2, 3) for r in range(-2, 3)
-                 if abs(q + r) <= 2]
-        names = ['Westwatch', 'Amber Fields', 'Old Hollow', 'Briarwood',
-                 'Silverford', 'Winding Vale', 'Mossfell', 'Raven Hill',
-                 'Greenwater', 'Heartwood', 'Stonecross', 'Sunken Road',
-                 'Ashen Marsh', 'Frostmere', 'Cinderwood', 'High Pass',
-                 'Lost Reach', 'Blackfen', 'Duskspire']
-        provinces = {}
-        for pos, name in zip(cells, names):
-            terrain = rng.choice(('plains', 'forest', 'hills', 'marsh'))
-            guards = [rng.choice(('brigand', 'goblin', 'wolf'))
-                      for _ in range(1 if pos[0] < 0 else 2)]
-            if pos[0] == 0:
-                guards = ['brigand', 'goblin', 'wolf']
-            elif pos[0] == 1:
-                guards = ['guard', 'guard', 'brigand', 'goblin']
-            elif pos[0] == 2:
-                guards = ['guard', 'guard', 'archer']
-            owner = 'rival' if pos[0] == 2 else 'neutral'
-            provinces[pos] = Province(pos, name, terrain, owner,
-                                      rng.randint(5, 9), int(terrain == 'hills'),
-                                      guards, None)
-            kind = rng.choice(tuple(SITES))
-            spec = SITES[kind]
-            province = provinces[pos]
-            province.site, province.site_kind = spec.name, kind
-            province.site_guards = list(spec.guards) + (['guard'] if pos[0] >= 1 else [])
-            province.site_relic = spec.relic
-            province.site_gold, province.site_crystals = spec.gold, spec.crystals
-        home, rival = provinces[(-2, 0)], provinces[(2, 0)]
-        home.name, home.owner, home.capital, home.income = 'Westwatch', 'player', True, 16
-        home.guards, home.site = [], 'Buried Shrine'
-        home.site_kind, home.site_guards, home.site_relic = 'shrine', list(SITES['shrine'].guards), 'moonstone'
-        home.site_gold, home.site_crystals = SITES['shrine'].gold, SITES['shrine'].crystals
-        rival.name, rival.owner, rival.capital, rival.income = 'Duskspire', 'rival', True, 16
-        rival.guards, rival.site = ['guard'] * 5 + ['archer'] * 2, None
-        rival.site_kind, rival.site_guards, rival.site_relic = None, [], None
-        rival.site_gold = rival.site_crystals = 0
+        from eador.worldgen import generate
+        provinces = generate(seed)
+        home = provinces[(-2, 0)]
         max_hp = 48 if hero_class == 'Warrior' else 36
         mana = 16 if hero_class == 'Wizard' else 10
         army = [Troop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
                 for i, kind in enumerate(('militia', 'militia', 'archer'), 1)]
         hero = Hero('Alden', hero_class, home.pos, max_hp, max_hp, mana, mana, army)
         state = cls(seed, provinces, hero, actions_left=3 if hero_class == 'Scout' else 2)
-        for province in state.provinces.values():
-            province.guard_hp = [UNITS[kind].hp for kind in province.guards]
-            province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
         state.rival = RivalState.initial()
         state.rival.plan(state, delay=3)
         state.log.append('Claim the shard: capture Duskspire before Westwatch falls.')
