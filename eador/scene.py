@@ -126,7 +126,8 @@ class TitleScene(Screen):
         for i, (ident, theme) in enumerate(THEMES.items()):
             self.button(theme.name, x + i * (width + 12) / 3, 418, (width - 24) / 3,
                         lambda ident=ident: self.choose_theme(ident), primary=ident == self.world_theme)
-        self.button("Enter the shard", w / 2 - 170, h - 124, 340, self.start, hotkey="Enter", primary=True)
+        self.button("Linked campaign", w / 2 - 348, h - 124, 336, self.start_campaign, shortcut="L", primary=True)
+        self.button("Enter single shard", w / 2 + 12, h - 124, 336, self.start, hotkey="Enter")
         self.button("Load shard", w / 2 - 202, h - 72, 196, self.browse_saves, hotkey="F6")
         self.button("New seed", w / 2 + 6, h - 72, 196, self.next_seed, shortcut="N")
         self.button("Settings", w - 178, 26, 152, self.open_settings, shortcut="O")
@@ -156,6 +157,12 @@ class TitleScene(Screen):
 
     def start(self):
         state = State.new(self.seed, self.hero_class, theme=self.world_theme)
+        self.enter_state(state)
+
+    def start_campaign(self):
+        self.enter_state(State.new_campaign(self.seed, self.hero_class))
+
+    def enter_state(self, state):
         root = ShardScene(state)
         if not self.checkpoint(state):
             root.message = self.message
@@ -188,7 +195,7 @@ class TitleScene(Screen):
         self.paragraph(THEMES[self.world_theme].description, x, 476, width=width, size=13)
         notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
                                   if self.preferences.error else "")
-        self.text(notice or f"Shard {self.seed}  ·  Conquer provinces, explore ruins, command every battle.",
+        self.text(notice or f"Seed {self.seed} · Linked: three stages from Frontier. Single shard: your selected world.",
                   w / 2, h - 155, size=11, color=RED if notice else MUTED, center=True)
 
 
@@ -228,6 +235,9 @@ class ShardScene(Screen):
             self.game.push(BattleScene(self))
         elif self.state.choice is not None:
             self.game.push(ChoiceScene(self))
+        elif self.state.campaign and self.state.campaign.phase != "playing":
+            from eador.campaign_scene import CampaignScene
+            self.game.push(CampaignScene(self))
         elif self.state.status != "playing":
             self.game.push(ResultScene(self))
 
