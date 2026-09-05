@@ -46,6 +46,13 @@ def check_state(state: State) -> None:
     assert all(0 < t.hp <= t.max_hp and 0 <= t.xp < t.level * 6 for t in hero.army)
     assert 0 <= hero.xp < hero.level * 12
     assert state.gold >= 0 and state.crystals >= 0
+    assert state.rival.gold >= 0
+    assert state.rival.pos in state.provinces
+    assert len({troop.id for troop in state.rival.army}) == len(state.rival.army)
+    assert all(0 < troop.hp <= troop.max_hp for troop in state.rival.army)
+    for province in state.provinces.values():
+        assert len(province.guards) == len(province.guard_hp)
+        assert len(province.site_guards) == len(province.site_guard_hp)
     assert 0 <= state.actions_left <= (3 if hero.hero_class == 'Scout' else 2)
     assert all(pos == p.pos and p.owner in ('player', 'neutral', 'rival')
                for pos, p in state.provinces.items())
@@ -58,7 +65,7 @@ def check_state(state: State) -> None:
         assert state.battle_kind is None and state.battle_province is None
     else:
         battle = state.battle
-        assert state.battle_kind in ('site', 'conquest', 'defense')
+        assert state.battle_kind in ('site', 'conquest', 'defense', 'intercept')
         assert state.battle_province in state.provinces
         alive = [u for u in battle.units if u.alive]
         assert len({u.pos for u in alive}) == len(alive)
@@ -142,9 +149,16 @@ def campaign_run(seed: int, steps: int, metrics: Counter) -> None:
         elif state.battle:
             if state.battle.outcome:
                 state.resolve_battle()
+            elif state.hero.pos == (-2, 0) and state.rival.defeats and state.battle_kind in ('conquest', 'intercept'):
+                state.battle.auto_turn()
             else:
                 state.retreat()
             metrics['cleanup_battles'] += 1
+        elif state.hero.pos == (-2, 0) and state.rival.defeats and state.actions_left:
+            # An opponent that learned to avoid a fortified hero will not keep
+            # donating assaults. Leave the capital exposed through real play.
+            state.travel(state.grid.neighbors(state.hero.pos)[0])
+            metrics['cleanup_departures'] += 1
         else:
             state.end_turn()
             metrics['cleanup_turns'] += 1
@@ -388,8 +402,16 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                 elif isinstance(scene, BattleScene):
                     if scene.battle.outcome:
                         press('e')
+                    elif (scene.root.state.hero.pos == (-2, 0) and scene.root.state.rival.defeats
+                          and scene.root.state.battle_kind in ('conquest', 'intercept')):
+                        press('a')
                     else:
                         button('Retreat')
+                elif (scene.state.hero.pos == (-2, 0) and scene.state.rival.defeats
+                      and scene.state.actions_left):
+                    click(*scene.grid.center(scene.grid.neighbors(scene.state.hero.pos)[0]))
+                    press('return')
+                    metrics['cleanup_departures'] += 1
                 else:
                     press('e')
             else:
