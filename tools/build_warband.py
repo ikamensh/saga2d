@@ -38,6 +38,8 @@ def main() -> None:
     subprocess.run(cmd, check=True, cwd=ROOT)
     exe = dist / "Warband" / ("Warband.exe" if platform.system() == "Windows" else "Warband")
     digest = hashlib.sha256(exe.read_bytes()).hexdigest()[:16]
+    if platform.system() == "Darwin":
+        subprocess.run(["caffeinate", "-u", "-t", "5"], check=False)  # the build takes minutes; a sleeping display cannot open the selftest window
     with tempfile.TemporaryDirectory() as clean:
         png = Path(clean) / "selftest.png"
         env = {"HOME": clean, "SAGA2D_SILENT": "1", "PATH": "/usr/bin:/bin"}
