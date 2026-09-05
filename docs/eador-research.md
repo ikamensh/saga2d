@@ -52,6 +52,14 @@ armies. Four starting hero classes change play: Warrior, Scout, Commander
 and Wizard. Five stronghold buildings cover economic growth, recruitment,
 magic and recovery.
 
+Progression is tuned around local exploration, recruitment and recovery
+before the final assault. Western provinces are lightly defended; the
+central belt has three defenders and the eastern approach has four.
+Duskspire has five Dread Guards and two Archers. The rival initially owns
+three eastern provinces and expands toward the player on turns 5, 9, 13,
+17 and every four turns thereafter. These are adaptation-specific balance
+choices intended to make investment matter while preserving a short shard.
+
 | Area | Concrete scope target |
 |---|---|
 | Strategy | Seeded connected provinces, ownership, visible adjacency, local exploration, sites, healing/resting, rival expansion. |
@@ -88,7 +96,13 @@ those before inventing abstractions. Read `DESIGN.md` as the current contract.
 | A small generic weighted search helper, only if both reachability and AI need it concretely. | Movement costs, occupancy, attack range and tactical combat formulas. |
 | Callable button availability/text, if repeated state synchronization proves cumbersome. | Available campaign commands, building prerequisites and resource affordability. |
 | Existing scene-stack and save-slot conveniences. | Campaign state, battle outcome application and serialization schema. |
+| Backend-measured paragraph wrapping: a scene supplies text and width and receives consumed height. | Guide copy, descriptions and how much room each game screen allocates. |
 | General drawing/input/layout fixes demonstrated by both reference games. | Hero classes, troop data, spells, opponent decisions, economy and victory. |
+
+The text primitive is motivated by actual overflow in Shardbound's guide
+and catalogues: counting characters does not predict rendered width with
+proportional fonts. `Scene.draw_paragraph` keeps that measurement and line
+breaking in the framework instead of duplicating it in individual games.
 
 Avoid a universal strategy-game engine, an entity-component rewrite, or a
 generic economy/quest system. The useful abstraction test is whether a game

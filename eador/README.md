@@ -25,27 +25,38 @@ that slot and loading restores the campaign, including an unfinished battle.
 1. Start with Commander. You have 100 gold, two militia, an archer and your
    hero. Press **B**, then **1** to build Barracks for 45 gold. Close with
    **Esc**, press **R**, then **2** to recruit a Swordsman for 45 gold.
-2. Close recruitment. Select a province next to Westwatch and press
-   **Enter** to invade. The neighboring western provinces have lighter
-   defenders than the eastern approach to Duskspire.
+2. Close recruitment and press **X** to explore Westwatch's guarded site.
+   This first expedition earns treasure and experience before you advance.
 3. In battle, click a friendly unit, then a blue reachable hex to move.
    Click an enemy marked as a target to attack. Keep the archer behind
    the front line; forest and hills reduce incoming attack damage.
 4. Press **E** after your units act to let the enemy take its turn. **A**
    plays your remaining actions and the enemy turn automatically for one
    round; repeat it if you want assistance with the encounter.
-5. After victory, press **E** to return to the shard. Your surviving troops
-   keep their wounds and earn experience. The conquered province earns
-   income. **X** explores a guarded site in the province where your hero
-   stands, spending an action and starting another battle for treasure.
-6. End a campaign turn with **E** to collect income, pay upkeep, heal and
-   regain mana. Reinforce and work toward Duskspire. The rival first
-   advances when turn 9 begins, then on turns 13, 17 and every four turns
-   thereafter. Save with **F5** before a difficult expedition.
+5. After victory, press **E** to return to the shard with treasure and
+   experience. Press **E** again to end the campaign turn, collect income,
+   pay upkeep, heal and regain mana. Build a Temple when you can afford
+   its 65 gold, then fill free troop slots with Swordsmen.
+6. Move east through Silverford, Heartwood and Cinderwood: select an
+   adjacent province and press **Enter** to invade. Rest after each
+   conquest, explore its site with **X**, then rest again. Invest the
+   rewards in recovery and reinforcements; every conquered province also
+   adds income.
+7. Before attacking Duskspire, restore every unit to within about 6 health
+   of its maximum. Its five Dread Guards and two Archers demand a prepared
+   army. A direct rush with the starting troops is unlikely to succeed.
+8. The rival starts with three eastern provinces and first advances when
+   turn 5 begins, then on turns 9, 13, 17 and every four turns thereafter.
+   An unopposed advance can reach Westwatch on turn 17. Save with **F5**
+   before a difficult expedition.
 
 The starting army is usable immediately; Barracks is one possible opening,
 not a required build. Marketplace provides income instead, while Wizard
 starts with both spells and can invest elsewhere.
+The investment-and-exploration route above wins the seed-7 Commander
+campaign on turn 9 using automatic battles; manual decisions and different
+seeds can change the outcome. For Wizard, a Mage Tower before the Temple
+adds mana to support the two spells already learned.
 
 ## Controls
 
@@ -76,7 +87,9 @@ starts with both spells and can invest elsewhere.
 ## Rules and scope
 
 The campaign has 19 connected provinces, a single controllable hero and a
-rival that expands along the frontier toward Westwatch. Travel and site
+rival that starts with three eastern provinces and expands along the
+frontier toward Westwatch. Initially, central provinces have three defenders, the
+eastern approach has four, and Duskspire has seven. Travel and site
 exploration spend campaign actions: two per turn, or three for Scout.
 Construction and recruitment spend resources without consuming actions;
 recruitment is available in any province you control. There is one guarded
@@ -137,7 +150,10 @@ The rule modules are usable without a window and import Saga2D's general
 Saga2D owns drawing, input dispatch, scenes, UI and save slots. Hex layout,
 picking, distance, reachable costs and routes are shared framework work;
 terrain meaning, army ownership, action budgets, spells and victory remain
-game rules. See the [HexGrid cookbook](../docs/framework-hexgrid.md) and
+game rules. Measured paragraph wrapping is another framework responsibility:
+the game supplies text and available width, while Saga2D fits actual font
+metrics. This removes character-count guesses from guides and catalogues.
+See the [HexGrid cookbook](../docs/framework-hexgrid.md) and
 [framework design](../DESIGN.md).
 
 The [research and scope notes](../docs/eador-research.md) cite the official
