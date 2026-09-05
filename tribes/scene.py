@@ -562,15 +562,13 @@ class MapScene(Scene):
         self.game.push(SettingsScene(self))
 
     def quick_save(self) -> None:
-        self.game.save(1)
+        self.game.save(1, scene=self)
         self.say("Saved to slot 1")
         self.sfx("button")
 
     def quick_load(self) -> None:
-        if self.game.save_manager.load(1) is None:
+        if self.game.load(1, scene=self) is None:
             self.warn("No save in slot 1")
-            return
-        self.game.load(1)
 
     def center_capital(self) -> None:
         capital = self.world.capital_of(self.human) or next(iter(self.world.tribe_cities(self.human)), None)

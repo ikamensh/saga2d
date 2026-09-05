@@ -154,6 +154,21 @@ def test_escape_opens_the_pause_menu_and_save_load_round_trips(play) -> None:
     assert scene.world.capital_of(scene.human) is not None
 
 
+def test_save_and_load_from_the_pause_menu_round_trip(play) -> None:
+    """Regression: the pause menu's pop is deferred, so saving through it used to
+    store the (empty) PauseScene state and loading through it did nothing."""
+    game, scene = play
+    press(game, "escape")
+    press(game, "f5")
+    assert game.scene is scene
+    assert game.save_manager.load(1)["scene_class"] == "MapScene"
+    scene.tribe.stars = 999
+    press(game, "escape")
+    press(game, "f9")
+    assert game.scene is scene
+    assert scene.tribe.stars != 999
+
+
 def test_help_overlay_opens_and_closes(play) -> None:
     game, scene = play
     press(game, "f1")
