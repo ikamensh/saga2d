@@ -193,8 +193,9 @@ def _village() -> Mesh:
 
 
 def _workshop() -> Mesh:
-    """A dark smithy with a chimney at the front corner of a city tile."""
-    x, y = 0.3, 0.3
+    """A dark smithy with a chimney at the front-right of a city tile, clear of the
+    houses behind and just outside the token disc, so a garrison does not hide it."""
+    x, y = 0.31, 0.13
     body = r3.box((x, y, 0.07), (0.17, 0.15, 0.14), (98, 88, 82))
     roof = r3.gable_roof((x, y, 0.14), (0.2, 0.18), 0.07, (70, 62, 60))
     chimney = r3.box((x - 0.05, y + 0.04, 0.2), (0.04, 0.04, 0.12), (60, 56, 56))
