@@ -338,3 +338,43 @@ def test_losing_a_foundry_relocks_the_assault_until_a_real_recapture():
         march_to(state, pos)
     assert state.assault_blocked_reason is None
     assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+@pytest.mark.parametrize('map_name', ['current', 'entry'])
+def test_a_required_watch_cannot_be_deleted_from_the_current_or_recovery_world(map_name):
+    """A damaged save must not load an adventure whose required seal no longer exists."""
+    import json
+    from eador.model import SaveFormatError
+    state = second_shard('rootward')
+    data = json.loads(state.to_json())
+    provinces = data['provinces'] if map_name == 'current' else data['campaign']['entry']['provinces']
+    watch = next(p for p in provinces if p['site_kind'] == 'border_watch')
+    watch.update(site=None, site_kind=None, site_relic=None, site_guards=[], site_guard_hp=[], site_gold=0, site_crystals=0)
+    with pytest.raises(SaveFormatError, match='Watch'):
+        State.from_json(json.dumps(data))
+
+
+def test_authored_encounters_can_be_queried_before_spending_a_travel_order():
+    """The UI can brief a site or final ritual using the same definition as the coming battle."""
+    state = State.new_campaign(7)
+    watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
+    saved = state.to_json()
+    assert state.encounter_at(watch, kind='site') == 'border_watch'
+    assert state.encounter_at(watch) is None
+    assert state.to_json() == saved
+    final = final_battle()
+    assert final.encounter_at((2, 0)) == final.battle_encounter == 'last_gate'
+    assert final.encounter_at((2, 0), kind='site') is None
+
+
+@pytest.mark.parametrize('change', [dict(kind='rout', target=None, progress=0, required=0, deadline=None),
+                                    dict(deadline=80), dict(required=1), dict(target=[0, 0])])
+def test_a_saved_final_ritual_cannot_silently_change_the_offered_contract(change):
+    """Current saves keep the exact ritual promised by the selected challenge."""
+    import json
+    from eador.model import SaveFormatError
+    state = final_battle()
+    data = json.loads(state.to_json())
+    data['battle']['objective'].update(change)
+    with pytest.raises(SaveFormatError, match='ritual'):
+        State.from_json(json.dumps(data))
