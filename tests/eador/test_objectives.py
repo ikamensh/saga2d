@@ -117,3 +117,153 @@ def test_rout_and_hero_death_end_an_objective_immediately():
     battle.objective.progress = 1
     battle.end_turn()
     assert battle.outcome == 'enemy' and battle.outcome_reason == 'hero_death'
+
+
+def prepared_watch(seed=7, hero_class='Commander'):
+    """Visit the northern site through an invested opening, conquests and normal recovery."""
+    state = State.new(seed, hero_class)
+    state.build('barracks')
+    state.recruit('swordsman')
+    for destination in (None, (-1, -1), (0, -2)):
+        if destination is None:
+            state.explore()
+        else:
+            state.travel(destination)
+        while state.battle and not state.battle.outcome:
+            state.battle.auto_turn()
+        if state.battle:
+            assert state.battle.outcome == 'player'
+            state.resolve_battle()
+        while state.choice:
+            state.choose(state.choice.options[0].id)
+        if state.inventory and not state.hero.relic:
+            state.equip(state.inventory[0])
+        state.end_turn()
+        if 'temple' not in state.buildings:
+            state.build('temple')
+        while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
+            state.recruit('swordsman')
+    state.explore()
+    return state
+
+
+def guard_army(battle):
+    for unit in battle.units:
+        if unit.team == 'player' and unit.alive and not unit.acted:
+            battle.guard(unit.id)
+
+
+def form_watch_screen(state):
+    """Use the starting roster to screen the seal, then rotate into the Pikeman's gap."""
+    battle = state.battle
+    pike = next(unit.id for unit in battle.units if unit.team == 'enemy' and unit.kind == 'pikeman')
+    for unit_id, destination in ((1, (1, 0)), (4, (0, 1)), (5, (0, 0)), (3, (0, -1)), (2, (-1, 0)), (6, (-1, 1))):
+        battle.move(unit_id, destination)
+    battle.attack(1, pike)
+    battle.attack(3, pike)
+    guard_army(battle)
+    battle.end_turn()
+    battle.attack(3, pike)
+    for unit_id, destination in ((1, (1, -1)), (4, (1, 0)), (6, (0, 1)), (0, (-1, 1))):
+        battle.move(unit_id, destination)
+    guard_army(battle)
+    battle.end_turn()
+    assert battle.objective.progress == 1 and battle.outcome is None
+
+
+def test_a_real_campaign_can_screen_hold_save_and_collect_the_site_only_once():
+    """Seven units protect the seal; a surviving archer withdraws and cannot be farmed."""
+    from eador.model import RuleError
+
+    state = prepared_watch()
+    form_watch_screen(state)
+    state = State.from_json(state.to_json())
+    guard_army(state.battle)
+    state.battle.end_turn()
+    assert state.battle.outcome_reason == 'hold'
+    surviving_defenders = [(unit.kind, unit.hp) for unit in state.battle.units if unit.team == 'enemy' and unit.alive]
+    assert surviving_defenders
+    state = State.from_json(state.to_json())  # The result overlay can save before collecting rewards.
+    before_gold, before_crystals = state.gold, state.crystals
+    owners = [p.owner for p in state.provinces.values()]
+    state.resolve_battle()
+    province = state.provinces[state.hero.pos]
+    assert province.explored and list(zip(province.site_guards, province.site_guard_hp)) == surviving_defenders
+    assert (state.gold, state.crystals) == (before_gold + 50, before_crystals + 2)
+    assert [p.owner for p in state.provinces.values()] == owners
+    while state.choice:
+        state = State.from_json(state.to_json())
+        state.choose(state.choice.options[0].id)
+    for command in (state.resolve_battle, state.explore):
+        saved = state.to_json()
+        with pytest.raises(RuleError):
+            command()
+        assert state.to_json() == saved
+
+
+def test_retreat_preserves_defender_losses_but_resets_the_unfinished_seal():
+    """A first holding turn earns no reward; returning starts a fresh timed encounter."""
+    state = prepared_watch()
+    form_watch_screen(state)
+    surviving_defenders = [(unit.kind, unit.hp) for unit in state.battle.units if unit.team == 'enemy' and unit.alive]
+    xp, crystals = state.hero.xp, state.crystals
+    state.retreat()
+    province = state.provinces[state.hero.pos]
+    assert not province.explored and not state.choice
+    assert list(zip(province.site_guards, province.site_guard_hp)) == surviving_defenders
+    assert (state.hero.xp, state.crystals) == (xp, crystals)
+    state = State.from_json(state.to_json())
+    state.explore()
+    assert state.battle.round == 1 and state.battle.objective.progress == 0
+    assert [(unit.kind, unit.hp) for unit in state.battle.units if unit.team == 'enemy'] == surviving_defenders
+
+
+@pytest.mark.parametrize('hero_class', ['Commander', 'Warrior', 'Scout', 'Wizard'])
+@pytest.mark.parametrize('seed', range(4))
+def test_prepared_armies_can_still_rout_the_watch_before_its_deadline(seed, hero_class):
+    """The new optional objective preserves the simple automatic combat alternative."""
+    state = prepared_watch(seed, hero_class)
+    while state.battle.outcome is None:
+        state.battle.auto_turn()
+    assert state.battle.outcome == 'player' and state.battle.outcome_reason == 'rout'
+    assert state.battle.round <= 8
+    State.from_json(state.to_json())
+
+
+def test_missing_the_deadline_saves_a_living_hero_and_resolves_as_retreat():
+    """Guarding the deployment area cannot stall indefinitely or award the unclaimed site."""
+    state = prepared_watch()
+    while state.battle.outcome is None:
+        guard_army(state.battle)
+        state.battle.end_turn()
+    assert state.battle.outcome_reason == 'deadline' and state.battle.round == 8
+    assert state.battle.unit(0).alive
+    state = State.from_json(state.to_json())
+    xp, crystals = state.hero.xp, state.crystals
+    assert 'Retreated' in state.resolve_battle()
+    assert not state.provinces[state.hero.pos].explored
+    assert (state.hero.xp, state.crystals) == (xp, crystals)
+    assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+@pytest.mark.parametrize('damage', ['unfinished_complete', 'false_hold', 'contested_hold', 'false_deadline'])
+def test_corrupt_objective_results_are_rejected_before_rewards(damage):
+    """Loaded claims of victory need an actual terminal hold and an uncontested living holder."""
+    state = prepared_watch()
+    form_watch_screen(state)
+    if damage != 'unfinished_complete':
+        guard_army(state.battle)
+        state.battle.end_turn()
+    data = json.loads(state.to_json())
+    if damage == 'unfinished_complete':
+        data['battle']['objective']['progress'] = 2
+    elif damage == 'false_hold':
+        data['battle']['objective']['progress'] = 0
+    elif damage == 'contested_hold':
+        holder = next(u for u in data['battle']['units'] if u['pos'] == [0, 0])
+        enemy = next(u for u in data['battle']['units'] if u['team'] == 'enemy' and u['hp'] > 0)
+        holder['pos'], enemy['pos'] = enemy['pos'], holder['pos']
+    else:
+        data['battle']['outcome'], data['battle']['outcome_reason'] = 'enemy', 'deadline'
+    with pytest.raises(SaveFormatError):
+        State.from_json(json.dumps(data))
