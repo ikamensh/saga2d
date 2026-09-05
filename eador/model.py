@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 from saga2d import HexGrid
 
 from eador.content import Choice, ChoiceOption, RELICS, SITES, SKILLS
-from eador.rival import INTENTS, RivalState, RivalTroop
+from eador.rival import INTENTS, STRONGHOLD, RivalState, RivalTroop
 
 if TYPE_CHECKING:
     from eador.battle import Battle
@@ -620,7 +620,12 @@ class State:
                             unit['source_id'] = unit['id']
                             if unit['hp'] > 0:
                                 army.append(RivalTroop(unit['id'], unit['kind'], unit['hp'], unit['max_hp']))
-                    data['rival'].update(army=[asdict(troop) for troop in army], intent='attack',
+                    target = tuple(data['battle_province'])
+                    neighbors = [province for province in data['provinces']
+                                 if HexGrid.distance(tuple(province['pos']), target) == 1]
+                    origin = min(neighbors, key=lambda province: (province['owner'] != 'rival',
+                                 HexGrid.distance(tuple(province['pos']), STRONGHOLD), tuple(province['pos'])))['pos']
+                    data['rival'].update(pos=origin, army=[asdict(troop) for troop in army], intent='attack',
                                          target=data['battle_province'], turns_until_action=0,
                                          next_troop_id=max((unit['id'] for unit in data['battle']['units']), default=0) + 1)
         data['rival']['pos'] = tuple(data['rival']['pos'])
@@ -798,10 +803,19 @@ def _validate_save(data: dict, version: int) -> None:
         integer(rival['defeats'], 'Rival defeats')
         integer(rival['turns_until_action'], 'Rival countdown', maximum=4)
         require(rival['intent'] in INTENTS, 'Unknown rival intent.')
-        require(position(rival['pos'], 'Rival position') in provinces, 'Rival is outside the shard.')
-        if rival['target'] is not None:
-            require(position(rival['target'], 'Rival target') in provinces, 'Rival target is outside the shard.')
+        rival_pos = position(rival['pos'], 'Rival position')
+        require(rival_pos in provinces, 'Rival is outside the shard.')
+        rival_target = None if rival['target'] is None else position(rival['target'], 'Rival target')
+        require(rival_target is None or rival_target in provinces, 'Rival target is outside the shard.')
+        if rival['intent'] in ('march', 'attack', 'return'):
+            require(rival_target is not None and HexGrid.distance(rival_pos, rival_target) == 1,
+                    'Rival movement requires an adjacent target.')
+        elif rival['intent'] in ('recruit', 'recover'):
+            require(rival_pos == rival_target == STRONGHOLD, 'Rival refitting requires its stronghold.')
         require(isinstance(rival['army'], list) and len(rival['army']) <= 7, 'Invalid rival army size.')
+        require(rival['army'] or rival['intent'] not in ('march', 'attack', 'return')
+                or data['battle'] is not None and data['battle_kind'] in ('defense', 'intercept'),
+                'Rival movement requires an expedition.')
         for troop in rival['army']:
             object_fields(troop, {f.name for f in fields(RivalTroop)}, 'Rival troop')
             require(isinstance(troop['kind'], str) and troop['kind'] in UNITS, 'Unknown rival troop kind.')
@@ -844,6 +858,7 @@ def _validate_save(data: dict, version: int) -> None:
     require(len(cells) == 37, 'A battlefield must contain 37 hexes.')
     require(isinstance(battle['units'], list) and 2 <= len(battle['units']) <= 14, 'Invalid battle army size.')
     ids, occupied, player_ids, enemies = set(), set(), set(), []
+    expedition_ids = set()
     for unit in battle['units']:
         unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set())
         object_fields(unit, unit_keys, 'Battle unit')
@@ -865,8 +880,12 @@ def _validate_save(data: dict, version: int) -> None:
         if version == 3:
             if unit['team'] == 'enemy' and data['battle_kind'] in ('intercept', 'defense'):
                 integer(unit['source_id'], 'Expedition soldier identity', minimum=1)
+                require(unit['source_id'] not in expedition_ids, 'Expedition soldier identity is duplicated.')
+                expedition_ids.add(unit['source_id'])
                 if unit['hp'] > 0:
-                    require(unit['source_id'] in rival_by_id and rival_by_id[unit['source_id']]['kind'] == unit['kind'], 'Expedition soldier differs from the rival army.')
+                    require(unit['source_id'] in rival_by_id, 'Expedition soldier is missing from the rival army.')
+                if unit['source_id'] in rival_by_id:
+                    require(rival_by_id[unit['source_id']]['kind'] == unit['kind'], 'Expedition soldier differs from the rival army.')
             else:
                 require(unit['source_id'] is None, 'A non-expedition combatant has a rival identity.')
         pos = position(unit['pos'], 'Battle unit position')
@@ -883,6 +902,8 @@ def _validate_save(data: dict, version: int) -> None:
         else:
             enemies.append(unit)
     require(player_ids == troop_ids | {0} and enemies, 'Battle army does not match the campaign army.')
+    if version == 3 and data['battle_kind'] in ('defense', 'intercept'):
+        require(rival_by_id.keys() <= expedition_ids, 'Expedition is missing a rival soldier.')
     hero_unit = next(unit for unit in battle['units'] if unit['id'] == 0)
     if battle['outcome'] == 'player':
         require(hero_unit['hp'] > 0 and all(unit['hp'] == 0 for unit in enemies), 'Battle victory is inconsistent.')

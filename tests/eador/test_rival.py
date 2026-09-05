@@ -55,6 +55,7 @@ def test_previous_saves_keep_pending_choices_and_exact_defense_continuations():
     defense = State.from_json((fixtures / 'v2_defense.json').read_text())
     assert defense.battle_kind == 'defense'
     assert defense.rival.intent == 'attack'
+    assert State.from_json(defense.to_json()).to_json() == defense.to_json()
     while not defense.battle.outcome:
         defense.battle.auto_turn()
     expected = json.loads((fixtures / 'v2_defense_result.json').read_text())
@@ -193,3 +194,38 @@ def test_camping_does_not_farm_repeat_victories_or_make_the_rival_oscillate():
     assert state.hero.level == 1 and state.hero.xp == 8
     assert all(province.owner == 'rival' for pos, province in state.provinces.items() if pos != state.hero.pos)
     assert state.rival.intent == 'watch'
+
+
+def test_save_rejects_rival_operations_that_cannot_execute():
+    """Damaged saves are rejected before their future end-turn operation can crash play."""
+    import json
+    import pytest
+    from eador.model import SaveFormatError
+
+    for changes in ({'intent': 'attack', 'target': None},
+                    {'intent': 'march', 'target': [-2, 0]},
+                    {'intent': 'recruit'}, {'intent': 'recover'}, {'army': []}):
+        data = json.loads(State.new(7).to_json())
+        data['rival'].update(changes)
+        with pytest.raises(SaveFormatError, match='Rival'):
+            State.from_json(json.dumps(data))
+
+
+def test_save_rejects_duplicate_or_missing_expedition_soldiers():
+    """Every persistent rival soldier must have exactly one combat identity, even when dead."""
+    import json
+    import pytest
+    from eador.model import SaveFormatError
+
+    state = central_hero()
+    state.travel(state.rival.pos)
+    data = json.loads(state.to_json())
+    guards = [unit for unit in data['battle']['units'] if unit['team'] == 'enemy' and unit['kind'] == 'guard']
+    guards[1]['source_id'] = guards[0]['source_id']
+    with pytest.raises(SaveFormatError, match='Expedition'):
+        State.from_json(json.dumps(data))
+    data = json.loads(state.to_json())
+    data['rival']['army'].append({'id': data['rival']['next_troop_id'], 'kind': 'guard', 'hp': 42, 'max_hp': 42})
+    data['rival']['next_troop_id'] += 1
+    with pytest.raises(SaveFormatError, match='Expedition'):
+        State.from_json(json.dumps(data))
