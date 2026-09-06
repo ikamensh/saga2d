@@ -54,3 +54,6 @@ walks every item through public input at both reading sizes in 1280×720,
 save reloads. The native regression originally found that an offers screen at
 125% could not fit the complete macOS directory error; section paging fixes that
 case without discarding the error or advice.
+
+[Retained native evidence](evidence/shardbound-campaign-reading-8b686c3/README.md)
+records the exact source, full suite, stress outcomes and seven inspected frames.
