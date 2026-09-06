@@ -52,6 +52,14 @@ abilities the shipped policy selects, never evidence of deliberate manual use.
 
 ## Manual comparisons still required
 
+The later [earned Scout path comparison](eador-scout-paths.md) supplies two
+explicit six-battle continuations from the same pending first skill: Pathfinder
+twice versus Skirmisher twice. Both pay for the same Rangers and complete the
+same itinerary without casualties. Native controls and exact saves verify both;
+different tactical choices, one seed and the historical autoplay opening limit
+what their equal treasury and different wounds establish. This advances the
+Mobile cases below without closing the broader army-plan comparison.
+
 * Sustain: Acolyte Heal while the hero attacks, Pikeman Brace against an actual
   melee entry, Archer Pin and Militia Rally. Compare an equally paid Warden
   substitution against a cheaper, faster Swordsman. Ranged attacks, expired Brace

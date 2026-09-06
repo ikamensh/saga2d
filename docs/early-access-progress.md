@@ -842,3 +842,27 @@ Game play remains capped at 60 FPS active / 15 inactive, native test input at
 run serially and have exited. Cancelled large matrices and soak were not restarted.
 G01–G19 remain incomplete; matched build comparisons, content depth, current
 candidate stress, platform checks and independent human feedback remain work.
+
+## Two earned Scout paths — 2026-09-06
+
+[Pathfinder II and Skirmisher II](eador-scout-paths.md) now have six-battle
+agent-directed continuations from the same earned first skill choice. Both
+follow the declared paid itinerary, spend 100 gold on two Rangers, finish at
+turn 4 with no casualties or extra rest, and retain 192 gold / 18 crystals.
+Pathfinder uses a Heal and ends with 13 missing army HP; Skirmisher uses no
+spell and ends with 17 missing army HP plus four missing hero HP. Different
+tactics mean these wound differences are not evidence of a dominant skill.
+
+The shared journey demonstrates terrain reach versus attack-then-move, contested
+Watch occupation and explicit Explorer evacuation through Swap. Both escape with
+three surviving defenders withdrawing. The historical opening used autoplay;
+the continuation contains no autoplay, resource injection or rewind. These are
+partial campaigns and do not replace independent first runs or human feedback.
+
+At native verifier `49d5b65`, all 225 commands match their exact saved results
+through 225 F5/F9 joins and 918 input events. Screenshots of encounter entry,
+ready evacuation and actual final wounds were inspected. Source hashes remain
+unchanged. The two sequential native runs average 25.38% and 25.30% of one core
+and close their games. [Retained journals and verification](evidence/scout-paths-78cb545/README.md)
+distinguish the original execution sources from the native verifier source.
+Twenty-four focused validator tests pass; G01–G19 remain incomplete.

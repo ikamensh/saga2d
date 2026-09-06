@@ -1,0 +1,4806 @@
+{
+  "branches": {
+    "pathfinder": {
+      "battles": [
+        {
+          "adventure": null,
+          "after_reward_mana": 12,
+          "after_reward_missing_hp": {
+            "army": 12,
+            "army_units": [
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 12,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 12
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 0
+          },
+          "before_reward": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 12,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 12
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1004,
+              "kind": "brigand"
+            },
+            {
+              "id": 1005,
+              "kind": "goblin"
+            }
+          ],
+          "enemy_phase_commands": [
+            12
+          ],
+          "entry": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 2,
+          "entry_turn": 2,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "site",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Silverford",
+          "province_pos": [
+            -1,
+            0
+          ],
+          "resolve_command": 16,
+          "reward_crystals": 2,
+          "reward_gold": 45,
+          "site": "Buried Shrine",
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 12,
+          "after_reward_missing_hp": {
+            "army": 12,
+            "army_units": [
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 12,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 12
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 1
+          },
+          "before_reward": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 39,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 1
+              },
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 12,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 12
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1005,
+              "kind": "brigand"
+            }
+          ],
+          "enemy_phase_commands": [
+            29
+          ],
+          "entry": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 12,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 12
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 19,
+          "entry_turn": 2,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 1,
+          "kind": "conquest",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Briarwood",
+          "province_pos": [
+            -1,
+            -1
+          ],
+          "resolve_command": 30,
+          "reward_crystals": 0,
+          "reward_gold": 25,
+          "site": null,
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 10,
+          "after_reward_missing_hp": {
+            "army": 0,
+            "army_units": [
+              {
+                "hp": 22,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 3
+          },
+          "before_reward": {
+            "mana": 8,
+            "units": [
+              {
+                "hp": 37,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 3
+              },
+              {
+                "hp": 22,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1006,
+              "kind": "brigand"
+            },
+            {
+              "id": 1007,
+              "kind": "goblin"
+            },
+            {
+              "id": 1008,
+              "kind": "wolf"
+            }
+          ],
+          "enemy_phase_commands": [
+            45
+          ],
+          "entry": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 33,
+          "entry_turn": 3,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "conquest",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Raven Hill",
+          "province_pos": [
+            0,
+            -2
+          ],
+          "resolve_command": 51,
+          "reward_crystals": 0,
+          "reward_gold": 25,
+          "site": null,
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 10,
+          "after_reward_missing_hp": {
+            "army": 3,
+            "army_units": [
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 43,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 3
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 3
+          },
+          "before_reward": {
+            "mana": 10,
+            "units": [
+              {
+                "hp": 41,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 3
+              },
+              {
+                "hp": 22,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 39,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 3
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1006,
+              "kind": "pikeman"
+            },
+            {
+              "id": 1007,
+              "kind": "archer"
+            },
+            {
+              "id": 1008,
+              "kind": "brigand"
+            }
+          ],
+          "enemy_phase_commands": [
+            65
+          ],
+          "entry": {
+            "mana": 10,
+            "units": [
+              {
+                "hp": 41,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 3
+              },
+              {
+                "hp": 22,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 53,
+          "entry_turn": 3,
+          "final_objective": {
+            "deadline": 8,
+            "exits": [],
+            "kind": "hold",
+            "progress": 0,
+            "required": 2,
+            "target": [
+              0,
+              0
+            ]
+          },
+          "final_round": 2,
+          "kind": "site",
+          "objective": {
+            "deadline": 8,
+            "exits": [],
+            "kind": "hold",
+            "progress": 0,
+            "required": 2,
+            "target": [
+              0,
+              0
+            ]
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Raven Hill",
+          "province_pos": [
+            0,
+            -2
+          ],
+          "resolve_command": 71,
+          "reward_crystals": 2,
+          "reward_gold": 50,
+          "site": "Border Watch",
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 14,
+          "after_reward_missing_hp": {
+            "army": 3,
+            "army_units": [
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 25,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 0
+          },
+          "before_reward": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 44,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 25,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1006,
+              "kind": "brigand"
+            },
+            {
+              "id": 1007,
+              "kind": "goblin"
+            },
+            {
+              "id": 1008,
+              "kind": "wolf"
+            }
+          ],
+          "enemy_phase_commands": [
+            87
+          ],
+          "entry": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 44,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 74,
+          "entry_turn": 4,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "conquest",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Greenwater",
+          "province_pos": [
+            0,
+            -1
+          ],
+          "resolve_command": 92,
+          "reward_crystals": 0,
+          "reward_gold": 25,
+          "site": null,
+          "surviving_enemies": []
+        },
+        {
+          "adventure": {
+            "approach": "north",
+            "cargo_penalty": 0,
+            "crystals": 1,
+            "encounter": "explorer_north",
+            "gold": 55,
+            "relic": "wayfarer_boots"
+          },
+          "after_reward_mana": 14,
+          "after_reward_missing_hp": {
+            "army": 13,
+            "army_units": [
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 10
+              },
+              {
+                "hp": 25,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 0
+          },
+          "before_reward": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 44,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 10
+              },
+              {
+                "hp": 25,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1007,
+              "kind": "archer"
+            }
+          ],
+          "enemy_phase_commands": [
+            106
+          ],
+          "entry": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 44,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 25,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 93,
+          "entry_turn": 4,
+          "final_objective": {
+            "deadline": 6,
+            "exits": [
+              [
+                -3,
+                1
+              ]
+            ],
+            "kind": "extract",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "site",
+          "objective": {
+            "deadline": 6,
+            "exits": [
+              [
+                -3,
+                1
+              ]
+            ],
+            "kind": "extract",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "escape",
+          "province": "Greenwater",
+          "province_pos": [
+            0,
+            -1
+          ],
+          "resolve_command": 110,
+          "reward_crystals": 1,
+          "reward_gold": 55,
+          "site": "Stranded Explorer",
+          "surviving_enemies": [
+            {
+              "hp": 24,
+              "id": 1006,
+              "kind": "pikeman",
+              "max_hp": 28,
+              "missing_hp": 4
+            },
+            {
+              "hp": 36,
+              "id": 1008,
+              "kind": "guard",
+              "max_hp": 42,
+              "missing_hp": 6
+            },
+            {
+              "hp": 38,
+              "id": 1009,
+              "kind": "warden",
+              "max_hp": 38,
+              "missing_hp": 0
+            }
+          ]
+        }
+      ],
+      "command_chain_verified": true,
+      "command_counts": {
+        "battle.attack": 29,
+        "battle.cast": 1,
+        "battle.end_turn": 6,
+        "battle.evacuate": 1,
+        "battle.guard": 15,
+        "battle.move": 34,
+        "battle.pin": 3,
+        "battle.swap": 1,
+        "choose": 5,
+        "end_turn": 2,
+        "explore": 3,
+        "recruit": 1,
+        "replace_troop": 1,
+        "resolve_battle": 6,
+        "travel": 3
+      },
+      "commands": 111,
+      "entry": {
+        "actions_left": 2,
+        "buildings": [
+          "archery",
+          "barracks"
+        ],
+        "campaign_phase": "playing",
+        "campaign_stage": 1,
+        "completed_shards": [],
+        "crystals": 7,
+        "gold": 25,
+        "hero": {
+          "army": [
+            {
+              "hp": 28,
+              "id": 1,
+              "kind": "militia",
+              "level": 2,
+              "max_hp": 28,
+              "xp": 0
+            },
+            {
+              "hp": 28,
+              "id": 2,
+              "kind": "militia",
+              "level": 2,
+              "max_hp": 28,
+              "xp": 0
+            },
+            {
+              "hp": 18,
+              "id": 3,
+              "kind": "archer",
+              "level": 2,
+              "max_hp": 24,
+              "xp": 0
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "warden",
+              "level": 2,
+              "max_hp": 42,
+              "xp": 0
+            }
+          ],
+          "hero_class": "Scout",
+          "hp": 40,
+          "level": 2,
+          "mana": 12,
+          "max_hp": 40,
+          "max_mana": 12,
+          "name": "Alden",
+          "pos": [
+            -1,
+            0
+          ],
+          "relic": "moonstone",
+          "skill_ranks": {},
+          "xp": 4
+        },
+        "inventory": [
+          "moonstone"
+        ],
+        "missing_hp": {
+          "army": 6,
+          "army_units": [
+            {
+              "hp": 28,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 28,
+              "missing_hp": 0
+            },
+            {
+              "hp": 28,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 28,
+              "missing_hp": 0
+            },
+            {
+              "hp": 18,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 24,
+              "missing_hp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "warden",
+              "max_hp": 42,
+              "missing_hp": 0
+            }
+          ],
+          "hero": 0
+        },
+        "rival": {
+          "army": [
+            {
+              "hp": 42,
+              "id": 1,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 42,
+              "id": 2,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 20
+            },
+            {
+              "hp": 20,
+              "id": 4,
+              "kind": "brigand",
+              "max_hp": 20
+            },
+            {
+              "hp": 42,
+              "id": 5,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 6,
+              "kind": "archer",
+              "max_hp": 20
+            }
+          ],
+          "defeats": 0,
+          "gold": 76,
+          "intent": "attack",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            -1
+          ],
+          "target": [
+            1,
+            -1
+          ],
+          "turns_until_action": 2
+        },
+        "status": "playing",
+        "turn": 2
+      },
+      "execution_source": "78cb545e3f961e49018ab8eff2460f5f15673d10",
+      "final": {
+        "actions_left": 1,
+        "buildings": [
+          "archery",
+          "barracks"
+        ],
+        "campaign_phase": "playing",
+        "campaign_stage": 1,
+        "completed_shards": [],
+        "crystals": 18,
+        "gold": 192,
+        "hero": {
+          "army": [
+            {
+              "hp": 26,
+              "id": 6,
+              "kind": "ranger",
+              "level": 2,
+              "max_hp": 26,
+              "xp": 6
+            },
+            {
+              "hp": 22,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 0
+            },
+            {
+              "hp": 25,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 0
+            },
+            {
+              "hp": 46,
+              "id": 4,
+              "kind": "warden",
+              "level": 3,
+              "max_hp": 46,
+              "xp": 0
+            },
+            {
+              "hp": 26,
+              "id": 5,
+              "kind": "ranger",
+              "level": 2,
+              "max_hp": 26,
+              "xp": 9
+            }
+          ],
+          "hero_class": "Scout",
+          "hp": 44,
+          "level": 3,
+          "mana": 14,
+          "max_hp": 44,
+          "max_mana": 14,
+          "name": "Alden",
+          "pos": [
+            0,
+            -1
+          ],
+          "relic": "moonstone",
+          "skill_ranks": {
+            "pathfinder": 2
+          },
+          "xp": 4
+        },
+        "inventory": [
+          "moonstone",
+          "watch_bell",
+          "wayfarer_boots"
+        ],
+        "missing_hp": {
+          "army": 13,
+          "army_units": [
+            {
+              "hp": 26,
+              "id": 6,
+              "kind": "ranger",
+              "max_hp": 26,
+              "missing_hp": 0
+            },
+            {
+              "hp": 22,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32,
+              "missing_hp": 10
+            },
+            {
+              "hp": 25,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28,
+              "missing_hp": 3
+            },
+            {
+              "hp": 46,
+              "id": 4,
+              "kind": "warden",
+              "max_hp": 46,
+              "missing_hp": 0
+            },
+            {
+              "hp": 26,
+              "id": 5,
+              "kind": "ranger",
+              "max_hp": 26,
+              "missing_hp": 0
+            }
+          ],
+          "hero": 0
+        },
+        "rival": {
+          "army": [
+            {
+              "hp": 26,
+              "id": 1,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 20
+            },
+            {
+              "hp": 2,
+              "id": 5,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 6,
+              "kind": "archer",
+              "max_hp": 20
+            }
+          ],
+          "defeats": 0,
+          "gold": 108,
+          "intent": "attack",
+          "next_troop_id": 7,
+          "pos": [
+            1,
+            -1
+          ],
+          "target": [
+            0,
+            -1
+          ],
+          "turns_until_action": 2
+        },
+        "status": "playing",
+        "turn": 4
+      },
+      "game_framework_hashes_matching_native": 66,
+      "journal": "pathfinder.json.gz",
+      "journal_sha256": "543ed0a413c2f0ff27d2894066079ba5f098a53133b87d75fc81b56dccef7b18",
+      "native": {
+        "backend": "pyglet",
+        "commands": 111,
+        "cpu_seconds": 11.747100999999999,
+        "cpu_wall_percent": 25.37749452443322,
+        "inputs": 457,
+        "listed_milestone_captures": 9,
+        "reloads": 111,
+        "report": "pathfinder-native/verification.json",
+        "requested_cpu_percent": 25.0,
+        "scope": "Agent-directed continuation from a historical autoplay opening. Exact game controls and saves; no native opening preparation, independent playtest or full-campaign claim.",
+        "source_commit": "49d5b656e9f41e58bab06dcf7eb5ce67db8f6231",
+        "source_unchanged": true,
+        "wall_seconds": 46.28944354096893
+      },
+      "observations": [
+        {
+          "after_commands": 0,
+          "text": "Predeclared comparison: choose Pathfinder twice, earn the second level through Silverford Shrine, Briarwood and Raven Hill, buy two Rangers via one recruitment and one Militia replacement, then compare Border Watch and Stranded Explorer while keeping Moonstone equipped. The matched Skirmisher branch starts from the identical historical choice; all actual costs, mistakes, wounds and necessary recovery remain recorded. No autoplay after this anchor."
+        },
+        {
+          "after_commands": 19,
+          "text": "Briarwood opening shows a genuine counter to movement bonuses: the hero has zero reachable cells until a friendly troop vacates a neighboring deployment cell. Clear the Militia before moving the hero; forest still blocks line of sight even though Pathfinder removes movement cost."
+        },
+        {
+          "after_commands": 53,
+          "text": "At Border Watch, Pathfinder makes the Warden's two-step forest path to the seal reachable in round one. This alone cannot win: the adjacent Pikeman contests control, and the other enemies can approach. Coordinate ranged fire before evaluating the enemy phase."
+        },
+        {
+          "after_commands": 65,
+          "text": "The first Watch enemy phase disproves any automatic hold from early seal arrival: the enemy Archer and Brigand both enter adjacent cover and contest it. The Warden absorbs only three HP of damage, enabling a second-round rout without spending additional mana."
+        },
+        {
+          "after_commands": 71,
+          "text": "After the Watch reward, the director attempted an unsupported generic 'keep' choice. The public command rejected it; no game mutation occurred, and the journal remains after resolve_battle. Inspect the actual offered relic ID before accepting it."
+        },
+        {
+          "after_commands": 87,
+          "text": "Greenwater's last Brigand moves into forest. Direct shots from the northern line are blocked despite Pathfinder; reposition onto the eastern plains instead of paying retaliation with the adjacent Archer or Militia."
+        },
+        {
+          "after_commands": 106,
+          "text": "Explorer round two: all four neighboring exit cells are screened or reserved, and the surviving Guard/Warden remain two cells from the exit. The hero cannot walk onto the friendly Warden's occupied exit; reachable cells include (-3,0) but exclude (-3,1). Use Swap to transfer the unspent hero onto the exit. Do not Heal the Militia first: even Skirmisher would not restore the hero action required for evacuation. Ten Militia wounds and the three inherited Archer wounds will remain after escape."
+        },
+        {
+          "after_commands": 109,
+          "text": "The Pathfinder branch reaches its predeclared six-battle endpoint without casualties, retreats, retries or extra recovery turns. Stop immediately after reward acceptance; do not normalize its wounds with an additional rest."
+        }
+      ],
+      "resource_changes": [
+        {
+          "command": "resolve_battle",
+          "command_number": 16,
+          "crystals_delta": 2,
+          "gold_delta": 45
+        },
+        {
+          "command": "choose",
+          "command_number": 17,
+          "crystals_delta": 4,
+          "gold_delta": 0
+        },
+        {
+          "command": "recruit",
+          "command_number": 18,
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 30,
+          "crystals_delta": 0,
+          "gold_delta": 25
+        },
+        {
+          "command": "end_turn",
+          "command_number": 31,
+          "crystals_delta": 1,
+          "gold_delta": 19
+        },
+        {
+          "command": "replace_troop",
+          "command_number": 32,
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 51,
+          "crystals_delta": 0,
+          "gold_delta": 25
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 71,
+          "crystals_delta": 2,
+          "gold_delta": 50
+        },
+        {
+          "command": "end_turn",
+          "command_number": 73,
+          "crystals_delta": 1,
+          "gold_delta": 23
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 92,
+          "crystals_delta": 0,
+          "gold_delta": 25
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 110,
+          "crystals_delta": 1,
+          "gold_delta": 55
+        }
+      ],
+      "resource_totals_by_command": {
+        "choose": {
+          "crystals_delta": 4,
+          "gold_delta": 0
+        },
+        "end_turn": {
+          "crystals_delta": 2,
+          "gold_delta": 42
+        },
+        "recruit": {
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        "replace_troop": {
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        "resolve_battle": {
+          "crystals_delta": 5,
+          "gold_delta": 225
+        }
+      },
+      "rests": [
+        {
+          "after": {
+            "actions_left": 3,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 14,
+            "gold": 64,
+            "hero": {
+              "army": [
+                {
+                  "hp": 28,
+                  "id": 1,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 18,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 2,
+                  "max_hp": 24,
+                  "xp": 6
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 2,
+                  "max_hp": 42,
+                  "xp": 6
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 1,
+                  "max_hp": 22,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 40,
+              "level": 2,
+              "mana": 12,
+              "max_hp": 40,
+              "max_mana": 12,
+              "name": "Alden",
+              "pos": [
+                -1,
+                -1
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "pathfinder": 1
+              },
+              "xp": 20
+            },
+            "inventory": [
+              "moonstone"
+            ],
+            "missing_hp": {
+              "army": 6,
+              "army_units": [
+                {
+                  "hp": 28,
+                  "id": 1,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 18,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 24,
+                  "missing_hp": 6
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 42,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 22,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 0
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 42,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 42,
+                  "id": 2,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 20,
+                  "id": 4,
+                  "kind": "brigand",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 42,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 92,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                -1
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 1
+            },
+            "status": "playing",
+            "turn": 3
+          },
+          "before": {
+            "actions_left": 0,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 13,
+            "gold": 45,
+            "hero": {
+              "army": [
+                {
+                  "hp": 28,
+                  "id": 1,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 12,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 2,
+                  "max_hp": 24,
+                  "xp": 6
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 2,
+                  "max_hp": 42,
+                  "xp": 6
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 1,
+                  "max_hp": 22,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 39,
+              "level": 2,
+              "mana": 12,
+              "max_hp": 40,
+              "max_mana": 12,
+              "name": "Alden",
+              "pos": [
+                -1,
+                -1
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "pathfinder": 1
+              },
+              "xp": 20
+            },
+            "inventory": [
+              "moonstone"
+            ],
+            "missing_hp": {
+              "army": 12,
+              "army_units": [
+                {
+                  "hp": 28,
+                  "id": 1,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 12,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 24,
+                  "missing_hp": 12
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 42,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 22,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 1
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 42,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 42,
+                  "id": 2,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 20,
+                  "id": 4,
+                  "kind": "brigand",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 42,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 76,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                -1
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 2
+            },
+            "status": "playing",
+            "turn": 2
+          },
+          "command_number": 31,
+          "reason": "Both campaign actions were spent on the shrine and Briarwood; take the mandatory income and recovery turn."
+        },
+        {
+          "after": {
+            "actions_left": 3,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 17,
+            "gold": 112,
+            "hero": {
+              "army": [
+                {
+                  "hp": 26,
+                  "id": 6,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 3,
+                  "max_hp": 32,
+                  "xp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 3,
+                  "max_hp": 28,
+                  "xp": 0
+                },
+                {
+                  "hp": 46,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 3,
+                  "max_hp": 46,
+                  "xp": 0
+                },
+                {
+                  "hp": 26,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 44,
+              "level": 3,
+              "mana": 14,
+              "max_hp": 44,
+              "max_mana": 14,
+              "name": "Alden",
+              "pos": [
+                0,
+                -2
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "pathfinder": 2
+              },
+              "xp": 4
+            },
+            "inventory": [
+              "moonstone",
+              "watch_bell"
+            ],
+            "missing_hp": {
+              "army": 0,
+              "army_units": [
+                {
+                  "hp": 26,
+                  "id": 6,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 32,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 46,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 46,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 26,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 0
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 26,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 2,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 108,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                1,
+                -1
+              ],
+              "target": [
+                0,
+                -1
+              ],
+              "turns_until_action": 2
+            },
+            "status": "playing",
+            "turn": 4
+          },
+          "before": {
+            "actions_left": 0,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 16,
+            "gold": 89,
+            "hero": {
+              "army": [
+                {
+                  "hp": 26,
+                  "id": 6,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 3,
+                  "max_hp": 32,
+                  "xp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 3,
+                  "max_hp": 28,
+                  "xp": 0
+                },
+                {
+                  "hp": 43,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 3,
+                  "max_hp": 46,
+                  "xp": 0
+                },
+                {
+                  "hp": 26,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 41,
+              "level": 3,
+              "mana": 10,
+              "max_hp": 44,
+              "max_mana": 14,
+              "name": "Alden",
+              "pos": [
+                0,
+                -2
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "pathfinder": 2
+              },
+              "xp": 4
+            },
+            "inventory": [
+              "moonstone",
+              "watch_bell"
+            ],
+            "missing_hp": {
+              "army": 3,
+              "army_units": [
+                {
+                  "hp": 26,
+                  "id": 6,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 32,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 43,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 46,
+                  "missing_hp": 3
+                },
+                {
+                  "hp": 26,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 3
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 42,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 42,
+                  "id": 2,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 20,
+                  "id": 4,
+                  "kind": "brigand",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 42,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 92,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                -1
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 1
+            },
+            "status": "playing",
+            "turn": 3
+          },
+          "command_number": 73,
+          "reason": "Take the mandatory turn-three rest, restoring the small hero/Warden wounds and some shared mana."
+        }
+      ],
+      "skill_choices": [
+        {
+          "args": [
+            "pathfinder"
+          ],
+          "command": "choose",
+          "command_number": 1,
+          "ranks": {
+            "pathfinder": 1
+          }
+        },
+        {
+          "args": [
+            "pathfinder"
+          ],
+          "command": "choose",
+          "command_number": 52,
+          "ranks": {
+            "pathfinder": 2
+          }
+        }
+      ],
+      "source": {
+        "command_index": 14,
+        "initial_sha256": "0abe3fe709cb83b3a78e77f72bdc36dba3532e1e44690edb1480d98db6b3c89d",
+        "journal_sha256": "1962ca77a5cbad06de2d81a5591e18d35e5502429dbe0d55b8b07a36bde00d5c",
+        "journal_source": "2d775de99dd1699d8f71e34e9cf63e4c4e57cda2",
+        "path": "docs/evidence/shardbound-army-plans-cd351a9/mobile.json.gz"
+      },
+      "spells": [
+        {
+          "args": [
+            "heal",
+            3
+          ],
+          "command_number": 46,
+          "hp_changes": [
+            {
+              "hp_delta": 11,
+              "id": 3,
+              "kind": "archer"
+            }
+          ],
+          "kwargs": {},
+          "mana_spent": 4
+        }
+      ],
+      "totals": {
+        "battle_attempts": 6,
+        "casualties": 0,
+        "crystals_received": 11,
+        "crystals_spent": 0,
+        "enemy_phases": 6,
+        "final_round_sum": 11,
+        "gold_received": 267,
+        "gold_spent": 100,
+        "mana_spent": 4,
+        "paid_command_actions": 1,
+        "rests": 2,
+        "spells": 1,
+        "wins": 6
+      },
+      "transactions": [
+        {
+          "actions_spent": 0,
+          "added_troops": [
+            {
+              "hp": 22,
+              "id": 5,
+              "kind": "ranger",
+              "level": 1,
+              "max_hp": 22,
+              "xp": 0
+            }
+          ],
+          "args": [
+            "ranger"
+          ],
+          "command": "recruit",
+          "command_number": 18,
+          "crystals_spent": 0,
+          "gold_spent": 50,
+          "retired_troops": []
+        },
+        {
+          "actions_spent": 1,
+          "added_troops": [
+            {
+              "hp": 22,
+              "id": 6,
+              "kind": "ranger",
+              "level": 1,
+              "max_hp": 22,
+              "xp": 0
+            }
+          ],
+          "args": [
+            1,
+            "ranger"
+          ],
+          "command": "replace_troop",
+          "command_number": 32,
+          "crystals_spent": 0,
+          "gold_spent": 50,
+          "retired_troops": [
+            {
+              "hp": 28,
+              "id": 1,
+              "kind": "militia",
+              "level": 2,
+              "max_hp": 28,
+              "xp": 6
+            }
+          ]
+        }
+      ]
+    },
+    "skirmisher": {
+      "battles": [
+        {
+          "adventure": null,
+          "after_reward_mana": 12,
+          "after_reward_missing_hp": {
+            "army": 9,
+            "army_units": [
+              {
+                "hp": 25,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 0
+          },
+          "before_reward": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 25,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1004,
+              "kind": "brigand"
+            },
+            {
+              "id": 1005,
+              "kind": "goblin"
+            }
+          ],
+          "enemy_phase_commands": [
+            13
+          ],
+          "entry": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 2,
+          "entry_turn": 2,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "site",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Silverford",
+          "province_pos": [
+            -1,
+            0
+          ],
+          "resolve_command": 16,
+          "reward_crystals": 2,
+          "reward_gold": 45,
+          "site": "Buried Shrine",
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 12,
+          "after_reward_missing_hp": {
+            "army": 12,
+            "army_units": [
+              {
+                "hp": 22,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 6
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ],
+            "hero": 0
+          },
+          "before_reward": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 6
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1005,
+              "kind": "brigand"
+            }
+          ],
+          "enemy_phase_commands": [
+            24
+          ],
+          "entry": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 25,
+                "id": 1,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 3
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 18,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 6
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 19,
+          "entry_turn": 2,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "conquest",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Briarwood",
+          "province_pos": [
+            -1,
+            -1
+          ],
+          "resolve_command": 27,
+          "reward_crystals": 0,
+          "reward_gold": 25,
+          "site": null,
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 14,
+          "after_reward_missing_hp": {
+            "army": 11,
+            "army_units": [
+              {
+                "hp": 16,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 6
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 21,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 5
+              }
+            ],
+            "hero": 0
+          },
+          "before_reward": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 16,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 6
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 17,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 5
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1006,
+              "kind": "brigand"
+            },
+            {
+              "id": 1007,
+              "kind": "goblin"
+            },
+            {
+              "id": 1008,
+              "kind": "wolf"
+            }
+          ],
+          "enemy_phase_commands": [
+            39
+          ],
+          "entry": {
+            "mana": 12,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 40,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 22,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 30,
+          "entry_turn": 3,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "conquest",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Raven Hill",
+          "province_pos": [
+            0,
+            -2
+          ],
+          "resolve_command": 43,
+          "reward_crystals": 0,
+          "reward_gold": 25,
+          "site": null,
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 14,
+          "after_reward_missing_hp": {
+            "army": 15,
+            "army_units": [
+              {
+                "hp": 20,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 6
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 4
+              },
+              {
+                "hp": 21,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 5
+              }
+            ],
+            "hero": 10
+          },
+          "before_reward": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 34,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 10
+              },
+              {
+                "hp": 16,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 6
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 38,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 4
+              },
+              {
+                "hp": 21,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 5
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1006,
+              "kind": "pikeman"
+            },
+            {
+              "id": 1007,
+              "kind": "archer"
+            },
+            {
+              "id": 1008,
+              "kind": "brigand"
+            }
+          ],
+          "enemy_phase_commands": [
+            57,
+            68
+          ],
+          "entry": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 44,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 0
+              },
+              {
+                "hp": 16,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 22,
+                "missing_hp": 6
+              },
+              {
+                "hp": 28,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 24,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 24,
+                "missing_hp": 0
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 42,
+                "missing_hp": 0
+              },
+              {
+                "hp": 21,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 5
+              }
+            ]
+          },
+          "entry_command": 45,
+          "entry_turn": 3,
+          "final_objective": {
+            "deadline": 8,
+            "exits": [],
+            "kind": "hold",
+            "progress": 0,
+            "required": 2,
+            "target": [
+              0,
+              0
+            ]
+          },
+          "final_round": 2,
+          "kind": "site",
+          "objective": {
+            "deadline": 8,
+            "exits": [],
+            "kind": "hold",
+            "progress": 0,
+            "required": 2,
+            "target": [
+              0,
+              0
+            ]
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Raven Hill",
+          "province_pos": [
+            0,
+            -2
+          ],
+          "resolve_command": 69,
+          "reward_crystals": 2,
+          "reward_gold": 50,
+          "site": "Border Watch",
+          "surviving_enemies": []
+        },
+        {
+          "adventure": null,
+          "after_reward_mana": 14,
+          "after_reward_missing_hp": {
+            "army": 7,
+            "army_units": [
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 30,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 2
+              },
+              {
+                "hp": 26,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 2
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 23,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 3
+              }
+            ],
+            "hero": 4
+          },
+          "before_reward": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 4
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 30,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 2
+              },
+              {
+                "hp": 26,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 2
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 23,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 3
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1006,
+              "kind": "brigand"
+            },
+            {
+              "id": 1007,
+              "kind": "goblin"
+            },
+            {
+              "id": 1008,
+              "kind": "wolf"
+            }
+          ],
+          "enemy_phase_commands": [
+            84
+          ],
+          "entry": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 42,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 2
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 0
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 26,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              }
+            ]
+          },
+          "entry_command": 72,
+          "entry_turn": 4,
+          "final_objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "conquest",
+          "objective": {
+            "deadline": null,
+            "exits": [],
+            "kind": "rout",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "rout",
+          "province": "Greenwater",
+          "province_pos": [
+            0,
+            -1
+          ],
+          "resolve_command": 94,
+          "reward_crystals": 0,
+          "reward_gold": 25,
+          "site": null,
+          "surviving_enemies": []
+        },
+        {
+          "adventure": {
+            "approach": "north",
+            "cargo_penalty": 0,
+            "crystals": 1,
+            "encounter": "explorer_north",
+            "gold": 55,
+            "relic": "wayfarer_boots"
+          },
+          "after_reward_mana": 14,
+          "after_reward_missing_hp": {
+            "army": 17,
+            "army_units": [
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 20,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 12
+              },
+              {
+                "hp": 26,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 2
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 23,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 3
+              }
+            ],
+            "hero": 4
+          },
+          "before_reward": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 4
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 20,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 12
+              },
+              {
+                "hp": 26,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 2
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 23,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 3
+              }
+            ]
+          },
+          "casualties": [],
+          "enemies_killed": [
+            {
+              "id": 1007,
+              "kind": "archer"
+            }
+          ],
+          "enemy_phase_commands": [
+            108
+          ],
+          "entry": {
+            "mana": 14,
+            "units": [
+              {
+                "hp": 40,
+                "id": 0,
+                "kind": "hero",
+                "max_hp": 44,
+                "missing_hp": 4
+              },
+              {
+                "hp": 26,
+                "id": 6,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 0
+              },
+              {
+                "hp": 30,
+                "id": 2,
+                "kind": "militia",
+                "max_hp": 32,
+                "missing_hp": 2
+              },
+              {
+                "hp": 26,
+                "id": 3,
+                "kind": "archer",
+                "max_hp": 28,
+                "missing_hp": 2
+              },
+              {
+                "hp": 46,
+                "id": 4,
+                "kind": "warden",
+                "max_hp": 46,
+                "missing_hp": 0
+              },
+              {
+                "hp": 23,
+                "id": 5,
+                "kind": "ranger",
+                "max_hp": 26,
+                "missing_hp": 3
+              }
+            ]
+          },
+          "entry_command": 95,
+          "entry_turn": 4,
+          "final_objective": {
+            "deadline": 6,
+            "exits": [
+              [
+                -3,
+                1
+              ]
+            ],
+            "kind": "extract",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "final_round": 2,
+          "kind": "site",
+          "objective": {
+            "deadline": 6,
+            "exits": [
+              [
+                -3,
+                1
+              ]
+            ],
+            "kind": "extract",
+            "progress": 0,
+            "required": 0,
+            "target": null
+          },
+          "outcome": "player",
+          "outcome_reason": "escape",
+          "province": "Greenwater",
+          "province_pos": [
+            0,
+            -1
+          ],
+          "resolve_command": 113,
+          "reward_crystals": 1,
+          "reward_gold": 55,
+          "site": "Stranded Explorer",
+          "surviving_enemies": [
+            {
+              "hp": 28,
+              "id": 1006,
+              "kind": "pikeman",
+              "max_hp": 28,
+              "missing_hp": 0
+            },
+            {
+              "hp": 36,
+              "id": 1008,
+              "kind": "guard",
+              "max_hp": 42,
+              "missing_hp": 6
+            },
+            {
+              "hp": 38,
+              "id": 1009,
+              "kind": "warden",
+              "max_hp": 38,
+              "missing_hp": 0
+            }
+          ]
+        }
+      ],
+      "command_chain_verified": true,
+      "command_counts": {
+        "battle.attack": 30,
+        "battle.end_turn": 7,
+        "battle.evacuate": 1,
+        "battle.guard": 16,
+        "battle.move": 38,
+        "battle.swap": 1,
+        "choose": 5,
+        "end_turn": 2,
+        "explore": 3,
+        "recruit": 1,
+        "replace_troop": 1,
+        "resolve_battle": 6,
+        "travel": 3
+      },
+      "commands": 114,
+      "entry": {
+        "actions_left": 2,
+        "buildings": [
+          "archery",
+          "barracks"
+        ],
+        "campaign_phase": "playing",
+        "campaign_stage": 1,
+        "completed_shards": [],
+        "crystals": 7,
+        "gold": 25,
+        "hero": {
+          "army": [
+            {
+              "hp": 28,
+              "id": 1,
+              "kind": "militia",
+              "level": 2,
+              "max_hp": 28,
+              "xp": 0
+            },
+            {
+              "hp": 28,
+              "id": 2,
+              "kind": "militia",
+              "level": 2,
+              "max_hp": 28,
+              "xp": 0
+            },
+            {
+              "hp": 18,
+              "id": 3,
+              "kind": "archer",
+              "level": 2,
+              "max_hp": 24,
+              "xp": 0
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "warden",
+              "level": 2,
+              "max_hp": 42,
+              "xp": 0
+            }
+          ],
+          "hero_class": "Scout",
+          "hp": 40,
+          "level": 2,
+          "mana": 12,
+          "max_hp": 40,
+          "max_mana": 12,
+          "name": "Alden",
+          "pos": [
+            -1,
+            0
+          ],
+          "relic": "moonstone",
+          "skill_ranks": {},
+          "xp": 4
+        },
+        "inventory": [
+          "moonstone"
+        ],
+        "missing_hp": {
+          "army": 6,
+          "army_units": [
+            {
+              "hp": 28,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 28,
+              "missing_hp": 0
+            },
+            {
+              "hp": 28,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 28,
+              "missing_hp": 0
+            },
+            {
+              "hp": 18,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 24,
+              "missing_hp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "warden",
+              "max_hp": 42,
+              "missing_hp": 0
+            }
+          ],
+          "hero": 0
+        },
+        "rival": {
+          "army": [
+            {
+              "hp": 42,
+              "id": 1,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 42,
+              "id": 2,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 20
+            },
+            {
+              "hp": 20,
+              "id": 4,
+              "kind": "brigand",
+              "max_hp": 20
+            },
+            {
+              "hp": 42,
+              "id": 5,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 6,
+              "kind": "archer",
+              "max_hp": 20
+            }
+          ],
+          "defeats": 0,
+          "gold": 76,
+          "intent": "attack",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            -1
+          ],
+          "target": [
+            1,
+            -1
+          ],
+          "turns_until_action": 2
+        },
+        "status": "playing",
+        "turn": 2
+      },
+      "execution_source": "36aaaa277f55b86a1081d7cded1f1e1207b2dd74",
+      "final": {
+        "actions_left": 1,
+        "buildings": [
+          "archery",
+          "barracks"
+        ],
+        "campaign_phase": "playing",
+        "campaign_stage": 1,
+        "completed_shards": [],
+        "crystals": 18,
+        "gold": 192,
+        "hero": {
+          "army": [
+            {
+              "hp": 26,
+              "id": 6,
+              "kind": "ranger",
+              "level": 2,
+              "max_hp": 26,
+              "xp": 6
+            },
+            {
+              "hp": 20,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 0
+            },
+            {
+              "hp": 26,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 0
+            },
+            {
+              "hp": 46,
+              "id": 4,
+              "kind": "warden",
+              "level": 3,
+              "max_hp": 46,
+              "xp": 0
+            },
+            {
+              "hp": 23,
+              "id": 5,
+              "kind": "ranger",
+              "level": 2,
+              "max_hp": 26,
+              "xp": 9
+            }
+          ],
+          "hero_class": "Scout",
+          "hp": 40,
+          "level": 3,
+          "mana": 14,
+          "max_hp": 44,
+          "max_mana": 14,
+          "name": "Alden",
+          "pos": [
+            0,
+            -1
+          ],
+          "relic": "moonstone",
+          "skill_ranks": {
+            "skirmisher": 2
+          },
+          "xp": 4
+        },
+        "inventory": [
+          "moonstone",
+          "watch_bell",
+          "wayfarer_boots"
+        ],
+        "missing_hp": {
+          "army": 17,
+          "army_units": [
+            {
+              "hp": 26,
+              "id": 6,
+              "kind": "ranger",
+              "max_hp": 26,
+              "missing_hp": 0
+            },
+            {
+              "hp": 20,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32,
+              "missing_hp": 12
+            },
+            {
+              "hp": 26,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28,
+              "missing_hp": 2
+            },
+            {
+              "hp": 46,
+              "id": 4,
+              "kind": "warden",
+              "max_hp": 46,
+              "missing_hp": 0
+            },
+            {
+              "hp": 23,
+              "id": 5,
+              "kind": "ranger",
+              "max_hp": 26,
+              "missing_hp": 3
+            }
+          ],
+          "hero": 4
+        },
+        "rival": {
+          "army": [
+            {
+              "hp": 26,
+              "id": 1,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 20
+            },
+            {
+              "hp": 2,
+              "id": 5,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 6,
+              "kind": "archer",
+              "max_hp": 20
+            }
+          ],
+          "defeats": 0,
+          "gold": 108,
+          "intent": "attack",
+          "next_troop_id": 7,
+          "pos": [
+            1,
+            -1
+          ],
+          "target": [
+            0,
+            -1
+          ],
+          "turns_until_action": 2
+        },
+        "status": "playing",
+        "turn": 4
+      },
+      "game_framework_hashes_matching_native": 66,
+      "journal": "skirmisher.json.gz",
+      "journal_sha256": "16002083f3af14a5e98e855c37892f934a54e4b909d570dcdcba3de7ed5cffb7",
+      "native": {
+        "backend": "pyglet",
+        "commands": 114,
+        "cpu_seconds": 10.014883000000001,
+        "cpu_wall_percent": 25.303563697722645,
+        "inputs": 461,
+        "listed_milestone_captures": 8,
+        "reloads": 114,
+        "report": "skirmisher-native/verification.json",
+        "requested_cpu_percent": 25.0,
+        "scope": "Agent-directed continuation from a historical autoplay opening. Exact game controls and saves; no native opening preparation, independent playtest or full-campaign claim.",
+        "source_commit": "49d5b656e9f41e58bab06dcf7eb5ce67db8f6231",
+        "source_unchanged": true,
+        "wall_seconds": 39.578942790976726
+      },
+      "observations": [
+        {
+          "after_commands": 0,
+          "text": "Delegated economic_depth_design directs the declared Skirmisher branch from the authenticated historical pending first-skill save. Both earned skill choices will be Skirmisher. Follow the paid Shrine/Briarwood/Raven Hill/Watch/Greenwater/Explorer north itinerary, keep Moonstone equipped, retain mistakes and casualties, no autoplay, no retries or alternative simulated branches. Limit six battle attempts, turn seven and two justified extra recovery turns."
+        },
+        {
+          "after_commands": 113,
+          "text": "The delegated Skirmisher branch ends after six actual victories, five round-two routs and a round-two Explorer escape, without retries, casualties, autoplay, spell casts, extra recovery turns, or a normalization rest. The two paid Ranger transactions total 100 gold and the Militia replacement consumes one action. Both mandatory end-turns were retained. Final wounds are Hero 4, Militia 12, Archer 2 and Ranger 5 three; Explorer enemies dealt ten damage to the Militia during the single enemy phase. The final Boots choice is taken unequipped; Moonstone remains equipped. Tactical choices were independently directed and differ from the paired Pathfinder pilot, so final damage differences do not isolate a skill-only effect."
+        }
+      ],
+      "resource_changes": [
+        {
+          "command": "resolve_battle",
+          "command_number": 16,
+          "crystals_delta": 2,
+          "gold_delta": 45
+        },
+        {
+          "command": "choose",
+          "command_number": 17,
+          "crystals_delta": 4,
+          "gold_delta": 0
+        },
+        {
+          "command": "recruit",
+          "command_number": 18,
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 27,
+          "crystals_delta": 0,
+          "gold_delta": 25
+        },
+        {
+          "command": "end_turn",
+          "command_number": 28,
+          "crystals_delta": 1,
+          "gold_delta": 19
+        },
+        {
+          "command": "replace_troop",
+          "command_number": 29,
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 43,
+          "crystals_delta": 0,
+          "gold_delta": 25
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 69,
+          "crystals_delta": 2,
+          "gold_delta": 50
+        },
+        {
+          "command": "end_turn",
+          "command_number": 71,
+          "crystals_delta": 1,
+          "gold_delta": 23
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 94,
+          "crystals_delta": 0,
+          "gold_delta": 25
+        },
+        {
+          "command": "resolve_battle",
+          "command_number": 113,
+          "crystals_delta": 1,
+          "gold_delta": 55
+        }
+      ],
+      "resource_totals_by_command": {
+        "choose": {
+          "crystals_delta": 4,
+          "gold_delta": 0
+        },
+        "end_turn": {
+          "crystals_delta": 2,
+          "gold_delta": 42
+        },
+        "recruit": {
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        "replace_troop": {
+          "crystals_delta": 0,
+          "gold_delta": -50
+        },
+        "resolve_battle": {
+          "crystals_delta": 5,
+          "gold_delta": 225
+        }
+      },
+      "rests": [
+        {
+          "after": {
+            "actions_left": 3,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 14,
+            "gold": 64,
+            "hero": {
+              "army": [
+                {
+                  "hp": 28,
+                  "id": 1,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 24,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 2,
+                  "max_hp": 24,
+                  "xp": 6
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 2,
+                  "max_hp": 42,
+                  "xp": 6
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 1,
+                  "max_hp": 22,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 40,
+              "level": 2,
+              "mana": 12,
+              "max_hp": 40,
+              "max_mana": 12,
+              "name": "Alden",
+              "pos": [
+                -1,
+                -1
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "skirmisher": 1
+              },
+              "xp": 20
+            },
+            "inventory": [
+              "moonstone"
+            ],
+            "missing_hp": {
+              "army": 0,
+              "army_units": [
+                {
+                  "hp": 28,
+                  "id": 1,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 24,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 24,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 42,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 22,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 0
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 42,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 42,
+                  "id": 2,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 20,
+                  "id": 4,
+                  "kind": "brigand",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 42,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 92,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                -1
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 1
+            },
+            "status": "playing",
+            "turn": 3
+          },
+          "before": {
+            "actions_left": 0,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 13,
+            "gold": 45,
+            "hero": {
+              "army": [
+                {
+                  "hp": 22,
+                  "id": 1,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 2,
+                  "max_hp": 28,
+                  "xp": 6
+                },
+                {
+                  "hp": 18,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 2,
+                  "max_hp": 24,
+                  "xp": 6
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 2,
+                  "max_hp": 42,
+                  "xp": 6
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 1,
+                  "max_hp": 22,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 40,
+              "level": 2,
+              "mana": 12,
+              "max_hp": 40,
+              "max_mana": 12,
+              "name": "Alden",
+              "pos": [
+                -1,
+                -1
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "skirmisher": 1
+              },
+              "xp": 20
+            },
+            "inventory": [
+              "moonstone"
+            ],
+            "missing_hp": {
+              "army": 12,
+              "army_units": [
+                {
+                  "hp": 22,
+                  "id": 1,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 6
+                },
+                {
+                  "hp": 28,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 18,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 24,
+                  "missing_hp": 6
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 42,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 22,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 22,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 0
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 42,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 42,
+                  "id": 2,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 20,
+                  "id": 4,
+                  "kind": "brigand",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 42,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 76,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                -1
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 2
+            },
+            "status": "playing",
+            "turn": 2
+          },
+          "command_number": 28,
+          "reason": "Both T2 actions are exhausted after Shrine and Briarwood. Take the prescribed mandatory rest, actual income and rival countdown; do not add an elective healing wait."
+        },
+        {
+          "after": {
+            "actions_left": 3,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 17,
+            "gold": 112,
+            "hero": {
+              "army": [
+                {
+                  "hp": 26,
+                  "id": 6,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 3,
+                  "max_hp": 32,
+                  "xp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 3,
+                  "max_hp": 28,
+                  "xp": 0
+                },
+                {
+                  "hp": 46,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 3,
+                  "max_hp": 46,
+                  "xp": 0
+                },
+                {
+                  "hp": 26,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 42,
+              "level": 3,
+              "mana": 14,
+              "max_hp": 44,
+              "max_mana": 14,
+              "name": "Alden",
+              "pos": [
+                0,
+                -2
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "skirmisher": 2
+              },
+              "xp": 4
+            },
+            "inventory": [
+              "moonstone",
+              "watch_bell"
+            ],
+            "missing_hp": {
+              "army": 0,
+              "army_units": [
+                {
+                  "hp": 26,
+                  "id": 6,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 32,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 46,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 46,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 26,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 0
+                }
+              ],
+              "hero": 2
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 26,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 2,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 108,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                1,
+                -1
+              ],
+              "target": [
+                0,
+                -1
+              ],
+              "turns_until_action": 2
+            },
+            "status": "playing",
+            "turn": 4
+          },
+          "before": {
+            "actions_left": 0,
+            "buildings": [
+              "archery",
+              "barracks"
+            ],
+            "campaign_phase": "playing",
+            "campaign_stage": 1,
+            "completed_shards": [],
+            "crystals": 16,
+            "gold": 89,
+            "hero": {
+              "army": [
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 0
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "level": 3,
+                  "max_hp": 32,
+                  "xp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "level": 3,
+                  "max_hp": 28,
+                  "xp": 0
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "level": 3,
+                  "max_hp": 46,
+                  "xp": 0
+                },
+                {
+                  "hp": 21,
+                  "id": 5,
+                  "kind": "ranger",
+                  "level": 2,
+                  "max_hp": 26,
+                  "xp": 3
+                }
+              ],
+              "hero_class": "Scout",
+              "hp": 34,
+              "level": 3,
+              "mana": 14,
+              "max_hp": 44,
+              "max_mana": 14,
+              "name": "Alden",
+              "pos": [
+                0,
+                -2
+              ],
+              "relic": "moonstone",
+              "skill_ranks": {
+                "skirmisher": 2
+              },
+              "xp": 4
+            },
+            "inventory": [
+              "moonstone",
+              "watch_bell"
+            ],
+            "missing_hp": {
+              "army": 15,
+              "army_units": [
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 6
+                },
+                {
+                  "hp": 32,
+                  "id": 2,
+                  "kind": "militia",
+                  "max_hp": 32,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 28,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 28,
+                  "missing_hp": 0
+                },
+                {
+                  "hp": 42,
+                  "id": 4,
+                  "kind": "warden",
+                  "max_hp": 46,
+                  "missing_hp": 4
+                },
+                {
+                  "hp": 21,
+                  "id": 5,
+                  "kind": "ranger",
+                  "max_hp": 26,
+                  "missing_hp": 5
+                }
+              ],
+              "hero": 10
+            },
+            "rival": {
+              "army": [
+                {
+                  "hp": 42,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 42,
+                  "id": 2,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 3,
+                  "kind": "archer",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 20,
+                  "id": 4,
+                  "kind": "brigand",
+                  "max_hp": 20
+                },
+                {
+                  "hp": 42,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 92,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                -1
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 1
+            },
+            "status": "playing",
+            "turn": 3
+          },
+          "command_number": 71,
+          "reason": "All T3 actions are spent after replacement, Raven Hill and Watch. Take the prescribed mandatory income/recovery turn and the actual due rival battle."
+        }
+      ],
+      "skill_choices": [
+        {
+          "args": [
+            "skirmisher"
+          ],
+          "command": "choose",
+          "command_number": 1,
+          "ranks": {
+            "skirmisher": 1
+          }
+        },
+        {
+          "args": [
+            "skirmisher"
+          ],
+          "command": "choose",
+          "command_number": 44,
+          "ranks": {
+            "skirmisher": 2
+          }
+        }
+      ],
+      "source": {
+        "command_index": 14,
+        "initial_sha256": "0abe3fe709cb83b3a78e77f72bdc36dba3532e1e44690edb1480d98db6b3c89d",
+        "journal_sha256": "1962ca77a5cbad06de2d81a5591e18d35e5502429dbe0d55b8b07a36bde00d5c",
+        "journal_source": "2d775de99dd1699d8f71e34e9cf63e4c4e57cda2",
+        "path": "docs/evidence/shardbound-army-plans-cd351a9/mobile.json.gz"
+      },
+      "spells": [],
+      "totals": {
+        "battle_attempts": 6,
+        "casualties": 0,
+        "crystals_received": 11,
+        "crystals_spent": 0,
+        "enemy_phases": 7,
+        "final_round_sum": 12,
+        "gold_received": 267,
+        "gold_spent": 100,
+        "mana_spent": 0,
+        "paid_command_actions": 1,
+        "rests": 2,
+        "spells": 0,
+        "wins": 6
+      },
+      "transactions": [
+        {
+          "actions_spent": 0,
+          "added_troops": [
+            {
+              "hp": 22,
+              "id": 5,
+              "kind": "ranger",
+              "level": 1,
+              "max_hp": 22,
+              "xp": 0
+            }
+          ],
+          "args": [
+            "ranger"
+          ],
+          "command": "recruit",
+          "command_number": 18,
+          "crystals_spent": 0,
+          "gold_spent": 50,
+          "retired_troops": []
+        },
+        {
+          "actions_spent": 1,
+          "added_troops": [
+            {
+              "hp": 22,
+              "id": 6,
+              "kind": "ranger",
+              "level": 1,
+              "max_hp": 22,
+              "xp": 0
+            }
+          ],
+          "args": [
+            1,
+            "ranger"
+          ],
+          "command": "replace_troop",
+          "command_number": 29,
+          "crystals_spent": 0,
+          "gold_spent": 50,
+          "retired_troops": [
+            {
+              "hp": 28,
+              "id": 1,
+              "kind": "militia",
+              "level": 2,
+              "max_hp": 28,
+              "xp": 6
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "command_numbers": "One-based within each continuation; historical anchor index is zero-based.",
+  "execution_manifest_differences": [],
+  "matched_initial_state": true,
+  "method": "Read-only JSON aggregation; no game imports, command replay or simulation.",
+  "rounds": "Sum of final saved battle rounds; enemy phases count explicit battle.end_turn commands.",
+  "wounds": "Missing HP at the named snapshot, not cumulative damage; promotion, Heal and rests can change it."
+}
