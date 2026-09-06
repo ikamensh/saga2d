@@ -40,6 +40,20 @@ def seal(scene, grid, pos, *, label=True):
         scene.text("SEAL" if grid.size >= 30 else "S", x, y - 6, size=8, color=GOLD, center=True)
 
 
+def exit_marker(scene, grid, pos, number, *, label=True):
+    """A numbered doorway remains distinguishable from the seal without color."""
+    x, y = grid.center(pos)
+    outline(scene, grid.corners(pos), TEAL, 3)
+    size = grid.size
+    left, top = x - size * .30, y - size * .40
+    scene.draw_line(left, y + size * .24, left, top, TEAL, width=2)
+    scene.draw_line(left, top, x + size * .30, top, TEAL, width=2)
+    scene.draw_line(x + size * .30, top, x + size * .30, y + size * .24, TEAL, width=2)
+    if label:
+        scene.text(f'EXIT {number}' if size >= 30 else str(number), x, y + size * .34,
+                   size=8 if size >= 30 else 7, color=TEAL, center=True)
+
+
 def backdrop(scene, width, height):
     """Quiet star field and engraved orbit lines around the floating shard."""
     rng = random.Random(918)
