@@ -9,7 +9,31 @@ the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Current playable checkpoint — 2026-09-06
 
-The latest preserved Mac development archive is clean source **a6851fb**:
+The latest preserved Mac development archive is clean source **32f354c**:
+[build identity, full tests and packaged frames](evidence/shardbound-package-32f354c/README.md).
+It includes the CPU caps, About screen and isolated profiles from the prior
+archive, plus lethal attack warnings and battle health labels that remain within
+their pieces. Selected-unit corner ticks distinguish selection from targeting.
+
+The clean checkout passes **1,264 tests in 188.44 seconds**. The actual extracted
+frozen app passes its save/settings/input/audio smoke and the new earned casualty
+diagnostic at 100% and 125% text size, including an unchanged State and exact
+reload. Two packaged battle frames were inspected independently; a second
+extraction passes local ad-hoc signature verification. Test and build jobs ran
+serially and ended. This refresh does not repeat full frozen campaigns or claim
+Windows, clean-account, human/listening or sustained acceptance.
+**All G01–G19 gates remain incomplete.**
+
+[Paid Vault continuation](eador-vault-continuation.md) now follows an earned
+two-crystal unseal through production and veteran replacement. In this seed-7
+example it captures production two turns earlier and retains the original
+Militia, finishing 38 gold and two crystals ahead at the same turn-11 endpoint.
+The report includes the free route's actual 14-gold replacement and all exact
+reloads. It establishes this local tradeoff, not general scarcity or balance.
+
+## Earlier About-screen checkpoint — 2026-09-06
+
+The prior Mac development archive is clean source **a6851fb**:
 [build identity, screenshots and verification](evidence/shardbound-package-a6851fb/README.md).
 It now includes the CPU caps, an in-game About screen and `--data-dir PATH` for
 isolated saves/settings. The About screen identifies the actual packaged source
@@ -61,7 +85,7 @@ avoids 65 gold/2 crystals, while withdrawing the Warden transfers the loss to
 Militia, saving 35 gold at the cost of four living HP. These local examples do
 not establish three complete manual plans, and G04 remains incomplete.
 
-Latest source **0b4e163** adds [explicit casualty forecasts](evidence/casualty-forecasts-0b4e163/README.md)
+Source **0b4e163** adds [explicit casualty forecasts](evidence/casualty-forecasts-0b4e163/README.md)
 and a retaliation explanation in the Field Guide. Twenty-nine focused tests,
 30 native reading layouts and 170 inputs pass. Both earned decisions now replay
 through native controls to the exact paid aftermath; the additional lethal Pin

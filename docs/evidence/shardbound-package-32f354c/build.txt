@@ -1,0 +1,97 @@
+Installed 4 packages in 27ms
+37 INFO: PyInstaller: 6.22.2, contrib hooks: 2026.7
+37 INFO: Python: 3.13.2
+42 INFO: Platform: macOS-26.6.2-arm64-arm-64bit-Mach-O
+42 INFO: Python environment: /Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e
+44 INFO: Removing temporary files and cleaning cache in /Users/ikamen/Library/Application Support/pyinstaller
+50 INFO: Module search paths (PYTHONPATH):
+['/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/source',
+ '/Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/python313.zip',
+ '/Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/python3.13',
+ '/Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/python3.13/lib-dynload',
+ '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages',
+ '/Users/ikamen/.cache/uv/builds-v0/.tmpexoXkV/lib/python3.13/site-packages',
+ '/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/source']
+620 INFO: Appending 'datas' from .spec
+623 INFO: checking Analysis
+623 INFO: Building Analysis because Analysis-00.toc is non existent
+623 INFO: Looking for Python shared library...
+625 INFO: Using Python shared library: /Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/libpython3.13.dylib
+625 INFO: Running Analysis Analysis-00.toc
+625 INFO: Target bytecode optimization level: 0
+625 INFO: Initializing module dependency graph...
+626 INFO: Initializing module graph hook caches...
+632 INFO: Analyzing modules for base_library.zip ...
+1041 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+1161 INFO: Processing standard module hook 'hook-math.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+1681 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2123 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2295 INFO: Caching module dependency graph...
+2309 INFO: Analyzing /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/source/entry.py
+2333 INFO: Processing standard module hook 'hook-platform.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2349 INFO: Processing standard module hook 'hook-xml.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2359 INFO: Processing standard module hook 'hook-_ctypes.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2402 INFO: Processing standard module hook 'hook-PIL.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2466 INFO: Processing standard module hook 'hook-PIL.Image.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2568 INFO: Processing standard module hook 'hook-numpy.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2759 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2876 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3457 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3463 INFO: Processing standard module hook 'hook-_osx_support.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3712 INFO: Processing standard module hook 'hook-webbrowser.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3985 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3986 INFO: SetuptoolsInfo: initializing cached setuptools info...
+4529 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+4617 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+5870 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+6798 INFO: Processing module hooks (post-graph stage)...
+6931 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+6984 INFO: Performing binary vs. data reclassification (48 entries)
+6990 INFO: Looking for ctypes DLLs
+7048 WARNING: Library libc.so.6 required via ctypes not found
+7152 WARNING: Library winmm required via ctypes not found
+7175 INFO: Analyzing run-time hooks ...
+7177 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7178 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7179 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7185 INFO: Creating base_library.zip...
+7193 INFO: Looking for dynamic libraries
+7240 INFO: Warnings written to /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/pyinstaller/shardbound/warn-shardbound.txt
+7254 INFO: Graph cross-reference written to /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/pyinstaller/shardbound/xref-shardbound.html
+7277 INFO: checking PYZ
+7277 INFO: Building PYZ because PYZ-00.toc is non existent
+7277 INFO: Building PYZ (ZlibArchive) /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/pyinstaller/shardbound/PYZ-00.pyz
+7695 INFO: Building PYZ (ZlibArchive) /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/pyinstaller/shardbound/PYZ-00.pyz completed successfully.
+7701 INFO: EXE target arch: arm64
+7701 INFO: Code signing identity: None
+7702 INFO: checking PKG
+7702 INFO: Building PKG because PKG-00.toc is non existent
+7702 INFO: Building PKG (CArchive) Shardbound.pkg
+7717 INFO: Building PKG (CArchive) Shardbound.pkg completed successfully.
+7717 INFO: Bootloader /Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/bootloader/Darwin-64bit/runw
+7717 INFO: checking EXE
+7717 INFO: Building EXE because EXE-00.toc is non existent
+7717 INFO: Building EXE from EXE-00.toc
+7717 INFO: Copying bootloader EXE to /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/build/shardbound/pyinstaller/shardbound/Shardbound
+7718 INFO: Converting EXE to target arch (arm64)
+7733 INFO: Removing signature(s) from EXE
+7751 INFO: Modifying Mach-O image UUID(s) in EXE
+7755 INFO: Appending PKG archive to EXE
+7760 INFO: Fixing EXE headers for code signing
+7764 INFO: Rewriting the executable's macOS SDK version (26.2.0) to match the SDK version of the Python library (14.2.0) in order to avoid inconsistent behavior and potential UI issues in the frozen application.
+7765 INFO: Re-signing the EXE
+7790 INFO: Building EXE from EXE-00.toc completed successfully.
+7791 INFO: checking COLLECT
+7791 INFO: Building COLLECT because COLLECT-00.toc is non existent
+7791 INFO: Building COLLECT COLLECT-00.toc
+8794 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+8796 INFO: checking BUNDLE
+8796 INFO: Building BUNDLE because BUNDLE-00.toc is non existent
+8796 INFO: Building BUNDLE BUNDLE-00.toc
+8884 INFO: Signing the BUNDLE...
+8955 INFO: Building BUNDLE BUNDLE-00.toc completed successfully.
+8957 INFO: Build complete! The results are available in: /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/dist/shardbound
+2026-09-06 18:19:10.055 Shardbound[12947:18118654] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+Built /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/dist/shardbound/Shardbound-macos-arm64.zip
+SHA256 cfd75163fec5d38496e45c81a526523087dca582acc18fab58c9828012069d16
+Manifest /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-package-forecasts/dist/shardbound/build-manifest.json
