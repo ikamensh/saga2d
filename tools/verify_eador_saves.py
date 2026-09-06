@@ -199,10 +199,7 @@ def verify(output, *, backend='pyglet', budget=None):
                 player.press(key)
             assert reading_scale(game) == 125
         finally:
-            try:
-                game._teardown()
-            finally:
-                game.backend.quit()
+            game.close()
         restarted = create_game(backend=backend, visible=False, save_dir=saves_path)
         try:
             assert reading_scale(restarted) == 125
@@ -212,10 +209,7 @@ def verify(output, *, backend='pyglet', budget=None):
             replay.capture('settings-restarted-slots')
             events = player.events + replay.events
         finally:
-            try:
-                restarted._teardown()
-            finally:
-                restarted.backend.quit()
+            restarted.close()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   backend=backend, source_sha256=hashes, source_unchanged=True, input_activations=len(events),

@@ -163,10 +163,7 @@ def verify(output, *, backend='pyglet', budget=None):
                         assert player.state.to_json() == snapshot
             before_restart = player.state.to_json()
         finally:
-            try:
-                game._teardown()
-            finally:
-                game.backend.quit()
+            game.close()
         restarted = create_game(backend=backend, visible=False, save_dir=saves)
         try:
             assert reading_scale(restarted) == 125
@@ -180,10 +177,7 @@ def verify(output, *, backend='pyglet', budget=None):
             assert isinstance(restarted.scene, TitleScene)
             events = len(player.events) + len(replay.events)
         finally:
-            try:
-                restarted._teardown()
-            finally:
-                restarted.backend.quit()
+            restarted.close()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   backend=backend, source_sha256=hashes, source_unchanged=True, input_events=events,

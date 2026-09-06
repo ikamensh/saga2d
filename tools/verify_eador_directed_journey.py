@@ -112,10 +112,7 @@ def verify(input_report, output, *, backend='pyglet', cpu_percent=25):
             final = player.state.to_json()
             assert final == source['final_state']
         finally:
-            try:
-                game._teardown()
-            finally:
-                game.backend.quit()
+            game.close()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, source_unchanged=True, backend=backend, cpu_percent=cpu_percent,

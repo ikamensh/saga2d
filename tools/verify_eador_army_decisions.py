@@ -127,10 +127,7 @@ def verify(input_report, output, *, backend='pyglet'):
                                  reloads=player.reloads, exact_commands=len(source[branch]['commands']),
                                  final=player.state.to_json()))
             finally:
-                try:
-                    game._teardown()
-                finally:
-                    game.backend.quit()
+                game.close()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, source_unchanged=True,
