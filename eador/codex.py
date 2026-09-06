@@ -9,6 +9,7 @@ from eador.battle import Battle, SPELLS
 from eador.content import RELICS, SITES, SKILLS
 from eador.encounters import ENCOUNTERS
 from eador.preferences import reading_scale
+from eador.reading import reading_pages
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
@@ -95,25 +96,9 @@ class CodexScene(Screen):
         available = 451 - intro.get_preferred_size()[1] - 20
         heights = [block.get_preferred_size()[1] for block in self._blocks]
 
-        def pack(start, stop):
-            pages, current, height = [], [], 0
-            for index in range(start, stop):
-                size = heights[index]
-                if size > available:
-                    raise ValueError(f"Codex entry does not fit at {scale:.0%}: {self.entries[index].title}")
-                if current and height + 20 + size > available:
-                    pages.append(current)
-                    current, height = [], 0
-                height += (20 if current else 0) + size
-                current.append(index)
-            return pages + ([current] if current else [])
-
         # Reflow around the old first entry, so changing reading size cannot move
         # the reader to a different rule or quietly hide part of that entry.
-        anchor = min(anchor, max(0, len(self.entries) - 1))
-        prefix = pack(0, anchor)
-        self._page_indices = prefix + pack(anchor, len(self.entries)) or [[]]
-        self.page = len(prefix)
+        self._page_indices, self.page = reading_pages(heights, available, anchor=anchor, spacing=20)
         self._laid_out_category = self.category
         for i, category in enumerate(CATEGORIES):
             self.button(category, self.x + 24 + i * 167, self.y + 104, 157,
