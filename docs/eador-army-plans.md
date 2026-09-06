@@ -72,9 +72,10 @@ Paired commands must begin from the same earned saved state and retain both
 outcomes and later paid recovery. A favorable tactical example and an automatic
 campaign completion are separate evidence, not substitutes for one another.
 
-## First serial pilots
+## Historical first serial pilots
 
-One Standard seed-7 Foundries→Throne attempt per plan completed all three shards.
+On the historical source retained under `shardbound-army-plans-cd351a9`, one
+Standard seed-7 Foundries→Throne attempt per plan completed all three shards.
 The Commander integration check also passed, covering actual paid replacements,
 an assembled target roster and exact command-by-command saved continuation.
 The CLI reports retain complete command journals and source hashes; all runs
@@ -103,10 +104,45 @@ recovery for these three rosters remains unverified.
 
 ## First earned order comparisons
 
-[Two exact saved decisions](evidence/army-decisions-474b41a/README.md) now continue
+[Two historical saved decisions](evidence/army-decisions-474b41a/README.md) continue
 through real rewards and immediate paid replenishment. Using three ready
 attackers before the wounded Adept preserves it and avoids a 65-gold/2-crystal
 replacement, with the same round and mana. Withdrawing the wounded Warden saves
 35 replacement gold but transfers the casualty to Militia and leaves four less
 living HP. Both are local model-command examples; no rest, native continuation
-or complete manual campaign is claimed. G04 remains incomplete.
+or complete manual campaign is claimed for that report. G04 remains incomplete.
+
+## Current autoplay follow-up
+
+[Source d643410 and retained current reports](evidence/autoplay-survival-d643410/README.md)
+defer a predictably lethal player autoplay attack once while another ready ally
+can act. The earned Control decision now preserves the Adept in both branches,
+so manual attack ordering no longer saves replacement money against current
+autoplay. Mobile's wounded-Warden withdrawal still trades a Militia casualty for
+35 less replacement gold and four less living HP. The four current branches pass
+native continuation through paid aftermath: 165 inputs, 24 forecast layouts and
+17 exact command/save/reload joins.
+
+The same three full campaign policies were also rerun, sequentially at the
+default 25% CPU allowance. Their current results include a bounded unfinished
+attempt:
+
+| Plan | Completion | Summed shard turns | Fallen troops | Tactical defeats | Recruitment gold / crystals | Exact saved commands |
+|---|---|---:|---:|---:|---:|---:|
+| Sustain | Three shards | 35 | 4 | 0 | 345 / 0 | 230 |
+| Mobile fire | Three shards | 63 | 38 | 3 | 1,600 / 0 | 357 |
+| Control | First shard still playing; policy bound | 50 | 15 | 1 | 1,115 / 26 | 180 |
+
+Sustain's complete journal is unchanged. Mobile's first divergence preserves a
+wounded Warden, then the policy spends time recovering that veteran instead of
+replacing a casualty with a fresh troop. Its complete campaign worsens. Control
+spends the last of its 40 final-assault iterations waiting for mana and stops at
+turn 50 in a ready, healthy state. Its partial totals cannot be compared directly
+with the old three-shard totals. At matched turn 46 on the first shard, the old
+policy had won and current Control was still playing.
+
+These results distinguish a correct local survival improvement from an effective
+whole-campaign policy. A complete manually directed Control journey should
+examine actual Tower infusion, specialist purchases, protection and the cost of
+waiting while the rival recruits. That journey remains unexecuted; additional
+automated completions or favorable isolated orders would not replace it.

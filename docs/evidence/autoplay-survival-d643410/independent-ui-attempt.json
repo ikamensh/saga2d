@@ -1,0 +1,20 @@
+{
+  "date": "2026-09-06",
+  "kind": "Independent AI UI-only walkthrough attempt",
+  "app": "/tmp/shardbound-playtest-32f354c/Shardbound.app",
+  "call": "cua.getApp(app)",
+  "error": "Computer Use server error -10005: timeoutReached",
+  "elapsed_seconds": 16.469,
+  "gameplay_inputs": 0,
+  "screenshots": 0,
+  "campaigns_observed": 0,
+  "human_playtest_credit": false,
+  "walkthrough_credit": false,
+  "cleanup": {
+    "observed_owned_pid": 19428,
+    "observed_command": "/private/tmp/shardbound-playtest-32f354c/Shardbound.app/Contents/MacOS/Shardbound",
+    "action": "SIGTERM after exact command verification",
+    "process_absent_after": true
+  },
+  "source": "Retained from tool response and root process checks; no UI was observed."
+}

@@ -29,8 +29,27 @@ adds the 25% cooperative allowance to resource-breakpoint, Aerie and Relief
 audits, including paid preparation and detached quotes, plus Pin's model-only
 preparation. Fifty-six focused tests pass; two small serial CLI checks average
 about 28–29% of one core including startup and report writing, with unchanged
-outcomes. No cancelled matrix or soak was restarted. This changes development
-tools only; the game/framework still match the packaged source above.
+outcomes. No cancelled matrix or soak was restarted. That increment changes
+development tools only; the subsequent autoplay change below is not packaged.
+
+[Current source d643410](evidence/autoplay-survival-d643410/README.md) lets another
+ready ally act before retrying a predictably lethal player autoplay attack. It
+preserves the earned Control Adept that the earlier policy needlessly lost.
+The full suite passes **1,275 tests**; four current earned branches pass **165
+native inputs, 24 forecast layouts and 17 exact command/save/reload joins** through
+rewards and paid replenishment. Inspected images show the surviving veteran and
+paid aftermath. Tribes fuzz and a bounded 12-model/12-scene Shardbound run pass;
+the random campaigns end in defeat and do not count as winning strategies.
+
+The three paid campaign policies were rerun at the 25% CPU allowance. Sustain is
+unchanged; Mobile completes with worse total time and casualties; Control stops
+at its existing policy bound with the first shard still playing. All 767 saved
+commands and the unfavorable outcomes are retained. The historical three-army
+completion claim does not apply to this source. A local autoplay fix does not
+establish campaign balance or manual depth. The independent UI-only attempt again
+timed out before observing any game, and its launched app was closed. All jobs
+ended; no cancelled large matrix or soak was restarted. The Mac archive above
+predates this battle-policy change. **All G01–G19 remain incomplete.**
 
 [Paid Vault continuation](eador-vault-continuation.md) now follows an earned
 two-crystal unseal through production and veteran replacement. In this seed-7
@@ -87,7 +106,7 @@ The 62 focused integration checks and two small serial CLI probes pass; all
 Saga2D jobs ended. These tools retain existing matrix choices and add small-case
 filters to the economic comparisons. No cancelled stress work was restarted.
 
-[Two earned order comparisons](evidence/army-decisions-474b41a/README.md) carry
+[Two historical earned order comparisons](evidence/army-decisions-474b41a/README.md) carry
 actual casualties through immediate paid replenishment: protecting the Adept
 avoids 65 gold/2 crystals, while withdrawing the Warden transfers the loss to
 Militia, saving 35 gold at the cost of four living HP. These local examples do

@@ -1,0 +1,19 @@
+{
+  "README.md": "18fed18772a1641d1a8cec13c978c227bd8732c833967f1c03c6358e137a04fa",
+  "control-auto-paid.png": "2035121ca1059076c0ea130501189fdb3ce78553bbf694711aeec86bb92dd0ef",
+  "control-campaign.json.gz": "a1857b9ec33fcd33f3293dace98021e01afaba1220ada452a7a5af73804f1dcd",
+  "control-decision.json.gz": "99102daf6a437e1333c03d071f07507f9c267d72290664f3d0dc862c91fa86cb",
+  "control-native.json": "c6f39c70970acf993b9fe9059af8e4a775802b93fd3b7341ae3d490b48b4e60e",
+  "control-warning-125.png": "105a12f761dad342807183a02dc50a70f1ca79d62c234f7508a76f24a9c646f8",
+  "full-tests.txt": "3562a3580e4ef3f8ac85571031cd42f5a02f12365f1b550951cc201b47252157",
+  "independent-ui-attempt.json": "27b3b2cb837ba79f2add2f8119e33097cc665932382cbf3c0c435cb4984da612",
+  "mobile-campaign.json.gz": "8ffa4ec1b89fcc6ee329b5d0ceb20c50c03e61ad77e5639f28a2ec41ccf6aead",
+  "mobile-decision.json.gz": "98f6b2d8ad5bcfcf5ba9dc3166920f61a7a15b52539c77e619b238459eb30e37",
+  "mobile-manual-paid.png": "7efad20029763a45e63c37576f10bccecca8d59e6f17454bfce197f6369cbdbb",
+  "mobile-native.json": "4a737bea2b30429f60ba527b3a776798fac5c4b7308b4f7322f4c996e9723f94",
+  "shardbound-fuzz.json": "c8644f16d819c0e63dbdc67b0f43e612b59ee0fddd95de49628b38d36729c390",
+  "shardbound-fuzz.txt": "4df2fadac47a51d1516f0db26ee0439ffe88e268db3c8acc0e5b239ef1fdc093",
+  "sustain-campaign.json.gz": "3f613012dd59c28635d59682fcf945a9919e67f787ebb5a079abca9ef3e2bc45",
+  "tribes-fuzz.txt": "e3787a145aa5e01638cd25378ce6080b3820492d7a8545b69cc0f622b99d07a7",
+  "verification.json": "78e3aeb0a3b55e14ebcf5a86fe7d9d6f6f184563b89c4646069f35d47e1d6e12"
+}

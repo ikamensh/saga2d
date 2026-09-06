@@ -1,0 +1,160 @@
+{
+  "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+  "source_checks": [
+    {
+      "report": "control-campaign.json.gz",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 32,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "control-decision.json.gz",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 71,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "control-native.json",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 69,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "mobile-campaign.json.gz",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 32,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "mobile-decision.json.gz",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 71,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "mobile-native.json",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 69,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "shardbound-fuzz.json",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 70,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    },
+    {
+      "report": "sustain-campaign.json.gz",
+      "source_commit": "d643410a889cc8f097c2d497c2b9ce65d0c1263d",
+      "checked_files": 32,
+      "matches_commit": true,
+      "unchanged_during_run": true
+    }
+  ],
+  "native_decisions": [
+    {
+      "plan": "control",
+      "branch": "manual",
+      "input_events": 45,
+      "forecast_layouts": 6,
+      "exact_commands_and_reloads": 5,
+      "exact_final_match": true,
+      "outcome": "player",
+      "round": 5,
+      "casualties": [],
+      "living_hp": 140,
+      "purchase_gold": 0,
+      "purchase_crystals": 0
+    },
+    {
+      "plan": "control",
+      "branch": "auto",
+      "input_events": 30,
+      "forecast_layouts": 6,
+      "exact_commands_and_reloads": 2,
+      "exact_final_match": true,
+      "outcome": "player",
+      "round": 5,
+      "casualties": [],
+      "living_hp": 140,
+      "purchase_gold": 0,
+      "purchase_crystals": 0
+    },
+    {
+      "plan": "mobile",
+      "branch": "manual",
+      "input_events": 48,
+      "forecast_layouts": 6,
+      "exact_commands_and_reloads": 6,
+      "exact_final_match": true,
+      "outcome": "player",
+      "round": 5,
+      "casualties": [
+        {
+          "id": 2,
+          "kind": "militia"
+        }
+      ],
+      "living_hp": 122,
+      "purchase_gold": 20,
+      "purchase_crystals": 0
+    },
+    {
+      "plan": "mobile",
+      "branch": "auto",
+      "input_events": 42,
+      "forecast_layouts": 6,
+      "exact_commands_and_reloads": 4,
+      "exact_final_match": true,
+      "outcome": "player",
+      "round": 5,
+      "casualties": [
+        {
+          "id": 4,
+          "kind": "warden"
+        }
+      ],
+      "living_hp": 126,
+      "purchase_gold": 55,
+      "purchase_crystals": 0
+    }
+  ],
+  "totals": {
+    "native_inputs": 165,
+    "native_layouts": 24,
+    "native_exact_commands_and_reloads": 17,
+    "pilot_saved_commands": 767
+  },
+  "full_tests": {
+    "passed": 1275,
+    "seconds": 170.2
+  },
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "random_input_runs": 20,
+    "failures": 0
+  },
+  "shardbound_fuzz": {
+    "model_runs": 12,
+    "scene_runs": 12,
+    "input_events": 2161,
+    "random_input_events": 1764,
+    "cpu_percent": 25,
+    "unchanged_during_run": true,
+    "limitation": "Random campaigns and cleanup ended in defeat; these are invariant/save checks, not winning strategy evidence."
+  },
+  "inspected_images": [
+    "control-warning-125.png",
+    "control-auto-paid.png",
+    "mobile-manual-paid.png"
+  ],
+  "cpu_policy": "All execution jobs serial. Native input capped at 30 FPS; long fuzz and campaign CLIs used a 25% one-core cooperative allowance. These reports are not battery-life measurements.",
+  "current_package": "Preserved 32f354c Mac archive predates the autoplay change."
+}

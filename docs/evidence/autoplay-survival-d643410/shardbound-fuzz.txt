@@ -1,0 +1,18 @@
+Campaign seed 0 (1/12)
+Campaign seed 11 (12/12)
+Scene seed 0 (1/12)
+Scene seed 1 (2/12)
+Scene seed 2 (3/12)
+Scene seed 3 (4/12)
+Scene seed 4 (5/12)
+Scene seed 5 (6/12)
+Scene seed 6 (7/12)
+Scene seed 7 (8/12)
+Scene seed 8 (9/12)
+Scene seed 9 (10/12)
+Scene seed 10 (11/12)
+Scene seed 11 (12/12)
+Campaign metrics: {'adventure_approach.clear': 1, 'adventure_approach.lure': 2, 'adventure_approach.northern': 1, 'battle_enemy': 1, 'battle_player': 86, 'battle_rounds': 211, 'battle_troop_losses': 13, 'build': 50, 'campaign_theme.elderwild': 4, 'campaign_theme.frontier': 4, 'campaign_theme.ruins': 4, 'choice_relic': 20, 'choice_skill': 16, 'cleanup_battles': 10, 'cleanup_choices': 1, 'cleanup_declined_recovery': 9, 'cleanup_turns': 98, 'completed_defeat': 12, 'end_turn': 114, 'equip': 106, 'explore': 27, 'infuse': 6, 'linked_recovery': 3, 'linked_start_stage.1': 4, 'linked_start_stage.2': 4, 'linked_start_stage.3': 4, 'pin_orders': 2, 'random_linked_phase_playing': 12, 'random_phase_playing': 12, 'recruit': 29, 'rejected_commands': 592, 'rejected_infusion_orders': 97, 'rejected_pin_orders': 63, 'rejected_replacement_orders': 120, 'replace_troop': 32, 'replacement_crystals': 9, 'replacement_full_army': 9, 'replacement_gold': 1189, 'replacement_incoming.adept': 3, 'replacement_incoming.archer': 1, 'replacement_incoming.healer': 1, 'replacement_incoming.militia': 12, 'replacement_incoming.pikeman': 3, 'replacement_incoming.ranger': 6, 'replacement_incoming.sapper': 3, 'replacement_incoming.swordsman': 2, 'replacement_incoming.warden': 1, 'replacement_probe_defenses': 0, 'replacement_probe_territory_losses': 1, 'replacement_retired_rank_total': 63, 'replacement_retired_veterans': 20, 'replacement_retired_xp_total': 57, 'replacement_same_role': 8, 'replacement_saved_next_turn_probes': 12, 'retreats': 14, 'setup_completed_shards': 12, 'state_checks': 1570, 'trace_events': 1811, 'travel': 109}
+Scene metrics: {'attack_inputs': 19, 'backup_inputs': 4, 'battle_save_load': 12, 'choice_inputs': 15, 'choice_save_load': 4, 'defensive_order_inputs': 16, 'input_events': 2161, 'input_ticks': 2173, 'keyboard_tactical_inputs': 17, 'message_reader_inputs': 91, 'move_inputs': 66, 'ordinary_recruit_inputs': 2, 'pin_inputs': 4, 'playback_readonly_inputs': 236, 'random_click': 429, 'random_hover': 32, 'random_input_events': 1764, 'random_key': 1303, 'replacement_veteran_selections': 2, 'replays': 12, 'result_save_load': 14, 'save_browser_inputs': 29, 'screen_BattlePlaybackScene': 302, 'screen_BattleScene': 644, 'screen_CampaignPlanScene': 10, 'screen_CampaignScene': 12, 'screen_CatalogScene': 115, 'screen_ChoiceScene': 33, 'screen_CodexScene': 121, 'screen_DiagnosticScene': 93, 'screen_HelpScene': 40, 'screen_HeroScene': 53, 'screen_ReplacementScene': 3, 'screen_ResultScene': 62, 'screen_RivalScene': 10, 'screen_SaveScene': 74, 'screen_SettingsScene': 85, 'screen_ShardScene': 458, 'screen_TitleScene': 58, 'spell_inputs': 21, 'state_checks': 2114}
+Passed 12 model campaigns and 12 scene runs in 81.6s.
+Report: /tmp/shardbound-autoplay-fuzz.json
