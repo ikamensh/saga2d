@@ -6,7 +6,7 @@ from copy import deepcopy
 from saga2d import Anchor, Label, Settings, SettingsError
 
 from eador.preferences import (DEFAULTS, WINDOW_SIZES, apply_display_preferences,
-                               apply_preferences, codex_text_scale, reduced_motion, validate_preferences)
+                               apply_preferences, reading_scale, reduced_motion, validate_preferences)
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, RED, TEAL
 
@@ -18,7 +18,7 @@ SOUND_ROWS = (("master", "Master volume", "Overall level for all sound."),
 DISPLAY_ROWS = (("window_size", "Window size", "Resize the window; the game canvas stays fixed."),
                 ("fullscreen", "Fullscreen", "Use the desktop's current resolution."),
                 ("reduced_motion", "Reduced motion", "Keep damage numbers still."),
-                ("codex_text_scale", "Codex reading size", "Read the Codex at this size."))
+                ("codex_text_scale", "Reading size", "Read guidance at this size."))
 
 
 class SettingsScene(Screen):
@@ -49,7 +49,7 @@ class SettingsScene(Screen):
         self.entry = deepcopy(DEFAULTS)
         self.entry.update({channel: self.game.audio.get_volume(channel) for channel in ("master", "music", "sfx")})
         self.entry.update(muted=self.game.audio.muted, reduced_motion=reduced_motion(self.game),
-                          codex_text_scale=codex_text_scale(self.game),
+                          codex_text_scale=reading_scale(self.game),
                           window_size=list(self.game.windowed_size), fullscreen=self.game.fullscreen)
         self.draft = {key: deepcopy(self.preferences[key]) for key in DEFAULTS}
         # The native window may have been resized or launched with an explicit override.
@@ -226,7 +226,7 @@ class SettingsScene(Screen):
         self.rule(x + 36, y + 477, w - 72)
         notice = "A saved settings file could not be read. It is still intact." if self.load_error else "Tab switches pages · Up/Down selects a row · Left/Right changes its value."
         if self.page == "display" and not self.load_error:
-            notice = "Codex reading size changes reference content only. Other screens keep their sizes.\nTab: page · Up/Down: row · Left/Right: value."
+            notice = "Reading size applies to the Codex and Field Guide. Other screens keep their sizes.\nTab: page · Up/Down: row · Left/Right: value."
         self.paragraph(notice, x + 36, y + 494, width=w - 72, size=12, color=RED if self.load_error else MUTED)
         if self.message:
             self.paragraph(self.message, x + 36, y + 586, width=w - 72, size=11,

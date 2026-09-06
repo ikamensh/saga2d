@@ -571,13 +571,52 @@ class HelpScene(Screen):
         super().__init__()
         self.root = root
 
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._reading_display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
     def refresh(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 340, self.game.height / 2 - 280
-        self.button("Return to game", self.x + 26, self.y + 481, 212, self.game.pop, shortcut="Esc", primary=True)
-        self.button("Codex", self.x + 249, self.y + 481, 192, self.root.codex, shortcut="C")
-        self.button("Save & title", self.x + 452, self.y + 481, 202, self.title, shortcut="S")
-        self.button("Settings", self.x + 504, self.y + 8, 150, self.open_settings, shortcut="O")
+        self.x, self.y = self.game.width / 2 - 520, self.game.height / 2 - 350
+        self._reading_display = self.game.window_size, reading_scale(self.game)
+        scale = self._reading_display[1] / 100
+        sections = (
+            ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
+            ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
+            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
+            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
+        )
+        blocks = [Column(
+            Label(title, width=472, wrap=True, font="Georgia", font_size=round(17 * scale), text_color=TEAL),
+            Label(body, width=472, wrap=True, font="Verdana", font_size=round(12 * scale), text_color=MUTED),
+            spacing=8,
+        ) for title, body in sections]
+        # Attach before measuring. Equal measured row heights align section tops;
+        # Columns then place all prose and the following quick-reference line.
+        for block in blocks:
+            self.ui.add(block)
+        rows = []
+        for pair in (blocks[:2], blocks[2:]):
+            height = max(block.get_preferred_size()[1] for block in pair)
+            rows.append(Row(*(Column(block, height=height) for block in pair), spacing=40))
+        objective = "J campaign objectives" if self.root.state.campaign else "Capture Duskspire to win"
+        content = Column(*rows, Label("F5 quicksave  /  F9 quickload  /  F6 save slots  /  " + objective,
+                                     width=984, wrap=True, font="Verdana", font_size=round(11 * scale), text_color=GOLD),
+                         spacing=28, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 142)))
+        self.ui.add(content)
+        if content.get_preferred_size()[1] > 464:
+            raise ValueError(f"Field Guide does not fit at {scale:.0%}")
+        self.button("Return to game", self.x + 28, self.y + 634, 260, self.game.pop, shortcut="Esc", primary=True)
+        self.button("Codex", self.x + 402, self.y + 634, 200, self.root.codex, shortcut="C")
+        self.button("Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
+        self.button("Settings", self.x + 862, self.y + 26, 150, self.open_settings, shortcut="O")
 
     def title(self):
         self.game.push(SaveScene(self.root, mode="save", return_to_title=True))
@@ -585,21 +624,11 @@ class HelpScene(Screen):
     def draw(self):
         x, y = self.x, self.y
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 210))
-        self.box(x, y, 680, 560)
+        self.box(x, y, 1040, 700)
         self.text("A FIELD GUIDE", x + 28, y + 26, size=11, color=GOLD)
         self.text("Claim a broken world", x + 28, y + 54, size=32, serif=True)
-        sections = [
-            ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
-            ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
-            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
-            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
-        ]
-        for i, (title, body) in enumerate(sections):
-            yy = y + 119 + i * 84
-            self.text(title, x + 28, yy, size=17, serif=True, color=TEAL)
-            self.paragraph(body, x + 28, yy + 28, width=624, size=12)
-        objective = "J campaign objectives" if self.root.state.campaign else "Capture Duskspire to win"
-        self.text("F5 quicksave  /  F9 quickload  /  F6 save slots  /  " + objective, x + 28, y + 459, size=11, color=GOLD)
+        self.rule(x + 28, y + 118, 984)
+        self.rule(x + 28, y + 620, 984)
 
 
 class BattleScene(Screen):
