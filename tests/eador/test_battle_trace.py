@@ -97,6 +97,8 @@ def test_real_old_battles_have_the_same_complete_saved_continuation_when_observe
         trace = state.battle.trace(state.battle.auto_turn)
         plain.battle.auto_turn()
         assert state.to_json() == plain.to_json()
+        if state.battle.objective.kind == 'rout':
+            assert all('escape clock' not in event.text.lower() for event in trace.events)
         frame = trace.before
         for event in trace.events:
             assert event.before == frame
@@ -104,3 +106,12 @@ def test_real_old_battles_have_the_same_complete_saved_continuation_when_observe
         assert frame == trace.after
     state.resolve_battle(); plain.resolve_battle()
     assert state.to_json() == plain.to_json()
+
+
+def test_enemy_pin_expiry_in_a_rout_is_not_described_as_an_escape_clock():
+    """A changed status may need a final frame even when there is no special objective."""
+    battle = Battle.clash([('archer', 20)], [('guard', 42)], 'plains')
+    battle.move(0, (0, 0)); battle.pin(0, 1000)
+    trace = battle.trace(battle.end_turn)
+    assert not trace.after.unit(1000).pinned
+    assert all('escape clock' not in event.text.lower() for event in trace.events)

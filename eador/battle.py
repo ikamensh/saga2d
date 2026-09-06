@@ -880,9 +880,13 @@ class Battle:
                 unit.pinned = False
         if not self.outcome:
             self._objective_turn()
-            self._emit('objective', text=(self.log[-1] if self.outcome else
-                       f'Seal held: {self.objective.progress}/{self.objective.required} turns.'
-                       if self.objective.kind == 'hold' else 'The escape clock advances.'))
+            if self.objective.kind in ('hold', 'extract'):
+                text = (self.log[-1] if self.outcome else
+                        f'Seal held: {self.objective.progress}/{self.objective.required} turns.'
+                        if self.objective.kind == 'hold' else 'The escape clock advances.')
+                self._emit('objective', text=text)
+            else:
+                self._emit('phase', text='Enemy effects expire.')
         if not self.outcome:
             self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != 'player']
             self.round += 1
