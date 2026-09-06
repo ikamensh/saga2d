@@ -1265,6 +1265,7 @@ class ChoiceScene(Screen):
     def __init__(self, root):
         super().__init__()
         self.root = root
+        self._applied = None
 
     def on_reveal(self):
         self.refresh()
@@ -1285,20 +1286,22 @@ class ChoiceScene(Screen):
         super().refresh()
         self._display = self.game.window_size, reading_scale(self.game)
         scale = self._display[1] / 100
-        choice = self.root.state.choice
+        choice = self._applied[0] if self._applied else self.root.state.choice
+        options = (self._applied[1],) if self._applied else choice.options
 
         def label(text, size, *, width=1064, color=MUTED):
             return Label(text, width=width, wrap=True, font='Verdana',
                          font_size=round(size * scale), text_color=color)
 
-        title = Label(choice.title, width=988 if choice.kind == 'relic' else 1064,
+        title = Label('Decision applied' if self._applied else choice.title,
+                      width=988 if choice.kind == 'relic' else 1064,
                       wrap=True, font='Georgia', font_size=30, text_color=GOLD)
         self._relic_space = Component(width=64, height=64) if choice.kind == 'relic' else None
         heading = Row(self._relic_space, title, spacing=12) if self._relic_space else title
-        introduction = Column(heading, label(choice.description, 12), spacing=12)
+        introduction = Column(heading, label(self._applied[2] if self._applied else choice.description, 12), spacing=12)
         blocks = [Column(label(option.name, 17, width=484, color=TEXT),
                          label(option.description, 12, width=484), spacing=12)
-                  for option in choice.options]
+                  for option in options]
         footer = label(self.message or
                        'Choose before taking your next campaign action. Your decision is saved automatically.',
                        11, color=GOLD if self.message else MUTED)
@@ -1307,11 +1310,12 @@ class ChoiceScene(Screen):
         self.ui.add(Column(introduction, *blocks, footer))
         option_height = max(block.get_preferred_size()[1] for block in blocks)
         cards = []
-        for index, (option, block) in enumerate(zip(choice.options, blocks)):
-            control = Button('Choose this path' if choice.kind == 'skill' else 'Choose reward',
-                             on_click=lambda option=option: self.choose(option.id),
-                             shortcut=str(index + 1), width=484, height=40, style=PRIMARY)
-            cards.append(Column(Column(block, height=option_height), control, spacing=24,
+        for index, (option, block) in enumerate(zip(options, blocks)):
+            controls = [] if self._applied else [Button(
+                'Choose this path' if choice.kind == 'skill' else 'Choose reward',
+                on_click=lambda option=option: self.choose(option.id),
+                shortcut=str(index + 1), width=484, height=40, style=PRIMARY)]
+            cards.append(Column(Column(block, height=option_height), *controls, spacing=24,
                                 style=Style(background_color=PANEL, border_color=LINE, border_width=1,
                                             padding=18, radius=5)))
         content = Column(introduction, Row(*cards, spacing=24), footer, spacing=24)
@@ -1328,9 +1332,11 @@ class ChoiceScene(Screen):
         self.button('Codex', self.x + 248, bottom, 170, self.root.codex, shortcut='C')
         self.button('Text size', self.x + 438, bottom, 200, self.open_text_settings, shortcut='T')
         self.button('Saves', self.x + 892, bottom, 200, self.browse_saves, hotkey='F6')
+        if self._applied:
+            self.button('Return', self.x + 658, bottom, 214, self.game.pop, shortcut=('Enter', 'Esc'))
 
     def choose(self, option_id):
-        kind = self.root.state.choice.kind
+        choice = self.root.state.choice
         try:
             self.root.state.choose(option_id)
         except RuleError as error:
@@ -1339,9 +1345,12 @@ class ChoiceScene(Screen):
             self.refresh()
             return
         self.message = ""
-        self.game.audio.play_sound("level_up" if kind == "skill" else "reward")
-        self.checkpoint(self.root.state)
+        self.game.audio.play_sound("level_up" if choice.kind == "skill" else "reward")
+        saved = self.checkpoint(self.root.state)
         if self.root.state.choice is not None:
+            self.refresh()
+        elif not saved:
+            self._applied = choice, next(option for option in choice.options if option.id == option_id), self.root.state.log[-1]
             self.refresh()
         else:
             self.root.message = self.message
@@ -1359,13 +1368,14 @@ class ChoiceScene(Screen):
         return loaded
 
     def browse_saves(self):
-        self.game.push(SaveScene(self.root))
+        self.game.push(SaveScene(self.root, mode='save' if self._applied else 'load'))
 
     def hero_details(self):
         self.game.push(HeroScene(self.root))
 
     def draw(self):
-        x, y, choice = self.x, self.y, self.root.state.choice
+        x, y = self.x, self.y
+        choice = self._applied[0] if self._applied else self.root.state.choice
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
         self.box(x, y, 1120, self.panel_height)
         self.text('A TURN IN YOUR STORY', x + 28, y + 22, size=10, color=MUTED)
