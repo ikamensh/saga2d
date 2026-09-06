@@ -86,7 +86,75 @@ def verify_audio_playback(game, files: dict) -> None:
     assert not game.backend._players
 
 
-def smoke(image_path: Path) -> None:
+def verify_forecast_save(save_path: Path, image_path: Path, *, backend='pyglet') -> dict:
+    """Read the earned Control party's lethal attack through ordinary loaded-game controls."""
+    from saga2d import Label
+    from eador.__main__ import create_session
+    from eador.model import State
+    from eador.persistence import CampaignSaves
+    from eador.preferences import reading_scale
+    from eador.scene import BattleScene
+    from tools.eador_ui import PlayerInput
+
+    payload = save_path.read_bytes()
+    initial = State.from_json(payload.decode('utf-8')).to_json()
+    image_path = image_path.resolve()
+    name = image_path.stem + '-forecast-125'
+    with TemporaryDirectory(prefix='shardbound-forecast-saves-') as saves:
+        game, title = create_session(['--data-dir', saves], backend=backend, visible=False)
+        player = PlayerInput(game, native=backend == 'pyglet', output=image_path.parent)
+
+        def labels():
+            return [item.text for item in game.scene.ui.walk() if isinstance(item, Label)]
+
+        def aim(ident):
+            player.click(*game.scene.grid.center(player.state.battle.unit(ident).pos))
+            assert game.scene.selected == ident
+            player.press('f')
+            assert game.scene.cursor == player.state.battle.unit(1011).pos
+
+        try:
+            CampaignSaves(game.save_manager).save(State.from_json(initial))
+            game.push(title)
+            player.press('f9')
+            assert isinstance(game.scene, BattleScene) and player.state.to_json() == initial
+            aim(6)
+            forecast_100 = labels()
+            assert any('Rune Adept falls.' in text for text in forecast_100)
+            assert any('Tab selects another unit.' in text for text in forecast_100)
+            assert reading_scale(game) == 100 and player.state.to_json() == initial
+            for key in ('f2', 'right', 'return'):
+                player.press(key)
+            forecast_125 = labels()
+            assert any('Rune Adept falls.' in text for text in forecast_125)
+            assert any('Tab selects another unit.' in text for text in forecast_125)
+            assert reading_scale(game) == 125 and player.state.to_json() == initial
+            player.capture(name, settle=False)
+            aim(8)
+            safe_forecast = labels()
+            assert any(text.startswith('Deal ') for text in safe_forecast)
+            assert not any('Rune Adept falls.' in text for text in safe_forecast)
+            assert player.state.to_json() == initial
+            player.reload(initial)
+            report = dict(backend=backend, input_sha256=hashlib.sha256(payload).hexdigest(),
+                          state_sha256=hashlib.sha256(player.state.to_json().encode('utf-8')).hexdigest(),
+                          state_unchanged=True, exact_save_reloads=player.reloads,
+                          input_activations=len(player.events), inputs=player.events,
+                          reading_percent=reading_scale(game), forecast_100=forecast_100,
+                          forecast_125=forecast_125, safe_forecast=safe_forecast,
+                          isolated_data_directory=str(game.data_dir),
+                          image=str(image_path.parent / (name + '.png')) if backend == 'pyglet' else None,
+                          scope='Public controls from an externally supplied Control save; '
+                                'no campaign preparation or human-playtest claim.')
+        finally:
+            try:
+                game._teardown()
+            finally:
+                game.backend.quit()
+    return report
+
+
+def smoke(image_path: Path, *, forecast_save: Path | None = None) -> None:
     os.environ["SAGA2D_SILENT"] = "1"
     import eador
     from saga2d import Game
@@ -240,6 +308,8 @@ def smoke(image_path: Path) -> None:
         finally:
             restarted._teardown()
             restarted.backend.quit()
+        if forecast_save is not None:
+            report['casualty_forecast'] = verify_forecast_save(forecast_save, image_path)
         image_path.with_suffix(".json").write_text(json.dumps(report, indent=2) + "\n")
 
 
@@ -255,7 +325,10 @@ if __name__ == "__main__":
     elif "--smoke-image" in sys.argv:
         parser = argparse.ArgumentParser(description="Verify the packaged Shardbound runtime")
         parser.add_argument("--smoke-image", required=True, type=Path)
-        smoke(parser.parse_args().smoke_image)
+        parser.add_argument('--forecast-save', type=Path,
+                            help='also inspect the earned Control casualty forecast from this plain State JSON')
+        args = parser.parse_args()
+        smoke(args.smoke_image, forecast_save=args.forecast_save)
     else:
         from eador.__main__ import main
         main()

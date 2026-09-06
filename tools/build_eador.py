@@ -174,7 +174,8 @@ def verify_campaign_processes(executable: Path, folder: Path, env: dict, output:
                 reports=[f'phase-{p["phase"]}.json' for p in phases])
 
 
-def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, *, campaign=False) -> dict:
+def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, *,
+                  campaign=False, forecast_save: Path | None = None) -> dict:
     with TemporaryDirectory(prefix="shardbound-outside-repo-") as temporary:
         folder = Path(temporary)
         if macos:
@@ -188,7 +189,14 @@ def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, 
         env["PATH"] = os.defpath
         env["PYTHONNOUSERSITE"] = "1"
         image = output / "packaged-smoke.png"
-        run([executable, "--smoke-image", image], cwd=folder, env=env, timeout=90)
+        command = [executable, "--smoke-image", image]
+        if forecast_save is not None:
+            # Verification input stays outside the archive and cannot fall back to repository data.
+            forecast_payload = forecast_save.read_bytes()
+            relocated_save = folder / 'forecast-input.json'
+            relocated_save.write_bytes(forecast_payload)
+            command.extend(['--forecast-save', relocated_save])
+        run(command, cwd=folder, env=env, timeout=90)
         report = json.loads(image.with_suffix(".json").read_text())
         if not all(report[key] for key in ("frozen", "save_load_roundtrip", "codex_and_rival_rendered",
                                           "battle_save_load_roundtrip", "guard_save_load_roundtrip",
@@ -205,6 +213,17 @@ def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, 
                         for name, record in report["audio_files"].items()}
         if actual_audio != expected_audio:
             raise RuntimeError("Packaged audio bytes differ from the build source snapshot")
+        if forecast_save is not None:
+            check = report['casualty_forecast']
+            if check['input_sha256'] != hashlib.sha256(forecast_payload).hexdigest():
+                raise RuntimeError('Packaged forecast check loaded different input bytes')
+            if (check['backend'] != 'pyglet' or not check['state_unchanged']
+                    or check['exact_save_reloads'] != 1 or check['reading_percent'] != 125
+                    or check['input_activations'] <= 0):
+                raise RuntimeError('Packaged forecast inspection or exact save reload failed')
+            forecast_image = image.with_stem(image.stem + '-forecast-125')
+            if Path(check['image']).resolve() != forecast_image.resolve() or not forecast_image.is_file():
+                raise RuntimeError('Packaged forecast check did not capture its native frame')
         if campaign:
             campaign_output = output / 'campaign-verification'
             if campaign_output.exists():
@@ -219,9 +238,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--skip-smoke", action="store_true", help="build only; artifact remains unverified")
     parser.add_argument("--check-campaign", action="store_true", help="also complete three linked shards across app restarts")
+    parser.add_argument('--forecast-save', type=Path,
+                        help='also verify the earned Control casualty forecast from this external plain State JSON')
     args = parser.parse_args()
     if args.skip_smoke and args.check_campaign:
         parser.error('--check-campaign requires the extracted archive smoke check')
+    if args.skip_smoke and args.forecast_save is not None:
+        parser.error('--forecast-save requires the extracted archive smoke check')
+    if args.forecast_save is not None:
+        args.forecast_save = args.forecast_save.expanduser().resolve()
+        if not args.forecast_save.is_file():
+            parser.error('--forecast-save must name an existing plain State JSON file')
     if sys.platform not in ("darwin", "win32"):
         parser.error("This recipe currently targets macOS and Windows only")
     if platform.python_version() != "3.13.2":
@@ -251,7 +278,8 @@ def main() -> None:
     info["artifact"] = {"file": archive.name, "sha256": sha256(archive), "bytes": archive.stat().st_size}
     info["files"] = inventory(artifact)
     info["smoke"] = None if args.skip_smoke else smoke_archive(
-        archive, output, macos, info["package_data"], campaign=args.check_campaign)
+        archive, output, macos, info["package_data"], campaign=args.check_campaign,
+        forecast_save=args.forecast_save)
     write_json(output / "build-manifest.json", info)
     print(f"Built {archive}\nSHA256 {info['artifact']['sha256']}\nManifest {output / 'build-manifest.json'}", flush=True)
 
