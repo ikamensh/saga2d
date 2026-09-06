@@ -62,6 +62,9 @@ policy ends R4 with 12 missing HP. **Guard** instead ends R4 with 23. Both spend
 the Sapper's order, finish with the same two mana and no deaths. The Smoke result
 matches the original paid battle exactly when compared in serialized form.
 These are two public choices; no ability, terrain, income or defender was edited.
+Guard leaves the charge available, and a later automatic round still uses Smoke.
+The comparison therefore demonstrates the value of screening at the earlier
+decision, rather than removing the ability from the alternative army.
 The two choices can cause the same subsequent automatic policy to select different
 actions. They are not proof of optimal manual tactics or native input coverage.
 
@@ -116,11 +119,26 @@ uv run python tools/prototype_eador_early_conversion.py --authored --seeds 0 --h
 uv run python tools/prototype_eador_early_conversion.py --tactical-control-from /tmp/earned-investment.json.gz --report /tmp/earned-smoke-control.json.gz
 ```
 
-The new source/model control command completed its public continuations in the pilot,
-then hit a tuple/list comparison in its final assertion. That comparison is fixed
-by comparing the serialized battle form; a read-only comparison of the previously
-written results confirms exact equality. A fresh invocation of that command is
-pending the coordinated test pause.
+The original source/model control invocation hit a tuple/list comparison in its
+final assertion. Comparing the serialized battle form fixes it. A fresh clean
+`4c555b2` invocation now passes, following a repeated one-window Commander/Ruins
+pilot with ten branches, both at the default 25% CPU allowance. The original
+twenty-one-branch evidence remains historical; the larger matrix was not resumed.
+
+The [current reproduction](evidence/earned-specialist-investment-4c555b2/README.md)
+also resumes the earned round-three save through real native F9 input and issues
+Smoke or Guard through the displayed controls. **51 native inputs and seven
+exact reloads** reproduce both model continuations and final campaign states.
+The preparation was performed by the model, so this is native decision/continuation
+coverage, not a native whole paid journey or a human playtest.
+
+Review found a separate harness bug: waiting for actions could intercept the rival,
+move away from the intended site and then explore the wrong province. A regression
+from the actual paid Ruins camp targets Sealed Vault; it failed before the fix and
+now passes after returning to the intended site. Every recorded target fight now
+asserts its actual battle province and site kind. The twenty-one historical branches
+were checked and already targeted the right sites; this correction does not invalidate
+their measured outcomes. Fourteen focused audit/budget integration tests pass.
 
 Do not add a tax or relocate crystal income on this evidence. A purposeful small
 purchase is already available and can trade an action/retirement for less damage;
