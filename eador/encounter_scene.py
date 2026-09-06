@@ -99,7 +99,7 @@ class EncounterScene(Screen):
             f"Before round {definition.deadline} ends, secure the seal or defeat every defender. Hero death loses immediately.",
             "Guard shields a holder; Pikemen Brace against melee. Ranged attacks bypass Brace.",
         ) if holding else (
-            'Defeat every defender to claim the reward. No round limit; there is no seal to hold or exit to reach.',
+            'Defeat every defender to claim the reward. Exhaustion forces retreat after 80 rounds.',
             'Keep your hero alive. Hero death ends the expedition immediately.',
             'Protect your rear and rotate wounded allies. Forest blocks distant shots but provides cover at its edge.',
         )

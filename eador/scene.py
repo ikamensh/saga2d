@@ -894,8 +894,9 @@ class BattleScene(Screen):
                       38, 165, size=10, color=GOLD if b.evacuation_blocked_reason else TEAL)
         else:
             self.box(26, 100, self.edge - 52, 60)
-            self.text('ROUT THE DEFENDERS · No round limit', 38, 108, size=12, color=GOLD)
-            self.text('Defeat every defender. Keep your hero alive.', 38, 137, size=10, color=MUTED)
+            self.text('ROUT THE DEFENDERS', 38, 108, size=12, color=GOLD)
+            self.text('Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.',
+                      38, 137, size=10, color=MUTED)
         self.text("TACTICAL COMMAND", x, 30, size=10, color=GOLD)
         self.text("Your army", x, 57, size=30, serif=True)
         allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
