@@ -1,0 +1,340 @@
+{
+  "scenario": "repulse",
+  "backend": "pyglet",
+  "input_activations": 47,
+  "exact_save_reloads": 1,
+  "inputs": [
+    [
+      "TitleScene",
+      "key",
+      "return"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "b"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "4"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "r"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "right"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "r"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "right"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "4"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "x"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        396,
+        526
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        540,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "r"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "left"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "left"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "left"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "left"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "escape"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f5"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f9"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        540,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "r"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "e"
+    ]
+  ],
+  "revision": "24e77b2c67cbeba6f4de682b2f260a2b9162bc22",
+  "dirty_at_start": [
+    " M .gitignore",
+    " M docs/eador-reading-size.md",
+    " M eador/README.md",
+    " M eador/scene.py",
+    " M eador/settings_scene.py",
+    " M tools/verify_eador_control.py",
+    " M tools/verify_eador_extraction.py",
+    "?? docs/eador-forecast-reading.md",
+    "?? tests/eador/test_forecast_reading.py",
+    "?? tools/verify_eador_forecast.py"
+  ],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "6ad5769c6d1ce1f8eb9db56d84cc5e65a972a778d24053129d92bbc3af5442a0",
+    "eador/codex.py": "dbb12fff9abdc2c386963474a5c89996541c03ba1e6718f03e071dc4e62a84c1",
+    "eador/content.py": "b7e768ccd01e20d20f46ef5a63971f16c0d383f9cda20ccfd6a2acf87ff1f915",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "054a4742ff038dc763a567c02cb7f2b7e51e59f328002fe538dac100767df8dc",
+    "eador/encounters.py": "697a9b60d571f93894c75d7b247732ad76e2431075d65dc9500acafed08d789b",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c",
+    "eador/replacement_scene.py": "95ca38ee23c7a7dbd792ce283616978aaba738a12b2988d6f3ef12054b4b1057",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "4a3a15bb4a36fc6d10c7d5ebdd07a37faba0def606ce1e3ff8af35170d48a21b",
+    "eador/scene.py": "980a556a235f0bff57ab9823840939897d5135dce677895fd429a1633699490d",
+    "eador/settings_scene.py": "5b7f6d8d050f4c297be3da04ae737b69f1bac3ff4f83c7120137dabb5f6702d9",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "2531d3e02902000dd7cab6c31b460eabd0b39fdd35c4a49ef7e0cfd6e64b1de8",
+    "saga2d/__init__.py": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/_scene_stack.py": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "d2e10d6e84ee0bcadde245f873bce1c216ec7505eed3b56b87a3648404112185",
+    "saga2d/backends/mock_backend.py": "18ac93641c51e9e4df9796a35bb7afbdf3c9431c73a3fcc338457ef45faf7f1e",
+    "saga2d/backends/pyglet_backend.py": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8",
+    "saga2d/game.py": "21f03dac8c2a2d450bc3dd32554d31a6b2dd4c882c41f8f8d7a64b4ff58bef2d",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/input.py": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29",
+    "saga2d/render3d.py": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996",
+    "saga2d/rendering/particles.py": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0",
+    "saga2d/rendering/shapes.py": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f",
+    "saga2d/rendering/sprite.py": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8",
+    "saga2d/save.py": "e1002496a7fc01f2dbebb2831aba001ea3d1b725800a06911160a58ea0597c01",
+    "saga2d/scene.py": "ae417745d4aa23e6cc470ef0fddb2fd762b1606423c1e3c5cbe51396ac3fd477",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/testing.py": "e73a33918038b50384ee380adf2473dde0e1c6bc8d6222d1a7264dcea63fc0f4",
+    "saga2d/ui/__init__.py": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933",
+    "saga2d/ui/base.py": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/theme.py": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/eador_control_campaign.py": "4eb25a987106af9a63c111f829107f7c8068f33a0d4b02974bfb44e47316c0ec",
+    "tools/eador_extraction_campaign.py": "a73348493275070164bc4319ebbdb479888a327793968fd1075775fcdab250ea",
+    "tools/eador_roles_campaign.py": "c795ba1213dedbd1135daa5e132718611ec69092e8ed580c65437db0b88fbc75",
+    "tools/eador_ui.py": "9a3d99b3a287203b88d6eb3ce9f782011df5ae4dc9827aa383053e528708446b",
+    "tools/verify_eador_control.py": "d07c87fdf32965d660fc2561e0a7f66ab50801ff59f16a3f1f7e855f16d20743",
+    "tools/verify_eador_extraction.py": "f8a24fba9c16689fd3e13e2bdbc8c0ded863ce692e651c9903f328ed9f0fe82b"
+  },
+  "source_files_changed": [],
+  "elapsed_seconds": 2.6544727500295267,
+  "python": "3.13.2",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O"
+}
