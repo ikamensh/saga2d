@@ -486,7 +486,12 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         for _ in range(12):
             if max([state.hero.max_hp - state.hero.hp] + [u.max_hp - u.hp for u in state.hero.army]) <= 6:
                 break
+            # Rest advances the visible rival order; strike before Westwatch falls.
+            if state.rival.target == (-2, 0) and state.rival.turns_until_action == 1:
+                break
             rest()
+        assert state.status == "playing"
+        assert game.scene is root
         click(game, *root.grid.center((2, 0)))
         press(game, "return")
         battle()

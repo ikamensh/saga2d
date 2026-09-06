@@ -6,7 +6,8 @@ from tests.eador.test_pack_hunt import assert_one_rout_reward
 
 def test_paid_western_screen_relocates_under_smoke_and_wins_with_saved_orders():
     state = prepare_screen()
-    assert state.hero.pos == (0, -1) and state.turn == 8
+    assert state.hero.pos == (0, -1) and state.actions_left > 0
+    assert state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army)
     assert state.provinces[state.hero.pos].site_kind == 'smuggler_screen'
     assert [troop.kind for troop in state.hero.army] == ['militia', 'militia', 'archer', 'warden', 'ranger']
     before = State.from_json(state.to_json())
@@ -58,14 +59,16 @@ class ScreenJourney(Journey):
 def test_same_paid_party_uses_distinct_orders_for_the_two_free_assemblies():
     from tools.eador_screen_campaign import screen_northern_route
 
-    original = prepare_screen().to_json()
+    prepared = prepare_screen()
+    original = prepared.to_json()
     west = screen_western_route(State.from_json(original), orders_type=ScreenJourney)
     north = screen_northern_route(State.from_json(original), orders_type=ScreenJourney)
     assert west.clouds_after_first_phase == [(-2, 1)]
     assert north.clouds_after_first_phase == [(0, -2)]
     assert not west.rallied_after_shooting and north.rallied_after_shooting
     assert (west.battle.round, north.battle.round) == (4, 5)
-    assert (west.battle.mana, north.battle.mana) == (10, 2)
+    assert west.battle.mana == prepared.hero.mana
+    assert north.battle.mana == prepared.hero.mana - 2 * north.battle.spell_cost('heal')
     assert west.state.gold == north.state.gold and west.state.crystals == north.state.crystals
     assert [(u.kind, u.hp) for u in west.battle.units if u.team == 'enemy'] == [(u.kind, u.hp) for u in north.battle.units if u.team == 'enemy']
     assert_one_rout_reward(west); assert_one_rout_reward(north)

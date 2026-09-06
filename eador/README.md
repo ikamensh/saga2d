@@ -101,6 +101,9 @@ and mix review remain part of release preparation.
    round. Moves, abilities and reactions are shown in order; watch them or
    press **Space** to finish playback. Battle orders resume afterward.
    Repeat **A** if you want assistance with the next round.
+   Autoplay lets other ready allies act before retrying an attack with a
+   fatal reaction. It can still lose troops; manual positioning and protection
+   remain useful.
 5. After victory, press **E** to return with treasure and experience.
    Resolve any skill or relic decisions with **1/2**. Keeping a relic adds
    it to your inventory; **H**, then its number equips it. Press **E**

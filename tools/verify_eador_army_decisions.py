@@ -50,58 +50,104 @@ def inspect(player, warning):
     return rows
 
 
-def verify(output, *, backend='pyglet'):
+def verify(input_report, output, *, backend='pyglet'):
+    """Replay one current audit report; historical journals remain provenance only."""
     paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
              ROOT / 'tools/verify_eador_army_decisions.py', ROOT / 'tools/eador_ui.py',
              ROOT / 'tools/verify_eador_guidance.py']
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
-    rows, inputs = [], {}
-    for plan in ('control', 'mobile'):
-        path = ROOT / 'docs/evidence/army-decisions-474b41a' / f'{plan}.json.gz'
-        inputs[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
-        source = json.loads(gzip.decompress(path.read_bytes()))
-        for branch in ('manual', 'auto'):
-            with TemporaryDirectory(prefix='shardbound-army-input-') as directory:
-                game, title = create_session(['--data-dir', directory], backend=backend, visible=False)
-                player = PlayerInput(game, native=backend == 'pyglet', output=output / f'{plan}-{branch}')
-                try:
-                    CampaignSaves(game.save_manager).save(State.from_json(source['initial_state']))
-                    game.push(title); player.press('f9')
-                    # Inspect a genuine casualty before either branch chooses its orders.
-                    aim(player, 6 if plan == 'control' else 4, 1011 if plan == 'control' else 1007)
-                    warning = 'Rune Adept falls.' if plan == 'control' else 'Warden falls.'
-                    layouts = inspect(player, warning)
-                    player.press('f1')
-                    check_reading_layout(game.scene)
-                    player.capture('guide-125', settle=False)
-                    player.press('escape')
-                    for entry in source[branch]['commands']:
-                        assert player.state.to_json() == entry['before']
-                        command, args, kwargs = entry['command'], entry['args'], entry['kwargs']
-                        if command == 'battle.auto_turn':
-                            player.press('a')
-                        elif command == 'battle.attack':
-                            aim(player, *args); player.press('return')
-                        elif command in ('battle.move', 'battle.guard'):
-                            player.click(*game.scene.grid.center(player.state.battle.unit(args[0]).pos))
-                            if command == 'battle.move':
-                                player.click(*game.scene.grid.center(tuple(args[1])))
-                            else:
-                                player.press('g')
+    input_bytes = input_report.read_bytes()
+    source = json.loads(gzip.decompress(input_bytes))
+    required = {'plan', 'source', 'initial_state', 'manual', 'auto', 'source_commit', 'source_sha256'}
+    if not isinstance(source, dict) or not required <= source.keys():
+        raise ValueError('Input report must contain the current army audit, source manifest and both branches')
+    plan = source['plan']
+    if plan not in ('control', 'mobile'):
+        raise ValueError(f'Unsupported army decision plan: {plan!r}')
+    model_hashes = {path: digest for path, digest in hashes.items() if path.startswith(('eador/', 'saga2d/'))}
+    if not isinstance(source['source_sha256'], dict):
+        raise ValueError('Input report must contain its model source manifest')
+    recorded_models = {path: digest for path, digest in source['source_sha256'].items()
+                       if path.startswith(('eador/', 'saga2d/'))}
+    # Compare only known repository paths; never read a path supplied by the report.
+    if recorded_models.keys() != model_hashes.keys():
+        raise ValueError('Input report model source manifest is incomplete or incompatible; regenerate the audit')
+    for path, digest in model_hashes.items():
+        if recorded_models[path] != digest:
+            raise ValueError(f'Input report differs from current {path}; regenerate the audit')
+    provenance = source['source']
+    required_provenance = {'path', 'journal_sha256', 'journal_source_commit', 'command_index', 'state_sha256'}
+    if not isinstance(provenance, dict) or not required_provenance <= provenance.keys():
+        raise ValueError('Input report must identify the historical earned save')
+    initial = source['initial_state']
+    if not isinstance(initial, str) or hashlib.sha256(initial.encode()).hexdigest() != provenance['state_sha256']:
+        raise ValueError('Input report earned save differs from its recorded hash')
+    for branch in ('manual', 'auto'):
+        data = source[branch]
+        if (not isinstance(data, dict) or not {'commands', 'replenished'} <= data.keys()
+                or not isinstance(data['commands'], list) or not data['commands']
+                or not isinstance(data['replenished'], str)):
+            raise ValueError(f'Input report must contain the {branch} command journal and paid aftermath')
+        before = initial
+        for entry in data['commands']:
+            if not isinstance(entry, dict) or not {'command', 'args', 'kwargs', 'before', 'after'} <= entry.keys():
+                raise ValueError(f'Input report has an incomplete {branch} command')
+            if (not isinstance(entry['command'], str) or not isinstance(entry['args'], list)
+                    or not isinstance(entry['kwargs'], dict) or not isinstance(entry['after'], str)):
+                raise ValueError(f'Input report has a malformed {branch} command')
+            if entry['before'] != before:
+                raise ValueError(f'Input report {branch} commands do not form an exact saved chain')
+            before = entry['after']
+        if before != data['replenished']:
+            raise ValueError(f'Input report {branch} paid aftermath differs from its last command')
+    rows = []
+    for branch in ('manual', 'auto'):
+        with TemporaryDirectory(prefix='shardbound-army-input-') as directory:
+            game, title = create_session(['--data-dir', directory], backend=backend, visible=False)
+            player = PlayerInput(game, native=backend == 'pyglet', output=output / f'{plan}-{branch}')
+            try:
+                CampaignSaves(game.save_manager).save(State.from_json(initial))
+                game.push(title); player.press('f9')
+                # Inspect a genuine casualty before either branch chooses its orders.
+                aim(player, 6 if plan == 'control' else 4, 1011 if plan == 'control' else 1007)
+                warning = 'Rune Adept falls.' if plan == 'control' else 'Warden falls.'
+                layouts = inspect(player, warning)
+                player.press('f1')
+                check_reading_layout(game.scene)
+                player.capture('guide-125', settle=False)
+                player.press('escape')
+                for entry in source[branch]['commands']:
+                    assert player.state.to_json() == entry['before']
+                    command, args, kwargs = entry['command'], entry['args'], entry['kwargs']
+                    if command == 'battle.auto_turn':
+                        player.press('a')
+                    elif command == 'battle.attack':
+                        aim(player, *args); player.press('return')
+                    elif command in ('battle.move', 'battle.guard'):
+                        player.click(*game.scene.grid.center(player.state.battle.unit(args[0]).pos))
+                        if command == 'battle.move':
+                            player.click(*game.scene.grid.center(tuple(args[1])))
                         else:
-                            getattr(player.state, command)(*args, **kwargs)
-                        assert player.state.to_json() == entry['after'], command
-                    assert player.state.to_json() == source[branch]['replenished']
-                    player.reload(player.state.to_json())
-                    player.capture('paid-aftermath', settle=False)
-                    rows.append(dict(plan=plan, branch=branch, layouts=layouts, inputs=player.events,
-                                     reloads=player.reloads, exact_commands=len(source[branch]['commands']),
-                                     final=player.state.to_json()))
+                            player.press('g')
+                    else:
+                        getattr(player.state, command)(*args, **kwargs)
+                    assert player.state.to_json() == entry['after'], command
+                    player.reload(entry['after'])
+                assert player.state.to_json() == source[branch]['replenished']
+                player.capture('paid-aftermath', settle=False)
+                rows.append(dict(plan=plan, branch=branch, layouts=layouts, inputs=player.events,
+                                 reloads=player.reloads, exact_commands=len(source[branch]['commands']),
+                                 final=player.state.to_json()))
+            finally:
+                try:
+                    game._teardown()
                 finally:
-                    game._teardown(); game.backend.quit()
+                    game.backend.quit()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                  source_sha256=hashes, source_unchanged=True, input_sha256=inputs, backend=backend,
+                  source_sha256=hashes, source_unchanged=True,
+                  input_report=str(input_report.resolve()), input_sha256=hashlib.sha256(input_bytes).hexdigest(),
+                  input_source_commit=source['source_commit'], input_source=provenance, backend=backend,
                   scope='Native/model input from earned saves, explicit orders then autoplay as journaled, '
                         'real rewards and paid replenishment. No native preparation or independent playtest.', rows=rows)
     output.mkdir(parents=True, exist_ok=True)
@@ -113,7 +159,9 @@ def verify(output, *, backend='pyglet'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--input-report', type=Path, required=True,
+                        help='One current .json.gz report from audit_eador_army_decisions.py')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--backend', choices=('mock', 'pyglet'), default='pyglet')
     args = parser.parse_args()
-    verify(args.output, backend=args.backend)
+    verify(args.input_report, args.output, backend=args.backend)

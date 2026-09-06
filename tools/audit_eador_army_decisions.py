@@ -42,13 +42,11 @@ CASES = {
 }
 
 
-def _branch(initial, plan, orders, budget, *, expected_first_after=None):
+def _branch(initial, plan, orders, budget):
     state = SavedCommands(State.from_json(initial), budget)
     assert state.to_json() == initial, 'The earned input must restore exactly'
     for command, args in orders:
         state.order(command, *args)
-    if expected_first_after is not None:
-        assert state.to_json() == expected_first_after, 'Autoplay differs from the retained source command'
 
     trial = ArmyTrial(state, plan, route=(), budget=budget)
     # Finish with the same autoplay policy, then apply real rewards and choices.
@@ -88,9 +86,9 @@ def compare(plan='control', *, cpu_percent=25):
     initial = command['before']
     assert hashlib.sha256(initial.encode()).hexdigest() == case['state_sha256'], 'The selected earned save changed'
     assert command['command'] == 'battle.auto_turn', 'The control must begin with the recorded autoplay command'
-    auto = _branch(initial, plan, (('battle.auto_turn', ()),), budget,
-                   expected_first_after=command['after'])
+    auto = _branch(initial, plan, (('battle.auto_turn', ()),), budget)
     manual = _branch(initial, plan, case['orders'], budget)
+    current_after = auto['commands'][0]['after']
     return dict(
         plan=plan, description=case['description'], cpu_percent=cpu_percent,
         policy='One disclosed manual decision versus autoplay from the same earned save; '
@@ -99,7 +97,11 @@ def compare(plan='control', *, cpu_percent=25):
         source=dict(path=str(path.relative_to(ROOT)), journal_sha256=journal_hash,
                     journal_source_commit=journal['source_commit'],
                     stage_index=case['stage'], battle_index=case['battle'],
-                    command_index=case['command'], state_sha256=case['state_sha256']),
+                    command_index=case['command'], state_sha256=case['state_sha256'],
+                    historical_first_after=command['after'],
+                    historical_first_after_sha256=hashlib.sha256(command['after'].encode()).hexdigest()),
+        current_first_after_sha256=hashlib.sha256(current_after.encode()).hexdigest(),
+        historical_first_after_matches_current=current_after == command['after'],
         initial_state=initial, manual_orders=case['orders'], auto=auto, manual=manual)
 
 

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+from collections import deque
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field, replace
 
@@ -756,10 +757,13 @@ class Battle:
 
     def _play_team(self, team: str) -> None:
         self._control_orders(team)
-        for unit in self.units:
+        pending = deque(unit for unit in self.units if unit.team == team)
+        deferred = set()
+        while pending:
+            unit = pending.popleft()
             if self.outcome:
                 break
-            if unit.team != team or not unit.alive or unit.acted:
+            if not unit.alive or unit.acted:
                 continue
             if unit.kind == 'hero':
                 if self.objective.kind == 'extract':
@@ -847,6 +851,16 @@ class Battle:
                 use_pin = (target in self.pin_targets(unit.id) and (slows_escape or slow_stops_approach or target.kind == 'ranger' and distance > 1)
                            and self.preview(unit.id, target.id)[0] < target.hp
                            and not (defending_seal and target.pos == self.objective.target))
+                # Give ready allies a chance before knowingly sacrificing a
+                # player unit. Revisit once: movement and spent orders persist,
+                # and an unavoidable risky attack cannot stall the round.
+                preview = self.pin_preview if use_pin else self.preview
+                if (team == 'player' and unit.id not in deferred
+                        and preview(unit.id, target.id)[1] >= unit.hp
+                        and any(other.alive and not other.acted for other in pending)):
+                    deferred.add(unit.id)
+                    pending.append(unit)
+                    continue
                 if use_pin:
                     if team == 'player':
                         self.pin(unit.id, target.id)
