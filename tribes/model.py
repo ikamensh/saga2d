@@ -716,7 +716,7 @@ class World:
             self.explore(tribe, unit.pos, self._vision(unit))
 
     def surrender_reason(self, tribe: int) -> str | None:
-        """AI concedes only when it has neither an army nor a way to rebuild."""
+        """Check after harvesting / rewards: no army and no funded recruitment path."""
         t = self.tribes[tribe]
         if t.human or not t.alive or self.winner is not None or self.tribe_units(tribe):
             return None
@@ -762,7 +762,8 @@ class World:
                 t.alive = False
                 for unit in self.tribe_units(t.id):
                     self._kill(unit)
-                self.log.append(f"{t.name} has fallen")
+                if not t.surrendered:
+                    self.log.append(f"{t.name} has fallen")
         alive = [t for t in self.tribes if t.alive]
         if self.winner is not None:
             return

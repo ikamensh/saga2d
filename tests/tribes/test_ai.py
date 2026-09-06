@@ -7,7 +7,7 @@ import pytest
 
 from tribes import ai, mapgen
 from tribes.model import Tile, World
-from tribes.rules import MAX_ROUNDS, Terrain, UnitType
+from tribes.rules import MAX_ROUNDS, Resource, Tech, Terrain, UnitType
 
 
 def flat_world(size: int = 10, tribes: int = 2) -> World:
@@ -62,6 +62,7 @@ def test_surrounded_ai_without_an_army_surrenders_its_occupied_cities() -> None:
     assert city.tribe == 1
     assert world.winner == 1
     assert any("surrendered" in line for line in world.log)
+    assert World.from_dict(world.to_dict()).tribes[0].surrendered
     check_invariants(world)
 
 
@@ -90,6 +91,24 @@ def test_ai_only_concedes_when_recovery_is_impossible(round_number, stars, army,
         assert world.city_at(city.pos) is None
         assert world.tile(city.pos).village
         assert world.owner_of(city.pos) is None
+    check_invariants(world)
+
+
+def test_armyless_ai_uses_city_rewards_to_recover_before_conceding() -> None:
+    """An affordable harvest can unlock recruitment cash even on the final round."""
+    world = flat_world()
+    world.round = MAX_ROUNDS
+    tribe = world.tribes[0]
+    tribe.stars = 1
+    tribe.techs.update((Tech.CONSTRUCTION, Tech.HUNTING))
+    city = world.capital_of(0)
+    city.level, city.population = 2, 2
+    world.tile((1, 2)).resource = Resource.GAME
+
+    ai.take_turn(world, 0, random.Random(1))
+
+    assert tribe.alive and not tribe.surrendered
+    assert world.tribe_units(0)
     check_invariants(world)
 
 

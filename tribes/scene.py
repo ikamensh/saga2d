@@ -3,19 +3,23 @@
 from __future__ import annotations
 
 import math
+import json
 import random
 from collections import deque
 from typing import Any
+from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from saga2d import (
     Anchor, Button, Camera, Column, Delay, InputEvent, KeyHints, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer,
-    Row, Scene, Sequence, Sprite, Style,
+    Row, SaveError, Scene, Sequence, Sprite, Style,
 )
 from tribes import ai, effects, mapgen
 from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, TilePulse, Toast, hop, play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, REWARDS, TECHS, UNITS, Reward, Tech, UnitType
-from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE, SEMIBOLD
+from tribes.scores import HighScores
+from tribes.score_scene import HighScoresScene
+from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE, RESULTS_STYLE, SEMIBOLD
 from tribes.textures import FOG, TILE
 from tribes.view import MapView, Selection, rgba, tile_at, tile_center, tint
 
@@ -61,9 +65,12 @@ class MapScene(Scene):
         ("f1", "slash", "question"): "open_help",
     }
 
-    def __init__(self, world: World, seed: int, *, settings: dict[str, Any] | None = None, stats: dict[str, int] | None = None) -> None:
+    def __init__(self, world: World, seed: int, *, settings: dict[str, Any] | None = None,
+                 stats: dict[str, int] | None = None, run_id: str | None = None) -> None:
         self.world = world
         self.seed = seed
+        self.run_id = run_id if run_id is not None else str(uuid4())
+        self._game_over_shown = False
         self.rng = random.Random(seed)
         self.human = next(t.id for t in world.tribes if t.human)
         self.cursor: Pos = (0, 0)
@@ -567,12 +574,13 @@ class MapScene(Scene):
                 place = f"in {where.name}" if where is not None and where.tribe == self.human else f"at ({unit.x}, {unit.y})"
                 news.append(f"{unit_type.value.title()} {place} took {hp - unit.hp} damage")
         for line in world.log[before["log"]:]:
-            if line.endswith("has fallen") and self.tribe.name not in line:
+            if (line.endswith("has fallen") or "surrendered:" in line) and self.tribe.name not in line:
                 news.append(line)
         return len(lost), news[:6]
 
     def _check_game_over(self) -> None:
-        if self.world.winner is not None:
+        if self.world.winner is not None and not self._game_over_shown:
+            self._game_over_shown = True
             self.sfx("victory" if self.world.winner == self.human else "defeat")
             self.game.push(GameOverScene(self))
 
@@ -689,6 +697,8 @@ class MapScene(Scene):
         self._update_hover()
         self._update_info()
         self._offer_reward()
+        if self.game.scene is self:
+            self._check_game_over()
 
     def _offer_reward(self) -> None:
         """A city that reached a new level asks for its reward as soon as the map is on top."""
@@ -803,11 +813,13 @@ class MapScene(Scene):
     # -- Save / load ---------------------------------------------------------------
 
     def get_save_state(self) -> dict:
-        return {"seed": self.seed, "world": self.world.to_dict(), "stats": self.stats, "settings": self.settings}
+        return {"seed": self.seed, "world": self.world.to_dict(), "stats": self.stats, "settings": self.settings, "run_id": self.run_id}
 
     def load_save_state(self, state: dict) -> None:
         self.world = World.from_dict(state["world"])
         self.seed = state["seed"]
+        self.run_id = _saved_run_id(state)
+        self._game_over_shown = False
         self.stats = {**self.stats, **state.get("stats", {})}
         self.settings = {**self.settings, **state.get("settings", {})}
         self.effects.clear()
@@ -1236,19 +1248,52 @@ class GameOverScene(_Overlay):
         winner = world.tribes[world.winner]
         won = winner.id == scene.human
         panel = self.panel("Victory!" if won else f"Defeat — {winner.name} wins")
+        panel.style = RESULTS_STYLE
+        rounds = min(world.round, MAX_ROUNDS)
         cities = len(world.tribe_cities(scene.human))
         panel.add(Label(
-            f"{_plural(world.round, 'round')} · {cities} {'city' if cities == 1 else 'cities'} held · "
+            f"{_plural(rounds, 'round')} · {cities} {'city' if cities == 1 else 'cities'} held · "
             f"{_plural(scene.stats['cities_taken'], 'capture')} · {_plural(scene.stats['units_killed'], 'kill')} · "
             f"{_plural(scene.stats['units_lost'], 'unit')} lost",
             text_style="body",
         ))
-        for tribe in sorted(world.tribes, key=lambda t: -world.score(t.id)):
-            panel.add(Row(Label(tribe.name, text_style="heading", width=150, text_color=rgba(tribe.color)),
-                          Label(f"{world.score(tribe.id)} points", text_style="hud", width=110, align="right"), spacing=0))
-        panel.add(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=260))
-        panel.add(Button("Back to title", hotkey="T", on_click=self.back_to_title, style=GHOST_BUTTON, width=260))
-        panel.add(Button("Quit", hotkey="Q", on_click=self.quit, style=GHOST_BUTTON, width=260))
+        points = world.score_breakdown(scene.human, final=True)
+        report = Column(spacing=2, width=330)
+        report.add(Label("Your score", text_style="heading"))
+        report.add(Label(f"{sum(points.values()):,}", text_style="banner", font_size=30, text_color=GOLD))
+        for name, value in points.items():
+            report.add(Row(Label(name, text_style="body", font_size=13, width=235),
+                           Label(f"{value:,}", text_style="hud", font_size=13, width=80, align="right"), spacing=0))
+        standings = Column(spacing=6, width=330, height=self.measure(report)[1])
+        standings.add(Label("Final standings", text_style="heading"))
+        standings.add(Row(Label("Tribe", text_style="caption", width=90),
+                          Label("Result", text_style="caption", width=115),
+                          Label("Empire", text_style="caption", width=95, align="right"), spacing=0))
+        for tribe in sorted(world.tribes, key=lambda t: (t.id != world.winner, not t.alive, -world.score(t.id))):
+            status = "Winner" if tribe.id == world.winner else "Surrendered" if tribe.surrendered else "Fallen" if not tribe.alive else "Survived"
+            standings.add(Row(Label(tribe.name, text_style="body", width=90, text_color=rgba(tribe.color)),
+                              Label(status, text_style="sub", width=115),
+                              Label(f"{world.score(tribe.id):,}", text_style="sub", width=95, align="right"), spacing=0))
+        reason = "Round limit reached; highest empire score wins." if world.round > MAX_ROUNDS else "All rival tribes defeated." if won else "Your last city fell."
+        standings.add(Label(reason, text_style="sub", width=300, wrap=True))
+        panel.add(Row(report, standings, spacing=24))
+        panel.add(Label("Victory +1,000 · Early finish +50 per round remaining", text_style="sub"))
+        self.score_error = None
+        try:
+            rank = HighScores(self.game.data_dir).record(world, tribe=scene.human, seed=scene.seed, run_id=scene.run_id)
+            message = f"Your run's best: #{rank} locally" if rank is not None else "Outside the local top 10"
+            panel.add(Label(f"{message} · {world.size}×{world.size} · {len(world.tribes)} tribes", text_style="hud", text_color=GOLD))
+        except SaveError as error:
+            self.score_error = str(error)
+            panel.add(Label("Score could not be saved. Open High scores for details.", text_style="sub", text_color=BAD))
+        panel.add(Row(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=165),
+                      Button("High scores", shortcut="L", on_click=self.high_scores, style=GHOST_BUTTON, width=165),
+                      Button("Back to title", hotkey="T", on_click=self.back_to_title, style=GHOST_BUTTON, width=165),
+                      Button("Quit", hotkey="Q", on_click=self.quit, style=GHOST_BUTTON, width=165), spacing=8))
+
+    def high_scores(self) -> None:
+        scene = self.map_scene
+        self.game.push(HighScoresScene(size=scene.world.size, tribes=len(scene.world.tribes), highlight=scene.run_id, error=self.score_error))
 
     def new_game(self) -> None:
         scene = self.map_scene
@@ -1257,7 +1302,8 @@ class GameOverScene(_Overlay):
     def back_to_title(self) -> None:
         from tribes.title import TitleScene
 
-        self.game.clear_and_push(TitleScene(settings=self.map_scene.settings))
+        scene = self.map_scene
+        self.game.clear_and_push(TitleScene(size=scene.world.size, tribes=len(scene.world.tribes), settings=scene.settings))
 
     def quit(self) -> None:
         self.game.quit()
@@ -1270,4 +1316,11 @@ def new_game(seed: int, size: int = 14, tribes: int = 3, *, settings: dict[str, 
 def load_game(state: dict[str, Any], *, settings: dict[str, Any] | None = None) -> MapScene:
     """A map scene from a save slot's ``state`` (see :meth:`MapScene.get_save_state`)."""
     return MapScene(World.from_dict(state["world"]), state["seed"], settings={**state.get("settings", {}), **(settings or {})},
-                    stats=state.get("stats"))
+                    stats=state.get("stats"), run_id=_saved_run_id(state))
+
+
+def _saved_run_id(state: dict[str, Any]) -> str:
+    """Old saves get a stable identity so repeatedly loading one cannot flood the board."""
+    if "run_id" in state:
+        return state["run_id"]
+    return str(uuid5(NAMESPACE_URL, json.dumps(state["world"], sort_keys=True)))

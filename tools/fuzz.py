@@ -83,7 +83,7 @@ def ai_games(seeds: range, *, budget: CpuBudget | None = None) -> int:
     return failures
 
 
-MONKEY_KEYS = [k for keys in MapScene.controls for k in ((keys,) if isinstance(keys, str) else keys)] + list("12345sn")
+MONKEY_KEYS = [k for keys in MapScene.controls for k in ((keys,) if isinstance(keys, str) else keys)] + list("12345snlmp")
 
 
 def monkey_runs(seeds: range, steps: int = 600, *, budget: CpuBudget | None = None) -> int:

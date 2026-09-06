@@ -70,6 +70,7 @@ class HighScores:
                            world.size, len(world.tribes), seed, world.winner == tribe,
                            datetime.now(timezone.utc).isoformat())
         entries = self.load()
+        original = entries
         previous = next((e for e in entries if e.run_id == run_id), None)
         if previous is None or self._order(entry) < self._order(previous):
             entries = [e for e in entries if e.run_id != run_id] + [entry]
@@ -82,7 +83,8 @@ class HighScores:
                 if counts[board] <= 10:
                     kept.append(candidate)
             entries = kept
-            self.saves.save(1, {"version": 1, "entries": [asdict(e) for e in entries]}, "TribesHighScores")
+            if entries != original:
+                self.saves.save(1, {"version": 1, "entries": [asdict(e) for e in entries]}, "TribesHighScores")
         table = [e for e in entries if (e.size, e.tribes) == (entry.size, entry.tribes)]
         return next((i for i, e in enumerate(table, 1) if e.run_id == run_id), None)
 

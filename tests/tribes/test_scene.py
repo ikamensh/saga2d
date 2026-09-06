@@ -6,14 +6,14 @@ from saga2d import Game
 from tribes import effects
 from tribes.style import build_theme
 from tribes.rules import Tech, Terrain, UnitType
-from tribes.scene import HIT_TIME, START_ZOOM, GameOverScene, MapScene, PauseScene, RewardScene, SettingsScene, TechScene, new_game
+from tribes.scene import HIT_TIME, START_ZOOM, GameOverScene, MapScene, PauseScene, RewardScene, SettingsScene, TechScene, load_game, new_game
 from tribes.title import NewGameScene, TitleScene
 from tribes.view import tile_center, tint
 
 
 @pytest.fixture
 def game(tmp_path):
-    g = Game("Tribes Test", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=tmp_path)
+    g = Game("Tribes Test", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=tmp_path / "saves")
     yield g
     g._teardown()
 
@@ -229,6 +229,111 @@ def test_game_over_overlay_appears_when_the_player_wins(play) -> None:
     assert any("Victory" in t for t in shown)
     assert any("round" in t and "held" in t for t in shown)
     assert any("Back to title" in t for t in shown)
+
+
+def test_finished_save_opens_results_and_persists_one_record_across_sessions(tmp_path) -> None:
+    """A result is recorded automatically, remains reachable from title, and survives game restart."""
+    from tribes.scores import HighScores
+    from tribes.score_scene import HighScoresScene
+
+    game = Game("Tribes Scores", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=tmp_path / "saves")
+    try:
+        scene = new_game(seed=7, size=11, tribes=2)
+        state = scene.get_save_state()
+        state["world"]["winner"] = 0
+        state["world"]["round"] = 31
+        game.push(load_game(state))
+        game.tick(1 / 60)
+        assert isinstance(game.scene, GameOverScene)
+        assert "Your score" in texts(game)
+        assert any("30 rounds" in t for t in texts(game))
+        assert not any("31 rounds" in t for t in texts(game))
+        press(game, "l")
+        assert isinstance(game.scene, HighScoresScene)
+        assert "Victory" in texts(game)
+        press(game, "escape")
+        assert isinstance(game.scene, GameOverScene)
+        press(game, "t")
+        press(game, "l")
+        assert isinstance(game.scene, HighScoresScene)
+        assert "Victory" in texts(game)
+    finally:
+        game.close()
+    restarted = Game("Tribes Scores", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=tmp_path / "saves")
+    try:
+        restarted.push(load_game(state))
+        restarted.tick(1 / 60)
+        assert isinstance(restarted.scene, GameOverScene)
+        assert len(HighScores(tmp_path).load()) == 1
+    finally:
+        restarted.close()
+
+
+def test_high_scores_empty_setup_switching_and_storage_failure_stay_navigable(game) -> None:
+    """An empty or damaged table is visible, and neither state traps the player."""
+    from tribes.score_scene import HighScoresScene
+
+    game.push(TitleScene(size=11, tribes=2))
+    game.tick(1 / 60)
+    press(game, "l")
+    assert isinstance(game.scene, HighScoresScene)
+    assert any("No completed games" in t for t in texts(game))
+    press(game, "m")
+    assert "Map 14×14" in texts(game)
+    press(game, "p")
+    assert "3 tribes" in texts(game)
+    press(game, "escape")
+    path = game.data_dir / "high_scores" / "save_1.json"
+    path.parent.mkdir(parents=True)
+    path.write_text("{broken")
+    scene = new_game(seed=7)
+    scene.world.winner = 0
+    game.clear_and_push(scene)
+    game.tick(1 / 60)
+    assert isinstance(game.scene, GameOverScene)
+    assert any("Score could not be saved" in t for t in texts(game))
+    press(game, "l")
+    assert any("Cannot load" in t for t in texts(game))
+    press(game, "escape")
+    press(game, "t")
+    assert isinstance(game.scene, TitleScene)
+    assert path.read_text() == "{broken"
+
+
+def test_run_identity_survives_saving_and_loading_old_and_new_saves(play) -> None:
+    """Quick load restores the saved run, and older saves get stable duplicate protection."""
+    game, scene = play
+    state = scene.get_save_state()
+    restored = load_game(state)
+    assert restored.run_id == scene.run_id
+    other = new_game(seed=scene.seed)
+    assert other.run_id != scene.run_id
+    press(game, "f5")
+    game.clear_and_push(other)
+    game.tick(1 / 60)
+    press(game, "f9")
+    assert other.run_id == scene.run_id
+    del state["run_id"]
+    assert load_game(state).run_id == load_game(state).run_id
+
+
+def test_title_subtitle_stays_above_the_first_menu_action(game) -> None:
+    """Adding a menu item must not move a button across the separately drawn title."""
+    from saga2d import Button
+
+    game.push(TitleScene())
+    for _ in range(3):
+        game.tick(1 / 60)
+
+    def descendants(component):
+        yield component
+        for child in component.children:
+            yield from descendants(child)
+
+    start = next(c for c in descendants(game.scene.ui) if isinstance(c, Button) and c.text == "New game")
+    subtitle = next(t for t in game.backend.texts if t["text"].startswith("Capture villages"))
+    _, height = game.backend.measure_text(subtitle["text"], subtitle["font_size"], subtitle["font"])
+    assert subtitle["y"] + height / 2 < start.bounds[1]
 
 
 # -- Title screen ----------------------------------------------------------------
