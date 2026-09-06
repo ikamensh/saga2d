@@ -30,16 +30,15 @@ recruitment, harvesting and city rewards. It protects an immediately affordable
 recovery unit from research or harvest spending. Then it concedes if:
 
 - Every remaining city is occupied by enemies, preventing recruitment; or
-- Its treasury plus all remaining turn income cannot pay for the cheapest
-  unlocked unit before the round limit, or it has no cities to recruit from.
+- It has no cities to recruit from.
 
-An empty treasury alone is insufficient: an open city that can fund a future
-unit keeps the AI alive. Pending rewards are resolved before the decision.
+An empty treasury alone is insufficient: every Tribes city generates income,
+so an open city can fund a future unit. A cash shortage on the final turn also
+does not forfeit a possible score victory. Pending rewards are resolved before the decision.
 Humans never surrender automatically. Existing elimination on losing the last
 city remains unchanged.
 
-Occupied cities pass to their occupying tribes. Unoccupied surrendered cities
-become villages and their territory becomes unowned. Surrendered tribes leave
+Occupied cities pass to their occupying tribes. Surrendered tribes leave
 the turn order and are explicitly marked in the log and final standings. These
 changes and the surrender marker survive save/load.
 

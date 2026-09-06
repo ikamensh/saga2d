@@ -716,19 +716,21 @@ class World:
             self.explore(tribe, unit.pos, self._vision(unit))
 
     def surrender_reason(self, tribe: int) -> str | None:
-        """Check after harvesting / rewards: no army and no funded recruitment path."""
+        """Check after rewards: an armyless AI needs an unoccupied recruitment city.
+
+        Every city generates income, so low cash alone never makes a position
+        hopeless. The round limit can still award an armyless empire a score win.
+        """
         t = self.tribes[tribe]
         if t.human or not t.alive or self.winner is not None or self.tribe_units(tribe):
             return None
         if self.pending_rewards(tribe):
             return None  # resolve rewards before judging the economy
         cities = self.tribe_cities(tribe)
-        if cities and all(self.unit_at(city.pos) is not None for city in cities):
+        if not cities:
+            return "no army and no city to recruit from"
+        if all(self.unit_at(city.pos) is not None for city in cities):
             return "no army and every city occupied"
-        cheapest = min(info.cost for info in UNITS.values() if self.has_tech(tribe, info.tech))
-        remaining_income = max(0, MAX_ROUNDS - self.round) * self.income(tribe)
-        if not cities or t.stars + remaining_income < cheapest:
-            return "no army and cannot fund a unit before the round limit"
         return None
 
     def surrender(self, tribe: int) -> None:
@@ -739,19 +741,10 @@ class World:
             raise RuleError("This tribe can still fight or rebuild")
         for city in self.tribe_cities(tribe):
             occupant = self.unit_at(city.pos)
-            if occupant is not None:
-                city.tribe = occupant.tribe
-                city.capital = False
-                self.explore(occupant.tribe, city.pos, city.radius)
-            else:
-                # Nobody receives free unoccupied cities: they can be settled again.
-                for tile in self.all_tiles():
-                    if tile.owner_city == city.id:
-                        tile.owner_city = None
-                tile = self.tile(city.pos)
-                tile.city_id = None
-                tile.village = True
-                del self.cities[city.id]
+            assert occupant is not None
+            city.tribe = occupant.tribe
+            city.capital = False
+            self.explore(occupant.tribe, city.pos, city.radius)
         self.tribes[tribe].surrendered = True
         self.log.append(f"{self.tribes[tribe].name} surrendered: {reason}")
         self._check_elimination()

@@ -66,13 +66,13 @@ def test_surrounded_ai_without_an_army_surrenders_its_occupied_cities() -> None:
     check_invariants(world)
 
 
-@pytest.mark.parametrize("round_number,stars,army,occupied,concedes", [
-    (1, 0, False, False, False),  # future income funds a recovery
-    (MAX_ROUNDS, 2, False, False, False),  # can recruit now
-    (MAX_ROUNDS, 1, False, False, True),  # no remaining income before the limit
-    (1, 0, True, True, False),  # surviving army can liberate the city
+@pytest.mark.parametrize("round_number,stars,army,occupied", [
+    (1, 0, False, False),  # future income funds a recovery
+    (MAX_ROUNDS, 2, False, False),  # can recruit now
+    (MAX_ROUNDS, 1, False, False),  # a solvent empire can still win on score
+    (1, 0, True, True),  # surviving army can liberate the city
 ])
-def test_ai_only_concedes_when_recovery_is_impossible(round_number, stars, army, occupied, concedes) -> None:
+def test_ai_keeps_playing_when_it_can_fight_or_rebuild(round_number, stars, army, occupied) -> None:
     """Lack of cash alone is not defeat; remaining income and troops matter."""
     world = flat_world()
     world.round = round_number
@@ -85,12 +85,8 @@ def test_ai_only_concedes_when_recovery_is_impossible(round_number, stars, army,
 
     ai.take_turn(world, 0, random.Random(1))
 
-    assert world.tribes[0].surrendered == concedes
-    assert world.tribes[0].alive != concedes
-    if concedes:
-        assert world.city_at(city.pos) is None
-        assert world.tile(city.pos).village
-        assert world.owner_of(city.pos) is None
+    assert not world.tribes[0].surrendered
+    assert world.tribes[0].alive
     check_invariants(world)
 
 
@@ -110,6 +106,19 @@ def test_armyless_ai_uses_city_rewards_to_recover_before_conceding() -> None:
     assert tribe.alive and not tribe.surrendered
     assert world.tribe_units(0)
     check_invariants(world)
+
+
+def test_cash_shortage_on_the_final_round_does_not_forfeit_a_score_victory() -> None:
+    """The round limit already ends play; a leading empire should not concede for lack of cash."""
+    world = flat_world()
+    world.round = MAX_ROUNDS
+    world.tribes[0].stars = 1
+    world.tribes[0].techs.update(Tech)
+
+    ai.take_turn(world, 0, random.Random(1))
+    assert world.tribes[0].alive
+    ai.take_turn(world, 1, random.Random(1))
+    assert world.winner == 0
 
 
 def test_ai_captures_the_village_it_stands_on() -> None:
