@@ -357,3 +357,22 @@ G01–G19 remain incomplete. Twelve relics, more meaningful authored patterns,
 whole-campaign build/difficulty comparisons and ability-aware automatic play
 are continuing. A new frozen artifact, candidate-specific stress, Windows
 runtime, text scaling, human playtests and listening review remain required.
+
+## Authored rout presentation and combined control integration — 2026-09-06
+
+- Merged the validated control/flight automatic policy and finite Smoke-order
+  validation; its source-specific evidence and attrition debt are in
+  [eador-control-model.md](eador-control-model.md).
+- Pack Hunt's initial model tracer now uses an explicit game-owned encounter
+  objective. Its briefing and Codex correctly describe an untimed rout, show
+  each deployment and fee, and preserve cancellation and saved entry decisions.
+  Tactical rout battles now state their objective above the board. All site
+  briefings show their remaining finite defender HP.
+- This is the presentation checkpoint, not completion of Pack Hunt's authored
+  content gate: manual route comparison and deployment tuning are still in
+  progress. No Saga2D scenario API was added.
+- Combined source passed **861 full tests**, 60 Tribes AI games and 20 random
+  Tribes input runs, plus 12 linked model campaigns and 12 linked scene runs
+  (2,227 inputs). Both Pack Hunt entry choices were captured and inspected
+  natively: 22 inputs, two exact quicksave/reloads, free cancellation, correct
+  rout briefing/board/Codex. Final reward/guardian copy passed 11 focused tests.
