@@ -8,6 +8,7 @@ from saga2d import HexGrid
 
 from eador.model import Hero, Pos, RuleError, UNITS
 from eador.encounters import ENCOUNTERS
+from eador.sight import line_of_sight
 
 
 @dataclass(frozen=True)
@@ -25,6 +26,12 @@ SPELLS = {
     'bolt': SpellSpec('Arcane Bolt', 4, 'Deal 14 damage to an enemy within 4 hexes.'),
     'heal': SpellSpec('Heal', 4, 'Restore 16 health to a living ally within 4 hexes.'),
 }
+
+
+@dataclass(frozen=True)
+class SmokeCloud:
+    pos: Pos
+    expires_before_team: str
 
 
 @dataclass(frozen=True)
@@ -58,6 +65,19 @@ class BattleUnit:
     pinned: bool = False
     pin_cooldown: int = 0
     cargo_penalty: int = 0
+    spent_abilities: tuple[str, ...] = ()
+
+    @property
+    def can_fly(self) -> bool:
+        return 'fly' in self.abilities
+
+    @property
+    def can_repulse(self) -> bool:
+        return 'repulse' in self.abilities
+
+    @property
+    def can_smoke(self) -> bool:
+        return 'smoke' in self.abilities
 
     @property
     def can_rally(self) -> bool:
@@ -121,6 +141,8 @@ class Battle:
     hero_id: int | None = 0
     objective: BattleObjective = field(default_factory=BattleObjective)
     outcome_reason: str | None = None
+    sight_rules: str = 'terrain'
+    smoke_clouds: list[SmokeCloud] = field(default_factory=list)
 
     @classmethod
     def create(cls, hero: Hero, enemies: list[str], terrain: str,
@@ -221,16 +243,25 @@ class Battle:
         if not unit.alive or unit.moved or (unit.acted and not unit.skirmisher) or self.outcome:
             return set()
         occupied = {other.pos for other in self.units if other.alive and other.id != unit.id}
-        cells = self.grid.reachable(unit.pos, unit.effective_move_range, blocked=occupied,
-                                    cost=lambda pos: 2 if self.terrain[pos] in ('forest', 'marsh') and not unit.terrain_walk else 1)
-        return set(cells) - {unit.pos}
+        cells = self.grid.reachable(unit.pos, unit.effective_move_range, blocked=() if unit.can_fly else occupied,
+                                    cost=lambda pos: 2 if self.terrain[pos] in ('forest', 'marsh')
+                                    and not (unit.terrain_walk or unit.can_fly) else 1)
+        return set(cells) - occupied - {unit.pos}
+
+    def has_sight(self, source: Pos, target: Pos) -> bool:
+        """Forest/cloud visibility shared by targeting, previews and route evaluation."""
+        return self.sight_rules == 'open' or line_of_sight(self.terrain, source, target,
+                                                          smoke={cloud.pos for cloud in self.smoke_clouds})
 
     def targets(self, unit_id: int) -> list[BattleUnit]:
-        unit = self.unit(unit_id)
+        return self._targets_from(self.unit(unit_id), self.unit(unit_id).pos)
+
+    def _targets_from(self, unit: BattleUnit, pos: Pos) -> list[BattleUnit]:
         if not unit.alive or unit.acted or self.outcome:
             return []
         return [other for other in self.units if other.alive and other.team != unit.team
-                and HexGrid.distance(unit.pos, other.pos) <= unit.attack_range]
+                and HexGrid.distance(pos, other.pos) <= unit.attack_range
+                and (unit.attack_range == 1 or self.has_sight(pos, other.pos))]
 
     def move(self, unit_id: int, destination: Pos) -> None:
         unit = self._actor(unit_id)
@@ -250,7 +281,8 @@ class Battle:
         if not unit.alive or not unit.can_pin or unit.pin_cooldown or unit.acted or self.outcome:
             return []
         return [other for other in self.units if other.alive and other.team != unit.team
-                and not other.pinned and HexGrid.distance(unit.pos, other.pos) <= 3]
+                and not other.pinned and HexGrid.distance(unit.pos, other.pos) <= 3
+                and self.has_sight(unit.pos, other.pos)]
 
     def pin_preview(self, unit_id: int, target_id: int) -> tuple[int, int]:
         """Forecast actual Pin damage and any adjacent defensive reaction, without mutation."""
@@ -271,6 +303,56 @@ class Battle:
         unit.stance = 'brace' if unit.can_brace else 'guard'
         unit.moved = unit.acted = True
         self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
+
+    def repulse_targets(self, unit_id: int) -> list[BattleUnit]:
+        unit = self.unit(unit_id)
+        if not unit.alive or not unit.can_repulse or unit.acted or 'repulse' in unit.spent_abilities or self.outcome:
+            return []
+        occupied = {other.pos for other in self.units if other.alive}
+        return [other for other in self.units if other.alive and other.team != unit.team and other.stance is None
+                and self.grid.distance(unit.pos, other.pos) == 1
+                and (landing := self._repulse_destination(unit, other)) in self.terrain and landing not in occupied]
+
+    @staticmethod
+    def _repulse_destination(unit: BattleUnit, target: BattleUnit) -> Pos:
+        return 2 * target.pos[0] - unit.pos[0], 2 * target.pos[1] - unit.pos[1]
+
+    def repulse_preview(self, unit_id: int, target_id: int) -> Pos:
+        target = self.unit(target_id)
+        if target not in self.repulse_targets(unit_id):
+            raise RuleError('Repulse needs an unused charge, an adjacent unanchored enemy and an empty landing hex.')
+        return self._repulse_destination(self.unit(unit_id), target)
+
+    def repulse(self, unit_id: int, target_id: int) -> None:
+        self._repulse(self._actor(unit_id), self.unit(target_id))
+
+    def _repulse(self, unit: BattleUnit, target: BattleUnit) -> None:
+        target.pos = self.repulse_preview(unit.id, target.id)
+        unit.spent_abilities += ('repulse',)
+        unit.acted = unit.moved = True
+        self.log.append(f'{unit.name} repulses {target.name} to {target.pos}.')
+
+    def smoke_targets(self, unit_id: int) -> set[Pos]:
+        unit = self.unit(unit_id)
+        if not unit.alive or not unit.can_smoke or unit.acted or 'smoke' in unit.spent_abilities or self.outcome:
+            return set()
+        cloudy = {cloud.pos for cloud in self.smoke_clouds}
+        return {pos for pos in self.terrain if pos not in cloudy and self.grid.distance(unit.pos, pos) <= 3
+                and self.has_sight(unit.pos, pos)}
+
+    def smoke_preview(self, unit_id: int, pos: Pos) -> SmokeCloud:
+        if pos not in self.smoke_targets(unit_id):
+            raise RuleError('Smoke needs an unused charge and a clear hex within three hexes.')
+        return SmokeCloud(pos, self.unit(unit_id).team)
+
+    def smoke(self, unit_id: int, pos: Pos) -> None:
+        self._smoke(self._actor(unit_id), pos)
+
+    def _smoke(self, unit: BattleUnit, pos: Pos) -> None:
+        self.smoke_clouds.append(self.smoke_preview(unit.id, pos))
+        unit.spent_abilities += ('smoke',)
+        unit.acted = unit.moved = True
+        self.log.append(f'{unit.name} screens {pos} with smoke until its next turn.')
 
     def rally_targets(self, unit_id: int) -> list[BattleUnit]:
         """Living pinned adjacent allies; clearing Pin never refreshes their orders."""
@@ -420,6 +502,7 @@ class Battle:
             return []
         return [target for target in self.units if target.alive
                 and HexGrid.distance(caster.pos, target.pos) <= 4
+                and self.has_sight(caster.pos, target.pos)
                 and (target.team != caster.team if spell == 'bolt'
                      else target.team == caster.team and target.hp < target.max_hp)]
 
@@ -428,7 +511,7 @@ class Battle:
         self._caster(spell, caster_id)
         target = self.unit(target_id)
         if target not in self.spell_targets(spell, caster_id=caster_id):
-            raise RuleError('Choose a wounded ally for Heal or an enemy for Bolt within 4 hexes.')
+            raise RuleError('Choose a visible wounded ally for Heal or an enemy for Bolt within 4 hexes.')
         return min(self.spell_power[spell], target.max_hp - target.hp if spell == 'heal' else target.hp)
 
     def cast(self, spell: str, target_id: int, *, caster_id: int | None = None) -> None:
@@ -549,12 +632,11 @@ class Battle:
                         self.move(unit.id, min(escapes))
                         self.evacuate()
                         continue
-                injured = [u for u in self.units if u.alive and u.team == team and u.max_hp - u.hp >= 12
-                           and HexGrid.distance(unit.pos, u.pos) <= 4]
+                injured = [u for u in self.spell_targets('heal') if u.max_hp - u.hp >= 12]
                 if 'heal' in self.spells and self.mana >= self.spell_cost('heal') and injured:
                     self.cast('heal', min(injured, key=lambda u: u.hp / u.max_hp).id)
                     continue
-                enemies = [u for u in self.units if u.alive and u.team != team and HexGrid.distance(unit.pos, u.pos) <= 4]
+                enemies = self.spell_targets('bolt')
                 if 'bolt' in self.spells and self.mana >= self.spell_cost('bolt') and enemies:
                     self.cast('bolt', min(enemies, key=lambda u: u.hp).id)
                     continue
@@ -589,7 +671,7 @@ class Battle:
                     def score(pos):
                         distances = [HexGrid.distance(pos, enemy.pos) for enemy in enemies]
                         distance = min(distances)
-                        can_attack = distance <= unit.attack_range
+                        can_attack = bool(self._targets_from(unit, pos))
                         cover = self.terrain[pos] in ('forest', 'hills')
                         return (not can_attack, max(0, distance - unit.attack_range), not cover,
                                 -distance if can_attack else distance, pos)
@@ -638,6 +720,7 @@ class Battle:
     def end_turn(self) -> None:
         if self.outcome:
             raise RuleError('The battle is over.')
+        self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != 'enemy']
         # Enemy actions begin fresh; retaliation refreshes once per full round.
         for unit in self.units:
             if unit.team == 'player':
@@ -653,6 +736,7 @@ class Battle:
         if not self.outcome:
             self._objective_turn()
         if not self.outcome:
+            self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != 'player']
             self.round += 1
             for unit in self.units:
                 unit.moved = unit.acted = unit.retaliated = False
@@ -677,15 +761,17 @@ class Battle:
                 'mana': self.mana, 'spells': sorted(self.spells), 'round': self.round,
                 'outcome': self.outcome, 'log': list(self.log),
                 'spell_costs': dict(self.spell_costs), 'spell_power': dict(self.spell_power), 'hero_id': self.hero_id,
-                'objective': asdict(self.objective), 'outcome_reason': self.outcome_reason}
+                'objective': asdict(self.objective), 'outcome_reason': self.outcome_reason,
+                'sight_rules': self.sight_rules, 'smoke_clouds': [asdict(cloud) for cloud in self.smoke_clouds]}
 
     @classmethod
     def from_dict(cls, data: dict) -> Battle:
-        return cls(units=[BattleUnit(**{**u, 'pos': tuple(u['pos']), 'abilities': tuple(u['abilities'])}) for u in data['units']],
+        return cls(units=[BattleUnit(**{**u, 'pos': tuple(u['pos']), 'abilities': tuple(u['abilities']), 'spent_abilities': tuple(u['spent_abilities'])}) for u in data['units']],
                    terrain={tuple(t['pos']): t['kind'] for t in data['terrain']},
                    mana=data['mana'], spells=set(data['spells']), round=data['round'],
                    outcome=data['outcome'], log=list(data['log']),
                    spell_costs=dict(data['spell_costs']), spell_power=dict(data['spell_power']), hero_id=data['hero_id'],
                    objective=BattleObjective(**{**data['objective'], 'target': tuple(data['objective']['target']) if data['objective']['target'] is not None else None,
                                                 'exits': tuple(tuple(pos) for pos in data['objective']['exits'])}),
-                   outcome_reason=data['outcome_reason'])
+                   outcome_reason=data['outcome_reason'], sight_rules=data['sight_rules'],
+                   smoke_clouds=[SmokeCloud(tuple(cloud['pos']), cloud['expires_before_team']) for cloud in data['smoke_clouds']])

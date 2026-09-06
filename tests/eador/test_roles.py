@@ -199,7 +199,7 @@ def test_a_paid_support_army_rotates_after_shooting_and_extracts_its_seal_holder
     from eador.model import State
     from tests.eador.test_objectives import guard_army
     state = prepare_support_watch()
-    assert state.turn == 7 and {t.kind for t in state.hero.army} >= {'ranger', 'warden', 'healer'}
+    assert state.turn == 8 and {t.kind for t in state.hero.army} >= {'ranger', 'warden', 'healer'}
     battle = state.battle
     for uid, destination in ((1, (1, 0)), (3, (0, -1)), (2, (0, 0)), (6, (0, 1)),
                              (4, (-1, 1)), (5, (-1, 0)), (0, (-1, -1))):

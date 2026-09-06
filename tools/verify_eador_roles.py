@@ -59,7 +59,7 @@ def verify(output, *, backend='pyglet'):
             player.capture('recruitment-second-page')
             player.press('escape')
             prepare_support_watch(player.state)
-            assert player.state.turn == 7 and isinstance(game.scene, BattleScene)
+            assert player.state.turn == 8 and isinstance(game.scene, BattleScene)
             for uid, destination in ((1, (1, 0)), (3, (0, -1)), (2, (0, 0)), (6, (0, 1)),
                                      (4, (-1, 1)), (5, (-1, 0)), (0, (-1, -1))):
                 move(uid, destination)

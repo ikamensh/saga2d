@@ -48,8 +48,11 @@ def test_loading_a_v6_archer_battle_preserves_its_exact_automatic_continuation()
         state.battle.auto_turn()
     actual = json.loads(json.dumps(state.battle.to_dict()))
     assert actual['objective'].pop('exits') == []
+    assert actual.pop('sight_rules') == 'open'
+    assert actual.pop('smoke_clouds') == []
     for unit in actual['units']:
         assert unit.pop('cargo_penalty') == 0
+        assert unit.pop('spent_abilities') == []
         for field in ('abilities', 'pinned', 'pin_cooldown'):
             unit.pop(field)
     assert actual == json.loads((fixture / 'v6_archer_battle_result.json').read_text())
