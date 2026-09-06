@@ -80,6 +80,7 @@ def test_a_real_v9_support_battle_retains_its_exact_continuation():
     actual = json.loads(state.to_json())
     expected = json.loads((fixture / 'v9_support_watch_result.json').read_text())
     actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual.pop('rules_id') == 'standard-1'
     expected['battle_adventure'] = None
     assert actual == expected
 

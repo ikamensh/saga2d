@@ -101,6 +101,7 @@ def test_an_existing_v10_ruins_battle_and_site_array_keep_their_actual_continuat
     actual = json.loads(state.to_json())
     expected = json.loads((fixtures / 'v10_ruins_battle_result.json').read_text())
     actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual.pop('rules_id') == 'standard-1'
     assert actual == expected
 
 

@@ -30,7 +30,12 @@ def test_existing_active_crossing_keeps_its_reward_and_exact_continuation():
     assert state.provinces[(0, 2)].site_relic == 'merchant_seal'
     assert not state.battle.unit(0).abilities
     finish_battle(state)
-    assert state.to_json() == (fixtures / 'v11_crossing_relic_result.json').read_text().strip()
+    import json
+    actual = json.loads(state.to_json())
+    expected = json.loads((fixtures / 'v11_crossing_relic_result.json').read_text())
+    assert actual.pop('rules_id') == 'standard-1'
+    actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual == expected
 
 
 def test_censer_uses_one_equipped_slot_and_cannot_change_power_during_combat():

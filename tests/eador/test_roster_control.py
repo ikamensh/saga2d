@@ -41,6 +41,7 @@ def test_new_militia_ability_saves_while_a_real_v10_extraction_continues_exactly
     actual = json.loads(legacy.to_json())
     expected = json.loads((fixtures / 'v10_pinned_crossing_result.json').read_text())
     actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual.pop('rules_id') == 'standard-1'
     assert actual == expected
 
 
