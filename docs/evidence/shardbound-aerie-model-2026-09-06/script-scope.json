@@ -1,0 +1,1488 @@
+[
+  {
+    "difficulty": "standard",
+    "seed": 0,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 0,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Not enough mana."
+  },
+  {
+    "difficulty": "standard",
+    "seed": 0,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 1,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 1,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 3,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 1,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 2,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: That unit has fallen."
+  },
+  {
+    "difficulty": "standard",
+    "seed": 2,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "standard",
+    "seed": 2,
+    "plan": "scout",
+    "turn": 4,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: That hex is occupied, out of reach, or this unit already moved."
+  },
+  {
+    "difficulty": "standard",
+    "seed": 7,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 7,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 3,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 7,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 19,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "standard",
+    "seed": 19,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Not enough mana."
+  },
+  {
+    "difficulty": "standard",
+    "seed": 19,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 0,
+    "plan": "western",
+    "turn": 10,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 0,
+    "plan": "northern",
+    "turn": 10,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 0,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 1,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: That unit has fallen."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 1,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 1,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 2,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: That unit has fallen."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 2,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 2,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 7,
+    "plan": "western",
+    "turn": 9,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Repulse needs an unused charge, an adjacent unanchored enemy and an empty landing hex."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 7,
+    "plan": "northern",
+    "turn": 9,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 7,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 19,
+    "plan": "western",
+    "turn": 9,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Repulse needs an unused charge, an adjacent unanchored enemy and an empty landing hex."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 19,
+    "plan": "northern",
+    "turn": 9,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        2
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "accessible",
+    "seed": 19,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 0,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 0,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 3,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 0,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 1,
+    "plan": "western",
+    "turn": 10,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: That unit has fallen."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 1,
+    "plan": "northern",
+    "turn": 10,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 1,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 2,
+    "plan": "western",
+    "turn": 10,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: That unit has fallen."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 2,
+    "plan": "northern",
+    "turn": 10,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 2,
+    "plan": "scout",
+    "turn": 4,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: That hex is occupied, out of reach, or this unit already moved."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 7,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 4,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 7,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "archer",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 3,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 7,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 19,
+    "plan": "western",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Unknown unit."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 19,
+    "plan": "northern",
+    "turn": 8,
+    "hero_level": 3,
+    "army": [
+      [
+        "militia",
+        3
+      ],
+      [
+        "militia",
+        3
+      ],
+      [
+        "pikeman",
+        2
+      ],
+      [
+        "adept",
+        2
+      ],
+      [
+        "skyrider",
+        1
+      ]
+    ],
+    "needs_adaptation": "RuleError: Choose an enemy in range; ranged shots need clear sight. Attack once per turn."
+  },
+  {
+    "difficulty": "challenge",
+    "seed": 19,
+    "plan": "scout",
+    "turn": 5,
+    "hero_level": 2,
+    "army": [
+      [
+        "militia",
+        2
+      ],
+      [
+        "militia",
+        2
+      ],
+      [
+        "archer",
+        2
+      ],
+      [
+        "pikeman",
+        1
+      ],
+      [
+        "warden",
+        1
+      ]
+    ],
+    "outcome": "rout",
+    "round": 5,
+    "dead": []
+  }
+]
