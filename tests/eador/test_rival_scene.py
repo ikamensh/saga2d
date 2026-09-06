@@ -129,3 +129,9 @@ def test_rival_reading_size_cancel_apply_and_restart_preserve_saved_forces(tmp_p
         assert root.state.to_json() == before
     finally:
         game._teardown()
+
+
+def test_earned_rival_operations_and_old_rules_remain_complete_at_both_reading_sizes(tmp_path):
+    """Every current order, wounded survivor, paid refit and old-rule warning is read without issuing a command."""
+    from tools.verify_eador_rival_reading import verify
+    verify(tmp_path, backend='mock')

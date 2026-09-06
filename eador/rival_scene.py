@@ -80,7 +80,7 @@ class RivalScene(Screen):
         self._display = self.game.window_size, reading_scale(self.game)
         scale = self._display[1] / 100
         self.x, self.y = self.game.width / 2 - 560, (self.game.height - 740) / 2
-        self._portraits, self._health_bars = [], []
+        self._troop_art = []
 
         def label(text, size=13, *, width=520, color=MUTED, serif=False, scaled=True):
             return Label(text, width=width, wrap=True, font='Georgia' if serif else 'Verdana',
@@ -124,8 +124,7 @@ class RivalScene(Screen):
                               label(f'{troop.hp}/{troop.max_hp} health', 11, width=166), spacing=12)
                 row = Row(portrait, Column(details, bar, spacing=6), spacing=12)
                 rows.append(row)
-                self._portraits.append((portrait, troop))
-                self._health_bars.append((bar, troop))
+                self._troop_art.append((portrait, bar, troop))
             self.ui.add(Column(force_heading, *rows))
             ids = [troop.id for troop in rival.army]
             anchor = ids.index(self.visible_troops[0]) if self.visible_troops else 0
@@ -134,8 +133,7 @@ class RivalScene(Screen):
                                               anchor=anchor, spacing=10)
             self._page_troops = [tuple(ids[index] for index in page) for page in packed]
             visible = packed[self.page]
-            self._portraits = [self._portraits[index] for index in visible]
-            self._health_bars = [self._health_bars[index] for index in visible]
+            self._troop_art = [self._troop_art[index] for index in visible]
             force = Column(force_heading, *(rows[index] for index in visible), spacing=10)
         else:
             self.page, self._page_troops = 0, [()]
@@ -164,11 +162,10 @@ class RivalScene(Screen):
     def draw(self):
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 215))
         self.box(self.x, self.y, 1120, 740)
-        for component, troop in self._portraits:
-            x, y, width, height = component.bounds
+        for portrait, bar, troop in self._troop_art:
+            x, y, width, height = portrait.bounds
             art.piece(self, x + width / 2, y + height / 2, troop.kind, 'enemy', scale=.72)
-        for component, troop in self._health_bars:
-            x, y, width, _ = component.bounds
+            x, y, width, _ = bar.bounds
             self.bar(x, y, width, troop.hp, troop.max_hp, RED)
         if self.pages > 1:
             self.text(f'Force {self.page + 1}/{self.pages}', self.x + 672, self.y + 684, size=12, color=MUTED)
