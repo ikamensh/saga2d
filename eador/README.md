@@ -248,7 +248,7 @@ cheaper Heal. **H** shows learned effects.
 Sites have different defending parties, rewards and objectives. Ordinary
 guarded ruins sit alongside authored adventures such as Border Watch,
 Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory,
-Stranded Explorer, Smuggler Screen and Aerie Raid. The Codex describes the current catalogue and its
+Stranded Explorer, Smuggler Screen, Aerie Raid and Relief Column. The Codex describes the current catalogue and its
 saved rewards.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
@@ -297,6 +297,16 @@ Archer and a Pikeman. Flight crosses the marsh and occupied hexes, but still
 needs an empty landing. Block useful landings, Brace the next melee approach,
 or reposition with Swap and Repulse. Both formations offer 60 gold, two
 crystals and a Watch Bell; wounded survivors persist after a failed attempt.
+
+Frontier's Relief Column asks you to hold a signal for two consecutive
+uncontested enemy turns by round four, or rout its four defenders. Intercept
+the Militia before it Rallies a pinned Skyrider, receive the landing from a
+western assembly, or occupy the useful landing cells with a larger party.
+Both assemblies are free. Its reward varies by shard and is shown before
+entry; an unchanged ordinary site offers the same reward elsewhere. After a
+failed attempt, defeated enemies stay gone and survivors keep their wounds;
+a lost veteran needs a fresh paid replacement. There are eleven authored
+encounter patterns so far.
 
 | Building | Cost | Benefit |
 |---|---|---|

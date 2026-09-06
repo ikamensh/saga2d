@@ -24,18 +24,18 @@ their actual source fingerprints rather than being relabeled as package tests.
 
 The extracted frozen app and macOS app-launch smoke pass with isolated saves,
 settings restart and all shipping audio assets. Seven package screenshots were
-inspected. Full packaged-campaign play, the remaining two
-authored families, meaningful recurring economic choices, human/listening
+inspected. Full packaged-campaign play, the remaining authored
+pattern, meaningful recurring economic choices, human/listening
 feedback, Windows/clean-account execution and candidate-specific stress remain
 open. Newer source adds measured campaign and battle HUDs, complete tactical
 forecasts/objectives, battle history and long-path save diagnostics; these
-changes are not included in this preserved package.
+changes and Relief Column are not included in this preserved package.
 
 Saga2D now measures unattached UI trees using their eventual font/theme context;
 its independent runnable example verifies rendering and input ownership. Campaign,
 encounter, pagination and economy rules remain in Shardbound.
 
-Source after this package passes **1,156 tests**. [Tactical forecasts](eador-forecast-reading.md)
+Source after this package passes **1,168 tests**. [Tactical forecasts](eador-forecast-reading.md)
 support shared 100/125 reading through F2 while T remains Retreat. The
 [native matrix](evidence/shardbound-forecast-086ce14/README.md) records 96 layouts,
 865 inputs and 21 exact reloads. [Complete save diagnostics](eador-diagnostics.md)
@@ -60,9 +60,18 @@ candidate/platform or human-readability acceptance.
 The [resource attribution study](eador-resource-breakpoints.md) reconciles 27
 unchanged campaigns and 10,762 real detached quotes. Available investments still
 compete at earlier turns; later tested policies stop buying while rewards and
-income continue. No unproven tax or currency sink was added. The eleventh
-encounter's revised geometry passed independent tactical and ordinary-source
-review; campaign integration and acceptance remain in progress.
+income continue. No unproven tax or currency sink was added.
+
+[Relief Column](eador-relief.md) is integrated as the eleventh authored pattern.
+It uses existing hold, Rally, flight, Pin and Repulse rules, with two free
+assemblies and a preserved ordinary site offering the same reward. Sixty paid
+manual plans across three modes and five seeds preserve every arriving unit,
+with 1,740 exact full-State order reloads. Seven native journeys pass 1,202
+inputs and 71 reloads, including veteran loss, a fresh paid recruit and a retry
+against only the surviving wounded defenders. The full suite passes 1,168
+tests; 300 model campaigns, 10,009 random scene inputs, 60 linked model runs
+and Tribes' fuzz checks pass on the identical integrated source. This is
+11/12 pattern coverage; G05 and the broader release gates remain incomplete.
 
 A [three-minute native run](evidence/shardbound-reading-soak-a431f47/README.md)
 completed 54 repeated journeys and 10,246 frames on the earlier reading source.
