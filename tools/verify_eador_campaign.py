@@ -13,6 +13,7 @@ os.environ['SAGA2D_SILENT'] = '1'
 from eador.app import create_game
 from eador.campaign_scene import CampaignPlanScene, CampaignScene
 from eador.content import RELICS
+from eador.difficulty import DIFFICULTIES
 from eador.model import State
 from eador.scene import ShardScene, TitleScene
 from tools.eador_campaign import play_campaign
@@ -45,7 +46,7 @@ def verify_inventory(output, *, backend='pyglet'):
             game._teardown()
 
 
-def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recovery=False):
+def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recovery=False, difficulty='standard'):
     started = perf_counter()
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='shardbound-linked-') as directory:
@@ -54,9 +55,10 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
         player = PlayerInput(game, native=backend == 'pyglet', output=output)
         try:
             game.push(TitleScene(7))
+            player.press(str(list(DIFFICULTIES).index(difficulty) + 1))
             player.capture('title')
             player.press('l')
-            assert player.state.campaign.stage == 1
+            assert player.state.campaign.stage == 1 and player.state.rules is DIFFICULTIES[difficulty]
             for stage, destination in ((1, middle), (2, finale), (3, None)):
                 before = player.state.to_json()
                 player.press('j')
@@ -71,10 +73,11 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
                     before = player.state.to_json()
                     player.capture('recovery')
                     player.reload(before)
+                    funds = player.state.expedition_funding(recovery=True)
                     player.choose_retinue(travel_selection(player.state))
                     player.press('return')
                     assert player.state.campaign.recovery_used and player.state.campaign.phase == 'playing'
-                    assert player.state.gold == 60 and len(player.state.hero.army) == 3
+                    assert (player.state.gold, player.state.crystals) == funds and len(player.state.hero.army) == 3
                     player.reload(player.state.to_json())
                 play_stage(player.state, reload_state=player.reload)
                 assert player.state.status == 'victory', f'Stage {stage} did not finish'
@@ -84,8 +87,9 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
                     player.capture('completed')
                     player.reload(player.state.to_json())
                     records = json.loads(player.state.to_json())['campaign']['completed']
+                    rules_id = player.state.rules_id
                     player.press('return')
-                    assert isinstance(game.scene, TitleScene)
+                    assert isinstance(game.scene, TitleScene) and game.scene.difficulty == difficulty
                     break
                 player.capture(f'stage-{stage}-offers')
                 before = player.state.to_json()
@@ -97,16 +101,20 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
                 assert player.state.to_json() == before and game.scene.step == 'offers'
                 player.press(str(index + 1))
                 selected = player.choose_retinue(travel_selection(player.state))
+                funds = player.state.expedition_funding()
                 player.capture(f'stage-{stage}-retinue')
                 player.press('return')
                 assert isinstance(game.scene, ShardScene) and player.state.campaign.stage == stage + 1
+                assert player.state.rules is DIFFICULTIES[difficulty]
+                assert (player.state.gold, player.state.crystals) == funds
                 assert set(selected['troop_ids']) <= {troop.id for troop in player.state.hero.army}
                 assert set(selected['relic_ids']) == set(player.state.inventory)
                 player.capture(f'stage-{stage + 1}-arrival')
                 player.reload(player.state.to_json())
             if finale == 'gate':
                 assert 'The Last Gate' in player.briefings, 'The final ritual was not briefed before committing'
-            report = dict(backend=backend, middle=middle, finale=finale, recovery=recovery, briefings=player.briefings,
+            report = dict(backend=backend, middle=middle, finale=finale, recovery=recovery, difficulty=difficulty,
+                          rules_id=rules_id, briefings=player.briefings,
                           elapsed_seconds=perf_counter() - started, input_activations=len(player.events),
                           exact_save_reloads=player.reloads, records=records, inputs=player.events)
             (output / 'journey.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -123,9 +131,10 @@ if __name__ == '__main__':
     parser.add_argument('--middle', choices=('rootward', 'foundries'), default='rootward')
     parser.add_argument('--finale', choices=('throne', 'gate'), default='gate')
     parser.add_argument('--recovery', action='store_true')
+    parser.add_argument('--difficulty', choices=DIFFICULTIES, default='standard')
     parser.add_argument('--inventory', action='store_true', help='verify mouse pagination using a prepared full-inventory save')
     args = parser.parse_args()
     if args.inventory:
         verify_inventory(args.output)
     else:
-        verify(args.output, middle=args.middle, finale=args.finale, recovery=args.recovery)
+        verify(args.output, middle=args.middle, finale=args.finale, recovery=args.recovery, difficulty=args.difficulty)
