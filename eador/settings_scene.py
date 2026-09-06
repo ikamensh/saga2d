@@ -226,7 +226,7 @@ class SettingsScene(Screen):
         self.rule(x + 36, y + 477, w - 72)
         notice = "A saved settings file could not be read. It is still intact." if self.load_error else "Tab switches pages · Up/Down selects a row · Left/Right changes its value."
         if self.page == "display" and not self.load_error:
-            notice = "Reading size: title, Codex, Field Guide, briefings, Build, Recruit, replacement, Hero, choices, results, Saves, rival plans and campaign transitions/plans.\nTab: page · Up/Down: row · Left/Right: value."
+            notice = "Reading size: title, Codex, Guide, briefings, Build, Recruit, replacement, Hero, choices, results, Saves, rival and campaign plans, campaign transitions, battle forecasts.\nTab: page · Up/Down: row · Left/Right: value."
         self.paragraph(notice, x + 36, y + 494, width=w - 72, size=12, color=RED if self.load_error else MUTED)
         if self.message:
             self.paragraph(self.message, x + 36, y + 586, width=w - 72, size=11,

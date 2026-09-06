@@ -845,7 +845,7 @@ class BattleScene(Screen):
         if self.selected is None or not any(u.id == self.selected for u in alive):
             self.selected = alive[0].id if alive else None
         selected = b.unit(self.selected) if self.selected is not None else None
-        self.button("Brace" if selected and selected.can_brace else "Guard", x + 184, 291, 116,
+        self.button("Brace" if selected and selected.can_brace else "Guard", x + 184, 247, 116,
                     self.guard, shortcut="G", enabled=selected is not None and not selected.acted and b.outcome is None)
         if self.unit_order:
             name = self.unit_order
@@ -854,20 +854,28 @@ class BattleScene(Screen):
                 label += ' · wait'
             elif name in ('smoke', 'repulse'):
                 label += ' · 0' if name in selected.spent_abilities else ' · 1'
-            self.button(label, x, 291, 172, lambda: self.choose_order(name), shortcut=key,
+            self.button(label, x, 247, 172, lambda: self.choose_order(name), shortcut=key,
                         primary=self.targeting == name, enabled=bool(getattr(b, name + '_targets')(selected.id)))
-        self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 378, 300, self.bolt, hotkey="1",
+        self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 334, 300, self.bolt, hotkey="1",
                     enabled=bool(b.spell_targets('bolt')))
         healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
-        self.button(f"{healer} Heal · {b.spell_cost('heal')} mana", x, 428, 300, self.heal, hotkey="2",
+        self.button(f"{healer} Heal · {b.spell_cost('heal')} mana", x, 384, 300, self.heal, hotkey="2",
                     enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster)))
-        self.button("Auto-play one round", x, 518, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
-        self.button("Retreat", x, 568, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
-        self.button("End battle round", x, h - 93, 300, self.end_turn,
+        self.button("Auto-play one round", x, 474, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
+        self.button("Retreat", x, 524, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
+        self.button("End battle round", x, h - 46, 300, self.end_turn,
                     hotkey="E", primary=True, enabled=b.outcome is None)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
         self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
+        self.button('Text size', x + 126, 16, 174, self.open_text_settings, shortcut='F2')
+        from saga2d import Column
+        from eador.preferences import reading_scale
+        forecast = self._forecast()
+        if self.measure(forecast)[1] > h - 58 - 575:
+            raise ValueError('Tactical forecast exceeds the available reading space')
+        self.ui.add(Column(forecast, anchor=Anchor.TOP_LEFT, margin=(x, 575)))
+        self._reading_view = self.hover, self.game.window_size, reading_scale(self.game)
         if b.objective.kind == "hold":
             self.button("Locate seal", self.edge - 188, 109, 162, self.locate_objective, shortcut="O")
         elif b.objective.kind == 'extract':
@@ -1030,6 +1038,9 @@ class BattleScene(Screen):
         self.act_at(self.cursor)
 
     def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._reading_view != (self.hover, self.game.window_size, reading_scale(self.game)):
+            self.refresh()
         self.clock += dt
         self.floats = [f for f in self.floats if self.clock - f[0] < 1.6]
 
@@ -1072,6 +1083,74 @@ class BattleScene(Screen):
         elif self.selected is not None:
             self.act(lambda: self.battle.move(self.selected, pos), cue="move")
 
+    def _forecast(self):
+        from saga2d import Column, Label
+        from eador.preferences import reading_scale
+        b = self.battle
+        selected = b.unit(self.selected) if self.selected is not None else None
+        scale, labels = reading_scale(self.game) / 100, []
+
+        def line(text, *, size=13, color=MUTED):
+            labels.append(Label(text, width=300, wrap=True, font='Verdana',
+                                font_size=round(size * scale), text_color=color))
+
+        hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
+        if self.targeting == 'smoke':
+            legal = self.hover in b.smoke_targets(self.selected)
+            line('Smoke screen' if legal else 'Choose a highlighted hex', size=13, color=BLUE)
+            line('Blocks both sides’ shots and spells until your next turn. One charge per battle.', size=10, color=MUTED)
+        elif hovered:
+            line(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", size=13, color=GOLD)
+            pin_target = selected and self.targeting == "pin" and hovered in b.pin_targets(selected.id)
+            caster = b.unit(self.heal_caster if self.targeting == 'heal' else 0) if self.targeting in ('bolt', 'heal') else selected
+            sight_blocked = caster and (self.targeting in ('bolt', 'heal', 'pin') or caster.attack_range > 1) and not b.has_sight(caster.pos, hovered.pos)
+            if pin_target:
+                damage, retaliation = b.pin_preview(selected.id, hovered.id)
+                line(f"Pin {damage}  /  Take {retaliation}", size=12, color=RED)
+            elif self.targeting in ('bolt', 'heal') and hovered in self.action_targets():
+                amount = b.spell_preview(self.targeting, hovered.id, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
+                line(f'Restore {amount} HP' if self.targeting == 'heal' else f'Deal {amount} HP damage', size=12, color=TEAL if self.targeting == 'heal' else RED)
+            elif self.targeting == 'swap' and hovered in self.action_targets():
+                line('Exchange positions', size=12, color=TEAL)
+            elif self.targeting == 'rally' and hovered in self.action_targets():
+                forecast = b.rally_preview(selected.id, hovered.id)
+                line(f'Rally: Move {forecast.move_range} · {len(forecast.reachable)} reachable hexes', size=11, color=TEAL)
+            elif self.targeting == 'repulse' and hovered in self.action_targets():
+                landing = b.repulse_preview(selected.id, hovered.id)
+                line(f'Repulse to {landing} · No damage', size=12, color=BLUE)
+            elif selected and not self.targeting and hovered in b.targets(selected.id):
+                damage, retaliation = b.preview(selected.id, hovered.id)
+                line(f"Deal {damage}  /  Take {retaliation}", size=12, color=RED)
+            elif sight_blocked:
+                line('Sight blocked', size=12, color=GOLD)
+            else:
+                line(f"Attack {hovered.attack}  ·  Defense {hovered.effective_defense}  ·  Range {hovered.attack_range}", size=11, color=MUTED)
+            detail = ('Ally keeps order; both moves spent.' if self.targeting == 'swap' else
+                      'Clears Pin; spent orders stay spent.' if self.targeting == 'rally' else
+                      'One charge; target keeps its orders.' if self.targeting == 'repulse' else
+                      'Forest and smoke block ranged orders.' if sight_blocked else
+                      f'{b.spell_cost(self.targeting)} shared mana · caster spends its order.' if self.targeting in ('bolt', 'heal') else
+                      f"Next turn: Move {max(1, hovered.move_range - 2 - hovered.cargo_penalty)} · may still attack." if pin_target else
+                      f"Pinned: Move {hovered.effective_move_range} · may still attack." if hovered.pinned else
+                      "Brace strikes first against melee." if hovered.stance == "brace" else
+                      'Smoke clears before its team’s next turn.' if hovered.pos in {cloud.pos for cloud in b.smoke_clouds} else
+                      f"Terrain: {b.terrain[hovered.pos].title()}" + (" · Guard +2 defense" if hovered.stance == "guard" else ""))
+            line(detail, size=11, color=MUTED)
+        else:
+            sight_hint = ('Forest and smoke block ranged orders.' if b.sight_rules == 'terrain' else
+                          'Saved rules allow ranged orders through terrain.')
+            line('Arrows aim. F targets. Enter acts. Esc cancels. C: Codex. ' + sight_hint, size=11)
+        return Column(*labels, spacing=5)
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
+    def on_reveal(self):
+        # Accepting a result clears the battle before the two queued scenes pop.
+        if self.battle is not None:
+            self.refresh()
+
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
@@ -1100,84 +1179,32 @@ class BattleScene(Screen):
             self.text('ROUT THE DEFENDERS', 38, 108, size=12, color=GOLD)
             self.text('Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.',
                       38, 137, size=10, color=MUTED)
-        self.text("TACTICAL COMMAND", x, 30, size=10, color=GOLD)
-        self.text("Your army", x, 57, size=30, serif=True)
+        self.text("COMMAND", x, 30, size=10, color=GOLD)
         allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
         enemies = sum(u.hp > 0 and u.team != "player" for u in b.units)
-        self.text(f"{allies} standing  ·  {enemies} enemies", x, 104, size=12, color=MUTED)
-        self.rule(x, 138, 300)
+        self.text(f"{allies} allies · {enemies} foes · Tab selects", x, 60, size=12, color=MUTED)
+        self.rule(x, 94, 300)
         selected = b.unit(self.selected) if self.selected is not None else None
         if selected:
             self.text(s.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name,
-                      x, 159, size=25, serif=True)
-            self.text(f"{selected.hp} / {selected.max_hp} HP", x, 198, size=13, color=TEAL)
-            self.bar(x, 225, 300, selected.hp, selected.max_hp)
-            self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 246, size=13)
+                      x, 115, size=25, serif=True)
+            self.text(f"{selected.hp} / {selected.max_hp} HP", x, 154, size=13, color=TEAL)
+            self.bar(x, 181, 300, selected.hp, selected.max_hp)
+            self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 202, size=13)
             penalties = ['Pinned'] if selected.pinned else []
             if selected.cargo_penalty:
                 penalties.append(f'Cargo −{selected.cargo_penalty}')
             movement = f"{'Fly' if selected.can_fly else 'Move'} {selected.effective_move_range}" + (f" ({', '.join(penalties)})" if penalties else '')
-            self.text(f"{movement}   Range {selected.attack_range}", x, 272, size=12, color=MUTED)
+            self.text(f"{movement}   Range {selected.attack_range}", x, 228, size=12, color=MUTED)
             status = ("Guard +2" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
                       "Can move" if selected.acted and b.reachable(selected.id) else
                       "Spent" if selected.acted else "Moved" if selected.moved else "Ready")
-            self.text(status, x + 193, 199, size=12, color=GOLD)
-        self.rule(x, 336, 300)
-        self.text(f"SHARED MANA   /   {b.mana} REMAINING", x, 353, size=10, color=BLUE)
+            self.text(status, x + 193, 155, size=12, color=GOLD)
+        self.rule(x, 292, 300)
+        self.text(f"SHARED MANA   /   {b.mana} REMAINING", x, 309, size=10, color=BLUE)
         self.text('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else 'Spells spend the hero’s order.',
-                  x, 479, size=11, color=MUTED)
+                  x, 435, size=11, color=MUTED)
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
-        if self.targeting == 'smoke':
-            legal = self.hover in b.smoke_targets(self.selected)
-            self.text('Smoke screen' if legal else 'Choose a highlighted hex', x, 630, size=13, color=BLUE)
-            self.paragraph('Blocks both sides’ shots and spells until your next turn. One charge per battle.',
-                           x, 655, width=300, size=10, color=MUTED)
-        elif hovered:
-            self.text(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", x, 630, size=13, color=GOLD)
-            pin_target = selected and self.targeting == "pin" and hovered in b.pin_targets(selected.id)
-            caster = b.unit(self.heal_caster if self.targeting == 'heal' else 0) if self.targeting in ('bolt', 'heal') else selected
-            sight_blocked = caster and (self.targeting in ('bolt', 'heal', 'pin') or caster.attack_range > 1) and not b.has_sight(caster.pos, hovered.pos)
-            if pin_target:
-                damage, retaliation = b.pin_preview(selected.id, hovered.id)
-                self.text(f"Pin {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
-            elif self.targeting in ('bolt', 'heal') and hovered in self.action_targets():
-                amount = b.spell_preview(self.targeting, hovered.id, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
-                self.text(f'Restore {amount} HP' if self.targeting == 'heal' else f'Deal {amount} HP damage',
-                          x, 655, size=12, color=TEAL if self.targeting == 'heal' else RED)
-            elif self.targeting == 'swap' and hovered in self.action_targets():
-                self.text('Exchange positions', x, 655, size=12, color=TEAL)
-            elif self.targeting == 'rally' and hovered in self.action_targets():
-                forecast = b.rally_preview(selected.id, hovered.id)
-                self.text(f'Rally: Move {forecast.move_range} · {len(forecast.reachable)} reachable hexes',
-                          x, 655, size=11, color=TEAL)
-            elif self.targeting == 'repulse' and hovered in self.action_targets():
-                landing = b.repulse_preview(selected.id, hovered.id)
-                self.text(f'Repulse to {landing} · No damage', x, 655, size=12, color=BLUE)
-            elif selected and not self.targeting and hovered in b.targets(selected.id):
-                damage, retaliation = b.preview(selected.id, hovered.id)
-                self.text(f"Deal {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
-            elif sight_blocked:
-                self.text('Sight blocked', x, 655, size=12, color=GOLD)
-            else:
-                self.text(f"Attack {hovered.attack}  ·  Defense {hovered.effective_defense}  ·  Range {hovered.attack_range}",
-                          x, 655, size=11, color=MUTED)
-            detail = ('Ally keeps order; both moves spent.' if self.targeting == 'swap' else
-                      'Clears Pin; spent orders stay spent.' if self.targeting == 'rally' else
-                      'One charge; target keeps its orders.' if self.targeting == 'repulse' else
-                      'Forest and smoke block ranged orders.' if sight_blocked else
-                      f'{b.spell_cost(self.targeting)} shared mana · caster spends its order.' if self.targeting in ('bolt', 'heal') else
-                      f"Next turn: Move {max(1, hovered.move_range - 2 - hovered.cargo_penalty)} · may still attack." if pin_target else
-                      f"Pinned: Move {hovered.effective_move_range} · may still attack." if hovered.pinned else
-                      "Brace strikes first against melee." if hovered.stance == "brace" else
-                      'Smoke clears before its team’s next turn.' if hovered.pos in {cloud.pos for cloud in b.smoke_clouds} else
-                      f"Terrain: {b.terrain[hovered.pos].title()}" + (" · Guard +2 defense" if hovered.stance == "guard" else ""))
-            self.text(detail, x, 679, size=11, color=MUTED)
-        else:
-            sight_hint = ('Forest and smoke block ranged orders.' if b.sight_rules == 'terrain' else
-                          'Saved rules allow ranged orders through terrain.')
-            self.paragraph('F targets. Enter acts. Esc cancels. C opens the Codex. ' + sight_hint,
-                           x, 630, size=11)
-        self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
         reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting else set()
         targets = {u.id for u in self.action_targets()} if b.outcome is None else set()
         rally_reachable = b.rally_preview(selected.id, hovered.id).reachable if (

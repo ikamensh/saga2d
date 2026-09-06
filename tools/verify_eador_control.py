@@ -62,7 +62,7 @@ class ControlOrders(PlayerOrders):
         self.player.reload(self.state.to_json())
 
 
-def verify(output, *, backend='pyglet', scenario='smoke'):
+def verify(output, *, backend='pyglet', scenario='smoke', player_type=PlayerInput):
     output.mkdir(parents=True, exist_ok=True)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *[ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_control_campaign.py',
@@ -74,7 +74,7 @@ def verify(output, *, backend='pyglet', scenario='smoke'):
     started = perf_counter()
     with TemporaryDirectory(prefix='shardbound-controls-') as directory:
         game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
-        player = PlayerInput(game, native=backend == 'pyglet', output=output)
+        player = player_type(game, native=backend == 'pyglet', output=output)
         state = player.state
 
         def select(ident):

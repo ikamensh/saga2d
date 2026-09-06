@@ -91,11 +91,11 @@ class PlayerOrders(AdventureOrders):
             self.player.reload(self.state.to_json())
 
 
-def verify(output, *, backend='pyglet', theme='frontier', approach='guided', hero_class='Commander'):
+def verify(output, *, backend='pyglet', theme='frontier', approach='guided', hero_class='Commander', player_type=PlayerInput):
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='shardbound-escape-') as directory:
         game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
-        player = PlayerInput(game, native=backend == 'pyglet', output=output)
+        player = player_type(game, native=backend == 'pyglet', output=output)
         try:
             game.push(TitleScene(7, hero_class=hero_class, theme=theme))
             player.press('return')

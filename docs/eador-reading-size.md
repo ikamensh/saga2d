@@ -27,8 +27,11 @@ replacement enlarges the outgoing roster, lost rank/XP, incoming role and exact
 cost/upkeep review. Campaign transitions enlarge offer details, retinue rows,
 focused descriptions, funding, recovery rules and ending records. Navigation and
 purchase buttons, large screen titles and page count keep their normal size.
-Other screens—including tactical forecasts and the shard HUD—keep their
-existing text sizes.
+Battle target forecasts also use this setting, opened with **F2** or **Text size**;
+**T** still retreats. Target health, damage/retaliation, healing, ability consequences,
+costs and sight guidance wrap completely within the tactical sidebar. Returning
+from Apply/Cancel preserves the selected unit and aimed command. The shard and
+tactical HUD values, objective text and battle log keep their existing text sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
 
