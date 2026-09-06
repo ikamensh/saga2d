@@ -140,3 +140,18 @@ ENCOUNTERS['screen_western'] = EncounterSpec(
 )
 ENCOUNTERS['screen_northern'] = replace(ENCOUNTERS['screen_western'],
     player_positions=((-3, 0), (-2, -1), (-2, 0), (-1, -2), (-3, 1), (0, -3), (-3, 2)))
+
+
+# Flyers cross the marsh and occupied approach; their exposed landing remains a
+# melee commitment. Both assemblies face the same finite eastern defenders.
+ENCOUNTERS['aerie_western'] = EncounterSpec(
+    'Aerie Raid',
+    tuple(((q, r), 'marsh' if (q in (-1, 0) and (q, r) != (-1, 0)) or (q, r) in {(1, 0), (1, 1)} else
+           'hills' if (q, r) in {(1, -1), (2, -1)} else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-3, 0), (-1, 0), (-2, 0), (-3, 1), (-3, 2), (-2, 2), (-1, 1)),
+    ((1, -2), (1, 1), (2, -1), (1, -1), (3, -1), (2, 1), (3, -3)),
+)
+
+ENCOUNTERS['aerie_northern'] = replace(ENCOUNTERS['aerie_western'],
+    player_positions=((-2, -1), (-1, -1), (-2, 0), (-2, 1), (0, -2), (-1, -2), (-3, 0)))

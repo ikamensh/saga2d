@@ -44,11 +44,14 @@ def prepared_briefings():
     from tools.eador_relic_campaign import prepare_relic_gate
     from tools.eador_vault_campaign import prepare_vault
     from tools.eador_screen_campaign import prepare_screen
+    from tools.eador_aerie_campaign import prepare_aerie, aerie_failed_sortie
 
     cases = [('crossing', prepare_adventure(), None),
              ('cache', prepare_adventure(theme='elderwild'), None),
              ('vault', prepare_vault(), None), ('hunt', prepare_pack_hunt(), None),
              ('observatory', prepare_observatory(), None),
+             ('aerie', prepare_aerie(), None),
+             ('aerie-scout', prepare_aerie('Scout', party='ground'), None),
              ('screen-commander', prepare_screen(), None),
              ('screen-scout', prepare_screen('Scout'), None),
              ('explorer-ranger', prepare_explorer(), None),
@@ -70,6 +73,9 @@ def prepared_briefings():
     screened = prepare_screen()
     screened.explore(approach='western'); screened.battle.auto_turn(); screened.retreat()
     cases.append(('screen-wounded', screened, None))
+    aerie = aerie_failed_sortie(prepare_aerie()).state
+    aerie.resolve_battle()
+    cases.append(('aerie-wounded', aerie, None))
     poor = prepare_adventure()
     poor.build('archery'); poor.build('market'); poor.recruit('ranger')
     poor.explore(approach='guided'); poor.retreat()

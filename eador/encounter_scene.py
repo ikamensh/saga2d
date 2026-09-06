@@ -83,7 +83,7 @@ class EncounterScene(Screen):
                                    style=PRIMARY if index == self.approach_index else None)
                              for index, approach in enumerate(self.approaches)), spacing=20))
             description = self.approach.description
-            if p.site_kind == 'smuggler_screen' and Counter(self.guards) != Counter(SITES[p.site_kind].guards):
+            if p.site_kind in ('smuggler_screen', 'aerie_raid') and Counter(self.guards) != Counter(SITES[p.site_kind].guards):
                 description = f'Free. {self.approach.title} against the surviving defenders shown below.'
             top.append(label(description, color=GOLD))
 
@@ -163,6 +163,13 @@ class EncounterScene(Screen):
             if 'warden' in self.guards:
                 advice.append('Warden swaps wounded allies to safety.')
             rout_advice = ' '.join(advice + ['Defeated guards stay defeated. Codex explains these orders.'])
+        elif self.province.site_kind == 'aerie_raid':
+            advice = []
+            if 'skyrider' in self.guards:
+                advice.append('Skyriders cross marsh and troops. Pin slows flight; Brace punishes melee landings.')
+            if 'pikeman' in self.guards:
+                advice.append('Their Pikeman can Brace. Ranged shots avoid its spear reaction.')
+            rout_advice = ' '.join(advice + ['Codex explains these orders.'])
         return (
             carrier,
             f'Clear adjacent foes. Escape or rout all defenders by round {definition.deadline}. Hero death loses immediately.',

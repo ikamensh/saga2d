@@ -140,10 +140,14 @@ of general balance from these two arrivals: the control investment is currently
 expensive and its benefits are situational. Passing this prototype does not
 establish first-time readability, enjoyment, replay variety or G05 completion.
 
-## Reproduce and retire
+## Historical reproduction
+
+The temporary tool has been absorbed by the [production Aerie journey](eador-aerie-raid.md).
+To reproduce this historical detached probe, check out source `78254e7` in a
+separate worktree, then run:
 
 ```sh
-PYTHONPATH=. python tools/prototype_eador_aerie.py --output /tmp/aerie.json.gz
+PYTHONPATH=. python tools/prototype_eador_aerie.py --output /tmp/aerie.json
 PYTHONPATH=. python tools/prototype_eador_aerie.py --interactive flight
 ```
 
@@ -152,8 +156,8 @@ order. Every scripted manual command checks relevant immediate forecasts and
 serializes/reloads the complete **Battle**. Whole campaign validation is not
 claimed for the detached proposed battle; its ordinary prepared campaign remains
 byte-identical. The retained report records that campaign, purchases, terrain,
-all intermediate battles, failures and source hashes. Delete/absorb this named
-throwaway tool after the design is accepted into production or rejected.
+all intermediate battles, failures and source hashes. The removed throwaway tool remains available at that historical commit; current
+production code does not import or temporarily register prototype content.
 
 The [retained report](evidence/aerie-prototype-2026-09-06.json.gz) records clean
 prototype source `78254e7`. The three completed manual plans contain 102 public
