@@ -13,6 +13,8 @@ from eador.model import SaveFormatError, State
 
 MANUAL_SLOTS = (1, 2, 3)
 AUTO_SLOTS = (10, 11, 12)
+_PHASE_LABELS = {"departure": "Next challenge", "recovery": "Recovery available",
+                 "lost": "Campaign lost", "completed": "Campaign completed"}
 
 
 @dataclass(frozen=True)
@@ -78,10 +80,14 @@ class CampaignSaves:
                                              backup_error=backup_error))
                     continue
                 detail = f"Turn {state.turn} · {state.hero.hero_class} · Shard {state.seed}"
+                if state.campaign is not None:
+                    detail = f"Stage {state.campaign.stage}/3 · {state.campaign.title} · {detail}"
                 if state.battle is not None:
                     detail += f" · Battle round {state.battle.round}"
                 elif state.choice is not None:
                     detail += " · Decision pending"
+                elif state.campaign is not None and state.campaign.phase in _PHASE_LABELS:
+                    detail += f" · {_PHASE_LABELS[state.campaign.phase]}"
                 elif state.status != "playing":
                     detail += f" · {state.status.title()}"
                 entries.append(SaveEntry(slot, label, detail, metadata["timestamp"], True,

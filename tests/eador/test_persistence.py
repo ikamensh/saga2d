@@ -125,3 +125,65 @@ def test_checkpoint_preserves_actual_write_error_until_matching_manual_is_saved(
     saves.save(state, 2)
     assert saves.checkpoint(state) == 2
     assert {name: (tmp_path / name).read_bytes() for name in before} == before
+
+
+def test_linked_save_descriptions_distinguish_progress_and_recovery(tmp_path):
+    """A player can identify the linked stage and whether defeat still permits recovery."""
+    from tools.eador_linked_campaign import play_stage
+    from tools.verify_eador_campaign import lose_shard
+
+    saves = CampaignSaves(SaveManager(tmp_path))
+    state = State.new_campaign(7)
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Stage 1/3' in detail and 'Westwatch' in detail
+    state = play_stage(state)
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Next challenge' in detail and 'Victory' not in detail
+    state.advance('rootward', troop_ids=(), relic_ids=())
+    lose_shard(state)
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Stage 2/3' in detail and 'Rootward' in detail and 'Recovery available' in detail
+    state.abandon_campaign()
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Campaign lost' in detail and 'Recovery available' not in detail
+
+
+def test_linked_descriptions_keep_battle_decisions_and_completed_ending(tmp_path):
+    """Linked context supplements actionable battle/reward details and identifies the true ending."""
+    from tools.eador_linked_campaign import play_linked
+
+    saves = CampaignSaves(SaveManager(tmp_path))
+    state = State.new_campaign(7)
+    state.explore()
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Stage 1/3' in detail and f'Battle round {state.battle.round}' in detail
+    for _ in range(80):
+        if state.battle.outcome:
+            break
+        state.battle.auto_turn()
+    state.resolve_battle()
+    assert state.choice is not None
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Stage 1/3' in detail and 'Decision pending' in detail
+    finished = play_linked()
+    assert finished.campaign.phase == 'completed'
+    saves.save(finished)
+    detail = saves.entries()[0].detail
+    assert 'Stage 3/3' in detail and finished.campaign.title in detail and 'Campaign completed' in detail
+
+
+def test_standalone_save_descriptions_keep_the_existing_format(tmp_path):
+    """Single-shard saves retain their familiar description without campaign-only vocabulary."""
+    saves = CampaignSaves(SaveManager(tmp_path))
+    state = State.new(7)
+    saves.save(state)
+    assert saves.entries()[0].detail == 'Turn 1 · Commander · Shard 7'
+    state.explore()
+    saves.save(state)
+    assert saves.entries()[0].detail == 'Turn 1 · Commander · Shard 7 · Battle round 1'
