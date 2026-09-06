@@ -73,10 +73,12 @@ def snapshot_sources(source: Path) -> dict:
     for package in ("saga2d", "eador"):
         shutil.copytree(ROOT / package, source / package,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    for name in ("entry.py", "shardbound.spec"):
+    for name in ("entry.py", "campaign_check.py", "shardbound.spec"):
         shutil.copyfile(ROOT / "packaging" / name, source / name)
     (source / "tools").mkdir()
-    for name in ("build_eador.py", "build_eador_audio.py"):
+    (source / "tools" / "__init__.py").write_text('"""Frozen public-input verification helpers."""\n')
+    for name in ("build_eador.py", "build_eador_audio.py", "eador_ui.py",
+                 "eador_campaign.py", "eador_linked_campaign.py"):
         shutil.copyfile(ROOT / "tools" / name, source / "tools" / name)
     validate_audio(source)
     data = collect_package_data(source)
@@ -144,7 +146,32 @@ def inventory(folder: Path) -> dict:
     return contents
 
 
-def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict) -> dict:
+def verify_campaign_processes(executable: Path, folder: Path, env: dict, output: Path, *, recovery=False) -> dict:
+    """Run actual app lifetimes; load departures and the ending through Title F9."""
+    phases = []
+    for phase in range(1, 6 if recovery else 5):
+        command = [executable, '--campaign-check', output, '--phase', phase]
+        if recovery:
+            command.append('--recovery')
+        run(command, cwd=folder, env=env, timeout=180)
+        report = json.loads((output / f'phase-{phase}.json').read_text())
+        if not report['frozen'] or Path(report['executable']).resolve() != executable.resolve():
+            raise RuntimeError('Campaign check did not run the extracted executable.')
+        if not Path(report['asset_path']).resolve().is_relative_to(folder.resolve()):
+            raise RuntimeError('Campaign check loaded assets from outside the archive.')
+        if phases and report['loaded_checkpoint'] != phases[-1]['checkpoint']:
+            raise RuntimeError('Campaign process restart changed the saved State.')
+        phases.append(report)
+    if not phases[-1]['returned_to_title'] or len(phases[-1]['completed_shards']) != 3:
+        raise RuntimeError('Packaged linked campaign did not complete and return to title.')
+    return dict(recovery=recovery, processes=len(phases), process_ids=[p['process_id'] for p in phases],
+                input_activations=sum(p['input_activations'] for p in phases),
+                exact_save_reloads=sum(p['exact_save_reloads'] for p in phases),
+                exact_process_restarts=len(phases) - 1, completed_shards=phases[-1]['completed_shards'],
+                reports=[f'phase-{p["phase"]}.json' for p in phases])
+
+
+def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, *, campaign=False) -> dict:
     with TemporaryDirectory(prefix="shardbound-outside-repo-") as temporary:
         folder = Path(temporary)
         if macos:
@@ -175,13 +202,23 @@ def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict) 
                         for name, record in report["audio_files"].items()}
         if actual_audio != expected_audio:
             raise RuntimeError("Packaged audio bytes differ from the build source snapshot")
+        if campaign:
+            campaign_output = output / 'campaign-verification'
+            if campaign_output.exists():
+                shutil.rmtree(campaign_output)
+            report['linked_campaigns'] = {
+                name: verify_campaign_processes(executable, folder, env, campaign_output / name, recovery=recovery)
+                for name, recovery in (('direct', False), ('recovery', True))}
         return report
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--skip-smoke", action="store_true", help="build only; artifact remains unverified")
+    parser.add_argument("--check-campaign", action="store_true", help="also complete three linked shards across app restarts")
     args = parser.parse_args()
+    if args.skip_smoke and args.check_campaign:
+        parser.error('--check-campaign requires the extracted archive smoke check')
     if sys.platform not in ("darwin", "win32"):
         parser.error("This recipe currently targets macOS and Windows only")
     if platform.python_version() != "3.13.2":
@@ -210,7 +247,8 @@ def main() -> None:
         shutil.make_archive(str(archive.with_suffix("")), "zip", output, artifact.name)
     info["artifact"] = {"file": archive.name, "sha256": sha256(archive), "bytes": archive.stat().st_size}
     info["files"] = inventory(artifact)
-    info["smoke"] = None if args.skip_smoke else smoke_archive(archive, output, macos, info["package_data"])
+    info["smoke"] = None if args.skip_smoke else smoke_archive(
+        archive, output, macos, info["package_data"], campaign=args.check_campaign)
     write_json(output / "build-manifest.json", info)
     print(f"Built {archive}\nSHA256 {info['artifact']['sha256']}\nManifest {output / 'build-manifest.json'}", flush=True)
 

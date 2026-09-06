@@ -12,6 +12,20 @@ From the repository root, with uv installed:
 uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py
 ```
 
+Add `--check-campaign` to exercise two complete linked campaigns in the extracted
+app. The direct journey uses four separate app processes; the recovery journey
+uses five, including a restart at the lost-capital recovery decision. Every
+changing order uses native player input. Tactical battles use the visible
+automatic-round control; this is campaign/save verification, not manual tactics
+or a human playtest. The final process restores the completed chronicle and
+returns to title. Settings persist at 125% reading size throughout.
+
+The check writes complete state checkpoints, event records and screenshots under
+`dist/shardbound/campaign-verification/`, isolated from player saves. Each fresh
+process loads through the title's quickload control and compares the entire saved
+State with the preceding process. These reports supplement the quick smoke check;
+they do not establish clean-account, Windows or human playtest acceptance.
+
 Generate shipping audio explicitly before packaging when composition or
 synthesis source changes:
 
@@ -120,6 +134,14 @@ Without smoke arguments, `Shardbound.app` runs the game's ordinary entry point.
 Normal player saves retain the game's configured location; smoke mode never
 uses those saves. The special flag is packaging verification, not a player
 feature or a substitute for a complete packaged campaign test.
+
+The separate `--campaign-check OUTPUT --phase N` verification entry runs one
+phase of the journey above; add `--recovery` consistently for all five recovery
+phases. Phase one requires a new output directory. The build snapshots only the
+three existing public-input policy helpers it needs, alongside the verifier;
+the frozen app does not import them from a source checkout. Normal launches do
+not execute these verification paths. The build manifest fingerprints their
+exact sources along with the application and packaging recipe.
 
 ## Evidence from the first local artifact
 

@@ -213,7 +213,15 @@ def smoke(image_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    if "--smoke-image" in sys.argv:
+    if "--campaign-check" in sys.argv:
+        from campaign_check import run
+        parser = argparse.ArgumentParser(description="Verify one isolated packaged campaign phase")
+        parser.add_argument("--campaign-check", required=True, type=Path)
+        parser.add_argument("--phase", required=True, type=int, choices=range(1, 6))
+        parser.add_argument("--recovery", action="store_true")
+        args = parser.parse_args()
+        run(args.campaign_check, phase=args.phase, recovery=args.recovery)
+    elif "--smoke-image" in sys.argv:
         parser = argparse.ArgumentParser(description="Verify the packaged Shardbound runtime")
         parser.add_argument("--smoke-image", required=True, type=Path)
         smoke(parser.parse_args().smoke_image)
