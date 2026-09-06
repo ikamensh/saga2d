@@ -168,3 +168,13 @@ know about, and read it before touching shared files.
   measured after UI attachment, and the scoped 100/125 preference explicitly
   leaves other game screens unchanged. No Warband worktree was touched. See
   `docs/eador-reading-size.md` for the vertical slice and remaining G10 scope.
+
+- 2026-09-06 (Shardbound framework agent): a malformed save version containing
+  5,000 characters expanded into an equally large SaveError and overflowed a
+  measured reward dialog. SaveManager now diagnoses wrong metadata types and
+  invalid timestamps/overflowing numbers without repeating their arbitrary
+  payload. Ordinary unsupported integer versions remain visible in the error.
+  This changes no accepted format, recovery policy or API; Tribes, Shardbound
+  and Warband callers all receive the same usable parser diagnostic. Real-file
+  tests preserve malformed bytes and backups through refused loads/writes.
+  No Warband worktree changed.
