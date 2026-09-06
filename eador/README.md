@@ -58,7 +58,9 @@ and recovery funds.
 **O** opens settings from the title or field guide. **S / D** selects Sound
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
-Reading size offers 100/125% for the Codex, Field Guide and expedition briefings.
+Reading size offers 100/125% for the Codex, Field Guide, expedition briefings,
+Build, Recruit and Hero screens. Press **T** in the Codex, briefing, purchase
+or Hero screen to open that setting directly.
 **T** opens it directly from a briefing; other screens currently keep their sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
@@ -141,8 +143,10 @@ adds mana to support the two spells already learned.
 | Codex | 1–6 / Tab / Shift+Tab | Select / cycle categories |
 | Codex | Arrows / Page Up / Page Down | Turn pages |
 | Decision | 1 / 2 | Choose the corresponding skill or reward |
-| Hero | 1–4 / U | Equip a visible relic / unequip |
+| Hero | Visible number / U | Equip the corresponding visible relic / unequip |
 | Hero | Left / Right | Previous / next inventory page |
+| Hero | I | Infuse mana with a Mage Tower; review the exact cost and gain first |
+| Hero, Build, Recruit | T | Adjust reading size and return to the same first visible item |
 | Catalogue | Number key / click | Buy the corresponding visible building or troop |
 | Recruitment | Left / Right or Previous / Next | Change troop page |
 | Shard | E | End campaign turn |
@@ -280,7 +284,7 @@ The briefing identifies the actual isolated party before entry.
 | Barracks | 45 gold | Recruit Swordsmen, Pikemen and Wardens |
 | Archery Range | 55 gold | Recruit Archers and Rangers |
 | Temple | 65 gold | Recruit Acolytes and Skyriders, learn Heal, improve recovery |
-| Mage Tower | 75 gold + 2 crystals | Recruit Rune Adepts, learn Arcane Bolt and gain 4 maximum mana |
+| Mage Tower | 75 gold + 2 crystals | Recruit Rune Adepts, learn Arcane Bolt, gain 4 maximum mana and unlock mana infusion |
 | Marketplace | 60 gold | Recruit Sappers and add 8 gold income each turn |
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
@@ -291,6 +295,13 @@ The shard warns before End Turn if gold plus income cannot cover upkeep.
 Unpaid troops leave, preserving higher levels and experience first; among
 equal veterans, more expensive/newer recruits leave first. Outlying owned
 provinces still produce income.
+
+With a Mage Tower, open **H**, then **I** to spend **3 crystals and one hero
+action** for up to **8 mana**, capped at your maximum. The Hero screen quotes
+the actual gain and explains unavailable orders. You must be in your own
+territory, outside a battle or pending choice; encirclement blocks infusion
+at Westwatch. Infusion leaves the turn and rival in place. Resting remains
+the ordinary free recovery option, while ending a turn also advances the rival.
 
 Ending the turn restores health on friendly land and mana according to the
 saved mode, unless the
@@ -329,7 +340,7 @@ the original games' large content catalogue. The rival has a finite
 expedition and treasury, with a fixed recruitment plan. Tactical morale,
 stamina and spell preparation are simplified
 away. Hero mana replaces Eador's prepared spells and gem costs; crystals
-fund construction, specialist recruits and some expedition approaches.
+fund construction, specialist recruits, mana infusion and some expedition approaches.
 
 ## Game and framework
 

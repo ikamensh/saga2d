@@ -109,7 +109,7 @@ class PlayerState:
     def __getattr__(self, name):
         value = getattr(self.player.root.state, name)
         if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches',
-                                            'recovery_preview', 'expedition_funding'):
+                                            'recovery_preview', 'infusion_preview', 'expedition_funding'):
             raise AssertionError(f'No input adapter for campaign command {name!r}')
         return value
 
@@ -183,12 +183,25 @@ class PlayerState:
         if ident is None:
             self.player.press('u')
         else:
-            index = self.inventory.index(ident)
-            for _ in range(index // 4):
+            for _ in range(self.player.game.scene.pages):
+                if ident in self.player.game.scene.visible_relics:
+                    break
                 self.player.press('right')
-            self.player.press(str(index % 4 + 1))
+            else:
+                raise AssertionError(f'No visible equipment control for {ident!r}')
+            self.player.press(str(self.player.game.scene.visible_relics.index(ident) + 1))
         self.player.press('escape')
         assert self.hero.relic == ident
+
+    def infuse(self):
+        assert isinstance(self.player.game.scene, ShardScene)
+        quote = self.infusion_preview()
+        assert quote.blocked_reason is None, quote.blocked_reason
+        before = self.hero.mana
+        self.player.press('h')
+        self.player.press('i')
+        self.player.press('escape')
+        assert self.hero.mana == before + quote.mana
 
     def resolve_battle(self):
         assert isinstance(self.player.game.scene, ResultScene)
