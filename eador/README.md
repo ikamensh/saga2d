@@ -59,8 +59,8 @@ and recovery funds.
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
 Reading size offers 100/125% for the Codex, Field Guide, expedition briefings,
-Build, Recruit, troop replacement, Hero, reward choices, results, Saves and campaign
-plan. Press **T** in these screens to open that setting directly.
+Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival and campaign
+plans. Press **T** in these screens to open that setting directly.
 Other screens, including the tactical HUD and campaign departures, keep their existing sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.

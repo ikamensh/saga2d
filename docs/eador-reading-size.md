@@ -1,7 +1,7 @@
 # Reading size
 
 The Field Codex, expedition briefings, Build/Recruit catalogs, troop replacement,
-Hero, reward choices, results, Saves and campaign plan offer **Text size** (`T`), opening Settings directly on
+Hero, reward choices, results, Saves, rival and campaign plans offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -18,7 +18,9 @@ availability reasons, current resources and purchase messages. Hero enlarges
 stats, recovery and infusion quotes, learned disciplines, relic descriptions
 and action messages. Battle and shard results enlarge conclusion details,
 consequences and save/load messages. Reward choices keep their complete option
-cards; campaign plans enlarge objectives, live progress and saved rules. Troop
+cards; campaign plans enlarge objectives, live progress and saved rules. Rival
+plans enlarge the full order, location, finite army, upkeep/refit prices and
+interception or breakout advice. Troop
 replacement enlarges the outgoing roster, lost rank/XP, incoming role and exact
 cost/upkeep review. Navigation and
 purchase buttons, large screen titles and page count keep their normal size.
