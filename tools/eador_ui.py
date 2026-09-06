@@ -3,7 +3,6 @@
 The same driver works against mock input and native pyglet event dispatch. Reads
 come from the current saved game; every changing command goes through its UI.
 """
-from eador.model import BUILDINGS, RECRUITABLE
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HeroScene, ResultScene, ShardScene
 from eador.encounter_scene import EncounterScene
 from saga2d import Button
@@ -153,21 +152,23 @@ class PlayerState:
         self.player.press('e')
 
     def build(self, name):
-        self.catalog('b', list(BUILDINGS).index(name))
+        self.catalog('b', name)
         assert name in self.buildings
 
     def recruit(self, name):
         before = len(self.hero.army)
-        self.catalog('r', list(RECRUITABLE).index(name))
+        self.catalog('r', name)
         assert len(self.hero.army) == before + 1 and self.hero.army[-1].kind == name
 
-    def catalog(self, shortcut, index):
+    def catalog(self, shortcut, name):
         assert isinstance(self.player.game.scene, ShardScene)
         self.player.press(shortcut)
         assert isinstance(self.player.game.scene, CatalogScene)
-        for _ in range(index // 5):
+        scene = self.player.game.scene
+        while name not in scene.visible_items:
+            assert scene.page + 1 < scene.pages, f'Catalog has no item {name}'
             self.player.press('right')
-        self.player.press(str(index % 5 + 1))
+        self.player.press(str(scene.visible_items.index(name) + 1))
         self.player.press('escape')
 
     def choose(self, ident):

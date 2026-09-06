@@ -9,8 +9,8 @@ from eador.scene import ShardScene
 from tools.eador_ui import PlayerInput
 
 
-@pytest.mark.parametrize('kind,number', [('sapper', '3'), ('adept', '4'), ('skyrider', '5')])
-def test_recruit_buttons_require_crystals_and_deduct_both_displayed_costs(tmp_path, kind, number):
+@pytest.mark.parametrize('kind', ['sapper', 'adept', 'skyrider'])
+def test_recruit_buttons_require_crystals_and_deduct_both_displayed_costs(tmp_path, kind):
     """Gold alone cannot activate a special recruit's button or number shortcut."""
     for crystals in (0, 8):
         # Isolate affordability with a valid funded save; paid campaign routes
@@ -21,7 +21,11 @@ def test_recruit_buttons_require_crystals_and_deduct_both_displayed_costs(tmp_pa
         player = PlayerInput(game)
         try:
             game.push(ShardScene(state))
-            player.press('r'); player.press('right')
+            player.press('r')
+            while kind not in game.scene.visible_items:
+                assert game.scene.page + 1 < game.scene.pages
+                player.press('right')
+            number = str(game.scene.visible_items.index(kind) + 1)
             before = state.to_json()
             crystal_cost = state.recruit_crystal_cost(kind)
             assert any(f'{crystal_cost} crystal' in item['text'] for item in game.backend.texts)

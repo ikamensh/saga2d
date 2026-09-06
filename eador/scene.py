@@ -471,96 +471,167 @@ class ShardScene(Screen):
 
 
 class CatalogScene(Screen):
+    """Measured complete purchase rows; number shortcuts belong to the visible page."""
+
     transparent = True
     pop_on_cancel = True
-    controls = {'left': 'previous_page', 'right': 'next_page'}
+    controls = {('left', 'pageup'): 'previous_page', ('right', 'pagedown'): 'next_page'}
 
     def __init__(self, root, kind):
         super().__init__()
         self.root, self.kind, self.page = root, kind, 0
+        self.items = list(BUILDINGS) if kind == 'build' else list(RECRUITABLE)
+        self._page_items = [self.items]
+
+    @property
+    def visible_items(self):
+        """Current purchasable item IDs in displayed order, including disabled rows."""
+        return tuple(self._page_items[self.page])
+
+    @property
+    def pages(self):
+        return len(self._page_items)
 
     def previous_page(self):
         self.page = max(0, self.page - 1)
         self.refresh()
 
     def next_page(self):
-        self.page = min((len(self.items) - 1) // 5, self.page + 1)
+        self.page = min(self.pages - 1, self.page + 1)
         self.refresh()
 
-    def refresh(self):
-        super().refresh()
-        self.x, self.y = self.game.width / 2 - 360, self.game.height / 2 - 300
-        self.items = list(BUILDINGS) if self.kind == "build" else list(RECRUITABLE)
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
+    def _availability(self, name):
+        """Explain current blockers; the model remains authoritative when purchasing."""
         s = self.root.state
-        for i, name in enumerate(self.items[self.page * 5:self.page * 5 + 5]):
-            spec = BUILDINGS[name] if self.kind == "build" else UNITS[name]
-            built = self.kind == "build" and name in s.buildings
-            locked = self.kind == "recruit" and spec.building and spec.building not in s.buildings
-            available = self.kind == "build" or (len(s.hero.army) < s.hero.max_army
-                                                  and s.provinces[s.hero.pos].owner == "player")
-            cost = spec.cost if self.kind == "build" else s.recruit_cost(name)
+        if s.status != 'playing':
+            return 'This campaign has ended. Start a new shard.'
+        if s.battle is not None:
+            return 'Finish or retreat from the battle first.'
+        if s.choice is not None:
+            return 'Resolve the pending choice first.'
+        spec = BUILDINGS[name] if self.kind == 'build' else UNITS[name]
+        if self.kind == 'build' and name in s.buildings:
+            return 'Already built. This building is permanent.'
+        reasons = []
+        if self.kind == 'recruit':
+            if s.provinces[s.hero.pos].owner != 'player':
+                reasons.append('Recruit in a province you control.')
+            if spec.building and spec.building not in s.buildings:
+                reasons.append(f'Requires {BUILDINGS[spec.building].name}.')
+            if len(s.hero.army) >= s.hero.max_army:
+                reasons.append(f'Army full ({len(s.hero.army)}/{s.hero.max_army}).')
+        gold = spec.cost if self.kind == 'build' else s.recruit_cost(name)
+        crystals = spec.crystals if self.kind == 'build' else s.recruit_crystal_cost(name)
+        missing = []
+        if s.gold < gold:
+            missing.append(f'{gold - s.gold} gold')
+        if s.crystals < crystals:
+            missing.append(f'{crystals - s.crystals} crystal' + ('s' if crystals - s.crystals != 1 else ''))
+        if missing:
+            reasons.append('Need ' + ' and '.join(missing) + ' more.')
+        return ' '.join(reasons)
+
+    def _description(self, name):
+        spec = BUILDINGS[name] if self.kind == 'build' else UNITS[name]
+        if self.kind == 'build':
+            return spec.description
+        facts = f'{spec.hp} HP · {spec.attack} attack · range {spec.attack_range} · upkeep {spec.upkeep} gold/turn.'
+        role = {
+            'pikeman': 'G: Brace strikes first against melee.',
+            'healer': 'Heal uses its order and shared mana.',
+            'ranger': 'Shoot before moving to retain movement.',
+            'warden': 'S swaps places with an adjacent ally.',
+            'militia': 'Q rallies an adjacent Pinned ally.',
+            'sapper': 'D: one Smoke screen per battle.',
+            'adept': 'R: one Repulse per battle; Guard anchors.',
+            'skyrider': 'Fly over bodies and rough ground; land on empty hexes.',
+        }.get(name, '')
+        return facts + (' ' + role if role else '')
+
+    def refresh(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        from eador.reading import reading_pages
+
+        anchor = self.items.index(self.visible_items[0])
+        super().refresh()
+        self.x, self.y = self.game.width / 2 - 520, self.game.height / 2 - 370
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+        s = self.root.state
+
+        def label(text, size=12, *, width=992, color=MUTED, serif=False):
+            return Label(text, width=width, wrap=True, font='Georgia' if serif else 'Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        resources = label(f'{s.gold} gold · {s.crystals} crystals · {len(s.hero.army)}/{s.hero.max_army} troops')
+        blocks, reasons, prices = {}, {}, {}
+        for name in self.items:
+            spec = BUILDINGS[name] if self.kind == 'build' else UNITS[name]
+            reason = reasons[name] = self._availability(name)
+            built = self.kind == 'build' and name in s.buildings
+            cost = spec.cost if self.kind == 'build' else s.recruit_cost(name)
             crystals = spec.crystals if self.kind == 'build' else s.recruit_crystal_cost(name)
-            affordable = s.gold >= cost and s.crystals >= crystals
-            self.button("Built" if built else "Locked" if locked else f"{cost} gold", self.x + 548,
-                        self.y + 123 + i * 77, 143, lambda name=name: self.purchase(name), shortcut=str(i + 1),
-                        enabled=not built and not locked and affordable and available)
-        if len(self.items) > 5:
-            self.button('Previous', self.x + 22, self.y + 535, 130, self.previous_page, enabled=self.page > 0)
-            self.button('Next', self.x + 164, self.y + 535, 120, self.next_page,
-                        enabled=(self.page + 1) * 5 < len(self.items))
-            self.button('Back to shard', self.x + 306, self.y + 535, 392, self.game.pop, hotkey='Esc')
-        else:
-            self.button("Back to shard", self.x + 22, self.y + 535, 676, self.game.pop, hotkey="Esc")
+            prices[name] = f'{cost} gold' + (f' + {crystals} crystal' + ('s' if crystals != 1 else '') if crystals else '')
+            blocks[name] = Column(label(spec.name, 19, width=736, color=TEXT, serif=True),
+                                  label(self._description(name), width=736),
+                                  label(prices[name] + (' · ' + reason if reason else ''), 11, width=736,
+                                        color=MUTED if built else RED if reason else GOLD), spacing=6)
+        policy = ('Buildings are permanent; build even while your hero is away.' if self.kind == 'build'
+                  else 'Recruit in a province you control.')
+        hint = 'Numbers buy the visible items. Left/Right changes page. ' + policy
+        footer = Column(*([label(self.message, 11, color=GOLD)] if self.message else []), label(hint, 11), spacing=6)
+        self.ui.add(Column(resources, *blocks.values(), footer))
+        body_y = 99 + resources.get_preferred_size()[1] + 18
+        footer_y = 666 - footer.get_preferred_size()[1]
+        available = footer_y - 18 - body_y
+        heights = {name: max(40, block.get_preferred_size()[1]) for name, block in blocks.items()}
+
+        pages, self.page = reading_pages([heights[name] for name in self.items], available,
+                                        anchor=anchor, spacing=18, max_items=9)
+        self._page_items = [[self.items[index] for index in page] for page in pages]
+        self.ui.clear()
+        self.ui.add(Column(resources, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 24), round(self.y + 99))))
+        rows = []
+        for index, name in enumerate(self.visible_items):
+            built = self.kind == 'build' and name in s.buildings
+            control = Button('Built' if built else prices[name], on_click=lambda name=name: self.purchase(name),
+                             shortcut=str(index + 1), enabled=not reasons[name], width=228, height=40)
+            rows.append(Row(blocks[name], control, spacing=28))
+        self.ui.add(Column(*rows, spacing=18, anchor=Anchor.TOP_LEFT,
+                           margin=(round(self.x + 24), round(self.y + body_y))))
+        self.ui.add(Column(footer, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 24), round(self.y + footer_y))))
+        self.button('Text size', self.x + 830, self.y + 41, 186, self.open_text_settings, shortcut='T')
+        self.button('Previous', self.x + 24, self.y + 684, 150, self.previous_page, hotkey='←', enabled=self.page > 0)
+        self.button('Next', self.x + 184, self.y + 684, 150, self.next_page, hotkey='→', enabled=self.page + 1 < self.pages)
+        self.button('Back to shard', self.x + 794, self.y + 684, 222, self.game.pop, shortcut='Esc')
 
     def purchase(self, name):
-        callback = self.root.state.build if self.kind == "build" else self.root.state.recruit
+        callback = self.root.state.build if self.kind == 'build' else self.root.state.recruit
         if self.command(lambda: callback(name)):
             if self.checkpoint(self.root.state):
                 self.message = self.root.state.log[-1]
+            self.refresh()
 
     def draw(self):
-        x, y, s = self.x, self.y, self.root.state
+        x, y = self.x, self.y
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 200))
-        self.box(x, y, 720, 600)
-        self.text("WESTWATCH / STRONGHOLD", x + 24, y + 22, size=10, color=GOLD)
-        self.text("Build your kingdom" if self.kind == "build" else "Raise an army", x + 24, y + 46, size=31, serif=True)
-        self.text(f"{s.gold} gold   ·   {s.crystals} crystals   ·   {len(s.hero.army)}/{s.hero.max_army} troops", x + 24, y + 94, size=12, color=MUTED)
-        for i, name in enumerate(self.items[self.page * 5:self.page * 5 + 5]):
-            yy = y + 127 + i * 77
-            spec = BUILDINGS[name] if self.kind == "build" else UNITS[name]
-            self.rule(x + 22, yy - 9, 676)
-            self.text(spec.name, x + 26, yy, size=19, serif=True)
-            if self.kind == "build":
-                description = spec.description + (f" Costs {spec.crystals} crystals." if spec.crystals else "")
-            else:
-                description = f"{spec.hp} HP  /  {spec.attack} attack  /  range {spec.attack_range}  /  upkeep {spec.upkeep}"
-                if spec.building and spec.building not in s.buildings:
-                    description = f"Requires {BUILDINGS[spec.building].name}. " + description
-                elif name == "pikeman":
-                    description += ". G: Brace strikes first against melee."
-                if name == 'healer':
-                    description += '. Heal uses its order and shared mana.'
-                elif name == 'ranger':
-                    description += '. Shoot before moving to retain movement.'
-                elif name == 'warden':
-                    description += '. S swaps places with an adjacent ally.'
-                elif name == 'militia':
-                    description += '. Q rallies an adjacent Pinned ally.'
-                elif name == 'sapper':
-                    description += '. D: one Smoke screen per battle.'
-                elif name == 'adept':
-                    description += '. R: one Repulse per battle; Guard anchors.'
-                elif name == 'skyrider':
-                    description += '. Fly over bodies and rough ground; land on empty hexes.'
-                if spec.crystals:
-                    crystals = s.recruit_crystal_cost(name)
-                    self.text(f'+ {crystals} {"crystal" if crystals == 1 else "crystals"}', x + 619, yy + 40,
-                              size=10, color=RED if s.crystals < spec.crystals else BLUE, center=True)
-            self.paragraph(description, x + 26, yy + 29, width=500, size=11)
-        hint = (f'Page {self.page + 1}/{(len(self.items) + 4) // 5} · Left/Right changes page; numbers buy visible troops.'
-                if len(self.items) > 5 else 'Buildings are permanent. Recruit in any province you control.')
-        self.text(textwrap.shorten(self.message or hint, width=93, placeholder="…"),
-                  x + 24, y + 507, size=11, color=GOLD)
+        self.box(x, y, 1040, 740)
+        self.text('WESTWATCH / STRONGHOLD', x + 24, y + 22, size=10, color=GOLD)
+        self.text('Build your kingdom' if self.kind == 'build' else 'Raise an army', x + 24, y + 46, size=31, serif=True)
+        self.text(f'Page {self.page + 1}/{self.pages}', x + 400, y + 696, size=12, color=MUTED)
 
 
 class HelpScene(Screen):

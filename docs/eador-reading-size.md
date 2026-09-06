@@ -1,6 +1,6 @@
 # Reading size
 
-The Field Codex and expedition briefings offer **Text size** (`T`), opening Settings directly on
+The Field Codex, expedition briefings and Build/Recruit catalogs offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -12,8 +12,10 @@ Relics. The Field Guide uses the same value for all four numbered headings, thei
 and the quick-reference line. Its two measured columns preserve all sections at
 both sizes. Expedition briefings enlarge objective headings/instructions,
 resource and approach facts, rewards, map legends, defender counts/health and
-entry messages. Navigation buttons, large screen titles and page count keep their
-normal size. Other screens—including tactical forecasts, HUD, recruitment, rewards, equipment,
+entry messages. Build and Recruit enlarge item names, descriptions, prices,
+availability reasons, current resources and purchase messages. Navigation and
+purchase buttons, large screen titles and page count keep their normal size.
+Other screens—including tactical forecasts, HUD, rewards, equipment,
 saves and campaign plans—keep their existing text sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
@@ -113,9 +115,9 @@ prose measured 348 pixels at 125% through attached wrapped Labels at 1280×720.
 Simply increasing the font would have collided with the reward. The scene now
 measures whole groups and leaves text at the selected size.
 
-Later conversions should reuse this same preference. Recruitment, reward and
-Hero screens need measured complete rows/cards and visible-entry shortcuts;
-currently recruitment uses 77-pixel rows and equipment 95-pixel rows. Campaign,
+Later conversions should reuse this same preference. Reward and Hero screens
+need measured complete rows/cards and visible-entry shortcuts; equipment
+currently uses 95-pixel rows. Campaign,
 Rival and Saves need their own content flow. Tactical forecasts, HUD values,
 unit badges and setting/control labels require a separate coordinated layout
 pass. Changing the global theme or every `Screen.text` call cannot provide that:
@@ -124,8 +126,10 @@ heights. G10 remains open until those views are usable at the advertised size.
 
 Saga2D already supplies measured wrapped Labels, Columns, Rows and button-owned
 shortcuts. Each game screen should own its content budget and paging policy.
-Extract game-owned pagination only when another real variable-entry catalog
-needs it; the fixed four-section Guide needs no paging subsystem.
+Codex and the purchase catalogs share the small game-owned `reading_pages`
+calculation for complete index pages around a first-entry anchor. Callers supply
+measured heights and their own budgets; the fixed four-section Guide needs no
+paging subsystem.
 
 The Guide tracer built on `dc63810` uses native input from title through Settings,
 Cancel, Apply, Codex return, three native window sizes and settings restart.
@@ -157,3 +161,31 @@ The [retained guidance evidence](evidence/shardbound-guidance-2026-09-06/README.
 contains this final source-attributed matrix and six inspected frames. The
 isolated full suite passed 1,029 tests; 27 focused guidance, extraction,
 Observatory and Codex checks passed.
+
+
+## Build and Recruit
+
+Purchase catalogs use complete measured rows: a name, description or troop
+facts, and the actual gold/crystal price with any current blocker, beside the
+purchase button. The layout never shrinks an item to keep a fixed number of rows.
+Visible Previous/Next controls and Left/Right (also Page Up/Down) turn pages.
+Numbers always buy the corresponding visible item; hidden pages own no shortcuts.
+`visible_items` exposes those ordered IDs, and `PlayerState` uses them to find
+purchases without a fixed five-item page assumption.
+
+Applying or canceling Settings preserves the first visible item. Native window
+resizing uses the same anchor. Model purchases still validate the command and
+checkpoint the result. Disabled rows explain prerequisites, full armies, unowned
+provinces and exact resource shortages; clicking or pressing their number does
+not issue a command or rotate saves. The single existing disk preference and its
+recovery semantics remain unchanged.
+
+Run `python tools/verify_eador_catalog.py --output /tmp/shardbound-catalog` for
+the native purchase, Settings and restart tracer plus all Build/Recruit pages at
+100/125 in 1280×720, 1280×800 and 1920×1080 windows.
+
+The isolated Catalog checkpoint passed 1,046 tests and both games' bounded
+60-model-game/20-scene fuzz runs. Its native matrix passed 30 complete purchase
+pages across the two reading sizes and three windows, with real keyboard/mouse
+purchases, Apply/Cancel around the current reading anchor and settings restart.
+Page counts describe this snapshot, not a fixed rows-per-page contract.
