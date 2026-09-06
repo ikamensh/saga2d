@@ -64,7 +64,8 @@ The map's campaign facts and battle objectives, unit facts, forecasts, guidance
 and history share this setting. **F2 / Text size** opens it on the map or in battle;
 **T** still retreats during battle. **L / Battle log** reads the complete history.
 Compact map/board markers, large titles and command buttons keep their normal sizes.
-Reduced motion keeps battle damage and healing numbers still. The logical
+Reduced motion keeps units and battle damage/healing numbers still while
+highlighting each action in order. The logical
 canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
 loading another campaign. Damaged settings are reported and kept until you
@@ -84,7 +85,9 @@ and mix review remain part of release preparation.
    the front line; forest and hills reduce incoming attack damage.
 4. Press **E** after your units act to let the enemy take its turn. **A**
    plays your remaining actions and the enemy turn automatically for one
-   round; repeat it if you want assistance with the encounter.
+   round. Moves, abilities and reactions are shown in order; watch them or
+   press **Space** to finish playback. Battle orders resume afterward.
+   Repeat **A** if you want assistance with the next round.
 5. After victory, press **E** to return with treasure and experience.
    Resolve any skill or relic decisions with **1/2**. Keeping a relic adds
    it to your inventory; **H**, then its number equips it. Press **E**
@@ -172,6 +175,7 @@ adds mana to support the two spells already learned.
 | Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
+| Battle playback | Space / Enter / Esc / Finish playback | Finish watching resolved actions and resume play |
 | Battle | T / Retreat button | Withdraw with surviving troops and a gold penalty |
 | Shard, battle or decision | F5 / F9 | Quicksave / quickload Manual 1 |
 | Title, shard, battle or decision | F6 | Open all saves |
@@ -182,6 +186,12 @@ adds mana to support the two spells already learned.
 | Shard | Esc | Open guide |
 | Battle | Esc | Cancel spell targeting, otherwise open guide |
 | Catalogue or guide | Esc | Close overlay |
+
+During ordered playback, **F2** opens settings and **L** opens the complete
+battle log; these screens pause playback. Saves contain the resolved turn.
+Loading resumes from that saved state, with a completed battle's result ready
+to accept. Playback takes at most eight game seconds and can be finished at
+any point with its visible button or shortcut.
 
 ## Rules and scope
 
