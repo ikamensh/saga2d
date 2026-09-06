@@ -154,3 +154,10 @@ claimed for the detached proposed battle; its ordinary prepared campaign remains
 byte-identical. The retained report records that campaign, purchases, terrain,
 all intermediate battles, failures and source hashes. Delete/absorb this named
 throwaway tool after the design is accepted into production or rejected.
+
+The [retained report](evidence/aerie-prototype-2026-09-06.json) records clean
+prototype source `78254e7`. The three completed manual plans contain 102 public
+orders with 102 exact Battle reloads; failed/partial probes and the seven
+automatic phases are recorded separately. All source hashes matched after the
+run; 25 existing control, sight and public-route tests also passed. These are
+pure model observations, with no native presentation or production-site claim.
