@@ -477,9 +477,10 @@ class CatalogScene(Screen):
     pop_on_cancel = True
     controls = {('left', 'pageup'): 'previous_page', ('right', 'pagedown'): 'next_page'}
 
-    def __init__(self, root, kind):
+    def __init__(self, root, kind, *, outgoing_id=None):
         super().__init__()
         self.root, self.kind, self.page = root, kind, 0
+        self.outgoing_id = outgoing_id
         self.items = list(BUILDINGS) if kind == 'build' else list(RECRUITABLE)
         self._page_items = [self.items]
 
@@ -515,6 +516,8 @@ class CatalogScene(Screen):
     def _availability(self, name):
         """Explain current blockers; the model remains authoritative when purchasing."""
         s = self.root.state
+        if self.outgoing_id is not None:
+            return s.replacement_preview(self.outgoing_id, name).blocked_reason or ''
         if s.status != 'playing':
             return 'This campaign has ended. Start a new shard.'
         if s.battle is not None:
@@ -591,7 +594,10 @@ class CatalogScene(Screen):
                                         color=MUTED if built else RED if reason else GOLD), spacing=6)
         policy = ('Buildings are permanent; build even while your hero is away.' if self.kind == 'build'
                   else 'Recruit in a province you control.')
-        hint = 'Numbers buy the visible items. Left/Right changes page. ' + policy
+        if self.outgoing_id is not None:
+            troop = next(t for t in s.hero.army if t.id == self.outgoing_id)
+            policy = f'Replacing {UNITS[troop.kind].name} #{troop.id}, rank {troop.level}, {troop.xp} XP. Review the full cost before retiring them.'
+        hint = ('Numbers review replacements.' if self.outgoing_id is not None else 'Numbers buy the visible items.') + ' Left/Right changes page. ' + policy
         footer = Column(*([label(self.message, 11, color=GOLD)] if self.message else []), label(hint, 11), spacing=6)
         self.ui.add(Column(resources, *blocks.values(), footer))
         body_y = 99 + resources.get_preferred_size()[1] + 18
@@ -607,8 +613,8 @@ class CatalogScene(Screen):
         rows = []
         for index, name in enumerate(self.visible_items):
             built = self.kind == 'build' and name in s.buildings
-            control = Button('Built' if built else prices[name], on_click=lambda name=name: self.purchase(name),
-                             shortcut=str(index + 1), enabled=not reasons[name], width=228, height=40)
+            control = Button('Review' if self.outgoing_id is not None else 'Built' if built else prices[name], on_click=lambda name=name: self.purchase(name),
+                             shortcut=str(index + 1), enabled=self.outgoing_id is not None or not reasons[name], width=228, height=40)
             rows.append(Row(blocks[name], control, spacing=28))
         self.ui.add(Column(*rows, spacing=18, anchor=Anchor.TOP_LEFT,
                            margin=(round(self.x + 24), round(self.y + body_y))))
@@ -616,9 +622,21 @@ class CatalogScene(Screen):
         self.button('Text size', self.x + 830, self.y + 41, 186, self.open_text_settings, shortcut='T')
         self.button('Previous', self.x + 24, self.y + 684, 150, self.previous_page, hotkey='←', enabled=self.page > 0)
         self.button('Next', self.x + 184, self.y + 684, 150, self.next_page, hotkey='→', enabled=self.page + 1 < self.pages)
+        if self.kind == 'recruit':
+            self.button('Choose veteran' if self.outgoing_id is not None else 'Replace troop',
+                        self.x + 548, self.y + 684, 222, self.replacement, shortcut='M', enabled=bool(s.hero.army))
         self.button('Back to shard', self.x + 794, self.y + 684, 222, self.game.pop, shortcut='Esc')
 
+    def replacement(self):
+        from eador.replacement_scene import ReplacementScene
+        self.game.replace(ReplacementScene(self.root))
+
     def purchase(self, name):
+        if self.outgoing_id is not None:
+            from eador.replacement_scene import ReplacementScene
+            self.game.push(ReplacementScene(self.root, outgoing_id=self.outgoing_id, kind=name,
+                                            description=self._description(name)))
+            return
         callback = self.root.state.build if self.kind == 'build' else self.root.state.recruit
         if self.command(lambda: callback(name)):
             if self.checkpoint(self.root.state):
@@ -630,7 +648,8 @@ class CatalogScene(Screen):
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 200))
         self.box(x, y, 1040, 740)
         self.text('WESTWATCH / STRONGHOLD', x + 24, y + 22, size=10, color=GOLD)
-        self.text('Build your kingdom' if self.kind == 'build' else 'Raise an army', x + 24, y + 46, size=31, serif=True)
+        title = 'Choose a fresh recruit' if self.outgoing_id is not None else 'Build your kingdom' if self.kind == 'build' else 'Raise an army'
+        self.text(title, x + 24, y + 46, size=31, serif=True)
         self.text(f'Page {self.page + 1}/{self.pages}', x + 400, y + 696, size=12, color=MUTED)
 
 
@@ -1174,28 +1193,111 @@ class SaveScene(Screen):
 
     transparent = True
     pop_on_cancel = True
+    controls = {('left', 'pageup'): 'previous_page', ('right', 'pagedown'): 'next_page'}
 
     def __init__(self, root=None, *, mode="load", return_to_title=False):
         super().__init__()
         self.root, self.mode = root, mode
         self.return_to_title = return_to_title
+        self.page = 0
+        self.entries = []
+        self._page_indices = [()]
+
+    @property
+    def visible_entries(self):
+        """Complete slots on the current page; their original 1–6 shortcuts stay stable."""
+        return tuple(self.entries[index] for index in self._page_indices[self.page])
+
+    @property
+    def pages(self):
+        return len(self._page_indices)
+
+    def previous_page(self):
+        self.page = max(0, self.page - 1)
+        self.refresh()
+
+    def next_page(self):
+        self.page = min(self.pages - 1, self.page + 1)
+        self.refresh()
+
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
 
     def refresh(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        from eador.reading import reading_pages
+
+        anchor = self.entries.index(self.visible_entries[0]) if self.visible_entries else 0
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 410, self.game.height / 2 - 324
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+        self.x, self.y = self.game.width / 2 - 560, self.game.height / 2 - 380
         self.entries = self.saves.entries()
         x, y = self.x, self.y
-        for i, entry in enumerate(self.entries):
+
+        def label(text, size=12, *, width=1064, color=MUTED):
+            return Label(text, width=width, wrap=True, font='Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        introduction = label('Choose a manual slot to save, then return to the title.' if self.return_to_title else
+                             'Three manual slots. Autosaves rotate after campaign actions and battle rounds.')
+        blocks = []
+        for entry in self.entries:
+            heading = entry.label
+            if entry.timestamp:
+                heading += ' · ' + entry.timestamp[:19].replace('T', '  ') + ' UTC'
+            detail = entry.detail
+            if entry.error:
+                detail += (' · Choose Backup or another slot.' if self.mode == 'load' and entry.backup_available
+                           else ' · Choose another slot.')
+            elif entry.backup_error:
+                detail += ' · Previous version is damaged.'
+            blocks.append(Column(label(heading, 13, width=744, color=GOLD),
+                                 label(detail, 12, width=744, color=RED if entry.error else MUTED), spacing=8))
+        hint = ('Choose a shown manual slot to save and return to the title. Esc keeps your current game open.' if self.return_to_title else
+                'Shown slot numbers select a save. Shift + number opens its previous version. Left/Right changes page. Loading never overwrites a file.')
+        footer = label(self.message or hint, 11, color=GOLD if self.message else MUTED)
+        self.ui.add(Column(introduction, *blocks, footer))
+        body_y = 99 + introduction.get_preferred_size()[1] + 18
+        footer_y = 670 - footer.get_preferred_size()[1]
+        self._page_indices, self.page = reading_pages([max(40, block.get_preferred_size()[1]) for block in blocks],
+                                                      footer_y - 18 - body_y, anchor=anchor, spacing=20)
+        self.ui.clear()
+        self.ui.add(Column(introduction, anchor=Anchor.TOP_LEFT, margin=(round(x + 28), round(y + 99))))
+        rows = []
+        for i in self._page_indices[self.page]:
+            entry = self.entries[i]
             can_save = self.mode == "save" and entry.slot in MANUAL_SLOTS
             can_load = self.mode == "load" and entry.exists
-            self.button("Save" if can_save else "Load", x + 540, y + 100 + i * 70, 92,
-                        lambda i=i: self.activate(i), shortcut=str(i + 1), enabled=can_save or can_load)
-            self.button("Backup", x + 642, y + 100 + i * 70, 150,
-                        lambda i=i: self.recover(i), shortcut=f"Shift+{i + 1}",
-                        enabled=entry.backup_available and self.mode == "load")
+            controls = Row(Button('Save' if can_save else 'Load', width=132, height=40,
+                                  on_click=lambda i=i: self.activate(i), shortcut=str(i + 1), enabled=can_save or can_load),
+                           Button('Backup', width=156, height=40, on_click=lambda i=i: self.recover(i),
+                                  shortcut=f'Shift+{i + 1}', enabled=entry.backup_available and self.mode == 'load'), spacing=12)
+            rows.append(Row(blocks[i], controls, spacing=20))
+        self.ui.add(Column(*rows, spacing=20, anchor=Anchor.TOP_LEFT, margin=(round(x + 28), round(y + body_y))))
+        self.ui.add(Column(footer, anchor=Anchor.TOP_LEFT, margin=(round(x + 28), round(y + footer_y))))
         if self.root is not None and not self.return_to_title:
-            self.button("Save slots" if self.mode == "load" else "Load slots", x + 28, y + 590, 164, self.toggle, shortcut="Tab")
-        self.button("Close", x + 650, y + 590, 140, self.game.pop, shortcut="Esc")
+            self.button("Save slots" if self.mode == "load" else "Load slots", x + 28, y + 692, 200, self.toggle, shortcut="Tab")
+        self.button('Previous', x + 248, y + 692, 150, self.previous_page, hotkey='←', enabled=self.page > 0)
+        self.button('Next', x + 418, y + 692, 150, self.next_page, hotkey='→', enabled=self.page + 1 < self.pages)
+        self.button('Text size', x + 886, y + 32, 206, self.open_text_settings, shortcut='T')
+        self.button("Close", x + 892, y + 692, 200, self.game.pop, shortcut="Esc")
+
+    def load_game(self, slot=1, *, backup=False):
+        loaded = super().load_game(slot, backup=backup)
+        if not loaded:
+            self.refresh()
+        return loaded
 
     def toggle(self):
         if self.root is None or self.return_to_title:
@@ -1229,31 +1331,10 @@ class SaveScene(Screen):
     def draw(self):
         x, y = self.x, self.y
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
-        self.box(x, y, 820, 648)
-        self.text("SAVE YOUR CHRONICLE" if self.mode == "save" else "RETURN TO A CHRONICLE", x + 28, y + 21,
-                  size=26, serif=True, color=GOLD)
-        self.text("Choose a manual slot to save, then return to the title." if self.return_to_title else
-                  "Three manual slots. Autosaves rotate after campaign actions and battle rounds.",
-                  x + 28, y + 63, size=11, color=MUTED)
-        for i, entry in enumerate(self.entries):
-            top = y + 94 + i * 70
-            self.rule(x + 28, top - 7, 764)
-            self.text(entry.label, x + 28, top, size=13, color=GOLD)
-            if entry.timestamp:
-                self.text(entry.timestamp[:19].replace("T", "  ") + " UTC", x + 168, top + 2, size=10, color=MUTED)
-            detail = entry.detail
-            if entry.error:
-                detail += (" · Choose Backup or another slot." if self.mode == "load" and entry.backup_available else
-                           " · Choose another slot.")
-            elif entry.backup_error:
-                detail += " · Previous version is damaged."
-            self.paragraph(detail, x + 28, top + 24, width=500, size=10, color=RED if entry.error else MUTED)
-        hint = ("Choose 1–3 to save and return to the title. Esc keeps your current game open." if self.return_to_title else
-                "Shift + 1–6 opens a slot’s previous version. Tab switches Save / Load. Loading never overwrites a file.")
-        if self.root is None:
-            hint = "1–6 opens a saved campaign. Shift + 1–6 opens its previous version. Loading never overwrites a file."
-        self.paragraph(self.message or hint,
-                       x + 28, y + 523, width=764, size=11, color=GOLD if self.message else MUTED)
+        self.box(x, y, 1120, 760)
+        self.text('Save your chronicle' if self.mode == 'save' else 'Return to a chronicle', x + 28, y + 34,
+                  size=30, serif=True, color=GOLD)
+        self.text(f'Page {self.page + 1}/{self.pages}', x + 592, y + 704, size=12, color=MUTED)
 
 
 class ChoiceScene(Screen):

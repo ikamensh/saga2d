@@ -1,0 +1,1964 @@
+[
+  {
+    "case": "accessible-opening",
+    "rules_id": "accessible-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 4 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "accessible-conquest",
+    "rules_id": "accessible-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      4,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-opening",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 3 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-conquest",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-announced-attack",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Heartwood in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-intercept-survivors",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Return via Blackfen next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-recovering",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Heal at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-healed",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-defeated",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [],
+    "order": "Recruit at Duskspire in 4 turns",
+    "labels": 9,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-paid-recruit",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      7
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 10,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "challenge-opening",
+    "rules_id": "challenge-2",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "challenge-conquest",
+    "rules_id": "challenge-2",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "saved-v11-order",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "saved-challenge-1",
+    "rules_id": "challenge-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "saved-encircled",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      23,
+      26,
+      28,
+      30,
+      31,
+      32
+    ],
+    "order": "Reassess its orders next turn",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "accessible-opening",
+    "rules_id": "accessible-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 4 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "accessible-conquest",
+    "rules_id": "accessible-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      4,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-opening",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 3 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-conquest",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-announced-attack",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Heartwood in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-intercept-survivors",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Return via Blackfen next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-recovering",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Heal at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-healed",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-defeated",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [],
+    "order": "Recruit at Duskspire in 4 turns",
+    "labels": 9,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "standard-paid-recruit",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      7
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 10,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "challenge-opening",
+    "rules_id": "challenge-2",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "challenge-conquest",
+    "rules_id": "challenge-2",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "saved-v11-order",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "saved-challenge-1",
+    "rules_id": "challenge-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "saved-encircled",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "page": 0,
+    "troops": [
+      23,
+      26,
+      28,
+      30,
+      31,
+      32
+    ],
+    "order": "Reassess its orders next turn",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "accessible-opening",
+    "rules_id": "accessible-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 4 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "accessible-conquest",
+    "rules_id": "accessible-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      4,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-opening",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 3 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-conquest",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-announced-attack",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Heartwood in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-intercept-survivors",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Return via Blackfen next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-recovering",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Heal at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-healed",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-defeated",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [],
+    "order": "Recruit at Duskspire in 4 turns",
+    "labels": 9,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-paid-recruit",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      7
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 10,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "challenge-opening",
+    "rules_id": "challenge-2",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "challenge-conquest",
+    "rules_id": "challenge-2",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "saved-v11-order",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "saved-challenge-1",
+    "rules_id": "challenge-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "saved-encircled",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      23,
+      26,
+      28,
+      30,
+      31,
+      32
+    ],
+    "order": "Reassess its orders next turn",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "accessible-opening",
+    "rules_id": "accessible-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 4 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "accessible-conquest",
+    "rules_id": "accessible-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      4,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-opening",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 3 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-conquest",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-announced-attack",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Heartwood in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-intercept-survivors",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Return via Blackfen next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-recovering",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Heal at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-healed",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-defeated",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [],
+    "order": "Recruit at Duskspire in 4 turns",
+    "labels": 9,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "standard-paid-recruit",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      7
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 10,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "challenge-opening",
+    "rules_id": "challenge-2",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "challenge-conquest",
+    "rules_id": "challenge-2",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "saved-v11-order",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "saved-challenge-1",
+    "rules_id": "challenge-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "saved-encircled",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "page": 0,
+    "troops": [
+      23,
+      26,
+      28,
+      30,
+      31,
+      32
+    ],
+    "order": "Reassess its orders next turn",
+    "labels": 20,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "accessible-opening",
+    "rules_id": "accessible-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 4 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "accessible-conquest",
+    "rules_id": "accessible-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      4,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 14,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-opening",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 3 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-conquest",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-announced-attack",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Heartwood in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-intercept-survivors",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Return via Blackfen next turn",
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-recovering",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Heal at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-healed",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-defeated",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [],
+    "order": "Recruit at Duskspire in 4 turns",
+    "labels": 9,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-paid-recruit",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      7
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 10,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "challenge-opening",
+    "rules_id": "challenge-2",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "challenge-conquest",
+    "rules_id": "challenge-2",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "saved-v11-order",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "saved-challenge-1",
+    "rules_id": "challenge-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "saved-encircled",
+    "rules_id": "standard-1",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      23,
+      26,
+      28,
+      30,
+      31,
+      32
+    ],
+    "order": "Reassess its orders next turn",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "accessible-opening",
+    "rules_id": "accessible-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 4 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "accessible-conquest",
+    "rules_id": "accessible-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      4,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 14,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-opening",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 3 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-conquest",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-announced-attack",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Heartwood in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-intercept-survivors",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Return via Blackfen next turn",
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-recovering",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Heal at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-healed",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      6
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-defeated",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [],
+    "order": "Recruit at Duskspire in 4 turns",
+    "labels": 9,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "standard-paid-recruit",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      7
+    ],
+    "order": "Recruit at Duskspire next turn",
+    "labels": 10,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "challenge-opening",
+    "rules_id": "challenge-2",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "challenge-conquest",
+    "rules_id": "challenge-2",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      3,
+      5,
+      6
+    ],
+    "order": "Attack Greenwater in 2 turns",
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "saved-v11-order",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "saved-challenge-1",
+    "rules_id": "challenge-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "order": "Attack Frostmere in 2 turns",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "saved-encircled",
+    "rules_id": "standard-1",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "page": 0,
+    "troops": [
+      23,
+      26,
+      28,
+      30,
+      31,
+      32
+    ],
+    "order": "Reassess its orders next turn",
+    "labels": 20,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  }
+]
