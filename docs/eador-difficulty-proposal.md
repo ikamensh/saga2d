@@ -91,9 +91,11 @@ Use a game-owned `eador/difficulty.py` with frozen policy records and a three-en
 selection catalog. Add `difficulty='standard'` to `State.new` and
 `State.new_campaign`; expose `State.difficulty` and the selected policy's title
 and plain description. Existing `income`, `crystal_income` and
-`upkeep_shortfall` remain authoritative. If the UI displays exact recovery,
-expose one query for the effective army/hero HP and mana rates so it does not
-copy the Temple/skill/blockade calculation.
+`upkeep_shortfall` remain authoritative. Add a small `recovery_preview()` query
+for actual hero HP/mana gains, HP restored per surviving troop (up to its missing
+health), and a blockade reason. Both end-turn recovery and its readout consume
+that calculation. The forecast is recovery before the announced rival operation;
+it does not promise the final health after a subsequent battle.
 
 Reserve schema **v12**, subject to the current schema owner's agreement. Store
 one immutable `rules_id` such as `standard-1`, `accessible-1` or `challenge-1`.
@@ -102,6 +104,9 @@ values. Later tuning introduces a new ID instead of changing the meaning of an
 existing save. Old v11 and earlier saves migrate to `standard-1`. Unknown IDs or
 future schemas fail through `SaveFormatError` before replacing a live state.
 This is saved game compatibility data, not a framework rules engine.
+Only these difficulty parameters are frozen by the ID. It does not promise that
+every future content addition or combat correction will reproduce historical
+behavior; that remains subject to the game's explicit save/version policy.
 
 Loading never reapplies a starting grant, replans the rival, regenerates provinces
 or revisits battle capabilities. Linked advance, recovery and same-run replay
@@ -110,6 +115,16 @@ Recovery restores its recorded entry provinces and rival, then follows its
 existing explicit arrival scheduling with that same policy. The difficulty is
 fixed for a run; changing the title selection affects only the next new game.
 Display it in the title, map, departure/recovery brief and save metadata.
+
+| Caller | Bounded change |
+|---|---|
+| `eador/model.py` | Creation selects the profile; income/end-turn and recovery preview use it; current command validation remains in force. |
+| `eador/rival.py` | Initial scheduling and destruction delay read policy values. Saved live orders/treasury are untouched on load; ordinary planning remains the same. |
+| `eador/campaign.py` | Advance uses profile starting grants plus existing carry caps; recovery uses its separate grant and original checkpoint. Both copy the rules ID into candidates. |
+| Save validation | Migrate missing ID to `standard-1`; validate known IDs and profile-aware legal countdown bounds. Preserve all existing world, battle and finite-army checks. |
+| Title, CLI and app creation | Choose a visible mode before a new run; Standard remains default. The selection cannot mutate an existing campaign. |
+| Map/Hero/Rival/Campaign/Save readouts | Show saved mode, actual income, upkeep shortfall, live mana/HP recovery and explicit arrival/recovery funding. Never reproduce policy arithmetic in scene code. |
+| Public input driver and verifiers | Route selection through actual title controls, and any newly introduced replay command through an explicit adapter; keep rejecting unadapted mutations. |
 
 ## Acceptance before calling the selection usable
 
@@ -122,7 +137,7 @@ Display it in the title, map, departure/recovery brief and save metadata.
    resources must not remove access to a required linked contract or recovery.
 3. Compare Economy, military/sustain and Spells across matched 100-seed sets,
    all themes/classes/difficulties. Include direct and useful flank policies;
-   report purchases, crystal sinks, troop losses, retirements, recovery turns,
+   report purchases, crystal sinks, troop losses, desertions, recovery turns,
    intercepted operations, bankruptcy, median/tail duration and unfinished runs.
    Keep prices and combat AI fixed while isolating difficulty. Do not require
    every rigid policy to win Challenge or rename a safety-bound stop as victory.
