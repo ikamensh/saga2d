@@ -13,16 +13,62 @@ sys.path.insert(0, str(ROOT))
 
 from eador.app import create_game
 from eador.difficulty import DIFFICULTIES
+from eador.model import State
+from eador.persistence import CampaignSaves
 from eador.scene import TitleScene
 from tools.eador_campaign import finish_battle
+from tools.eador_linked_campaign import travel_selection
 from tools.eador_ui import PlayerInput
+
+RECORDED_CHALLENGE = ROOT / 'tests/eador/fixtures/v12_challenge1_ui_cases.json'
+
+
+def verify_recorded_challenge(output, *, backend='pyglet'):
+    """Use real earlier snapshots; starting the current profile cannot rewrite their next commands."""
+    fixture = json.loads(RECORDED_CHALLENGE.read_text())
+    reports = []
+    for name in ('rest', 'advance', 'recover'):
+        case = next(case for case in fixture['cases'] if case['name'] == name)
+        with TemporaryDirectory(prefix='shardbound-recorded-mode-') as directory:
+            game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
+            player = PlayerInput(game, native=backend == 'pyglet', output=output / case['name'])
+            try:
+                CampaignSaves(game.save_manager).save(State.from_json(json.dumps(case['before'])))
+                game.push(TitleScene(7, difficulty='challenge'))
+                player.press('return')
+                assert player.state.rules is DIFFICULTIES['challenge']
+                player.press('f9')
+                assert json.loads(player.state.to_json()) == case['before']
+                assert player.state.rules_id == fixture['rules_id'] == 'challenge-1'
+                if case['name'] == 'rest':
+                    player.press('h'); player.capture('recorded-recovery'); player.press('escape')
+                    assert player.state.recovery_preview().mana == 3
+                    player.state.end_turn()
+                else:
+                    if case['name'] == 'advance':
+                        index = next(i for i, offer in enumerate(player.state.campaign.offers) if offer.id == 'rootward')
+                        player.press(str(index + 1))
+                    player.choose_retinue(travel_selection(player.state))
+                    player.capture('recorded-funding')
+                    player.press('return')
+                assert json.loads(player.state.to_json()) == case['after'], case['name']
+                player.reload(player.state.to_json())
+                player.capture('recorded-continuation')
+                reports.append(dict(case=case['name'], rules_id=player.state.rules_id,
+                                    fixture_revision=fixture['source_revision'],
+                                    input_activations=len(player.events), exact_save_reloads=player.reloads,
+                                    inputs=player.events))
+            finally:
+                game._teardown()
+    return reports
 
 
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *[ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_ui.py',
-                          'verify_eador_difficulty.py', 'verify_eador_campaign.py', 'eador_linked_campaign.py')]])
+                          'verify_eador_difficulty.py', 'verify_eador_campaign.py', 'eador_linked_campaign.py')],
+                      RECORDED_CHALLENGE])
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     report = dict(source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, backend=backend, platform=platform.platform(), modes=[])
@@ -88,9 +134,10 @@ def verify(output, *, backend='pyglet'):
             finally:
                 restarted._teardown()
             report['modes'].append(row)
+    report['recorded_challenge'] = verify_recorded_challenge(output / 'recorded-challenge', backend=backend)
     assert all(hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest for name, digest in hashes.items())
     (output / 'journey.json').write_text(json.dumps(report, indent=2) + '\n')
-    print(f'Three difficulty openings, paid-army forecasts and exact fresh-game restarts passed ({backend}).', flush=True)
+    print(f'Three difficulty openings, fresh-game restarts and recorded Challenge continuations passed ({backend}).', flush=True)
     return report
 
 
