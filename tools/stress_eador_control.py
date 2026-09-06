@@ -94,8 +94,9 @@ def issue(battle, command, uid, target):
         getattr(battle, command)(uid, target)
 
 
-def exercise(seed, metrics):
-    rng, battle = random.Random(seed), fixture(seed)
+def exercise(seed, metrics, *, battle=None, checkpoint=None):
+    rng = random.Random(seed)
+    battle = fixture(seed) if battle is None else battle
     metrics['fixture.' + battle.objective.kind] += 1
     metrics['fixture.hero_free'] += battle.hero_id is None
     for _ in range(80):
@@ -144,13 +145,19 @@ def exercise(seed, metrics):
             elif command == 'smoke':
                 assert preview in battle.smoke_clouds
             metrics['order.' + command] += 1
+            if unit.id == battle.hero_id:
+                metrics['hero_order.' + command] += 1
             metrics['flight_moves'] += command == 'move' and unit.can_fly
             metrics['forecast_checks'] += preview is not None
+            if checkpoint is not None:
+                checkpoint()
         if not battle.outcome:
             restored = Battle.from_dict(battle.to_dict())
             battle.auto_turn(); restored.auto_turn()
             assert battle.to_dict() == restored.to_dict(), 'Automatic policy changed after reload'
             metrics['automatic_rounds'] += 1
+            if checkpoint is not None:
+                checkpoint()
         alive = [u for u in battle.units if u.alive]
         assert len({u.pos for u in alive}) == len(alive)
         assert all(0 <= u.hp <= u.max_hp and u.effective_move_range >= 1 for u in battle.units)
