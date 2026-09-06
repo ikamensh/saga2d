@@ -35,9 +35,13 @@ def check_page(scene):
 
 def verify_matrix(game, output):
     from tools.eador_relic_campaign import prepare_censer_watch
+    from tools.eador_observatory_campaign import prepare_observatory
 
+    observatory = prepare_observatory()
+    observatory.explore(approach='clear')
     old = Path(__file__).resolve().parents[1] / 'tests/eador/fixtures/v10_pinned_crossing.json'
-    snapshots = [('earned-censer', prepare_censer_watch().to_json()), ('v10', old.read_text())]
+    snapshots = [('earned-censer', prepare_censer_watch().to_json()),
+                 ('paid-observatory', observatory.to_json()), ('v10', old.read_text())]
     metrics = []
     player = PlayerInput(game, native=True, output=output)
     for requested in ((1280, 720), (1280, 800), (1920, 1080)):
