@@ -84,6 +84,8 @@ class CampaignSaves:
                     detail = f"Stage {state.campaign.stage}/3 · {state.campaign.title} · {detail}"
                 if state.battle is not None:
                     detail += f" · Battle round {state.battle.round}"
+                    if state.battle.outcome is not None:
+                        detail += ' · ' + ('Victory' if state.battle.outcome == 'player' else 'Defeat') + ' result pending'
                 elif state.choice is not None:
                     detail += " · Decision pending"
                 elif state.campaign is not None and state.campaign.phase in _PHASE_LABELS:

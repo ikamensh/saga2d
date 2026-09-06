@@ -1,0 +1,38 @@
+{
+  "committed_source": "f3a59e2949245f2c98e9f778711b7830cf36540c",
+  "reports": {
+    "native.json": {
+      "recorded_head": "94bc7b1e0373fda565753b18abc8c2a16b29f414",
+      "matched_source_files": 38
+    },
+    "saves.json": {
+      "recorded_head": "94bc7b1e0373fda565753b18abc8c2a16b29f414",
+      "matched_source_files": 174
+    },
+    "linked-fuzz.json": {
+      "recorded_head": "94bc7b1e0373fda565753b18abc8c2a16b29f414",
+      "matched_source_files": 65
+    },
+    "rival.json": {
+      "source_attribution": "Root ran against the same frozen source as the save matrix; this older verifier emits no source hashes.",
+      "layouts": 90,
+      "inputs": 818,
+      "exact_reloads": 1
+    }
+  },
+  "all_recorded_source_hashes_match_commit": true,
+  "full_tests": {
+    "passed": 1119,
+    "seconds": 94.42
+  },
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "scene_runs": 20
+  },
+  "inspected_frames": {
+    "preview-long.png": "f2595ab28c5d9900a1b03a70395b145306843fe92a36898627c1c030faff6b89",
+    "preview-short.png": "51ed2df0fec52bc51ecbd1c084daec34297e3fef9bf17b0a73b5dd57b5d093f2",
+    "save-result-125.png": "7c3ad880853643d236197d134436df8790ccaa0027fd027fbb0240dfdd70860c",
+    "rival-opening-125.png": "6d94e501e7dfba58ef43f1926891fe88d2da395ef227000393a97d9d7f2b6c1c"
+  }
+}
