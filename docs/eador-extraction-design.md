@@ -1,6 +1,10 @@
 # Proposed third objective: carry and escape
 
-Design only, after the v9 support roles. This tranche should add two authored
+[The first two adventures are implemented and verified](eador-extraction.md) at
+`93b5cf8`. The Ruins vault remains deferred. The proposal below records the
+original design and its acceptance criteria.
+
+After the v9 support roles, this tranche should add two authored
 extraction adventures, then a third after the first two prove distinct manual
 plans. It does not complete G05's twelve-pattern requirement. The existing
 hero carries the recovered item; no escort NPC, extra army slot, reinforcement
