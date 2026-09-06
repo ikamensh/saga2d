@@ -1,4 +1,4 @@
-# Twelve relics: earned model evidence
+# Twelve relics: earned play and save evidence
 
 The four active relics reuse existing tactical commands. One equipped slot remains
 the constraint: equipping one gives up the other relic's income, movement, armor,
@@ -118,3 +118,45 @@ Raw evidence: [earned orders](evidence/relics-earned-stress.json),
 These examples demonstrate reachable abilities, costs, counterplay and saved
 continuation. They do not compare all twelve choices across all heroes, establish
 sell-price balance or replace first-time human discovery and enjoyment checks.
+
+## Native earned-use verification
+
+All four journeys passed on the same integrated source `a288171`, on macOS
+26.6.2 arm64 with the native pyglet backend. Every purchase, travel, source
+battle command, reward choice, equipment change, linked departure and manual
+demonstration order uses the shipped mouse/keyboard controls. Each report records
+the full input sequence and identical game/framework/helper source hashes;
+those files remained unchanged during all four runs.
+
+| Earned relic | Later outcome | Input activations | Exact F5/F9 reloads | Evidence |
+|---|---|---:|---:|---|
+| Veil Censer | Watch hold, round 3 | 251 | 12 | [Journey](evidence/shardbound-earned-relics-2026-09-06/veil_censer/journey.json), [forecast](evidence/shardbound-earned-relics-2026-09-06/veil_censer/round-1-smoke-forecast.png) |
+| Porter's Rune | Ruins Gate hold, round 5 | 491 | 16 | [Journey](evidence/shardbound-earned-relics-2026-09-06/porter_rune/journey.json), [landing](evidence/shardbound-earned-relics-2026-09-06/porter_rune/round-4-repulse-forecast.png) |
+| Mirror Badge | Elderwild Gate hold, round 2 | 428 | 12 | [Journey](evidence/shardbound-earned-relics-2026-09-06/mirror_badge/journey.json), [exchange](evidence/shardbound-earned-relics-2026-09-06/mirror_badge/round-2-swap-forecast.png) |
+| Vanguard Drum | Watch rout, round 3 | 146 | 5 | [Journey](evidence/shardbound-earned-relics-2026-09-06/vanguard_drum/journey.json), [restored reach](evidence/shardbound-earned-relics-2026-09-06/vanguard_drum/round-2-rally-forecast.png), [retained shot](evidence/shardbound-earned-relics-2026-09-06/vanguard_drum/rallied-ranger-keeps-shot.png) |
+
+The total is **1,316 input activations and 45 exact reloads**. All four retinues
+survive their demonstration battles; both Gate journeys resolve to completed
+linked campaigns. The Rune and Badge source battles remain explicit auto-play,
+and the Drum's continuation after its manual Rally/move/shot uses auto-play.
+The forecasts and result screens were inspected; final forecast PNGs are also
+byte-identical to the corresponding previously inspected captures. The tactical
+limitations documented above still apply.
+
+`tools/eador_ui.py` now refuses unadapted campaign/battle methods instead of
+forwarding a mutating call into the model behind its screen. Regression tests
+reproduce this former bypass with a ready recovery and a legal battle move.
+Explicit departure support selects the visible offer and two-relic retinue;
+the existing linked recovery/departure verifier shares that selection driver.
+The strict-driver source passed **904 full tests**. The integrated earned-stress
+tool also passed a bounded eight-continuation check after its merge.
+
+```sh
+uv run python tools/verify_eador_relics.py --relic veil_censer --output /tmp/censer
+uv run python tools/verify_eador_relics.py --relic porter_rune --output /tmp/rune
+uv run python tools/verify_eador_relics.py --relic mirror_badge --output /tmp/badge
+uv run python tools/verify_eador_relics.py --relic vanguard_drum --output /tmp/drum
+```
+
+These are source-mode native journeys. The preserved opening-playtest Mac
+archive predates the four new relics; this evidence does not update that artifact.

@@ -420,3 +420,25 @@ G01–G19 remain incomplete. The next increments address earned relic use, the
 seventh authored encounter and larger reference text. Difficulty selection,
 whole-campaign balance/pacing, complete text scaling, candidate-specific stress,
 Windows runtime, human playtests and listening review remain open.
+
+## Earned relic use through the complete input path — 2026-09-06
+
+- All four new relics now have native earned-use journeys at the same integrated
+  source `a288171`: Censer/Watch hold, Rune/Ruins Gate recovery hold,
+  Badge/Elderwild Gate exchange hold, and Drum/Watch Pin removal followed by rout.
+  Purchases, rewards, equipment and both linked departures use visible controls;
+  1,316 input activations and 45 exact reloads pass. Both Gate routes complete
+  their linked campaigns. [Retained relic evidence](eador-active-relics.md#native-earned-use-verification)
+  includes reports, inspected forecasts/results and the explicit tactical limits.
+- The shared test driver now rejects missing command adapters. Previously a
+  forwarded method could mutate the model without UI input; public recovery
+  and battle-movement regressions reproduce that gap. The stricter path passes
+  all 904 tests and all four native journeys.
+- Model evidence varies 400 continuations from four earned checkpoints, with
+  16,038 full-save checks, and separately validates 300 random campaigns. These
+  counts establish saved-order robustness, not 400 independently generated
+  worlds or equipment balance.
+
+G01–G19 remain incomplete. Broken Observatory, scoped larger Codex text and
+difficulty design continue independently; global text scaling, content depth,
+economy/pacing, platform, candidate stress and human feedback remain open.
