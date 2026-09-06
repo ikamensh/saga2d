@@ -1267,10 +1267,9 @@ class SaveScene(Screen):
         hint = ('Choose a shown manual slot to save and return to the title. Esc keeps your current game open.' if self.return_to_title else
                 'Shown slot numbers select a save. Shift + number opens its previous version. Left/Right changes page. Loading never overwrites a file.')
         footer = label(self.message or hint, 11, color=GOLD if self.message else MUTED)
-        self.ui.add(Column(introduction, *blocks, footer))
-        body_y = 99 + introduction.get_preferred_size()[1] + 18
-        footer_y = 670 - footer.get_preferred_size()[1]
-        self._page_indices, self.page = reading_pages([max(40, block.get_preferred_size()[1]) for block in blocks],
+        body_y = 99 + self.measure(introduction)[1] + 18
+        footer_y = 670 - self.measure(footer)[1]
+        self._page_indices, self.page = reading_pages([max(40, self.measure(block)[1]) for block in blocks],
                                                       footer_y - 18 - body_y, anchor=anchor, spacing=20)
         self.ui.clear()
         self.ui.add(Column(introduction, anchor=Anchor.TOP_LEFT, margin=(round(x + 28), round(y + 99))))
