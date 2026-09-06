@@ -1,4 +1,4 @@
-"""Replay an explicitly directed continuation from the retained earned Control opening."""
+"""Replay an explicitly directed continuation from a fixed retained earned opening."""
 import argparse
 import gzip
 import hashlib
@@ -17,12 +17,17 @@ os.environ.setdefault('SAGA2D_SILENT', '1')
 from eador.__main__ import create_session
 from eador.model import State
 from eador.persistence import CampaignSaves
+from eador.preferences import reading_scale
 from tools.cpu_budget import CpuBudget
 from tools.eador_ui import PLAYER_COMMANDS, PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 
-HISTORY = 'docs/evidence/shardbound-army-plans-cd351a9/control.json.gz'
-HISTORY_SHA256 = '6609eb4f334a956f6d6873e378b0b87bdd6901f3ad2f4688226265b8ede0b72a'
+EARNED_OPENINGS = {
+    'docs/evidence/shardbound-army-plans-cd351a9/control.json.gz':
+        ('6609eb4f334a956f6d6873e378b0b87bdd6901f3ad2f4688226265b8ede0b72a', 38),
+    'docs/evidence/shardbound-army-plans-cd351a9/mobile.json.gz':
+        ('1962ca77a5cbad06de2d81a5591e18d35e5502429dbe0d55b8b07a36bde00d5c', 14),
+}
 
 
 def load_journal(blob, hashes, budget):
@@ -31,15 +36,21 @@ def load_journal(blob, hashes, budget):
     required = {'source', 'execution_source', 'source_sha256', 'initial_state', 'final_state', 'commands'}
     if not isinstance(source, dict) or not required <= source.keys():
         raise ValueError('Directed journal must contain provenance, model hashes and saved commands')
-    history_blob = (ROOT / HISTORY).read_bytes()
-    if hashlib.sha256(history_blob).hexdigest() != HISTORY_SHA256:
-        raise ValueError('The retained earned Control opening has changed')
+    supplied = source['source']
+    if (not isinstance(supplied, dict) or not isinstance(supplied.get('path'), str)
+            or supplied['path'] not in EARNED_OPENINGS):
+        raise ValueError('Directed journal must name an authenticated earned opening')
+    path = supplied['path']
+    checksum, index = EARNED_OPENINGS[path]
+    history_blob = (ROOT / path).read_bytes()
+    if hashlib.sha256(history_blob).hexdigest() != checksum:
+        raise ValueError(f'The retained earned opening has changed: {path}')
     history = json.loads(gzip.decompress(history_blob))
-    initial = history['commands'][38]['before']
-    provenance = dict(path=HISTORY, journal_sha256=HISTORY_SHA256, journal_source=history['source_commit'],
-                      command_index=38, initial_sha256=hashlib.sha256(initial.encode()).hexdigest())
-    if source['source'] != provenance or source['initial_state'] != initial:
-        raise ValueError('Directed journal must start from the authenticated earned Control opening')
+    initial = history['commands'][index]['before']
+    provenance = dict(path=path, journal_sha256=checksum, journal_source=history['source_commit'],
+                      command_index=index, initial_sha256=hashlib.sha256(initial.encode()).hexdigest())
+    if supplied != provenance or source['initial_state'] != initial:
+        raise ValueError('Directed journal must start from the authenticated earned opening')
     manifest = source['source_sha256']
     if not isinstance(manifest, dict):
         raise ValueError('Directed journal must include its model source manifest')
@@ -87,8 +98,10 @@ def verify(input_report, output, *, backend='pyglet', cpu_percent=25):
             CampaignSaves(game.save_manager).save(State.from_json(source['initial_state']))
             game.push(title)
             player.press('f9')
-            for key in ('f2', 'right', 'return'):
+            player.button('Text size')
+            for key in ('right', 'return'):
                 player.press(key)
+            assert reading_scale(game) == 125
             assert player.state.to_json() == source['initial_state']
             seen = set()
             for index, entry in enumerate(source['commands'], 1):
