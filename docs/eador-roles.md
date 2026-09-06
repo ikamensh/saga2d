@@ -94,3 +94,7 @@ Reproduce with `python -m pytest tests/eador/test_roles.py -q`,
 `python tools/fuzz_eador.py --campaigns 300 --scenes 0 --steps 180` from the
 source checkout. UI/native verification and a soak of the later integrated
 candidate remain separate release work.
+
+After merging the independent all-class final-seal journeys and display
+primitives at `8f4d2da`, the combined suite passed 713 tests. The role game
+rules are unchanged from the retained `79b2d49` stress snapshot.
