@@ -1,0 +1,27 @@
+{
+  "accepted_source": "3fd3412163a3518ba64ded3f3ee7f72bc9b62a2c",
+  "original_report_revisions_preserved": true,
+  "fingerprint_comparison": {
+    "verification.json": {
+      "recorded_sources": 147,
+      "different_from_committed_source": []
+    },
+    "aerie-journey.json": {
+      "recorded_sources": 84,
+      "different_from_committed_source": []
+    },
+    "linked-fuzz.json": {
+      "recorded_sources": 66,
+      "different_from_committed_source": []
+    }
+  },
+  "full_suite": "1149 passed in 156.71s",
+  "tribes_fuzz": "60 AI games and 20 scene runs; no failures",
+  "reviewed_images": [
+    "aerie-flight-125.png",
+    "escape-acted-125.png",
+    "escape-ready-125.png",
+    "hold-125.png",
+    "settings-scope.png"
+  ]
+}
