@@ -59,7 +59,7 @@ class CampaignPlanScene(Screen):
 
         heading = Column(label(f'YOUR CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}', 11, color=GOLD),
                          Label(campaign.title, width=1064, wrap=True, font='Georgia', font_size=30, text_color=TEXT),
-                         label(campaign.objective, 14, color=TEXT), spacing=12)
+                         label(campaign.objective.replace(' or rout ', '\nor rout '), 14, color=TEXT), spacing=12)
         rows = []
         for index, (pos, name, complete) in enumerate(campaign_targets(state)):
             rows.append(Row(label(f'{index + 1}. {name}', 16, width=600, color=TEAL if complete else TEXT),
@@ -70,8 +70,10 @@ class CampaignPlanScene(Screen):
         objectives = Column(label('NUMBERED OBJECTIVES ON YOUR MAP', 10, color=GOLD), *rows, spacing=12)
         readiness = label(state.assault_blocked_reason or
                           'Duskspire is open to assault. Prepare your army and protect Westwatch.', color=GOLD)
-        travel = Column(label('Between shards', 13, width=520, color=TEAL),
-                        label('After a victory, carry your learned skills, up to two veterans and two relics. '
+        travel = Column(label('The final shard' if campaign.stage == 3 else 'Between shards', 13, width=520, color=TEAL),
+                        label('Victory completes this three-shard campaign. There is no further departure; '
+                              'your earned skills, veterans and relics stay with the completed chronicle.' if campaign.stage == 3 else
+                              'After a victory, carry your learned skills, up to two veterans and two relics. '
                               'The new expedition has three troops; unfilled places become fresh Militia. '
                               'Local buildings, holdings and remaining wealth stay on this shard.', width=520), spacing=10)
         gold, crystals = state.expedition_funding(recovery=True)

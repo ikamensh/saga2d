@@ -47,7 +47,6 @@ def test_earned_foundry_plan_reflows_without_spending_and_locates_its_saved_obje
         player.reload(before)
     finally:
         game._teardown()
-
     game = create_game(backend='mock', save_dir=saves)
     try:
         game.push(ShardScene(State.from_json(before)))
@@ -60,3 +59,10 @@ def test_earned_foundry_plan_reflows_without_spending_and_locates_its_saved_obje
         assert player.state.to_json() == before
     finally:
         game._teardown()
+
+
+def test_campaign_plan_keeps_actual_progress_recovery_and_finale_rules_readable(tmp_path):
+    """All five earned contracts and a real recovered attempt preserve every target through reading and locating."""
+    from tools.verify_eador_campaign_plan import verify
+
+    verify(tmp_path, backend='mock')
