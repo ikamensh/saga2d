@@ -145,9 +145,15 @@ independent counterplay review and native forecast/retry journeys remain gates.
 Run `uv run python tools/prototype_eador_causeway.py` from the checkout. The
 default report is `/tmp/causeway-prototype.json.gz`; `--step` shows unit state,
 resources, forecasts and each next order, advancing with Enter or quitting with
-`q`. The retained report will include source revision/hashes, exact paid
-campaigns and purchase bills, all 161 order checkpoints and settlement/recovery
-snapshots. Reports are compressed; no large indented fixture is needed in Git.
+`q`. The [retained report](evidence/causeway-prototype-2026-09-06.json.gz) was
+produced at source `f4cf6fb07bd261731b86fea48637cf276c4f500e`. It includes exact
+paid campaigns and purchase bills, all 161 order/reload checkpoints and
+settlement/recovery snapshots. All 44 recorded source hashes match that Git
+revision; no production source changed. The compressed file is 30,156 bytes,
+SHA-256 `f9b45f3c039b3390ca455dcfab24d4b6aeaadf8a557900e59e90d7ba8e0d1466`.
+The prototype assertions and 78 existing public Guard/control/extraction tests
+passed; the terminal step/quit path was also exercised. Independent review is
+still pending. This is source-attributed model evidence, not native gameplay.
 
 Reject or fold this into another family if independent play finds no meaningful
 action/formation consequence, a cheap universal bypass makes the Repulse
