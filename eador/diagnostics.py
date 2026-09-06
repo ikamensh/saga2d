@@ -9,14 +9,15 @@ from eador.style import MUTED, RED, TEXT
 
 
 class DiagnosticScene(Screen):
-    """A read-only error snapshot with measured pages and ordinary scene-stack input isolation."""
+    """A complete message snapshot with measured pages and ordinary scene-stack input isolation."""
 
     transparent = True
     controls = {('left', 'pageup'): 'previous_page', ('right', 'pagedown'): 'next_page'}
 
-    def __init__(self, message, *, return_label='Return', title='Complete save/load diagnostic'):
+    def __init__(self, message, *, return_label='Return', title='Complete save/load diagnostic', body_color=RED):
         super().__init__()
         self.message, self.return_label, self.title = message, return_label, title
+        self.body_color = body_color
         self.page = 0
         self._pages = ('',)
 
@@ -50,8 +51,9 @@ class DiagnosticScene(Screen):
         self.x, self.y = (self.game.width - 1120) / 2, (self.game.height - 760) / 2
         x, y = self.x + 28, self.y + 28
 
-        def label(text, *, width=1064, color=RED):
-            return Label(text, width=width, wrap=True, font='Verdana', font_size=round(12 * scale), text_color=color)
+        def label(text, *, width=1064, color=None):
+            return Label(text, width=width, wrap=True, font='Verdana', font_size=round(12 * scale),
+                         text_color=self.body_color if color is None else color)
 
         title = Label(self.title, width=800, wrap=True,
                       font='Georgia', font_size=30, text_color=TEXT)

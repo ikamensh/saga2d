@@ -67,6 +67,13 @@ class ForecastInput(PlayerInput):
         before = self.state.to_json()
         aim = scene.selected, scene.cursor, scene.hover, scene.targeting
         initial_window = self.game.window_size
+        # Complete events remain available in Battle log when its compact footer
+        # fills; changing the reading size may legitimately expose that link.
+        footer = set(scene.battle.log[-3:]) | {
+            scene.message or ('Click a target for ' + scene.targeting if scene.targeting else scene.order_hint()),
+            'Open the battle log to read the latest entries.',
+            'A complete battle message is available below.',
+        }
         for window in ((1280, 720), (1280, 800), (1920, 1080)):
             self.game.set_window_size(window)
             self.game.tick(1 / 60)
@@ -78,7 +85,8 @@ class ForecastInput(PlayerInput):
                 assert self.game.scene is scene and reading_scale(self.game) == percent
                 assert self.state.to_json() == before
                 assert (scene.selected, scene.cursor, scene.hover, scene.targeting) == aim
-                assert [c.text for c in scene.ui.walk() if isinstance(c, Label)] == labels
+                after_labels = [c.text for c in scene.ui.walk() if isinstance(c, Label)]
+                assert [s for s in after_labels if s not in footer] == [s for s in labels if s not in footer], (labels, after_labels)
                 check_reading_layout(scene)
                 self.layouts.append(dict(category=category, objective=objective_key, new_cases=sorted(additions),
                                          window=window, percent=percent, text=labels))

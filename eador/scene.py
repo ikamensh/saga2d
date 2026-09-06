@@ -6,7 +6,6 @@ scene lifetimes, hotkeys, geometry, drawing and save files.
 
 from __future__ import annotations
 
-import textwrap
 from collections import Counter
 
 from saga2d import Anchor, Button, HexGrid, InputEvent, SaveError, Scene
@@ -895,38 +894,26 @@ class BattleScene(Screen):
         objective = self._objective_content()
         self.objective_bottom = 100 + self.measure(objective)[1] + 24
         self.ui.add(Column(objective, anchor=Anchor.TOP_LEFT, margin=(38, 112)))
+        alive = [u for u in b.units if u.team == "player" and u.hp > 0]
+        if self.selected is None or not any(u.id == self.selected for u in alive):
+            self.selected = alive[0].id if alive else None
+        command = self._command_content()
+        if self.measure(command)[1] > h - 118:
+            raise ValueError('Tactical commands exceed the available reading space')
+        self.ui.add(Column(command, anchor=Anchor.TOP_LEFT, margin=(x, 60)))
+        footer = self._footer_content()
+        self.footer_top = h - 16 - self.measure(footer)[1]
+        self.ui.add(Column(footer, anchor=Anchor.TOP_LEFT, margin=(30, round(self.footer_top))))
         # Fit any finite battle board; topology, picking and polygons share one grid.
         geometry = HexGrid(b.terrain)
         centers = [geometry.center(p) for p in b.terrain]
         left, right = min(p[0] for p in centers) - .866, max(p[0] for p in centers) + .866
         top, bottom = min(p[1] for p in centers) - 1, max(p[1] for p in centers) + 1
-        board_top, board_bottom = self.objective_bottom + 16, h - 146
+        board_top, board_bottom = self.objective_bottom + 16, self.footer_top - 36
         size = min((self.edge - 100) / (right - left), (board_bottom - board_top) / (bottom - top))
         origin = (self.edge / 2 - (left + right) / 2 * size,
                   (board_top + board_bottom) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
-        alive = [u for u in b.units if u.team == "player" and u.hp > 0]
-        if self.selected is None or not any(u.id == self.selected for u in alive):
-            self.selected = alive[0].id if alive else None
-        selected = b.unit(self.selected) if self.selected is not None else None
-        self.button("Brace" if selected and selected.can_brace else "Guard", x + 184, 247, 116,
-                    self.guard, shortcut="G", enabled=selected is not None and not selected.acted and b.outcome is None)
-        if self.unit_order:
-            name = self.unit_order
-            label, key, _, _ = self.unit_orders[name]
-            if name == 'pin' and selected.pin_cooldown:
-                label += ' · wait'
-            elif name in ('smoke', 'repulse'):
-                label += ' · 0' if name in selected.spent_abilities else ' · 1'
-            self.button(label, x, 247, 172, lambda: self.choose_order(name), shortcut=key,
-                        primary=self.targeting == name, enabled=bool(getattr(b, name + '_targets')(selected.id)))
-        self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 334, 300, self.bolt, hotkey="1",
-                    enabled=bool(b.spell_targets('bolt')))
-        healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
-        self.button(f"{healer} Heal · {b.spell_cost('heal')} mana", x, 384, 300, self.heal, hotkey="2",
-                    enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster)))
-        self.button("Auto-play one round", x, 474, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
-        self.button("Retreat", x, 524, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
         self.button("End battle round", x, h - 46, 300, self.end_turn,
                     hotkey="E", primary=True, enabled=b.outcome is None)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
@@ -934,11 +921,101 @@ class BattleScene(Screen):
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
         self.button('Text size', x + 126, 16, 174, self.open_text_settings, shortcut='F2')
         from eador.preferences import reading_scale
-        forecast = self._forecast()
-        if self.measure(forecast)[1] > h - 58 - 575:
-            raise ValueError('Tactical forecast exceeds the available reading space')
-        self.ui.add(Column(forecast, anchor=Anchor.TOP_LEFT, margin=(x, 575)))
-        self._reading_view = self.hover, self.game.window_size, reading_scale(self.game)
+        self._reading_view = self.hover, self.message, self.game.window_size, reading_scale(self.game)
+
+    def _command_content(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        b = self.battle
+        selected = b.unit(self.selected) if self.selected is not None else None
+        scale = reading_scale(self.game) / 100
+
+        def label(text, *, size=12, color=MUTED, width=300):
+            return Label(text, width=width, wrap=True, font='Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        allies = sum(u.hp > 0 and u.team == 'player' for u in b.units)
+        enemies = sum(u.hp > 0 and u.team != 'player' for u in b.units)
+        sections = [label(f'{allies} allies · {enemies} foes · Tab selects')]
+        if selected:
+            name = self.root.state.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name
+            status = ('Guard +2' if selected.stance == 'guard' else 'Braced' if selected.stance == 'brace' else
+                      'Can move' if selected.acted and b.reachable(selected.id) else
+                      'Spent' if selected.acted else 'Moved' if selected.moved else 'Ready')
+            penalties = ['Pinned'] if selected.pinned else []
+            if selected.cargo_penalty:
+                penalties.append(f'Cargo −{selected.cargo_penalty}')
+            movement = f"{'Fly' if selected.can_fly else 'Move'} {selected.effective_move_range}"
+            if penalties:
+                movement += f" ({', '.join(penalties)})"
+            sections.append(Column(Label(name, width=300, wrap=True, font='Georgia', font_size=25, text_color=TEXT),
+                                   Row(label(f'{selected.hp} / {selected.max_hp} HP', color=TEAL, width=180),
+                                       label(status, color=GOLD, width=108), spacing=12),
+                                   label(f'Attack {selected.attack}   Defense {selected.effective_defense}', color=TEXT),
+                                   label(f'{movement}   Range {selected.attack_range}'), spacing=6))
+        orders = []
+        if self.unit_order:
+            name = self.unit_order
+            title, key, _, _ = self.unit_orders[name]
+            if name == 'pin' and selected.pin_cooldown:
+                title += ' · wait'
+            elif name in ('smoke', 'repulse'):
+                title += ' · 0' if name in selected.spent_abilities else ' · 1'
+            orders.append(Button(title, width=172, height=40, shortcut=key,
+                                 on_click=lambda: self.choose_order(name),
+                                 style=PRIMARY if self.targeting == name else None,
+                                 enabled=bool(getattr(b, name + '_targets')(selected.id))))
+        orders.append(Button('Brace' if selected and selected.can_brace else 'Guard', width=116, height=40,
+                             shortcut='G', on_click=self.guard,
+                             enabled=selected is not None and not selected.acted and b.outcome is None))
+        sections.append(Row(*orders, spacing=12))
+        healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
+        sections.append(Column(label(f'SHARED MANA   /   {b.mana} REMAINING', size=10, color=BLUE),
+                               Button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", width=300, height=40,
+                                      hotkey='1', on_click=self.bolt, enabled=bool(b.spell_targets('bolt'))),
+                               Button(f"{healer} Heal · {b.spell_cost('heal')} mana", width=300, height=40,
+                                      hotkey='2', on_click=self.heal,
+                                      enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster))),
+                               label('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else
+                                     'Spells spend the hero’s order.', size=11), spacing=8))
+        sections.append(self._forecast())
+        return Column(*sections, spacing=18)
+
+    def _footer_content(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        scale, width = reading_scale(self.game) / 100, self.edge - 60
+
+        def label(text, *, width=380, color=MUTED):
+            return Label(text, width=width, wrap=True, font='Verdana', font_size=round(11 * scale), text_color=color)
+
+        logs = Column(*(label(line) for line in self.battle.log[-3:]), spacing=4)
+        if self.measure(logs)[1] > 100:
+            logs = label('Open the battle log to read the latest entries.')
+        hint = label(self.message or ('Click a target for ' + self.targeting if self.targeting else self.order_hint()),
+                     width=width - 396, color=GOLD)
+        overflow = self.measure(hint)[1] > 100
+        if overflow:
+            hint = label('A complete battle message is available below.', width=width - 396, color=GOLD)
+        controls = Row(Button('Auto-play one round', width=270, height=40, shortcut='A', on_click=self.auto_round,
+                              enabled=self.battle.outcome is None),
+                       Button('Retreat', width=150, height=40, shortcut='T', style=DANGER,
+                              on_click=self.retreat, enabled=self.battle.outcome is None),
+                       Button('Battle log', width=170, height=40, shortcut='L', on_click=self.read_log), spacing=12)
+        if overflow:
+            controls.add(Button('Read message', width=242, height=40, shortcut='M', on_click=self.read_message))
+        # Reserve the same footer height after every order, so the board cannot
+        # move underneath a pointer when recent events or guidance change.
+        return Column(Row(logs, hint, spacing=16, height=100), controls, spacing=12)
+
+    def read_log(self):
+        from eador.diagnostics import DiagnosticScene
+        self.game.push(DiagnosticScene('\n'.join(self.battle.log), title='Battle log',
+                                       body_color=MUTED, return_label='Return to battle'))
+
+    def read_message(self):
+        from eador.diagnostics import DiagnosticScene
+        self.game.push(DiagnosticScene(self.message, title='Complete battle message', return_label='Return to battle'))
 
     def _objective_content(self):
         from saga2d import Column, Label, Row
@@ -1128,7 +1205,7 @@ class BattleScene(Screen):
 
     def update(self, dt):
         from eador.preferences import reading_scale
-        if self._reading_view != (self.hover, self.game.window_size, reading_scale(self.game)):
+        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
             self.refresh()
         self.clock += dt
         self.floats = [f for f in self.floats if self.clock - f[0] < 1.6]
@@ -1252,30 +1329,7 @@ class BattleScene(Screen):
         self.rule(26, 90, self.edge - 52)
         self.box(26, 100, self.edge - 52, self.objective_bottom - 100)
         self.text("COMMAND", x, 30, size=10, color=GOLD)
-        allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
-        enemies = sum(u.hp > 0 and u.team != "player" for u in b.units)
-        self.text(f"{allies} allies · {enemies} foes · Tab selects", x, 60, size=12, color=MUTED)
-        self.rule(x, 94, 300)
         selected = b.unit(self.selected) if self.selected is not None else None
-        if selected:
-            self.text(s.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name,
-                      x, 115, size=25, serif=True)
-            self.text(f"{selected.hp} / {selected.max_hp} HP", x, 154, size=13, color=TEAL)
-            self.bar(x, 181, 300, selected.hp, selected.max_hp)
-            self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 202, size=13)
-            penalties = ['Pinned'] if selected.pinned else []
-            if selected.cargo_penalty:
-                penalties.append(f'Cargo −{selected.cargo_penalty}')
-            movement = f"{'Fly' if selected.can_fly else 'Move'} {selected.effective_move_range}" + (f" ({', '.join(penalties)})" if penalties else '')
-            self.text(f"{movement}   Range {selected.attack_range}", x, 228, size=12, color=MUTED)
-            status = ("Guard +2" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
-                      "Can move" if selected.acted and b.reachable(selected.id) else
-                      "Spent" if selected.acted else "Moved" if selected.moved else "Ready")
-            self.text(status, x + 193, 155, size=12, color=GOLD)
-        self.rule(x, 292, 300)
-        self.text(f"SHARED MANA   /   {b.mana} REMAINING", x, 309, size=10, color=BLUE)
-        self.text('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else 'Spells spend the hero’s order.',
-                  x, 435, size=11, color=MUTED)
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
         reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting else set()
         targets = {u.id for u in self.action_targets()} if b.outcome is None else set()
@@ -1329,14 +1383,14 @@ class BattleScene(Screen):
                       selected=u.id == self.selected, spent=u.acted)
             with self.screen_layer(1):
                 if u.stance:
-                    self.draw_circle(cx + 30, cy - 17, 9, INK)
-                    self.text("B" if u.stance == "brace" else "G", cx + 30, cy - 24, size=10, color=GOLD, center=True)
+                    self.draw_circle(cx + 20, cy + 7, 9, INK)
+                    self.text("B" if u.stance == "brace" else "G", cx + 20, cy, size=10, color=GOLD, center=True)
                 if u.pinned:
-                    self.draw_circle(cx - 30, cy - 17, 9, INK)
-                    self.text("P", cx - 30, cy - 24, size=10, color=BLUE, center=True)
+                    self.draw_circle(cx - 20, cy + 7, 9, INK)
+                    self.text("P", cx - 20, cy, size=10, color=BLUE, center=True)
                 if u.pos in cloudy:
-                    self.draw_circle(cx + 32, cy + 7, 10, INK)
-                    for dx, dy in ((29, 7), (35, 7), (32, 3)):
+                    self.draw_circle(cx, cy + 7, 10, INK)
+                    for dx, dy in ((-3, 7), (3, 7), (0, 3)):
                         self.draw_circle(cx + dx, cy + dy, 4, BLUE)
                 self.draw_rect(cx - 29, cy + 29, 58, 16, INK, radius=3)
                 self.text(f"{u.hp}/{u.max_hp}", cx, cy + 29, size=10, center=True)
@@ -1349,12 +1403,7 @@ class BattleScene(Screen):
                 self.draw_rect(cx - 31, yy - 2, 62, 35, INK, radius=4)
                 self.text(f"{change:+}", cx, yy, size=23,
                           color=TEAL if change > 0 else RED, center=True)
-        self.rule(26, h - 122, self.edge - 52)
-        for i, line in enumerate(b.log[-3:]):
-            self.text(textwrap.shorten(line, width=105, placeholder="…"), 30, h - 102 + i * 24,
-                      size=11, color=MUTED)
-        self.text(self.message or ("Click a target for " + self.targeting if self.targeting else self.order_hint()),
-                  30, h - 26, size=11, color=GOLD)
+        self.rule(26, self.footer_top - 12, self.edge - 52)
 
 
 class SaveScene(Screen):
