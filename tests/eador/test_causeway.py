@@ -63,3 +63,62 @@ def test_a_thousand_ruins_keep_the_recorded_witness_and_every_other_world_field(
         assert world[(1, 0)].site_kind == 'barrow' and world[(1, 0)].site_relic == 'iron_crown'
     for theme in ('frontier', 'elderwild'):
         assert all(p.site_kind != 'runebound_causeway' for p in generate(7, theme).values())
+
+
+def test_actual_low_mana_commander_can_prioritize_the_caster_and_escape():
+    """Ten earned mana permits focus+Heal now; the initial caster dies without a forced Guard order."""
+    from tools.eador_causeway_campaign import prepare_causeway, causeway_focus_route
+    from tests.eador.test_extraction_journeys import Journey, assert_one_reward
+
+    state = prepare_causeway()
+    assert state.turn == 9 and state.hero.mana == 10
+    play = causeway_focus_route(state, heal=True, orders_type=Journey)
+    assert play.battle.outcome_reason == 'escape' and play.battle.round == 4
+    assert play.battle.mana == 2
+    assert sum(u.max_hp - u.hp for u in play.battle.units if u.team == 'player') == 15
+    adept = next(u for u in play.battle.units if u.kind == 'adept')
+    assert not adept.alive and not adept.spent_abilities
+    assert_one_reward(play)
+
+
+def test_guard_and_occupied_landing_trade_real_recovery_for_fewer_wounds():
+    """The same paid six-body army has two safe Repulse counters; neither refills mana for free."""
+    from tools.eador_causeway_campaign import prepare_causeway, causeway_guard_route
+    from tests.eador.test_extraction_journeys import Journey, assert_one_reward
+
+    guard_state = prepare_causeway(mana=12)
+    assert (guard_state.turn, guard_state.hero.mana) == (10, 14)
+    guard = causeway_guard_route(guard_state, heal=True, orders_type=Journey)
+    occupied_state = prepare_causeway(mana=16)
+    assert (occupied_state.turn, occupied_state.hero.mana) == (11, 18)
+    occupied = causeway_guard_route(occupied_state, backstop=True, heal=True, orders_type=Journey)
+    assert guard.state.hero.army == occupied.state.hero.army
+    for play, wounds, spent in ((guard, 12, 12), (occupied, 14, 16)):
+        assert play.battle.round == 4 and play.battle.outcome_reason == 'escape'
+        assert sum(u.max_hp - u.hp for u in play.battle.units if u.team == 'player') == wounds
+        assert play.state.hero.mana - play.battle.mana == spent
+        assert not next(u for u in play.battle.units if u.kind == 'adept').spent_abilities
+        assert_one_reward(play)
+
+
+def test_smaller_scout_can_leave_at_low_mana_or_recover_and_finish_with_healing():
+    """A five-body flank needs no Acolyte; later recovery includes the real rival and level gain."""
+    from tools.eador_causeway_campaign import prepare_causeway, causeway_scout_route
+    from tests.eador.test_extraction_journeys import Journey, assert_one_reward
+    from tests.eador.test_relief import assert_one_reward as assert_rout_reward
+
+    early = prepare_causeway('Scout')
+    assert (early.turn, early.hero.level, early.hero.mana) == (6, 3, 6)
+    escape = causeway_scout_route(early, orders_type=Journey)
+    assert escape.battle.round == 4 and escape.battle.outcome_reason == 'escape'
+    assert sum(u.max_hp - u.hp for u in escape.battle.units if u.team == 'player') == 41
+    assert not any(command == 'swap' for command, *_ in escape.orders)
+    assert_one_reward(escape)
+    recovered = prepare_causeway('Scout', mana=8)
+    assert (recovered.turn, recovered.hero.level, recovered.hero.mana) == (8, 4, 8)
+    assert [t.kind for t in recovered.hero.army] == ['militia', 'militia', 'archer', 'warden']
+    healed = causeway_scout_route(recovered, heal=True, orders_type=Journey)
+    assert healed.battle.round == 4 and healed.battle.outcome_reason == 'rout'
+    assert sum(command == 'end_turn' for command, *_ in healed.orders) == 4
+    assert sum(u.max_hp - u.hp for u in healed.battle.units if u.team == 'player') == 19
+    assert_rout_reward(healed)
