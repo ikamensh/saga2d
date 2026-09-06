@@ -130,6 +130,9 @@ def cache_route(state, approach, *, orders_type=AdventureOrders):
         play.do('move', 0, (-2, 1))
         play.guard_remaining(); play.do('end_turn')
         if play.battle.unit(0).hp < play.battle.unit(0).max_hp:
+            # The forest blocks this diagonal: step into the western lane before healing.
+            if play.battle.unit(0) not in play.battle.spell_targets('heal', caster_id=5):
+                play.do('move', 5, (-1, 0))
             play.do('cast', 'heal', 0, caster_id=5)
         play.do('move', 4, (-3, 1)); play.do('swap', 4, 0)
     play.do('evacuate')

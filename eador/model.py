@@ -43,10 +43,11 @@ class UnitSpec:
     color: tuple[int, int, int]
     abilities: tuple[str, ...] = ()
     skirmisher: bool = False
+    crystals: int = 0
 
 
 UNITS = {
-    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127)),
+    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127), ('rally',)),
     'swordsman': UnitSpec('Swordsman', 34, 11, 4, 3, 1, 45, 2, 'barracks', (131, 177, 185)),
     'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112), ('pin',)),
     'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233), ('heal',)),
@@ -57,8 +58,11 @@ UNITS = {
     'warden': UnitSpec('Warden', 38, 8, 4, 2, 1, 55, 2, 'barracks', (140, 164, 203), ('swap',)),
     'ranger': UnitSpec('Ranger', 22, 7, 1, 3, 3, 50, 2, 'archery', (118, 185, 157), skirmisher=True),
     'pikeman': UnitSpec('Pikeman', 28, 9, 3, 2, 1, 40, 2, 'barracks', (173, 188, 149)),
+    'sapper': UnitSpec('Sapper', 26, 7, 2, 3, 1, 60, 2, 'market', (190, 161, 105), ('smoke',), crystals=1),
+    'adept': UnitSpec('Rune Adept', 28, 6, 2, 3, 2, 65, 2, 'mage_tower', (173, 143, 206), ('repulse',), crystals=2),
+    'skyrider': UnitSpec('Skyrider', 28, 10, 2, 4, 1, 85, 3, 'temple', (137, 189, 221), ('fly',), crystals=3),
 }
-RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman', 'ranger', 'warden')
+RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman', 'ranger', 'warden', 'sapper', 'adept', 'skyrider')
 
 
 @dataclass(frozen=True)
@@ -388,6 +392,11 @@ class State:
             self.hero.mana += 4
         self.log.append(f'Built {spec.name}.')
 
+    def recruit_crystal_cost(self, kind: str) -> int:
+        if kind not in RECRUITABLE:
+            raise RuleError('That unit cannot be recruited.')
+        return UNITS[kind].crystals
+
     def recruit(self, kind: str) -> None:
         self._ready()
         if kind not in RECRUITABLE:
@@ -400,9 +409,10 @@ class State:
         if len(self.hero.army) >= self.hero.max_army:
             raise RuleError('Your army is full.')
         cost = self.recruit_cost(kind)
-        if self.gold < cost:
-            raise RuleError('Not enough gold.')
+        if self.gold < cost or self.crystals < self.recruit_crystal_cost(kind):
+            raise RuleError('Not enough gold or crystals.')
         self.gold -= cost
+        self.crystals -= self.recruit_crystal_cost(kind)
         self.hero.army.append(Troop(self.next_troop_id, kind, spec.hp, spec.hp))
         self.next_troop_id += 1
         self.log.append(f'Recruited {spec.name}.')
@@ -675,7 +685,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 10
+        data['schema_version'] = 11
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -694,8 +704,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 and 11.')
         _validate_save(data, version)
         if version >= 8:
             from eador.campaign import validate_campaign
@@ -762,6 +772,10 @@ class State:
                 data['battle']['objective']['exits'] = ()
                 for unit in data['battle']['units']:
                     unit['cargo_penalty'] = 0
+        if version < 11 and data['battle'] is not None:
+            data['battle'].update(sight_rules='open', smoke_clouds=[])
+            for unit in data['battle']['units']:
+                unit['spent_abilities'] = ()
         if data['battle_adventure'] is not None:
             data['battle_adventure'] = AdventureAttempt(**data['battle_adventure'])
         data['rival']['pos'] = tuple(data['rival']['pos'])
@@ -993,7 +1007,8 @@ def _validate_save(data: dict, version: int) -> None:
     require(position(data['battle_province'], 'Battle province') in provinces, 'Battle province is outside the shard.')
     keys = {'units', 'terrain', 'mana', 'spells', 'round', 'outcome', 'log'}
     object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version >= 3 else set())
-                  | ({'objective', 'outcome_reason'} if version >= 5 else set()), 'Battle')
+                  | ({'objective', 'outcome_reason'} if version >= 5 else set())
+                  | ({'sight_rules', 'smoke_clouds'} if version >= 11 else set()), 'Battle')
     integer(battle['mana'], 'Battle mana', maximum=hero['max_mana'])
     integer(battle['round'], 'Battle round', minimum=1, maximum=81)
     require(battle['outcome'] in (None, 'player', 'enemy'), 'Unknown battle outcome.')
@@ -1015,6 +1030,17 @@ def _validate_save(data: dict, version: int) -> None:
         cells.add(pos)
         require(tile['kind'] in ('plains', 'forest', 'hills', 'marsh'), 'Unknown battle terrain.')
     require(len(cells) == 37, 'A battlefield must contain 37 hexes.')
+    if version >= 11:
+        require(battle['sight_rules'] in ('open', 'terrain'), 'Unknown sight rules.')
+        require(isinstance(battle['smoke_clouds'], list), 'Smoke clouds must be a list.')
+        cloudy = set()
+        for cloud in battle['smoke_clouds']:
+            object_fields(cloud, {'pos', 'expires_before_team'}, 'Smoke cloud')
+            pos = position(cloud['pos'], 'Smoke position')
+            require(pos in cells and pos not in cloudy, 'Smoke hex is invalid or duplicated.')
+            cloudy.add(pos)
+            require(cloud['expires_before_team'] in ('player', 'enemy'), 'Smoke expiry needs a team.')
+        require(battle['sight_rules'] == 'terrain' or not cloudy, 'Open sight battles cannot contain smoke.')
     objective = battle['objective'] if version >= 5 else asdict(BattleObjective())
     if version >= 5:
         object_fields(objective, {f.name for f in fields(BattleObjective)} - ({'exits'} if version < 10 else set()), 'Objective')
@@ -1071,7 +1097,7 @@ def _validate_save(data: dict, version: int) -> None:
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     expedition_ids = set()
     for unit in battle['units']:
-        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set()) - ({'cargo_penalty'} if version < 10 else set())
+        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set()) - ({'cargo_penalty'} if version < 10 else set()) - ({'spent_abilities'} if version < 11 else set())
         object_fields(unit, unit_keys, 'Battle unit')
         integer(unit['id'], 'Battle unit ID')
         require(unit['id'] not in ids, 'Duplicate battle unit ID.')
@@ -1090,7 +1116,16 @@ def _validate_save(data: dict, version: int) -> None:
             expected_cargo = data['battle_adventure']['cargo_penalty'] if unit['id'] == 0 and data['battle_adventure'] else 0
             require(unit['cargo_penalty'] == expected_cargo, 'Carried cargo differs from the adventure approach.')
         if version >= 7:
-            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
+            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap', 'rally', 'smoke', 'repulse', 'fly') if version >= 11 else ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
+            if version >= 11:
+                strings(unit['spent_abilities'], 'Spent abilities', ('smoke', 'repulse'), unique=True)
+                require(set(unit['spent_abilities']) <= set(unit['abilities']), 'Spent charge requires its ability.')
+                require(battle['sight_rules'] == 'terrain' or not set(unit['abilities']) & {'rally', 'smoke', 'repulse', 'fly'},
+                        'Older open-sight armies cannot gain new capabilities.')
+            require('fly' not in unit['abilities'] or unit['kind'] == 'skyrider', 'Only Skyriders can fly.')
+            require('repulse' not in unit['abilities'] or unit['kind'] == 'adept', 'Only Rune Adepts can Repulse.')
+            require('smoke' not in unit['abilities'] or unit['kind'] == 'sapper', 'Only Sappers can use Smoke.')
+            require('rally' not in unit['abilities'] or unit['kind'] == 'militia', 'Only Militia can Rally.')
             require('swap' not in unit['abilities'] or unit['kind'] == 'warden', 'Only Wardens can swap allies.')
             require('heal' not in unit['abilities'] or unit['kind'] == 'healer', 'Only Acolytes gain troop Heal.')
             require('pin' not in unit['abilities'] or unit['kind'] == 'archer'
@@ -1140,6 +1175,11 @@ def _validate_save(data: dict, version: int) -> None:
         require([unit['kind'] for unit in enemies] == province['site_guards'], 'Extraction defenders differ from the saved site roster.')
         require(all(unit['hp'] <= hp for unit, hp in zip(enemies, province['site_guard_hp'])),
                 'Extraction defenders cannot regain wounds during an attempt.')
+    if version >= 11:
+        for team in ('player', 'enemy'):
+            require(sum(cloud['expires_before_team'] == team for cloud in battle['smoke_clouds'])
+                    <= sum(unit['team'] == team and 'smoke' in unit['spent_abilities'] for unit in battle['units']),
+                    'Smoke requires a spent charge belonging to its team.')
     hero_unit = next(unit for unit in battle['units'] if unit['id'] == 0)
     if battle['outcome'] == 'player':
         if version >= 10 and battle['outcome_reason'] == 'escape':
