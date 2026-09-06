@@ -127,6 +127,17 @@ class Journey:
             yield "key", option
             self.counts[kind + "_choices"] += 1
 
+    def playback(self):
+        """Let normal paced frames finish the view; never count waiting as a battle order."""
+        from eador.battle_playback_scene import BattlePlaybackScene
+
+        if isinstance(self.game.scene, BattlePlaybackScene):
+            resolved = self.state.to_json()
+            self.counts["watched_playbacks"] += 1
+            while isinstance(self.game.scene, BattlePlaybackScene):
+                yield "wait", None
+                assert self.state.to_json() == resolved, "playback changed its resolved game state"
+
     def battle(self):
         assert isinstance(self.game.scene, self.BattleScene)
         yield "key", "F5"
@@ -162,6 +173,7 @@ class Journey:
                 break
             yield "key", "A"
             self.counts["auto_rounds"] += 1
+            yield from self.playback()
         assert self.state.battle.outcome == "player", "prepared opening encounter was not won"
         yield "key", "E"
         self.counts["battles_resolved"] += 1
@@ -233,6 +245,8 @@ class Journey:
         window = self.game.backend.window
         if kind == "restart":
             self.game.clear_and_push(TitleScene(value))
+        elif kind == "wait":
+            pass  # The worker continues ordinary rendered frames between input opportunities.
         elif kind == "key":
             symbol = getattr(key, value)
             window.dispatch_event("on_key_press", symbol, 0)
@@ -272,7 +286,7 @@ def soak(args):
               "platform": platform.platform(), "architecture": platform.machine(),
               "latency_measurement": "Game.tick only: input dispatch, updates and real rendering; excludes pacing, driver setup, screenshots and report I/O",
               "latency_file": "latency-ms.f64", "latency_byte_order": sys.byteorder,
-              "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, both reading sizes and battle settings cancellation in one persistent hidden Pyglet window; silent audio driver. Not full campaigns or human playtesting."}
+              "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, both reading sizes, natural ordered battle playback and battle settings cancellation in one persistent hidden Pyglet window; silent audio driver. Wait steps are not input activations. Not full campaigns or human playtesting."}
     for name in ("hw.model", "machdep.cpu.brand_string", "hw.memsize"):
         report[name] = subprocess.check_output(["sysctl", "-n", name], text=True).strip()
     awake = subprocess.Popen(["/usr/bin/caffeinate", "-dims", "-w", str(os.getpid())])
