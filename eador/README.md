@@ -91,7 +91,9 @@ and mix review remain part of release preparation.
    This first expedition earns treasure and experience before you advance.
 3. In battle, click a friendly unit, then a blue reachable hex to move.
    Click an enemy marked as a target to attack. Keep the archer behind
-   the front line; forest and hills reduce incoming attack damage.
+   the front line; forest and hills reduce incoming attack damage. Hover or
+   aim before attacking: **Deal / Take** previews damage and reactions, with
+   explicit casualty text if either unit would fall. **Tab** selects units.
 4. Press **E** after your units act to let the enemy take its turn. **A**
    plays your remaining actions and the enemy turn automatically for one
    round. Moves, abilities and reactions are shown in order; watch them or

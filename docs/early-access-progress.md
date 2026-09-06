@@ -61,6 +61,15 @@ avoids 65 gold/2 crystals, while withdrawing the Warden transfers the loss to
 Militia, saving 35 gold at the cost of four living HP. These local examples do
 not establish three complete manual plans, and G04 remains incomplete.
 
+Latest source **0b4e163** adds [explicit casualty forecasts](evidence/casualty-forecasts-0b4e163/README.md)
+and a retaliation explanation in the Field Guide. Twenty-nine focused tests,
+30 native reading layouts and 170 inputs pass. Both earned decisions now replay
+through native controls to the exact paid aftermath; the additional lethal Pin
+also matches its forecast after reload. Screenshots were inspected. This UI
+change is newer than the preserved Mac archive above. A fresh independent
+walkthrough timed out before any UI observation; G09 still has no credit from
+that attempt. All release gates remain incomplete.
+
 ## Earlier playable checkpoint — 2026-09-06
 
 **Later source changes:** [frame pacing and test CPU budgets](evidence/frame-pacing-069f79c/README.md)
