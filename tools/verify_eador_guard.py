@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
+from tools.native_frames import tick
 from saga2d import Button
 
 from eador.app import create_game
@@ -26,10 +27,10 @@ def verify(output):
         def press(symbol):
             window.dispatch_event("on_key_press", symbol, 0)
             window.dispatch_event("on_key_release", symbol, 0)
-            game.tick(1 / 60)
+            tick(game)
 
         def capture(name):
-            game.tick(1 / 60)
+            tick(game)
             game.backend.capture_frame().save(output / f"{name}.png")
 
         def button(label):
@@ -41,7 +42,7 @@ def verify(output):
             py = (window.height - game.height * scale) / 2 + (game.height - y - height / 2) * scale
             window.dispatch_event("on_mouse_press", round(px), round(py), mouse.LEFT, 0)
             window.dispatch_event("on_mouse_release", round(px), round(py), mouse.LEFT, 0)
-            game.tick(1 / 60)
+            tick(game)
 
         try:
             game.push(TitleScene(seed=7))

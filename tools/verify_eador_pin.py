@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault('SAGA2D_SILENT', '1')
 
+from tools.native_frames import tick
 from saga2d import Button
 
 from eador.app import create_game
@@ -29,7 +30,7 @@ def verify(output):
         def press(symbol):
             window.dispatch_event('on_key_press', symbol, 0)
             window.dispatch_event('on_key_release', symbol, 0)
-            game.tick(1 / 60)
+            tick(game)
 
         def click(x, y):
             scale = min(window.width / game.width, window.height / game.height)
@@ -37,11 +38,11 @@ def verify(output):
             py = (window.height - game.height * scale) / 2 + (game.height - y) * scale
             window.dispatch_event('on_mouse_press', round(px), round(py), mouse.LEFT, 0)
             window.dispatch_event('on_mouse_release', round(px), round(py), mouse.LEFT, 0)
-            game.tick(1 / 60)
+            tick(game)
 
         def capture(name):
             for _ in range(110):
-                game.tick(1 / 60)
+                tick(game)
             game.backend.capture_frame().save(output / f'{name}.png')
 
         try:
@@ -113,7 +114,7 @@ def verify(output):
             state.travel(destination)
             assert state.battle and state.battle.unit(0).can_brace
             game.clear_and_push(ShardScene(State.from_json(state.to_json())))
-            game.tick(1 / 60)
+            tick(game)
             button = game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Brace')
             assert button.enabled
             x, y, w, h = button.bounds

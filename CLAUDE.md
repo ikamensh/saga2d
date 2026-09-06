@@ -17,7 +17,9 @@ a time, including work delegated to agents. Long audit/fuzz/stress CLIs default
 to `--cpu-percent 25`; retain that allowance for ordinary development. Explicit
 stress runs may use 100. Select small cases while iterating; do not automatically
 restart a cancelled large matrix or soak. Native `PlayerInput` already caps at
-30 FPS; direct `tick(dt)` calls remain unpaced and require their caller's clock.
+30 FPS; use `tools.native_frames.tick(game)` for standalone native verification
+loops, including screenshot settling. Direct `game.tick(dt)` calls remain
+unpaced and require their caller's clock.
 
 ## Visual changes must be looked at
 

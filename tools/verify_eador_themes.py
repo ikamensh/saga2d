@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault('SAGA2D_SILENT', '1')
 
+from tools.native_frames import tick
 from eador.app import create_game
 from eador.scene import ShardScene, TitleScene
 from eador.worldgen import THEMES
@@ -28,10 +29,10 @@ def verify(output):
                 window = game.backend.window
                 window.dispatch_event('on_key_press', symbol, 0)
                 window.dispatch_event('on_key_release', symbol, 0)
-                game.tick(1 / 60)
+                tick(game)
 
             def capture(name):
-                game.tick(1 / 60)
+                tick(game)
                 game.backend.capture_frame().save(output / f'{name}-{height}.png')
 
             try:

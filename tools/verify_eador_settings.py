@@ -19,15 +19,16 @@ from eador.app import create_game  # noqa: E402
 from eador.preferences import DEFAULTS, load_preferences, reduced_motion  # noqa: E402
 from eador.scene import HelpScene, TitleScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
+from tools.native_frames import tick
 from saga2d import Button  # noqa: E402
 from pyglet.window import key, mouse  # noqa: E402
 
 
 def press(game, symbol):
     game.backend.window.dispatch_event("on_key_press", symbol, 0)
-    game.tick(1 / 60)
+    tick(game)
     game.backend.window.dispatch_event("on_key_release", symbol, 0)
-    game.tick(1 / 60)
+    tick(game)
 
 
 def click(game, label):
@@ -40,7 +41,7 @@ def click(game, label):
     py = (window.height - game.height * scale) / 2 + (game.height - y - h / 2) * scale
     window.dispatch_event("on_mouse_press", round(px), round(py), mouse.LEFT, 0)
     window.dispatch_event("on_mouse_release", round(px), round(py), mouse.LEFT, 0)
-    game.tick(1 / 60)
+    tick(game)
 
 
 def verify_display(out):
@@ -48,7 +49,7 @@ def verify_display(out):
 
     def capture(game, name):
         for _ in range(3):
-            game.tick(1 / 60)
+            tick(game)
         game.backend.capture_frame().save(out / f"{name}.png")
         observations.append(dict(name=name, fullscreen=game.fullscreen, window_size=game.window_size,
                                  windowed_size=game.windowed_size, canvas=game.resolution,
@@ -61,9 +62,9 @@ def verify_display(out):
         try:
             title = TitleScene()
             game.push(title)
-            game.tick(1 / 60)
+            tick(game)
             game.backend.window.set_size(940, 720)  # Simulates an OS resize outside the Game API.
-            game.tick(1 / 60)
+            tick(game)
             assert game.window_size == game.windowed_size == (940, 720)
             press(game, key.O)
             click(game, "Display")
@@ -145,11 +146,11 @@ def main():
                     prefs.path.with_suffix(".backup.json").mkdir()
                 title = TitleScene()
                 game.push(title)
-                game.tick(1 / 60)
+                tick(game)
                 game.backend.capture_frame().save(args.out / f"title-{scenario}.png")
                 press(game, key.O)
                 assert isinstance(game.scene, SettingsScene)
-                game.tick(1 / 60)
+                tick(game)
                 if scenario in ("normal", "compact"):
                     press(game, key.LEFT)
                     press(game, key.DOWN)

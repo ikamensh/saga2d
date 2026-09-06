@@ -14,6 +14,7 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ["SAGA2D_SILENT"] = "1"
 
+from tools.native_frames import tick
 from saga2d import Button
 
 from eador.app import create_game
@@ -32,7 +33,7 @@ def verify(output: Path):
         def press(symbol, modifiers=0):
             window.dispatch_event("on_key_press", symbol, modifiers)
             window.dispatch_event("on_key_release", symbol, modifiers)
-            game.tick(1 / 60)
+            tick(game)
 
         def click(x, y):
             scale = min(window.width / game.width, window.height / game.height)
@@ -40,10 +41,10 @@ def verify(output: Path):
             py = (window.height - game.height * scale) / 2 + (game.height - y) * scale
             window.dispatch_event("on_mouse_press", round(px), round(py), mouse.LEFT, 0)
             window.dispatch_event("on_mouse_release", round(px), round(py), mouse.LEFT, 0)
-            game.tick(1 / 60)
+            tick(game)
 
         def capture(name):
-            game.tick(1 / 60)
+            tick(game)
             game.backend.capture_frame().save(output / f"{name}.png")
 
         def button(label):
@@ -164,7 +165,7 @@ def verify(output: Path):
             assert isinstance(game.scene, BattleScene)
             # A new launch fixture, then a complete aimed keyboard sequence.
             game.clear_and_push(TitleScene(seed=7))
-            game.tick(1 / 60)
+            tick(game)
             for _ in range(3):
                 press(key.TAB)
             press(key.ENTER)
