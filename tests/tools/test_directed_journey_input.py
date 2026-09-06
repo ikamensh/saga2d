@@ -77,6 +77,25 @@ def test_scout_journal_replays_the_earned_skill_choice_through_saved_input(tmp_p
     assert result['input_source'] == source['source'] and result['source_unchanged']
 
 
+def test_scout_replay_captures_the_first_warden_swap(tmp_path):
+    """The tactical action gets its own indexed capture while saved input remains exact."""
+    from tools.verify_eador_directed_journey import verify
+
+    source = earned_report('mobile')
+    played = SavedCommands(State.from_json(source['final_state']), CpuBudget(100))
+    for command, args in (('explore', ()), ('battle.swap', (4, 3))):
+        played.order(command, *args)
+        played.commands[-1]['reason'] = 'Observe the earned Warden swap in the nearby shrine.'
+    source['commands'].extend(played.commands)
+    source['final_state'] = played.state.to_json()
+    path = tmp_path / 'scout-swap.json.gz'
+    path.write_bytes(gzip.compress(json.dumps(source).encode()))
+    result = verify(path, tmp_path / 'verified', backend='mock')
+    assert result['captures'] == ['003-battle-swap', 'final-state']
+    assert result['final_state'] == source['final_state']
+    assert result['reloads'] == result['exact_commands'] == 3
+
+
 @pytest.mark.parametrize('anchor', ['control', 'mobile'])
 @pytest.mark.parametrize('tamper', ('opening', 'source_index', 'source_path', 'source_hash',
                                    'model', 'chain', 'autoplay', 'query', 'final'))

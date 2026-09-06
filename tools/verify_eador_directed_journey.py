@@ -107,11 +107,22 @@ def verify(input_report, output, *, backend='pyglet', cpu_percent=25):
             for index, entry in enumerate(source['commands'], 1):
                 budget.checkpoint()
                 assert player.state.to_json() == entry['before'], f'Before command {index}'
-                player.order(entry['command'], *entry['args'], **entry['kwargs'])
-                assert player.state.to_json() == entry['after'], f'After command {index}: {entry["command"]}'
                 command = entry['command']
-                if command not in seen and command in ('battle.cast', 'battle.end_turn', 'battle.repulse', 'battle.smoke',
-                                                       'resolve_battle', 'advance'):
+                if command == 'battle.evacuate':
+                    name = f'{index:03d}-before-battle-evacuate'
+                    check_reading_layout(game.scene)
+                    player.capture(name, settle=False)
+                    captures.append(name)
+                player.order(command, *entry['args'], **entry['kwargs'])
+                assert player.state.to_json() == entry['after'], f'After command {index}: {entry["command"]}'
+                if command == 'explore' and player.state.battle_encounter:
+                    name = f'{index:03d}-entry-{player.state.battle_encounter}'
+                    check_reading_layout(game.scene)
+                    player.capture(name, settle=False)
+                    captures.append(name)
+                if command == 'battle.evacuate' or (command not in seen and command in (
+                        'battle.cast', 'battle.end_turn', 'battle.repulse', 'battle.smoke', 'battle.swap',
+                        'resolve_battle', 'advance')):
                     name = f'{index:03d}-{command.replace(".", "-")}'
                     check_reading_layout(game.scene)
                     player.capture(name, settle=False)
