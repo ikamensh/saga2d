@@ -20,7 +20,7 @@ def validate_preferences(values: Mapping[str, Any]) -> None:
         if type(values[key]) is not bool:
             raise ValueError(f"{key.replace('_', ' ').title()} must be true or false")
     if type(values["codex_text_scale"]) is not int or values["codex_text_scale"] not in (100, 125):
-        raise ValueError("Codex reading size must be 100 or 125 percent")
+        raise ValueError("Reading size must be 100 or 125 percent")
     size = values["window_size"]
     if (type(size) is not list or len(size) != 2
             or any(type(value) is not int or not 1 <= value <= 16384 for value in size)):
@@ -34,7 +34,7 @@ def apply_preferences(game: Game, values: Mapping[str, Any]) -> None:
         game.audio.set_volume(channel, values[channel])
     game.audio.muted = values["muted"]
     game._shardbound_reduced_motion = values["reduced_motion"]
-    game._shardbound_codex_text_scale = values["codex_text_scale"]
+    game._shardbound_reading_scale = values["codex_text_scale"]
 
 
 def reduced_motion(game: Game) -> bool:
@@ -42,9 +42,9 @@ def reduced_motion(game: Game) -> bool:
     return getattr(game, "_shardbound_reduced_motion", DEFAULTS["reduced_motion"])
 
 
-def codex_text_scale(game: Game) -> int:
-    """Percent size of Codex reading content; other game text is unchanged."""
-    return getattr(game, "_shardbound_codex_text_scale", DEFAULTS["codex_text_scale"])
+def reading_scale(game: Game) -> int:
+    """Percent size of supported reading content, including live Settings previews."""
+    return getattr(game, "_shardbound_reading_scale", DEFAULTS["codex_text_scale"])
 
 
 def apply_display_preferences(game: Game, values: Mapping[str, Any]) -> None:

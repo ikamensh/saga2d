@@ -8,7 +8,7 @@ from saga2d import Anchor, Column, Label
 from eador.battle import Battle, SPELLS
 from eador.content import RELICS, SITES, SKILLS
 from eador.encounters import ENCOUNTERS
-from eador.preferences import codex_text_scale
+from eador.preferences import reading_scale
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
@@ -69,7 +69,7 @@ class CodexScene(Screen):
         self.refresh()
 
     def update(self, dt):
-        if self._display != (self.game.window_size, codex_text_scale(self.game)):
+        if self._display != (self.game.window_size, reading_scale(self.game)):
             self.refresh()
 
     def refresh(self):
@@ -78,7 +78,7 @@ class CodexScene(Screen):
         super().refresh()
         self.entries = self.read_entries()
         self.x, self.y = self.game.width / 2 - 520, self.game.height / 2 - 350
-        self._display = self.game.window_size, codex_text_scale(self.game)
+        self._display = self.game.window_size, reading_scale(self.game)
         scale = self._display[1] / 100
         intro = Label(INTRODUCTIONS[self.category], width=992, wrap=True, font="Verdana",
                       font_size=round(13 * scale), text_color=MUTED)
