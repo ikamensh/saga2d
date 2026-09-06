@@ -94,6 +94,8 @@ and mix review remain part of release preparation.
    the front line; forest and hills reduce incoming attack damage. Hover or
    aim before attacking: **Deal / Take** previews damage and reactions, with
    explicit casualty text if either unit would fall. **Tab** selects units.
+   Corner marks identify the selected hex. Piece badges show remaining HP;
+   select or point to a unit to read its full current/maximum HP and stats.
 4. Press **E** after your units act to let the enemy take its turn. **A**
    plays your remaining actions and the enemy turn automatically for one
    round. Moves, abilities and reactions are shown in order; watch them or

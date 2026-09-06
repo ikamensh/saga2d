@@ -16,6 +16,7 @@ from eador.app import create_game
 from eador.model import State
 from eador.scene import BattleScene, ShardScene, TitleScene
 from tools.eador_campaign import finish_battle, march_to, provision_army, rest
+from tools.eador_ui import PlayerInput
 
 
 def verify(output):
@@ -26,11 +27,13 @@ def verify(output):
         game = create_game('Shardbound Pin', resolution=(1280, 800), visible=False,
                     save_dir=Path(directory) / 'saves')
         window = game.backend.window
+        player = PlayerInput(game, native=True)
 
         def press(symbol):
             window.dispatch_event('on_key_press', symbol, 0)
             window.dispatch_event('on_key_release', symbol, 0)
             tick(game)
+            player.finish_playback()
 
         def click(x, y):
             scale = min(window.width / game.width, window.height / game.height)
@@ -39,6 +42,7 @@ def verify(output):
             window.dispatch_event('on_mouse_press', round(px), round(py), mouse.LEFT, 0)
             window.dispatch_event('on_mouse_release', round(px), round(py), mouse.LEFT, 0)
             tick(game)
+            player.finish_playback()
 
         def capture(name):
             for _ in range(110):

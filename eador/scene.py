@@ -1423,28 +1423,40 @@ class BattleScene(Screen):
                                 label=not any(unit.alive and unit.pos == pos for unit in b.units))
             if pos == self.hover:
                 art.outline(self, points, GOLD, 2)
+            if selected and pos == selected.pos:
+                # Corner ticks keep selection distinct from the pointer's full outline.
+                corners = [(cx + (px - cx) * .84, cy + (py - cy) * .84) for px, py in points]
+                for index, (px, py) in enumerate(corners):
+                    for neighbor in (corners[index - 1], corners[(index + 1) % 6]):
+                        self.draw_line(px, py, px + (neighbor[0] - px) * .25,
+                                       py + (neighbor[1] - py) * .25, GOLD, 2)
         for u in sorted((u for u in b.units if u.hp > 0), key=lambda u: self.grid.center(u.pos)[1]):
             cx, cy = self._unit_center(u)
+            size = self.grid.size
             if u.id in targets:
                 self.draw_circle(cx, cy + 7, 25, TEAL if self.targeting in ('heal', 'swap', 'rally') else RED)
             layer = self._unit_layer(u)
             with self.screen_layer(layer):
-                art.piece(self, cx, cy - 1, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, self.grid.size / 43),
+                art.piece(self, cx, cy + size * .22, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, size / 56),
                           selected=u.id == self.selected, spent=u.acted)
             with self.screen_layer(layer + 1):
                 if u.stance:
-                    self.draw_circle(cx + 20, cy + 7, 9, INK)
-                    self.text("B" if u.stance == "brace" else "G", cx + 20, cy, size=10, color=GOLD, center=True)
+                    self.draw_circle(cx + size * .62, cy + 4, 7, INK)
+                    self.text("B" if u.stance == "brace" else "G", cx + size * .62, cy - 2, size=9, color=GOLD, center=True)
                 if u.pinned:
-                    self.draw_circle(cx - 20, cy + 7, 9, INK)
-                    self.text("P", cx - 20, cy, size=10, color=BLUE, center=True)
+                    self.draw_circle(cx - size * .62, cy + 4, 7, INK)
+                    self.text("P", cx - size * .62, cy - 2, size=9, color=BLUE, center=True)
                 if u.pos in cloudy:
                     self.draw_circle(cx, cy + 7, 10, INK)
                     for dx, dy in ((-3, 7), (3, 7), (0, 3)):
                         self.draw_circle(cx + dx, cy + dy, 4, BLUE)
-                self.draw_rect(cx - 29, cy + 29, 58, 16, INK, radius=3)
-                self.text(f"{u.hp}/{u.max_hp}", cx, cy + 29, size=10, center=True)
-                self.bar(cx - 26, cy + 46, 52, u.hp, u.max_hp, TEAL if u.team == "player" else RED)
+                # Keep persistent health on the base, inside this unit's hex.
+                # The selected/hovered panel retains exact current/maximum HP.
+                width, height, top = min(32, size * .82), min(18, size * .48), cy + size * .23
+                self.draw_rect(cx - width / 2, top, width, height, INK, radius=3)
+                self.text(u.hp, cx, top, size=min(10, size * .27), center=True)
+                self.bar(cx - width / 2 + 3, top + height - 4, width - 6, u.hp, u.max_hp,
+                         TEAL if u.team == "player" else RED)
         with self.screen_layer(2):
             for started, pos, change in self.floats:
                 cx, cy = self.grid.center(pos)
