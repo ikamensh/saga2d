@@ -28,6 +28,27 @@ game, so G09 gains no walkthrough or human-playtest credit. Test processes ended
 The full packaged campaigns and sustained candidate checks are not yet repeated
 for this archive. **All G01–G19 gates remain incomplete.**
 
+Later [paid investment checks](eador-authored-investment-comparison.md) reproduce
+the small Sapper timing tradeoff on current source and through native controls:
+51 inputs, seven exact reloads, and 12 versus 23 missing HP from the same earned
+army after Smoke-now versus Guard-now. Both finish R4 without deaths at two mana.
+Preparation is model-owned and the continuation uses automatic rounds; this is
+neither a full native paid campaign nor optimal manual play. A real Sealed Vault
+regression also fixed a harness detour that could explore away from its named
+target. Audit CLIs now honor the 25% CPU allowance and default to a bounded case.
+
+[Three persistent paid army plans](eador-army-plans.md) complete first Standard
+seed-7 Foundries→Throne model pilots while maintaining different recruitment and
+retinue policies. Their differences matter: sustain takes 35 total shard turns
+and four casualties, mobile takes 44/32, control takes 82/22 and loses all its
+troops in the final battle. These outcomes establish execution, not three viable
+or balanced manual builds. All 897 public commands resume from exact saved states;
+capital recovery was not needed or tested. The next depth work must test deliberate
+protection, movement and control decisions from these actual earned formations.
+Fifteen combined audit/budget/journey tests pass on `64cfe7a`; all jobs ended.
+This work changes only development tools, tests and evidence. The game/framework
+bytes remain those in the preserved `a6851fb` archive.
+
 ## Earlier playable checkpoint — 2026-09-06
 
 **Later source changes:** [frame pacing and test CPU budgets](evidence/frame-pacing-069f79c/README.md)

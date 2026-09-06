@@ -87,7 +87,7 @@ no native input or manual-order credit.
 | Mobile fire | 44 | 32 | 2 | 1,250 | 0 | 33 / 37 | 299 |
 | Control | 82 | 22 | 1 | 1,365 | 33 | 24 / 41 | 368 |
 
-All three genuinely paid to restore their formation after losses; none used a
+All three paid to restore their formation after losses; none used a
 capital recovery expedition. Mobile fire's many losses and Control's 46-turn
 opening shard are significant weaknesses of these automatic policies. Control
 completed its final battle with **no surviving troops**, so campaign victory

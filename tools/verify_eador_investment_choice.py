@@ -77,7 +77,7 @@ def verify(input_report, output, *, backend='pyglet'):
     assert all(hashlib.sha256((ROOT / p).read_bytes()).hexdigest() == digest for p, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, backend=backend, input_sha256=hashlib.sha256(input_report.read_bytes()).hexdigest(),
-                  scope='Native/public input from an earned round-three save; model preparation, explicit first order, '
+                  scope='Public game input from an earned round-three save; model preparation, explicit first order, '
                         'then automatic rounds and visible Finish playback. No native preparation or optimal-play claim.',
                   branches=rows)
     output.mkdir(parents=True, exist_ok=True)

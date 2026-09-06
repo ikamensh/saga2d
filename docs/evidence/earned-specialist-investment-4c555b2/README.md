@@ -31,7 +31,9 @@ caffeinate -diu uv run --extra dev python tools/verify_eador_investment_choice.p
 It exited 0 on macOS 26.6.2 / Apple M4 at 1280×800 logical, 2560×1600 physical
 pixels. A mock-input invocation also passed before it. The native report names
 parent `4c555b2`, because the verifier itself was newly written; its complete
-recorded source hashes are retained and verified against the committed verifier.
+recorded source hashes are retained and verified against verifier commit `7658afa`.
+The subsequent report wording uses "Public game input" for both backends; the
+retained pyglet receipt predates that wording-only cleanup.
 No game, framework, data or save-schema code changed.
 
 | First order | Native inputs | Exact UI reloads | Result | Living missing HP |

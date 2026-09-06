@@ -109,8 +109,15 @@ complete army plans and their counter-scenarios.
 | Veil Censer, Porter's Rune, Mirror Badge, Vanguard Drum | [Four earned native journeys](eador-active-relics.md#native-earned-use-verification): purchases, source, reward, equip, later manual use and exact reloads; two complete linked Gate campaigns. | Censer saved only one early HP in its measured plan; Rune's delayed recovery was slower than a complete opening ring; Badge can expose both units; Drum continuation was autoplay. These limitations are useful counterplay evidence, not reasons to count four automatic dominant upgrades. |
 
 Do not add more relics or abilities before comparing three complete paid rosters.
-A useful next set is **durable melee/sustain**, **ranged reposition/extraction**,
-and **Smoke/Repulse/flight control**, with explicit replacements and loss recovery.
+The [first persistent army pilots](eador-army-plans.md) now carry **durable
+melee/sustain**, **ranged reposition/extraction**, and **Smoke/Repulse/flight
+control** formations through three earned shards, with actual replacements and
+distinct retinues. All finish under autoplay, but mobile loses 32 troops and
+control loses 22, including its entire final army. These are executable candidates;
+the manual decisions, counter-scenarios and capital-loss recovery remain open.
+The [paid Sapper timing choice](eador-authored-investment-comparison.md) separately
+reproduces 12 versus 23 wounds through native controls from an earned save. That
+local advantage does not establish the complete control formation's viability.
 The old economy study's three purchase orders eventually all fill with Swordsmen;
 it therefore cannot substitute for these army-plan acceptance cases.
 
