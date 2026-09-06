@@ -1,5 +1,8 @@
 # Eleventh encounter candidate: Relief Column, revised
 
+This is the historical detached proposal. The accepted production integration
+and earned campaign evidence are recorded in [Relief Column](eador-relief.md).
+
 The original corner proposal is **rejected**. Independent review found that
 four original units, after only the ordinary 60-gold Market preparation, won
 round two with four moves followed by Guard. It did not require recruitment,

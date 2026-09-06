@@ -1,0 +1,39 @@
+{
+  "source_revision": "c6093de99e468e360561922b231fa7df9205a8a3",
+  "clean_during_verification": true,
+  "full_suite": "1168 passed in 195.87s",
+  "model_holds": 60,
+  "model_order_reloads": 1740,
+  "native_input_activations": 1202,
+  "native_exact_reloads": 71,
+  "inspected_images": [
+    "active-first-score.png",
+    "western-last-scoring-turn.png",
+    "passive-success.png",
+    "smaller-party-briefing-125.png",
+    "missed-support-loses-score.png",
+    "deadline-veteran-loss.png",
+    "wounded-retry-125.png",
+    "paid-retry-rout.png",
+    "recorded-crown-codex-125.png"
+  ],
+  "scope": "Source unchanged across model/native/fuzz runs. Evidence/docs were added only afterward. Explicit automatic retry is separate from 60 manual holds.",
+  "artifact_sha256": {
+    "active-first-score.png": "cea3274a3be40e48f02334d31000a8ed02bf7b172d3ad1434d5b8bab1551ae6d",
+    "deadline-veteran-loss.png": "0fb7c74bb17ee57f3426dbd11d08765aa55c36846265362485a733116a348b23",
+    "linked-fuzz.json": "780ee6244de157863771a425feb417747d1df44c077a6afe9cbd7e8af14a7d5e",
+    "missed-support-loses-score.png": "38c806e688b429ff4731d3a0d26dddabcc617a11a2e86e360f46104457772de5",
+    "model-orders.json.gz": "a1b288a7fbe5a66944adf072090f4c86653b915316a4188afb08bda7c20989aa",
+    "native-journeys.json.gz": "521a077c7fe18b6228d26f17362d41b9536eac1376275426e9cb89a48a4fe33c",
+    "native.txt": "3c9b00f84c8749e49916ef4b2ef5e6f1451a490205d69ac400ef2ddd494aa5ad",
+    "paid-retry-rout.png": "ef5bc4e1482a5e02c7e7ec28c4938a67318387dcefef83a93d555ec863adb8d4",
+    "passive-success.png": "efcc85ba7fb2c673a3fe3475b1e3e8721f154521e3612bf543b4bbb34aa507b7",
+    "recorded-crown-codex-125.png": "358d5ed2a9f8f814af553e942a46e0b6a2191c7629b10158af24a79876bb4775",
+    "smaller-party-briefing-125.png": "ea9883d8726cf29009d0b2505d9e829e9c9025b7aea83567c5ff1a7a7a229ad8",
+    "standalone-fuzz.json": "f3d5fd480dfa5984de5967a8a7d64b6ceb2431174e00e45a0fd5cfe8a9656d02",
+    "tests.txt": "5e4472d1bd124243b8a49605c0a8fa0f03fc52d79d04501d0163d9fafca76f13",
+    "tribes-fuzz.txt": "e3787a145aa5e01638cd25378ce6080b3820492d7a8545b69cc0f622b99d07a7",
+    "western-last-scoring-turn.png": "e3846670d063d604564666130910ce7837b34d17aa17cafb4a850536e7639d9c",
+    "wounded-retry-125.png": "c1adec36524da4f64cb55e3b0e1eb4f53c281aa67fff4bad2ecdbe009dc1f517"
+  }
+}
