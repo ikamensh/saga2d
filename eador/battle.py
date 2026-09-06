@@ -614,7 +614,99 @@ class Battle:
         if destination != unit.pos:
             self._move(unit, destination)
 
+    def _useful_repulse(self, unit: BattleUnit, target: BattleUnit) -> bool:
+        destination = self.repulse_preview(unit.id, target.id)
+        if self.objective.kind == 'hold':
+            seal = self.objective.target
+            return (self.grid.distance(target.pos, seal) <= 1 < self.grid.distance(destination, seal)
+                    if unit.team == 'player' else target.pos == seal)
+        if self.objective.kind == 'extract':
+            hero = self.unit(self.hero_id)
+            if unit.team == 'enemy':
+                return target.id == hero.id and min(self.grid.distance(destination, pos) for pos in self.objective.exits) > min(
+                    self.grid.distance(target.pos, pos) for pos in self.objective.exits)
+            approaches = self.reachable(hero.id) | {hero.pos}
+            return not hero.acted and any(pos in approaches and self.grid.distance(target.pos, pos) <= 1
+                       < self.grid.distance(destination, pos) for pos in self.objective.exits)
+        # In a rout, clear immediate pressure from a wounded ally; never push
+        # a foe closer to the hero while doing so.
+        if self.hero_id is not None and unit.team == 'player':
+            hero = self.unit(self.hero_id)
+            if self.grid.distance(destination, hero.pos) < self.grid.distance(target.pos, hero.pos):
+                return False
+        return any(ally.alive and ally.team == unit.team and ally.hp * 2 <= ally.max_hp
+                   and self.grid.distance(target.pos, ally.pos) == 1 < self.grid.distance(destination, ally.pos)
+                   for ally in self.units)
+
+    def _useful_rally(self, unit: BattleUnit, target: BattleUnit) -> bool:
+        current = self.reachable(target.id) | {target.pos}
+        extra = self.rally_preview(unit.id, target.id).reachable - current
+        if not extra:
+            return False
+        foes = [foe for foe in self.units if foe.alive and foe.team != target.team]
+        if self.objective.kind == 'extract' and target.id == self.hero_id and not target.acted:
+            return any(pos in extra and not any(self.grid.distance(pos, foe.pos) <= 1 for foe in foes)
+                       for pos in self.objective.exits)
+        if self.objective.kind == 'hold':
+            goal = self.objective.target
+            if min(self.grid.distance(pos, goal) for pos in extra) < min(self.grid.distance(pos, goal) for pos in current):
+                return True
+        if any(self._targets_from(target, pos) for pos in extra) and not any(self._targets_from(target, pos) for pos in current):
+            return True
+        if target.skirmisher and foes:
+            def exposure(pos):
+                return sum(self.grid.distance(pos, foe.pos) <= foe.attack_range + foe.effective_move_range for foe in foes)
+            return min(map(exposure, extra)) < min(map(exposure, current))
+        return False
+
+    def _smoke_choice(self, unit: BattleUnit) -> Pos | None:
+        choices = self.smoke_targets(unit.id)
+        if not choices:
+            return None
+        living = [other for other in self.units if other.alive]
+        lanes = [(shooter, target) for shooter in living if shooter.attack_range > 1
+                 and (shooter.team != unit.team or not shooter.acted)
+                 for target in living if target.team != shooter.team
+                 and self.grid.distance(shooter.pos, target.pos) <= shooter.attack_range
+                 and self.has_sight(shooter.pos, target.pos)]
+        friendly_magic = []
+        if unit.team == 'player' and self.hero_id is not None:
+            for caster in living:
+                if caster.team == unit.team and (caster.id == self.hero_id or caster.can_heal):
+                    for spell in ('bolt', 'heal'):
+                        friendly_magic.extend((caster.pos, target.pos, self.spell_preview(spell, target.id, caster_id=caster.id))
+                                              for target in self.spell_targets(spell, caster_id=caster.id))
+        clouds = {cloud.pos for cloud in self.smoke_clouds}
+        def benefit(pos):
+            smoke = clouds | {pos}
+            score = sum(self._damage(shooter, target) * (1 if shooter.team != unit.team else -1)
+                        for shooter, target in lanes
+                        if not line_of_sight(self.terrain, shooter.pos, target.pos, smoke=smoke))
+            return score - sum(amount for source, target, amount in friendly_magic
+                               if not line_of_sight(self.terrain, source, target, smoke=smoke))
+        best = min(choices, key=lambda pos: (-benefit(pos), pos))
+        attack_value = max((self.preview(unit.id, target.id)[0] for target in self.targets(unit.id)), default=0)
+        return best if benefit(best) > attack_value else None
+
+    def _control_orders(self, team: str) -> None:
+        for unit in self.units:
+            if unit.team == team:
+                targets = [target for target in self.rally_targets(unit.id) if self._useful_rally(unit, target)]
+                if targets:
+                    self._rally(unit, min(targets, key=lambda target: (target.id != self.hero_id, target.id)))
+        for unit in self.units:
+            if unit.team == team:
+                targets = [target for target in self.repulse_targets(unit.id) if self._useful_repulse(unit, target)]
+                if targets:
+                    self._repulse(unit, min(targets, key=lambda target: target.id))
+        for unit in self.units:
+            if unit.team == team:
+                pos = self._smoke_choice(unit)
+                if pos is not None:
+                    self._smoke(unit, pos)
+
     def _play_team(self, team: str) -> None:
+        self._control_orders(team)
         for unit in self.units:
             if self.outcome:
                 break
@@ -673,7 +765,10 @@ class Battle:
                         distance = min(distances)
                         can_attack = bool(self._targets_from(unit, pos))
                         cover = self.terrain[pos] in ('forest', 'hills')
-                        return (not can_attack, max(0, distance - unit.attack_range), not cover,
+                        landing_risk = sum(self._damage(enemy, replace(unit, pos=pos)) for enemy in enemies
+                                           if self.grid.distance(pos, enemy.pos) <= enemy.attack_range
+                                           and (enemy.attack_range == 1 or self.has_sight(enemy.pos, pos))) if unit.can_fly else 0
+                        return (not can_attack, max(0, distance - unit.attack_range), landing_risk, not cover,
                                 -distance if can_attack else distance, pos)
                     destination = min(reachable | {unit.pos}, key=score)
                     if destination != unit.pos:
