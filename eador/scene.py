@@ -662,7 +662,7 @@ class HelpScene(Screen):
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
             ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
-            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
+            ("04   Grow and counterattack", "Win battles for skills; H equips relics. A Mage Tower unlocks H → I: spend crystals and an action for mana. V shows rival orders; strike while it rebuilds."),
         )
         blocks = [Column(
             Label(title, width=472, wrap=True, font="Georgia", font_size=round(17 * scale), text_color=TEAL),
@@ -1331,24 +1331,120 @@ class HeroScene(Screen):
     def __init__(self, root):
         super().__init__()
         self.root, self.page = root, 0
+        self._relics, self._page_indices = (), ((),)
 
     @property
     def pages(self):
-        return max(1, (len(self.root.state.inventory) + 3) // 4)
+        return len(self._page_indices)
+
+    @property
+    def visible_relics(self):
+        """Whole relics on this page, in the order of their visible shortcuts."""
+        return tuple(self._relics[index] for index in self._page_indices[self.page])
+
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus="codex_text_scale"))
 
     def refresh(self):
+        from saga2d import Column, Component, Label, Row
+        from eador.preferences import reading_scale
+        from eador.reading import reading_pages
+
+        first = self.visible_relics[0] if self.visible_relics else None
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 410, self.game.height / 2 - 366
-        x, y, s = self.x, self.y, self.root.state
-        for i, relic in enumerate(s.inventory[self.page * 4:self.page * 4 + 4]):
-            equipped = s.hero.relic == relic
-            self.button("Equipped" if equipped else "Equip", x + 637, y + 260 + i * 95, 152,
-                        lambda relic=relic: self.equip(relic), shortcut=str(i + 1), enabled=not equipped)
-        self.button("Unequip", x + 637, y + 208, 152, self.unequip, shortcut="U", enabled=s.hero.relic is not None)
-        self.button("Previous", x + 28, y + 669, 138, self.previous_page, enabled=self.page > 0)
-        self.button("Next", x + 177, y + 669, 110, self.next_page, enabled=self.page + 1 < self.pages)
-        self.button("Close", x + 650, y + 669, 140, self.game.pop, hotkey="Esc")
-        self.button("Codex", x + 449, y + 669, 170, self.root.codex, shortcut="C")
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+        self.height = 760
+        self.x, self.y = (self.game.width - 1120) / 2, (self.game.height - self.height) / 2
+        s, hero = self.root.state, self.root.state.hero
+        self._relics = tuple(s.inventory)
+
+        def label(text, size=12, *, width=1064, color=MUTED, serif=False, scaled=True):
+            return Label(text, width=width, wrap=True, font="Georgia" if serif else "Verdana",
+                         font_size=round(size * scale) if scaled else size, text_color=color)
+
+        title = Row(label(hero.name, 32, width=520, color=GOLD, serif=True, scaled=False),
+                    label(f"{s.rules.title} realm", width=310, color=GOLD),
+                    Button("Text size", width=186, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24)
+        stats = label(f"Level {hero.level} {hero.hero_class} · {hero.hp}/{hero.max_hp} health · {hero.mana}/{hero.max_mana} mana", 13)
+        recovery = s.recovery_preview()
+        rest = label(recovery.blocked_reason or
+                     f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.",
+                     11, color=RED if recovery.blocked_reason else MUTED)
+        quote = s.infusion_preview()
+        infusion = Row(Column(label(f"Tower infusion · +{quote.mana} mana", 14, width=818, color=TEAL),
+                              label(f"{quote.crystals} crystals · {quote.actions} hero action · "
+                                    f"available: {s.crystals} crystal{'s' if s.crystals != 1 else ''}, {s.actions_left} "
+                                    f"hero action{'s' if s.actions_left != 1 else ''}", 11, width=818),
+                              label(quote.blocked_reason or "Recover mana now; time and the rival advance only when you end the turn.",
+                                    11, width=818, color=RED if quote.blocked_reason else MUTED), spacing=4),
+                       Button("Infuse mana", width=222, height=40, shortcut="I", on_click=self.infuse,
+                              enabled=quote.blocked_reason is None), spacing=24)
+        skill_width = 520 if len(hero.skill_ranks) == 2 else 1064
+        skills = [Column(label(f"{SKILLS[skill].name} {rank}", 16, width=skill_width, color=TEXT),
+                         label(SKILLS[skill].description, width=skill_width), spacing=6)
+                  for skill, rank in hero.skill_ranks.items()]
+        if skills:
+            for column in skills:
+                self.ui.add(column)
+            skill_height = max(column.get_preferred_size()[1] for column in skills)
+            skill_body = Row(*(Column(column, height=skill_height) for column in skills), spacing=24)
+        else:
+            skill_body = label("Win battles to gain experience. Each level lets you deepen a discipline or try the other path.")
+        learned = Column(label("LEARNED DISCIPLINES", 10, color=GOLD), skill_body, spacing=6)
+        inventory_heading = Row(label(f"RELICS · {len(s.inventory)} OWNED · ONE EQUIPPED AT A TIME", 10,
+                                      width=836, color=GOLD),
+                                Button("Unequip", width=204, height=40, shortcut="U", on_click=self.unequip,
+                                       enabled=hero.relic is not None), spacing=24)
+        top = Column(Column(title, stats, rest, spacing=6), infusion, learned, inventory_heading, spacing=14)
+        hint = self.message or (f"Rank limits: hero {s.hero_level_cap}, troops {s.troop_level_cap}. XP pauses at the limit. "
+                               "Change equipment between battles." if s.campaign else
+                               "Find relics in adventure sites. Change equipment between battles.")
+        previous = Button("Previous", width=150, height=40, on_click=self.previous_page)
+        following = Button("Next", width=130, height=40, on_click=self.next_page)
+        page_label = label("", width=196)
+        footer = Column(label(hint, 10, color=GOLD if self.message else MUTED),
+                        Row(previous, following, page_label,
+                            Button("Codex", width=220, height=40, shortcut="C", on_click=self.root.codex),
+                            Button("Close", width=272, height=40, shortcut="Esc", on_click=self.game.pop), spacing=24), spacing=10)
+        blocks = [Column(label(RELICS[relic].name, 17, width=742,
+                               color=TEAL if hero.relic == relic else TEXT),
+                         label(RELICS[relic].description, width=742), spacing=6) for relic in self._relics]
+        for component in (top, footer, Column(*blocks)):
+            self.ui.add(component)
+        body_top = self.y + 24 + top.get_preferred_size()[1] + 14
+        footer_top = self.y + self.height - 24 - footer.get_preferred_size()[1]
+        available = footer_top - body_top - 16
+        heights = [max(64, block.get_preferred_size()[1]) for block in blocks]
+        for relic, height in zip(self._relics, heights):
+            if height > available:
+                raise ValueError(f"Hero relic does not fit at {scale:.0%}: {RELICS[relic].name}")
+        anchor = self._relics.index(first) if first in self._relics else 0
+        self._page_indices, self.page = reading_pages(heights, available, anchor=anchor, spacing=16, max_items=9)
+        page_label.text = f"Page {self.page + 1}/{self.pages}"
+        previous.enabled, following.enabled = self.page > 0, self.page + 1 < self.pages
+        self.ui.clear()
+        self._icons, rows = [], []
+        for shortcut, index in enumerate(self._page_indices[self.page], 1):
+            relic = self._relics[index]
+            icon = Component(width=64, height=64)
+            self._icons.append((icon, relic))
+            rows.append(Row(icon, blocks[index], Button("Equipped" if hero.relic == relic else "Equip",
+                            width=222, height=40, shortcut=str(shortcut), enabled=hero.relic != relic,
+                            on_click=lambda relic=relic: self.equip(relic)), spacing=18, height=heights[index]))
+        if not rows:
+            rows.append(label("Explore sites and keep their treasures. Equipment changes the spells, movement and economy available to your hero.", 13))
+        for component, top_y in ((top, self.y + 24), (Column(*rows, spacing=16), body_top), (footer, footer_top)):
+            self.ui.add(Column(component, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(top_y))))
 
     def previous_page(self):
         self.page = max(0, self.page - 1)
@@ -1363,47 +1459,23 @@ class HeroScene(Screen):
             return
         if self.command(lambda: self.root.state.equip(relic)):
             self.checkpoint(self.root.state)
+        self.refresh()
 
     def unequip(self):
         self.equip(None)
 
+    def infuse(self):
+        if self.command(self.root.state.infuse, cue="heal"):
+            if self.checkpoint(self.root.state):
+                self.message = self.root.state.log[-1]
+        self.refresh()
+
     def draw(self):
-        x, y, s = self.x, self.y, self.root.state
-        hero = s.hero
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
-        self.box(x, y, 820, 732)
-        self.text(hero.name, x + 28, y + 24, size=29, color=GOLD, serif=True)
-        self.text(f"{s.rules.title} realm", x + 566, y + 36, size=12, color=GOLD)
-        self.text(f"Level {hero.level} {hero.hero_class}   ·   {hero.hp}/{hero.max_hp} health   ·   {hero.mana}/{hero.max_mana} mana",
-                  x + 28, y + 68, size=12, color=MUTED)
-        recovery = s.recovery_preview()
-        rest = (recovery.blocked_reason or
-                f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.")
-        self.text(rest, x + 28, y + 90, size=10, color=RED if recovery.blocked_reason else MUTED)
-        self.rule(x + 28, y + 112, 764)
-        self.text("LEARNED DISCIPLINES", x + 28, y + 119, size=10, color=GOLD)
-        if not hero.skill_ranks:
-            self.paragraph("Win battles to gain experience. Each level lets you deepen a discipline or try the other path.",
-                           x + 28, y + 148, width=744, size=12)
-        for i, (skill, rank) in enumerate(hero.skill_ranks.items()):
-            left = x + 28 + i * 382
-            self.text(f"{SKILLS[skill].name} {rank}", left, y + 141, size=14)
-            self.paragraph(SKILLS[skill].description, left, y + 166, width=360, size=10)
-        self.rule(x + 28, y + 206, 764)
-        self.text(f"RELICS   /   {len(s.inventory)} OWNED   /   ONE EQUIPPED AT A TIME", x + 28, y + 223, size=10, color=GOLD)
-        if not s.inventory:
-            self.paragraph("Explore sites and choose to keep their treasures. Equipment can change the spells, movement and economy available to your hero.",
-                           x + 28, y + 274, width=580, size=13)
-        for i, relic in enumerate(s.inventory[self.page * 4:self.page * 4 + 4]):
-            top = y + 260 + i * 95
-            art.relic(self, x + 52, top + 26, relic, scale=.8)
-            self.text(RELICS[relic].name, x + 91, top, size=15, color=TEAL if hero.relic == relic else TEXT)
-            self.paragraph(RELICS[relic].description, x + 91, top + 25, width=523, size=11)
-        self.paragraph(self.message or (f'Rank limits: hero {s.hero_level_cap}, troops {s.troop_level_cap}. XP pauses at the limit. '
-                                       'Change equipment between battles.' if s.campaign else
-                                       "Find relics in adventure sites. Change equipment between battles."),
-                       x + 28, y + 637, width=744, size=10, color=GOLD if self.message else MUTED)
-        self.text(f"{self.page + 1} / {self.pages}", x + 332, y + 682, size=12, color=MUTED)
+        self.box(self.x, self.y, 1120, self.height)
+        for component, relic in self._icons:
+            x, y, width, height = component.bounds
+            art.relic(self, x + width / 2, y + height / 2, relic, scale=.8)
 
 
 class ResultScene(Screen):

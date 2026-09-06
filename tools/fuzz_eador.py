@@ -534,7 +534,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(x + width / 2, y + height / 2)
                         metrics['equip_inputs'] += 1
                     else:
-                        press(rng.choice(('left', 'right', 'u', 'c', 'escape', 'escape')))
+                        press(rng.choice(('left', 'right', 'u', 'i', 't', 'c', 'escape', 'escape')))
                 elif isinstance(scene, CatalogScene):
                     press(rng.choice(('1', '2', '3', '4', '5', 'left', 'right', 'escape', 'escape')))
                 elif rng.random() < .15:

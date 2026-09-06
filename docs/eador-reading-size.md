@@ -1,6 +1,6 @@
 # Reading size
 
-The Field Codex, expedition briefings and Build/Recruit catalogs offer **Text size** (`T`), opening Settings directly on
+The Field Codex, expedition briefings, Build/Recruit catalogs and Hero screen offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -13,9 +13,11 @@ and the quick-reference line. Its two measured columns preserve all sections at
 both sizes. Expedition briefings enlarge objective headings/instructions,
 resource and approach facts, rewards, map legends, defender counts/health and
 entry messages. Build and Recruit enlarge item names, descriptions, prices,
-availability reasons, current resources and purchase messages. Navigation and
+availability reasons, current resources and purchase messages. Hero enlarges
+stats, recovery and infusion quotes, learned disciplines, relic descriptions
+and action messages. Navigation and
 purchase buttons, large screen titles and page count keep their normal size.
-Other screens—including tactical forecasts, HUD, rewards, equipment,
+Other screens—including tactical forecasts, HUD, rewards,
 saves and campaign plans—keep their existing text sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
@@ -115,9 +117,8 @@ prose measured 348 pixels at 125% through attached wrapped Labels at 1280×720.
 Simply increasing the font would have collided with the reward. The scene now
 measures whole groups and leaves text at the selected size.
 
-Later conversions should reuse this same preference. Reward and Hero screens
-need measured complete rows/cards and visible-entry shortcuts; equipment
-currently uses 95-pixel rows. Campaign,
+Later conversions should reuse this same preference. Reward screens
+need measured complete cards. Campaign,
 Rival and Saves need their own content flow. Tactical forecasts, HUD values,
 unit badges and setting/control labels require a separate coordinated layout
 pass. Changing the global theme or every `Screen.text` call cannot provide that:
@@ -126,7 +127,7 @@ heights. G10 remains open until those views are usable at the advertised size.
 
 Saga2D already supplies measured wrapped Labels, Columns, Rows and button-owned
 shortcuts. Each game screen should own its content budget and paging policy.
-Codex and the purchase catalogs share the small game-owned `reading_pages`
+Codex, Hero and the purchase catalogs share the small game-owned `reading_pages`
 calculation for complete index pages around a first-entry anchor. Callers supply
 measured heights and their own budgets; the fixed four-section Guide needs no
 paging subsystem.
@@ -192,3 +193,31 @@ Page counts describe this snapshot, not a fixed rows-per-page contract.
 
 The [compact Catalog evidence](evidence/shardbound-catalog-reading-2026-09-06/README.md)
 retains four inspected frames, the native matrix, fuzz report and source hashes.
+
+## Hero and equipment
+
+Hero uses complete measured relic rows beside unchanged procedural icons and
+equipment buttons. Both learned disciplines align at their tops. The same
+`reading_pages` policy preserves the first visible relic when Settings or native
+resizing reflows the inventory. `visible_relics` reports the ordered IDs on the
+current page; only those number shortcuts exist. Repeated activation of an
+already equipped relic spends nothing and does not rotate autosaves. Equipment
+and infusion errors reflow the message immediately, including damaged-file
+checkpoint failures.
+
+Tower infusion is a game command with a read-only quote. The screen shows actual
+mana gain, crystal/action costs, available resources and the blocking reason.
+It does not duplicate resource eligibility rules in the view. Ordinary resting
+remains visible for comparison. Infusion and equipment use the same existing
+checkpoint mechanism; the reading preference remains outside campaign saves.
+
+`tools/verify_eador_hero.py` drives keyboard and mouse from the same paid Wizard
+checkpoint, checks disabled repeats and exact reloads, then traverses old and
+earned collections at both sizes in all three windows. Its paid preparations
+cover all twelve relics and both disciplines for all four heroes, including an
+actual defeated campaign. Completed-state panels are opened directly for layout
+inspection; those inspections are not claimed as navigable campaign journeys.
+An empty new hero, actual damaged autosaves and a fresh-game settings restart are
+also checked. The full native matrix and inspected frames are retained separately
+from model/public-input tests; neither establishes Windows font behavior or
+completes G10.
