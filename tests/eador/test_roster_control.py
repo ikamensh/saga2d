@@ -288,3 +288,27 @@ def test_recruitment_with_insufficient_crystals_is_atomic():
     with pytest.raises(RuleError):
         state.recruit('skyrider')
     assert state.to_json() == before
+
+
+def test_killing_the_sapper_keeps_its_existing_cloud_until_the_recorded_phase():
+    """Smoke's lifetime belongs to the spent order, not its source's remaining HP."""
+    from eador.battle import BattleUnit
+    terrain = {(q, r): 'plains' for q in range(-3, 4) for r in range(-3, 4) if abs(q+r) <= 3}
+    battle = Battle([
+        BattleUnit(1, 'enemy', 'sapper', (-1, 1), 1, 26, 7, 2, 3, 1, abilities=('smoke',)),
+        BattleUnit(2, 'enemy', 'militia', (-1, 0), 24, 24, 8, 2, 3, 1),
+        BattleUnit(1000, 'player', 'archer', (1, 0), 20, 20, 8, 1, 3, 3),
+        BattleUnit(1001, 'player', 'goblin', (1, 1), 16, 16, 6, 1, 3, 2),
+        BattleUnit(1002, 'player', 'militia', (0, 1), 24, 24, 12, 2, 3, 1),
+    ], terrain, 0, set(), hero_id=None)
+    for unit in battle.units:
+        if unit.team == 'player':
+            battle.guard(unit.id)
+    battle.end_turn()
+    clouds = list(battle.smoke_clouds)
+    assert clouds and battle.unit(1).spent_abilities == ('smoke',)
+    battle.attack(1002, 1)
+    assert not battle.unit(1).alive and battle.smoke_clouds == clouds
+    restored = Battle.from_dict(battle.to_dict())
+    battle.end_turn(); restored.end_turn()
+    assert battle.to_dict() == restored.to_dict() and battle.smoke_clouds == []

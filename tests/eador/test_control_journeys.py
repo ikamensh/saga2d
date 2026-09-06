@@ -44,3 +44,15 @@ def test_paid_smoke_repulse_and_flight_win_hold_with_a_living_archer_and_save_ev
     state.resolve_battle()
     assert state.provinces[(0, -2)].explored
     assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+def test_paid_control_and_flight_campaigns_win_for_each_hero():
+    """Both disclosed investments earn a campaign win without injecting resources or troops."""
+    from eador.model import HERO_CLASSES
+    from tools.stress_eador_control import ControlTrial
+    for hero_class in HERO_CLASSES:
+        for plan, recruits in (('control', ('sapper', 'adept')), ('flight', ('skyrider', 'warden'))):
+            result = ControlTrial(7, hero_class, 'frontier', plan).run()
+            assert result['status'] == 'victory'
+            assert all(result['purchases'].get('recruit.' + kind, 0) >= 1 for kind in recruits)
+            assert sum(entry[4] for entry in result['investments'] if entry[1] == 'recruit') >= 3
