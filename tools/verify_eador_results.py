@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from functools import partial
 import hashlib
 import json
 import os
@@ -20,24 +21,28 @@ from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ResultScene, ShardScene, TitleScene
 from tools.eador_campaign import finish_battle, play_campaign
-from tools.eador_extraction_campaign import prepare_adventure, crossing_route
+from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure, crossing_route
 from tools.eador_observatory_campaign import prepare_observatory, observatory_route
 from tools.eador_ui import PlayerInput
+from tools.cpu_budget import CpuBudget
 from tools.verify_eador_guidance import check_reading_layout
 
 
-def prepared_results():
+def prepared_results(*, budget=None):
     """Actual public purchases and tactics earn all conclusion types without editing saved fields."""
+    budget = CpuBudget(25) if budget is None else budget
     cases = []
     state = State.new(7, 'Wizard')
     state.explore()
     while not state.battle.outcome:
+        budget.checkpoint()
         state.battle.auto_turn()
     cases.append(('rout', state.to_json()))
 
     # March east without recovery or investment until the first genuine defeat.
     state = State.new(0)
     for _ in range(8):
+        budget.checkpoint()
         if not state.actions_left:
             state.end_turn()
         if not state.battle:
@@ -45,6 +50,7 @@ def prepared_results():
         if not state.battle:
             continue
         while not state.battle.outcome:
+            budget.checkpoint()
             state.battle.auto_turn()
         if state.battle.outcome == 'enemy':
             break
@@ -54,15 +60,17 @@ def prepared_results():
     assert state.battle.outcome_reason == 'hero_death'
     cases.append(('hero-death', state.to_json()))
 
-    crossing = prepare_adventure()
-    observatory = prepare_observatory()
-    for name, play in (('escape', crossing_route(State.from_json(crossing.to_json()), 'guided')),
-                       ('hold', observatory_route(State.from_json(observatory.to_json()), 'clear'))):
+    crossing = prepare_adventure(budget=budget)
+    observatory = prepare_observatory(budget=budget)
+    orders = partial(AdventureOrders, budget=budget)
+    for name, play in (('escape', crossing_route(State.from_json(crossing.to_json()), 'guided', orders_type=orders)),
+                       ('hold', observatory_route(State.from_json(observatory.to_json()), 'clear', orders_type=orders))):
         assert play.battle.outcome_reason == name
         cases.append((name, play.state.to_json()))
     for name, state, approach in (('extract-deadline', crossing, 'direct'), ('hold-deadline', observatory, 'clear')):
         state.explore(approach=approach)
         for _ in range(20):
+            budget.checkpoint()
             battle = state.battle
             if battle.outcome:
                 break
@@ -73,24 +81,27 @@ def prepared_results():
         assert state.battle.outcome_reason == 'deadline'
         cases.append((name, state.to_json()))
 
-    victory = play_campaign(State.new(0))
+    victory = play_campaign(State.new(0), budget=budget)
     assert victory.status == 'victory'
     cases.append(('shard-victory', victory.to_json()))
     defeat = State.new(7)
     defeat.travel((-1, 0))
-    finish_battle(defeat)
+    finish_battle(defeat, budget=budget)
     for _ in range(50):
+        budget.checkpoint()
         if defeat.status != 'playing':
             break
         defeat.end_turn()
         if defeat.battle:
-            finish_battle(defeat)
+            finish_battle(defeat, budget=budget)
     assert defeat.status == 'defeat'
     cases.append(('capital-lost', defeat.to_json()))
+    budget.checkpoint()
     return cases
 
 
-def verify(output, *, backend='pyglet'):
+def verify(output, *, backend='pyglet', budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
@@ -133,7 +144,7 @@ def verify(output, *, backend='pyglet'):
             player.button('Return to shard')
             assert player.state.to_json() == expected.to_json()
 
-            for name, snapshot in prepared_results():
+            for name, snapshot in prepared_results(budget=budget):
                 for size in ((1280, 720), (1280, 800), (1920, 1080)):
                     game.set_window_size(size)
                     game.clear_and_push(ShardScene(State.from_json(snapshot)))
@@ -152,7 +163,10 @@ def verify(output, *, backend='pyglet'):
                         assert player.state.to_json() == snapshot
             before_restart = player.state.to_json()
         finally:
-            game._teardown()
+            try:
+                game._teardown()
+            finally:
+                game.backend.quit()
         restarted = create_game(backend=backend, visible=False, save_dir=saves)
         try:
             assert reading_scale(restarted) == 125
@@ -166,18 +180,31 @@ def verify(output, *, backend='pyglet'):
             assert isinstance(restarted.scene, TitleScene)
             events = len(player.events) + len(replay.events)
         finally:
-            restarted._teardown()
+            try:
+                restarted._teardown()
+            finally:
+                restarted.backend.quit()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   backend=backend, source_sha256=hashes, source_unchanged=True, input_events=events,
-                  exact_reloads=player.reloads, matrix=metrics)
+                  exact_reloads=player.reloads, matrix=metrics, cpu_percent=budget.percent)
     (output / 'verification.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f'Result reading passed ({backend}): {len(metrics)} outcome views, {events} inputs; {output}')
 
 
-if __name__ == '__main__':
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-results'))
     parser.add_argument('--backend', choices=('pyglet', 'mock'), default='pyglet')
-    args = parser.parse_args()
-    verify(args.output, backend=args.backend)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Model preparation CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.output, backend=args.backend, budget=budget)
+
+
+if __name__ == '__main__':
+    main()

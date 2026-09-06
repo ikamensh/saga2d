@@ -4,12 +4,12 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders
 
 
-def prepare_observatory(state=None, *, support="sapper"):
+def prepare_observatory(state=None, *, support="sapper", budget=None):
     state = State.new(7, 'Commander', theme='ruins') if state is None else state
     state.build('barracks'); state.recruit('warden')
-    state.explore(); finish_battle(state)
+    state.explore(); finish_battle(state, budget=budget)
     for destination in ((-1, -1), (-1, 0)):
-        march_to(state, destination); rest(state)
+        march_to(state, destination, budget=budget); rest(state, budget=budget)
     for kind in (support, 'healer'):
         spec = UNITS[kind]
         for _ in range(48):
@@ -20,14 +20,14 @@ def prepare_observatory(state=None, *, support="sapper"):
             if spec.building in state.buildings and state.gold >= state.recruit_cost(kind) and state.crystals >= state.recruit_crystal_cost(kind):
                 state.recruit(kind)
                 break
-            rest(state)
+            rest(state, budget=budget)
         else:
             raise AssertionError(f'Could not fund {spec.name}')
     for _ in range(48):
-        march_to(state, (-1, 0))
+        march_to(state, (-1, 0), budget=budget)
         if state.actions_left and state.crystals >= 2 and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the Observatory recovered')
 
 

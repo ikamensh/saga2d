@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-from functools import cache
 import hashlib
 import json
 import os
@@ -22,36 +21,40 @@ from eador.preferences import reading_scale
 from eador.scene import BattleScene, SaveScene, ShardScene, TitleScene
 from tools.eador_linked_campaign import lose_shard, play_linked, play_stage, travel_selection
 from tools.eador_ui import PlayerInput
+from tools.cpu_budget import CpuBudget
+from tools.native_frames import tick
 from tools.verify_eador_guidance import check_reading_layout
 
 
-@cache
-def prepared_saves():
+def prepared_saves(*, budget=None):
     """Earn saved phases with public commands, and keep actual old fixture payloads."""
+    budget = CpuBudget(25) if budget is None else budget
     state = State.new_campaign(7)
     states = [('opening', state.to_json())]
     state.explore()
     states.append(('battle', state.to_json()))
     while state.battle.outcome is None:
+        budget.checkpoint()
         state.battle.auto_turn()
     states.append(('result', state.to_json()))
     state.resolve_battle()
     assert state.choice is not None
     states.append(('choice', state.to_json()))
-    departure = play_stage(State.new_campaign(7))
+    departure = play_stage(State.new_campaign(7), budget=budget)
     states.append(('departure', departure.to_json()))
     departure.advance('rootward', **travel_selection(departure))
-    lose_shard(departure)
+    lose_shard(departure, budget=budget)
     states.append(('recovery', departure.to_json()))
     lost = State.from_json(departure.to_json())
     lost.abandon_campaign()
     states.append(('lost', lost.to_json()))
     departure.recover(**travel_selection(departure))
     states.append(('recovered', departure.to_json()))
-    states.append(('completed', play_linked().to_json()))
+    states.append(('completed', play_linked(budget=budget).to_json()))
     states.append(('challenge', State.new_campaign(7, difficulty='challenge').to_json()))
     for filename in ('v1_campaign.json', 'v10_pinned_crossing.json'):
         states.append((filename, (ROOT / 'tests/eador/fixtures' / filename).read_text()))
+    budget.checkpoint()
     return tuple(states)
 
 
@@ -74,7 +77,7 @@ def select_slot(player, slot, *, backup=False):
         window = player.game.backend.window
         window.dispatch_event('on_key_press', getattr(key, '_' + number), key.MOD_SHIFT)
         window.dispatch_event('on_key_release', getattr(key, '_' + number), key.MOD_SHIFT)
-        player.game.tick(1 / 60)
+        tick(player.game)
     else:
         player.events.append(('SaveScene', 'key', 'shift+' + number))
         player.game.backend.inject_key(number, shift=True)
@@ -82,7 +85,8 @@ def select_slot(player, slot, *, backup=False):
         player.game.tick(1 / 60)
 
 
-def verify(output, *, backend='pyglet'):
+def verify(output, *, backend='pyglet', budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py'),
                *ROOT.glob('tests/eador/fixtures/*.json')]
@@ -146,7 +150,7 @@ def verify(output, *, backend='pyglet'):
             assert isinstance(game.scene, ShardScene) and player.state.to_json() == opening
 
             # This is a read-only layout matrix over actual saved phases, separate from the tracer.
-            cases = prepared_saves()
+            cases = prepared_saves(budget=budget)
             for batch in range(2):
                 game.clear_and_push(ShardScene(State.new(7)))
                 saves = player.root.saves
@@ -195,7 +199,10 @@ def verify(output, *, backend='pyglet'):
                 player.press(key)
             assert reading_scale(game) == 125
         finally:
-            game._teardown()
+            try:
+                game._teardown()
+            finally:
+                game.backend.quit()
         restarted = create_game(backend=backend, visible=False, save_dir=saves_path)
         try:
             assert reading_scale(restarted) == 125
@@ -205,18 +212,31 @@ def verify(output, *, backend='pyglet'):
             replay.capture('settings-restarted-slots')
             events = player.events + replay.events
         finally:
-            restarted._teardown()
+            try:
+                restarted._teardown()
+            finally:
+                restarted.backend.quit()
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest for path, digest in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   backend=backend, source_sha256=hashes, source_unchanged=True, input_activations=len(events),
-                  matrix=metrics, inputs=events, phases=[name for name, _ in cases])
+                  matrix=metrics, inputs=events, phases=[name for name, _ in cases], cpu_percent=budget.percent)
     (output / 'verification.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f'Save reading passed ({backend}): {len(metrics)} pages, {len(events)} inputs; {output}')
 
 
-if __name__ == '__main__':
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-save-reading'))
     parser.add_argument('--backend', choices=('pyglet', 'mock'), default='pyglet')
-    args = parser.parse_args()
-    verify(args.output, backend=args.backend)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Model preparation CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.output, backend=args.backend, budget=budget)
+
+
+if __name__ == '__main__':
+    main()
