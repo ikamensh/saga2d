@@ -10,14 +10,17 @@ from tools.eador_roles_campaign import prepare_support_watch
 
 
 class AdventureOrders:
-    def __init__(self, state):
+    def __init__(self, state, *, budget=None):
         self.state, self.orders = state, []
+        self.budget = budget
 
     @property
     def battle(self):
         return self.state.battle
 
     def do(self, command, *args, **kwargs):
+        if self.budget:
+            self.budget.checkpoint()
         getattr(self.battle, command)(*args, **kwargs)
         self.orders.append((command, args, kwargs))
 
@@ -30,13 +33,13 @@ class AdventureOrders:
         return next(u.id for u in self.battle.units if u.team == 'enemy' and u.kind == kind)
 
 
-def prepared_crossing(state=None):
+def prepared_crossing(state=None, *, budget=None):
     """Buy all three supports, clear their Watch, and travel to the southern crossing."""
-    state = prepare_support_watch(state)
-    finish_battle(state)
-    march_to(state, (0, 2))
+    state = prepare_support_watch(state, budget=budget)
+    finish_battle(state, budget=budget)
+    march_to(state, (0, 2), budget=budget)
     if not state.actions_left:
-        rest(state, defend=False)
+        rest(state, defend=False, budget=budget)
     return state
 
 

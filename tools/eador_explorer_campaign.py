@@ -4,19 +4,19 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders
 
 
-def prepare_explorer(hero_class='Commander', *, support='ranger', collect_boots=False, state=None):
+def prepare_explorer(hero_class='Commander', *, support='ranger', collect_boots=False, state=None, budget=None):
     state = State.new(7, hero_class) if state is None else state
     state.build('barracks')
     for _ in range(8):
         if state.gold >= state.recruit_cost('warden'):
             state.recruit('warden')
             break
-        rest(state)
+        rest(state, budget=budget)
     else:
         raise AssertionError('Could not fund the Warden')
-    state.explore(); finish_battle(state)
+    state.explore(); finish_battle(state, budget=budget)
     for pos in ((-1, -1), (-1, 0)):
-        march_to(state, pos); rest(state)
+        march_to(state, pos, budget=budget); rest(state, budget=budget)
     if support is not None:
         building_id = UNITS[support].building
         building = BUILDINGS[building_id]
@@ -27,21 +27,21 @@ def prepare_explorer(hero_class='Commander', *, support='ranger', collect_boots=
             if building_id in state.buildings and state.gold >= state.recruit_cost(support) and state.crystals >= state.recruit_crystal_cost(support):
                 state.recruit(support)
                 break
-            rest(state)
+            rest(state, budget=budget)
         else:
             raise AssertionError('Could not fund the explorer escort')
     # Develop the western road before crossing into the optional northern site.
     for pos in ((-1, 1), (-1, 2), (0, -1)):
-        march_to(state, pos)
+        march_to(state, pos, budget=budget)
         if pos == (-1, 2) and collect_boots:
             if not state.actions_left:
-                rest(state); march_to(state, pos)
-            state.explore(); finish_battle(state)
+                rest(state, budget=budget); march_to(state, pos, budget=budget)
+            state.explore(); finish_battle(state, budget=budget)
     for _ in range(48):
-        march_to(state, (0, -1))
+        march_to(state, (0, -1), budget=budget)
         if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army) and (support != 'healer' or state.hero.mana >= 4):
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the Explorer with the purchased party recovered')
 
 

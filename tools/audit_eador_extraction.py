@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Measure the explicit seed-seven extraction plans; not an optimal-play benchmark."""
 import argparse
+from functools import partial
 import hashlib
 import json
 from pathlib import Path
@@ -13,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from eador.model import HERO_CLASSES, RuleError, State
-from tools.eador_extraction_campaign import prepare_adventure, prepared_crossing, crossing_route, cache_route
+from tools.cpu_budget import CpuBudget
+from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure, prepared_crossing, crossing_route, cache_route
 
 
 class PaidState:
@@ -36,12 +38,12 @@ class PaidState:
         self.recruitment_gold += before - self.gold
 
 
-def measure(prepared, approach, route, name):
+def measure(prepared, approach, route, name, *, budget=None):
     state = State.from_json(prepared.to_json())
     before = {'campaign_turn': state.turn, 'gold': state.gold, 'hero_class': state.hero.hero_class,
               'building_gold': prepared.building_gold, 'recruitment_gold': prepared.recruitment_gold,
               'army': [troop.kind for troop in state.hero.army], 'hero_skills': dict(state.hero.skill_ranks)}
-    play = route(state, approach)
+    play = route(state, approach, orders_type=partial(AdventureOrders, budget=budget))
     state, battle = play.state, play.battle
     assert battle.outcome_reason == 'escape'
     assert all(unit.alive for unit in battle.units if unit.team == 'player')
@@ -58,6 +60,8 @@ def measure(prepared, approach, route, name):
     state.resolve_battle()
     assert state.gold == gold + reward.gold and state.crystals == crystals + reward.crystals
     while state.choice:
+        if budget:
+            budget.checkpoint()
         state.choose(state.choice.options[0].id)
     saved = state.to_json()
     try:
@@ -70,31 +74,37 @@ def measure(prepared, approach, route, name):
     return result
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path, required=True)
-    args = parser.parse_args()
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       ROOT / 'tools/eador_campaign.py', ROOT / 'tools/eador_roles_campaign.py',
-                      ROOT / 'tools/eador_extraction_campaign.py', Path(__file__).resolve()])
+                      ROOT / 'tools/eador_extraction_campaign.py', ROOT / 'tools/cpu_budget.py', Path(__file__).resolve()])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     started = time.perf_counter()
     rows = []
-    paired = prepared_crossing(PaidState(State.new(7)))
+    paired = prepared_crossing(PaidState(State.new(7)), budget=budget)
     for approach in ('direct', 'guided'):
-        rows.append(measure(paired, approach, crossing_route, 'same seven-body Crossing army'))
+        rows.append(measure(paired, approach, crossing_route, 'same seven-body Crossing army', budget=budget))
     for hero in HERO_CLASSES:
         for approach, support in (('direct', 'ranger'), ('guided', 'healer')):
-            state = prepare_adventure(hero, 'frontier', support=support, state=PaidState(State.new(7, hero)))
-            rows.append(measure(state, approach, crossing_route, 'six-body Crossing route'))
-        prepared = prepare_adventure(hero, 'elderwild', state=PaidState(State.new(7, hero, theme='elderwild')))
+            state = prepare_adventure(hero, 'frontier', support=support, state=PaidState(State.new(7, hero)), budget=budget)
+            rows.append(measure(state, approach, crossing_route, 'six-body Crossing route', budget=budget))
+        prepared = prepare_adventure(hero, 'elderwild', state=PaidState(State.new(7, hero, theme='elderwild')), budget=budget)
         for approach in ('light', 'full'):
-            rows.append(measure(prepared, approach, cache_route, 'same six-body Cache army'))
+            rows.append(measure(prepared, approach, cache_route, 'same six-body Cache army', budget=budget))
     changed = [str(p.relative_to(ROOT)) for p in sources if hashlib.sha256(p.read_bytes()).hexdigest() != hashes[str(p.relative_to(ROOT))]]
     assert not changed
-    report = {'revision': revision, 'dirty_at_start': dirty,
+    report = {'revision': revision, 'dirty_at_start': dirty, 'cpu_percent': budget.percent,
               'source_sha256': hashes, 'source_files_changed': changed, 'seed': 7,
               'python': platform.python_version(), 'platform': platform.platform(),
               'elapsed_seconds': time.perf_counter() - started, 'completed_manual_escapes': len(rows), 'journeys': rows}

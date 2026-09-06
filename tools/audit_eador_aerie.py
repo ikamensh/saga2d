@@ -46,8 +46,8 @@ def without_flight_reachable(battle, ident):
 
 
 class RecordedOrders(AdventureOrders):
-    def __init__(self, state):
-        super().__init__(State.from_json(state.to_json()))
+    def __init__(self, state, *, budget=None):
+        super().__init__(State.from_json(state.to_json()), budget=budget)
         self.initial = json.loads(self.state.to_json())
         self.snapshots, self.flight_landings = [], []
 

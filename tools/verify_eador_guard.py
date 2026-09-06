@@ -96,7 +96,10 @@ def verify(output):
             capture("stances-restored")
             print(f"Native recruitment, Guard/Brace, disabled shortcut, expiry and exact save restoration passed: {output}")
         finally:
-            game._teardown()
+            try:
+                game._teardown()
+            finally:
+                game.backend.quit()
 
 
 if __name__ == "__main__":
