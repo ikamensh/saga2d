@@ -13,6 +13,8 @@ from eador.model import SaveFormatError, State
 
 MANUAL_SLOTS = (1, 2, 3)
 AUTO_SLOTS = (10, 11, 12)
+_PHASE_LABELS = {"departure": "Next challenge", "recovery": "Recovery available",
+                 "lost": "Campaign lost", "completed": "Campaign completed"}
 
 
 @dataclass(frozen=True)
@@ -78,10 +80,14 @@ class CampaignSaves:
                                              backup_error=backup_error))
                     continue
                 detail = f"Turn {state.turn} · {state.hero.hero_class} · Shard {state.seed}"
+                if state.campaign is not None:
+                    detail = f"Stage {state.campaign.stage}/3 · {state.campaign.title} · {detail}"
                 if state.battle is not None:
                     detail += f" · Battle round {state.battle.round}"
                 elif state.choice is not None:
                     detail += " · Decision pending"
+                elif state.campaign is not None and state.campaign.phase in _PHASE_LABELS:
+                    detail += f" · {_PHASE_LABELS[state.campaign.phase]}"
                 elif state.status != "playing":
                     detail += f" · {state.status.title()}"
                 entries.append(SaveEntry(slot, label, detail, metadata["timestamp"], True,
@@ -90,6 +96,27 @@ class CampaignSaves:
                 entries.append(SaveEntry(slot, label, "Cannot read this save", exists=True,
                                          error=str(error), backup_available=backup, backup_error=backup_error))
         return entries
+
+    def checkpoint(self, state: State) -> int:
+        """Return the slot preserving this exact state before a campaign transition.
+
+        Prefer a new rolling autosave. If that fails, an already saved, current
+        manual slot may satisfy the checkpoint instead. Only a validated full
+        state match counts; stale, unrelated or backup snapshots never do.
+        Failed reads stay untouched and cannot hide the original autosave error.
+        """
+        try:
+            return self.autosave(state)
+        except SaveError:
+            expected = state.to_json()
+            for slot in MANUAL_SLOTS:
+                try:
+                    saved = self.load(slot)
+                except SaveError:
+                    continue
+                if saved is not None and saved.to_json() == expected:
+                    return slot
+            raise
 
     def autosave(self, state: State) -> int:
         """Rotate only autosave slots; manual or damaged files stay untouched."""

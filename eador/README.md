@@ -2,8 +2,8 @@
 
 An Eador-inspired strategy game built on Saga2D. Develop a stronghold,
 explore guarded sites, lead a persistent army through hex battles, and
-capture Duskspire before the rival takes Westwatch. It is an independently
-implemented single-shard adaptation with procedural art.
+capture Duskspire before the rival takes Westwatch. Its three-shard linked
+campaign and quick standalone mode use original content and procedural art.
 
 From the repository root:
 
@@ -12,8 +12,24 @@ uv sync --extra dev
 uv run python -m eador                       # title and hero selection
 uv run python -m eador --seed 7              # start immediately as Commander
 uv run python -m eador --seed 7 --hero Wizard --theme elderwild
+uv run python -m eador --campaign --seed 7 --hero Commander
 uv run python -m pytest tests/eador -q
 ```
+
+On the title, **L** begins a linked campaign with your hero and seed, starting
+in Frontier. **Enter** starts one standalone shard in your selected world.
+Linked victories offer two next challenges, followed by a choice of up to
+two surviving veterans and two relics. Use **Left/Right**, **Up/Down** and
+**Space** to choose a retinue, then **Enter** to depart; **Esc** returns to
+challenge comparison. Learned skills persist, traveling health and mana
+recover, and local holdings and buildings stay behind. A first lost capital
+offers one recovery expedition; another loss ends the run. See the
+[linked campaign guide](../docs/eador-linked-ui.md) for carryover and saves.
+**J** opens your current contract, numbered map objectives, rank limits and
+recovery status. Its numbered **Locate** controls select a required province
+without spending an action. The final ritual's briefing shows the deployment,
+seal, defending army and deadline before you commit the assault. Retinue
+pages also have mouse-accessible **Previous / Next** controls.
 
 `--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard`; `--theme` accepts
 `frontier`, `elderwild` or `ruins`. With `--seed` they start that world directly;

@@ -3,14 +3,14 @@ from eador.model import State
 from tools.eador_campaign import play_campaign
 
 
-def play_stage(state):
+def play_stage(state, **options):
     route = None
     if state.campaign.contract == 'rootward':
         watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
         route = ((-2, 0), (-1, 0), (0, 0), watch, (1, 0), (2, 0))
     elif state.campaign.contract == 'foundries':
         route = ((-2, 0), (-1, 0), (0, -1), (0, 1), (1, 0), (2, 0))
-    return play_campaign(state, route)
+    return play_campaign(state, route, **options)
 
 
 def travel_selection(state):

@@ -1,5 +1,5 @@
 """Authored Shardbound battlefields; layout and objective rules are game content."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 Pos = tuple[int, int]
 
@@ -10,9 +10,10 @@ class EncounterSpec:
     terrain: tuple[tuple[Pos, str], ...]
     player_positions: tuple[Pos, ...]
     enemy_positions: tuple[Pos, ...]
-    seal: Pos
+    seal: Pos | None = None
     hold_turns: int = 2
     deadline: int = 8
+    exits: tuple[Pos, ...] = ()
 
 
 _WATCH_FOREST = {(-1, 1), (-1, 2), (0, -1), (1, -2)}
@@ -39,4 +40,29 @@ ENCOUNTERS['last_gate'] = EncounterSpec(
     ((-3, 0), (-2, 0), (-3, 1), (-2, -1), (-3, 2), (-2, 1), (-3, 3)),
     ((1, -1), (2, -1), (1, 1), (2, 0), (3, -2), (3, -1), (3, 0)),
     (-1, 0),
+)
+
+
+_CROSSING_FOREST = {(-2, -1), (-1, -1), (0, -2), (1, -3), (-1, 3), (0, 2)}
+_CROSSING_HILLS = {(0, 0), (1, -1), (2, -2)}
+ENCOUNTERS['courier_direct'] = EncounterSpec(
+    'Courier’s Crossing',
+    tuple(((q, r), 'forest' if (q, r) in _CROSSING_FOREST else 'hills' if (q, r) in _CROSSING_HILLS else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-3, 1), (-2, 0), (-3, 2), (-2, 1), (-2, 2), (-3, 0), (-2, 3)),
+    ((1, -1), (2, -2), (1, 1), (2, 0), (2, 1), (3, -2), (3, -1)),
+    exits=((3, -3), (3, 0)),
+)
+ENCOUNTERS['courier_guided'] = replace(ENCOUNTERS['courier_direct'],
+    player_positions=((-1, 3), (0, 3), (-2, 3), (-1, 2), (0, 2), (-2, 2), (-3, 3)))
+
+
+_CACHE_FOREST = {(-2, 0), (-1, 0), (0, -2), (1, -2), (1, 0), (0, 1), (-1, 2)}
+ENCOUNTERS['supply_cache'] = EncounterSpec(
+    'Supply Cache',
+    tuple(((q, r), 'forest' if (q, r) in _CACHE_FOREST else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((0, 0), (1, 0), (0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1)),
+    ((-3, 0), (3, -3), (3, 0), (0, 3), (2, 1), (-3, 3), (1, 2)),
+    exits=((-3, 1), (2, -3)),
 )

@@ -87,6 +87,10 @@ class CodexScene(Screen):
     def read_entries(self):
         state = self.root.state
         category = CATEGORIES[self.category]
+        older_acolytes = state.battle and any(unit.team == 'player' and unit.alive
+                                             and unit.kind == 'healer' and not unit.can_heal
+                                             for unit in state.battle.units)
+        saved_healing_note = "This older battle retains its noncasting Acolytes."
         if category == "Troops":
             entries = []
             for kind, spec in UNITS.items():
@@ -98,9 +102,15 @@ class CodexScene(Screen):
                     description = (f"{role} Recruit for {state.recruit_cost(kind)} gold now (base {spec.cost}); "
                                    f"upkeep {spec.upkeep} gold/turn. {requirement}")
                     if kind == "healer":
-                        description += " An acolyte adds 2 army recovery each resting turn."
+                        description = (f"Recruit for {state.recruit_cost(kind)} gold (base {spec.cost}); upkeep {spec.upkeep}. {requirement} "
+                                       "Heal uses its order and shared mana. Adds 2 army recovery per resting turn. "
+                                       + (saved_healing_note if older_acolytes else "See Abilities for costs and timing."))
                     elif kind == "archer":
                         description += " Pin trades half damage for -2 movement on the target’s next turn. See Abilities for timing and counters."
+                    elif kind == "ranger":
+                        description += " Shoot before moving to reposition; moving first gives no extra move. No Pin. See Abilities for limits."
+                    elif kind == "warden":
+                        description += " Swap into an adjacent ally’s place to extract it. Spends both moves and the Warden’s action. See Abilities for exact costs."
                     elif kind == "pikeman":
                         description = (f"Costs {state.recruit_cost(kind)} gold (base {spec.cost}); upkeep {spec.upkeep}. "
                                        "Requires Barracks. Brace hits once before melee, through retaliation protection. "
@@ -126,11 +136,28 @@ class CodexScene(Screen):
             hero = battle.unit(0)
             pin_hero = "Hero equipped" if hero.can_pin else "Hero needs Storm Quiver"
             brace_hero = "Hero equipped" if hero.can_brace else "Hero needs Watch Bell"
+            acolytes = [unit for unit in battle.units if unit.team == 'player' and unit.alive and unit.kind == 'healer']
+            healers = sum(unit.can_heal for unit in acolytes)
+            context = "Current battle" if state.battle else "Next battle"
             entries += [
                 _Entry("Pin", f"Range 3 · No mana · Army: {len(capable)} capable / {ready} ready · {cooling} cooling · {pin_hero}",
                        "Half damage after defense/cover (round up); forecast includes reactions. "
                        "-2 movement (minimum 1) next own turn; attacks and Guard still work. "
                        "Cannot stack or extend; skip the following turn before reuse. Avoids Brace."),
+                _Entry("Ranger: shoot then move", "Ordinary attack · No mana · No Pin",
+                       "Shoot before moving to keep the Ranger's unused movement. Moving first gives no second move. "
+                       "Pin still slows the escape; occupied hexes and normal terrain costs still apply."),
+                _Entry("Swap", "Warden · Adjacent living ally · No mana",
+                       "Exchange places, spending the Warden's action and both units' remaining movement. "
+                       "The ally's action stays as it was, even if already spent. May move then Swap. "
+                       "Guard/Brace and Pin stay unchanged."),
+                _Entry("Acolyte Heal",
+                       f"{context}: {healers} of {len(acolytes)} Acolytes have Heal · "
+                       f"{battle.spell_cost('heal')} mana / up to {battle.spell_power['heal']} healing · Shared mana: {battle.mana}",
+                       "Heal a wounded living ally within 4 hexes; spends the Acolyte's action and movement. "
+                       "The hero's action is untouched; the hero need not know Heal. "
+                       + (saved_healing_note if older_acolytes
+                          else "Skills and relics modify the cost and healing.")),
                 _Entry("Brace", f"Pikemen and Watch Bell heroes · No mana · {brace_hero}",
                        "Use Guard to spend the remaining order. The first adjacent melee attacker takes a normal hit before striking; "
                        "a lethal hit cancels its attack. One reaction, expiring next own turn. Ranged attacks avoid it. "
@@ -171,8 +198,8 @@ class CodexScene(Screen):
         self.text(f"{state.hero.hero_class} · {HERO_CLASSES[state.hero.hero_class].description}",
                   x + 24, y + 81, size=12, color=MUTED)
         introductions = (
-            "Guard grants +2 defense; Pikemen and Watch Bell heroes Brace. Archers can Pin. Stats exclude veteran and hero bonuses.",
-            "Spell costs and power include skills and relics. Pin and Brace cost no mana; readiness reflects your current army.",
+            "Each troop offers different orders. See Abilities for timing and limits. Base stats exclude veteran and hero bonuses.",
+            "Hero and Acolytes share mana. Spell values include skills and relics; counts use this battle's saved capabilities.",
             "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
             "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
             "Explore an owned, uncleared site using one action. These are base definitions; map briefs show saved rewards and surviving guards.",
