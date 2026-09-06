@@ -75,3 +75,83 @@ def assert_one_rout_reward(play):
     with pytest.raises(RuleError):
         state.resolve_battle()
     assert state.to_json() == before
+
+
+def test_a_cheaper_warrior_spear_army_can_clear_the_free_approach_with_different_orders():
+    """Two ordinary Pikemen replace the Ranger/Warden investment without changing the pack."""
+    from tools.eador_hunt_campaign import prepare_hunt_spears, spear_hunt_route
+    from tests.eador.test_extraction_journeys import Journey
+
+    state = prepare_hunt_spears()
+    assert state.hero.hero_class == 'Warrior' and state.buildings == {'barracks'}
+    assert [t.kind for t in state.hero.army][-2:] == ['pikeman', 'pikeman']
+    play = spear_hunt_route(state, orders_type=Journey)
+    assert play.battle.round == 3 and play.battle.mana == state.hero.mana
+    assert any('Pikeman braces' in line for line in play.battle.log)
+    assert_one_rout_reward(play)
+
+
+def test_saved_failed_lure_keeps_its_cost_and_remaining_wolves_when_retrying_for_free():
+    """A killed wolf and another wolf's wounds remain after retreat, reload and reselection."""
+    from tools.eador_campaign import finish_battle, rest
+    state = prepared_hunt()
+    gold, xp = state.gold, state.hero.xp
+    state.explore(approach='lure')
+    battle = state.battle
+    east, north = [next(u.id for u in battle.units if u.team == 'enemy' and u.pos == pos)
+                   for pos in ((1, -1), (2, -1))]
+    battle.attack(5, east); battle.move(2, (3, -2)); battle.move(0, (2, -2)); battle.attack(0, east)
+    battle.move(3, (1, -3)); battle.attack(3, north)
+    survivors = [(u.kind, u.hp) for u in battle.units if u.team == 'enemy' and u.alive]
+    assert len(survivors) == 5 and min(hp for _, hp in survivors) < 17
+    state = State.from_json(state.to_json())
+    assert state.gold == gold - 20
+    state.retreat()
+    assert state.gold == gold - 40 and state.hero.xp == xp  # Fee plus ordinary retreat loss.
+    state = State.from_json(state.to_json())
+    province = state.provinces[state.hero.pos]
+    assert list(zip(province.site_guards, province.site_guard_hp)) == survivors
+    if not state.actions_left:
+        rest(state)
+    before_gold = state.gold
+    state.explore(approach='compact')
+    assert state.gold == before_gold
+    assert [(u.kind, u.hp) for u in state.battle.units if u.team == 'enemy'] == survivors
+    state = State.from_json(state.to_json())
+    reward = state.battle_adventure
+    finish_battle(state)
+    assert state.provinces[(-1, 1)].explored and state.gold == before_gold + reward.gold
+
+
+@pytest.mark.parametrize('corruption', ['missing_attempt', 'hold', 'explored', 'displaced_hero', 'missing_guard'])
+def test_a_damaged_rout_attempt_is_refused_before_it_can_lose_state_or_repeat_rewards(corruption):
+    """Generalizing an approach's objective preserves the existing origin/roster boundary."""
+    from eador.model import SaveFormatError
+    state = prepared_hunt(); state.explore(approach='lure')
+    data = json.loads(state.to_json())
+    province = next(p for p in data['provinces'] if p['pos'] == [-1, 1])
+    if corruption == 'missing_attempt':
+        data['battle_adventure'] = None
+    elif corruption == 'hold':
+        data['battle']['objective'].update(kind='hold', target=[0, 0], required=2, deadline=8)
+    elif corruption == 'explored':
+        province['explored'] = True
+    elif corruption == 'displaced_hero':
+        data['hero']['pos'] = [-2, 0]
+    else:
+        province['site_guards'].pop(); province['site_guard_hp'].pop()
+    with pytest.raises(SaveFormatError):
+        State.from_json(json.dumps(data))
+
+
+def test_pack_hunt_is_placed_once_in_elderwild_without_replacing_required_sources():
+    """Authored placement is a new-world choice; old Den and guaranteed equipment remain."""
+    for seed in range(100):
+        state = State.new(seed, theme='elderwild')
+        assert sum(p.site_kind == 'pack_hunt' for p in state.provinces.values()) == 1
+        assert state.provinces[(-1, 1)].site_kind == 'pack_hunt'
+        assert state.provinces[(-2, 0)].site_kind == 'shrine'
+        assert state.provinces[(-2, 2)].site_kind == 'den'
+        assert state.provinces[(-2, 2)].site_relic == 'storm_quiver'
+        assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
+        assert sum(p.site_kind == 'border_watch' for p in state.provinces.values()) == 1
