@@ -1,7 +1,7 @@
 """Shardbound's whole-entry reading policy; layout and controls stay in each screen."""
 
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 
 
 def reading_pages(heights: Sequence[float], available: float, *, anchor: int = 0,
@@ -37,3 +37,38 @@ def reading_pages(heights: Sequence[float], available: float, *, anchor: int = 0
     anchor = min(anchor, max(0, len(heights) - 1))
     prefix = pack(0, anchor)
     return tuple(prefix + pack(anchor, len(heights))) or ((),), len(prefix)
+
+
+def reading_text_pages(text: str, available: float, *, measure: Callable[[str], float]) -> tuple[str, ...]:
+    """Fit complete prose using measured prefix heights, preserving every character.
+
+    ``measure`` supplies the same wrapped text width/font used to display a page.
+    Prefer whitespace boundaries; split overlong tokens such as filesystem paths
+    when necessary. Joining the returned pages exactly reproduces ``text``.
+    Empty text has one empty page. A character too tall for the area fails clearly.
+    """
+    if not isinstance(text, str):
+        raise TypeError('Reading text must be a string.')
+    if not math.isfinite(available) or available <= 0:
+        raise ValueError('Reading text space must be positive and finite.')
+    pages = []
+    while text:
+        low, high = 0, len(text)
+        while low < high:
+            end = (low + high + 1) // 2
+            height = measure(text[:end])
+            if not math.isfinite(height) or height < 0:
+                raise ValueError('Measured reading height must be nonnegative and finite.')
+            if height <= available:
+                low = end
+            else:
+                high = end - 1
+        if not low:
+            raise ValueError('A reading character does not fit in the available height.')
+        if low < len(text) and not text[low].isspace():
+            boundary = next((index + 1 for index in range(low - 1, -1, -1) if text[index].isspace()), 0)
+            if boundary and text[:boundary].strip():
+                low = boundary
+        pages.append(text[:low])
+        text = text[low:]
+    return tuple(pages) or ('',)
