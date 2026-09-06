@@ -89,19 +89,23 @@ def test_linked_arrival_and_recovery_keep_the_saved_policy_and_separate_grants(m
     assert state.campaign.phase == 'departure'
     state = State.from_json(state.to_json())
     rules, old_gold, old_crystals = state.rules, state.gold, state.crystals
+    funding = state.expedition_funding()
     state.advance('rootward', **travel_selection(state))
     assert state.rules is rules and state.difficulty == mode
     assert (state.gold, state.crystals) == (rules.starting_gold + min(40, old_gold),
                                            rules.starting_crystals + min(2, old_crystals))
+    assert (state.gold, state.crystals) == funding
     assert state.rival.gold == 80 and state.rival.turns_until_action == rules.arrival_delay
     original = json.loads(json.dumps(state.campaign.entry))
     state = lose_shard(state)
     saved = State.from_json(state.to_json())
     for current in (state, saved):
+        funding = current.expedition_funding(recovery=True)
         current.recover(**travel_selection(current))
         assert current.rules is rules and current.campaign.recovery_used
         assert json.loads(json.dumps(current.campaign.entry)) == original
         assert (current.gold, current.crystals) == (rules.recovery_gold, rules.recovery_crystals)
+        assert (current.gold, current.crystals) == funding
         assert current.rival.gold == original['rival']['gold']
         assert current.rival.turns_until_action == rules.arrival_delay
     assert state.to_json() == saved.to_json()

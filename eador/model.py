@@ -230,6 +230,12 @@ class State:
         from eador.campaign import advance
         advance(self, offer_id, troop_ids, relic_ids)
 
+    def expedition_funding(self, *, recovery: bool = False) -> tuple[int, int]:
+        """Preview arrival gold/crystals; ordinary travel includes capped treasury carryover."""
+        if recovery:
+            return self.rules.recovery_gold, self.rules.recovery_crystals
+        return self.rules.starting_gold + min(40, self.gold), self.rules.starting_crystals + min(2, self.crystals)
+
     def recover(self, *, troop_ids=(), relic_ids=()) -> None:
         from eador.campaign import recover
         recover(self, troop_ids, relic_ids)
