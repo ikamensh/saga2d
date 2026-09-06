@@ -59,9 +59,9 @@ and recovery funds.
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
 Reading size offers 100/125% for the Codex, Field Guide, expedition briefings,
-Build, Recruit, Hero and result screens. Press **T** in the Codex, briefing,
-purchase, Hero or result screen to open that setting directly.
-**T** opens it directly from a briefing; other screens currently keep their sizes.
+Build, Recruit, troop replacement, Hero, reward choices, results and campaign
+plan. Press **T** in these screens to open that setting directly.
+Other screens, including the tactical HUD and campaign departures, keep their existing sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
@@ -294,6 +294,15 @@ and a Veil Censer. A failed attempt preserves killed guards and wounded survivor
 | Temple | 65 gold | Recruit Acolytes and Skyriders, learn Heal, improve recovery |
 | Mage Tower | 75 gold + 2 crystals | Recruit Rune Adepts, learn Arcane Bolt, gain 4 maximum mana and unlock mana infusion |
 | Marketplace | 60 gold | Recruit Sappers and add 8 gold income each turn |
+
+Once an army is full, **R → M** opens troop replacement. Choose the veteran,
+choose a fresh recruit from the usual catalog, then review the exact cost.
+**Replace veteran** permanently retires the named troop, losing its rank and
+experience with no refund or reserve. It buys a rank-one recruit in the same
+army slot at the ordinary price and spends one campaign action. The review
+shows health, role, both upkeep totals and any missing prerequisite or resources.
+Cancel spends nothing. Keeping the army and resting remains an alternative;
+ordinary recruitment into an empty slot still costs no campaign action.
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
 deducted each campaign turn. If every province neighboring Westwatch is
