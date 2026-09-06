@@ -189,3 +189,6 @@ The isolated Catalog checkpoint passed 1,046 tests and both games' bounded
 pages across the two reading sizes and three windows, with real keyboard/mouse
 purchases, Apply/Cancel around the current reading anchor and settings restart.
 Page counts describe this snapshot, not a fixed rows-per-page contract.
+
+The [compact Catalog evidence](evidence/shardbound-catalog-reading-2026-09-06/README.md)
+retains four inspected frames, the native matrix, fuzz report and source hashes.
