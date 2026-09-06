@@ -1128,16 +1128,11 @@ def _validate_save(data: dict, version: int) -> None:
                 require(set(unit['spent_abilities']) <= set(unit['abilities']), 'Spent charge requires its ability.')
                 require(battle['sight_rules'] == 'terrain' or not set(unit['abilities']) & {'rally', 'smoke', 'repulse', 'fly'},
                         'Older open-sight armies cannot gain new capabilities.')
-            require('fly' not in unit['abilities'] or unit['kind'] == 'skyrider', 'Only Skyriders can fly.')
-            require('repulse' not in unit['abilities'] or unit['kind'] == 'adept', 'Only Rune Adepts can Repulse.')
-            require('smoke' not in unit['abilities'] or unit['kind'] == 'sapper', 'Only Sappers can use Smoke.')
-            require('rally' not in unit['abilities'] or unit['kind'] == 'militia', 'Only Militia can Rally.')
-            require('swap' not in unit['abilities'] or unit['kind'] == 'warden', 'Only Wardens can swap allies.')
-            require('heal' not in unit['abilities'] or unit['kind'] == 'healer', 'Only Acolytes gain troop Heal.')
-            require('pin' not in unit['abilities'] or unit['kind'] == 'archer'
-                    or unit['kind'] == 'hero' and hero['relic'] == 'storm_quiver', 'This unit cannot learn Pin.')
-            require('brace' not in unit['abilities'] or unit['kind'] == 'hero' and hero['relic'] == 'watch_bell',
-                    'Only the Watch Bell grants a Brace ability.')
+            relic_ability = RELICS[hero['relic']].battle_ability if hero['relic'] else None
+            allowed = ({relic_ability} - {None} if unit['kind'] == 'hero'
+                       else set(UNITS[unit['kind']].abilities))
+            require(set(unit['abilities']) <= allowed,
+                    'A battle ability is not granted by this troop or its equipped relic.')
             require(type(unit['pinned']) is bool, 'Invalid Pinned status.')
             integer(unit['pin_cooldown'], 'Pin cooldown', maximum=2)
             require(unit['pin_cooldown'] == 0 or 'pin' in unit['abilities'], 'Pin cooldown requires the ability.')

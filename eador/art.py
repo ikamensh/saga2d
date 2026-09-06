@@ -28,6 +28,136 @@ def outline(scene, points, color, width=1):
         scene.draw_line(*a, *b, color, width)
 
 
+def relic(scene, x, y, kind, *, scale=1):
+    """Draw an original relic medallion in a 60 × 60 square about its center.
+
+    The object silhouette identifies the item independently of its accent color.
+    Scale .8 fits equipment rows; scale 1 fits reward headings. All shapes use
+    the owning Scene's current drawing layer and need no image assets.
+    """
+    if kind not in ('wayfarer_boots', 'oak_standard', 'ember_lens', 'moonstone',
+                    'iron_crown', 'merchant_seal', 'watch_bell', 'storm_quiver',
+                    'veil_censer', 'porter_rune', 'mirror_badge', 'vanguard_drum'):
+        raise ValueError(f'Unknown relic artwork: {kind}')
+    if not math.isfinite(scale) or scale <= 0:
+        raise ValueError('Relic scale must be finite and positive.')
+
+    def poly(points, color):
+        scene.draw_polygon([(x + a * scale, y + b * scale) for a, b in points], color)
+
+    def line(a, b, color, width=2):
+        scene.draw_line(x + a[0] * scale, y + a[1] * scale,
+                        x + b[0] * scale, y + b[1] * scale, color, width * scale)
+
+    def circle(a, b, radius, color):
+        scene.draw_circle(x + a * scale, y + b * scale, radius * scale, color)
+
+    circle(0, 1, 28, INK)
+    rim = [(x + math.cos(i * math.tau / 32) * 27 * scale,
+            y + math.sin(i * math.tau / 32) * 27 * scale) for i in range(32)]
+    outline(scene, rim, LINE, scale)
+    bronze, ivory, violet = (171, 132, 76, 255), (226, 218, 184, 255), (170, 145, 199, 255)
+
+    if kind == 'wayfarer_boots':
+        for dx, dy in ((-11, -3), (5, 3)):
+            poly([(dx - 5, dy - 15), (dx + 5, dy - 15), (dx + 4, dy + 4),
+                  (dx + 11, dy + 9), (dx + 10, dy + 15), (dx - 6, dy + 15)], bronze)
+            line((dx - 5, dy - 11), (dx + 5, dy - 11), GOLD, 3)
+            line((dx - 6, dy + 14), (dx + 10, dy + 14), ivory, 2)
+            line((dx, dy - 4), (dx + 4, dy - 2), INK, 2)
+    elif kind == 'oak_standard':
+        line((-13, -20), (-13, 21), bronze, 3)
+        circle(-13, -21, 3, GOLD)
+        poly([(-11, -17), (17, -17), (14, -1), (18, 14), (3, 8), (-11, 14)], TEAL)
+        poly([(1, -12), (6, -8), (4, -5), (10, -3), (8, 2), (2, 5), (-4, 1), (-5, -4)], ivory)
+        line((2, -8), (2, 9), bronze, 1.5)
+    elif kind == 'ember_lens':
+        poly([(0, -20), (19, 13), (-19, 13)], bronze)
+        poly([(0, -14), (12, 9), (-12, 9)], RED)
+        poly([(0, -14), (0, 9), (-12, 9)], GOLD)
+        line((-23, -4), (-8, -4), ivory, 2)
+        for dy in (-8, 0, 8):
+            line((12, 2), (23, 2 + dy), RED if dy else GOLD, 2)
+        line((-10, 18), (10, 18), bronze, 3)
+    elif kind == 'moonstone':
+        poly([(0, -22), (17, -9), (16, 12), (0, 23), (-17, 10), (-17, -9)], violet)
+        poly([(0, -22), (0, 23), (-17, 10), (-17, -9)], BLUE)
+        circle(1, 0, 12, ivory)
+        circle(6, -4, 10, violet)
+        circle(-7, -14, 2, TEXT)
+    elif kind == 'iron_crown':
+        poly([(-20, -13), (-10, -3), (0, -20), (10, -3), (20, -13), (15, 14), (-15, 14)], bronze)
+        poly([(-15, 10), (15, 10), (14, 18), (-14, 18)], GOLD)
+        poly([(0, -8), (5, 0), (0, 7), (-5, 0)], RED)
+        for dx in (-20, 0, 20):
+            circle(dx, -20 if dx == 0 else -13, 2, ivory)
+    elif kind == 'merchant_seal':
+        poly([(-17, -21), (14, -21), (20, -15), (20, 12), (-17, 12)], ivory)
+        poly([(14, -21), (14, -15), (20, -15)], bronze)
+        for yy in (-12, -6):
+            line((-10, yy), (9, yy), bronze, 1.5)
+        poly([(-8, 8), (0, 10), (-3, 24), (-8, 19), (-13, 21)], RED)
+        poly([(2, 10), (10, 8), (15, 20), (9, 18), (6, 24)], RED)
+        circle(1, 8, 11, bronze)
+        circle(1, 8, 8, GOLD)
+        line((-3, 8), (5, 8), INK, 2)
+        line((1, 4), (1, 12), INK, 2)
+    elif kind == 'watch_bell':
+        circle(0, -17, 6, GOLD)
+        circle(0, -17, 3, INK)
+        poly([(-3, -13), (3, -13), (12, -5), (14, 10), (20, 16), (-20, 16), (-14, 10), (-12, -5)], bronze)
+        poly([(-3, -10), (2, -10), (4, 11), (-10, 11), (-8, -3)], GOLD)
+        line((-20, 16), (20, 16), ivory, 3)
+        circle(0, 20, 4, GOLD)
+    elif kind == 'storm_quiver':
+        for dx, dy in ((-7, -3), (0, 0), (7, -4)):
+            line((dx, dy - 18), (dx - 5, 13), ivory, 2)
+            poly([(dx, dy - 24), (dx + 4, dy - 17), (dx, dy - 19), (dx - 4, dy - 17)], BLUE)
+        poly([(-13, -5), (10, -1), (6, 21), (-12, 18)], bronze)
+        line((-13, -5), (10, -1), GOLD, 3)
+        poly([(-2, 1), (-7, 9), (-2, 8), (-4, 16), (4, 6), (-1, 7)], BLUE)
+    elif kind == 'veil_censer':
+        circle(0, -20, 4, bronze)
+        line((-3, -17), (-15, 5), GOLD, 1.5)
+        line((3, -17), (15, 5), GOLD, 1.5)
+        for dx, dy, radius in ((-1, -9, 5), (5, -5, 6), (0, 1, 7)):
+            circle(dx, dy, radius, MUTED)
+        poly([(-19, 5), (19, 5), (12, 18), (0, 22), (-12, 18)], bronze)
+        line((-19, 5), (19, 5), GOLD, 3)
+        for dx in (-8, 0, 8):
+            circle(dx, 12, 2, INK)
+    elif kind == 'porter_rune':
+        poly([(-15, -21), (12, -23), (20, -8), (16, 20), (-12, 23), (-20, 8)], MUTED)
+        poly([(-15, -21), (-8, -15), (-11, 13), (-12, 23), (-20, 8)], bronze)
+        # An open doorway and outward stroke suggest displacement, not flight.
+        line((-5, 12), (-5, -11), INK, 4)
+        line((-5, -11), (8, -11), INK, 4)
+        line((8, -11), (8, -3), INK, 4)
+        line((-1, 4), (15, 4), GOLD, 3)
+        line((9, -2), (15, 4), GOLD, 3)
+        line((15, 4), (9, 10), GOLD, 3)
+    elif kind == 'mirror_badge':
+        poly([(0, -22), (14, -12), (14, 12), (0, 22), (-14, 12), (-14, -12)], bronze)
+        poly([(0, -17), (9, -9), (9, 9), (0, 17), (-9, 9), (-9, -9)], BLUE)
+        line((-5, 7), (5, -7), ivory, 2)
+        line((-22, -6), (-15, -12), TEAL, 2)
+        line((-22, -6), (-15, 0), TEAL, 2)
+        line((22, 6), (15, 0), TEAL, 2)
+        line((22, 6), (15, 12), TEAL, 2)
+    else:  # vanguard_drum
+        poly([(-17, -5), (17, -5), (17, 16), (0, 23), (-17, 16)], RED)
+        for dx in (-15, -5, 5):
+            line((dx, -3), (dx + 7, 17), ivory, 1.5)
+            line((dx + 7, -3), (dx, 17), ivory, 1.5)
+        poly([(-18, -5), (-10, -10), (10, -10), (18, -5), (10, 1), (-10, 1)], GOLD)
+        line((-17, 16), (0, 23), bronze, 3)
+        line((0, 23), (17, 16), bronze, 3)
+        line((-15, -20), (10, -8), bronze, 3)
+        line((15, -20), (-10, -8), bronze, 3)
+        circle(-15, -20, 3, ivory)
+        circle(15, -20, 3, ivory)
+
+
 def seal(scene, grid, pos, *, label=True):
     """An engraved objective with a distinct ring and name, also visible without color."""
     x, y = grid.center(pos)
