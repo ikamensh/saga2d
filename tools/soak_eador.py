@@ -136,6 +136,13 @@ class Journey:
         assert self.state.to_json() == saved, "battle quickload changed state"
         self.counts["battle_save_load"] += 1
         scene, battle = self.game.scene, self.state.battle
+        aim = scene.selected, scene.cursor, scene.hover, scene.targeting
+        yield "key", "F2"
+        yield "key", "LEFT" if self.cycles % 2 else "RIGHT"
+        yield "key", "ESCAPE"
+        assert self.game.scene is scene and self.state.to_json() == saved
+        assert (scene.selected, scene.cursor, scene.hover, scene.targeting) == aim
+        self.counts["battle_reading_cancel"] += 1
         hero = battle.unit(0)
         yield "click", scene.grid.center(hero.pos)
         reachable = battle.reachable(0) - {hero.pos}
@@ -162,12 +169,19 @@ class Journey:
 
     def repeat(self):
         from eador.scene import HeroScene, SaveScene, TitleScene
+        from eador.preferences import reading_scale
 
         while True:
             # Bounded restarts reuse the same Game/window/render caches for the entire soak.
             seed = 7 + self.cycles % 8
             yield "restart", seed
             self.counts[f"seed_{seed}"] += 1
+            yield "key", "T"
+            yield "key", "RIGHT" if self.cycles % 2 else "LEFT"
+            yield "key", "ENTER"
+            percent = 125 if self.cycles % 2 else 100
+            assert isinstance(self.game.scene, TitleScene) and reading_scale(self.game) == percent
+            self.counts[f"reading_{percent}"] += 1
             for _ in range(self.cycles % 4):
                 yield "key", "TAB"
             yield "key", "ENTER"
@@ -242,7 +256,7 @@ def soak(args):
     os.environ["SAGA2D_HEADLESS"] = "1"
     os.environ["SAGA2D_SILENT"] = "1"
     sys.path.insert(0, str(ROOT))
-    from saga2d import Game
+    from eador.app import create_game
     from eador.model import State
     from eador.scene import ShardScene, TitleScene
 
@@ -258,7 +272,7 @@ def soak(args):
               "platform": platform.platform(), "architecture": platform.machine(),
               "latency_measurement": "Game.tick only: input dispatch, updates and real rendering; excludes pacing, driver setup, screenshots and report I/O",
               "latency_file": "latency-ms.f64", "latency_byte_order": sys.byteorder,
-              "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, one persistent hidden Pyglet window; silent audio driver. Not full campaigns or human playtesting."}
+              "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, both reading sizes and battle settings cancellation in one persistent hidden Pyglet window; silent audio driver. Not full campaigns or human playtesting."}
     for name in ("hw.model", "machdep.cpu.brand_string", "hw.memsize"):
         report[name] = subprocess.check_output(["sysctl", "-n", name], text=True).strip()
     awake = subprocess.Popen(["/usr/bin/caffeinate", "-dims", "-w", str(os.getpid())])
@@ -285,8 +299,7 @@ def soak(args):
     try:
         with tempfile.TemporaryDirectory(prefix="shardbound-soak-saves-") as saves, (output / "latency-ms.f64").open("wb") as timing:
             report["temporary_save_directory"] = saves
-            game = Game("Shardbound real-backend soak", resolution=(1280, 800), visible=False, save_dir=Path(saves) / "saves",
-                        asset_path=ROOT / "eador" / "assets")
+            game = create_game("Shardbound real-backend soak", visible=False, save_dir=Path(saves) / "saves")
             # Pyglet's Cocoa event loop installs its own SIGTERM handler at startup.
             signal.signal(signal.SIGTERM, cancel_run)
             signal.signal(signal.SIGINT, cancel_run)
