@@ -127,6 +127,10 @@ class CampaignScene(Screen):
         self._prose_anchor = self.prose_page = 0
         self.prose_pages = 1
         self._prose_indices = ((),)
+        self._reading_error = False
+        self._dismissed_error = None
+        self._error_page = 0
+        self._error_pages = ()
 
     @property
     def campaign(self):
@@ -148,7 +152,7 @@ class CampaignScene(Screen):
         from dataclasses import replace
         from saga2d import Anchor, Button, Column, Label, Row, Style
         from eador.preferences import reading_scale
-        from eador.reading import reading_pages
+        from eador.reading import reading_pages, reading_text_pages
         from eador.style import PRIMARY
 
         super().refresh()
@@ -170,11 +174,29 @@ class CampaignScene(Screen):
                  'Choose your recovery expedition' if self.step == 'retinue' and self.phase == 'recovery' else
                  'Choose who travels with you' if self.step == 'retinue' else
                  'The three shards are free' if self.phase == 'completed' else 'The expedition has ended')
+        if self._reading_error:
+            title = 'Complete save/load diagnostic'
         heading = Column(label(f'LINKED CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}',
                                10, width=700, color=GOLD),
                          label(title, 29, width=700, serif=True, scaled=False, color=TEXT), spacing=12)
         body_y = y + self.measure(heading)[1] + 20
-        error = label(self.message, 12, color=RED) if self.message else None
+        place(heading, x, y)
+        self.button('Text size', self.x + 754, y, 170, self.open_text_settings, shortcut='T')
+        self.button('Saves', self.x + 942, y, 150, self.browse_saves, hotkey='F6')
+        if self._reading_error:
+            self._error_pages = reading_text_pages(self.message, bottom - body_y - 24,
+                                                  measure=lambda text: self.measure(label(text, color=RED))[1])
+            self._error_page = min(self._error_page, len(self._error_pages) - 1)
+            place(label(self._error_pages[self._error_page], color=RED), x, body_y)
+            self.button('Previous', x, bottom, 160, lambda: self.turn_error(-1), shortcut='PageUp', enabled=self._error_page > 0)
+            self.button('Next', x + 176, bottom, 160, lambda: self.turn_error(1), shortcut='PageDown',
+                        enabled=self._error_page + 1 < len(self._error_pages))
+            place(label(f'Page {self._error_page + 1} / {len(self._error_pages)}', 10, width=140), x + 354, bottom + 12)
+            self.button('Return to review', self.x + 686, bottom, 406, self.close_error, shortcut=('Enter', 'Esc'))
+            return
+        shortened_error = self.message and self._dismissed_error == self.message
+        error = label('The last save/load attempt failed. Read the complete diagnostic before retrying.'
+                      if shortened_error else self.message, 12, color=RED) if self.message else None
         content_bottom = bottom - 18
         if error:
             content_bottom -= self.measure(error)[1] + 16
@@ -240,7 +262,11 @@ class CampaignScene(Screen):
                                        on_click=lambda column=column, index=index: self.toggle(column, index)))
                 available = footer_y - row_y - self.measure(column_heading)[1] - 12 - 56
                 anchor = ids.index(self.visible_items[column][0]) if self.visible_items[column] else 0
-                packed, current = reading_pages([self.measure(row)[1] for row in rows], available,
+                heights = [self.measure(row)[1] for row in rows]
+                if error and (available <= 0 or any(height > available for height in heights)):
+                    self.open_error()
+                    return
+                packed, current = reading_pages(heights, available,
                                                 anchor=anchor, spacing=10)
                 self._item_pages[column] = [tuple(ids[index] for index in page) for page in packed]
                 self.pages[column] = current
@@ -281,24 +307,27 @@ class CampaignScene(Screen):
                         label('Recovery used' if campaign.recovery_used else 'Recovery declined' if self.phase == 'lost'
                                    else 'No recovery needed', color=GOLD)]
         if sections is not None:
+            heights = [self.measure(section)[1] for section in sections]
+            if error and any(height > content_bottom - body_y for height in heights):
+                self.open_error()
+                return
             self._prose_indices, self.prose_page = reading_pages(
-                [self.measure(section)[1] for section in sections], content_bottom - body_y,
+                heights, content_bottom - body_y,
                 anchor=self._prose_anchor, spacing=24)
             self.prose_pages = len(self._prose_indices)
             self._prose_anchor = self._prose_indices[self.prose_page][0]
             blocks.append((Column(*(sections[index] for index in self._prose_indices[self.prose_page]), spacing=24), x, body_y))
-        place(heading, x, y)
         for block, left, top in blocks:
             place(block, left, top)
         if error:
             place(error, x, content_bottom + 16)
-        self.button('Text size', self.x + 754, y, 170, self.open_text_settings, shortcut='T')
-        self.button('Saves', self.x + 942, y, 150, self.browse_saves, hotkey='F6')
+        if shortened_error:
+            self.button('Read error', self.x + 540, bottom, 130, self.open_error, shortcut='D')
         if self.step != 'retinue' and self.prose_pages > 1:
             self.button('Previous', x, bottom, 160, lambda: self.turn_prose(-1), shortcut='PageUp', enabled=self.prose_page > 0)
             self.button('Next', x + 176, bottom, 160, lambda: self.turn_prose(1), shortcut='PageDown',
                         enabled=self.prose_page + 1 < self.prose_pages)
-            place(label(f'Page {self.prose_page + 1} / {self.prose_pages}', 10, width=170), x + 354, bottom + 12)
+            place(label(f'Page {self.prose_page + 1} / {self.prose_pages}', 10, width=140), x + 354, bottom + 12)
         if self.step == 'retinue':
             if self.phase == 'departure':
                 self.button('Other challenge', x, bottom, 236, self.back, shortcut='Esc')
@@ -308,6 +337,22 @@ class CampaignScene(Screen):
                         self.x + 686, bottom, 406, self.depart, shortcut='Enter', primary=True)
         elif self.step == 'ending':
             self.button('Return to title', self.x + 686, bottom, 406, self.to_title, shortcut='Enter', primary=True)
+
+    def open_error(self):
+        self._reading_error = True
+        self._error_page = 0
+        self.refresh()
+
+    def turn_error(self, direction):
+        page = self._error_page + direction
+        if 0 <= page < len(self._error_pages):
+            self._error_page = page
+            self.refresh()
+
+    def close_error(self):
+        self._reading_error = False
+        self._dismissed_error = self.message
+        self.refresh()
 
     def turn_prose(self, direction):
         page = self.prose_page + direction
@@ -329,16 +374,22 @@ class CampaignScene(Screen):
         return self.root.state.hero.army if column == 0 else self.root.state.inventory
 
     def left(self):
+        if self._reading_error:
+            self.turn_error(-1)
+            return
         self.column = 0
         self.refresh()
 
     def right(self):
+        if self._reading_error:
+            self.turn_error(1)
+            return
         self.column = 1
         self.refresh()
 
     def shift(self, direction):
         items = self.items(self.column)
-        if self.step == 'retinue' and items:
+        if self.step == 'retinue' and not self._reading_error and items:
             self.cursors[self.column] = (self.cursors[self.column] + direction) % len(items)
             item = items[self.cursors[self.column]]
             ident = item.id if self.column == 0 else item
@@ -353,7 +404,7 @@ class CampaignScene(Screen):
         self.shift(1)
 
     def toggle_focused(self):
-        if self.step == 'retinue' and self.items(self.column):
+        if self.step == 'retinue' and not self._reading_error and self.items(self.column):
             self.toggle(self.column, self.cursors[self.column])
 
     def page(self, column, direction):

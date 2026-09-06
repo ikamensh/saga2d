@@ -151,6 +151,57 @@ def verify_reflow(player):
     assert state.to_json() == before
 
 
+def verify_long_error(output, *, backend='pyglet'):
+    """Use a valid long nested path, then read every diagnostic page and return to the same retinue."""
+    with TemporaryDirectory(prefix='campaign-reading-review-') as directory:
+        saves = Path(directory)
+        for index in range(7):
+            saves /= 'ordinary-directory-name-' + str(index) + '-' + 'a' * 70
+        saves.mkdir(parents=True)
+        occupied = saves / 'save_1.json'; occupied.mkdir()
+        state = play_stage(State.new_campaign())
+        before = state.to_json()
+        game = create_game(backend=backend, visible=False, save_dir=saves)
+        player = PlayerInput(game, native=backend == 'pyglet', output=output)
+        try:
+            game.push(ShardScene(state)); game.tick(1 / 60)
+            for key in ('1', 'space', 't', 'right', 'return', 'f5'):
+                player.press(key)
+            scene = game.scene
+            selected = scene.troop_ids.copy(), scene.relic_ids.copy()
+            anchors = [page[0] for page in scene.visible_items if page]
+            for key in ('space', 'down', 'up', 'q'):
+                player.press(key)
+            assert (scene.troop_ids, scene.relic_ids) == selected and state.to_json() == before
+            parts = []
+            while True:
+                check_reading_layout(scene)
+                labels = scene.ui.find_all(lambda item: isinstance(item, Label))
+                part = next(label.text for label in labels if label.style.text_color == (228, 130, 112, 255))
+                parts.append(part)
+                player.capture(f'long-path-error-page-{len(parts)}')
+                control = scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Next')
+                if not control.enabled:
+                    break
+                player.press('pagedown')
+            assert ''.join(parts) == scene.message
+            for key in ('t', 'left', 'escape', 'f6', 'escape', 'return'):
+                player.press(key)
+            assert (scene.troop_ids, scene.relic_ids) == selected
+            assert [page[0] for page in scene.visible_items if page] == anchors
+            check_reading_layout(scene); player.capture('long-path-return-to-retinue-125')
+            player.button('Read error'); player.press('escape')
+            assert state.to_json() == before
+            occupied.rmdir()
+            player.press('f5'); player.press('return')
+            assert isinstance(game.scene, ShardScene) and state.campaign.stage == 2
+            player.press('f9'); assert player.state.to_json() == before
+            return dict(path_characters=len(str(saves)), diagnostic_characters=sum(map(len, parts)),
+                        pages=len(parts), input_activations=len(player.events), exact_save_reloads=1)
+        finally:
+            game._teardown()
+
+
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
     native, matrix = backend == 'pyglet', []
@@ -251,9 +302,11 @@ def verify(output, *, backend='pyglet'):
             events, reloads = len(player.events), player.reloads + verified_reloads
         finally:
             game._teardown()
-    report = dict(backend=backend, layouts=len(matrix), input_activations=events, exact_save_reloads=reloads, matrix=matrix)
+    long_error = verify_long_error(output, backend=backend)
+    report = dict(backend=backend, layouts=len(matrix), input_activations=events + long_error['input_activations'],
+                  exact_save_reloads=reloads + long_error['exact_save_reloads'], long_error=long_error, matrix=matrix)
     (output / 'matrix.json').write_text(json.dumps(report, indent=2) + '\n')
-    print(f'{backend} campaign reading passed: {len(matrix)} layouts / {events} inputs / {reloads} exact reloads; {output}')
+    print(f'{backend} campaign reading passed: {len(matrix)} layouts / {report['input_activations']} inputs / {report['exact_save_reloads']} exact reloads; {output}')
     return report
 
 

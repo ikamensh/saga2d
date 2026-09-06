@@ -15,10 +15,18 @@ Left/Right selects a column, Up/Down still traverses one logical item at a time,
 and mouse Previous/Next focuses the destination page's first item. The existing
 `PlayerInput.choose_retinue` route and Keep/Leave button labels remain compatible.
 
-The scene reserves measured error, focused-detail, funding and rules space before
+The scene reserves measured ordinary error, focused-detail, funding and rules space before
 packing whole retinue rows. Offers and endings use whole prose sections when an
 error requires an additional page, with visible Previous/Next and PageUp/PageDown.
-No description or error is shortened or made smaller to fit. Only visible offer
+When a diagnostic leaves insufficient space for even one reviewed entry, the
+same screen opens its complete diagnostic view. `reading_text_pages` packs exact
+text with measured heights, including long path tokens; joining its pages loses
+no characters. The player can return to the unchanged review, then reopen the
+diagnostic with **Read error / D**. Hidden retinue/abandon commands cannot act while
+reading it. This was verified with a legitimate 760-character nested save path
+whose actual filesystem error contains 1,597 characters.
+
+No description or error is truncated or made smaller to fit. Only visible offer
 buttons activate their numbered shortcuts. Retinue selection remains local until
 the checkpointed departure/recovery command; ordinary save errors do not consume
 it. A valid exact manual snapshot can still recover a blocked automatic checkpoint.

@@ -111,3 +111,9 @@ def test_complete_checkpoint_error_keeps_decision_pending_until_exact_manual_rem
         assert player.state.to_json() == before
     finally:
         game._teardown()
+
+
+def test_long_real_filesystem_error_is_read_in_full_without_hidden_retinue_actions(tmp_path):
+    """A valid deep directory cannot consume the row budget or hide a Space-triggered selection."""
+    from tools.verify_eador_campaign_reading import verify_long_error
+    verify_long_error(tmp_path, backend='mock')
