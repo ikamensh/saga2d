@@ -91,6 +91,7 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _site(provinces[(-1, 1)], 'pack_hunt')
     elif theme == 'ruins':
         _site(provinces[(-1, 1)], 'sealed_vault')
+        _site(provinces[(-1, 0)], 'broken_observatory')
     _site(provinces[(-2, 2)], 'den')
     _site(provinces[(-1, 2)], 'explorer_camp')
     # Preserve the former duplicate reward's discoverability without rerolling the map.
