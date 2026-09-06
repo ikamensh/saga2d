@@ -108,6 +108,29 @@ class Troop:
 
 
 @dataclass(frozen=True)
+class TroopSnapshot:
+    """A detached troop description for a camp decision, not a live army member."""
+    id: int
+    kind: str
+    hp: int
+    max_hp: int
+    level: int
+    xp: int
+
+
+@dataclass(frozen=True)
+class ReplacementPreview:
+    outgoing: TroopSnapshot
+    incoming: TroopSnapshot
+    gold: int
+    crystals: int
+    actions: int
+    upkeep_before: int
+    upkeep_after: int
+    blocked_reason: str | None = None
+
+
+@dataclass(frozen=True)
 class InfusionPreview:
     """Capped potential mana gain, fixed price, and the reason an order is blocked."""
     mana: int
@@ -501,8 +524,8 @@ class State:
             raise RuleError('That unit cannot be recruited.')
         return UNITS[kind].crystals
 
-    def recruit(self, kind: str) -> None:
-        self._ready()
+    def _check_recruit(self, kind: str, *, replacing: bool = False) -> None:
+        self._ready(action=replacing)
         if kind not in RECRUITABLE:
             raise RuleError('That unit cannot be recruited.')
         if self.provinces[self.hero.pos].owner != 'player':
@@ -510,16 +533,57 @@ class State:
         spec = UNITS[kind]
         if spec.building and spec.building not in self.buildings:
             raise RuleError(f'Build {BUILDINGS[spec.building].name} first.')
-        if len(self.hero.army) >= self.hero.max_army:
+        if not replacing and len(self.hero.army) >= self.hero.max_army:
             raise RuleError('Your army is full.')
         cost = self.recruit_cost(kind)
         if self.gold < cost or self.crystals < self.recruit_crystal_cost(kind):
             raise RuleError('Not enough gold or crystals.')
-        self.gold -= cost
+
+    def _fresh_troop(self, kind: str) -> Troop:
+        return Troop(self.next_troop_id, kind, UNITS[kind].hp, UNITS[kind].hp)
+
+    def _purchase_troop(self, kind: str) -> Troop:
+        troop = self._fresh_troop(kind)
+        self.gold -= self.recruit_cost(kind)
         self.crystals -= self.recruit_crystal_cost(kind)
-        self.hero.army.append(Troop(self.next_troop_id, kind, spec.hp, spec.hp))
         self.next_troop_id += 1
-        self.log.append(f'Recruited {spec.name}.')
+        return troop
+
+    def recruit(self, kind: str) -> None:
+        self._check_recruit(kind)
+        self.hero.army.append(self._purchase_troop(kind))
+        self.log.append(f'Recruited {UNITS[kind].name}.')
+
+    def replacement_preview(self, outgoing_id: int, kind: str) -> ReplacementPreview:
+        """Quote permanent retirement and a fresh paid role without changing the army."""
+        outgoing = next((troop for troop in self.hero.army if troop.id == outgoing_id), None)
+        if outgoing is None:
+            raise RuleError('Choose a living troop to retire.')
+        gold, crystals = self.recruit_cost(kind), self.recruit_crystal_cost(kind)
+        incoming = self._fresh_troop(kind)
+        try:
+            self._check_recruit(kind, replacing=True)
+        except RuleError as error:
+            reason = str(error)
+        else:
+            reason = None
+        upkeep = self.upkeep
+        return ReplacementPreview(TroopSnapshot(**asdict(outgoing)), TroopSnapshot(**asdict(incoming)),
+                                  gold, crystals, 1, upkeep,
+                                  upkeep - UNITS[outgoing.kind].upkeep + UNITS[kind].upkeep, reason)
+
+    def replace_troop(self, outgoing_id: int, kind: str) -> None:
+        """Retire one troop and buy a fresh recruit in its slot for one campaign action."""
+        quote = self.replacement_preview(outgoing_id, kind)
+        if quote.blocked_reason:
+            raise RuleError(quote.blocked_reason)
+        index = next(i for i, troop in enumerate(self.hero.army) if troop.id == outgoing_id)
+        self.hero.army[index] = self._purchase_troop(kind)
+        self.actions_left -= quote.actions
+        self.log.append(f'Retired {UNITS[quote.outgoing.kind].name} #{outgoing_id} '
+                        f'(rank {quote.outgoing.level}, XP {quote.outgoing.xp}); '
+                        f'recruited {UNITS[kind].name} #{quote.incoming.id} for '
+                        f'{quote.gold} gold and {quote.crystals} crystals; spent one action.')
 
     def travel(self, destination: Pos) -> None:
         self._ready(action=True)

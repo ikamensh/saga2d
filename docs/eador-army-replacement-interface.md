@@ -1,6 +1,6 @@
-# Proposed atomic troop replacement
+# Atomic troop replacement: model contract
 
-**For review; no production implementation.** The
+**Approved and implemented in the game model; UI/native acceptance is pending.** The
 [bounded experiment](eador-late-investment-review.md) supports optional role
 access after the army fills, not a solution to surplus gold.
 
@@ -94,3 +94,22 @@ separately from battlefield deaths and preserve ordinary rest as an alternative.
    timing, lost veteran and rival consequences. Demonstrate a manual specialist
    action through UI before calling the feature usable; automated casualty
    differences alone do not establish that acceptance.
+
+## Model checkpoint
+
+The implementation is confined to `eador/model.py`; the framework, combat rules,
+save schema and ordinary recruiting commands are unchanged. Thirteen public
+integration cases in `tests/eador/test_replacement.py` cover the contract above.
+The complete suite passes **1,072 tests**. Existing regression fuzzers pass
+60 Tribes AI games / 20 random-input runs and 12 Shardbound campaigns / 12 scene
+runs. Those existing fuzz policies do not issue the new replacement command;
+the new public integration cases provide its direct acceptance coverage.
+
+The paid manual model journey supplies a concrete UI replay: load the retained
+`late_full_roster`, buy Archery and Mage Tower, replace troop 1 with Warden, then
+travel to Duskspire. Three explicit automatic rounds reach a wounded Swordsman
+on the flank. On round 4, Warden 7 can Swap with Swordsman 5 (7 HP), bringing it
+into the hero's Heal targets. Manual Swap followed by Heal restores 22 HP and
+keeps that veteran alive through victory on turn 11. The complete saved and
+uninterrupted continuations match. These are model orders; native controls and
+the visible retirement/cost confirmation still need their own verification.
