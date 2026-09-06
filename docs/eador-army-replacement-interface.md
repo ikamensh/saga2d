@@ -1,6 +1,6 @@
 # Atomic troop replacement: model contract
 
-**Approved and implemented in the game model; UI/native acceptance is pending.** The
+**Implemented in the game model and playable through a reviewed purchase flow.** The
 [bounded experiment](eador-late-investment-review.md) supports optional role
 access after the army fills, not a solution to surplus gold.
 
@@ -113,3 +113,39 @@ into the hero's Heal targets. Manual Swap followed by Heal restores 22 HP and
 keeps that veteran alive through victory on turn 11. The complete saved and
 uninterrupted continuations match. These are model orders; native controls and
 the visible retirement/cost confirmation still need their own verification.
+
+## Playable review and native verification
+
+Recruit → Replace troop (`R`, `M`) lists the actual living troops with formation
+slot, identity, health, rank and XP. Choose one, then review a recruit from the
+existing measured catalog. Unavailable recruits still offer Review and explain
+their blocker. The final Replace control stays disabled until the model quote
+permits the command. The screen shows the permanent retirement, ordinary price,
+one-action cost, fresh rank-one identity, role and upkeep before/after. Canceling
+or opening Codex/Settings/Saves changes no campaign data.
+
+Confirmation keeps an applied acknowledgement with no repeated purchase control.
+A failed checkpoint leaves that result and the full error visible; manual Saves
+can retain it without overwriting damaged autosaves. The reading preference is
+shared at 100/125%. Whole-row roster paging reserves space for measured errors;
+only the visible troops own numbered keys. This fixes a real native case where
+a save path that was a directory overflowed the six-troop picker. In the review,
+an error replaces the optional resting hint; identity, rank/XP, retirement, cost,
+upkeep and blockers remain visible. This and measured spacing accommodate the
+same error with the longest Skyrider description. No error or quote text is
+truncated or shrunk and no framework API was added.
+
+`tools/verify_eador_replacement.py` runs the same public input journey with mock
+or native Pyglet. It starts from the retained paid full army, purchases Archery
+and Tower through controls, reviews/cancels/confirms the Warden with keyboard and
+mouse, checks exact reloads, then drives the saved Swap → Heal assault described
+above. Three preparatory rounds and the final cleanup are explicitly automatic;
+the rescue is two manually aimed orders. The sacrificed veteran is counted as a
+retirement, separate from battle casualties. It is optional role access, not a
+claim that replacement is universally preferable to keeping or resting an army.
+
+The verifier also checks every one of ten roles from funded and opening armies
+at both sizes in three native windows: 120 complete reviews. Real directory and
+damaged-file errors, disabled actions, manual recovery, the complete paged roster
+and settings restart are exercised. Native screenshots still require inspection.
+This checkpoint does not establish Windows behavior or close G07/G10.

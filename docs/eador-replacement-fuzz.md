@@ -1,8 +1,8 @@
-# Replacement-aware model stress
+# Replacement model and input stress
 
-The model policy in `tools/fuzz_eador.py` now exercises the public replacement
-command alongside ordinary recruiting. No game rules or scene input adapter
-changed in this tranche. The model interface is documented in
+The model policy in `tools/fuzz_eador.py` exercises the public replacement
+command alongside ordinary recruiting. The first tranche below changed no game
+rules or scene input adapter; the later input tranche is recorded separately. The model interface is documented in
 [the replacement contract](eador-army-replacement-interface.md).
 
 ## What each sampled order checks
@@ -74,6 +74,68 @@ uv run python tools/fuzz_eador.py --campaigns 120 --scenes 0 --steps 240 --repor
 uv run python tools/fuzz_eador.py --linked --campaigns 60 --scenes 0 --steps 240 --report /tmp/replacement-linked.json
 ```
 
-Input coverage follows after the replacement UI publishes its controls. It must
-use explicit visible outgoing/incoming selection and confirmation through
-`PlayerState`, rather than falling through to a direct model mutation.
+## Input adapter and measured follow-up
+
+The strict `PlayerState` adapter now exposes the read-only `replacement_preview`
+query and drives `replace_troop` through Recruit → Replace troop → visible veteran
+→ visible catalog role → explicit review confirmation → Return to shard. Both
+pickers use their actual visible items and page counts. The displayed quote must
+match the public query, browsing must leave the complete campaign unchanged, and
+the confirmed result must equal the public command executed on an independent
+copy. Returning to the shard must not repeat the purchase. The live campaign is
+changed only by UI input. The adapter does not issue quicksave/load; callers own
+that choice, just as with ordinary recruitment, building and equipment.
+
+Three new public input tests use the retained paid army and pursuit states. They
+exercise two consecutive replacements at 125% reading with fresh IDs in the same
+formation slot, refused policy orders without input, ordinary recruitment after
+replacement exhausts the actions, and exact caller-owned save/reload. In the
+last-action case the hero cannot intercept, and the warned Heartwood is actually
+lost on the following turn. A separate native adapter run passed both paid
+replacements in 33 real input activations with two caller-owned reloads; the
+125% Warden review image was inspected. This supplements the broader production
+UI verifier described in the [replacement contract](eador-army-replacement-interface.md).
+
+The scene fuzzer randomly navigates visible troop/role pages, cancels reviews,
+opens Settings/Codex/Saves, confirms permitted quotes and attempts blocked Enter.
+Draft and applied quicksave/load must recover the exact campaign; a draft choice
+itself is intentionally not saved. Numeric inputs on an applied acknowledgement
+cannot repeat its purchase, and Return/Esc must clear the old catalogs. Ordinary
+recruit input remains in the same policy.
+
+Clean source **a354961** completed 60 linked model runs and 60 scene runs with
+**30,018 random input activations** in 153.2 seconds. All 65 recorded game,
+framework and policy-helper files stayed unchanged. Linked model setup again
+starts twenty real campaigns per stage; scene setup alternates standalone and
+linked title starts and uses the Standard default. Setup and forced outcome
+cleanup are excluded from the random-input count.
+
+| Check or action | Model policy | Scene input |
+|---|---:|---:|
+| Confirmed replacements | 317 | 3 |
+| Ordinary recruits | 284 | 67 |
+| Experienced troops retired | 206 | 2 |
+| Replacement refusals, exact unchanged state | 1,189 | 36 blocked Enters |
+| Visible outgoing selections / final reviews | — | 69 / 49 |
+| Canceled reviews | — | 16 |
+| Exact draft / applied reloads | — | 53 / 2 |
+| Paired replacement next-turn probes | 113 | — |
+| Territory losses in those copied probes | 10 | — |
+| Complete state checks | 14,622 | 31,336 |
+
+Only three randomized UI orders reached confirmation: most reviewed replacements
+were unavailable or canceled. The 30,018-input total is not a claim of 30,018
+replacement decisions. The focused paid input tests and native journey cover
+successful consequences directly. Likewise, these random outcomes do not assess
+investment value or solve the late-economy balance gap. Model battle losses
+(143) remain separate from voluntary retirements and copied rival probes.
+
+The full combined suite passed **1,111 tests**; the independent Tribes fuzzer
+passed 60 AI games and 20 random-input runs. The retained
+[combined report](evidence/eador-replacement-input-fuzz.json) includes exact
+counts, source hashes, platform and run limits.
+
+```sh
+uv run pytest tests/eador/test_replacement_input.py -q
+uv run python tools/fuzz_eador.py --linked --campaigns 60 --scenes 60 --steps 240 --events 30000 --report /tmp/replacement-input.json
+```

@@ -477,9 +477,10 @@ class CatalogScene(Screen):
     pop_on_cancel = True
     controls = {('left', 'pageup'): 'previous_page', ('right', 'pagedown'): 'next_page'}
 
-    def __init__(self, root, kind):
+    def __init__(self, root, kind, *, outgoing_id=None):
         super().__init__()
         self.root, self.kind, self.page = root, kind, 0
+        self.outgoing_id = outgoing_id
         self.items = list(BUILDINGS) if kind == 'build' else list(RECRUITABLE)
         self._page_items = [self.items]
 
@@ -515,6 +516,8 @@ class CatalogScene(Screen):
     def _availability(self, name):
         """Explain current blockers; the model remains authoritative when purchasing."""
         s = self.root.state
+        if self.outgoing_id is not None:
+            return s.replacement_preview(self.outgoing_id, name).blocked_reason or ''
         if s.status != 'playing':
             return 'This campaign has ended. Start a new shard.'
         if s.battle is not None:
@@ -591,7 +594,10 @@ class CatalogScene(Screen):
                                         color=MUTED if built else RED if reason else GOLD), spacing=6)
         policy = ('Buildings are permanent; build even while your hero is away.' if self.kind == 'build'
                   else 'Recruit in a province you control.')
-        hint = 'Numbers buy the visible items. Left/Right changes page. ' + policy
+        if self.outgoing_id is not None:
+            troop = next(t for t in s.hero.army if t.id == self.outgoing_id)
+            policy = f'Replacing {UNITS[troop.kind].name} #{troop.id}, rank {troop.level}, {troop.xp} XP. Review the full cost before retiring them.'
+        hint = ('Numbers review replacements.' if self.outgoing_id is not None else 'Numbers buy the visible items.') + ' Left/Right changes page. ' + policy
         footer = Column(*([label(self.message, 11, color=GOLD)] if self.message else []), label(hint, 11), spacing=6)
         self.ui.add(Column(resources, *blocks.values(), footer))
         body_y = 99 + resources.get_preferred_size()[1] + 18
@@ -607,8 +613,8 @@ class CatalogScene(Screen):
         rows = []
         for index, name in enumerate(self.visible_items):
             built = self.kind == 'build' and name in s.buildings
-            control = Button('Built' if built else prices[name], on_click=lambda name=name: self.purchase(name),
-                             shortcut=str(index + 1), enabled=not reasons[name], width=228, height=40)
+            control = Button('Review' if self.outgoing_id is not None else 'Built' if built else prices[name], on_click=lambda name=name: self.purchase(name),
+                             shortcut=str(index + 1), enabled=self.outgoing_id is not None or not reasons[name], width=228, height=40)
             rows.append(Row(blocks[name], control, spacing=28))
         self.ui.add(Column(*rows, spacing=18, anchor=Anchor.TOP_LEFT,
                            margin=(round(self.x + 24), round(self.y + body_y))))
@@ -616,9 +622,21 @@ class CatalogScene(Screen):
         self.button('Text size', self.x + 830, self.y + 41, 186, self.open_text_settings, shortcut='T')
         self.button('Previous', self.x + 24, self.y + 684, 150, self.previous_page, hotkey='←', enabled=self.page > 0)
         self.button('Next', self.x + 184, self.y + 684, 150, self.next_page, hotkey='→', enabled=self.page + 1 < self.pages)
+        if self.kind == 'recruit':
+            self.button('Choose veteran' if self.outgoing_id is not None else 'Replace troop',
+                        self.x + 548, self.y + 684, 222, self.replacement, shortcut='M', enabled=bool(s.hero.army))
         self.button('Back to shard', self.x + 794, self.y + 684, 222, self.game.pop, shortcut='Esc')
 
+    def replacement(self):
+        from eador.replacement_scene import ReplacementScene
+        self.game.replace(ReplacementScene(self.root))
+
     def purchase(self, name):
+        if self.outgoing_id is not None:
+            from eador.replacement_scene import ReplacementScene
+            self.game.push(ReplacementScene(self.root, outgoing_id=self.outgoing_id, kind=name,
+                                            description=self._description(name)))
+            return
         callback = self.root.state.build if self.kind == 'build' else self.root.state.recruit
         if self.command(lambda: callback(name)):
             if self.checkpoint(self.root.state):
@@ -630,7 +648,8 @@ class CatalogScene(Screen):
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 200))
         self.box(x, y, 1040, 740)
         self.text('WESTWATCH / STRONGHOLD', x + 24, y + 22, size=10, color=GOLD)
-        self.text('Build your kingdom' if self.kind == 'build' else 'Raise an army', x + 24, y + 46, size=31, serif=True)
+        title = 'Choose a fresh recruit' if self.outgoing_id is not None else 'Build your kingdom' if self.kind == 'build' else 'Raise an army'
+        self.text(title, x + 24, y + 46, size=31, serif=True)
         self.text(f'Page {self.page + 1}/{self.pages}', x + 400, y + 696, size=12, color=MUTED)
 
 
