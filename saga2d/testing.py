@@ -38,5 +38,4 @@ def render_scene(
             game.tick(dt=dt)
         return game.backend.capture_frame()
     finally:
-        game._teardown()
-        game.backend.quit()
+        game.close()
