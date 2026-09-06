@@ -122,3 +122,27 @@ def test_smaller_scout_can_leave_at_low_mana_or_recover_and_finish_with_healing(
     assert sum(command == 'end_turn' for command, *_ in healed.orders) == 4
     assert sum(u.max_hp - u.hp for u in healed.battle.units if u.team == 'player') == 19
     assert_rout_reward(healed)
+
+
+def test_failed_causeway_keeps_the_dead_caster_and_finite_wounds_on_retry():
+    """An exposed carrier really is pushed; deliberate deadline failure pays no partial-kill reward."""
+    from tools.eador_causeway_campaign import prepare_causeway, causeway_failed_attempt, causeway_retry_route
+    from tests.eador.test_extraction_journeys import Journey
+    from tests.eador.test_relief import assert_one_reward
+
+    failed = causeway_failed_attempt(prepare_causeway(), orders_type=Journey)
+    assert failed.battle.outcome_reason == 'deadline' and failed.battle.round == 5
+    assert any('repulses' in text for text in failed.battle.log)
+    assert all(u.alive for u in failed.battle.units if u.team == 'player')
+    state = failed.state
+    gold, crystals, xp = state.gold, state.crystals, state.hero.xp
+    state.resolve_battle()
+    assert (state.gold, state.crystals, state.hero.xp) == (gold - 20, crystals, xp)
+    assert state.choice is None and not state.provinces[state.hero.pos].explored
+    survivors = [('pikeman', 28), ('ranger', 22), ('guard', 28)]
+    assert list(zip(state.provinces[state.hero.pos].site_guards, state.provinces[state.hero.pos].site_guard_hp)) == survivors
+    retry = causeway_retry_route(State.from_json(state.to_json()), orders_type=Journey)
+    assert retry.battle.outcome_reason == 'rout'
+    assert [u.kind for u in retry.battle.units if u.team == 'enemy'] == [kind for kind, _ in survivors]
+    assert all(u.alive for u in retry.battle.units if u.team == 'player')
+    assert_one_reward(retry)

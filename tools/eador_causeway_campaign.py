@@ -132,3 +132,41 @@ def causeway_scout_route(state, *, heal=False, orders_type=AdventureOrders):
     else:
         play.do('evacuate')
     return play
+
+
+def causeway_failed_attempt(state, *, orders_type=AdventureOrders):
+    """Expose the carrier to a real push, kill the caster, then deliberately miss the deadline."""
+    state.explore(approach='western')
+    play = orders_type(state)
+    _commander_opening(play, backstop=False, exposed=True)
+    play.do('attack', 3, play.enemy('adept'))
+    while play.battle.outcome is None:
+        _end(play)
+    return play
+
+
+def causeway_retry_route(state, *, orders_type=AdventureOrders):
+    """Recover publicly, then clear the three surviving wounded guards without regenerating a caster."""
+    destination = state.hero.pos
+    for _ in range(48):
+        march_to(state, destination)
+        if (state.actions_left and state.hero.hp == state.hero.max_hp and state.hero.mana >= 12
+                and all(t.hp == t.max_hp for t in state.hero.army)):
+            break
+        rest(state)
+    else:
+        raise AssertionError('Could not recover for the finite Causeway retry.')
+    state.explore(approach='western')
+    play = orders_type(state)
+    play.do('move', 3, (-1, -1)); play.do('attack', 3, play.enemy('pikeman'))
+    play.do('move', 0, (-1, 0)); play.do('cast', 'bolt', play.enemy('pikeman'))
+    play.do('move', 4, (-1, 1)); play.do('move', 5, (-2, 1))
+    play.do('attack', 5, play.enemy('pikeman'))
+    play.do('move', 1, (0, -2)); play.do('move', 2, (-1, 2)); _end(play)
+    play.do('move', 0, (0, -1)); play.do('cast', 'bolt', play.enemy('ranger'))
+    play.do('move', 1, (2, -3)); play.do('move', 3, (0, -2))
+    play.do('attack', 3, play.enemy('ranger'))
+    play.do('move', 4, (0, 0)); play.do('move', 2, (0, 1)); _end(play)
+    play.do('move', 0, (1, -2)); play.do('cast', 'bolt', play.enemy('guard'))
+    play.do('attack', 3, play.enemy('guard'))
+    return play
