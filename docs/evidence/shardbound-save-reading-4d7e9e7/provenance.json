@@ -1,0 +1,24 @@
+{
+  "committed_source": "4d7e9e7172456884063e087b244c91d1da1a804d",
+  "native_recorded_head": "bdcfe3f5acec468b86129fce38539b9cb4867986",
+  "all_native_source_hashes_match_commit": true,
+  "all_fuzz_source_hashes_match_commit": true,
+  "native_source_count": 172,
+  "native_pages": 54,
+  "native_inputs": 301,
+  "inspected_frames": [
+    "save-settings-125.png",
+    "batch-0-125-page-1.png",
+    "batch-0-125-page-2.png",
+    "directory-save-error-125.png",
+    "failed-save-before-title-125.png"
+  ],
+  "full_tests": {
+    "passed": 1114,
+    "seconds": 133.76
+  },
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "scene_runs": 20
+  }
+}
