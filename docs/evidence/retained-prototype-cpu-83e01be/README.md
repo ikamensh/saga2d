@@ -56,3 +56,17 @@ balance evidence.
 All checks ran serially under the team's sole execution lease. No native window,
 default prototype matrix, or full suite was launched. All owned processes were
 terminal before the lease was returned.
+
+## Main-checkout integration
+
+The CPU-only change was cherry-picked as `3c1d546`; the separate `Game.close()`
+work remains isolated. All six fingerprints in `source.sha256` match the main
+checkout. The four new regressions and existing CPU-budget checks pass together:
+**16 passed in 1.23 seconds** ([raw output](main-tests.txt)). Those existing checks
+include small real Shardbound and Tribes model/input runs with identical outcomes
+when paced. The test process exited before the ongoing directed finale resumed.
+
+```sh
+uv run --extra dev python -m pytest tests/tools/test_retained_prototype_budget.py \
+  tests/tools/test_cpu_budget.py -q
+```

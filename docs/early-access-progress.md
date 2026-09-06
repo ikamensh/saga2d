@@ -87,6 +87,15 @@ checkpoint. A fresh UI-only attempt stopped at the locked Mac before observing
 the game; its own process was closed. No human-playtest, full-campaign or release
 gate credit is claimed. Game and framework source hashes remain unchanged.
 
+[Four remaining retained economy prototypes](evidence/retained-prototype-cpu-83e01be/README.md)
+now share the default 25% CPU allowance through paid preparation, cloned battle
+comparisons and recovery. Full-speed execution requires explicit `--cpu-percent
+100`. Their existing experimental rules and sample matrices are unchanged.
+Sixteen tests pass in the main checkout at `3c1d546`; a single short real helper
+probe yields at about 29% of one core during its measured work. No default matrix
+or native window was launched. All test/probe processes ended, then the directed
+finale resumed. This changes development tools only; all G01–G19 remain open.
+
 [Paid Vault continuation](eador-vault-continuation.md) now follows an earned
 two-crystal unseal through production and veteran replacement. In this seed-7
 example it captures production two turns earlier and retains the original
