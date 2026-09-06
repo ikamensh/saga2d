@@ -103,6 +103,9 @@ def test_reference_prices_include_current_hero_recruitment_discounts(tmp_path):
         game.tick(1 / 60)
         assert f"Recruit for {state.recruit_cost('swordsman')} gold now (base {UNITS['swordsman'].cost})" in rendered_text(game)
         assert "Requires Barracks" in rendered_text(game)
+        press(game, 'end')
+        for kind in ('adept', 'skyrider'):
+            assert f"{state.recruit_cost(kind)} gold + {state.recruit_crystal_cost(kind)} crystals" in rendered_text(game)
         assert state.to_json() == before
     finally:
         game._teardown()
@@ -151,7 +154,9 @@ def test_ability_pages_explain_pin_timing_and_current_readiness_without_mutation
         assert 'Pin' in text and '1 capable / 0 ready' in text
         assert 'skip the following turn' in text and 'Cannot stack or extend' in text
         assert 'minimum 1' in text and 'forecast' in text
-        press(game, 'end')
+        while 'Pikemen and Watch Bell heroes' not in rendered_text(game):
+            assert game.scene.page + 1 < game.scene.pages
+            press(game, 'right')
         assert 'Brace' in rendered_text(game) and 'Watch Bell' in rendered_text(game)
         press(game, 'escape')
         assert state.to_json() == before
@@ -336,8 +341,9 @@ def test_full_cache_reference_matches_saved_cargo_reward_and_spent_hero_via_mous
         game.push(CodexScene(root))
         game.tick(1 / 60)
         click_button(game, 'Abilities')
-        click_button(game, 'Next')
-        click_button(game, 'Next')
+        while 'Hero move allowance' not in rendered_text(game):
+            assert game.scene.page + 1 < game.scene.pages
+            click_button(game, 'Next')
         text = rendered_text(game)
         assert state.battle.evacuation_blocked_reason in text
         assert f'Hero move allowance: {state.battle.unit(0).effective_move_range}' in text
@@ -384,5 +390,111 @@ def test_direct_route_reference_reports_real_pin_and_current_round_after_reload(
         assert f'Round {state.battle.round} of {state.battle.objective.deadline}' in text
         press(game, 'escape')
         assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
+
+
+def test_paid_control_army_reference_shows_both_currency_costs_and_recorded_roles(tmp_path):
+    """A troop's quoted crystals come from the same purchase API as recruitment."""
+    from eador.codex import CodexScene
+    from tools.eador_control_campaign import prepare_control_watch
+
+    state = State.from_json(prepare_control_watch().to_json())
+    game = create_game('Control recruit reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        game.tick(1 / 60)
+        text = rendered_text(game)
+        while game.scene.page + 1 < game.scene.pages:
+            click_button(game, 'Next')
+            text += ' ' + rendered_text(game)
+        for kind in ('sapper', 'adept', 'skyrider'):
+            assert UNITS[kind].name in text
+            assert f"{state.recruit_cost(kind)} gold + {state.recruit_crystal_cost(kind)} crystal" in text
+        assert 'Smoke' in text and 'Repulse' in text and 'Flight' in text
+        click_button(game, 'Abilities')
+        text = rendered_text(game)
+        while game.scene.page + 1 < game.scene.pages:
+            click_button(game, 'Next')
+            text += ' ' + rendered_text(game)
+        for ability in ('Smoke', 'Repulse', 'Flight'):
+            assert f'{ability}: 1 capable' in text
+        assert 'Rally: 2 capable / 2 unspent orders' in text
+        assert '1 charge left' in text and 'terrain sight' in text
+        click_button(game, 'Close codex')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
+
+
+def test_v10_active_battle_reference_keeps_open_sight_and_does_not_grant_new_orders(tmp_path):
+    """An older pinned courier cannot gain Rally, charges or new sight rules by opening a reference."""
+    from pathlib import Path
+    from eador.codex import CodexScene
+
+    state = State.from_json((Path(__file__).parent / 'fixtures/v10_pinned_crossing.json').read_text())
+    game = create_game('Legacy control reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        game.tick(1 / 60)
+        assert "This older battle's Militia cannot Rally" in rendered_text(game)
+        press(game, '2')
+        text = rendered_text(game)
+        while game.scene.page + 1 < game.scene.pages:
+            press(game, 'right')
+            text += ' ' + rendered_text(game)
+        assert 'This older battle uses open sight' in text
+        for ability in ('Rally', 'Smoke', 'Repulse', 'Flight'):
+            assert f'{ability}: 0 capable' in text
+        assert 'New battles use terrain sight' in text
+        press(game, 'escape')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
+
+
+def test_paid_saved_sapper_reference_keeps_used_charge_after_the_cloud_expires(tmp_path):
+    """Smoke duration and the once-per-battle charge are distinct, including after save/load."""
+    from eador.codex import CodexScene
+
+    state = State.new(7)
+    state.build('market')
+    while state.gold < state.recruit_cost('sapper'):
+        state.end_turn()
+    state.recruit('sapper')
+    state.explore()
+    sapper = next(unit for unit in state.battle.units if unit.can_smoke)
+    state.battle.smoke(sapper.id, sapper.pos)
+    state = State.from_json(state.to_json())
+    game = create_game('Used control charge reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        for expired in (False, True):
+            before = state.to_json()
+            game.push(CodexScene(root))
+            game.tick(1 / 60)
+            click_button(game, 'Abilities')
+            text = rendered_text(game)
+            while game.scene.page + 1 < game.scene.pages:
+                click_button(game, 'Next')
+                text += ' ' + rendered_text(game)
+            assert f"Smoke: 1 capable / {int(expired)} unspent order{'s' if not expired else ''} · 0 charges left" in text
+            assert f'Smoke clouds: {int(not expired)}' in text
+            assert 'self-targeting works' in text and 'both sides' in text
+            assert 'Guard/Brace anchors' in text and 'Target orders, retaliation and Pin stay unchanged' in text
+            assert 'terrain sight' in text and 'endpoint forest gives cover' in text
+            assert 'land on an empty hex' in text and 'Pin still slows flight' in text
+            click_button(game, 'Close codex')
+            assert state.to_json() == before and not list(tmp_path.iterdir())
+            if not expired:
+                state.battle.end_turn()
+                assert state.battle.unit(sapper.id).alive
     finally:
         game._teardown()

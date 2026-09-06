@@ -102,7 +102,22 @@ class CodexScene(Screen):
                     requirement = f"Requires {BUILDINGS[spec.building].name}." if spec.building else "No building required."
                     description = (f"{role} Recruit for {state.recruit_cost(kind)} gold now (base {spec.cost}); "
                                    f"upkeep {spec.upkeep} gold/turn. {requirement}")
-                    if kind == "healer":
+                    if kind in ('sapper', 'adept', 'skyrider'):
+                        crystals = state.recruit_crystal_cost(kind)
+                        price = f"{state.recruit_cost(kind)} gold + {crystals} crystal{'s' if crystals != 1 else ''}"
+                        roles = {
+                            'sapper': "One Smoke charge screens a hex from both sides' fire and magic.",
+                            'adept': "One Repulse charge pushes an unanchored adjacent enemy without damage.",
+                            'skyrider': "Flight crosses rough and occupied hexes; land empty. Pin and Brace still counter it.",
+                        }
+                        description = (f"Recruit for {price}; upkeep {spec.upkeep} gold/turn. {requirement} "
+                                       + roles[kind] + " See Abilities.")
+                    elif kind == "militia":
+                        older = state.battle and any(unit.alive and unit.team == 'player' and unit.kind == kind
+                                                    and not unit.can_rally for unit in state.battle.units)
+                        description += (" This older battle's Militia cannot Rally." if older else
+                                        " Rally clears an adjacent ally's Pin without refreshing orders. See Abilities.")
+                    elif kind == "healer":
                         description = (f"Recruit for {state.recruit_cost(kind)} gold (base {spec.cost}); upkeep {spec.upkeep}. {requirement} "
                                        "Heal uses its order and shared mana. Adds 2 army recovery per resting turn. "
                                        + (saved_healing_note if older_acolytes else "See Abilities for costs and timing."))
@@ -162,6 +177,39 @@ class CodexScene(Screen):
                 _Entry("Brace", f"Pikemen and Watch Bell heroes · No mana · {brace_hero}",
                        "Guard spends the order. The first adjacent melee attacker takes a normal hit before striking; lethal damage cancels its attack. "
                        "One reaction, expiring next own turn. Ranged fire avoids it. Other units gain +2 defense."),
+            ]
+            def orders(ability):
+                capable = [unit for unit in battle.units if unit.alive and unit.team == 'player'
+                           and ability in unit.abilities]
+                unspent = sum(not unit.acted for unit in capable)
+                facts = f"{context} · {ability.title()}: {len(capable)} capable / {unspent} unspent order{'s' if unspent != 1 else ''}"
+                if ability in ('smoke', 'repulse'):
+                    charges = sum(ability not in unit.spent_abilities for unit in capable)
+                    facts += f" · {charges} charge{'s' if charges != 1 else ''} left"
+                return facts + " · No mana"
+
+            flying = sum(unit.alive and unit.team == 'player' and unit.can_fly for unit in battle.units)
+            sight = (f"{context}: terrain sight · Smoke clouds: {len(battle.smoke_clouds)}" if battle.sight_rules == 'terrain'
+                     else "This older battle uses open sight · New battles use terrain sight")
+            entries += [
+                _Entry("Rally", orders('rally'),
+                       "Militia clears Pin from an adjacent living ally. Spends the Militia's action and move; "
+                       "never refreshes the ally's orders or clears cargo. Can be used each turn; not a battle charge."),
+                _Entry("Smoke", orders('smoke'),
+                       "One charge per battle; spends action and move. Place within 3 and in sight. "
+                       "Blocks both sides' fire and magic, endpoints too; self-targeting works. Ends before your next team turn, even if the Sapper dies."),
+                _Entry("Repulse", orders('repulse'),
+                       "One charge per battle; spends action and move. Push an adjacent foe one hex directly away without damage or retaliation. "
+                       "Guard/Brace anchors it; landing must be empty and on the board."),
+                _Entry("After a Repulse", "Position changes · No replacement orders · No immediate objective progress",
+                       "Target orders, retaliation and Pin stay unchanged. Seal progress waits for its normal checkpoint. "
+                       "Clearing an exit does not Evacuate the hero; that still needs its own unspent action."),
+                _Entry("Flight", f"{context} · Flight: {flying} capable · Skyrider passive · No charge",
+                       "Cross occupied and rough hexes; land on an empty hex. Pin still slows flight. "
+                       "No extra move or free attack: melee still triggers Brace. Flight cannot carry the hero to an exit."),
+                _Entry("Sight", sight,
+                       "Ranged attacks, Pin and spells need sight. Intervening forest blocks; endpoint forest gives cover. "
+                       "Hills, marsh and units do not block. A shot along a hex edge needs either whole side clear."),
             ]
             extraction = battle.objective.kind == 'extract'
             escape_status = (battle.evacuation_blocked_reason or "Ready: the hero can Evacuate now.") if extraction else "Only extraction adventures use this order."
