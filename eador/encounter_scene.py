@@ -80,12 +80,13 @@ class EncounterScene(Screen):
         state = self.root.state
         self.text(f"{p.name} · 1 hero action ({state.actions_left} left) · {state.gold} gold · {state.crystals} crystals",
                   x + 28, y + 96, size=12, color=MUTED)
-        extraction = bool(definition.exits)
+        extraction = definition.objective == 'extract'
+        holding = definition.objective == 'hold'
         offset = 112 if self.approaches else 0
         if self.approach:
             self.paragraph(self.approach.description, x + 28, y + 190, width=844, size=12, color=GOLD)
         self.rule(x + 28, y + 132 + offset, 844)
-        self.text('Escape with the cargo' if extraction else 'Secure the seal',
+        self.text('Escape with the cargo' if extraction else 'Secure the seal' if holding else 'Rout the defenders',
                   x + 28, y + 152 + offset, size=22, color=TEAL, serif=True)
         top = y + 191 + offset
         instructions = (
@@ -97,13 +98,17 @@ class EncounterScene(Screen):
             "Adjacent enemies contest it; empty or contested control resets progress.",
             f"Before round {definition.deadline} ends, secure the seal or defeat every defender. Hero death loses immediately.",
             "Guard shields a holder; Pikemen Brace against melee. Ranged attacks bypass Brace.",
+        ) if holding else (
+            'Defeat every defender to claim the reward. Exhaustion forces retreat after 80 rounds.',
+            'Keep your hero alive. Hero death ends the expedition immediately.',
+            'Protect your rear and rotate wounded allies. Forest blocks distant shots but provides cover at its edge.',
         )
         for paragraph in instructions:
             top += self.paragraph(paragraph, x + 28, top, width=450, size=12) + 14
         reward_top = y + self.height - 170
         self.text("REWARDS ON SUCCESS", x + 28, reward_top, size=10, color=GOLD)
         bonus = self.approach.bonus_gold if self.approach else 0
-        reward = (f"{p.site_gold + bonus} gold · {p.site_crystals} crystals" if self.kind == "site" else
+        reward = (f"{p.site_gold + bonus} gold · {p.site_crystals} crystal{'s' if p.site_crystals != 1 else ''}" if self.kind == "site" else
                   "Liberate Duskspire and complete the three-shard campaign.")
         if self.kind == "site" and p.site_relic:
             reward += f" · {RELICS[p.site_relic].name}"
@@ -123,13 +128,14 @@ class EncounterScene(Screen):
         if extraction:
             for number, pos in enumerate(definition.exits, 1):
                 art.exit_marker(self, grid, pos, number)
-        else:
+        elif holding:
             art.seal(self, grid, definition.seal)
-        self.text('● Allies    ■ Foes    Numbered exits' if extraction else '● Allies    ■ Defenders    ◎ Seal',
+        self.text('● Allies    ■ Foes    Numbered exits' if extraction else
+                  '● Allies    ■ Defenders    ◎ Seal' if holding else '● Allies    ■ Defenders',
                   x + 695, reward_top - 11, size=10, color=MUTED, center=True)
-        guards = ", ".join(f"{count} {UNITS[kind].name}" for kind, count in Counter(self.guards).items())
+        guards = ", ".join(f"{UNITS[kind].name} ×{count}" for kind, count in Counter(self.guards).items())
         self.paragraph(guards, x + 530, reward_top + 18, width=340, size=12, color=RED)
-        if extraction:
+        if self.kind == 'site':
             health = self.province.site_guard_hp
             total = sum(UNITS[kind].hp for kind in self.guards)
             self.text(f'Defenders: {sum(health)}/{total} HP; wounds persist.', x + 530, reward_top + 55, size=10, color=MUTED)

@@ -634,7 +634,7 @@ class BattleScene(Screen):
         centers = [geometry.center(p) for p in b.terrain]
         left, right = min(p[0] for p in centers) - .866, max(p[0] for p in centers) + .866
         top, bottom = min(p[1] for p in centers) - 1, max(p[1] for p in centers) + 1
-        objective_space = 80 if b.objective.kind == 'extract' else 52 if b.objective.kind == 'hold' else 0
+        objective_space = 80 if b.objective.kind == 'extract' else 52
         size = min((self.edge - 100) / (right - left), (h - 288 - objective_space) / (bottom - top))
         origin = (self.edge / 2 - (left + right) / 2 * size, (h - 50 + objective_space) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
@@ -892,6 +892,11 @@ class BattleScene(Screen):
                       38, 142, size=10, color=MUTED)
             self.text(b.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.',
                       38, 165, size=10, color=GOLD if b.evacuation_blocked_reason else TEAL)
+        else:
+            self.box(26, 100, self.edge - 52, 60)
+            self.text('ROUT THE DEFENDERS', 38, 108, size=12, color=GOLD)
+            self.text('Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.',
+                      38, 137, size=10, color=MUTED)
         self.text("TACTICAL COMMAND", x, 30, size=10, color=GOLD)
         self.text("Your army", x, 57, size=30, serif=True)
         allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
