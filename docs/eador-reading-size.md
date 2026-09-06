@@ -221,3 +221,10 @@ An empty new hero, actual damaged autosaves and a fresh-game settings restart ar
 also checked. The full native matrix and inspected frames are retained separately
 from model/public-input tests; neither establishes Windows font behavior or
 completes G10.
+
+The [Hero evidence](evidence/shardbound-hero-reading-2026-09-06/README.md) records
+the final `20de559` source: 1,059 passing tests, both games' bounded stress,
+182 native Hero pages and 610 real input activations. All six retained frames
+were inspected. Updated Tower purchase prose passes a 33-page Catalog matrix;
+the Guide/Settings/Observatory tracer also passes. These counts belong to that
+source and are not fixed page-count requirements.

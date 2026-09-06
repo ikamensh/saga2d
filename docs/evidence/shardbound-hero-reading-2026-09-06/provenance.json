@@ -1,0 +1,22 @@
+{
+  "committed_source": "20de5598c4a46de76b36b151bb6cf9c28b5c6b2b",
+  "native_run_base": "f7a90a6df23389c6e42edd62d852e5e7d3b2aa7e",
+  "all_recorded_source_hashes_match_commit": true,
+  "tests": {
+    "passed": 1059,
+    "seconds": 75.36
+  },
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "scene_runs": 20,
+    "failures": 0
+  },
+  "images_sha256": {
+    "tower-description-125.png": "541ac936c5bcaf14a55cb675627c723718070bf5e8fd0fc2975878b4ecb9af33",
+    "infusion-mouse-spent-125.png": "b04c4da1b85343f0dcac4f580bd55fe3fdbebeca26ea65a919763e883e9872e3",
+    "equipment-autosave-error-125.png": "7a989276bf2b04637c03f5b797e6ce92f38a3f9ea1ac7f45c1f006fb66472109",
+    "infusion-keyboard-quoted-125.png": "b4958f4c3edd962096f119b95ba5e76605a326bd0f6dfb75b201f3d390de5fea",
+    "wizard-frontier-victory-125-page-1.png": "56e7f32e2883ff5f7492cf49f0ccfb8d086e5644d0b07af9e724eb2c6abdeec1",
+    "guide-infusion-125.png": "df3705aa6870bb5fa0d16540921cf753fce822c9201ec04b219eed1032ab462b"
+  }
+}
