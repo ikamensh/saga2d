@@ -26,6 +26,20 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound framework agent): isolated `codex/screen-layers`
+  adds `with scene.screen_layer(1):` for immediate screen drawing. The scope
+  works through existing game helpers, leaves world RenderLayer unchanged,
+  and cannot escape the owning scene. UI controls draw above these local
+  layers; children/later siblings now cover earlier text as well as shapes,
+  matching input order. This serves Shardbound's stationary feedback pills
+  and Tribes' floating text/toast composition. It extends the private stride
+  from Warband `0f089fa`: four suborders remain available per UI component,
+  so Minimap's `order + 1` frame stays above its image and below later UI.
+  No Warband source or worktree was edited. The changed scene stride should
+  be retained when merging its older stride-only implementation. Public
+  integration tests and `tools/demo_screen_layers.py --verify` cover local
+  composition, native pixels/input, UI overlap and modal isolation.
+
 - 2026-09-06 (Shardbound framework agent): isolated `codex/window-display`
   adopts committed Warband `Game.set_fullscreen(bool)` and adds read-only
   `Game.fullscreen` / `window_size` plus `set_window_size((w, h))`. Choosing a

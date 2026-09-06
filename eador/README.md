@@ -45,8 +45,11 @@ retains its previous version, opened explicitly with **Backup** or
 reported without replacing live play; recover a backup and save to another
 manual slot. **Save & title** asks for a slot and leaves only after writing it.
 
-**O** opens sound settings from the title or field guide. Arrow keys or the
-visible buttons adjust volume and mute; **Enter** applies, **Esc** cancels.
+**O** opens settings from the title or field guide. **S / D** selects Sound
+or Display. Arrow keys or visible buttons adjust volume, mute, window size,
+fullscreen and reduced motion; **Enter** applies, **Esc** cancels the preview.
+Reduced motion keeps battle damage and healing numbers still. The logical
+canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
 loading another campaign. Damaged settings are reported and kept until you
 explicitly choose retained recovery. Original campaign/battle music and action
@@ -104,8 +107,9 @@ adds mana to support the two spells already learned.
 | Title | Left / Right / click world | Choose Frontier, Elderwild or Ruins |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
-| Title / guide | O | Open sound settings |
-| Settings | Up / Down, Left / Right | Select a row, adjust volume or mute |
+| Title / guide | O | Open sound and display settings |
+| Settings | S / D | Select Sound / Display |
+| Settings | Up / Down, Left / Right | Select a row, adjust its value |
 | Settings | Enter / Esc | Apply preferences / cancel live preview |
 | Shard | Click province | Select and inspect it |
 | Shard | Tab | Cycle provinces adjacent to the hero |
@@ -123,14 +127,16 @@ adds mana to support the two spells already learned.
 | Decision | 1 / 2 | Choose the corresponding skill or reward |
 | Hero | 1–4 / U | Equip a visible relic / unequip |
 | Hero | Left / Right | Previous / next inventory page |
-| Catalogue | Number key / click | Buy the corresponding building or troop |
+| Catalogue | Number key / click | Buy the corresponding visible building or troop |
+| Recruitment | Left / Right or Previous / Next | Change troop page |
 | Shard | E | End campaign turn |
-| Battle | Click friendly unit / Tab | Select unit / cycle units that can still act |
+| Battle | Click friendly unit / Tab | Select unit / cycle units with an action or movement left |
 | Battle | Click empty hex / enemy | Move / attack with selected unit |
 | Battle | Arrows / Page Up / Page Down | Aim at neighboring hexes (Page keys provide the other two diagonals) |
 | Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
-| Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
-| Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
+| Battle | F | Cycle enemies, or legal targets for the aimed spell, Pin or Swap |
+| Battle | 1 / 2, then click target | Hero Bolt / Heal with the selected Acolyte, otherwise the hero |
+| Battle | S, then F / click target / Enter | Exchange a Warden with an adjacent ally |
 | Objective battle | O | Aim at the seal |
 | Battle | P, then F / click target / Enter | Aim Pin with an Archer or Storm Quiver hero |
 | Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
@@ -167,9 +173,23 @@ site per eligible province, resolved in a single expedition.
 
 Other classes have five troop slots. Troops are individual fighters, not
 stacks. Victories improve the hero and surviving veterans; dead troops are
-lost. The five recruitable types are Militia, Swordsman, Archer, Acolyte and Pikeman.
-Acolytes improve campaign recovery; spellcasting belongs to the hero.
-Pikemen share the Barracks with Swordsmen and provide a defensive front line.
+lost. Seven recruitable roles have different orders and costs. Militia fill
+cheap front-line slots; Swordsmen provide stronger melee attacks; Archers
+offer ranged damage and Pin; Pikemen Brace against melee approaches.
+
+Acolytes improve campaign recovery and can Heal a wounded ally within four
+hexes. Select the Acolyte, press **2**, then **F** and **Enter** or click a
+highlighted ally. The preview shows actual HP restored. Heal spends that
+Acolyte's order and remaining movement, using the same finite mana as the
+hero. The hero keeps its own order.
+
+Rangers can shoot and then use their remaining movement. Moving before
+shooting gives no second move, and Pin still slows the escape. After firing,
+the status reads **Can move** and blue hexes show the available retreat.
+Wardens use **S** to exchange places with an adjacent ally. Both units spend
+their remaining movement; the Warden spends its action, while the ally keeps
+any unspent action. Guard, Brace and Pin remain unchanged. Ranger and Warden are
+on recruitment's second page; **Left/Right** or **Previous/Next** changes pages.
 
 Each level offers two class disciplines. Choose a new discipline or deepen
 one already learned, up to rank three. Commander balances recruitment and
@@ -190,8 +210,8 @@ to this adaptation; they do not reproduce the commercial game's catalogue.
 
 | Building | Cost | Benefit |
 |---|---|---|
-| Barracks | 45 gold | Recruit Swordsmen and Pikemen |
-| Archery Range | 55 gold | Recruit Archers |
+| Barracks | 45 gold | Recruit Swordsmen, Pikemen and Wardens |
+| Archery Range | 55 gold | Recruit Archers and Rangers |
 | Temple | 65 gold | Recruit Acolytes, learn Heal, improve recovery |
 | Mage Tower | 75 gold + 2 crystals | Learn Arcane Bolt and gain 4 maximum mana |
 | Marketplace | 60 gold | Add 8 gold income each turn |

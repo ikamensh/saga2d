@@ -159,32 +159,8 @@ def test_every_earned_relic_can_join_the_retinue_using_only_mouse_controls(tmp_p
         game._teardown()
 
 
-def test_damaged_autosaves_do_not_trap_a_departure_after_an_exact_manual_save(tmp_path):
+@pytest.mark.parametrize('recovery', [False, True])
+def test_damaged_autosaves_do_not_trap_a_transition_after_an_exact_manual_save(tmp_path, recovery):
     """The screen's suggested manual-save recovery actually permits the blocked transition."""
-    from eador.campaign_scene import CampaignScene
-    from eador.persistence import CampaignSaves, AUTO_SLOTS
-    save_dir = tmp_path / 'saves'
-    state = play_stage(State.new_campaign())
-    game = create_game(backend='mock', save_dir=save_dir)
-    try:
-        saves = CampaignSaves(game.save_manager)
-        for _ in AUTO_SLOTS:
-            saves.autosave(state)
-        paths = list(save_dir.glob('*.json'))
-        assert len(paths) == len(AUTO_SLOTS)
-        for path in paths:
-            path.write_text('Damaged autosave')
-        game.push(ShardScene(state))
-        press(game, '1')
-        press(game, 'space')
-        before = state.to_json()
-        press(game, 'return')
-        assert isinstance(game.scene, CampaignScene) and state.to_json() == before
-        press(game, 'f5')
-        press(game, 'return')
-        assert isinstance(game.scene, ShardScene) and state.campaign.stage == 2
-        assert all(path.read_text() == 'Damaged autosave' for path in paths)
-        press(game, 'f9')
-        assert isinstance(game.scene, CampaignScene) and game.scene.root.state.to_json() == before
-    finally:
-        game._teardown()
+    from tools.verify_eador_checkpoint import verify
+    verify(tmp_path, backend='mock', recovery=recovery)
