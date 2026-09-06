@@ -1488,11 +1488,17 @@ class ResultScene(Screen):
         super().__init__()
         self.root, self.is_battle = root, battle
 
-    def refresh(self):
-        super().refresh()
-        self.x, self.y = self.game.width / 2 - 270, self.game.height / 2 - 135
-        self.button("Return to shard" if self.is_battle else "New shard", self.x + 28, self.y + 196,
-                    484, self.continue_game, hotkey="E", primary=True)
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus="codex_text_scale"))
 
     def continue_game(self):
         if self.is_battle:
@@ -1510,14 +1516,25 @@ class ResultScene(Screen):
     def save_game(self):
         self.root.save_game()
         self.message = self.root.message
+        self.refresh()
+
+    def load_game(self, slot=1, *, backup=False):
+        loaded = super().load_game(slot, backup=backup)
+        if not loaded:
+            self.refresh()
+        return loaded
 
     def browse_saves(self):
         self.game.push(SaveScene(self.root))
 
-    def draw(self):
-        x, y, s = self.x, self.y, self.root.state
-        self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 175))
-        self.box(x, y, 540, 270)
+    def refresh(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+
+        super().refresh()
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+        s = self.root.state
         if self.is_battle:
             b = s.battle
             title = ('The cargo is safe' if b.outcome_reason == 'escape' else
@@ -1525,7 +1542,8 @@ class ResultScene(Screen):
                      else "Victory" if b.outcome == "player" else "The army is broken")
             standing = sum(u.hp > 0 for u in b.units if u.team == "player")
             lost = sum(u.hp == 0 for u in b.units if u.team == "player" and u.id != 0)
-            detail = f"{standing} standing  ·  {lost} troops lost  ·  {b.round} battle rounds"
+            detail = (f"{standing} standing · {lost} troop{'s' if lost != 1 else ''} lost · "
+                      f"{b.round} battle round{'s' if b.round != 1 else ''}")
             subtitle = ('Your surviving army escapes with the recovered cargo.' if b.outcome_reason == 'escape' else
                         'The cargo was not extracted. The site remains uncleared.' if b.outcome_reason == 'deadline' and b.objective.kind == 'extract' else
                         ("Surviving defenders withdraw. Claim the site's reward." if s.battle_kind == "site" else
@@ -1536,7 +1554,30 @@ class ResultScene(Screen):
             title = "The shard is yours" if s.status == "victory" else "Westwatch has fallen"
             detail = f"Turn {s.turn}  ·  Hero level {s.hero.level}"
             subtitle = "Begin another world with a different hero."
-        self.text(f"CHRONICLE OF {THEMES[s.theme].name.upper()}", x + 270, y + 23, size=10, color=MUTED, center=True)
-        self.text(title, x + 270, y + 59, size=34, serif=True, color=GOLD, center=True)
-        self.text(detail, x + 270, y + 117, size=13, center=True)
-        self.text(self.message or subtitle, x + 270, y + 157, size=12, color=MUTED, center=True)
+
+        def label(text, size, *, width=744, color=MUTED, serif=False, scaled=True, align="center"):
+            return Label(text, width=width, wrap=True, align=align,
+                         font="Georgia" if serif else "Verdana", text_color=color,
+                         font_size=round(size * scale) if scaled else size)
+
+        content = Column(
+            Row(label(f"CHRONICLE OF {THEMES[s.theme].name.upper()}", 10, width=534, align="left"),
+                Button("Text size", width=186, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24),
+            label(title, 34, color=GOLD, serif=True, scaled=False),
+            label(detail, 13, color=TEXT),
+            label(self.message or subtitle, 12, color=GOLD if self.message else MUTED),
+            Row(Button("Saves", width=220, height=40, hotkey="F6", on_click=self.browse_saves),
+                Button("Codex", width=220, height=40, shortcut="C", on_click=self.root.codex),
+                Button("Return to shard" if self.is_battle else "New shard", width=256, height=40,
+                       hotkey="E", on_click=self.continue_game, style=PRIMARY), spacing=24), spacing=20)
+        self.ui.add(content)
+        self.height = content.get_preferred_size()[1] + 48
+        if self.height > 760:
+            raise ValueError(f"Battle result does not fit at {scale:.0%}")
+        self.x, self.y = (self.game.width - 800) / 2, (self.game.height - self.height) / 2
+        self.ui.clear()
+        self.ui.add(Column(content, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 24))))
+
+    def draw(self):
+        self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 175))
+        self.box(self.x, self.y, 800, self.height)

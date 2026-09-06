@@ -1,6 +1,6 @@
 # Reading size
 
-The Field Codex, expedition briefings, Build/Recruit catalogs and Hero screen offer **Text size** (`T`), opening Settings directly on
+The Field Codex, expedition briefings, Build/Recruit catalogs, Hero and result screens offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -15,7 +15,8 @@ resource and approach facts, rewards, map legends, defender counts/health and
 entry messages. Build and Recruit enlarge item names, descriptions, prices,
 availability reasons, current resources and purchase messages. Hero enlarges
 stats, recovery and infusion quotes, learned disciplines, relic descriptions
-and action messages. Navigation and
+and action messages. Battle and shard results enlarge conclusion details,
+consequences and save/load messages. Navigation and
 purchase buttons, large screen titles and page count keep their normal size.
 Other screens—including tactical forecasts, HUD, rewards,
 saves and campaign plans—keep their existing text sizes.
@@ -228,3 +229,21 @@ the final `20de559` source: 1,059 passing tests, both games' bounded stress,
 were inspected. Updated Tower purchase prose passes a 33-page Catalog matrix;
 the Guide/Settings/Observatory tracer also passes. These counts belong to that
 source and are not fixed page-count requirements.
+
+## Battle and shard results
+
+Outcome panels measure their full details and consequences before placing the
+controls. Text size, Codex and Saves are visible; the original E/Enter/Space
+continuation and F5/F9 save keys remain. Opening these overlays, previewing a
+reading value or saving the completed battle does not resolve its rewards or
+casualties. Only Return to shard resolves that battle. Immediate save/load
+errors reflow in the panel and keep the current outcome and damaged bytes intact.
+The title and navigation controls retain their ordinary sizes.
+
+`tools/verify_eador_results.py` earns eight actual states through public commands:
+rout, hero death, extraction, holding a seal, both deadline failures, shard
+victory and loss of the capital. It inspects all forty-eight size/window
+combinations and drives an earned victory through Settings, Codex, Saves,
+exact reload, failed manual save/load and acceptance. A fresh Game restores
+the reading preference before returning from the ended shard to the title.
+The read-only matrix is separate from the actual-input preparation tracer.
