@@ -2,8 +2,8 @@
 
 The ninth authored-family direction is a rout against a finite Sapper, two
 Archers, Warden and Dread Guard. It adds game content and public development
-journeys; no battle rules, save schema or Saga2D API changed. Final native
-presentation and broader release gates remain separate acceptance work.
+journeys; no battle rules, save schema or Saga2D API changed. Paid model and
+native input journeys are verified; broader release gates remain separate work.
 
 New Elderwild shards place the site at `(0,-1)`. Success grants 60 gold, two
 crystals and Veil Censer, which grants the hero the same one-charge Smoke order
@@ -100,10 +100,21 @@ commands and automatic play remain available independently of these dev scripts.
 
 The shared guidance matrix includes real paid Commander, smaller Scout and
 wounded retry preparations at 100/125% reading sizes and three supported window
-sizes. Its mock geometry/nonmutation checks pass. Root's native verifier and
-screenshots are still pending; no visual approval is claimed here.
+sizes. Its mock geometry/nonmutation checks pass. The reusable native verifier
+`tools/verify_eador_screen.py` drives the four plans and a natural loss/retry
+through actual keyboard/mouse events, including briefing/Codex at 125%, exact
+F5/F9 checkpoints, Rally after shooting, Smoke denial and the once-only reward.
+The briefing describes only the surviving abilities on retry and removes
+formation advice that assumes dead guards are still present.
 
 The retained [model evidence](evidence/shardbound-screen-2026-09-06/README.md)
 records source `783f8d6`: 1,048 full tests, the four exact saved manual plans,
 300 randomized campaigns and 20 mock scene runs with 10,003 random input
 activations. This is model/robustness evidence, not native or release approval.
+
+Separate [native evidence](evidence/shardbound-screen-native-2026-09-06/README.md)
+records source `493d16e`: 1,071 full tests and five Pyglet journeys with 1,073
+input activations and 58 exact saves/reloads. Selected deployment, counterplay,
+briefing, defeat, retry and result screenshots were inspected. This covers
+Standard seed seven on the recorded Mac; it is not a human playtest or a claim
+of universal route success across difficulty modes.
