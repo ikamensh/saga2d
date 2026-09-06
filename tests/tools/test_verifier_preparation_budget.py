@@ -63,6 +63,53 @@ def test_result_preparation_yields_and_keeps_real_battle_and_campaign_outcomes(c
     assert results['capital-lost'].status == 'defeat'
 
 
+def test_choice_preparation_yields_and_preserves_every_earned_reward(clock):
+    """All real hero/theme campaigns earn identical reloadable decisions with the default allowance."""
+    from tools.verify_eador_choices import prepared_choices
+
+    actual = prepared_choices()
+    assert clock['sleeps'], 'The default reward preparation must yield'
+    clock['sleeps'].clear()
+    expected = prepared_choices(budget=CpuBudget(100))
+    assert not clock['sleeps']
+    assert actual == expected
+    kinds = set()
+    for _, snapshot in actual:
+        state = State.from_json(snapshot)
+        assert state.choice is not None
+        kinds.add(state.choice.kind)
+        state.choose(state.choice.options[0].id)
+        assert State.from_json(state.to_json()).to_json() == state.to_json()
+    assert kinds == {'relic', 'skill'}
+
+
+@pytest.mark.parametrize('cpu_percent', [25, 100], ids=['default', 'explicit-unpaced'])
+def test_choice_cli_paces_its_real_input_journey_and_closes_both_sessions(
+        cpu_percent, clock, tmp_path, monkeypatch):
+    """Default CLI preparation yields, explicit stress bypasses it, and both sessions always close."""
+    from saga2d.backends.mock_backend import MockBackend
+    from tools.verify_eador_choices import main
+
+    backends = []
+
+    class ObservedBackend(MockBackend):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            backends.append(self)
+
+    monkeypatch.setattr('saga2d.backends.mock_backend.MockBackend', ObservedBackend)
+    args = ['--backend', 'mock', '--output', str(tmp_path)]
+    if cpu_percent == 100:
+        args += ['--cpu-percent', '100']
+    main(args)
+    assert bool(clock['sleeps']) == (cpu_percent < 100)
+    metrics = json.loads((tmp_path / 'matrix.json').read_text())
+    assert metrics and {row['percent'] for row in metrics} == {100, 125}
+    assert {row['cpu_percent'] for row in metrics} == {cpu_percent}
+    assert len(backends) == 2
+    assert all(not backend.is_running for backend in backends)
+
+
 def test_prototype_paid_preparation_and_saved_orders_share_the_allowance(clock):
     """Paid troops and an explicit detached hold keep exact forecasts and snapshots when paced."""
     from tools.prototype_eador_relief import Orders, create, forward, prepare
