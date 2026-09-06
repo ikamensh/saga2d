@@ -304,7 +304,7 @@ class CodexScene(Screen):
 
             entries = []
             for kind, spec in SITES.items():
-                variable = kind == 'relief_column'
+                variable = spec.inherited_reward
                 base = (spec.gold, spec.crystals, spec.relic)
                 if variable:
                     recorded = next((p for p in state.provinces.values() if p.site_kind == kind), None)
@@ -312,7 +312,7 @@ class CodexScene(Screen):
                         base = (recorded.site_gold, recorded.site_crystals, recorded.site_relic)
                         base_facts = 'Recorded reward: ' + reward_text(*base)
                     else:
-                        base_facts = 'Reward varies by shard; no Relief source is recorded here.'
+                        base_facts = f'Reward varies by shard; no {spec.name} source is recorded here.'
                 else:
                     base_facts = (f"Base reward: {spec.gold} gold · {spec.crystals} "
                                   f"{'crystal' if spec.crystals == 1 else 'crystals'}" +

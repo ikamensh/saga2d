@@ -101,6 +101,26 @@ def test_guard_and_occupied_landing_trade_real_recovery_for_fewer_wounds():
         assert_one_reward(play)
 
 
+def test_existing_tower_infusion_can_pay_for_entry_now_instead_of_advancing_the_rival():
+    """Three crystals and one actual hero action buy enough mana while leaving one action to enter."""
+    from tools.eador_causeway_campaign import prepare_causeway, causeway_guard_route
+    from tests.eador.test_extraction_journeys import Journey, assert_one_reward
+    from dataclasses import asdict
+
+    state = prepare_causeway()
+    assert (state.turn, state.actions_left, state.hero.mana) == (9, 2, 10)
+    gold, crystals, rival = state.gold, state.crystals, asdict(state.rival)
+    state.infuse()
+    assert (state.turn, state.actions_left, state.hero.mana) == (9, 1, 18)
+    assert (state.gold, state.crystals, asdict(state.rival)) == (gold, crystals - 3, rival)
+    saved = state.to_json()
+    for backstop, wounds in ((False, 12), (True, 14)):
+        play = causeway_guard_route(State.from_json(saved), backstop=backstop, heal=True, orders_type=Journey)
+        assert play.state.turn == 9 and play.state.actions_left == 0
+        assert sum(u.max_hp - u.hp for u in play.battle.units if u.team == 'player') == wounds
+        assert_one_reward(play)
+
+
 def test_smaller_scout_can_leave_at_low_mana_or_recover_and_finish_with_healing():
     """A five-body flank needs no Acolyte; later recovery includes the real rival and level gain."""
     from tools.eador_causeway_campaign import prepare_causeway, causeway_scout_route
@@ -146,3 +166,30 @@ def test_failed_causeway_keeps_the_dead_caster_and_finite_wounds_on_retry():
     assert [u.kind for u in retry.battle.units if u.team == 'enemy'] == [kind for kind, _ in survivors]
     assert all(u.alive for u in retry.battle.units if u.team == 'player')
     assert_one_reward(retry)
+
+
+def test_codex_uses_this_shards_recorded_causeway_reward_and_closes_without_mutation(tmp_path):
+    """Variable loot must describe the actual saved source rather than a zero-valued registry default."""
+    from eador.app import create_game
+    from eador.content import RELICS
+    from eador.scene import ShardScene
+    from tools.eador_ui import PlayerInput
+
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        for seed in (0, 7):
+            state = State.new(seed, theme='ruins')
+            province = next(p for p in state.provinces.values() if p.site_kind == 'runebound_causeway')
+            before = state.to_json()
+            game.clear_and_push(ShardScene(state))
+            player = PlayerInput(game); player.press('c'); player.press('5')
+            entries = [e for e in game.scene.entries if e.title.startswith('Runebound Causeway')]
+            assert len(entries) == 2
+            for entry in entries:
+                assert 'Recorded reward:' in entry.facts
+                assert f'{province.site_gold} gold' in entry.facts
+                assert RELICS[province.site_relic].name in entry.facts
+            player.press('escape')
+            assert isinstance(game.scene, ShardScene) and state.to_json() == before
+    finally:
+        game._teardown()
