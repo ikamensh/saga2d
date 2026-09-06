@@ -115,7 +115,7 @@ class Battle:
     @classmethod
     def create(cls, hero: Hero, enemies: list[str], terrain: str,
                spells: set[str], seed: int = 0, *, enemy_hp: list[int] | None = None,
-               encounter: str | None = None) -> Battle:
+               encounter: str | None = None, cargo_penalty: int = 0) -> Battle:
         definition = ENCOUNTERS[encounter] if encounter is not None else None
         tiles = dict(definition.terrain) if definition else cls._terrain(terrain, seed)
         player_positions = definition.player_positions if definition else PLAYER_POSITIONS
@@ -135,6 +135,7 @@ class Battle:
             raise ValueError('Enemy health must match the enemy army.')
         units += cls._deploy(list(zip(enemies, health)), enemy_positions, 'enemy', max(u.id for u in units) + 1000)
         units[0].abilities = ('pin',) if hero.relic == 'storm_quiver' else ('brace',) if hero.relic == 'watch_bell' else ()
+        units[0].cargo_penalty = cargo_penalty
         ranks = hero.skill_ranks
         units[0].safe_attacks = ranks.get('duelist', 0) + (hero.relic == 'iron_crown')
         units[0].attack += 2 * ranks.get('duelist', 0)
@@ -148,7 +149,9 @@ class Battle:
         costs = {'bolt': max(1, 4 - ranks.get('channeling', 0)), 'heal': max(1, 4 - ranks.get('restoration', 0))}
         power = {'bolt': 14 + (6 if hero.relic == 'ember_lens' else 0),
                  'heal': 16 + 4 * ranks.get('restoration', 0) + (6 if hero.relic == 'moonstone' else 0)}
-        objective = BattleObjective('hold', definition.seal, 0, definition.hold_turns, definition.deadline) if definition else BattleObjective()
+        objective = (BattleObjective('extract', deadline=definition.deadline, exits=definition.exits) if definition and definition.exits
+                     else BattleObjective('hold', definition.seal, 0, definition.hold_turns, definition.deadline) if definition
+                     else BattleObjective())
         return cls(units, tiles, hero.mana, set(spells), log=['Advance, use cover, and protect your wounded.'],
                    spell_costs=costs, spell_power=power, objective=objective)
 
@@ -449,6 +452,30 @@ class Battle:
         if destination != unit.pos:
             self._move(unit, destination)
 
+    def _escape_costs(self) -> dict[Pos, float]:
+        """Actual carrier paths, including rough terrain, bodies and the carried burden."""
+        hero = self.unit(self.hero_id)
+        occupied = {other.pos for other in self.units if other.alive and other.id != hero.id}
+        costs = self.grid.reachable(hero.pos, 100, blocked=occupied,
+                                    cost=lambda pos: 2 if self.terrain[pos] in ('forest', 'marsh') and not hero.terrain_walk else 1)
+        return {pos: costs[pos] for pos in self.objective.exits if pos in costs}
+
+    def _intercept_carrier(self, unit: BattleUnit) -> None:
+        """Hold an exit or cut off the carrier's shortest currently open route."""
+        hero = self.unit(self.hero_id)
+        if hero in self.targets(unit.id) and self.preview(unit.id, hero.id)[0] == hero.hp:
+            return
+        if unit.moved or any(self.grid.distance(unit.pos, exit) <= 1 for exit in self.objective.exits):
+            return
+        costs = self._escape_costs()
+        exit = min(self.objective.exits, key=lambda pos: (costs.get(pos, 100), self.grid.distance(hero.pos, pos), pos))
+        choices = self.reachable(unit.id) | {unit.pos}
+        destination = min(choices, key=lambda pos: (self.grid.distance(pos, exit) > 1,
+                          self.grid.distance(pos, exit), self.grid.distance(pos, hero.pos) > unit.attack_range,
+                          self.terrain[pos] not in ('forest', 'hills'), pos))
+        if destination != unit.pos:
+            self._move(unit, destination)
+
     def _withdraw(self, unit: BattleUnit) -> None:
         """Mobile ranged troops spend their unused move to reduce immediate exposure."""
         if self.objective.kind == 'hold' and (unit.team == 'enemy' or unit.pos == self.objective.target):
@@ -472,6 +499,17 @@ class Battle:
             if unit.team != team or not unit.alive or unit.acted:
                 continue
             if unit.kind == 'hero':
+                if self.objective.kind == 'extract':
+                    if self.evacuation_blocked_reason is None:
+                        self.evacuate()
+                        continue
+                    escapes = [pos for pos in self.objective.exits if pos in self.reachable(unit.id)
+                               and not any(other.alive and other.team == 'enemy' and self.grid.distance(pos, other.pos) <= 1
+                                           for other in self.units)]
+                    if escapes:
+                        self.move(unit.id, min(escapes))
+                        self.evacuate()
+                        continue
                 injured = [u for u in self.units if u.alive and u.team == team and u.max_hp - u.hp >= 12
                            and HexGrid.distance(unit.pos, u.pos) <= 4]
                 if 'heal' in self.spells and self.mana >= self.spell_cost('heal') and injured:
@@ -498,11 +536,14 @@ class Battle:
                     self.cast('heal', min(injured, key=lambda target: (target.hp / target.max_hp, target.id)).id,
                               caster_id=unit.id)
                     continue
+            defending_exit = team == 'enemy' and self.objective.kind == 'extract'
+            if defending_exit:
+                self._intercept_carrier(unit)
             defending_seal = team == 'enemy' and self.objective.kind == 'hold'
             if defending_seal:
                 self._contest_seal(unit)
             targets = self.targets(unit.id)
-            if not targets and not unit.moved and not defending_seal:
+            if not targets and not unit.moved and not defending_seal and not defending_exit:
                 enemies = [u for u in self.units if u.alive and u.team != team]
                 reachable = self.reachable(unit.id)
                 if reachable and enemies:
@@ -521,7 +562,9 @@ class Battle:
                             self._move(unit, destination)
                 targets = self.targets(unit.id)
             if targets:
-                if defending_seal:
+                if defending_exit:
+                    target = min(targets, key=lambda other: (other.id != self.hero_id, other.hp, other.id))
+                elif defending_seal:
                     target = min(targets, key=lambda other: (
                         not (other.id == self.hero_id and self.preview(unit.id, other.id)[0] == other.hp),
                         other.pos != self.objective.target, other.hp, other.id))
@@ -533,7 +576,10 @@ class Battle:
                                if ally.alive and ally.team == team)
                 slow_stops_approach = (target.attack_range + max(1, target.move_range - 2) < distance
                                        <= target.attack_range + target.move_range)
-                use_pin = (target in self.pin_targets(unit.id) and (slow_stops_approach or target.kind == 'ranger' and distance > 1)
+                slows_escape = (defending_exit and target.id == self.hero_id and any(
+                    max(1, target.effective_move_range - 2) < cost <= target.effective_move_range
+                    for cost in self._escape_costs().values()))
+                use_pin = (target in self.pin_targets(unit.id) and (slows_escape or slow_stops_approach or target.kind == 'ranger' and distance > 1)
                            and self.preview(unit.id, target.id)[0] < target.hp
                            and not (defending_seal and target.pos == self.objective.target))
                 if use_pin:
