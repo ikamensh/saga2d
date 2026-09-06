@@ -34,20 +34,29 @@ Saga2D now measures unattached UI trees using their eventual font/theme context;
 its independent runnable example verifies rendering and input ownership. Campaign,
 encounter, pagination and economy rules remain in Shardbound.
 
-Source after this package passes **1,148 tests**. [Tactical forecasts](eador-forecast-reading.md)
+Source after this package passes **1,149 tests**. [Tactical forecasts](eador-forecast-reading.md)
 support shared 100/125 reading through F2 while T remains Retreat. The
 [native matrix](evidence/shardbound-forecast-086ce14/README.md) records 96 layouts,
 865 inputs and 21 exact reloads. [Complete save diagnostics](eador-diagnostics.md)
 preserve the selected slot, quoted replacement and already-applied purchase through
 long errors and hidden/batched input. Combined-source native diagnostics, both games'
-bounded fuzz and the full suite pass; this does not close the remaining HUD work.
+bounded fuzz and the full suite pass. [Complete tactical objectives](eador-battle-objective-reading.md)
+now scale too, with measured board placement and explicit hold reset/escape rules.
+The [objective matrix](evidence/shardbound-objectives-3fd3412/README.md) passes
+126 layouts, 970 inputs and 21 reloads, plus an independent 18-layout picking
+review and Aerie's native western route. Unit HUD, action guidance and logs remain.
 
 The [resource attribution study](eador-resource-breakpoints.md) reconciles 27
 unchanged campaigns and 10,762 real detached quotes. Available investments still
 compete at earlier turns; later tested policies stop buying while rewards and
 income continue. No unproven tax or currency sink was added. The eleventh
-encounter remains a prototype after independent review exposed a cheap passive
-win, and its revised geometry is being compared before integration.
+encounter's revised geometry passed independent tactical and ordinary-source
+review; campaign integration and acceptance remain in progress.
+
+A [three-minute native run](evidence/shardbound-reading-soak-a431f47/README.md)
+completed 54 repeated journeys and 10,246 frames on the earlier reading source.
+Its timing and overlapping RSS windows are retained as bounded measurements;
+this is not the required two-hour candidate stress or evidence of no memory leak.
 
 ## Baseline audit — 2026-09-05
 

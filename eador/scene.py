@@ -6,7 +6,6 @@ scene lifetimes, hotkeys, geometry, drawing and save files.
 
 from __future__ import annotations
 
-import textwrap
 from collections import Counter
 
 from saga2d import Anchor, Button, HexGrid, InputEvent, SaveError, Scene
@@ -295,7 +294,7 @@ class ShardScene(Screen):
 
     @property
     def edge(self):
-        return self.game.width - 344
+        return self.game.width - 400
 
     def on_enter(self):
         from eador.preferences import load_preferences
@@ -322,47 +321,158 @@ class ShardScene(Screen):
         elif self.state.status != "playing":
             self.game.push(ResultScene(self))
 
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game), self.message):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
+    def read_message(self):
+        from eador.diagnostics import DiagnosticScene
+        self.game.push(DiagnosticScene(self._notice, return_label='Return to map', title='Complete campaign message'))
+
     def refresh(self):
+        from saga2d import Column, Label
+        from eador.preferences import reading_scale
+        from eador.rival_scene import rival_order
+
         super().refresh()
-        self._last_hero_pos = self.state.hero.pos
-        w, h = self.game.resolution
-        self.grid = HexGrid(self.state.provinces, size=min((h - 246) / 8, (self.edge - 130) / 8.67),
-                            origin=(self.edge / 2, (h - 30) / 2))
-        x = self.edge + 22
-        province = self.state.provinces[self.selected]
-        playing = self.state.status == "playing"
-        here = self.selected == self.state.hero.pos
-        adjacent = self.selected in self.grid.neighbors(self.state.hero.pos)
-        can_act = playing and self.state.actions_left > 0
-        blocked = self.selected == (2, 0) and self.state.assault_blocked_reason
-        expedition_here = self.state.rival.army and self.selected == self.state.rival.pos
-        from saga2d import Label
-        hint = 'Select a neighboring province.'
-        if not self.state.actions_left:
+        s = self.state
+        self._last_hero_pos = s.hero.pos
+        scale = reading_scale(self.game) / 100
+        self._display = self.game.window_size, reading_scale(self.game), self.message
+        h, x, width = self.game.height, self.edge + 22, 356
+
+        def label(text, width, *, size=12, color=TEXT, serif=False):
+            return Label(text, width=width, wrap=True, font='Georgia' if serif else 'Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        def column(items, width, x, y, *, spacing=6):
+            block = Column(*items, width=width, spacing=spacing, anchor=Anchor.TOP_LEFT, margin=(x, y))
+            height = self.measure(block)[1]
+            self.ui.add(block)
+            return y + height
+
+        # Treasury and the hero remain visible while province commands are reviewed.
+        economy = [label('WESTWATCH ENCIRCLED' if s.encircled else 'YOUR DOMINION', 390,
+                         size=10, color=RED if s.encircled else MUTED),
+                   label(f'{s.gold} gold  ·  {s.crystals} crystals', 390, size=18, color=GOLD, serif=True),
+                   label(f'Income +{s.income}  ·  Upkeep −{s.upkeep} / turn', 390,
+                         color=RED if s.upkeep_shortfall else MUTED),
+                   label(f'Realm gold yield: {s.rules.gold_percent}% of base production', 390, size=10, color=MUTED)]
+        if s.upkeep_shortfall:
+            economy.append(label(f'{s.upkeep_shortfall} gold short: unpaid troops will leave.', 390, color=RED))
+        elif s.encircled:
+            economy.append(label('Capital supply blocked · V for breakout routes', 390, color=RED))
+        treasury_bottom = column(economy, 390, 26, 108)
+        hero_bottom = column([
+            label(f'{s.hero.name}, the {s.hero.hero_class}', 390, size=18, serif=True),
+            label(f'Level {s.hero.level} · {s.hero.xp} XP · {s.actions_left} actions left', 390, color=GOLD),
+            label(f'Health {s.hero.hp}/{s.hero.max_hp}  ·  Mana {s.hero.mana}/{s.hero.max_mana}', 390),
+            label(f'At {s.provinces[s.hero.pos].name}', 390, size=11, color=MUTED),
+        ], 390, 452, 108)
+        self._summary_bottom = max(treasury_bottom, hero_bottom) + 16
+
+        p = s.provinces[self.selected]
+        playing = s.status == 'playing'
+        here = self.selected == s.hero.pos
+        adjacent = self.selected in s.grid.neighbors(s.hero.pos)
+        can_act = playing and s.actions_left > 0
+        blocked = self.selected == (2, 0) and s.assault_blocked_reason
+        expedition_here = s.rival.army and self.selected == s.rival.pos
+        province_income = 0 if s.encircled and p.pos == (-2, 0) else p.income
+        details = [label('SELECTED PROVINCE', width, size=10, color=MUTED),
+                   label(p.name, width, size=22, serif=True),
+                   label(f'{p.terrain.title()} · {p.owner.title()} · {province_income} base gold', width,
+                         color=art.OWNERS[p.owner])]
+        if expedition_here:
+            details.append(label(f'Expedition: {len(s.rival.army)} troops · V for strengths', width, color=RED))
+        elif p.owner != 'player':
+            guards = ', '.join(f'{n} {UNITS[kind].name}' for kind, n in Counter(p.guards).items())
+            details.append(label('Defenders: ' + (guards or 'None'), width, color=RED))
+        else:
+            details.append(label('Ruins cleared' if p.explored else p.site or 'No ruins in this province',
+                                 width, color=GOLD))
+        hint = 'Select a neighboring province. Tab cycles neighbors; Home selects your hero.'
+        if not s.actions_left:
             hint = 'No actions left. End the turn.'
         elif not here and not adjacent:
             hint = 'Choose a province beside your hero.'
         elif blocked:
             hint = 'Assault locked. J lists objectives.'
-        self.ui.add(Label(hint, width=300, wrap=True, font='Verdana', font_size=11,
-                          text_color=MUTED, anchor=Anchor.TOP_LEFT, margin=(x, 395)))
-        self.button("Hero is here" if here else "Intercept expedition" if expedition_here else
-                    "Travel here" if province.owner == "player" else "Invade province",
-                    x, 423, 300, self.travel, hotkey="Enter", primary=True, enabled=can_act and adjacent and not blocked)
-        current = self.state.provinces[self.state.hero.pos]
-        self.button("Explore current province", x, 473, 300, self.explore, hotkey="X",
-                    enabled=can_act and current.owner == "player" and current.site is not None and not current.explored)
-        self.button("Build stronghold", x, 555, 300, self.buildings, hotkey="B", enabled=playing)
-        self.button("Recruit troops", x, 605, 300, self.recruitment, hotkey="R", enabled=playing)
-        self.button("End turn", x, h - 93, 300, self.end_turn, hotkey="E", primary=True, enabled=playing)
-        self.button("Guide", 26, 30, 94, self.help, hotkey="F1")
-        self.button("Hero", 130, 30, 88, self.hero_details, hotkey="H")
-        self.button("Codex", 228, 30, 110, self.codex, shortcut="C")
-        self.button("Save", self.edge - 177, 30, 72, lambda: self.browse_saves("save"))
-        self.button("Load", self.edge - 97, 30, 72, self.browse_saves)
-        self.button("Rival plan", self.edge - 185, 180, 160, self.rival_details, shortcut="V")
-        if self.state.campaign:
-            self.button("Campaign", self.edge - 185, 118, 160, self.campaign_plan, shortcut="J")
+        details.append(label(hint, width, size=11, color=MUTED))
+        y = column(details, width, x, 108) + 14
+        self.button('Hero is here' if here else 'Intercept expedition' if expedition_here else
+                    'Travel here' if p.owner == 'player' else 'Invade province',
+                    x, y, width, self.travel, hotkey='Enter', primary=True,
+                    enabled=can_act and adjacent and not blocked)
+        current = s.provinces[s.hero.pos]
+        self.button('Explore current province', x, y + 50, width, self.explore, hotkey='X',
+                    enabled=can_act and current.owner == 'player' and current.site is not None and not current.explored)
+        y = column([label('YOUR STRONGHOLD', width, size=10, color=MUTED),
+                    label(f'{len(s.buildings)}/{len(BUILDINGS)} buildings · {len(s.hero.army)}/{s.hero.max_army} troops',
+                          width, color=MUTED)], width, x, y + 114) + 12
+        self.button('Build stronghold', x, y, width, self.buildings, hotkey='B', enabled=playing)
+        self.button('Recruit troops', x, y + 50, width, self.recruitment, hotkey='R', enabled=playing)
+        self.button('End turn', x, y + 116, width, self.end_turn, hotkey='E', primary=True, enabled=playing)
+        column([label(f'Turn {s.turn} · Rival expedition: {len(s.rival.army)} troops', width,
+                      size=11, color=MUTED)], width, x, y + 172)
+
+        self.button('Guide', 614, 28, 92, self.help, hotkey='F1')
+        self.button('Hero', 716, 28, 84, self.hero_details, hotkey='H')
+        self.button('Codex', 810, 28, 102, self.codex, shortcut='C')
+        self.button('Text size', 922, 28, 140, self.open_text_settings, shortcut='F2')
+        self.button('Save', 1072, 28, 82, lambda: self.browse_saves('save'))
+        self.button('Load', 1164, 28, 90, self.browse_saves)
+        column([label(f'{THEMES[s.theme].name.upper()} / SHARD {s.seed} / {s.rules.title.upper()}', 540, size=10, color=GOLD)],
+               540, 26, 64)
+
+        # Current objectives sit outside the map; selecting a province does not replace them.
+        y = self._summary_bottom + 12
+        if s.campaign:
+            self.button('Campaign', 644, y, 210, self.campaign_plan, shortcut='J')
+            y = column([label(f'Stage {s.campaign.stage} of 3', 210, size=11, color=MUTED)],
+                       210, 644, y + 48) + 12
+        else:
+            y = column([label('Capture Duskspire', 210, size=14, color=GOLD, serif=True),
+                        label('Protect Westwatch', 210, size=12, color=MUTED)], 210, 644, y) + 16
+        self.button('Rival plan', 644, y, 210, self.rival_details, shortcut='V')
+        column([label(rival_order(s), 210, size=11, color=RED)], 210, 644, y + 50)
+
+        army_top = h - 158
+        self.grid = HexGrid(s.provinces, size=min(59, (army_top - self._summary_bottom - 24) / 8),
+                            origin=(326, (self._summary_bottom + army_top) / 2))
+        self._province_name_boxes = []
+        for pos, province in s.provinces.items():
+            cx, cy = self.grid.center(pos)
+            name_width = round(self.grid.size * 1.69)
+            name = Label(province.name, width=name_width, wrap=True, align='center',
+                         font='Verdana', font_size=9, text_color=TEXT)
+            name_height = self.measure(name)[1]
+            left, top = round(cx - name_width / 2), round(cy + self.grid.size * .60 - name_height)
+            column([name], name_width, left, top)
+            self._province_name_boxes.append((left, top - 1, name_width, name_height + 2))
+        column([label('YOUR ARMY · Level / health', self.edge - 52, size=10, color=MUTED)],
+               self.edge - 52, 26, army_top)
+        army_y = army_top + round(22 * scale)
+        self._army_art = []
+        for i, troop in enumerate(s.hero.army):
+            xx = 26 + i * 118
+            name_bottom = column([label(UNITS[troop.kind].name, 112, size=11)], 112, xx, army_y)
+            status_bottom = column([label(f'Lv {troop.level}\n{troop.hp}/{troop.max_hp}', 70, size=10, color=MUTED)],
+                                   70, xx + 42, name_bottom + 4)
+            self._army_art.append((xx, name_bottom + 38, status_bottom + 3))
+        self._notice = self.message or ('Settings could not be read. Open Text size to recover them.'
+                                       if self.preferences.error else s.log[-1])
+        notice = label(self._notice, self.edge - 52, size=11, color=GOLD if self.message else MUTED)
+        if self.measure(notice)[1] > 26:
+            notice = label('Message available. Read the complete message for details.', self.edge - 228,
+                           size=11, color=GOLD)
+            self.button('Read message', self.edge - 186, h - 49, 160, self.read_message, shortcut='D')
+        column([notice], self.measure(notice)[0], 26, h - 29)
 
     def get_save_state(self):
         return {"campaign": self.state.to_json()}
@@ -459,85 +569,33 @@ class ShardScene(Screen):
         return False
 
     def draw(self):
-        from eador.rival_scene import rival_order
-
-        s, h, x = self.state, self.game.height, self.edge + 22
+        s, h = self.state, self.game.height
         art.backdrop(self, self.edge, h)
-        self.draw_rect(self.edge, 0, 344, h, PANEL)
-        self.draw_line(self.edge, 0, self.edge, h, LINE)
-        self.draw_rect(0, 0, self.edge, 91, INK)
-        self.rule(24, 90, self.edge - 48)
-        header_center = (338 + self.edge - 177) / 2
-        self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
-        self.text(f"{THEMES[s.theme].name.upper()}  /  SHARD {s.seed}  /  {s.rules.title.upper()}",
-                  header_center, 61, size=10, color=GOLD, center=True)
-        self.text("WESTWATCH ENCIRCLED" if s.encircled else "YOUR DOMINION", x, 24,
-                  size=10, color=RED if s.encircled else MUTED)
-        self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
-        self.text(f"{s.crystals} crystals", x + 160, 52, size=15, color=BLUE)
-        self.text(f"Income +{s.income}   ·   Upkeep −{s.upkeep}   / turn", x, 84, size=11,
-                  color=RED if s.upkeep_shortfall else MUTED)
-        self.text(f"Realm gold yield: {s.rules.gold_percent}% of base production", x, 102, size=9, color=MUTED)
-        self.rule(x, 120, 300)
-        self.text(f"{s.hero.name}, the {s.hero.hero_class}", x, 132, size=21, serif=True)
-        self.text(f"LEVEL {s.hero.level}  ·  {s.hero.xp} XP  ·  {s.actions_left} ACTIONS LEFT", x, 166, size=10, color=GOLD)
-        self.text(f"Health {s.hero.hp}/{s.hero.max_hp}", x, 192, size=12, color=TEAL)
-        self.text(f"Mana {s.hero.mana}/{s.hero.max_mana}", x + 166, 192, size=12, color=BLUE)
-        self.bar(x, 216, 134, s.hero.hp, s.hero.max_hp)
-        self.bar(x + 166, 216, 134, s.hero.mana, s.hero.max_mana, BLUE)
-        self.text(f"At {s.provinces[s.hero.pos].name}", x, 231, size=11, color=MUTED)
-        self.rule(x, 259, 300)
-        p = s.provinces[self.selected]
-        self.text("SELECTED PROVINCE", x, 279, size=10, color=MUTED)
-        self.text(p.name, x, 302, size=27, serif=True)
-        province_income = 0 if s.encircled and p.pos == (-2, 0) else p.income
-        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  {province_income} base gold", x, 344,
-                  size=12, color=art.OWNERS[p.owner])
-        if s.rival.army and self.selected == s.rival.pos:
-            self.text(f"Expedition: {len(s.rival.army)} troops · V for strengths", x, 369, size=11, color=RED)
-        elif p.owner != "player":
-            guards = ", ".join(f"{n} {UNITS[kind].name}" for kind, n in Counter(p.guards).items())
-            self.text(textwrap.shorten(guards, width=40, placeholder="…"), x, 369, size=11, color=RED)
-        else:
-            self.text("Ruins cleared" if p.explored else p.site or "No ruins in this province", x, 369, size=12, color=GOLD)
-        self.text("YOUR STRONGHOLD", x, 531, size=10, color=MUTED)
-        self.text(f"{len(s.buildings)}/{len(BUILDINGS)} buildings  ·  {len(s.hero.army)}/{s.hero.max_army} troops", x, 662, size=11, color=MUTED)
-        if s.upkeep_shortfall:
-            self.text(f"{s.upkeep_shortfall} gold short: unpaid troops will leave.", x, h - 118, size=10, color=RED)
-        elif s.encircled:
-            self.text("Capital supply blocked · V for breakout routes", x, h - 118, size=10, color=RED)
-        self.text(f"TURN {s.turn}  ·  Rival expedition: {len(s.rival.army)} troops", x, h - 37, size=10, color=MUTED)
-        # Back-to-front relief keeps the southern edge of the shard continuous.
+        self.draw_rect(self.edge, 91, self.game.width - self.edge, h - 91, PANEL)
+        self.draw_line(self.edge, 91, self.edge, h, LINE)
+        self.draw_rect(0, 0, self.game.width, 91, INK)
+        self.rule(24, 90, self.game.width - 48)
+        self.text('SHARDBOUND', 26, 22, size=27, serif=True)
+        self.rule(26, self._summary_bottom - 4, self.edge - 52)
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
-                         hero=pos == s.hero.pos, hover=pos == self.hover)
+                         hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)
+        for box in self._province_name_boxes:
+            self.draw_rect(*box, (23, 37, 33, 235), radius=3)
         if s.rival.army:
             art.expedition(self, self.grid, s.rival.pos, len(s.rival.army))
-        art.compass(self, 75, 162)
+        art.compass(self, 75, self._summary_bottom + 60)
         if s.campaign:
             from eador.campaign_scene import campaign_targets
-            self.text(f'Stage {s.campaign.stage} of 3', self.edge - 185, 161, size=9, color=MUTED)
             for index, (pos, _, complete) in enumerate(campaign_targets(s)):
                 cx, cy = self.grid.center(pos)
                 cx, cy = cx + self.grid.size * .50, cy + self.grid.size * .05
                 self.draw_circle(cx, cy, 10, INK)
                 self.text(str(index + 1), cx, cy - 8, size=11, color=TEAL if complete else GOLD, center=True)
-        else:
-            self.text("Capture Duskspire", self.edge - 185, 122, size=13, color=GOLD, serif=True)
-            self.text("Protect Westwatch", self.edge - 185, 146, size=11, color=MUTED)
-        self.paragraph(rival_order(s), self.edge - 185, 232, width=160, size=11, color=RED)
-        self.text("YOUR ARMY", 28, h - 112, size=10, color=MUTED)
-        for i, troop in enumerate(s.hero.army):
-            xx = 100 + i * 124
-            art.piece(self, xx, h - 61, troop.kind, "player", scale=.61)
-            self.text(UNITS[troop.kind].name, xx + 23, h - 88, size=10)
-            self.text(f"Lv{troop.level} · {troop.hp}/{troop.max_hp}", xx + 23, h - 69, size=9, color=MUTED)
-            self.bar(xx + 23, h - 50, 66, troop.hp, troop.max_hp)
-        self.rule(26, h - 124, self.edge - 52)
-        message = self.message or ("Sound settings could not be read. Open Guide, then Settings (O) to recover them."
-                                   if self.preferences.error else s.log[-1])
-        self.text(textwrap.shorten(message, width=110, placeholder="…"), 28, h - 26, size=11,
-                  color=GOLD if self.message else MUTED)
+        for troop, (xx, piece_y, bar_y) in zip(s.hero.army, self._army_art):
+            art.piece(self, xx + 19, piece_y, troop.kind, 'player', scale=.53)
+            self.bar(xx + 42, bar_y, 66, troop.hp, troop.max_hp)
+        self.rule(26, h - 168, self.edge - 52)
 
 
 class CatalogScene(Screen):
@@ -832,56 +890,164 @@ class BattleScene(Screen):
         super().refresh()
         b = self.battle
         x, h = self.edge + 22, self.game.height
+        from saga2d import Column
+        objective = self._objective_content()
+        self.objective_bottom = 100 + self.measure(objective)[1] + 24
+        self.ui.add(Column(objective, anchor=Anchor.TOP_LEFT, margin=(38, 112)))
+        alive = [u for u in b.units if u.team == "player" and u.hp > 0]
+        if self.selected is None or not any(u.id == self.selected for u in alive):
+            self.selected = alive[0].id if alive else None
+        command = self._command_content()
+        if self.measure(command)[1] > h - 118:
+            raise ValueError('Tactical commands exceed the available reading space')
+        self.ui.add(Column(command, anchor=Anchor.TOP_LEFT, margin=(x, 60)))
+        footer = self._footer_content()
+        self.footer_top = h - 16 - self.measure(footer)[1]
+        self.ui.add(Column(footer, anchor=Anchor.TOP_LEFT, margin=(30, round(self.footer_top))))
         # Fit any finite battle board; topology, picking and polygons share one grid.
         geometry = HexGrid(b.terrain)
         centers = [geometry.center(p) for p in b.terrain]
         left, right = min(p[0] for p in centers) - .866, max(p[0] for p in centers) + .866
         top, bottom = min(p[1] for p in centers) - 1, max(p[1] for p in centers) + 1
-        objective_space = 80 if b.objective.kind == 'extract' else 52
-        size = min((self.edge - 100) / (right - left), (h - 288 - objective_space) / (bottom - top))
-        origin = (self.edge / 2 - (left + right) / 2 * size, (h - 50 + objective_space) / 2 - (top + bottom) / 2 * size)
+        board_top, board_bottom = self.objective_bottom + 16, self.footer_top - 36
+        size = min((self.edge - 100) / (right - left), (board_bottom - board_top) / (bottom - top))
+        origin = (self.edge / 2 - (left + right) / 2 * size,
+                  (board_top + board_bottom) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
-        alive = [u for u in b.units if u.team == "player" and u.hp > 0]
-        if self.selected is None or not any(u.id == self.selected for u in alive):
-            self.selected = alive[0].id if alive else None
-        selected = b.unit(self.selected) if self.selected is not None else None
-        self.button("Brace" if selected and selected.can_brace else "Guard", x + 184, 247, 116,
-                    self.guard, shortcut="G", enabled=selected is not None and not selected.acted and b.outcome is None)
-        if self.unit_order:
-            name = self.unit_order
-            label, key, _, _ = self.unit_orders[name]
-            if name == 'pin' and selected.pin_cooldown:
-                label += ' · wait'
-            elif name in ('smoke', 'repulse'):
-                label += ' · 0' if name in selected.spent_abilities else ' · 1'
-            self.button(label, x, 247, 172, lambda: self.choose_order(name), shortcut=key,
-                        primary=self.targeting == name, enabled=bool(getattr(b, name + '_targets')(selected.id)))
-        self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 334, 300, self.bolt, hotkey="1",
-                    enabled=bool(b.spell_targets('bolt')))
-        healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
-        self.button(f"{healer} Heal · {b.spell_cost('heal')} mana", x, 384, 300, self.heal, hotkey="2",
-                    enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster)))
-        self.button("Auto-play one round", x, 474, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
-        self.button("Retreat", x, 524, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
         self.button("End battle round", x, h - 46, 300, self.end_turn,
                     hotkey="E", primary=True, enabled=b.outcome is None)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
         self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
         self.button('Text size', x + 126, 16, 174, self.open_text_settings, shortcut='F2')
-        from saga2d import Column
         from eador.preferences import reading_scale
-        forecast = self._forecast()
-        if self.measure(forecast)[1] > h - 58 - 575:
-            raise ValueError('Tactical forecast exceeds the available reading space')
-        self.ui.add(Column(forecast, anchor=Anchor.TOP_LEFT, margin=(x, 575)))
-        self._reading_view = self.hover, self.game.window_size, reading_scale(self.game)
-        if b.objective.kind == "hold":
-            self.button("Locate seal", self.edge - 188, 109, 162, self.locate_objective, shortcut="O")
+        self._reading_view = self.hover, self.message, self.game.window_size, reading_scale(self.game)
+
+    def _command_content(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        b = self.battle
+        selected = b.unit(self.selected) if self.selected is not None else None
+        scale = reading_scale(self.game) / 100
+
+        def label(text, *, size=12, color=MUTED, width=300):
+            return Label(text, width=width, wrap=True, font='Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        allies = sum(u.hp > 0 and u.team == 'player' for u in b.units)
+        enemies = sum(u.hp > 0 and u.team != 'player' for u in b.units)
+        sections = [label(f'{allies} allies · {enemies} foes · Tab selects')]
+        if selected:
+            name = self.root.state.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name
+            status = ('Guard +2' if selected.stance == 'guard' else 'Braced' if selected.stance == 'brace' else
+                      'Can move' if selected.acted and b.reachable(selected.id) else
+                      'Spent' if selected.acted else 'Moved' if selected.moved else 'Ready')
+            penalties = ['Pinned'] if selected.pinned else []
+            if selected.cargo_penalty:
+                penalties.append(f'Cargo −{selected.cargo_penalty}')
+            movement = f"{'Fly' if selected.can_fly else 'Move'} {selected.effective_move_range}"
+            if penalties:
+                movement += f" ({', '.join(penalties)})"
+            sections.append(Column(Label(name, width=300, wrap=True, font='Georgia', font_size=25, text_color=TEXT),
+                                   Row(label(f'{selected.hp} / {selected.max_hp} HP', color=TEAL, width=180),
+                                       label(status, color=GOLD, width=108), spacing=12),
+                                   label(f'Attack {selected.attack}   Defense {selected.effective_defense}', color=TEXT),
+                                   label(f'{movement}   Range {selected.attack_range}'), spacing=6))
+        orders = []
+        if self.unit_order:
+            name = self.unit_order
+            title, key, _, _ = self.unit_orders[name]
+            if name == 'pin' and selected.pin_cooldown:
+                title += ' · wait'
+            elif name in ('smoke', 'repulse'):
+                title += ' · 0' if name in selected.spent_abilities else ' · 1'
+            orders.append(Button(title, width=172, height=40, shortcut=key,
+                                 on_click=lambda: self.choose_order(name),
+                                 style=PRIMARY if self.targeting == name else None,
+                                 enabled=bool(getattr(b, name + '_targets')(selected.id))))
+        orders.append(Button('Brace' if selected and selected.can_brace else 'Guard', width=116, height=40,
+                             shortcut='G', on_click=self.guard,
+                             enabled=selected is not None and not selected.acted and b.outcome is None))
+        sections.append(Row(*orders, spacing=12))
+        healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
+        sections.append(Column(label(f'SHARED MANA   /   {b.mana} REMAINING', size=10, color=BLUE),
+                               Button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", width=300, height=40,
+                                      hotkey='1', on_click=self.bolt, enabled=bool(b.spell_targets('bolt'))),
+                               Button(f"{healer} Heal · {b.spell_cost('heal')} mana", width=300, height=40,
+                                      hotkey='2', on_click=self.heal,
+                                      enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster))),
+                               label('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else
+                                     'Spells spend the hero’s order.', size=11), spacing=8))
+        sections.append(self._forecast())
+        return Column(*sections, spacing=18)
+
+    def _footer_content(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        scale, width = reading_scale(self.game) / 100, self.edge - 60
+
+        def label(text, *, width=380, color=MUTED):
+            return Label(text, width=width, wrap=True, font='Verdana', font_size=round(11 * scale), text_color=color)
+
+        logs = Column(*(label(line) for line in self.battle.log[-3:]), spacing=4)
+        if self.measure(logs)[1] > 100:
+            logs = label('Open the battle log to read the latest entries.')
+        hint = label(self.message or ('Click a target for ' + self.targeting if self.targeting else self.order_hint()),
+                     width=width - 396, color=GOLD)
+        overflow = self.measure(hint)[1] > 100
+        if overflow:
+            hint = label('A complete battle message is available below.', width=width - 396, color=GOLD)
+        controls = Row(Button('Auto-play one round', width=270, height=40, shortcut='A', on_click=self.auto_round,
+                              enabled=self.battle.outcome is None),
+                       Button('Retreat', width=150, height=40, shortcut='T', style=DANGER,
+                              on_click=self.retreat, enabled=self.battle.outcome is None),
+                       Button('Battle log', width=170, height=40, shortcut='L', on_click=self.read_log), spacing=12)
+        if overflow:
+            controls.add(Button('Read message', width=242, height=40, shortcut='M', on_click=self.read_message))
+        # Reserve the same footer height after every order, so the board cannot
+        # move underneath a pointer when recent events or guidance change.
+        return Column(Row(logs, hint, spacing=16, height=100), controls, spacing=12)
+
+    def read_log(self):
+        from eador.diagnostics import DiagnosticScene
+        self.game.push(DiagnosticScene('\n'.join(self.battle.log), title='Battle log',
+                                       body_color=MUTED, return_label='Return to battle'))
+
+    def read_message(self):
+        from eador.diagnostics import DiagnosticScene
+        self.game.push(DiagnosticScene(self.message, title='Complete battle message', return_label='Return to battle'))
+
+    def _objective_content(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        b, width = self.battle, self.edge - 76
+        scale = reading_scale(self.game) / 100
+
+        def label(text, *, size=10, color=MUTED, width=width):
+            return Label(text, width=width, wrap=True, font='Verdana', font_size=round(size * scale), text_color=color)
+
+        if b.objective.kind == 'hold':
+            objective = b.objective
+            title = label(f'HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}',
+                          size=12, color=GOLD, width=width - 174)
+            heading = Row(title, Button('Locate seal', width=162, height=40, shortcut='O',
+                                        on_click=self.locate_objective), spacing=12)
+            detail = 'Keep an ally on the seal after consecutive enemy turns, with no adjacent foe. Losing control resets progress; rout also wins.'
         elif b.objective.kind == 'extract':
-            self.button('Locate exit', self.edge - 362, 109, 156, self.locate_objective, shortcut='O')
-            self.button('Evacuate', self.edge - 194, 109, 156, self.evacuate, shortcut='V',
-                        primary=True, enabled=b.evacuation_blocked_reason is None)
+            title = label(f'ESCAPE WITH CARGO · By round {b.objective.deadline}', size=12,
+                          color=GOLD, width=width - 336)
+            heading = Row(title, Button('Locate exit', width=156, height=40, shortcut='O', on_click=self.locate_objective),
+                          Button('Evacuate', width=156, height=40, shortcut='V', on_click=self.evacuate,
+                                 style=PRIMARY, enabled=b.evacuation_blocked_reason is None), spacing=12)
+            detail = 'Hero on an exit, no adjacent foes, unspent hero order; rout also wins.'
+        else:
+            heading = label('ROUT THE DEFENDERS', size=12, color=GOLD)
+            detail = 'Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.'
+        content = Column(heading, label(detail), spacing=8)
+        if b.objective.kind == 'extract':
+            content.add(label(b.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.',
+                              color=GOLD if b.evacuation_blocked_reason else TEAL))
+        return content
 
     def locate_objective(self):
         objective = self.battle.objective
@@ -1039,7 +1205,7 @@ class BattleScene(Screen):
 
     def update(self, dt):
         from eador.preferences import reading_scale
-        if self._reading_view != (self.hover, self.game.window_size, reading_scale(self.game)):
+        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
             self.refresh()
         self.clock += dt
         self.floats = [f for f in self.floats if self.clock - f[0] < 1.6]
@@ -1161,49 +1327,9 @@ class BattleScene(Screen):
                   size=25, serif=True, center=True)
         self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", header_center, 63, size=10, color=GOLD, center=True)
         self.rule(26, 90, self.edge - 52)
-        if b.objective.kind == "hold":
-            objective = b.objective
-            self.box(26, 100, self.edge - 52, 60)
-            self.text(f"HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}",
-                      38, 108, size=12, color=GOLD)
-            self.text("End enemy turns on the seal with no adjacent enemy; rout also wins.", 38, 137, size=10, color=MUTED)
-        elif b.objective.kind == 'extract':
-            self.box(26, 100, self.edge - 52, 88)
-            self.text(f'ESCAPE WITH CARGO · By round {b.objective.deadline}', 38, 111, size=12, color=GOLD)
-            self.text('Hero on an exit, no adjacent foes, unspent hero order; rout also wins.',
-                      38, 142, size=10, color=MUTED)
-            self.text(b.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.',
-                      38, 165, size=10, color=GOLD if b.evacuation_blocked_reason else TEAL)
-        else:
-            self.box(26, 100, self.edge - 52, 60)
-            self.text('ROUT THE DEFENDERS', 38, 108, size=12, color=GOLD)
-            self.text('Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.',
-                      38, 137, size=10, color=MUTED)
+        self.box(26, 100, self.edge - 52, self.objective_bottom - 100)
         self.text("COMMAND", x, 30, size=10, color=GOLD)
-        allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
-        enemies = sum(u.hp > 0 and u.team != "player" for u in b.units)
-        self.text(f"{allies} allies · {enemies} foes · Tab selects", x, 60, size=12, color=MUTED)
-        self.rule(x, 94, 300)
         selected = b.unit(self.selected) if self.selected is not None else None
-        if selected:
-            self.text(s.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name,
-                      x, 115, size=25, serif=True)
-            self.text(f"{selected.hp} / {selected.max_hp} HP", x, 154, size=13, color=TEAL)
-            self.bar(x, 181, 300, selected.hp, selected.max_hp)
-            self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 202, size=13)
-            penalties = ['Pinned'] if selected.pinned else []
-            if selected.cargo_penalty:
-                penalties.append(f'Cargo −{selected.cargo_penalty}')
-            movement = f"{'Fly' if selected.can_fly else 'Move'} {selected.effective_move_range}" + (f" ({', '.join(penalties)})" if penalties else '')
-            self.text(f"{movement}   Range {selected.attack_range}", x, 228, size=12, color=MUTED)
-            status = ("Guard +2" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
-                      "Can move" if selected.acted and b.reachable(selected.id) else
-                      "Spent" if selected.acted else "Moved" if selected.moved else "Ready")
-            self.text(status, x + 193, 155, size=12, color=GOLD)
-        self.rule(x, 292, 300)
-        self.text(f"SHARED MANA   /   {b.mana} REMAINING", x, 309, size=10, color=BLUE)
-        self.text('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else 'Spells spend the hero’s order.',
-                  x, 435, size=11, color=MUTED)
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
         reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting else set()
         targets = {u.id for u in self.action_targets()} if b.outcome is None else set()
@@ -1257,14 +1383,14 @@ class BattleScene(Screen):
                       selected=u.id == self.selected, spent=u.acted)
             with self.screen_layer(1):
                 if u.stance:
-                    self.draw_circle(cx + 30, cy - 17, 9, INK)
-                    self.text("B" if u.stance == "brace" else "G", cx + 30, cy - 24, size=10, color=GOLD, center=True)
+                    self.draw_circle(cx + 20, cy + 7, 9, INK)
+                    self.text("B" if u.stance == "brace" else "G", cx + 20, cy, size=10, color=GOLD, center=True)
                 if u.pinned:
-                    self.draw_circle(cx - 30, cy - 17, 9, INK)
-                    self.text("P", cx - 30, cy - 24, size=10, color=BLUE, center=True)
+                    self.draw_circle(cx - 20, cy + 7, 9, INK)
+                    self.text("P", cx - 20, cy, size=10, color=BLUE, center=True)
                 if u.pos in cloudy:
-                    self.draw_circle(cx + 32, cy + 7, 10, INK)
-                    for dx, dy in ((29, 7), (35, 7), (32, 3)):
+                    self.draw_circle(cx, cy + 7, 10, INK)
+                    for dx, dy in ((-3, 7), (3, 7), (0, 3)):
                         self.draw_circle(cx + dx, cy + dy, 4, BLUE)
                 self.draw_rect(cx - 29, cy + 29, 58, 16, INK, radius=3)
                 self.text(f"{u.hp}/{u.max_hp}", cx, cy + 29, size=10, center=True)
@@ -1277,12 +1403,7 @@ class BattleScene(Screen):
                 self.draw_rect(cx - 31, yy - 2, 62, 35, INK, radius=4)
                 self.text(f"{change:+}", cx, yy, size=23,
                           color=TEAL if change > 0 else RED, center=True)
-        self.rule(26, h - 122, self.edge - 52)
-        for i, line in enumerate(b.log[-3:]):
-            self.text(textwrap.shorten(line, width=105, placeholder="…"), 30, h - 102 + i * 24,
-                      size=11, color=MUTED)
-        self.text(self.message or ("Click a target for " + self.targeting if self.targeting else self.order_hint()),
-                  30, h - 26, size=11, color=GOLD)
+        self.rule(26, self.footer_top - 12, self.edge - 52)
 
 
 class SaveScene(Screen):

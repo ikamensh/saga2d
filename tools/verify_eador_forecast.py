@@ -1,4 +1,4 @@
-"""Read tactical consequences at both sizes while executing paid, saved battle routes."""
+"""Read tactical objectives and consequences while executing paid, saved battle routes."""
 import argparse
 import hashlib
 import json
@@ -49,12 +49,31 @@ class ForecastInput(PlayerInput):
                       'Smoke clears', 'Guard +2 defense', 'Saved rules allow', 'F targets', 'Attack ')
         category = next((part for part in categories if part in text), None)
         assert category is not None, text
-        if category in self.seen:
+        objective = scene.battle.objective
+        if objective.kind == 'hold':
+            title = next(line for line in labels if line.startswith('HOLD THE SEAL'))
+            assert f'{objective.progress}/{objective.required} turns' in title and f'By round {objective.deadline}' in title
+            assert 'Keep an ally on the seal after consecutive enemy turns, with no adjacent foe. Losing control resets progress; rout also wins.' in labels
+        elif objective.kind == 'extract':
+            assert f'ESCAPE WITH CARGO · By round {objective.deadline}' in labels
+            assert (scene.battle.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.') in labels
+        else:
+            assert 'Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.' in labels
+        objective_key = f'objective.{objective.kind}.{objective.progress}.{scene.battle.evacuation_blocked_reason}'
+        additions = {category, objective_key} - self.seen
+        if not additions:
             return
-        self.seen.add(category)
+        self.seen.update(additions)
         before = self.state.to_json()
         aim = scene.selected, scene.cursor, scene.hover, scene.targeting
         initial_window = self.game.window_size
+        # Complete events remain available in Battle log when its compact footer
+        # fills; changing the reading size may legitimately expose that link.
+        footer = set(scene.battle.log[-3:]) | {
+            scene.message or ('Click a target for ' + scene.targeting if scene.targeting else scene.order_hint()),
+            'Open the battle log to read the latest entries.',
+            'A complete battle message is available below.',
+        }
         for window in ((1280, 720), (1280, 800), (1920, 1080)):
             self.game.set_window_size(window)
             self.game.tick(1 / 60)
@@ -66,12 +85,16 @@ class ForecastInput(PlayerInput):
                 assert self.game.scene is scene and reading_scale(self.game) == percent
                 assert self.state.to_json() == before
                 assert (scene.selected, scene.cursor, scene.hover, scene.targeting) == aim
-                assert [c.text for c in scene.ui.walk() if isinstance(c, Label)] == labels
+                after_labels = [c.text for c in scene.ui.walk() if isinstance(c, Label)]
+                assert [s for s in after_labels if s not in footer] == [s for s in labels if s not in footer], (labels, after_labels)
                 check_reading_layout(scene)
-                self.layouts.append(dict(category=category, window=window, percent=percent, text=labels))
+                self.layouts.append(dict(category=category, objective=objective_key, new_cases=sorted(additions),
+                                         window=window, percent=percent, text=labels))
                 if window == (1280, 720):
                     name = ''.join(c if c.isalnum() else '-' for c in category).strip('-').lower()
                     super().capture(f'reading-{name}-{percent}', settle=False)
+                    if objective_key in additions:
+                        super().capture(f'objective-{len(self.seen)}-{objective.kind}-{percent}', settle=False)
         # Cancel an opposite setting at the queued target, then execute the route unchanged.
         super().press('f2'); super().press('left'); super().press('escape')
         assert reading_scale(self.game) == 125 and self.state.to_json() == before

@@ -60,8 +60,10 @@ or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
 Reading size offers 100/125% for the title, Codex, Field Guide, expedition briefings,
 Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival plans and campaign transitions/plans. Press **T** in these screens to open that setting directly.
-Battle forecasts use the same setting, opened with **F2** or **Text size** during battle.
-The shard and tactical HUD values and objective text keep their existing sizes.
+The map's campaign facts and battle objectives, unit facts, forecasts, guidance
+and history share this setting. **F2 / Text size** opens it on the map or in battle;
+**T** still retreats during battle. **L / Battle log** reads the complete history.
+Compact map/board markers, large titles and command buttons keep their normal sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
@@ -156,7 +158,9 @@ adds mana to support the two spells already learned.
 | Battle | Arrows / Page Up / Page Down | Aim at neighboring hexes (Page keys provide the other two diagonals) |
 | Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
 | Battle | F | Cycle enemies, or legal targets for the selected order |
-| Battle | F2 / Text size | Read larger target forecasts, then return to the same aimed order |
+| Map / Battle | F2 / Text size | Read larger game facts, then return to the same selection and aimed order |
+| Battle | L / Battle log | Read complete events without spending an order |
+| Battle | M / Read message | Read a complete message when it exceeds the footer |
 | Battle | 1 / 2, then click target | Hero Bolt / Heal with the selected Acolyte, otherwise the hero |
 | Battle | S, then F / click target / Enter | Exchange a Warden with an adjacent ally |
 | Battle | Q, then F / click target / Enter | Rally an adjacent Pinned ally with Militia |

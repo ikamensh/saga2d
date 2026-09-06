@@ -167,10 +167,7 @@ def verify(output, *, backend='pyglet', plan='western'):
             before=state.to_json();player.press('x')
             assert state.to_json()==before and isinstance(game.scene,ShardScene)
             player.reload(before)
-            hint = game.scene.ui.find(lambda item: isinstance(item, Label))
-            assert hint is not None
-            x, y, width, height = hint.bounds
-            assert x >= game.scene.edge and x + width <= game.width and y + height <= 423
+            check_reading_layout(game.scene)
             player.capture('aerie-reward-kept-once')
             changed=[name for name,digest in hashes.items() if hashlib.sha256((ROOT/name).read_bytes()).hexdigest()!=digest]
             assert not changed

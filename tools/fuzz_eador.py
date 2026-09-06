@@ -34,6 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from saga2d import Button# noqa: E402
 
 from eador.app import create_game# noqa: E402
+from eador.diagnostics import DiagnosticScene
 from eador.campaign_scene import CampaignPlanScene, CampaignScene  # noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.encounter_scene import EncounterScene  # noqa: E402
@@ -588,6 +589,11 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     button(rng.choice(('Save & title', 'Codex', 'Settings', 'Return to game', 'Return to game')))
                 elif isinstance(scene, SettingsScene):
                     press(rng.choice(('up', 'down', 'left', 'right', 'return', 'escape')))
+                elif isinstance(scene, DiagnosticScene):
+                    before = root().state.to_json()
+                    press(rng.choice(('left', 'right', 't', 'return', 'escape', 'a', 'g', 'f5', 'f9')))
+                    assert root().state.to_json() == before, 'Reading a message changed the campaign'
+                    metrics['message_reader_inputs'] += 1
                 elif isinstance(scene, EncounterScene):
                     press(rng.choice(('return', 'escape', 'c')))
                 elif isinstance(scene, CodexScene):
@@ -743,7 +749,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         metrics['replays'] += 1
                         break
                 elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene,
-                                        SettingsScene, EncounterScene, CampaignPlanScene, ReplacementScene)):
+                                        SettingsScene, EncounterScene, CampaignPlanScene, ReplacementScene, DiagnosticScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
                     press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))
