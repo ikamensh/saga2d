@@ -111,6 +111,11 @@ SITES = {
             AdventureApproach('clear', 'Clear the central lane', 'Spend 2 crystals to clear the central forest. Both armies gain the open firing lane; the cost is lost on retreat.',
                               'observatory_clear', crystals_cost=2),
         )),
+    'smuggler_screen': SiteSpec('Smuggler Screen', 'Rout the smugglers. Their Sapper screens firing lanes once per battle; their Warden can rescue a wounded ally.',
+        ('sapper', 'archer', 'archer', 'warden', 'guard'), 60, 2, 'veil_censer', 'screen_western', (
+            AdventureApproach('western', 'Form the western column', 'Free. Assemble west of the forest. The southern Guard can press a screened front line.', 'screen_western'),
+            AdventureApproach('northern', 'Assemble to the north', 'Free. Challenge the northern bowmen earlier, with less distance between your support and their crossfire.', 'screen_northern'),
+        )),
     'stranded_explorer': SiteSpec('Stranded Explorer', 'Recover a trail kit beyond the marsh, then regroup at the western exit by round 6, or rout the patrol.',
         ('pikeman', 'archer', 'guard', 'warden'), 55, 1, 'wayfarer_boots', 'explorer_north', (
             AdventureApproach('north', 'Assemble to the north', 'Free. The main force begins north of the return exit. Your hero and fifth troop, if present, start isolated east of the marsh.', 'explorer_north'),
