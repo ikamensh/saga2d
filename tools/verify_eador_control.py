@@ -16,7 +16,8 @@ sys.path.insert(0, str(ROOT))
 os.environ['SAGA2D_SILENT'] = '1'
 
 from eador.app import create_game
-from eador.scene import ResultScene, TitleScene
+from eador.model import State
+from eador.scene import ResultScene, ShardScene, TitleScene
 from tools.eador_control_campaign import prepare_control_watch, watch_control_route
 from tools.eador_extraction_campaign import crossing_route, prepare_adventure
 from tools.eador_ui import PlayerInput
@@ -78,7 +79,43 @@ def verify(output, *, backend='pyglet', scenario='smoke'):
         try:
             game.push(TitleScene(7))
             player.press('return')
-            if scenario == 'watch':
+            if scenario == 'sight':
+                prepare_control_watch(state)
+                archer = next(unit for unit in state.battle.units if unit.team == 'player' and unit.kind == 'archer')
+                target = next(unit for unit in state.battle.units if unit.team == 'enemy' and unit.kind == 'pikeman')
+                select(archer.id)
+                player.click(*game.scene.grid.center((-2, -1)))
+                assert archer.pos == (-2, -1) and not archer.acted
+                for _ in range(3):
+                    player.press('right')
+                assert game.scene.cursor == target.pos and not state.battle.has_sight(archer.pos, target.pos)
+                before = state.to_json()
+                player.capture('forest-blocked-shot-preview')
+                player.press('return')
+                assert state.to_json() == before
+                assert 'clear sight' in game.scene.message
+                player.capture('forest-blocked-shot-refused')
+                legacy = State.from_json((ROOT / 'tests/eador/fixtures/v10_pinned_crossing.json').read_text())
+                game.clear_and_push(ShardScene(legacy))
+                player.press('left')
+                assert state.battle.sight_rules == 'open'
+                player.capture('saved-open-sight-guidance')
+                if backend == 'mock':
+                    displayed = ' '.join(item['text'] for item in game.backend.texts)
+                    assert 'Saved rules allow ranged orders through terrain.' in displayed
+                    assert 'Forest and smoke block ranged orders.' not in displayed
+                select(3)
+                for key in ('right', 'right', 'up', 'up', 'up'):
+                    player.press(key)
+                target = next(unit for unit in state.battle.units if unit.pos == game.scene.cursor)
+                assert target in state.battle.targets(3)
+                damage, retaliation = state.battle.preview(3, target.id)
+                health, own_health = target.hp, state.battle.unit(3).hp
+                player.capture('saved-open-sight-attack-preview')
+                player.press('return')
+                assert target.hp == health - damage and state.battle.unit(3).hp == own_health - retaliation
+                player.reload(state.to_json())
+            elif scenario == 'watch':
                 prepare_control_watch(state)
                 play = watch_control_route(state, orders_type=ControlOrders)
                 assert state.battle.outcome_reason == 'hold' and state.battle.round == 3
@@ -202,6 +239,6 @@ def verify(output, *, backend='pyglet', scenario='smoke'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-control-orders'))
-    parser.add_argument('--scenario', choices=('smoke', 'rally', 'repulse', 'watch'), default='smoke')
+    parser.add_argument('--scenario', choices=('smoke', 'rally', 'repulse', 'watch', 'sight'), default='smoke')
     args = parser.parse_args()
     verify(args.output, scenario=args.scenario)
