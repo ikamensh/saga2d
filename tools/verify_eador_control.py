@@ -25,9 +25,9 @@ from tools.verify_eador_extraction import PlayerOrders
 
 
 class ControlOrders(PlayerOrders):
-    """Extend ordinary battle inputs with previewed finite control orders."""
+    """Extend ordinary battle inputs with exact displacement, Pin removal and finite screens."""
     def do(self, command, *args, **kwargs):
-        if command not in ('smoke', 'repulse'):
+        if command not in ('smoke', 'repulse', 'rally'):
             if command == 'move' and self.battle.unit(args[0]).can_fly:
                 self.select(args[0])
                 self.player.capture(f'round-{self.battle.round}-flight-reachable')
@@ -36,10 +36,10 @@ class ControlOrders(PlayerOrders):
         self.select(actor.id)
         before = self.state.to_json()
         forecast = getattr(self.battle, command + '_preview')(*args)
-        if command == 'repulse':
+        if command != 'smoke':
             target = self.battle.unit(args[1])
             target_before = asdict(target)
-        self.player.press('d' if command == 'smoke' else 'r')
+        self.player.press({'smoke': 'd', 'repulse': 'r', 'rally': 'q'}[command])
         pos = args[1] if command == 'smoke' else target.pos
         for _ in self.battle.terrain:
             if self.player.game.scene.cursor == pos:
@@ -50,9 +50,14 @@ class ControlOrders(PlayerOrders):
         self.player.press('return')
         if command == 'smoke':
             assert forecast in self.battle.smoke_clouds
-        else:
+        elif command == 'repulse':
             assert asdict(target) == {**target_before, 'pos': forecast}
-        assert actor.acted and command in actor.spent_abilities
+        else:
+            assert asdict(target) == {**target_before, 'pinned': False}
+            assert self.battle.reachable(target.id) == forecast.reachable
+        assert actor.acted and actor.moved
+        if command != 'rally':
+            assert command in actor.spent_abilities
         self.orders.append((command, args, kwargs))
         self.player.reload(self.state.to_json())
 
@@ -163,10 +168,11 @@ def verify(output, *, backend='pyglet', scenario='smoke'):
                 player.capture('rally-restored-route-forecast')
                 player.press('escape')
                 assert state.to_json() == before
-                player.press('q'); player.press('f'); player.press('return')
+                play = ControlOrders(state)
+                play.do('rally', militia.id, 0)
+                battle = state.battle
                 assert asdict(battle.unit(0)) == {**carrier, 'pinned': False}
                 assert battle.reachable(0) == forecast.reachable
-                player.reload(state.to_json())
                 select(0)
                 player.capture('rallied-carrier-keeps-order')
             else:
