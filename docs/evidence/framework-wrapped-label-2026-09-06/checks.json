@@ -57,5 +57,11 @@
     "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
     "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
     "tools/demo_wrapped_label.py": "a840e5e458957192bc29b6da41fd391e724aff3f92888fa4a977602eb2b6efbe"
+  },
+  "latest_integration": {
+    "revision": "c2bbb2c92f10ee0d4314bef2ac8f32e017b0471c",
+    "merged_main": "9d52700",
+    "full_suite_passed": 894,
+    "full_suite_seconds": 44.03
   }
 }
