@@ -457,6 +457,61 @@ def authored_comparison(args):
     print(f'{len(rows)} earned windows; {len(skipped)} excluded; {sum(len(row["branches"]) for row in rows)} branches')
 
 
+
+def tactical_control(args):
+    """A paid Smoke versus Guard choice, followed by the same automatic policy."""
+    original = json.loads(gzip.decompress(args.tactical_control_from.read_bytes()))
+    row = next(row for row in original['rows']
+               if row['case'] == [0, 'Commander', 'ruins', 'economy', 'standard', 'direct'])
+    branch = next(branch for branch in row['branches'] if branch['plan'] == 'sapper')
+    encounter = branch['fights'][branch['target_fight']]
+    state = State.from_json(json.dumps(encounter['initial']))
+    prefix = []
+    for _ in range(80):
+        before = state.to_json()
+        battle = state.battle
+        trace = battle.trace(battle.auto_turn)
+        smoke = next((event for event in trace.events if event.kind == 'smoke'
+                      and battle.unit(event.actor_id).team == 'player'), None)
+        if smoke:
+            clouds = set(smoke.after.smoke) - set(smoke.before.smoke)
+            assert len(clouds) == 1
+            position = next(iter(clouds))[0]
+            break
+        prefix.append(('auto_turn', ()))
+        if battle.outcome:
+            raise AssertionError('The retained earned Sapper never chose Smoke')
+    else:
+        raise AssertionError('The earned Smoke decision exceeded the battle bound')
+    branches = []
+    for command in ('smoke', 'guard'):
+        play = Orders(State.from_json(before))
+        args_order = (smoke.actor_id, position) if command == 'smoke' else (smoke.actor_id,)
+        getattr(play.state.battle, command)(*args_order)
+        saved = play.state.to_json()
+        assert State.from_json(saved).to_json() == saved
+        fight(play, 'auto')
+        # A second complete public continuation establishes repeatability of the
+        # explicit first order too, in addition to fight's per-phase saved replay.
+        repeat = Orders(State.from_json(before))
+        getattr(repeat.state.battle, command)(*args_order)
+        fight(repeat, 'auto')
+        assert play.fights == repeat.fights and play.state.to_json() == repeat.state.to_json()
+        branches.append(dict(command=command, args=args_order, first_order_state=json.loads(saved),
+                             fight=play.fights[-1], final=json.loads(play.state.to_json())))
+    assert json.loads(json.dumps(branches[0]['fight']['result'])) == encounter['result'], 'Manual Smoke did not reproduce the original paid result'
+    report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+                  input_report_sha256=hashlib.sha256(args.tactical_control_from.read_bytes()).hexdigest(),
+                  paid_case=row['case'], campaign_input=row['input'], investment_branch=branch,
+                  public_prefix=prefix, before=json.loads(before), branches=branches,
+                  original_phase_trace=[asdict(event) for event in trace.events],
+                  scope='Two explicit public choices at one actual paid Sapper decision; the same later automatic policy. '
+                        'The Smoke line exactly reproduces the measured original result. Guard is a legal order alternative, '
+                        'not a mutation removing an ability. No native or optimal-play claim.')
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    args.report.write_bytes(gzip.compress(json.dumps(report, separators=(',', ':')).encode(), mtime=0))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/early-conversion-prototype.json.gz')
@@ -467,7 +522,11 @@ def main():
     parser.add_argument('--modes', nargs='+', choices=('accessible', 'standard', 'challenge'))
     parser.add_argument('--target', choices=('authored', 'watch'), default='authored')
     parser.add_argument('--repeat', action='store_true', help='Repeat every complete branch as well as every saved tactical phase.')
+    parser.add_argument('--tactical-control-from', type=Path, help='Replay the earned Causeway Sapper Smoke/Guard decision from an authored report.')
     args = parser.parse_args()
+    if args.tactical_control_from:
+        tactical_control(args)
+        return
     if args.authored:
         authored_comparison(args)
         return
