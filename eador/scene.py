@@ -391,14 +391,16 @@ class ShardScene(Screen):
         self.rule(24, 90, self.edge - 48)
         header_center = (338 + self.edge - 177) / 2
         self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
-        self.text(f"{THEMES[s.theme].name.upper()}   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
+        self.text(f"{THEMES[s.theme].name.upper()}  /  SHARD {s.seed}  /  {s.rules.title.upper()}",
+                  header_center, 61, size=10, color=GOLD, center=True)
         self.text("WESTWATCH ENCIRCLED" if s.encircled else "YOUR DOMINION", x, 24,
                   size=10, color=RED if s.encircled else MUTED)
         self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
         self.text(f"{s.crystals} crystals", x + 160, 52, size=15, color=BLUE)
         self.text(f"Income +{s.income}   ·   Upkeep −{s.upkeep}   / turn", x, 84, size=11,
                   color=RED if s.upkeep_shortfall else MUTED)
-        self.rule(x, 112, 300)
+        self.text(f"Realm gold yield: {s.rules.gold_percent}% of base production", x, 102, size=9, color=MUTED)
+        self.rule(x, 120, 300)
         self.text(f"{s.hero.name}, the {s.hero.hero_class}", x, 132, size=21, serif=True)
         self.text(f"LEVEL {s.hero.level}  ·  {s.hero.xp} XP  ·  {s.actions_left} ACTIONS LEFT", x, 166, size=10, color=GOLD)
         self.text(f"Health {s.hero.hp}/{s.hero.max_hp}", x, 192, size=12, color=TEAL)
@@ -411,7 +413,7 @@ class ShardScene(Screen):
         self.text("SELECTED PROVINCE", x, 279, size=10, color=MUTED)
         self.text(p.name, x, 302, size=27, serif=True)
         province_income = 0 if s.encircled and p.pos == (-2, 0) else p.income
-        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  +{province_income} gold", x, 344,
+        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  {province_income} base gold", x, 344,
                   size=12, color=art.OWNERS[p.owner])
         if s.rival.army and self.selected == s.rival.pos:
             self.text(f"Expedition: {len(s.rival.army)} troops · V for strengths", x, 369, size=11, color=RED)
@@ -1300,9 +1302,14 @@ class HeroScene(Screen):
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
         self.box(x, y, 820, 732)
         self.text(hero.name, x + 28, y + 24, size=29, color=GOLD, serif=True)
+        self.text(f"{s.rules.title} realm", x + 566, y + 36, size=12, color=GOLD)
         self.text(f"Level {hero.level} {hero.hero_class}   ·   {hero.hp}/{hero.max_hp} health   ·   {hero.mana}/{hero.max_mana} mana",
                   x + 28, y + 68, size=12, color=MUTED)
-        self.rule(x + 28, y + 103, 764)
+        recovery = s.recovery_preview()
+        rest = (recovery.blocked_reason or
+                f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.")
+        self.text(rest, x + 28, y + 90, size=10, color=RED if recovery.blocked_reason else MUTED)
+        self.rule(x + 28, y + 112, 764)
         self.text("LEARNED DISCIPLINES", x + 28, y + 119, size=10, color=GOLD)
         if not hero.skill_ranks:
             self.paragraph("Win battles to gain experience. Each level lets you deepen a discipline or try the other path.",

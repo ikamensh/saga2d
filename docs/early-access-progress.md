@@ -465,3 +465,26 @@ economy/pacing, platform, candidate stress and human feedback remain open.
 G01–G19 remain incomplete. Three-mode difficulty is under model review and
 matched evaluation; its UI is next. Global text scaling, remaining authored
 patterns, campaign economy/pacing, platform checks and human feedback remain open.
+
+## Saved realm modes and honest economic readouts — 2026-09-06
+
+- Three title/CLI modes now select frozen, saved realm parameters. Old saves
+  acquire Standard metadata without replaying grants or changing live battles.
+  Map, Hero, Rival, save browser and linked briefings show the saved mode, actual
+  production modifier, capped recovery and model-owned expedition funding.
+- Native `3638b69` runs select all three modes, purchase and recover an army,
+  change the next-run choice and reload exact progress in fresh Games. Three
+  complete linked input journeys use 1,108 activations and 35 exact reloads;
+  Accessible also loses a realm, launches its funded recovery and completes.
+  [Source hashes, inputs and inspected images](evidence/shardbound-difficulty-2026-09-06/README.md)
+  preserve the scope. The combined source passes 958 tests and both games'
+  bounded fuzz checks.
+- The matched 32,400-run model audit finds Accessible's plans finish sooner
+  with fewer casualties on average. Challenge's sustain plan has a long mana
+  recovery tail, and every plan leaves excess crystals. Difficulty selection
+  is implemented; tuning and meaningful recurring resource sinks remain work
+  in progress. No difficulty or campaign policy entered Saga2D.
+
+G01–G19 remain incomplete. Larger guidance text and the eighth authored encounter
+are separate increments. Content depth, economy/pacing, candidate-specific
+stress, platforms and human feedback remain open.

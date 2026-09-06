@@ -79,7 +79,7 @@ class CampaignSaves:
                     entries.append(SaveEntry(slot, label, "Empty slot", backup_available=backup,
                                              backup_error=backup_error))
                     continue
-                detail = f"Turn {state.turn} · {state.hero.hero_class} · Shard {state.seed}"
+                detail = f"{state.rules.title} · Turn {state.turn} · {state.hero.hero_class} · Shard {state.seed}"
                 if state.campaign is not None:
                     detail = f"Stage {state.campaign.stage}/3 · {state.campaign.title} · {detail}"
                 if state.battle is not None:
