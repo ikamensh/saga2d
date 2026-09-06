@@ -188,7 +188,7 @@ unverified. See [the playtest log](eador-playtests.md) for feedback status.
 
 ## Integrated playable checkpoint — 2026-09-06
 
-The latest preserved Mac checkpoint is source `0e271756d35d` at
+The previous integrated Mac checkpoint is source `0e271756d35d` at
 `dist/shardbound-checkpoints/0e271756d35d/Shardbound-macos-arm64.zip`:
 **32,693,078 bytes**, SHA-256
 `c182ef2e1daf00633e0381441dfc02eeb4f95d6193fbdc2ef52dc05a6577a21c`.
@@ -197,6 +197,20 @@ text, with an updated player guide. [Manifest, launch report and inspected frame
 retain the extracted frozen and LaunchServices checks. The earlier playtest
 archive is unchanged. This remains local development evidence; the native
 source campaign matrix is not a full packaged campaign test.
+
+## Ten-family development checkpoint — 2026-09-06
+
+The latest preserved Mac checkpoint is source `56f1ffb1036b` at
+`dist/shardbound-checkpoints/56f1ffb1036b/Shardbound-macos-arm64.zip`:
+**32,734,895 bytes**, SHA-256
+`c8a8a2a5bb3c9fe7f026dd7dccfddd3e03a2d237496502dc5357678f8165d3e1`.
+It includes Aerie Raid, Smuggler Screen, troop replacement, Tower infusion and
+larger title, purchase, Hero, reward/result, save, rival and campaign reading.
+[Manifest, launch checks and inspected frames](evidence/shardbound-package-56f1ffb/README.md)
+record extracted-runtime and LaunchServices smoke with isolated saves/settings,
+all shipping audio and a local ad-hoc signature. This is a development checkpoint;
+full packaged-campaign, Windows, clean-account and human checks remain open.
+Earlier archives and the original pending playtest are unchanged.
 
 ## Windows x64 plan — untested
 

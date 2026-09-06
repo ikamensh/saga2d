@@ -9,29 +9,30 @@ the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Current playable checkpoint — 2026-09-06
 
-The preserved Mac development build is source **0e27175**. It includes the
-three-shard campaign, three saved difficulty modes, eight authored adventure
-families, ten recruitable roles, twelve relics, and 100/125 reading size for
-Codex, Guide and expedition briefings. [Exact artifact and native evidence](evidence/shardbound-integrated-0e27175/README.md)
+The preserved Mac development build is source **56f1ffb**. It includes the
+three-shard campaign, three saved difficulty modes, ten authored adventure
+families, ten recruitable roles, twelve relics, paid troop replacement, Tower
+infusion and 100/125 reading size for title, reference, purchase, choice, result,
+save, rival and campaign screens. [Exact artifact and verification](evidence/shardbound-package-56f1ffb/README.md)
 identify what is playable; all G01–G19 release gates remain incomplete.
 
-This source passes 1,041 tests and both games' bounded fuzz checks. Native
-mode/old-save, full Challenge recovery and four Explorer journeys pass 1,089
-inputs and 47 exact reloads. A separate 138-record guidance matrix covers every
-current approach at both reading sizes and all three supported window sizes.
-The extracted frozen app and macOS app-launch smoke pass with isolated saves,
-settings restart and all shipping audio assets. Screenshots were inspected.
+This source passes 1,142 tests and both games' bounded fuzz checks. The integrated
+Aerie failed-sortie/retry passes 664 native inputs and 65 exact reloads; the
+216-layout title matrix also passes. The separate campaign-reading increment
+retains 570 native layouts, 999 inputs and four exact reloads. These reports keep
+their actual source fingerprints rather than being relabeled as package tests.
 
-Source development after that packaged checkpoint adds readable purchase
-catalogues and Hero equipment, with an optional Tower infusion command. These
-changes are not in the preserved `0e27175` app. The next work concerns recurring
-economic choices, the ninth authored encounter and readable reward decisions.
-Resource surpluses, complete text scaling,
-human playtests, Windows/clean-account execution and candidate-specific stress
-remain open. The README's first framework example is now an asset-free runnable
-game; its mouse and keyboard controls were exercised with mock and native input.
-The changes above compose existing Saga2D primitives and add no strategy rules
-to the framework.
+The extracted frozen app and macOS app-launch smoke pass with isolated saves,
+settings restart and all shipping audio assets. Seven package screenshots were
+inspected. Full packaged-campaign play, tactical/HUD scaling, the remaining two
+authored families, meaningful recurring economic choices, human/listening
+feedback, Windows/clean-account execution and candidate-specific stress remain
+open. Valid very long save-path errors in the remaining review screens are
+being fixed separately and are not included in this preserved package.
+
+Saga2D now measures unattached UI trees using their eventual font/theme context;
+its independent runnable example verifies rendering and input ownership. Campaign,
+encounter, pagination and economy rules remain in Shardbound.
 
 ## Baseline audit — 2026-09-05
 
@@ -592,5 +593,5 @@ records 1,142 passing tests, both bounded fuzz checks and the native retries.
 G01–G19 remain incomplete. Tactical/HUD reading, the remaining two authored
 families, meaningful economy and pacing, oversized errors in remaining review
 screens, candidate stress, platform verification and human feedback remain active.
-A fresh Mac development package is being checked; previous artifacts retain
-their original source attribution and do not prove the current build.
+The fresh Mac development package at `56f1ffb` passes isolated extracted and
+LaunchServices smoke checks. Earlier artifacts retain their original attribution.

@@ -27,3 +27,11 @@ text. [Exact identity and verification](evidence/shardbound-integrated-0e27175/R
 are recorded. It is available for subsequent feedback; no new request or human
 observation is counted, and the original pending playtest remains attributable
 to its earlier artifact.
+
+## Available ten-family checkpoint — 2026-09-06
+
+The separately preserved `56f1ffb1036b` Mac build adds two encounters, troop
+replacement, Tower infusion and broader reading-size support.
+[Identity and verification](evidence/shardbound-package-56f1ffb/README.md) include
+isolated extracted and app-launch checks. It is available for feedback; no new
+request or human observation is counted. The original request remains pending.
