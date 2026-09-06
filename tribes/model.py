@@ -141,6 +141,7 @@ class Tribe:
     techs: set[Tech] = field(default_factory=set)
     explored: set[Pos] = field(default_factory=set)
     alive: bool = True
+    surrendered: bool = False
 
 
 @dataclass
@@ -260,14 +261,32 @@ class World:
         return pos in self.tribes[tribe].explored
 
     def score(self, tribe: int) -> int:
+        return sum(self.score_breakdown(tribe).values())
+
+    def score_breakdown(self, tribe: int, *, final: bool = False) -> dict[str, int]:
+        """Empire points, with victory and pace bonuses only for a finished game.
+
+        The live empire score still decides round-limit wins. Banking stars or
+        farming kills earns no extra points; end bonuses reward winning promptly.
+        Compare final scores on the same map size and with the same tribe count.
+        """
+        if final and self.winner is None:
+            raise RuleError("The game is not over")
         t = self.tribes[tribe]
+        cities = self.tribe_cities(tribe)
         territory = sum(1 for tile in self.all_tiles() if self.owner_of(tile.pos) == tribe)
-        return (
-            sum(100 * c.level + REWARD_PARK_SCORE * c.parks for c in self.tribe_cities(tribe))
-            + 20 * len(t.techs)
-            + sum(5 * u.info.cost for u in self.tribe_units(tribe))
-            + 5 * territory
-        )
+        parts = {
+            "Cities": sum(100 * c.level for c in cities),
+            "Parks": sum(REWARD_PARK_SCORE * c.parks for c in cities),
+            "Technology": 20 * len(t.techs),
+            "Army": sum(5 * u.info.cost for u in self.tribe_units(tribe)),
+            "Territory": 5 * territory,
+        }
+        if final:
+            won = self.winner == tribe
+            parts["Victory"] = 1000 if won else 0
+            parts["Early finish"] = 50 * max(0, MAX_ROUNDS - self.round) if won else 0
+        return parts
 
     # -- Setup -------------------------------------------------------------------
 
@@ -696,6 +715,47 @@ class World:
             unit.moved = unit.attacked = unit.done = False
             self.explore(tribe, unit.pos, self._vision(unit))
 
+    def surrender_reason(self, tribe: int) -> str | None:
+        """AI concedes only when it has neither an army nor a way to rebuild."""
+        t = self.tribes[tribe]
+        if t.human or not t.alive or self.winner is not None or self.tribe_units(tribe):
+            return None
+        if self.pending_rewards(tribe):
+            return None  # resolve rewards before judging the economy
+        cities = self.tribe_cities(tribe)
+        if cities and all(self.unit_at(city.pos) is not None for city in cities):
+            return "no army and every city occupied"
+        cheapest = min(info.cost for info in UNITS.values() if self.has_tech(tribe, info.tech))
+        remaining_income = max(0, MAX_ROUNDS - self.round) * self.income(tribe)
+        if not cities or t.stars + remaining_income < cheapest:
+            return "no army and cannot fund a unit before the round limit"
+        return None
+
+    def surrender(self, tribe: int) -> None:
+        """Concede an unrecoverable AI position, giving occupied cities to their occupiers."""
+        self._check_turn(tribe)
+        reason = self.surrender_reason(tribe)
+        if reason is None:
+            raise RuleError("This tribe can still fight or rebuild")
+        for city in self.tribe_cities(tribe):
+            occupant = self.unit_at(city.pos)
+            if occupant is not None:
+                city.tribe = occupant.tribe
+                city.capital = False
+                self.explore(occupant.tribe, city.pos, city.radius)
+            else:
+                # Nobody receives free unoccupied cities: they can be settled again.
+                for tile in self.all_tiles():
+                    if tile.owner_city == city.id:
+                        tile.owner_city = None
+                tile = self.tile(city.pos)
+                tile.city_id = None
+                tile.village = True
+                del self.cities[city.id]
+        self.tribes[tribe].surrendered = True
+        self.log.append(f"{self.tribes[tribe].name} surrendered: {reason}")
+        self._check_elimination()
+
     def _check_elimination(self) -> None:
         for t in self.tribes:
             if t.alive and not self.tribe_cities(t.id):
@@ -728,7 +788,8 @@ class World:
             ],
             "tribes": [
                 {"id": t.id, "name": t.name, "color": list(t.color), "human": t.human, "stars": t.stars,
-                 "techs": sorted(x.value for x in t.techs), "explored": sorted(t.explored), "alive": t.alive}
+                 "techs": sorted(x.value for x in t.techs), "explored": sorted(t.explored), "alive": t.alive,
+                 "surrendered": t.surrendered}
                 for t in self.tribes
             ],
             "cities": [vars(c) for c in self.cities.values()],
@@ -763,6 +824,7 @@ class World:
             t.techs = {Tech(v) for v in saved["techs"]}
             t.explored = {tuple(p) for p in saved["explored"]}
             t.alive = saved["alive"]
+            t.surrendered = saved.get("surrendered", False)
         for c in data["cities"]:
             world.cities[c["id"]] = City(**c)
         for u in data["units"]:

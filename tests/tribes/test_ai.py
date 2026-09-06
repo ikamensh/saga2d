@@ -49,6 +49,50 @@ def test_ai_stops_acting_once_it_has_won() -> None:
     assert world.winner == 0
 
 
+def test_surrounded_ai_without_an_army_surrenders_its_occupied_cities() -> None:
+    """An armyless AI cannot recruit under occupation, even with a full treasury."""
+    world = flat_world()
+    city = world.capital_of(0)
+    world.spawn_unit(1, UnitType.WARRIOR, city.pos)
+    world.tribes[0].stars = 100
+
+    ai.take_turn(world, 0, random.Random(1))
+
+    assert not world.tribes[0].alive
+    assert city.tribe == 1
+    assert world.winner == 1
+    assert any("surrendered" in line for line in world.log)
+    check_invariants(world)
+
+
+@pytest.mark.parametrize("round_number,stars,army,occupied,concedes", [
+    (1, 0, False, False, False),  # future income funds a recovery
+    (MAX_ROUNDS, 2, False, False, False),  # can recruit now
+    (MAX_ROUNDS, 1, False, False, True),  # no remaining income before the limit
+    (1, 0, True, True, False),  # surviving army can liberate the city
+])
+def test_ai_only_concedes_when_recovery_is_impossible(round_number, stars, army, occupied, concedes) -> None:
+    """Lack of cash alone is not defeat; remaining income and troops matter."""
+    world = flat_world()
+    world.round = round_number
+    world.tribes[0].stars = stars
+    city = world.capital_of(0)
+    if occupied:
+        world.spawn_unit(1, UnitType.WARRIOR, city.pos)
+    if army:
+        world.spawn_unit(0, UnitType.WARRIOR, (4, 4))
+
+    ai.take_turn(world, 0, random.Random(1))
+
+    assert world.tribes[0].surrendered == concedes
+    assert world.tribes[0].alive != concedes
+    if concedes:
+        assert world.city_at(city.pos) is None
+        assert world.tile(city.pos).village
+        assert world.owner_of(city.pos) is None
+    check_invariants(world)
+
+
 def test_ai_captures_the_village_it_stands_on() -> None:
     world = flat_world()
     world.tile((4, 4)).village = True

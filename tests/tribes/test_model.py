@@ -23,6 +23,27 @@ def flat_world(size: int = 10, tribes: int = 2) -> World:
     return world
 
 
+def test_final_score_explains_empire_and_rewards_only_fast_victories() -> None:
+    """The live score stays comparable; end bonuses are transparent and cannot reward waiting."""
+    world = flat_world()
+    with pytest.raises(RuleError, match="not over"):
+        world.score_breakdown(0, final=True)
+    unit = world.spawn_unit(0, UnitType.WARRIOR, world.capital_of(1).pos)
+    world.round = 12
+    world.capture(unit)
+    live = world.score(0)
+    result = world.score_breakdown(0, final=True)
+    assert sum(result.values()) > live
+    assert sum(value for name, value in result.items() if name not in ("Victory", "Early finish")) == live
+    assert world.score_breakdown(1, final=True)["Victory"] == world.score_breakdown(1, final=True)["Early finish"] == 0
+    restored = World.from_dict(world.to_dict())
+    assert restored.score_breakdown(0, final=True) == result
+    world.round += 1
+    assert sum(world.score_breakdown(0, final=True).values()) < sum(result.values())
+    world.round = 31  # round-limit sentinel represents 30 completed rounds
+    assert world.score_breakdown(0, final=True)["Early finish"] == 0
+
+
 # -- Movement -----------------------------------------------------------------------
 
 

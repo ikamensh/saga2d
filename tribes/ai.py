@@ -19,6 +19,11 @@ _UNREACHABLE = 10**6
 def take_turn(world: World, tribe: int, rng: random.Random) -> None:
     """Play the whole turn for *tribe* (which must be current), then end it."""
     assert world.current == tribe and world.winner is None
+    _choose_rewards(world, tribe)
+    if world.surrender_reason(tribe) is not None:
+        world.surrender(tribe)
+        world.end_turn()
+        return
     _research(world, tribe)
     _harvest(world, tribe)
     _choose_rewards(world, tribe)
