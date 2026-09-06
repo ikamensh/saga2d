@@ -1178,8 +1178,10 @@ def _validate_save(data: dict, version: int) -> None:
     if version >= 11:
         for team in ('player', 'enemy'):
             require(sum(cloud['expires_before_team'] == team for cloud in battle['smoke_clouds'])
-                    <= sum(unit['team'] == team and 'smoke' in unit['spent_abilities'] for unit in battle['units']),
-                    'Smoke requires a spent charge belonging to its team.')
+                    <= sum(unit['team'] == team and 'smoke' in unit['spent_abilities']
+                           and (team == 'enemy' or unit['acted'] and unit['moved'])
+                           for unit in battle['units']),
+                    'Smoke requires its team’s spent charge and current player order.')
     hero_unit = next(unit for unit in battle['units'] if unit['id'] == 0)
     if battle['outcome'] == 'player':
         if version >= 10 and battle['outcome_reason'] == 'escape':

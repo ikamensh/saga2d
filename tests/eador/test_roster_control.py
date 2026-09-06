@@ -223,3 +223,68 @@ def test_flying_policy_chooses_the_less_exposed_ranged_flank():
     battle.auto_turn()
     assert battle.unit(1001).hp < 20
     assert battle.grid.distance(battle.unit(0).pos, (0, 0)) > 1
+
+
+def test_repulse_respects_anchored_units_occupied_landings_and_board_edges():
+    """Every denied displacement preserves the charge, positions and orders."""
+    from eador.battle import BattleUnit
+    from eador.model import RuleError
+    import pytest
+    terrain = {(q, r): 'plains' for q in range(-3, 4) for r in range(-3, 4) if abs(q+r) <= 3}
+    for stance, actor_pos, target_pos, blocker in (
+        ('guard', (0, 0), (1, 0), None), ('brace', (0, 0), (1, 0), None),
+        (None, (0, 0), (1, 0), (2, 0)), (None, (2, 0), (3, 0), None),
+    ):
+        battle = Battle([
+            BattleUnit(0, 'player', 'adept', actor_pos, 28, 28, 6, 2, 3, 2, abilities=('repulse',)),
+            BattleUnit(1000, 'enemy', 'pikeman', target_pos, 28, 28, 9, 3, 2, 1, stance=stance),
+        ], terrain, 0, set(), hero_id=None)
+        if blocker:
+            battle.units.append(BattleUnit(1001, 'enemy', 'guard', blocker, 42, 42, 12, 4, 3, 1))
+        before = battle.to_dict()
+        assert battle.repulse_targets(0) == []
+        for command in (battle.repulse_preview, battle.repulse):
+            with pytest.raises(RuleError):
+                command(0, 1000)
+            assert battle.to_dict() == before
+
+
+def test_damaged_save_cannot_keep_player_smoke_while_refunding_its_order():
+    """A live player cloud belongs to a Smoke order spent in this player phase."""
+    import json
+    import pytest
+    from eador.model import State, SaveFormatError
+    state = State.new(7); state.build('market')
+    while state.gold < state.recruit_cost('sapper'):
+        state.end_turn()
+    state.recruit('sapper'); state.explore()
+    sapper = next(u for u in state.battle.units if u.can_smoke)
+    state.battle.smoke(sapper.id, sapper.pos)
+    original = state.to_json()
+    for corruption in ('charge', 'action', 'movement', 'team', 'duplicate', 'outside'):
+        data = json.loads(original)
+        source = next(u for u in data['battle']['units'] if u['id'] == sapper.id)
+        cloud = data['battle']['smoke_clouds'][0]
+        if corruption == 'charge': source['spent_abilities'] = []
+        elif corruption == 'action': source['acted'] = False
+        elif corruption == 'movement': source['moved'] = False
+        elif corruption == 'team': cloud['expires_before_team'] = 'enemy'
+        elif corruption == 'duplicate': data['battle']['smoke_clouds'].append(dict(cloud))
+        else: cloud['pos'] = [4, 0]
+        with pytest.raises(SaveFormatError):
+            State.from_json(json.dumps(data))
+    assert state.to_json() == original
+
+
+def test_recruitment_with_insufficient_crystals_is_atomic():
+    """Gold alone cannot purchase the new crystal-funded roles."""
+    from eador.model import State, RuleError
+    import pytest
+    state = State.new(7); state.build('temple')
+    while state.gold < state.recruit_cost('skyrider'):
+        state.end_turn()
+    state.crystals = state.recruit_crystal_cost('skyrider') - 1
+    before = state.to_json()
+    with pytest.raises(RuleError):
+        state.recruit('skyrider')
+    assert state.to_json() == before
