@@ -22,6 +22,7 @@ from eador.difficulty import DIFFICULTIES
 from eador.model import State, UNITS
 from eador.preferences import reading_scale
 from eador.scene import ShardScene, TitleScene
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import play_campaign
 from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
 from tools.eador_ui import PlayerInput
@@ -29,40 +30,41 @@ from tools.verify_eador_guidance import check_reading_layout
 
 
 @cache
-def prepared_transitions():
+def prepared_transitions(*, budget=None):
     """Win or lose actual linked worlds; legacy snapshots retain their own saved difficulty rules."""
+    budget = CpuBudget(25) if budget is None else budget
     cases = []
     for mode in DIFFICULTIES:
-        victory = play_stage(State.new_campaign(7, difficulty=mode))
+        victory = play_stage(State.new_campaign(7, difficulty=mode), budget=budget)
         assert victory.campaign.phase == 'departure'
         cases.append((mode + '-departure', victory.to_json()))
-        lost = lose_shard(State.new_campaign(7, difficulty=mode))
+        lost = lose_shard(State.new_campaign(7, difficulty=mode), budget=budget)
         assert lost.campaign.phase == 'recovery'
         cases.append((mode + '-recovery', lost.to_json()))
     rich = State.new_campaign(0)
     route = [rich.hero.pos] + [p for p in sorted(rich.provinces) if p not in (rich.hero.pos, (2, 0))] + [(2, 0)]
-    rich = play_campaign(rich, route)
+    rich = play_campaign(rich, route, budget=budget)
     assert rich.campaign.phase == 'departure' and len(rich.inventory) > 6
     cases.append(('eight-earned-relics', rich.to_json()))
     for middle, finale in (('rootward', 'gate'), ('foundries', 'throne')):
         state = State.from_json(dict(cases)['standard-departure'])
         state.advance(middle, **travel_selection(state))
         if middle == 'foundries':
-            lose_shard(state)
+            lose_shard(state, budget=budget)
             cases.append(('foundries-recovery', state.to_json()))
             state.recover(**travel_selection(state))
-        state = play_stage(state)
+        state = play_stage(state, budget=budget)
         assert state.campaign.phase == 'departure'
         cases.append((middle + '-departure', state.to_json()))
         state.advance(finale, **travel_selection(state))
-        state = play_stage(state)
+        state = play_stage(state, budget=budget)
         assert state.campaign.phase == 'completed'
         cases.append((finale + '-completed', state.to_json()))
     declined = State.from_json(dict(cases)['standard-recovery'])
     declined.abandon_campaign()
     cases.append(('recovery-declined', declined.to_json()))
     lost = State.from_json(dict(cases)['foundries-recovery'])
-    lost.recover(); lose_shard(lost)
+    lost.recover(); lose_shard(lost, budget=budget)
     assert lost.campaign.phase == 'lost' and lost.campaign.recovery_used
     cases.append(('second-capital-loss', lost.to_json()))
     old_cases = json.loads((ROOT / 'tests/eador/fixtures/v12_challenge1_ui_cases.json').read_text())['cases']
@@ -120,10 +122,11 @@ def check_transition(scene):
     return count
 
 
-def verify_reflow(player):
+def verify_reflow(player, *, budget=None):
     """Keep actual selected relics and the first row; Space follows visible focus after font/size reflow."""
+    budget = CpuBudget(25) if budget is None else budget
     game = player.game
-    state = State.from_json(dict(prepared_transitions())['eight-earned-relics'])
+    state = State.from_json(dict(prepared_transitions(budget=budget))['eight-earned-relics'])
     before = state.to_json()
     game.clear_and_push(ShardScene(state)); game.tick(1 / 60)
     for key in ('t', 'left', 'return', '1', 'right'):
@@ -131,6 +134,7 @@ def verify_reflow(player):
     scene = game.scene
     first, last = scene.visible_items[1][0], scene.visible_items[1][-1]
     for _ in range(len(scene.visible_items[1]) - 1):
+        budget.checkpoint()
         player.press('down')
     player.press('space')
     assert last in scene.relic_ids
@@ -147,21 +151,23 @@ def verify_reflow(player):
     for key in ('t', 'left', 'escape'):
         player.press(key)
     for size in ((1920, 1080), (1280, 720)):
+        budget.checkpoint()
         game.set_window_size(size); game.tick(1 / 60)
         assert scene.visible_items[1][0] == anchor and scene.relic_ids == {first, last}
         check_transition(scene)
     assert state.to_json() == before
 
 
-def verify_long_error(output, *, backend='pyglet'):
+def verify_long_error(output, *, backend='pyglet', budget=None):
     """Use a valid long nested path, then read every diagnostic page and return to the same retinue."""
+    budget = CpuBudget(25) if budget is None else budget
     with TemporaryDirectory(prefix='campaign-reading-review-') as directory:
         saves = Path(directory)
         for index in range(7):
             saves /= 'ordinary-directory-name-' + str(index) + '-' + 'a' * 70
         saves.mkdir(parents=True)
         occupied = saves / 'save_1.json'; occupied.mkdir()
-        state = play_stage(State.new_campaign())
+        state = play_stage(State.new_campaign(), budget=budget)
         before = state.to_json()
         game = create_game(backend=backend, visible=False, save_dir=saves)
         player = PlayerInput(game, native=backend == 'pyglet', output=output)
@@ -177,6 +183,7 @@ def verify_long_error(output, *, backend='pyglet'):
             assert (scene.troop_ids, scene.relic_ids) == selected and state.to_json() == before
             parts = []
             while True:
+                budget.checkpoint()
                 check_reading_layout(scene)
                 labels = scene.ui.find_all(lambda item: isinstance(item, Label))
                 part = next(label.text for label in labels if label.style.text_color == (228, 130, 112, 255))
@@ -201,10 +208,11 @@ def verify_long_error(output, *, backend='pyglet'):
             return dict(path_characters=len(str(saves)), diagnostic_characters=sum(map(len, parts)),
                         pages=len(parts), input_activations=len(player.events), exact_save_reloads=1)
         finally:
-            game._teardown()
+            game.close()
 
 
-def verify(output, *, backend='pyglet'):
+def verify(output, *, backend='pyglet', budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     native, matrix = backend == 'pyglet', []
     verified_reloads = 0
@@ -213,10 +221,12 @@ def verify(output, *, backend='pyglet'):
         game = create_game(backend=backend, visible=False, save_dir=saves)
         player = PlayerInput(game, native=native, output=output)
         try:
+            cases = prepared_transitions(budget=budget)
             for size in ((1280, 720), (1280, 800), (1920, 1080)):
                 game.set_window_size(size)
                 for percent in (100, 125):
-                    for name, snapshot in prepared_transitions():
+                    for name, snapshot in cases:
+                        budget.checkpoint()
                         state = State.from_json(snapshot)
                         game.clear_and_push(ShardScene(state)); game.tick(1 / 60)
                         for key in ('t', 'left' if percent == 100 else 'right', 'return'):
@@ -224,6 +234,7 @@ def verify(output, *, backend='pyglet'):
                         page_texts = []
                         page_count = game.scene.prose_pages if game.scene.step != 'retinue' else 1
                         for page in range(page_count):
+                            budget.checkpoint()
                             matrix.append(dict(case=name, step=game.scene.step, rules_id=state.rules_id, percent=percent,
                                                window=game.window_size, page=page, labels=check_transition(game.scene)))
                             page_texts.extend(item.text for item in game.scene.ui.find_all(lambda item: isinstance(item, Label)))
@@ -249,6 +260,7 @@ def verify(output, *, backend='pyglet'):
                                 player.press('left' if column == 0 else 'right')
                                 items = list(game.scene.items(column))
                                 for index, item in enumerate(items):
+                                    budget.checkpoint()
                                     scene = game.scene
                                     assert scene.cursors[column] == index
                                     matrix.append(dict(case=name, step='retinue', percent=percent, window=game.window_size,
@@ -261,7 +273,8 @@ def verify(output, *, backend='pyglet'):
                         assert state.to_json() == snapshot and not saves.exists()
             # Exercise saved callbacks, complete filesystem errors and post-error return in the native backend too.
             for name in ('standard-departure', 'foundries-recovery', 'throne-completed'):
-                snapshot = dict(prepared_transitions())[name]
+                budget.checkpoint()
+                snapshot = dict(cases)[name]
                 state = State.from_json(snapshot)
                 game.clear_and_push(ShardScene(state)); game.tick(1 / 60)
                 saves.mkdir(exist_ok=True)
@@ -270,6 +283,7 @@ def verify(output, *, backend='pyglet'):
                 page_texts = []
                 page_count = game.scene.prose_pages if game.scene.step != 'retinue' else 1
                 for page in range(page_count):
+                    budget.checkpoint()
                     check_transition(game.scene)
                     page_texts.extend(item.text for item in game.scene.ui.find_all(lambda item: isinstance(item, Label)))
                     player.capture(f'{name}-save-error-125-page-{page + 1}')
@@ -300,11 +314,11 @@ def verify(output, *, backend='pyglet'):
                 # Keep each directory-error attempt isolated without deleting saved evidence.
                 for path in saves.iterdir():
                     path.unlink()
-            verify_reflow(player)
+            verify_reflow(player, budget=budget)
             events, reloads = len(player.events), player.reloads + verified_reloads
         finally:
-            game._teardown()
-    long_error = verify_long_error(output, backend=backend)
+            game.close()
+    long_error = verify_long_error(output, backend=backend, budget=budget)
     report = dict(backend=backend, layouts=len(matrix), input_activations=events + long_error['input_activations'],
                   exact_save_reloads=reloads + long_error['exact_save_reloads'], long_error=long_error, matrix=matrix)
     (output / 'matrix.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -312,9 +326,19 @@ def verify(output, *, backend='pyglet'):
     return report
 
 
-if __name__ == '__main__':
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-campaign-reading'))
     parser.add_argument('--backend', choices=('mock', 'pyglet'), default='pyglet')
-    args = parser.parse_args()
-    verify(args.output, backend=args.backend)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.output, backend=args.backend, budget=budget)
+
+
+if __name__ == '__main__':
+    main()

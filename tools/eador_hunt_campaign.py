@@ -4,9 +4,9 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure
 
 
-def prepare_pack_hunt(hero='Commander', *, support='ranger', state=None):
-    state = prepare_adventure(hero, 'elderwild', support=support, state=state)
-    return _recover_at_hunt(state)
+def prepare_pack_hunt(hero='Commander', *, support='ranger', state=None, budget=None):
+    state = prepare_adventure(hero, 'elderwild', support=support, state=state, budget=budget)
+    return _recover_at_hunt(state, budget=budget)
 
 
 def prepare_hunt_spears(state=None):
@@ -20,12 +20,12 @@ def prepare_hunt_spears(state=None):
     return _recover_at_hunt(state)
 
 
-def _recover_at_hunt(state):
+def _recover_at_hunt(state, *, budget=None):
     for _ in range(32):
-        march_to(state, (-1, 1))
+        march_to(state, (-1, 1), budget=budget)
         if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the Pack Hunt with a recovered purchased army')
 
 
