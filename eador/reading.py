@@ -67,7 +67,10 @@ def reading_text_pages(text: str, available: float, *, measure: Callable[[str], 
             raise ValueError('A reading character does not fit in the available height.')
         if low < len(text) and not text[low].isspace():
             boundary = next((index + 1 for index in range(low - 1, -1, -1) if text[index].isspace()), 0)
-            if boundary and text[:boundary].strip():
+            word_end = next((index for index in range(low, len(text)) if text[index].isspace()), len(text))
+            # A token taller than a page must split anyway; do not strand its
+            # short introduction on an otherwise empty preceding page.
+            if boundary and text[:boundary].strip() and measure(text[boundary:word_end]) <= available:
                 low = boundary
         pages.append(text[:low])
         text = text[low:]
