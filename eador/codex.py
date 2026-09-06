@@ -248,7 +248,7 @@ class CodexScene(Screen):
                     gold, crystals, relic = ((attempt.gold, attempt.crystals, attempt.relic) if current
                                              else (spec.gold + option.bonus_gold, spec.crystals, spec.relic))
                     fee = f"{option.gold_cost} gold" + (f" / {option.crystals_cost} crystals" if option.crystals_cost else "")
-                    reward = f"{gold} gold / {crystals} crystals" + (f" / {RELICS[relic].name}" if relic else "")
+                    reward = f"{gold} gold / {crystals} crystal{'s' if crystals != 1 else ''}" + (f" / {RELICS[relic].name}" if relic else "")
                     facts = ((f"Current attempt · Paid at entry: {fee} · Saved reward: {reward}") if current
                              else f"Entry fee: {fee} · Base reward: {reward}")
                     description = option.description + f" Evacuate by round {ENCOUNTERS[option.encounter].deadline}, or rout all defenders."

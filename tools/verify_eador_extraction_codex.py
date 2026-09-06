@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ['SAGA2D_SILENT'] = '1'
 
 from eador.app import create_game
-from eador.codex import CodexScene
+from eador.codex import CodexScene, PAGE_SIZE
 from eador.model import State
 from eador.scene import ShardScene
 from tools.eador_extraction_campaign import AdventureOrders, crossing_route, prepare_adventure, prepared_crossing
@@ -52,9 +52,11 @@ def verify(output):
                 player.capture(label + '-escape-orders')
                 if label in ('guided', 'full-cache'):
                     player.button('Sites')
-                    player.press('end')
-                    if label == 'guided':
-                        player.button('Previous')
+                    # Source additions can move a recorded approach to a new page.
+                    while not any(entry.facts.startswith('Current attempt') for entry in game.scene.entries[
+                            game.scene.page * PAGE_SIZE:(game.scene.page + 1) * PAGE_SIZE]):
+                        assert game.scene.page + 1 < game.scene.pages, 'The saved approach is absent from the reference'
+                        player.button('Next')
                     assert game.scene.category == 4
                     player.capture(label + '-approaches')
                 if label == 'ready':
