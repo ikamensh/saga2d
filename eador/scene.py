@@ -1153,15 +1153,15 @@ class ChoiceScene(Screen):
 
     def refresh(self):
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 400, self.game.height / 2 - 235
+        self.x, self.y = self.game.width / 2 - 400, self.game.height / 2 - 275
         for i, option in enumerate(self.root.state.choice.options):
             self.button("Choose this path" if self.root.state.choice.kind == "skill" else "Choose reward",
-                        self.x + 28 + i * 382, self.y + 310, 362,
+                        self.x + 28 + i * 382, self.y + 390, 362,
                         lambda option=option: self.choose(option.id), shortcut=str(i + 1), primary=True)
-        self.button("Hero & relics", self.x + 28, self.y + 405, 174,
+        self.button("Hero & relics", self.x + 28, self.y + 485, 174,
                     self.hero_details, hotkey="H")
-        self.button("Saves", self.x + 612, self.y + 405, 160, self.browse_saves, hotkey="F6")
-        self.button("Codex", self.x + 216, self.y + 405, 154, self.root.codex, shortcut="C")
+        self.button("Saves", self.x + 612, self.y + 485, 160, self.browse_saves, hotkey="F6")
+        self.button("Codex", self.x + 216, self.y + 485, 154, self.root.codex, shortcut="C")
 
     def choose(self, option_id):
         kind = self.root.state.choice.kind
@@ -1193,17 +1193,19 @@ class ChoiceScene(Screen):
     def draw(self):
         x, y, choice = self.x, self.y, self.root.state.choice
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
-        self.box(x, y, 800, 470)
+        self.box(x, y, 800, 550)
         self.text("A TURN IN YOUR STORY", x + 28, y + 24, size=10, color=MUTED)
-        self.text(choice.title, x + 28, y + 51, size=30, serif=True, color=GOLD)
+        if choice.kind == 'relic':
+            art.relic(self, x + 56, y + 75, choice.context)
+        self.text(choice.title, x + (98 if choice.kind == 'relic' else 28), y + 51, size=30, serif=True, color=GOLD)
         self.paragraph(choice.description, x + 28, y + 104, width=744, size=12)
         for i, option in enumerate(choice.options):
             left = x + 28 + i * 382
-            self.box(left, y + 157, 362, 197)
+            self.box(left, y + 157, 362, 277)
             self.paragraph(option.name, left + 18, y + 177, width=326, size=17, color=TEXT)
             self.paragraph(option.description, left + 18, y + 229, width=326, size=12)
         self.paragraph(self.message or "Choose before taking your next campaign action. Your decision is saved automatically.",
-                       x + 28, y + 370, width=744, size=10, color=GOLD if self.message else MUTED)
+                       x + 28, y + 450, width=744, size=10, color=GOLD if self.message else MUTED)
 
 
 class HeroScene(Screen):
@@ -1221,17 +1223,17 @@ class HeroScene(Screen):
 
     def refresh(self):
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 410, self.game.height / 2 - 326
+        self.x, self.y = self.game.width / 2 - 410, self.game.height / 2 - 366
         x, y, s = self.x, self.y, self.root.state
         for i, relic in enumerate(s.inventory[self.page * 4:self.page * 4 + 4]):
             equipped = s.hero.relic == relic
-            self.button("Equipped" if equipped else "Equip", x + 637, y + 260 + i * 75, 152,
+            self.button("Equipped" if equipped else "Equip", x + 637, y + 260 + i * 95, 152,
                         lambda relic=relic: self.equip(relic), shortcut=str(i + 1), enabled=not equipped)
         self.button("Unequip", x + 637, y + 208, 152, self.unequip, shortcut="U", enabled=s.hero.relic is not None)
-        self.button("Previous", x + 28, y + 589, 138, self.previous_page, enabled=self.page > 0)
-        self.button("Next", x + 177, y + 589, 110, self.next_page, enabled=self.page + 1 < self.pages)
-        self.button("Close", x + 650, y + 589, 140, self.game.pop, hotkey="Esc")
-        self.button("Codex", x + 449, y + 589, 170, self.root.codex, shortcut="C")
+        self.button("Previous", x + 28, y + 669, 138, self.previous_page, enabled=self.page > 0)
+        self.button("Next", x + 177, y + 669, 110, self.next_page, enabled=self.page + 1 < self.pages)
+        self.button("Close", x + 650, y + 669, 140, self.game.pop, hotkey="Esc")
+        self.button("Codex", x + 449, y + 669, 170, self.root.codex, shortcut="C")
 
     def previous_page(self):
         self.page = max(0, self.page - 1)
@@ -1254,7 +1256,7 @@ class HeroScene(Screen):
         x, y, s = self.x, self.y, self.root.state
         hero = s.hero
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
-        self.box(x, y, 820, 652)
+        self.box(x, y, 820, 732)
         self.text(hero.name, x + 28, y + 24, size=29, color=GOLD, serif=True)
         self.text(f"Level {hero.level} {hero.hero_class}   ·   {hero.hp}/{hero.max_hp} health   ·   {hero.mana}/{hero.max_mana} mana",
                   x + 28, y + 68, size=12, color=MUTED)
@@ -1273,14 +1275,15 @@ class HeroScene(Screen):
             self.paragraph("Explore sites and choose to keep their treasures. Equipment can change the spells, movement and economy available to your hero.",
                            x + 28, y + 274, width=580, size=13)
         for i, relic in enumerate(s.inventory[self.page * 4:self.page * 4 + 4]):
-            top = y + 260 + i * 75
-            self.text(RELICS[relic].name, x + 28, top, size=15, color=TEAL if hero.relic == relic else TEXT)
-            self.paragraph(RELICS[relic].description, x + 28, top + 25, width=586, size=11)
+            top = y + 260 + i * 95
+            art.relic(self, x + 52, top + 26, relic, scale=.8)
+            self.text(RELICS[relic].name, x + 91, top, size=15, color=TEAL if hero.relic == relic else TEXT)
+            self.paragraph(RELICS[relic].description, x + 91, top + 25, width=523, size=11)
         self.paragraph(self.message or (f'Rank limits: hero {s.hero_level_cap}, troops {s.troop_level_cap}. XP pauses at the limit. '
                                        'Change equipment between battles.' if s.campaign else
                                        "Find relics in adventure sites. Change equipment between battles."),
-                       x + 28, y + 557, width=744, size=10, color=GOLD if self.message else MUTED)
-        self.text(f"{self.page + 1} / {self.pages}", x + 332, y + 602, size=12, color=MUTED)
+                       x + 28, y + 637, width=744, size=10, color=GOLD if self.message else MUTED)
+        self.text(f"{self.page + 1} / {self.pages}", x + 332, y + 682, size=12, color=MUTED)
 
 
 class ResultScene(Screen):
