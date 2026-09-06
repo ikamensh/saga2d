@@ -164,3 +164,62 @@ def test_flight_crosses_an_occupied_screen_but_pin_and_brace_still_counter_it():
     battle.attack(0, 1000)
     assert (target_before-battle.unit(1000).hp, attacker_before-battle.unit(0).hp) == forecast
     assert forecast[1] > 0 and not battle.reachable(0)
+
+
+def test_auto_control_clears_the_carriers_exit_before_the_hero_spends_its_action():
+    """Support acts before ID-ordered hero magic when it can immediately enable evacuation."""
+    from eador.battle import BattleUnit, BattleObjective
+    terrain = {(q, r): 'plains' for q in range(-3, 4) for r in range(-3, 4) if abs(q+r) <= 3}
+    battle = Battle([BattleUnit(0, 'player', 'hero', (0, 0), 30, 30, 10, 3, 3, 1),
+                     BattleUnit(1, 'player', 'adept', (1, -1), 28, 28, 6, 2, 3, 2, abilities=('repulse',)),
+                     BattleUnit(1000, 'enemy', 'guard', (1, 0), 42, 42, 12, 4, 3, 1)],
+                    terrain, 12, {'bolt'}, objective=BattleObjective('extract', deadline=8, exits=((0, 0),)))
+    battle.auto_turn()
+    assert battle.outcome_reason == 'escape' and battle.unit(1000).hp == 42
+    assert battle.unit(1).spent_abilities == ('repulse',) and battle.mana == 12
+
+
+def test_auto_rally_restores_an_unspent_escape_route_but_never_refills_cargo():
+    """A reserve clears Pin before the carrier moves; full cargo still costs one movement."""
+    from eador.battle import BattleUnit, BattleObjective
+    terrain = {(q, r): 'plains' for q in range(-3, 4) for r in range(-3, 4) if abs(q+r) <= 3}
+    battle = Battle([BattleUnit(0, 'player', 'hero', (0, 0), 30, 30, 10, 3, 3, 1, pinned=True, cargo_penalty=1),
+                     BattleUnit(1, 'player', 'militia', (-1, 0), 24, 24, 8, 2, 3, 1, abilities=('rally',)),
+                     BattleUnit(1000, 'enemy', 'archer', (-3, 3), 20, 20, 8, 1, 3, 3)],
+                    terrain, 12, {'bolt'}, objective=BattleObjective('extract', deadline=8, exits=((2, 0),)))
+    assert battle.rally_preview(1, 0).move_range == 2
+    battle.auto_turn()
+    assert battle.outcome_reason == 'escape' and battle.unit(1).acted
+    assert battle.unit(0).cargo_penalty == 1 and not battle.unit(0).pinned
+
+
+def test_automatic_smoke_uses_one_real_screen_and_enemy_cloud_lasts_into_player_turn():
+    """Both policies spend a finite charge; enemy smoke survives until that enemy team next begins."""
+    from eador.battle import BattleUnit
+    terrain = {(q, r): 'plains' for q in range(-3, 4) for r in range(-3, 4) if abs(q+r) <= 3}
+    battle = Battle([BattleUnit(1, 'enemy', 'sapper', (-1, 1), 26, 26, 7, 2, 3, 1, abilities=('smoke',)),
+                     BattleUnit(2, 'enemy', 'militia', (-1, 0), 24, 24, 8, 2, 3, 1),
+                     BattleUnit(1000, 'player', 'archer', (1, 0), 20, 20, 8, 1, 3, 3),
+                     BattleUnit(1001, 'player', 'goblin', (1, 1), 16, 16, 6, 1, 3, 2)],
+                    terrain, 0, set(), hero_id=None)
+    battle.guard(1000); battle.guard(1001); battle.end_turn()
+    assert battle.unit(1).spent_abilities == ('smoke',)
+    assert len(battle.smoke_clouds) == 1 and battle.smoke_clouds[0].expires_before_team == 'enemy'
+    clone = Battle.from_dict(battle.to_dict())
+    battle.end_turn(); clone.end_turn()
+    assert battle.to_dict() == clone.to_dict() and battle.smoke_clouds == []
+    assert battle.unit(1).spent_abilities == ('smoke',)
+
+
+
+def test_flying_policy_chooses_the_less_exposed_ranged_flank():
+    """Equal attack access should not send a fragile flyer into the nearest spear point."""
+    from eador.battle import BattleUnit
+    terrain = {(q, r): 'plains' for q in range(-3, 4) for r in range(-3, 4) if abs(q+r) <= 3}
+    battle = Battle([BattleUnit(0, 'player', 'skyrider', (-3, 1), 28, 28, 10, 2, 4, 1, abilities=('fly',)),
+                     BattleUnit(1000, 'enemy', 'pikeman', (0, 0), 28, 28, 9, 3, 2, 1, stance='brace'),
+                     BattleUnit(1001, 'enemy', 'archer', (0, 2), 20, 20, 8, 1, 3, 3)],
+                    terrain, 0, set(), hero_id=None)
+    battle.auto_turn()
+    assert battle.unit(1001).hp < 20
+    assert battle.grid.distance(battle.unit(0).pos, (0, 0)) > 1
