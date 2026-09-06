@@ -9,6 +9,18 @@ the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Current playable checkpoint — 2026-09-06
 
+Current source adds [Runebound Causeway](eador-causeway.md), bringing authored
+pattern coverage to **12/12**. Final source `1a20e54` passes **1,188 tests**;
+seven native plans pass 1,645 inputs and 93 exact reloads, including actual
+Tower infusion, a deadline loss and manual wounded retry. Independent review
+compares 3,000 complete worlds and reproduces 806 exact command/save reloads.
+The site and shared placement/reward handling stay game-owned. Its retained
+source-specific checks include 300 random campaigns, 10,009 random scene
+inputs, Tribes fuzz and the complete briefing matrix. Counts do not close G05
+or prove balance, enjoyment or first-time comprehension. Ordered battle
+playback is still undergoing final isolated checks. The archive below predates
+Causeway and contains eleven patterns.
+
 The preserved Mac development build is clean source **c8ec2e2**. It includes
 three linked shards, three difficulty modes, eleven authored adventure patterns,
 ten recruitable roles, twelve relics, paid troop replacement, Tower infusion,
@@ -50,8 +62,10 @@ Shardbound. This packaging increment adds no framework API.
 The [resource attribution study](eador-resource-breakpoints.md) reconciles 27
 unchanged campaigns and 10,762 real detached quotes. Earlier investments compete
 for money, but the tested later policies stop buying while income continues.
-No unproven tax or currency sink was added. The twelfth encounter and ordered
-enemy-action feedback are isolated work in progress, outside this archive.
+No unproven tax or currency sink was added. Causeway's earned arrival also
+demonstrates a local crystals-versus-time infusion choice; recurring late-game
+economic depth remains open. Ordered enemy-action feedback is isolated work
+in progress, outside this archive.
 Meaningful recurring economic choices, human/listening feedback, clean-account
 and Windows execution, the remaining complete display/content acceptance and
 candidate-specific sustained stress remain open.

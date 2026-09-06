@@ -248,8 +248,8 @@ cheaper Heal. **H** shows learned effects.
 Sites have different defending parties, rewards and objectives. Ordinary
 guarded ruins sit alongside authored adventures such as Border Watch,
 Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory,
-Stranded Explorer, Smuggler Screen, Aerie Raid and Relief Column. The Codex describes the current catalogue and its
-saved rewards.
+Stranded Explorer, Smuggler Screen, Aerie Raid, Relief Column and Runebound
+Causeway. The Codex describes the current catalogue and its saved rewards.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
 defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of twelve
@@ -305,8 +305,17 @@ western assembly, or occupy the useful landing cells with a larger party.
 Both assemblies are free. Its reward varies by shard and is shown before
 entry; an unchanged ordinary site offers the same reward elsewhere. After a
 failed attempt, defeated enemies stay gone and survivors keep their wounds;
-a lost veteran needs a fresh paid replacement. There are eleven authored
-encounter patterns so far.
+a lost veteran needs a fresh paid replacement.
+
+Ruins' Runebound Causeway asks you to extract cargo through a guarded marsh
+by round five, or rout the defenders. Its free western assembly leaves room
+to focus the Rune Adept, anchor your carrier with Guard, or occupy its Repulse
+landing. A Warden can deliver an unspent hero to the northeastern exit;
+attacking, casting or Guarding spends the action needed to Evacuate. Prepare
+mana before entry: Tower infusion can buy time at the cost of crystals and
+one campaign action. The saved reward has an unchanged ordinary source
+elsewhere, and defeated defenders stay gone on retry. There are twelve
+authored encounter patterns so far.
 
 | Building | Cost | Benefit |
 |---|---|---|
