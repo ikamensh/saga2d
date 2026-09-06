@@ -1,0 +1,155 @@
+[
+  {
+    "name": "initial",
+    "fullscreen": false,
+    "window_size": [
+      1280,
+      800
+    ],
+    "framebuffer_size": [
+      2560,
+      1600
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 4
+  },
+  {
+    "name": "small",
+    "fullscreen": false,
+    "window_size": [
+      960,
+      600
+    ],
+    "framebuffer_size": [
+      1920,
+      1200
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 8
+  },
+  {
+    "name": "letterboxed",
+    "fullscreen": false,
+    "window_size": [
+      1000,
+      800
+    ],
+    "framebuffer_size": [
+      2000,
+      1600
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 12
+  },
+  {
+    "name": "os-resized",
+    "fullscreen": false,
+    "window_size": [
+      940,
+      720
+    ],
+    "framebuffer_size": [
+      1880,
+      1440
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 16
+  },
+  {
+    "name": "fullscreen",
+    "fullscreen": true,
+    "window_size": [
+      1440,
+      1280
+    ],
+    "framebuffer_size": [
+      2880,
+      2560
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 20
+  },
+  {
+    "name": "restored",
+    "fullscreen": false,
+    "window_size": [
+      940,
+      720
+    ],
+    "framebuffer_size": [
+      1880,
+      1440
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 24
+  },
+  {
+    "name": "size-exits-fullscreen",
+    "fullscreen": false,
+    "window_size": [
+      1280,
+      800
+    ],
+    "framebuffer_size": [
+      2560,
+      1600
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 28
+  },
+  {
+    "name": "fullscreen-start",
+    "fullscreen": true,
+    "window_size": [
+      1440,
+      1280
+    ],
+    "framebuffer_size": [
+      2880,
+      2560
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 4
+  },
+  {
+    "name": "fullscreen-start-restored",
+    "fullscreen": false,
+    "window_size": [
+      1280,
+      800
+    ],
+    "framebuffer_size": [
+      2560,
+      1600
+    ],
+    "logical_canvas": [
+      1280,
+      800
+    ],
+    "button_hits": 8
+  }
+]

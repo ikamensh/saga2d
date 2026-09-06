@@ -1,0 +1,460 @@
+{
+  "actions": {
+    "auto_rounds": 61,
+    "battle_reading_cancel": 30,
+    "battle_save_load": 30,
+    "battles_resolved": 29,
+    "browser_save_load": 14,
+    "button": 29,
+    "choice_save_load": 29,
+    "click": 75,
+    "hero_Commander": 4,
+    "hero_Scout": 4,
+    "hero_Warrior": 4,
+    "hero_Wizard": 3,
+    "key": 730,
+    "manual_moves": 30,
+    "reading_100": 8,
+    "reading_125": 7,
+    "relic_choices": 15,
+    "restart": 15,
+    "seed_10": 2,
+    "seed_11": 2,
+    "seed_12": 2,
+    "seed_13": 2,
+    "seed_14": 1,
+    "seed_7": 2,
+    "seed_8": 2,
+    "seed_9": 2,
+    "skill_choices": 14,
+    "wait": 1402,
+    "watched_playbacks": 61
+  },
+  "all_game_modules_from_snapshot": true,
+  "architecture": "arm64",
+  "backend": "PygletBackend",
+  "cleanup": {
+    "awake_helper_exited": true,
+    "temporary_saves_removed": true,
+    "window_closed": true
+  },
+  "completed_journeys": 14,
+  "elapsed_seconds": 583.2510057920008,
+  "error": "Traceback (most recent call last):\n  File \"/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/tools/soak_eador.py\", line 336, in soak\n    time.sleep(remaining)\n    ~~~~~~~~~~^^^^^^^^^^^\n  File \"/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/tools/soak_eador.py\", line 96, in cancel_run\n    raise KeyboardInterrupt(signal.Signals(signum).name)\nKeyboardInterrupt: SIGINT\n",
+  "finished_utc": "2026-09-06T13:42:32.171258+00:00",
+  "fps_cap": 60,
+  "frames": 31064,
+  "game_framework_last_change": "219bcf94136db9cd0fe2ac81f7e8a636be657e60",
+  "gl_renderer": "Apple M4",
+  "gl_vendor": "Apple",
+  "gl_version": "4.1 Metal - 90.5",
+  "hw.memsize": "25769803776",
+  "hw.model": "Mac16,13",
+  "input_interval_seconds": 0.25,
+  "last_actions": [
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattleScene",
+      "key",
+      "A"
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ]
+  ],
+  "latency": {
+    "max_ms": 297.55916696740314,
+    "p50_ms": 12.881416507298127,
+    "p95_ms": 27.44128394697325,
+    "p99_ms": 47.84317761834233,
+    "samples": 31064
+  },
+  "latency_byte_order": "little",
+  "latency_file": "latency-ms.f64",
+  "latency_measurement": "Game.tick only: input dispatch, updates and real rendering; excludes pacing, driver setup, screenshots and report I/O",
+  "loaded_game_modules": {
+    "eador": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/__init__.py",
+    "eador.app": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/app.py",
+    "eador.art": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/art.py",
+    "eador.battle": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/battle.py",
+    "eador.battle_playback_scene": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/battle_playback_scene.py",
+    "eador.battle_trace": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/battle_trace.py",
+    "eador.campaign": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/campaign.py",
+    "eador.content": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/content.py",
+    "eador.difficulty": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/difficulty.py",
+    "eador.encounters": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/encounters.py",
+    "eador.model": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/model.py",
+    "eador.persistence": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/persistence.py",
+    "eador.preferences": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/preferences.py",
+    "eador.reading": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/reading.py",
+    "eador.rival": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/rival.py",
+    "eador.rival_scene": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/rival_scene.py",
+    "eador.scene": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/scene.py",
+    "eador.settings_scene": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/settings_scene.py",
+    "eador.sight": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/sight.py",
+    "eador.sound": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/sound.py",
+    "eador.style": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/style.py",
+    "eador.worldgen": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/eador/worldgen.py",
+    "saga2d": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/__init__.py",
+    "saga2d._fileio": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/_fileio.py",
+    "saga2d._scene_stack": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/_scene_stack.py",
+    "saga2d.actions": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/actions.py",
+    "saga2d.animation": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/animation.py",
+    "saga2d.assets": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/assets.py",
+    "saga2d.audio": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/audio.py",
+    "saga2d.backends": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/backends/__init__.py",
+    "saga2d.backends.base": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/backends/base.py",
+    "saga2d.backends.pyglet_backend": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/backends/pyglet_backend.py",
+    "saga2d.game": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/game.py",
+    "saga2d.hexgrid": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/hexgrid.py",
+    "saga2d.input": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/input.py",
+    "saga2d.rendering": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/__init__.py",
+    "saga2d.rendering._text": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/_text.py",
+    "saga2d.rendering.camera": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/camera.py",
+    "saga2d.rendering.layers": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/layers.py",
+    "saga2d.rendering.particles": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/particles.py",
+    "saga2d.rendering.shapes": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/shapes.py",
+    "saga2d.rendering.sprite": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/rendering/sprite.py",
+    "saga2d.save": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/save.py",
+    "saga2d.scene": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/scene.py",
+    "saga2d.settings": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/settings.py",
+    "saga2d.synth": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/synth.py",
+    "saga2d.ui": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/ui/__init__.py",
+    "saga2d.ui.base": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/ui/base.py",
+    "saga2d.ui.components": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/ui/components.py",
+    "saga2d.ui.layout": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/ui/layout.py",
+    "saga2d.ui.theme": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/ui/theme.py",
+    "saga2d.util": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/util/__init__.py",
+    "saga2d.util.collision": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/util/collision.py",
+    "saga2d.util.reactive": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/util/reactive.py",
+    "saga2d.util.timer": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/util/timer.py",
+    "saga2d.util.tween": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-candidate-playback/dist/soak/candidate-219bcf9-20260906/source/saga2d/util/tween.py"
+  },
+  "machdep.cpu.brand_string": "Apple M4",
+  "memory": {
+    "comparison_windows_disjoint": true,
+    "first_window_elapsed_seconds": [
+      60.01244845800102,
+      120.02356599998893,
+      180.02533416700317,
+      240.03673316695495,
+      300.04035766696325
+    ],
+    "first_window_mean_bytes": 280136908.8,
+    "first_window_samples": 5,
+    "growth_bytes": -11714560.0,
+    "growth_percent": -4.181726731468805,
+    "last_window_elapsed_seconds": [
+      360.0530703329714,
+      420.055127916974,
+      480.0605161669664,
+      540.0602425419493,
+      583.2510057920008
+    ],
+    "last_window_mean_bytes": 268422348.8,
+    "last_window_samples": 5,
+    "peak_sampled_rss_bytes": 318160896,
+    "process_peak_rss_bytes": 326402048
+  },
+  "pid": 86443,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "requested_seconds": 7200.0,
+  "resolution": [
+    1280,
+    800
+  ],
+  "rss_samples": [
+    {
+      "elapsed_seconds": 5.00003807246685e-07,
+      "frames": 0,
+      "rss_bytes": 129269760,
+      "window_latency": {}
+    },
+    {
+      "elapsed_seconds": 60.01244845800102,
+      "frames": 3261,
+      "rss_bytes": 318160896,
+      "window_latency": {
+        "max_ms": 181.65099999168888,
+        "p50_ms": 11.064374994020909,
+        "p95_ms": 21.67095901677385,
+        "p99_ms": 44.66797477798545,
+        "samples": 3261
+      }
+    },
+    {
+      "elapsed_seconds": 120.02356599998893,
+      "frames": 6335,
+      "rss_bytes": 274743296,
+      "window_latency": {
+        "max_ms": 235.2794170146808,
+        "p50_ms": 14.897749992087483,
+        "p95_ms": 29.73710181831848,
+        "p99_ms": 57.223136819666244,
+        "samples": 3074
+      }
+    },
+    {
+      "elapsed_seconds": 180.02533416700317,
+      "frames": 8963,
+      "rss_bytes": 279805952,
+      "window_latency": {
+        "max_ms": 229.18949997983873,
+        "p50_ms": 19.14029152248986,
+        "p95_ms": 33.600537391612306,
+        "p99_ms": 85.9138400916709,
+        "samples": 2628
+      }
+    },
+    {
+      "elapsed_seconds": 240.03673316695495,
+      "frames": 11685,
+      "rss_bytes": 287948800,
+      "window_latency": {
+        "max_ms": 169.31041702628136,
+        "p50_ms": 19.103104015812278,
+        "p95_ms": 32.0285767520545,
+        "p99_ms": 63.94711390545121,
+        "samples": 2722
+      }
+    },
+    {
+      "elapsed_seconds": 300.04035766696325,
+      "frames": 14725,
+      "rss_bytes": 240025600,
+      "window_latency": {
+        "max_ms": 297.55916696740314,
+        "p50_ms": 14.980687003117055,
+        "p95_ms": 30.192283089854733,
+        "p99_ms": 57.465013132896615,
+        "samples": 3040
+      }
+    },
+    {
+      "elapsed_seconds": 360.0530703329714,
+      "frames": 18091,
+      "rss_bytes": 259948544,
+      "window_latency": {
+        "max_ms": 199.67187498696148,
+        "p50_ms": 12.239875009981915,
+        "p95_ms": 21.317260718205944,
+        "p99_ms": 48.78288123582016,
+        "samples": 3366
+      }
+    },
+    {
+      "elapsed_seconds": 420.055127916974,
+      "frames": 21518,
+      "rss_bytes": 267354112,
+      "window_latency": {
+        "max_ms": 176.56845902092755,
+        "p50_ms": 12.299207970499992,
+        "p95_ms": 19.29902489646338,
+        "p99_ms": 38.215469069545925,
+        "samples": 3427
+      }
+    },
+    {
+      "elapsed_seconds": 480.0605161669664,
+      "frames": 25040,
+      "rss_bytes": 271138816,
+      "window_latency": {
+        "max_ms": 137.5119580188766,
+        "p50_ms": 8.074771001702175,
+        "p95_ms": 15.480907962773923,
+        "p99_ms": 28.006513709551644,
+        "samples": 3522
+      }
+    },
+    {
+      "elapsed_seconds": 540.0602425419493,
+      "frames": 28518,
+      "rss_bytes": 268632064,
+      "window_latency": {
+        "max_ms": 109.58375001791865,
+        "p50_ms": 10.87585449567996,
+        "p95_ms": 17.298010693048127,
+        "p99_ms": 32.841682508005775,
+        "samples": 3478
+      }
+    },
+    {
+      "elapsed_seconds": 583.2510057920008,
+      "frames": 31064,
+      "rss_bytes": 275038208,
+      "window_latency": {
+        "max_ms": 97.03962499042973,
+        "p50_ms": 6.772375025320798,
+        "p95_ms": 15.331312737544067,
+        "p99_ms": 24.653170496458205,
+        "samples": 2546
+      }
+    }
+  ],
+  "scene_frames": {
+    "BattlePlaybackScene": 20923,
+    "BattleScene": 2696,
+    "CatalogScene": 737,
+    "ChoiceScene": 977,
+    "HelpScene": 152,
+    "HeroScene": 366,
+    "ResultScene": 150,
+    "SaveScene": 761,
+    "SettingsScene": 1200,
+    "ShardScene": 2169,
+    "TitleScene": 933
+  },
+  "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, both reading sizes, natural ordered battle playback and battle settings cancellation in one persistent hidden Pyglet window; silent audio driver. Wait steps are not input activations. Not full campaigns or human playtesting.",
+  "source_commit": "219bcf94136db9cd0fe2ac81f7e8a636be657e60",
+  "source_manifest": "manifest.json",
+  "source_snapshot_unchanged": true,
+  "started_utc": "2026-09-06T13:32:47.983200+00:00",
+  "status": "cancelled",
+  "temporary_save_directory": "/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-soak-saves-kuwvv79_",
+  "two_hour_duration_satisfied": false,
+  "window_pixels": [
+    2560,
+    1600
+  ]
+}
