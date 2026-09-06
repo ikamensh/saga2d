@@ -92,10 +92,9 @@ class RivalScene(Screen):
             label(rival_order(state), 25, width=1064, color=TEXT, serif=True, scaled=False),
             label(f'At {state.provinces[rival.pos].name} · {len(rival.army)} surviving troops', 12, width=1064), spacing=10)
         footer = label(self.message, 12, width=1064, color=GOLD) if self.message else None
-        self.ui.add(Column(heading, *([footer] if footer else [])))
-        body_y = self.y + 24 + heading.get_preferred_size()[1] + 20
+        body_y = self.y + 24 + self.measure(heading)[1] + 20
         bottom = self.y + 672
-        footer_y = bottom - 18 - footer.get_preferred_size()[1] if footer else bottom
+        footer_y = bottom - 18 - self.measure(footer)[1] if footer else bottom
         available = footer_y - 20 - body_y
 
         costs = ' / '.join(f'{UNITS[kind].name} {cost}' for kind, cost in RECRUIT_COSTS.items())
@@ -112,8 +111,7 @@ class RivalScene(Screen):
                             label(f'Income +{rival.income(state)} · Upkeep −{rival.upkeep} / turn'),
                             label(f'Refits at Duskspire: {costs} gold. Healing costs 1 gold per health restored.', 11),
                             label(advice), spacing=16)
-        self.ui.add(operations)
-        if operations.get_preferred_size()[1] > available:
+        if self.measure(operations)[1] > available:
             raise ValueError(f'Rival operations do not fit at {scale:.0%}')
         if rival.army:
             force_heading = label('SURVIVING EXPEDITION', 11, color=RED)
@@ -125,11 +123,10 @@ class RivalScene(Screen):
                 row = Row(portrait, Column(details, bar, spacing=6), spacing=12)
                 rows.append(row)
                 self._troop_art.append((portrait, bar, troop))
-            self.ui.add(Column(force_heading, *rows))
             ids = [troop.id for troop in rival.army]
             anchor = ids.index(self.visible_troops[0]) if self.visible_troops else 0
-            packed, self.page = reading_pages([row.get_preferred_size()[1] for row in rows],
-                                              available - force_heading.get_preferred_size()[1] - 12,
+            packed, self.page = reading_pages([self.measure(row)[1] for row in rows],
+                                              available - self.measure(force_heading)[1] - 12,
                                               anchor=anchor, spacing=10)
             self._page_troops = [tuple(ids[index] for index in page) for page in packed]
             visible = packed[self.page]
@@ -140,8 +137,7 @@ class RivalScene(Screen):
             force = Column(label('Its expedition is broken.', 25, color=TEAL, serif=True, scaled=False),
                            label("The rival must buy a new army. Advance on Duskspire while it remusters; "
                                  "the capital's garrison is a separate force.", 14), spacing=16)
-            self.ui.add(force)
-            if force.get_preferred_size()[1] > available:
+            if self.measure(force)[1] > available:
                 raise ValueError(f'Rival defeat advice does not fit at {scale:.0%}')
         self.ui.clear()
         self.ui.add(Column(heading, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 24))))
