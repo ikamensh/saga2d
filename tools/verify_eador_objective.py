@@ -11,6 +11,7 @@ os.environ["SAGA2D_SILENT"] = "1"
 
 from eador.app import create_game
 from eador.encounter_scene import EncounterScene
+from tools.eador_ui import PlayerInput
 from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
 
 
@@ -19,37 +20,8 @@ def verify(output, *, backend="pyglet"):
     with TemporaryDirectory(prefix="shardbound-watch-") as directory:
         game = create_game("Shardbound Watch verification", resolution=(1280, 800), backend=backend,
                     visible=False, save_dir=Path(directory) / "saves")
-        if backend == "pyglet":
-            from pyglet.window import key, mouse
-            window = game.backend.window
-
-        def press(name):
-            if backend == "mock":
-                game.backend.inject_key(name)
-                game.backend.inject_key(name, type="key_release")
-            else:
-                symbol = getattr(key, {"return": "ENTER"}.get(name, "_" + name if name.isdigit() else name.upper()))
-                window.dispatch_event("on_key_press", symbol, 0)
-                window.dispatch_event("on_key_release", symbol, 0)
-            game.tick(1 / 60)
-
-        def click(x, y):
-            if backend == "mock":
-                game.backend.inject_click(round(x), round(y))
-                game.backend.inject_release(round(x), round(y))
-            else:
-                scale = min(window.width / game.width, window.height / game.height)
-                px = (window.width - game.width * scale) / 2 + x * scale
-                py = (window.height - game.height * scale) / 2 + (game.height - y) * scale
-                window.dispatch_event("on_mouse_press", round(px), round(py), mouse.LEFT, 0)
-                window.dispatch_event("on_mouse_release", round(px), round(py), mouse.LEFT, 0)
-            game.tick(1 / 60)
-
-        def capture(name):
-            for _ in range(110 if isinstance(game.scene, BattleScene) else 1):
-                game.tick(1 / 60)  # Let transient damage labels settle; model turns do not advance.
-            if backend == "pyglet":
-                game.backend.capture_frame().save(output / f"{name}.png")
+        player = PlayerInput(game, native=backend == 'pyglet', output=output)
+        press, click, capture = player.press, player.click, player.capture
 
         def root():
             return next(scene for scene in game.scenes if isinstance(scene, ShardScene))

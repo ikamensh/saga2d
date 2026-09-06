@@ -1342,6 +1342,9 @@ class BattleScene(Screen):
     def _unit_center(self, unit):
         return self.grid.center(unit.pos)
 
+    def _unit_layer(self, unit):
+        return 0
+
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
@@ -1404,9 +1407,11 @@ class BattleScene(Screen):
             cx, cy = self._unit_center(u)
             if u.id in targets:
                 self.draw_circle(cx, cy + 7, 25, TEAL if self.targeting in ('heal', 'swap', 'rally') else RED)
-            art.piece(self, cx, cy - 1, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, self.grid.size / 43),
-                      selected=u.id == self.selected, spent=u.acted)
-            with self.screen_layer(1):
+            layer = self._unit_layer(u)
+            with self.screen_layer(layer):
+                art.piece(self, cx, cy - 1, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, self.grid.size / 43),
+                          selected=u.id == self.selected, spent=u.acted)
+            with self.screen_layer(layer + 1):
                 if u.stance:
                     self.draw_circle(cx + 20, cy + 7, 9, INK)
                     self.text("B" if u.stance == "brace" else "G", cx + 20, cy, size=10, color=GOLD, center=True)

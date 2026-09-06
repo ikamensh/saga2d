@@ -108,7 +108,8 @@ class BattlePlaybackScene(BattleScene):
                  label(event.text, 15, TEXT)]
         if event.actor_id is not None:
             unit = self.battle.unit(event.actor_id)
-            lines.append(label(f'{unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL))
+            side = "Enemy" if unit.team == "enemy" else "Your"
+            lines.append(label(f'{side} {unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL))
         lines.extend([label('Watch each move, ability and reaction in order.'),
                       label('Space, Enter or Esc finishes playback. Battle orders resume afterward.'),
                       label('Saves record the resolved turn. Loading resumes after these actions.', 11)])
@@ -132,6 +133,12 @@ class BattlePlaybackScene(BattleScene):
 
     def _unit_center(self, unit):
         return self.playback.position(unit, self.grid, still=reduced_motion(self.game))
+
+    def _unit_layer(self, unit):
+        event = self.playback.event
+        if not reduced_motion(self.game) and event.before.unit(unit.id).pos != event.after.unit(unit.id).pos:
+            return 2
+        return 0
 
     def _announce(self):
         shown = self.playback.index, self.playback.applied
@@ -177,5 +184,6 @@ class BattlePlaybackScene(BattleScene):
     def finish(self):
         if not self.finished:
             self.finished = True
+            self.parent.message = self.message
             self.game.pop()
             self.parent.finish_phase()

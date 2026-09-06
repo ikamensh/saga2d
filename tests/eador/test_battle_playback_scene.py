@@ -24,7 +24,9 @@ def test_enemy_playback_is_read_only_and_visible_finish_restores_ordinary_contro
             player.press(key)
         player.click(*game.scene.grid.center((0, 0)))
         assert player.state.to_json() == resolved
-        player.press('space')
+        for key in ('space', 'a', 't'):
+            game.backend.inject_key(key)
+        game.tick(1/60)
         assert type(game.scene) is BattleScene and player.state.to_json() == resolved
     finally:
         game._teardown()
@@ -193,3 +195,24 @@ def test_the_earned_native_equivalent_chain_preserves_each_frame_and_the_hold_re
     report = verify(tmp_path, backend='mock', scenario='hold', still=True, scale=125)
     assert any(item['event'] == 'objective' for item in report['observed'])
     assert report['exact_save_reloads'] >= 3
+
+
+def test_manual_save_acknowledgement_survives_finishing_playback(tmp_path):
+    """A successful save in the modal must not reveal an obsolete failure after Finish."""
+    from eador.persistence import AUTO_SLOTS
+    state = relief_before_rally()
+    for slot in AUTO_SLOTS:
+        (tmp_path / f'save_{slot}.json').write_bytes(b'damaged autosave')
+    game = create_game(backend='mock', save_dir=tmp_path)
+    try:
+        game.push(ShardScene(state)); game.tick(1/60)
+        player = PlayerInput(game, finish_actions=False); player.press('e')
+        assert 'Autosave failed' in game.scene.message
+        before = state.to_json(); player.press('f5')
+        assert 'Saved to Manual 1' in game.scene.message
+        player.press('space')
+        assert type(game.scene) is BattleScene and state.to_json() == before
+        assert 'Saved to Manual 1' in game.scene.message
+        assert game.scene.saves.load(1).to_json() == before
+    finally:
+        game._teardown()

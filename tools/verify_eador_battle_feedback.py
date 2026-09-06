@@ -48,7 +48,7 @@ def watch(player, report, *, output, overlays=False):
         stamp = (playback.index, playback.applied)
         if stamp not in seen:
             seen.add(stamp)
-            report.append(dict(tick=tick, event=event.kind, index=playback.index,
+            report.append(dict(phase=output.name, tick=tick, event=event.kind, index=playback.index,
                                applied=playback.applied, text=event.text,
                                actor=event.actor_id, target=event.target_id))
         if player.native and tick % 3 == 0:
@@ -65,7 +65,9 @@ def watch(player, report, *, output, overlays=False):
     if frames:
         (output / 'timing.json').write_text(json.dumps(frames, indent=2) + '\n')
     player.reload(resolved)
-    return frames
+    return dict(phase=output.name, events=len(scene.playback.trace.events), ticks=tick,
+                game_seconds=round(tick / 60, 3), frame_samples=len(frames),
+                outcome=player.state.battle.outcome, outcome_reason=player.state.battle.outcome_reason)
 
 
 class WatchedOrders(ControlOrders):
@@ -78,8 +80,9 @@ class WatchedOrders(ControlOrders):
         self.player.press('e')
         assert self.state.to_json() == expected.to_json()
         self.orders.append((command, args, kwargs))
-        watch(self.player, self.player.observed, output=self.player.output / f'phase-{len(self.orders)}',
-              overlays=not self.player.observed)
+        self.player.batches.append(watch(
+            self.player, self.player.observed, output=self.player.output / f'phase-{len(self.orders)}',
+            overlays=not self.player.observed))
 
 
 def verify(output, *, backend='pyglet', scenario='rally', still=False, scale=100):
@@ -93,7 +96,7 @@ def verify(output, *, backend='pyglet', scenario='rally', still=False, scale=100
     with TemporaryDirectory(prefix='shardbound-feedback-') as temporary:
         game = create_game(backend=backend, visible=False, save_dir=Path(temporary) / 'saves')
         player = PlayerInput(game, native=backend == 'pyglet', output=output)
-        player.observed = []
+        player.observed, player.batches = [], []
         try:
             game.push(TitleScene(7)); player.press('return')
             prepare_relief(state=player.state)
@@ -118,7 +121,7 @@ def verify(output, *, backend='pyglet', scenario='rally', still=False, scale=100
                 assert player.state.battle.outcome is None
                 orders = play.orders
             report = dict(scenario=scenario, backend=backend, reduced_motion=still, reading_scale=scale,
-                          observed=player.observed, inputs=player.events, input_activations=len(player.events),
+                          observed=player.observed, batches=player.batches, inputs=player.events, input_activations=len(player.events),
                           exact_save_reloads=player.reloads, orders=orders, source_revision=revision,
                           dirty_at_start=dirty, source_sha256=hashes)
             player.capture('resolved-battle', settle=False)
