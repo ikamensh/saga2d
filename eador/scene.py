@@ -112,6 +112,9 @@ class TitleScene(Screen):
         self.hero_class = hero_class
         self.world_theme = theme
         self.difficulty = difficulty
+        self.notice = ''
+        self.notice_page = 0
+        self.notice_pages = ('',)
 
     def on_enter(self):
         from eador.preferences import load_preferences
@@ -119,25 +122,97 @@ class TitleScene(Screen):
         set_music(self.game, "campaign")
         super().on_enter()
 
+    def on_reveal(self):
+        from eador.preferences import load_preferences
+        self.preferences = load_preferences(self.game)
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
+    def previous_notice(self):
+        self.notice_page = max(0, self.notice_page - 1)
+        self.refresh()
+
+    def next_notice(self):
+        self.notice_page = min(len(self.notice_pages) - 1, self.notice_page + 1)
+        self.refresh()
+
     def refresh(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        from eador.reading import reading_text_pages
+
         super().refresh()
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
         w, h = self.game.resolution
         x, width = w / 2 - 100, w / 2 + 40
-        for i, name in enumerate(HERO_CLASSES):
-            self.button(name, x + i * (width + 12) / 4, 270, (width - 36) / 4,
-                        lambda name=name: self.choose(name), primary=name == self.hero_class)
-        for i, (ident, theme) in enumerate(THEMES.items()):
-            self.button(theme.name, x + i * (width + 12) / 3, 395, (width - 24) / 3,
-                        lambda ident=ident: self.choose_theme(ident), primary=ident == self.world_theme)
-        for i, (ident, rules) in enumerate(DIFFICULTIES.items()):
-            self.button(rules.title, x + i * (width + 12) / 3, 535, (width - 24) / 3,
-                        lambda ident=ident: self.choose_difficulty(ident), shortcut=str(i + 1),
-                        primary=ident == self.difficulty)
-        self.button("Linked campaign", w / 2 - 348, h - 124, 336, self.start_campaign, shortcut="L", primary=True)
-        self.button("Enter single shard", w / 2 + 12, h - 124, 336, self.start, hotkey="Enter")
-        self.button("Load shard", w / 2 - 202, h - 72, 196, self.browse_saves, hotkey="F6")
-        self.button("New seed", w / 2 + 6, h - 72, 196, self.next_seed, shortcut="N")
-        self.button("Settings", w - 178, 26, 152, self.open_settings, shortcut="O")
+
+        def label(text, size=13, *, width=width, color=MUTED):
+            return Label(text, width=width, wrap=True, font='Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        heroes = Row(*(Button(name, width=(width - 36) / 4, height=40,
+                              on_click=lambda name=name: self.choose(name),
+                              style=PRIMARY if name == self.hero_class else None)
+                       for name in HERO_CLASSES), spacing=12)
+        themes = Row(*(Button(theme.name, width=(width - 24) / 3, height=40,
+                              on_click=lambda ident=ident: self.choose_theme(ident),
+                              style=PRIMARY if ident == self.world_theme else None)
+                       for ident, theme in THEMES.items()), spacing=12)
+        modes = Row(*(Button(rules.title, width=(width - 24) / 3, height=40, shortcut=str(i + 1),
+                             on_click=lambda ident=ident: self.choose_difficulty(ident),
+                             style=PRIMARY if ident == self.difficulty else None)
+                      for i, (ident, rules) in enumerate(DIFFICULTIES.items())), spacing=12)
+        body = Column(
+            Column(label('CHOOSE YOUR HERO · Tab to cycle', 11, color=GOLD), heroes,
+                   label(HERO_CLASSES[self.hero_class].description), spacing=6),
+            Column(label('CHOOSE YOUR WORLD · Left / Right to cycle', 11, color=GOLD), themes,
+                   label(THEMES[self.world_theme].description), spacing=6),
+            Column(label('DIFFICULTY · Fixed for this run', 11, color=GOLD), modes,
+                   label(DIFFICULTIES[self.difficulty].description, 12), spacing=6), spacing=14)
+        if self.measure(body)[1] > h - 148 - 226:
+            raise ValueError('Title choices exceed the available reading space')
+        self.ui.add(Column(body, anchor=Anchor.TOP_LEFT, margin=(round(x), 226)))
+        message = self.message or ('Settings could not be read. Open Settings (O) to recover them.'
+                                  if self.preferences.error else '')
+        offset = sum(map(len, self.notice_pages[:self.notice_page])) if message == self.notice else 0
+        self.notice = message
+        content = self.notice or f'Seed {self.seed} · Linked: three stages from Frontier. Single shard: your selected world.'
+        notice = label(content, 11, width=412, color=RED if self.notice else MUTED)
+        notice_top = 250 if self.notice else 539
+        self.notice_pages = reading_text_pages(content, 334, measure=lambda text: self.measure(label(text, 11, width=412))[1]) if (
+            notice_top + self.measure(notice)[1] > h - 148) else (content,)
+        self.notice_page, consumed = 0, 0
+        for index, page in enumerate(self.notice_pages):
+            if consumed <= offset:
+                self.notice_page = index
+            consumed += len(page)
+        notice = label(self.notice_pages[self.notice_page], 11, width=412, color=RED if self.notice else MUTED)
+        self.ui.add(Column(notice, anchor=Anchor.TOP_LEFT, margin=(74, notice_top)))
+        if len(self.notice_pages) > 1:
+            self.button('Previous', 74, 605, 186, self.previous_notice, shortcut='PageUp', enabled=self.notice_page > 0)
+            self.button('Next', 280, 605, 186, self.next_notice, shortcut='PageDown',
+                        enabled=self.notice_page + 1 < len(self.notice_pages))
+        self.button('Linked campaign', w / 2 - 348, h - 124, 336, self.start_campaign, shortcut='L', primary=True)
+        self.button('Enter single shard', w / 2 + 12, h - 124, 336, self.start, hotkey='Enter')
+        self.button('Load shard', w / 2 - 202, h - 72, 196, self.browse_saves, hotkey='F6')
+        self.button('New seed', w / 2 + 6, h - 72, 196, self.next_seed, shortcut='N')
+        self.button('Settings', w - 178, 26, 152, self.open_settings, shortcut='O')
+        self.button('Text size', 26, 26, 176, self.open_text_settings, shortcut='T')
+
+    def load_game(self, slot=1, *, backup=False):
+        loaded = super().load_game(slot, backup=backup)
+        if not loaded:
+            self.refresh()
+        return loaded
 
     def choose(self, name):
         self.hero_class = name
@@ -149,6 +224,7 @@ class TitleScene(Screen):
 
     def next_seed(self):
         self.seed += 1
+        self.refresh()
 
     def choose_theme(self, theme):
         self.world_theme = theme
@@ -188,28 +264,20 @@ class TitleScene(Screen):
         self.text("C H R O N I C L E S   O F   T H E   S H A R D S", w / 2, 56, size=11, color=GOLD, center=True)
         self.text("SHARDBOUND", w / 2, 88, size=64, serif=True, center=True)
         self.text("One broken world. A kingdom to build.", w / 2, 169, size=17, color=MUTED, center=True)
-        x, width = w / 2 - 100, w / 2 + 40
-        self.text(THEMES[self.world_theme].name.upper(), w * .245, 244, size=12, color=GOLD, center=True)
-        cells = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
-        grid = HexGrid(cells, size=42, origin=(w * .245, 385))
-        from types import SimpleNamespace
-        terrains = {"frontier": ("forest", "hills", "plains"), "elderwild": ("forest", "marsh", "forest"),
-                    "ruins": ("hills", "plains", "hills")}[self.world_theme]
-        for i, pos in enumerate(sorted(cells, key=lambda c: grid.center(c)[1])):
-            data = SimpleNamespace(terrain=terrains[i % 3], owner="player" if pos == (0, 0) else "neutral",
-                                   capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
-            art.province(self, grid, pos, data)
-        self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
-        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 239, size=11, color=GOLD)
-        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 326, width=width, size=13)
-        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 369, size=11, color=GOLD)
-        self.paragraph(THEMES[self.world_theme].description, x, 449, width=width, size=13)
-        self.text("DIFFICULTY   ·   Fixed for this run", x, 509, size=11, color=GOLD)
-        self.paragraph(DIFFICULTIES[self.difficulty].description, x, 588, width=width, size=12)
-        notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
-                                  if self.preferences.error else "")
-        self.text(notice or f"Seed {self.seed} · Linked: three stages from Frontier. Single shard: your selected world.",
-                  w / 2, h - 155, size=11, color=RED if notice else MUTED, center=True)
+        if len(self.notice_pages) > 1:
+            self.text(f'Error details · Page {self.notice_page + 1}/{len(self.notice_pages)}', 74, 219, size=11, color=RED)
+        if not self.notice:
+            self.text(THEMES[self.world_theme].name.upper(), w * .245, 244, size=12, color=GOLD, center=True)
+            cells = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
+            grid = HexGrid(cells, size=42, origin=(w * .245, 385))
+            from types import SimpleNamespace
+            terrains = {"frontier": ("forest", "hills", "plains"), "elderwild": ("forest", "marsh", "forest"),
+                        "ruins": ("hills", "plains", "hills")}[self.world_theme]
+            for i, pos in enumerate(sorted(cells, key=lambda c: grid.center(c)[1])):
+                data = SimpleNamespace(terrain=terrains[i % 3], owner="player" if pos == (0, 0) else "neutral",
+                                       capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
+                art.province(self, grid, pos, data)
+            self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
 
 
 class ShardScene(Screen):

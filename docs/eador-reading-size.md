@@ -1,13 +1,15 @@
 # Reading size
 
-The Field Codex, expedition briefings, Build/Recruit catalogs, troop replacement,
+The title, Field Codex, expedition briefings, Build/Recruit catalogs, troop replacement,
 Hero, reward choices, results, Saves, rival and campaign plans offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
 entry size. Sound remains the default tab when Settings is opened normally.
 
-This setting enlarges the Codex category introduction and each entry's title,
+The title enlarges full hero/world/difficulty descriptions, new-run guidance and
+failed-load messages while preserving the selected run. This setting enlarges
+the Codex category introduction and each entry's title,
 facts and description across Troops, Abilities, Buildings, Skills, Sites and
 Relics. The Field Guide uses the same value for all four numbered headings, their prose
 and the quick-reference line. Its two measured columns preserve all sections at

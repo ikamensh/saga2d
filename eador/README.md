@@ -58,7 +58,7 @@ and recovery funds.
 **O** opens settings from the title or field guide. **S / D** selects Sound
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
-Reading size offers 100/125% for the Codex, Field Guide, expedition briefings,
+Reading size offers 100/125% for the title, Codex, Field Guide, expedition briefings,
 Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival and campaign
 plans. Press **T** in these screens to open that setting directly.
 Other screens, including the tactical HUD and campaign departures, keep their existing sizes.
