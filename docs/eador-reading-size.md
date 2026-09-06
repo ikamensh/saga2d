@@ -57,7 +57,8 @@ and native-resize simulation. The native checker dispatches real Pyglet input,
 checks every visible reading Label against the content bounds and records page
 counts and actual window/framebuffer dimensions in `matrix.json`. It exercises
 100/125 at 1280×720, 1280×800 and 1920×1080 native window sizes on the fixed
-logical canvas, using an earned Censer battle and a v10 active save. Screenshots
+logical canvas, using an earned Censer battle, the paid Observatory approach,
+and a v10 active save. Screenshots
 still require visual inspection; pixel measurements do not establish universal
 font availability or cross-platform accessibility.
 
@@ -69,3 +70,10 @@ exposed and then verified the separate framework measurement-cache correction
 suite passed 908 tests, and both games' bounded 60-game/20-scene fuzz runs
 passed. The existing native Settings journey also passed title/guide entry,
 fullscreen restoration, damaged-file recovery and write-error presentation.
+
+After integrating main `86bef00` (including the authored Observatory), the suite
+passed 919 tests. The extended native matrix passed 108 category traversals,
+650 pages and 1,422 entry presentations. The paid Observatory's actual crystal
+fee/reward and hold rules were inspected at 100/125; its 25-entry Sites catalog
+remains complete. These counts describe that content snapshot, not a fixed
+pagination contract.
