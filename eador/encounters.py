@@ -14,6 +14,7 @@ class EncounterSpec:
     hold_turns: int = 2
     deadline: int = 8
     exits: tuple[Pos, ...] = ()
+    objective: str = 'rout'
 
 
 _WATCH_FOREST = {(-1, 1), (-1, 2), (0, -1), (1, -2)}
@@ -27,6 +28,7 @@ ENCOUNTERS = {
         ((-3, 1), (-2, 0), (-3, 2), (-2, 1), (-2, 2), (-3, 0), (-2, 3)),
         ((1, -1), (3, -1), (2, -2), (2, 0), (2, 1), (3, -3), (3, -2)),
         (0, 0),
+        objective='hold',
     ),
 }
 
@@ -40,6 +42,7 @@ ENCOUNTERS['last_gate'] = EncounterSpec(
     ((-3, 0), (-2, 0), (-3, 1), (-2, -1), (-3, 2), (-2, 1), (-3, 3)),
     ((1, -1), (2, -1), (1, 1), (2, 0), (3, -2), (3, -1), (3, 0)),
     (-1, 0),
+    objective='hold',
 )
 
 
@@ -52,6 +55,7 @@ ENCOUNTERS['courier_direct'] = EncounterSpec(
     ((-3, 1), (-2, 0), (-3, 2), (-2, 1), (-2, 2), (-3, 0), (-2, 3)),
     ((1, -1), (2, -2), (1, 1), (2, 0), (2, 1), (3, -2), (3, -1)),
     exits=((3, -3), (3, 0)),
+    objective='extract',
 )
 ENCOUNTERS['courier_guided'] = replace(ENCOUNTERS['courier_direct'],
     player_positions=((-1, 3), (0, 3), (-2, 3), (-1, 2), (0, 2), (-2, 2), (-3, 3)))
@@ -65,6 +69,7 @@ ENCOUNTERS['supply_cache'] = EncounterSpec(
     ((0, 0), (1, 0), (0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1)),
     ((-3, 0), (3, -3), (3, 0), (0, 3), (2, 1), (-3, 3), (1, 2)),
     exits=((-3, 1), (2, -3)),
+    objective='extract',
 )
 
 
@@ -77,5 +82,18 @@ ENCOUNTERS['vault_crossfire'] = EncounterSpec(
     ((-2, 0), (-2, -1), (-3, 1), (-1, -1), (-2, 1), (-3, 0), (-3, 2)),
     ((2, -1), (-3, 3), (2, 1), (0, -1), (3, -3), (2, 0), (3, -1)),
     exits=((3, -1),),
+    objective='extract',
 )
 ENCOUNTERS['vault_unsealed'] = replace(ENCOUNTERS['vault_crossfire'], exits=((3, -1), (-1, 3)))
+
+
+_HUNT_FOREST = {(0, -1), (0, 0), (0, 1), (0, 2), (-2, 2), (-1, 2)}
+ENCOUNTERS['hunt_compact'] = EncounterSpec(
+    'Pack Hunt',
+    tuple(((q, r), 'forest' if (q, r) in _HUNT_FOREST else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-1, 0), (0, -1), (-1, 1), (-2, 1), (-1, -1), (-2, 0), (-3, 0)),
+    ((1, -2), (2, -1), (2, 1), (-3, 2), (-3, 3), (1, 1), (3, -2)),
+)
+ENCOUNTERS['hunt_lured'] = replace(ENCOUNTERS['hunt_compact'],
+    player_positions=((-1, -2), (-2, -1), (0, -3), (1, -3), (0, -2), (-1, -1), (-2, 0)))
