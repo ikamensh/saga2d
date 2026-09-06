@@ -43,11 +43,14 @@ def prepared_briefings():
     from tools.eador_observatory_campaign import prepare_observatory
     from tools.eador_relic_campaign import prepare_relic_gate
     from tools.eador_vault_campaign import prepare_vault
+    from tools.eador_screen_campaign import prepare_screen
 
     cases = [('crossing', prepare_adventure(), None),
              ('cache', prepare_adventure(theme='elderwild'), None),
              ('vault', prepare_vault(), None), ('hunt', prepare_pack_hunt(), None),
              ('observatory', prepare_observatory(), None),
+             ('screen-commander', prepare_screen(), None),
+             ('screen-scout', prepare_screen('Scout'), None),
              ('explorer-ranger', prepare_explorer(), None),
              ('explorer-acolyte', prepare_explorer('Warrior', support='healer'), None),
              ('explorer-alone', prepare_explorer('Scout', support=None), None)]
@@ -64,6 +67,9 @@ def prepared_briefings():
     province = wounded.provinces[wounded.hero.pos]
     assert 0 < sum(province.site_guard_hp) < sum(UNITS[kind].hp for kind in province.site_guards)
     cases.append(('observatory-wounded', wounded, None))
+    screened = prepare_screen()
+    screened.explore(approach='western'); screened.battle.auto_turn(); screened.retreat()
+    cases.append(('screen-wounded', screened, None))
     poor = prepare_adventure()
     poor.build('archery'); poor.build('market'); poor.recruit('ranger')
     poor.explore(approach='guided'); poor.retreat()

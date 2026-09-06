@@ -4,7 +4,7 @@ from collections import Counter
 
 from saga2d import Anchor, Button, Column, Component, HexGrid, Label, Row
 from eador import art
-from eador.content import RELICS
+from eador.content import RELICS, SITES
 from eador.encounters import ENCOUNTERS
 from eador.model import UNITS
 from eador.preferences import reading_scale
@@ -82,7 +82,10 @@ class EncounterScene(Screen):
                                    on_click=lambda index=index: self.choose_approach(index),
                                    style=PRIMARY if index == self.approach_index else None)
                              for index, approach in enumerate(self.approaches)), spacing=20))
-            top.append(label(self.approach.description, color=GOLD))
+            description = self.approach.description
+            if p.site_kind == 'smuggler_screen' and Counter(self.guards) != Counter(SITES[p.site_kind].guards):
+                description = f'Free. {self.approach.title} against the surviving defenders shown below.'
+            top.append(label(description, color=GOLD))
 
         left_width, right_width = 640, 392
         orders = Column(
@@ -152,6 +155,14 @@ class EncounterScene(Screen):
             split = ('Isolated east: hero and ' + ', '.join(isolated) + '.' if isolated
                      else 'Hero starts alone east.')
             carrier = split + ' ' + carrier
+        rout_advice = 'Protect your rear and rotate wounded allies. Forest blocks distant shots but provides cover at its edge.'
+        if self.province.site_kind == 'smuggler_screen':
+            advice = []
+            if 'sapper' in self.guards:
+                advice.append('Sapper: one Smoke charge per battle blocks both sides’ shots and spells.')
+            if 'warden' in self.guards:
+                advice.append('Warden swaps wounded allies to safety.')
+            rout_advice = ' '.join(advice + ['Defeated guards stay defeated. Codex explains these orders.'])
         return (
             carrier,
             f'Clear adjacent foes. Escape or rout all defenders by round {definition.deadline}. Hero death loses immediately.',
@@ -164,7 +175,7 @@ class EncounterScene(Screen):
         ) if definition.objective == 'hold' else (
             'Defeat every defender to claim the reward. Exhaustion forces retreat after 80 rounds.',
             'Keep your hero alive. Hero death ends the expedition immediately.',
-            'Protect your rear and rotate wounded allies. Forest blocks distant shots but provides cover at its edge.',
+            rout_advice,
         )
 
     def enter(self):

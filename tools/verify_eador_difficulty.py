@@ -18,6 +18,7 @@ from eador.persistence import CampaignSaves
 from eador.scene import TitleScene
 from tools.eador_campaign import finish_battle
 from tools.eador_linked_campaign import travel_selection
+from tools.eador_save_expectations import expected_rootward_arrival
 from tools.eador_ui import PlayerInput
 
 RECORDED_CHALLENGE = ROOT / 'tests/eador/fixtures/v12_challenge1_ui_cases.json'
@@ -51,7 +52,8 @@ def verify_recorded_challenge(output, *, backend='pyglet'):
                     player.choose_retinue(travel_selection(player.state))
                     player.capture('recorded-funding')
                     player.press('return')
-                assert json.loads(player.state.to_json()) == case['after'], case['name']
+                expected = expected_rootward_arrival(case['after']) if case['name'] == 'advance' else case['after']
+                assert json.loads(player.state.to_json()) == expected, case['name']
                 player.reload(player.state.to_json())
                 player.capture('recorded-continuation')
                 reports.append(dict(case=case['name'], rules_id=player.state.rules_id,
@@ -67,7 +69,7 @@ def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *[ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_ui.py',
-                          'verify_eador_difficulty.py', 'verify_eador_campaign.py', 'eador_linked_campaign.py')],
+                          'verify_eador_difficulty.py', 'verify_eador_campaign.py', 'eador_linked_campaign.py', 'eador_save_expectations.py')],
                       RECORDED_CHALLENGE])
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     report = dict(source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
