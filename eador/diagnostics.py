@@ -14,9 +14,9 @@ class DiagnosticScene(Screen):
     transparent = True
     controls = {('left', 'pageup'): 'previous_page', ('right', 'pagedown'): 'next_page'}
 
-    def __init__(self, message, *, return_label='Return'):
+    def __init__(self, message, *, return_label='Return', title='Complete save/load diagnostic'):
         super().__init__()
-        self.message, self.return_label = message, return_label
+        self.message, self.return_label, self.title = message, return_label, title
         self.page = 0
         self._pages = ('',)
 
@@ -53,7 +53,7 @@ class DiagnosticScene(Screen):
         def label(text, *, width=1064, color=RED):
             return Label(text, width=width, wrap=True, font='Verdana', font_size=round(12 * scale), text_color=color)
 
-        title = Label('Complete save/load diagnostic', width=800, wrap=True,
+        title = Label(self.title, width=800, wrap=True,
                       font='Georgia', font_size=30, text_color=TEXT)
         body_y = y + self.measure(title)[1] + 24
         bottom = self.y + 692
