@@ -24,6 +24,14 @@ serially and ended. This refresh does not repeat full frozen campaigns or claim
 Windows, clean-account, human/listening or sustained acceptance.
 **All G01–G19 gates remain incomplete.**
 
+[The remaining audit CPU follow-up](evidence/remaining-audit-cpu-31c4bee/README.md)
+adds the 25% cooperative allowance to resource-breakpoint, Aerie and Relief
+audits, including paid preparation and detached quotes, plus Pin's model-only
+preparation. Fifty-six focused tests pass; two small serial CLI checks average
+about 28–29% of one core including startup and report writing, with unchanged
+outcomes. No cancelled matrix or soak was restarted. This changes development
+tools only; the game/framework still match the packaged source above.
+
 [Paid Vault continuation](eador-vault-continuation.md) now follows an earned
 two-crystal unseal through production and veteran replacement. In this seed-7
 example it captures production two turns earlier and retains the original

@@ -1,0 +1,57 @@
+{
+  "source_commit": "31c4bee8a095fd9118fa213b7a74e0a32562b628",
+  "tests": {
+    "passed": 56,
+    "wall_seconds": 7.68
+  },
+  "runs": [
+    {
+      "name": "resource",
+      "command": [
+        "uv",
+        "run",
+        "--extra",
+        "dev",
+        "python",
+        "tools/audit_eador_resource_breakpoints.py",
+        "--theme",
+        "frontier",
+        "--difficulty",
+        "standard",
+        "--plan",
+        "economy",
+        "--report",
+        "/tmp/shardbound-remaining-audit-cpu-31c4bee/resource.json"
+      ],
+      "wall_seconds": 1.8376763749402016,
+      "cpu_seconds": 0.529259,
+      "cpu_percent_including_startup": 28.80044643427612,
+      "source_hashes_verified": 35,
+      "allowance": 25,
+      "cases": 1,
+      "matched_unobserved_outcomes": true
+    },
+    {
+      "name": "aerie",
+      "command": [
+        "uv",
+        "run",
+        "--extra",
+        "dev",
+        "python",
+        "tools/audit_eador_aerie.py",
+        "--output",
+        "/tmp/shardbound-remaining-audit-cpu-31c4bee/aerie.json.gz"
+      ],
+      "wall_seconds": 3.11635666701477,
+      "cpu_seconds": 0.874386,
+      "cpu_percent_including_startup": 28.057956563668768,
+      "source_hashes_verified": 85,
+      "allowance": 25,
+      "plans": 6,
+      "orders": 362,
+      "exact_reloads": 362
+    }
+  ],
+  "scope": "Two serial bounded CLI checks; percent is relative to one core and includes interpreter startup and report compression. No battery-life, stress-matrix, full Relief matrix or release-gate claim."
+}
