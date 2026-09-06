@@ -546,3 +546,28 @@ distinguish this source from earlier artifacts and isolated model stress.
 G01–G19 remain incomplete. Remaining reading layouts, replacement input stress,
 additional authored patterns, economic balance, candidate-specific stress,
 platform verification and human feedback remain active work.
+
+## Complete save metadata and a smaller framework interface — 2026-09-06
+
+Saves now show complete phase metadata, including results awaiting acceptance,
+and page whole slots around larger text or actual filesystem errors. Explicit
+backup restoration and failed save-before-title recovery pass through native
+controls. Rival intelligence also supports the shared reading size with its
+complete current orders, finite army and economic/breakout advice.
+
+`Scene.measure(component)` removes the repeated temporary attachment needed
+to measure prospective UI trees. It supplies the actual theme/font context
+without taking ownership or activating controls; save and rival layouts use it.
+The independent example verifies that measured cards match their eventual
+rendered sizes. No game or pagination policy entered Saga2D.
+
+At `f3a59e2`, the suite passes 1,119 tests and both games' bounded stress checks.
+Native verification covers the independent example, 54 save pages and 90 rival
+layouts. [Retained checks and inspected frames](evidence/framework-ui-measurement-f3a59e2/README.md)
+preserve source attribution. Replacement scene stress is now integrated too;
+[its report](eador-replacement-fuzz.md) separates random input coverage from
+the dedicated successful paid journeys.
+
+G01–G19 remain incomplete. Campaign transitions/retinue and tactical/HUD
+reading, the tenth and remaining authored patterns, meaningful economy,
+candidate-specific stress, platforms and human feedback remain active work.
