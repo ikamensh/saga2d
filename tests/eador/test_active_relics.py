@@ -105,3 +105,118 @@ def test_earned_censer_screen_and_guard_both_hold_with_defenders_alive():
         assert any(u.alive for u in play.battle.units if u.team == 'enemy')
         play.state.resolve_battle()
         assert play.state.provinces[(0, -2)].explored
+
+
+def test_both_earned_relic_branches_hold_the_gate_and_preserve_every_order_on_reload():
+    from dataclasses import asdict
+    import pytest
+    from eador.model import RuleError
+    from tools.eador_extraction_campaign import AdventureOrders
+    from tools.eador_relic_campaign import porter_gate_route, mirror_gate_route
+
+    class SavedOrders(AdventureOrders):
+        def do(self, command, *args, **kwargs):
+            before = self.state.to_json()
+            target_before = asdict(self.battle.unit(args[1])) if command in ('repulse', 'swap') else None
+            actor_pos = self.battle.unit(args[0]).pos if target_before else None
+            forecast = self.battle.repulse_preview(*args) if command == 'repulse' else None
+            if command == 'repulse':
+                # Controlled counter-fixtures use the earned hero and its exact charge.
+                # They isolate anchoring and occupancy; these two enemy states are not
+                # claimed as additional naturally played encounters.
+                for counter in ('guard', 'occupied'):
+                    clone = State.from_json(before)
+                    if counter == 'guard':
+                        clone.battle.unit(args[1]).stance = 'guard'
+                    else:
+                        blocker = next(u for u in clone.battle.units if u.team == 'enemy' and u.id != args[1])
+                        blocker.pos = forecast
+                    clone = State.from_json(clone.to_json())
+                    denied = clone.to_json()
+                    with pytest.raises(RuleError):
+                        clone.battle.repulse(*args)
+                    assert clone.to_json() == denied
+            assert self.state.to_json() == before
+            super().do(command, *args, **kwargs)
+            if command == 'repulse':
+                assert asdict(self.battle.unit(args[1])) == {**target_before, 'pos': forecast}
+                assert self.battle.unit(args[1]).alive
+            elif command == 'swap':
+                assert asdict(self.battle.unit(args[1])) == {**target_before, 'pos': actor_pos, 'moved': True}
+            saved = self.state.to_json()
+            self.state = State.from_json(saved)
+            assert self.state.to_json() == saved
+
+    for route, relic, theme, rounds in ((porter_gate_route, 'porter_rune', 'ruins', 5),
+                                        (mirror_gate_route, 'mirror_badge', 'elderwild', 2)):
+        play = route(orders_type=SavedOrders)
+        state = play.state
+        assert state.campaign.stage == 3 and state.theme == theme and state.hero.relic == relic
+        assert play.battle.outcome_reason == 'hold' and play.battle.round == rounds
+        assert all(u.alive for u in play.battle.units if u.team == 'player')
+        assert any(u.alive for u in play.battle.units if u.team == 'enemy')
+        finish_battle(state)
+        assert state.campaign.phase == 'completed'
+        assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+def test_earned_drum_clears_a_real_watch_pin_without_refreshing_a_spent_ranger():
+    from dataclasses import asdict
+    from tools.eador_extraction_campaign import AdventureOrders
+    from tools.eador_relic_campaign import drum_watch_route
+
+    class SavedOrders(AdventureOrders):
+        def do(self, command, *args, **kwargs):
+            if command == 'rally':
+                before = self.state.to_json()
+                target = asdict(self.battle.unit(args[1]))
+                forecast = self.battle.rally_preview(*args)
+                assert self.state.to_json() == before and (0, -1) in forecast.reachable
+                spent = State.from_json(before)
+                spent.battle.guard(args[1])
+                spent_before = asdict(spent.battle.unit(args[1]))
+                spent.battle.rally(*args)
+                assert asdict(spent.battle.unit(args[1])) == {**spent_before, 'pinned': False}
+                assert not spent.battle.reachable(args[1]) and not spent.battle.targets(args[1])
+            super().do(command, *args, **kwargs)
+            if command == 'rally':
+                assert asdict(self.battle.unit(args[1])) == {**target, 'pinned': False}
+            saved = self.state.to_json()
+            self.state = State.from_json(saved)
+            assert self.state.to_json() == saved
+
+    play = drum_watch_route(orders_type=SavedOrders)
+    assert play.state.hero.relic == 'vanguard_drum'
+    assert play.battle.unit(5).pos == (0, -1) and play.battle.unit(5).acted
+    assert any('Archer pins Ranger' in entry for entry in play.battle.log)
+    restored = State.from_json(play.state.to_json())
+    finish_battle(play.state); finish_battle(restored)
+    assert play.state.to_json() == restored.to_json()
+    assert play.state.provinces[(0, -2)].explored
+
+
+def test_earned_mirror_extends_arrival_but_cannot_evacuate_with_a_spent_hero_order():
+    """The actual Badge can deliver its hero to an exit, but arrival costs that phase's action."""
+    import pytest
+    from eador.model import RuleError
+    from tools.eador_relic_campaign import prepare_relic_gate, _recover_at
+    state = prepare_relic_gate('mirror_badge')
+    state.retreat()
+    _recover_at(state, (-1, -1))
+    state.explore(approach='light')
+    battle = state.battle
+    ids = {u.pos: u.id for u in battle.units if u.team == 'player'}
+    wolf = next(u.id for u in battle.units if u.team == 'enemy' and u.pos == (-3, 0))
+    battle.move(ids[(-1, 1)], (-3, 1)); battle.attack(ids[(-1, 1)], wolf)
+    battle.move(ids[(-1, 0)], (-2, 0)); battle.attack(ids[(-1, 0)], wolf)
+    battle.move(0, (-2, 1)); battle.swap(0, ids[(-1, 1)])
+    assert battle.unit(0).pos in battle.objective.exits
+    assert not any(u.alive and u.team == 'enemy' and battle.grid.distance(u.pos, battle.unit(0).pos) <= 1 for u in battle.units)
+    before = state.to_json()
+    with pytest.raises(RuleError, match='unspent action'):
+        battle.evacuate()
+    assert state.to_json() == before
+    state = State.from_json(before)
+    state.battle.end_turn(); state.battle.evacuate()
+    assert state.battle.outcome_reason == 'escape' and state.battle.round == 2
+    assert any(u.alive for u in state.battle.units if u.team == 'enemy')

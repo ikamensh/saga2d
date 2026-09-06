@@ -45,20 +45,6 @@ def verify_inventory(output, *, backend='pyglet'):
             game._teardown()
 
 
-def choose_retinue(player):
-    selection = travel_selection(player.state)
-    assert isinstance(player.game.scene, CampaignScene) and player.game.scene.step == 'retinue'
-    for column, choices in ((0, selection['troop_ids']), (1, selection['relic_ids'])):
-        player.press('left' if column == 0 else 'right')
-        items = player.state.hero.army if column == 0 else player.state.inventory
-        for index, item in enumerate(items):
-            if (item.id if column == 0 else item) in choices:
-                player.press('space')
-            if index + 1 < len(items):
-                player.press('down')
-    return selection
-
-
 def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recovery=False):
     started = perf_counter()
     output.mkdir(parents=True, exist_ok=True)
@@ -85,7 +71,7 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
                     before = player.state.to_json()
                     player.capture('recovery')
                     player.reload(before)
-                    choose_retinue(player)
+                    player.choose_retinue(travel_selection(player.state))
                     player.press('return')
                     assert player.state.campaign.recovery_used and player.state.campaign.phase == 'playing'
                     assert player.state.gold == 60 and len(player.state.hero.army) == 3
@@ -110,7 +96,7 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
                 player.press('escape')
                 assert player.state.to_json() == before and game.scene.step == 'offers'
                 player.press(str(index + 1))
-                selected = choose_retinue(player)
+                selected = player.choose_retinue(travel_selection(player.state))
                 player.capture(f'stage-{stage}-retinue')
                 player.press('return')
                 assert isinstance(game.scene, ShardScene) and player.state.campaign.stage == stage + 1

@@ -68,13 +68,35 @@ class PlayerInput:
         self.reloads += 1
         return self.state
 
+    def choose_retinue(self, selection):
+        from eador.campaign_scene import CampaignScene
+        assert isinstance(self.game.scene, CampaignScene) and self.game.scene.step == 'retinue'
+        before = self.state.to_json()
+        for column, choices in ((0, selection['troop_ids']), (1, selection['relic_ids'])):
+            self.press('left' if column == 0 else 'right')
+            items = self.state.hero.army if column == 0 else self.state.inventory
+            for index, item in enumerate(items):
+                if (item.id if column == 0 else item) in choices:
+                    self.press('space')
+                if index + 1 < len(items):
+                    self.press('down')
+        assert self.state.to_json() == before, 'Choosing a retinue changed the campaign before departure'
+        return selection
+
 
 class PlayerBattle:
     def __init__(self, player, battle):
         self.player, self.battle = player, battle
 
     def __getattr__(self, name):
-        return getattr(self.battle, name)
+        value = getattr(self.battle, name)
+        queries = ('unit', 'reachable', 'has_sight', 'targets', 'preview', 'spell_cost', 'to_dict',
+                   'pin_targets', 'pin_preview', 'repulse_targets', 'repulse_preview',
+                   'smoke_targets', 'smoke_preview', 'rally_targets', 'rally_preview',
+                   'swap_targets', 'spell_targets', 'spell_preview')
+        if callable(value) and name not in queries:
+            raise AssertionError(f'No input adapter for battle command {name!r}')
+        return value
 
     def auto_turn(self):
         assert isinstance(self.player.game.scene, BattleScene)
@@ -86,7 +108,10 @@ class PlayerState:
         self.player = player
 
     def __getattr__(self, name):
-        return getattr(self.player.root.state, name)
+        value = getattr(self.player.root.state, name)
+        if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches'):
+            raise AssertionError(f'No input adapter for campaign command {name!r}')
+        return value
 
     @property
     def battle(self):
@@ -172,3 +197,20 @@ class PlayerState:
         assert isinstance(self.player.game.scene, BattleScene)
         self.player.press('t')
         assert self.battle is None
+
+    def advance(self, destination, *, troop_ids, relic_ids):
+        from eador.campaign_scene import CampaignScene
+        assert isinstance(self.player.game.scene, CampaignScene) and self.campaign.phase == 'departure'
+        stage, before = self.campaign.stage, self.to_json()
+        index = next(index for index, offer in enumerate(self.campaign.offers) if offer.id == destination)
+        self.player.press(str(index + 1))
+        self.player.press('escape')
+        assert self.to_json() == before and self.player.game.scene.step == 'offers'
+        self.player.press(str(index + 1))
+        self.player.choose_retinue(dict(troop_ids=troop_ids, relic_ids=relic_ids))
+        self.player.capture(f'stage-{stage}-earned-retinue')
+        self.player.press('return')
+        assert isinstance(self.player.game.scene, ShardScene) and self.campaign.stage == stage + 1
+        assert set(troop_ids) <= {troop.id for troop in self.hero.army}
+        assert set(relic_ids) == set(self.inventory)
+        self.player.capture(f'stage-{stage + 1}-earned-arrival')
