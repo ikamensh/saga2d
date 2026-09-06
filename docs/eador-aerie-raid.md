@@ -108,8 +108,17 @@ The audit checks exact attack, spell and Repulse forecasts, reloads complete
 campaign state after every order, records purchases and final reward rejection,
 and saves compressed snapshots with source hashes. The shared guidance matrix
 includes both actual assemblies at 100/125% and all three supported window
-sizes. Native full-plan integration and broader release judgments remain
-separate acceptance work. This pattern's count alone does not satisfy G05.
+sizes.
+
+All five [native paid journeys](evidence/shardbound-aerie-native-2026-09-06/README.md)
+passed on clean source `3ba80da`: both Commander assemblies, the optional
+western Heal, six-body Scout, and the actual failed attempt with its saved
+finite retry. They used 1,430 keyboard/mouse activations and 101 exact F5/F9
+reloads; all 1,128 combined tests passed. Inspected screenshots retain the
+deployments, exact forecasts, landings, casualty result and wounded retry.
+One shared shard sidebar sentence clips after the reward and is documented
+for a separate layout follow-up. These scripted plans do not replace human
+playtesting; this pattern's count alone does not satisfy G05.
 
 The [earlier detached prototype](eador-tenth-encounter-proposal.md) remains as
 compressed historical evidence. Its temporary tool is absorbed by the real-site
