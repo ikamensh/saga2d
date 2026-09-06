@@ -96,6 +96,10 @@ Reproduce with `python -m pytest tests/eador/test_roles.py -q`,
 source checkout. These reports do not include UI/native verification or a soak
 of the later integrated candidate.
 
+After merging the independent all-class final-seal journeys and display
+primitives at `8f4d2da`, the combined suite passed 713 tests. The role game
+rules were unchanged from the retained `79b2d49` stress snapshot.
+
 ## Player controls and presentation
 
 Recruitment uses pages of five with mouse Previous/Next controls and Left/Right

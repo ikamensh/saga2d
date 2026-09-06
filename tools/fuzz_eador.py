@@ -81,13 +81,20 @@ def check_state(state: State) -> None:
         assert all(u.pos in battle.grid.cells and 0 <= u.hp <= u.max_hp for u in battle.units)
         assert all(type(u.pinned) is bool and 0 <= u.pin_cooldown <= 2 for u in battle.units)
         assert all(not u.pin_cooldown or u.can_pin for u in battle.units)
-        assert all(u.effective_move_range == max(1, u.move_range - (2 if u.pinned else 0)) for u in battle.units)
+        assert all(u.effective_move_range == max(1, u.move_range - (2 if u.pinned else 0) - u.cargo_penalty) for u in battle.units)
         assert {u.id for u in battle.units if u.team == 'player'} == {0, *(t.id for t in hero.army)}
         assert 0 <= battle.mana <= hero.max_mana
         assert battle.outcome in (None, 'player', 'enemy')
         if battle.outcome == 'player':
             assert battle.unit(0).alive
-            if battle.outcome_reason == 'hold':
+            if battle.outcome_reason == 'escape':
+                objective, carrier = battle.objective, battle.unit(battle.hero_id)
+                assert state.battle_kind == 'site' and state.battle_adventure is not None
+                assert objective.kind == 'extract' and battle.round <= objective.deadline
+                assert carrier.pos in objective.exits and carrier.acted and carrier.moved
+                assert any(u.alive and u.team == 'enemy' for u in battle.units)
+                assert not any(u.alive and u.team == 'enemy' and battle.grid.distance(u.pos, carrier.pos) <= 1 for u in battle.units)
+            elif battle.outcome_reason == 'hold':
                 objective = battle.objective
                 assert state.battle_encounter is not None and objective.kind == 'hold'
                 assert objective.progress == objective.required and battle.round <= objective.deadline
@@ -151,6 +158,23 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
             if state.battle.outcome:
                 metrics['battle_' + state.battle.outcome] += 1
                 state.resolve_battle()
+            elif state.battle.objective.kind == 'extract' and rng.random() < .20:
+                before = state.to_json()
+                restored = State.from_json(before)
+                reason = state.battle.evacuation_blocked_reason
+                if reason is not None:
+                    try:
+                        state.battle.evacuate()
+                    except RuleError as error:
+                        assert str(error) == reason
+                    else:
+                        raise AssertionError('Evacuation ignored its blocking reason')
+                    assert state.to_json() == before
+                    metrics['rejected_evacuation_orders'] += 1
+                else:
+                    state.battle.evacuate(); restored.battle.evacuate()
+                    assert state.to_json() == restored.to_json()
+                    metrics['evacuation_orders'] += 1
             elif rng.random() < .20:
                 battle = state.battle
                 shooter = rng.choice([u for u in battle.units if u.alive and u.team == 'player'])
@@ -198,7 +222,11 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
             elif command == 'travel':
                 state.travel(rng.choice(state.grid.neighbors(state.hero.pos)))
             elif command == 'explore':
-                state.explore()
+                approaches = state.adventure_approaches()
+                approach = rng.choice([None, 'missing', *(option.id for option in approaches)]) if approaches else None
+                state.explore(approach=approach)
+                if state.battle_adventure:
+                    metrics['adventure_approach.' + state.battle_adventure.approach] += 1
             elif command == 'equip':
                 state.equip(rng.choice([None, *state.inventory]))
             else:

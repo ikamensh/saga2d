@@ -42,6 +42,18 @@ RELICS = {
 
 
 @dataclass(frozen=True)
+class AdventureApproach:
+    id: str
+    title: str
+    description: str
+    encounter: str
+    gold_cost: int = 0
+    crystals_cost: int = 0
+    cargo_penalty: int = 0
+    bonus_gold: int = 0
+
+
+@dataclass(frozen=True)
 class SiteSpec:
     name: str
     description: str
@@ -50,6 +62,7 @@ class SiteSpec:
     crystals: int
     relic: str
     encounter: str | None = None
+    approaches: tuple[AdventureApproach, ...] = ()
 
 
 SITES = {
@@ -62,6 +75,17 @@ SITES = {
     'border_watch': SiteSpec('Border Watch', 'Secure the watched seal for two uncontested enemy turns by round 8, or rout its defenders.',
                             ('pikeman', 'archer', 'brigand'), 50, 2, 'watch_bell', 'border_watch'),
     'explorer_camp': SiteSpec('Explorer’s Camp', 'A goblin and its hound guard a pair of trail-worn boots.', ('goblin', 'wolf'), 40, 1, 'wayfarer_boots'),
+    'courier_crossing': SiteSpec('Courier’s Crossing', 'Carry recovered dispatches to either exit by round 8, or rout the roadblock.',
+        ('pikeman', 'archer', 'brigand'), 50, 2, 'merchant_seal', 'courier_direct', (
+            AdventureApproach('direct', 'Take the open road', 'Free. Cross the exposed western approach; keep the full reward.', 'courier_direct'),
+            AdventureApproach('guided', 'Hire a guide', 'Pay 20 gold for covered southern deployment. The fee is lost if you retreat.', 'courier_guided', gold_cost=20),
+        )),
+    'supply_cache': SiteSpec('Supply Cache', 'Break out of the surrounding pack with recovered supplies by round 8, or rout the guardians.',
+        ('wolf', 'wolf', 'wolf', 'goblin'), 40, 2, 'oak_standard', 'supply_cache', (
+            AdventureApproach('light', 'Travel light', 'Carry the normal supplies at full movement speed.', 'supply_cache'),
+            AdventureApproach('full', 'Carry the full cache', 'Gain 40 extra gold on success; your hero has 1 less movement this battle, minimum 1.',
+                              'supply_cache', cargo_penalty=1, bonus_gold=40),
+        )),
 }
 
 
@@ -79,3 +103,14 @@ class Choice:
     options: tuple[ChoiceOption, ...]
     kind: str
     context: str
+
+
+@dataclass(frozen=True)
+class AdventureAttempt:
+    """An entered approach keeps its actual reward and burden across later saves."""
+    approach: str
+    encounter: str
+    gold: int
+    crystals: int
+    relic: str | None
+    cargo_penalty: int = 0
