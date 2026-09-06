@@ -152,3 +152,8 @@ names the isolated troop from the current army and selected deployment, using
 the hero starts alone. No saved troop capabilities or entry commands change.
 The wider defender column keeps all four Explorer names and wounded HP distinct
 at 125%, without reducing font size or changing the deployment geometry.
+
+The [retained guidance evidence](evidence/shardbound-guidance-2026-09-06/README.md)
+contains this final source-attributed matrix and six inspected frames. The
+isolated full suite passed 1,029 tests; 27 focused guidance, extraction,
+Observatory and Codex checks passed.
