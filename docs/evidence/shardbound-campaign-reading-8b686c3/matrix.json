@@ -1,0 +1,9624 @@
+{
+  "backend": "pyglet",
+  "layouts": 570,
+  "input_activations": 999,
+  "exact_save_reloads": 4,
+  "long_error": {
+    "path_characters": 760,
+    "diagnostic_characters": 1597,
+    "pages": 2,
+    "input_activations": 22,
+    "exact_save_reloads": 1
+  },
+  "matrix": [
+    {
+      "case": "accessible-departure",
+      "step": "offers",
+      "rules_id": "accessible-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "rules_id": "accessible-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-departure",
+      "step": "offers",
+      "rules_id": "challenge-2",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "rules_id": "challenge-2",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 6,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 7,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 8,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "rootward-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 5,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "gate-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "throne-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "recovery-declined",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 5
+    },
+    {
+      "case": "second-capital-loss",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 7
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "offers",
+      "rules_id": "challenge-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "rules_id": "challenge-1",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "offers",
+      "rules_id": "accessible-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "rules_id": "accessible-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-departure",
+      "step": "offers",
+      "rules_id": "challenge-2",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "rules_id": "challenge-2",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 6,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 7,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 8,
+      "visible": [
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "rootward-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 5,
+      "visible": [
+        11
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "gate-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "throne-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "recovery-declined",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 5
+    },
+    {
+      "case": "second-capital-loss",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 7
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "offers",
+      "rules_id": "challenge-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "rules_id": "challenge-1",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "offers",
+      "rules_id": "accessible-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "rules_id": "accessible-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-departure",
+      "step": "offers",
+      "rules_id": "challenge-2",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "rules_id": "challenge-2",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 6,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 7,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 8,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "rootward-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 5,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "gate-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "throne-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "recovery-declined",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 5
+    },
+    {
+      "case": "second-capital-loss",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 7
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "offers",
+      "rules_id": "challenge-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "rules_id": "challenge-1",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "offers",
+      "rules_id": "accessible-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "rules_id": "accessible-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-departure",
+      "step": "offers",
+      "rules_id": "challenge-2",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "rules_id": "challenge-2",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 6,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 7,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 8,
+      "visible": [
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "rootward-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 5,
+      "visible": [
+        11
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "gate-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "throne-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "recovery-declined",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 5
+    },
+    {
+      "case": "second-capital-loss",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 7
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "offers",
+      "rules_id": "challenge-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "rules_id": "challenge-1",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1280,
+        800
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "offers",
+      "rules_id": "accessible-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "rules_id": "accessible-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-departure",
+      "step": "offers",
+      "rules_id": "challenge-2",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "rules_id": "challenge-2",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots",
+        "watch_bell"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 6,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 7,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 8,
+      "visible": [
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "rootward-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 5,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "gate-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "throne-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "recovery-declined",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 5
+    },
+    {
+      "case": "second-capital-loss",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 7
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "offers",
+      "rules_id": "challenge-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "rules_id": "challenge-1",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 100,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "offers",
+      "rules_id": "accessible-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "rules_id": "accessible-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "accessible-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "standard-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-departure",
+      "step": "offers",
+      "rules_id": "challenge-2",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "rules_id": "challenge-2",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "challenge-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        1,
+        2,
+        3
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum",
+        "wayfarer_boots"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "storm_quiver",
+        "ember_lens",
+        "vanguard_drum"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 6,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer",
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 7,
+      "visible": [
+        "wayfarer_boots",
+        "watch_bell",
+        "merchant_seal",
+        "veil_censer"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "eight-earned-relics",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 8,
+      "visible": [
+        "iron_crown"
+      ],
+      "labels": 9
+    },
+    {
+      "case": "rootward-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        8,
+        9,
+        10
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 5,
+      "visible": [
+        11
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver",
+        "watch_bell"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 3,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "oak_standard",
+        "storm_quiver"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 4,
+      "visible": [
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "rootward-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 5,
+      "visible": [
+        "watch_bell",
+        "ember_lens"
+      ],
+      "labels": 10
+    },
+    {
+      "case": "gate-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        7
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-recovery",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "offers",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 3,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 4,
+      "visible": [
+        5,
+        4,
+        9,
+        10,
+        11
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "foundries-departure",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "iron_crown",
+        "ember_lens"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "throne-completed",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 11
+    },
+    {
+      "case": "recovery-declined",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 5
+    },
+    {
+      "case": "second-capital-loss",
+      "step": "ending",
+      "rules_id": "standard-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 7
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "offers",
+      "rules_id": "challenge-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 12
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        3,
+        4,
+        5
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-advance",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 2,
+      "visible": [
+        "moonstone",
+        "oak_standard",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "rules_id": "challenge-1",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "page": 0,
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 0,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 1,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 0,
+      "focused": 2,
+      "visible": [
+        5,
+        4,
+        6
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 0,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    },
+    {
+      "case": "saved-challenge1-recover",
+      "step": "retinue",
+      "percent": 125,
+      "window": [
+        1920,
+        1080
+      ],
+      "column": 1,
+      "focused": 1,
+      "visible": [
+        "moonstone",
+        "iron_crown"
+      ],
+      "labels": 8
+    }
+  ]
+}

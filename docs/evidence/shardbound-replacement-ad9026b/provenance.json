@@ -1,0 +1,27 @@
+{
+  "source_commit": "ad9026b426fd7f7c0d4f83408a5f9b64c1aadd2b",
+  "recorded_native_base": "c80fb3e79a305f85087c32037fd89d34ae4086e5",
+  "all_recorded_source_hashes_match_committed_source": true,
+  "native_inputs": 1170,
+  "native_exact_reloads": 4,
+  "native_reviews": 120,
+  "images_sha256": {
+    "replacement-save-error-125.png": "53b494c0b740b6806d7ae2fd5bd1e3f4396c115896da5d2f38ebac63c1cafe6e",
+    "round-4-heal-forecast.png": "23f2f25fd9493484774de907ecf34d429b48c9afca171ee21c5aa2dcff3ef743",
+    "roster-file-error-125-page-1.png": "8fb1abf2ff2334a53dfb12a69483809b971ea4ea9fdd380556157417424d64bd",
+    "review-warden-False-125.png": "5bcc8beaa6e63d918841a606cc9f473b7fa81c12635a6c6126a6a86de1dc5744",
+    "roster-file-error-125-page-2.png": "8ad60f3a93900f8e377ef72b2667a3dee59bf7639ce3909185d7fa105275d68d",
+    "round-4-swap-forecast.png": "de8347601149611e3169bb9c26a53d6dad6e2062b295ffad4302943c6cc11353",
+    "skyrider-file-error-125.png": "72443ea2f61701067e91ed2fd7848a46c1a8cf81e3bcac2c836ea91749dafe67"
+  },
+  "tests": {
+    "passed": 1108,
+    "seconds": 85.77
+  },
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "scene_runs": 20,
+    "failures": 0,
+    "scope": "same framework and Tribes source; before final optional replacement hint layout change"
+  }
+}

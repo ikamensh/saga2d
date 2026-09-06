@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+from collections import Counter
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -83,12 +84,58 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _elderwild(provinces, seed)
     elif theme == 'ruins':
         _ruins(provinces, seed)
+    if theme == 'frontier':
+        _site(provinces[(0, 2)], 'courier_crossing')
+        _site(provinces[(-1, 1)], 'muster_yard')
+        _site(provinces[(0, -1)], 'stranded_explorer')
+    elif theme == 'elderwild':
+        _site(provinces[(-1, -1)], 'supply_cache')
+        _site(provinces[(-1, 1)], 'pack_hunt')
+        _site(provinces[(0, -1)], 'smuggler_screen')
+    elif theme == 'ruins':
+        _site(provinces[(-1, 1)], 'sealed_vault')
+        _site(provinces[(-1, 0)], 'broken_observatory')
+        _site(provinces[(0, 0)], 'aerie_raid')
     _site(provinces[(-2, 2)], 'den')
     _site(provinces[(-1, 2)], 'explorer_camp')
+    # Preserve the former duplicate reward's discoverability without rerolling the map.
+    # (-2, 1) is a procedural western site, clear of every fixed authored source.
+    fallback = 'caravan' if theme == 'frontier' else 'grove' if theme == 'elderwild' else None
+    if fallback and not any(province.site_relic == SITES[fallback].relic for province in provinces.values()):
+        _site(provinces[(-2, 1)], fallback)
+    if theme == 'frontier':
+        _authored_duplicate(provinces, 'relief_column')
+    elif theme == 'ruins':
+        _authored_duplicate(provinces, 'runebound_causeway', reserved={(1, 0)})
     for province in provinces.values():
         province.guard_hp = [UNITS[kind].hp for kind in province.guards]
         province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
     return provinces
+
+
+def _authored_duplicate(provinces: dict[Pos, Province], kind: str, *, reserved=()) -> None:
+    """Replace one duplicate ordinary site, preserving its cheaper reward route.
+
+    Fixed authored sites and the western fallback are ineligible. The unchanged
+    duplicate is no farther east and has the same reward and no larger roster.
+    Province conquest, income and the displaced reward never change. Ruins also
+    reserves the direct road's ordinary Crown source for its unchanged route.
+    """
+    for province in sorted(provinces.values(), key=lambda p: p.pos):
+        if province.pos[0] < 0 or province.pos in reserved or province.site_kind not in FRONTIER_SITES:
+            continue
+        reward = province.site_gold, province.site_crystals, province.site_relic
+        if any(other.pos != province.pos and other.pos[0] <= province.pos[0]
+               and other.site_kind == province.site_kind
+               and (other.site_gold, other.site_crystals, other.site_relic) == reward
+               and Counter(other.site_guards) <= Counter(province.site_guards)
+               for other in provinces.values()):
+            spec = SITES[kind]
+            province.site, province.site_kind = spec.name, kind
+            # Authored finite roster: never append the normal eastern Guard.
+            province.site_guards = list(spec.guards)
+            return
+    raise ValueError(f'No duplicate ordinary reward route for {SITES[kind].name}.')
 
 
 def _site(province: Province, kind: str) -> None:

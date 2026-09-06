@@ -11,8 +11,9 @@ from typing import TYPE_CHECKING
 
 from saga2d import HexGrid
 
-from eador.content import Choice, ChoiceOption, RELICS, SITES, SKILLS
+from eador.content import AdventureApproach, AdventureAttempt, Choice, ChoiceOption, RELICS, SITES, SKILLS
 from eador.campaign import Campaign
+from eador.difficulty import DIFFICULTIES, RULESETS, DifficultySpec, RecoveryPreview
 from eador.rival import INTENTS, STRONGHOLD, RivalState, RivalTroop
 
 if TYPE_CHECKING:
@@ -41,20 +42,28 @@ class UnitSpec:
     upkeep: int
     building: str | None
     color: tuple[int, int, int]
+    abilities: tuple[str, ...] = ()
+    skirmisher: bool = False
+    crystals: int = 0
 
 
 UNITS = {
-    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127)),
+    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127), ('rally',)),
     'swordsman': UnitSpec('Swordsman', 34, 11, 4, 3, 1, 45, 2, 'barracks', (131, 177, 185)),
-    'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112)),
-    'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233)),
+    'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112), ('pin',)),
+    'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233), ('heal',)),
     'brigand': UnitSpec('Brigand', 20, 7, 1, 3, 1, 0, 0, None, (185, 102, 91)),
     'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
     'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
     'guard': UnitSpec('Dread Guard', 42, 12, 4, 3, 1, 0, 0, None, (173, 130, 196)),
+    'warden': UnitSpec('Warden', 38, 8, 4, 2, 1, 55, 2, 'barracks', (140, 164, 203), ('swap',)),
+    'ranger': UnitSpec('Ranger', 22, 7, 1, 3, 3, 50, 2, 'archery', (118, 185, 157), skirmisher=True),
     'pikeman': UnitSpec('Pikeman', 28, 9, 3, 2, 1, 40, 2, 'barracks', (173, 188, 149)),
+    'sapper': UnitSpec('Sapper', 26, 7, 2, 3, 1, 60, 2, 'market', (190, 161, 105), ('smoke',), crystals=1),
+    'adept': UnitSpec('Rune Adept', 28, 6, 2, 3, 2, 65, 2, 'mage_tower', (173, 143, 206), ('repulse',), crystals=2),
+    'skyrider': UnitSpec('Skyrider', 28, 10, 2, 4, 1, 85, 3, 'temple', (137, 189, 221), ('fly',), crystals=3),
 }
-RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman')
+RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman', 'ranger', 'warden', 'sapper', 'adept', 'skyrider')
 
 
 @dataclass(frozen=True)
@@ -66,10 +75,10 @@ class BuildingSpec:
 
 
 BUILDINGS = {
-    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen and defensive pikemen.'),
-    'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit ranged archers.'),
+    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen, defensive pikemen and extracting wardens.'),
+    'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit pinning archers and mobile rangers.'),
     'temple': BuildingSpec('Temple', 65, 0, 'Recruit acolytes; learn Heal; faster recovery.'),
-    'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana.'),
+    'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana. In your territory, H then I spends 3 crystals and 1 action to restore up to 8 mana. Encirclement blocks infusion at Westwatch.'),
     'market': BuildingSpec('Marketplace', 60, 0, '+8 gold income each turn.'),
 }
 
@@ -96,6 +105,38 @@ class Troop:
     max_hp: int
     level: int = 1
     xp: int = 0
+
+
+@dataclass(frozen=True)
+class TroopSnapshot:
+    """A detached troop description for a camp decision, not a live army member."""
+    id: int
+    kind: str
+    hp: int
+    max_hp: int
+    level: int
+    xp: int
+
+
+@dataclass(frozen=True)
+class ReplacementPreview:
+    outgoing: TroopSnapshot
+    incoming: TroopSnapshot
+    gold: int
+    crystals: int
+    actions: int
+    upkeep_before: int
+    upkeep_after: int
+    blocked_reason: str | None = None
+
+
+@dataclass(frozen=True)
+class InfusionPreview:
+    """Capped potential mana gain, fixed price, and the reason an order is blocked."""
+    mana: int
+    crystals: int
+    actions: int
+    blocked_reason: str | None = None
 
 
 @dataclass
@@ -165,13 +206,24 @@ class State:
     rival: RivalState = field(default_factory=RivalState)
     theme: str = 'frontier'
     campaign: Campaign | None = None
+    battle_adventure: AdventureAttempt | None = None
+    rules_id: str = 'standard-1'
 
     @classmethod
-    def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier') -> State:
+    def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier',
+            difficulty: str = 'standard') -> State:
+        if not isinstance(difficulty, str) or difficulty not in DIFFICULTIES:
+            raise RuleError('Choose Accessible, Standard or Challenge.')
+        return cls._new(seed, hero_class, theme, DIFFICULTIES[difficulty].id)
+
+    @classmethod
+    def _new(cls, seed: int, hero_class: str, theme: str, rules_id: str) -> State:
+        """Create from an exact saved policy, independent of new-game catalog aliases."""
         if type(seed) is not int:
             raise RuleError('The shard seed must be an integer.')
         if not isinstance(hero_class, str) or hero_class not in HERO_CLASSES:
             raise RuleError('Choose Commander, Warrior, Scout or Wizard.')
+        rules = RULESETS[rules_id]
         from eador.worldgen import generate
         provinces = generate(seed, theme)
         home = provinces[(-2, 0)]
@@ -180,22 +232,41 @@ class State:
         army = [Troop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
                 for i, kind in enumerate(('militia', 'militia', 'archer'), 1)]
         hero = Hero('Alden', hero_class, home.pos, max_hp, max_hp, mana, mana, army)
-        state = cls(seed, provinces, hero, theme=theme, actions_left=3 if hero_class == 'Scout' else 2)
+        state = cls(seed, provinces, hero, theme=theme, rules_id=rules.id,
+                    gold=rules.starting_gold, crystals=rules.starting_crystals,
+                    actions_left=3 if hero_class == 'Scout' else 2)
         state.rival = RivalState.initial()
-        state.rival.plan(state, delay=3)
+        state.rival.plan(state, delay=rules.opening_delay)
         state.log.append('Claim the shard: capture Duskspire before Westwatch falls.')
         return state
 
     @classmethod
-    def new_campaign(cls, seed: int = 7, hero_class: str = 'Commander') -> State:
-        state = cls.new(seed, hero_class)
+    def new_campaign(cls, seed: int = 7, hero_class: str = 'Commander', *,
+                     difficulty: str = 'standard') -> State:
+        state = cls.new(seed, hero_class, difficulty=difficulty)
         state.campaign = Campaign(seed)
         state.campaign.checkpoint(state)
+        return state
+
+    def replay(self) -> State:
+        """Return a fresh run with its original seed and exact saved realm policy."""
+        seed = self.campaign.seed if self.campaign else self.seed
+        state = type(self)._new(seed, self.hero.hero_class,
+                               'frontier' if self.campaign else self.theme, self.rules_id)
+        if self.campaign:
+            state.campaign = Campaign(seed)
+            state.campaign.checkpoint(state)
         return state
 
     def advance(self, offer_id: str, *, troop_ids=(), relic_ids=()) -> None:
         from eador.campaign import advance
         advance(self, offer_id, troop_ids, relic_ids)
+
+    def expedition_funding(self, *, recovery: bool = False) -> tuple[int, int]:
+        """Preview arrival gold/crystals; ordinary travel includes capped treasury carryover."""
+        if recovery:
+            return self.rules.recovery_gold, self.rules.recovery_crystals
+        return self.rules.starting_gold + min(40, self.gold), self.rules.starting_crystals + min(2, self.crystals)
 
     def recover(self, *, troop_ids=(), relic_ids=()) -> None:
         from eador.campaign import recover
@@ -218,6 +289,12 @@ class State:
             return 'Control both foundries before assaulting Duskspire.'
         return None
 
+    def adventure_approaches(self, destination: Pos | None = None) -> tuple[AdventureApproach, ...]:
+        destination = self.hero.pos if destination is None else destination
+        self.encounter_at(destination, kind='site')
+        site = self.provinces[destination].site_kind
+        return SITES[site].approaches if site else ()
+
     def encounter_at(self, destination: Pos, *, kind: str = 'conquest') -> str | None:
         if kind not in ('conquest', 'site'):
             raise RuleError('Inspect a conquest or site encounter.')
@@ -234,6 +311,8 @@ class State:
 
     @property
     def battle_encounter(self) -> str | None:
+        if self.battle_adventure is not None:
+            return self.battle_adventure.encounter
         if self.battle_kind not in ('conquest', 'site'):
             return None
         return self.encounter_at(self.battle_province, kind=self.battle_kind)
@@ -251,6 +330,27 @@ class State:
         return HexGrid(self.provinces)
 
     @property
+    def rules(self) -> DifficultySpec:
+        return RULESETS[self.rules_id]
+
+    @property
+    def difficulty(self) -> str:
+        return self.rules_id.rsplit('-', 1)[0]
+
+    def recovery_preview(self) -> RecoveryPreview:
+        """Read the coming rest without spending a turn or copying recovery rules."""
+        if self.encircled and self.hero.pos == (-2, 0):
+            return RecoveryPreview(0, 0, 0, 'Encirclement blocks recovery at Westwatch.')
+        departing = {troop.id for troop in self._unpaid_troops()}
+        recovery = (self.rules.army_recovery + (3 if 'temple' in self.buildings else 0)
+                    + self.hero.skill_ranks.get('quartermaster', 0)
+                    + (3 if self.hero.relic == 'oak_standard' else 0)
+                    + (2 if any(t.kind == 'healer' and t.id not in departing for t in self.hero.army) else 0))
+        hero_recovery = recovery + 2 + 2 * self.hero.skill_ranks.get('vigor', 0)
+        return RecoveryPreview(min(self.hero.max_hp - self.hero.hp, hero_recovery), recovery,
+                               min(self.hero.max_mana - self.hero.mana, self.rules.mana_recovery))
+
+    @property
     def encircled(self) -> bool:
         return self.provinces[(-2, 0)].owner == 'player' and all(
             self.provinces[pos].owner == 'rival' for pos in self.grid.neighbors((-2, 0)))
@@ -259,8 +359,9 @@ class State:
     def income(self) -> int:
         blocked = self.encircled
         income = sum(p.income for p in self.provinces.values() if p.owner == 'player')
-        return income - (self.provinces[(-2, 0)].income if blocked else 0) + (
+        production = income - (self.provinces[(-2, 0)].income if blocked else 0) + (
             8 if 'market' in self.buildings and not blocked else 0)
+        return production * self.rules.gold_percent // 100
 
     @property
     def crystal_income(self) -> int:
@@ -274,6 +375,17 @@ class State:
     @property
     def upkeep_shortfall(self) -> int:
         return max(0, self.upkeep - self.gold - self.income)
+
+    def _unpaid_troops(self) -> list[Troop]:
+        """Project deterministic desertions against this turn's available treasury."""
+        shortfall, departing = self.upkeep_shortfall, []
+        for troop in sorted(self.hero.army,
+                            key=lambda t: (t.level, t.xp, -UNITS[t.kind].upkeep, -t.id)):
+            if shortfall <= 0:
+                break
+            departing.append(troop)
+            shortfall -= UNITS[troop.kind].upkeep
+        return departing
 
     @property
     def spells(self) -> set[str]:
@@ -375,8 +487,45 @@ class State:
             self.hero.mana += 4
         self.log.append(f'Built {spec.name}.')
 
-    def recruit(self, kind: str) -> None:
-        self._ready()
+    def infusion_preview(self) -> InfusionPreview:
+        """Quote an optional Tower infusion without spending mana, currency or an action."""
+        mana = min(8, self.hero.max_mana - self.hero.mana)
+        try:
+            self._ready(action=True)
+        except RuleError as error:
+            reason = str(error)
+        else:
+            if self.provinces[self.hero.pos].owner != 'player':
+                reason = 'Infuse in one of your provinces.'
+            elif self.encircled and self.hero.pos == (-2, 0):
+                reason = 'Encirclement blocks infusion at Westwatch.'
+            elif 'mage_tower' not in self.buildings:
+                reason = 'Build a Mage Tower to infuse mana.'
+            elif not mana:
+                reason = 'Mana is already full.'
+            elif self.crystals < 3:
+                reason = 'Infusion requires 3 crystals.'
+            else:
+                reason = None
+        return InfusionPreview(mana, 3, 1, reason)
+
+    def infuse(self) -> None:
+        """Trade crystals and one campaign action for up to eight mana in a supplied camp."""
+        quote = self.infusion_preview()
+        if quote.blocked_reason:
+            raise RuleError(quote.blocked_reason)
+        self.crystals -= quote.crystals
+        self.actions_left -= quote.actions
+        self.hero.mana += quote.mana
+        self.log.append(f'Infused {quote.mana} mana for {quote.crystals} crystals and one action.')
+
+    def recruit_crystal_cost(self, kind: str) -> int:
+        if kind not in RECRUITABLE:
+            raise RuleError('That unit cannot be recruited.')
+        return UNITS[kind].crystals
+
+    def _check_recruit(self, kind: str, *, replacing: bool = False) -> None:
+        self._ready(action=replacing)
         if kind not in RECRUITABLE:
             raise RuleError('That unit cannot be recruited.')
         if self.provinces[self.hero.pos].owner != 'player':
@@ -384,15 +533,57 @@ class State:
         spec = UNITS[kind]
         if spec.building and spec.building not in self.buildings:
             raise RuleError(f'Build {BUILDINGS[spec.building].name} first.')
-        if len(self.hero.army) >= self.hero.max_army:
+        if not replacing and len(self.hero.army) >= self.hero.max_army:
             raise RuleError('Your army is full.')
         cost = self.recruit_cost(kind)
-        if self.gold < cost:
-            raise RuleError('Not enough gold.')
-        self.gold -= cost
-        self.hero.army.append(Troop(self.next_troop_id, kind, spec.hp, spec.hp))
+        if self.gold < cost or self.crystals < self.recruit_crystal_cost(kind):
+            raise RuleError('Not enough gold or crystals.')
+
+    def _fresh_troop(self, kind: str) -> Troop:
+        return Troop(self.next_troop_id, kind, UNITS[kind].hp, UNITS[kind].hp)
+
+    def _purchase_troop(self, kind: str) -> Troop:
+        troop = self._fresh_troop(kind)
+        self.gold -= self.recruit_cost(kind)
+        self.crystals -= self.recruit_crystal_cost(kind)
         self.next_troop_id += 1
-        self.log.append(f'Recruited {spec.name}.')
+        return troop
+
+    def recruit(self, kind: str) -> None:
+        self._check_recruit(kind)
+        self.hero.army.append(self._purchase_troop(kind))
+        self.log.append(f'Recruited {UNITS[kind].name}.')
+
+    def replacement_preview(self, outgoing_id: int, kind: str) -> ReplacementPreview:
+        """Quote permanent retirement and a fresh paid role without changing the army."""
+        outgoing = next((troop for troop in self.hero.army if troop.id == outgoing_id), None)
+        if outgoing is None:
+            raise RuleError('Choose a living troop to retire.')
+        gold, crystals = self.recruit_cost(kind), self.recruit_crystal_cost(kind)
+        incoming = self._fresh_troop(kind)
+        try:
+            self._check_recruit(kind, replacing=True)
+        except RuleError as error:
+            reason = str(error)
+        else:
+            reason = None
+        upkeep = self.upkeep
+        return ReplacementPreview(TroopSnapshot(**asdict(outgoing)), TroopSnapshot(**asdict(incoming)),
+                                  gold, crystals, 1, upkeep,
+                                  upkeep - UNITS[outgoing.kind].upkeep + UNITS[kind].upkeep, reason)
+
+    def replace_troop(self, outgoing_id: int, kind: str) -> None:
+        """Retire one troop and buy a fresh recruit in its slot for one campaign action."""
+        quote = self.replacement_preview(outgoing_id, kind)
+        if quote.blocked_reason:
+            raise RuleError(quote.blocked_reason)
+        index = next(i for i, troop in enumerate(self.hero.army) if troop.id == outgoing_id)
+        self.hero.army[index] = self._purchase_troop(kind)
+        self.actions_left -= quote.actions
+        self.log.append(f'Retired {UNITS[quote.outgoing.kind].name} #{outgoing_id} '
+                        f'(rank {quote.outgoing.level}, XP {quote.outgoing.xp}); '
+                        f'recruited {UNITS[kind].name} #{quote.incoming.id} for '
+                        f'{quote.gold} gold and {quote.crystals} crystals; spent one action.')
 
     def travel(self, destination: Pos) -> None:
         self._ready(action=True)
@@ -421,15 +612,29 @@ class State:
         if self.campaign:
             self.campaign.sync(self)
 
-    def explore(self) -> None:
+    def explore(self, *, approach: str | None = None) -> None:
         self._ready(action=True)
         province = self.provinces[self.hero.pos]
         if province.owner != 'player':
             raise RuleError('Explore a province you control.')
         if province.explored or province.site is None:
             raise RuleError('This province has no unexplored site.')
-        self.actions_left -= 1
+        options = self.adventure_approaches()
+        selected = None
+        if options:
+            selected_id = options[0].id if approach is None else approach
+            selected = next((option for option in options if option.id == selected_id), None)
+        if approach is not None and selected is None:
+            raise RuleError('Choose one of the offered adventure approaches.')
+        if selected and (self.gold < selected.gold_cost or self.crystals < selected.crystals_cost):
+            raise RuleError('Not enough gold or crystals for that approach.')
+        self.battle_adventure = (AdventureAttempt(selected.id, selected.encounter, province.site_gold + selected.bonus_gold,
+                                 province.site_crystals, province.site_relic, selected.cargo_penalty) if selected else None)
         self._start_battle(province.pos, 'site', province.site_guards)
+        self.actions_left -= 1
+        if selected:
+            self.gold -= selected.gold_cost
+            self.crystals -= selected.crystals_cost
 
     def _start_battle(self, province: Pos, kind: str, enemies: list[str]) -> None:
         from eador.battle import Battle
@@ -440,7 +645,8 @@ class State:
                   target.site_guard_hp if kind == 'site' else target.guard_hp)
         self.battle = Battle.create(self.hero, enemies, target.terrain, self.spells,
                                     seed=self.seed + self.turn * 37 + province[0] * 7 + province[1], enemy_hp=health,
-                                    encounter=self.battle_encounter)
+                                    encounter=self.battle_encounter,
+                                    cargo_penalty=self.battle_adventure.cargo_penalty if self.battle_adventure else 0)
         if expedition:
             for unit, troop in zip((u for u in self.battle.units if u.team == 'enemy'), self.rival.army):
                 unit.source_id = troop.id
@@ -508,11 +714,13 @@ class State:
             self.hero.hp = min(self.hero.max_hp, self.hero.hp + 6 * self.hero.skill_ranks.get('vigor', 0))
             if self.battle_kind == 'site':
                 province.explored = True
-                self.gold += province.site_gold
-                self.crystals += province.site_crystals
-                message = f'Explored {province.site}: +{province.site_gold} gold, +{province.site_crystals} crystals.'
-                if province.site_relic:
-                    self._choices.append(self._relic_choice(province.site_relic))
+                reward = self.battle_adventure
+                gold, crystals, relic = (reward.gold, reward.crystals, reward.relic) if reward else (province.site_gold, province.site_crystals, province.site_relic)
+                self.gold += gold
+                self.crystals += crystals
+                message = f'Explored {province.site}: +{gold} gold, +{crystals} crystals.'
+                if relic:
+                    self._choices.append(self._relic_choice(relic))
             elif self.battle_kind == 'intercept' and province.guards:
                 self.gold += 25
                 message = f'The rival expedition is broken: +25 gold. {province.name} still has a garrison.'
@@ -544,6 +752,7 @@ class State:
         self.battle = None
         self.battle_kind = None
         self.battle_province = None
+        self.battle_adventure = None
         if self.status != 'playing' or expedition and not expedition_lost:
             self.rival.plan(self)
         if self.campaign:
@@ -561,8 +770,8 @@ class State:
 
     def end_turn(self) -> None:
         self._ready()
-        while self.upkeep_shortfall:
-            deserter = min(self.hero.army, key=lambda troop: (troop.level, troop.xp, -UNITS[troop.kind].upkeep, -troop.id))
+        recovery = self.recovery_preview()
+        for deserter in self._unpaid_troops():
             self.hero.army.remove(deserter)
             self.log.append(f'Unpaid upkeep: level {deserter.level} {UNITS[deserter.kind].name} deserted.')
         earnings = self.income - self.upkeep
@@ -570,17 +779,12 @@ class State:
         self.crystals += self.crystal_income
         self.turn += 1
         self.actions_left = 3 if self.hero.hero_class == 'Scout' else 2
-        can_rest = not (self.encircled and self.hero.pos == (-2, 0))
+        can_rest = recovery.blocked_reason is None
         if can_rest:
-            recovery = 6 + (3 if 'temple' in self.buildings else 0) + self.hero.skill_ranks.get('quartermaster', 0)
-            if self.hero.relic == 'oak_standard':
-                recovery += 3
-            if any(t.kind == 'healer' for t in self.hero.army):
-                recovery += 2
-            self.hero.hp = min(self.hero.max_hp, self.hero.hp + recovery + 2 + 2 * self.hero.skill_ranks.get('vigor', 0))
+            self.hero.hp += recovery.hero_hp
             for troop in self.hero.army:
-                troop.hp = min(troop.max_hp, troop.hp + recovery)
-            self.hero.mana = min(self.hero.max_mana, self.hero.mana + 4)
+                troop.hp = min(troop.max_hp, troop.hp + recovery.army_hp)
+            self.hero.mana += recovery.mana
         rest = 'army rests' if can_rest else 'encirclement blocks recovery'
         self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; {rest}.')
         self.rival.advance(self)
@@ -644,7 +848,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 8
+        data['schema_version'] = 12
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -663,8 +867,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7 and 8.')
+        if type(version) is not int or version not in range(1, 13):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1 through 12.')
         _validate_save(data, version)
         if version >= 8:
             from eador.campaign import validate_campaign
@@ -672,6 +876,8 @@ class State:
         else:
             data['campaign'] = None
         data.pop('schema_version', None)
+        if version < 12:
+            data['rules_id'] = 'standard-1'
         if version < 6:
             data['theme'] = 'frontier'
         if version == 1:
@@ -725,6 +931,18 @@ class State:
         if version < 7 and data['battle'] is not None:
             for unit in data['battle']['units']:
                 unit.update(abilities=(), pinned=False, pin_cooldown=0)
+        if version < 10:
+            data['battle_adventure'] = None
+            if data['battle'] is not None:
+                data['battle']['objective']['exits'] = ()
+                for unit in data['battle']['units']:
+                    unit['cargo_penalty'] = 0
+        if version < 11 and data['battle'] is not None:
+            data['battle'].update(sight_rules='open', smoke_clouds=[])
+            for unit in data['battle']['units']:
+                unit['spent_abilities'] = ()
+        if data['battle_adventure'] is not None:
+            data['battle_adventure'] = AdventureAttempt(**data['battle_adventure'])
         data['rival']['pos'] = tuple(data['rival']['pos'])
         if data['rival']['target'] is not None:
             data['rival']['target'] = tuple(data['rival']['target'])
@@ -782,7 +1000,7 @@ def _validate_save(data: dict, version: int) -> None:
     def text_fields(value, names, label):
         require(all(isinstance(value[name], str) for name in names), f'{label} contains invalid text.')
 
-    new_state = {'inventory', '_choices', 'rival', 'theme', 'campaign'}
+    new_state = {'inventory', '_choices', 'rival', 'theme', 'campaign', 'battle_adventure', 'rules_id'}
     state_keys = {f.name for f in fields(State)} - new_state
     if version >= 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
@@ -792,7 +1010,14 @@ def _validate_save(data: dict, version: int) -> None:
         state_keys.add('theme')
     if version >= 8:
         state_keys.add('campaign')
+    if version >= 10:
+        state_keys.add('battle_adventure')
+    if version >= 12:
+        state_keys.add('rules_id')
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
+    if version >= 12:
+        require(isinstance(data['rules_id'], str) and data['rules_id'] in RULESETS, 'Unknown saved difficulty rules.')
+    rules = RULESETS[data['rules_id']] if version >= 12 else RULESETS['standard-1']
     if version >= 6:
         from eador.worldgen import THEMES
         require(isinstance(data['theme'], str) and data['theme'] in THEMES, 'Unknown shard theme.')
@@ -907,7 +1132,7 @@ def _validate_save(data: dict, version: int) -> None:
         integer(rival['gold'], 'Rival treasury')
         integer(rival['next_troop_id'], 'Rival next troop ID', minimum=1)
         integer(rival['defeats'], 'Rival defeats')
-        integer(rival['turns_until_action'], 'Rival countdown', maximum=4)
+        integer(rival['turns_until_action'], 'Rival countdown', maximum=rules.replacement_delay)
         require(rival['intent'] in INTENTS, 'Unknown rival intent.')
         rival_pos = position(rival['pos'], 'Rival position')
         require(rival_pos in provinces, 'Rival is outside the shard.')
@@ -932,6 +1157,17 @@ def _validate_save(data: dict, version: int) -> None:
             rival_by_id[troop['id']] = troop
 
     battle = data['battle']
+    if version >= 10:
+        attempt = data['battle_adventure']
+        if attempt is not None:
+            require(battle is not None and data['battle_kind'] == 'site', 'Adventure approach has no site battle.')
+            object_fields(attempt, {f.name for f in fields(AdventureAttempt)}, 'Adventure approach')
+            text_fields(attempt, ('approach', 'encounter'), 'Adventure approach')
+            integer(attempt['gold'], 'Adventure gold reward')
+            integer(attempt['crystals'], 'Adventure crystal reward')
+            integer(attempt['cargo_penalty'], 'Adventure cargo penalty', maximum=1)
+            require(attempt['relic'] is None or isinstance(attempt['relic'], str) and attempt['relic'] in RELICS,
+                    'Adventure names an unknown relic.')
     if battle is None:
         require(data['battle_kind'] is None and data['battle_province'] is None, 'Battle context has no battle.')
         return
@@ -941,7 +1177,8 @@ def _validate_save(data: dict, version: int) -> None:
     require(position(data['battle_province'], 'Battle province') in provinces, 'Battle province is outside the shard.')
     keys = {'units', 'terrain', 'mana', 'spells', 'round', 'outcome', 'log'}
     object_fields(battle, keys | ({'spell_costs', 'spell_power'} if version >= 2 else set()) | ({'hero_id'} if version >= 3 else set())
-                  | ({'objective', 'outcome_reason'} if version >= 5 else set()), 'Battle')
+                  | ({'objective', 'outcome_reason'} if version >= 5 else set())
+                  | ({'sight_rules', 'smoke_clouds'} if version >= 11 else set()), 'Battle')
     integer(battle['mana'], 'Battle mana', maximum=hero['max_mana'])
     integer(battle['round'], 'Battle round', minimum=1, maximum=81)
     require(battle['outcome'] in (None, 'player', 'enemy'), 'Unknown battle outcome.')
@@ -963,13 +1200,59 @@ def _validate_save(data: dict, version: int) -> None:
         cells.add(pos)
         require(tile['kind'] in ('plains', 'forest', 'hills', 'marsh'), 'Unknown battle terrain.')
     require(len(cells) == 37, 'A battlefield must contain 37 hexes.')
+    if version >= 11:
+        require(battle['sight_rules'] in ('open', 'terrain'), 'Unknown sight rules.')
+        require(isinstance(battle['smoke_clouds'], list), 'Smoke clouds must be a list.')
+        cloudy = set()
+        for cloud in battle['smoke_clouds']:
+            object_fields(cloud, {'pos', 'expires_before_team'}, 'Smoke cloud')
+            pos = position(cloud['pos'], 'Smoke position')
+            require(pos in cells and pos not in cloudy, 'Smoke hex is invalid or duplicated.')
+            cloudy.add(pos)
+            require(cloud['expires_before_team'] in ('player', 'enemy'), 'Smoke expiry needs a team.')
+        require(battle['sight_rules'] == 'terrain' or not cloudy, 'Open sight battles cannot contain smoke.')
     objective = battle['objective'] if version >= 5 else asdict(BattleObjective())
     if version >= 5:
-        object_fields(objective, {f.name for f in fields(BattleObjective)}, 'Objective')
-        require(objective['kind'] in ('rout', 'hold'), 'Unknown battle objective.')
+        object_fields(objective, {f.name for f in fields(BattleObjective)} - ({'exits'} if version < 10 else set()), 'Objective')
+        require(objective['kind'] in (('rout', 'hold', 'extract') if version >= 10 else ('rout', 'hold')), 'Unknown battle objective.')
+        if version >= 10:
+            from eador.encounters import ENCOUNTERS
+            province = provinces[tuple(data['battle_province'])]
+            options = (SITES[province['site_kind']].approaches
+                       if data['battle_kind'] == 'site' and province['site_kind'] else ())
+            attempt = data['battle_adventure']
+            require(bool(options) == (attempt is not None), 'This adventure requires its recorded approach.')
+            if attempt is not None:
+                selected = next((option for option in options if option.id == attempt['approach'] and option.encounter == attempt['encounter']), None)
+                require(selected is not None, 'Adventure approach does not belong to this site.')
+                require(province['owner'] == 'player' and not province['explored'] and hero['pos'] == province['pos'],
+                        'An adventure requires the hero at its controlled, unexplored site.')
+                require(attempt['cargo_penalty'] == selected.cargo_penalty, 'Cargo differs from the selected approach.')
+                require((attempt['gold'], attempt['crystals'], attempt['relic']) == (
+                    province['site_gold'] + selected.bonus_gold, province['site_crystals'], province['site_relic']),
+                    'Adventure rewards differ from the saved site and selected approach.')
+                definition = ENCOUNTERS[attempt['encounter']]
+                require(objective['kind'] == definition.objective, 'Objective differs from the selected approach.')
+                require(objective['deadline'] == (None if definition.objective == 'rout' else definition.deadline),
+                        'Deadline differs from the selected approach.')
+                if definition.objective == 'hold':
+                    require(objective['target'] == list(definition.seal) and objective['required'] == definition.hold_turns,
+                            'Hold objective differs from the selected approach.')
+            if objective['kind'] == 'extract':
+                require(attempt is not None, 'Extraction requires a recorded adventure approach.')
+                require(isinstance(objective['exits'], list) and 1 <= len(objective['exits']) <= 2, 'Extraction needs one or two exits.')
+                exits = [position(pos, 'Exit') for pos in objective['exits']]
+                require(len(set(exits)) == len(exits) and set(exits) <= cells, 'Invalid or duplicate exits.')
+                require(tuple(exits) == ENCOUNTERS[attempt['encounter']].exits, 'Exits differ from the selected approach.')
+            else:
+                require(objective['exits'] == [], 'Only extraction objectives have exits.')
         integer(objective['required'], 'Objective required turns', maximum=80)
         integer(objective['progress'], 'Objective progress', maximum=objective['required'])
-        if objective['kind'] == 'rout':
+        if objective['kind'] == 'extract':
+            require(objective['target'] is None and objective['required'] == objective['progress'] == 0, 'Extraction has hold parameters.')
+            integer(objective['deadline'], 'Extraction deadline', minimum=1, maximum=80)
+            require(battle['round'] <= objective['deadline'], 'The extraction is past its deadline.')
+        elif objective['kind'] == 'rout':
             require(objective['target'] is None and objective['deadline'] is None
                     and objective['required'] == objective['progress'] == 0, 'Rout objective has hold parameters.')
         else:
@@ -983,13 +1266,14 @@ def _validate_save(data: dict, version: int) -> None:
                           and data['battle_kind'] == 'conquest' and data['battle_province'] == [2, 0])
             require(authored_site or final_gate, 'A hold objective requires an authored adventure.')
         reason = battle['outcome_reason']
-        require(reason in (None, 'rout', 'hold', 'hero_death', 'deadline', 'exhaustion'), 'Unknown battle outcome reason.')
+        require(reason in ((None, 'rout', 'hold', 'hero_death', 'deadline', 'exhaustion', 'escape') if version >= 10
+                           else (None, 'rout', 'hold', 'hero_death', 'deadline', 'exhaustion')), 'Unknown battle outcome reason.')
         require((battle['outcome'] is None) == (reason is None), 'Battle outcome reason is inconsistent.')
     require(isinstance(battle['units'], list) and 2 <= len(battle['units']) <= 14, 'Invalid battle army size.')
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     expedition_ids = set()
     for unit in battle['units']:
-        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set())
+        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set()) - ({'cargo_penalty'} if version < 10 else set()) - ({'spent_abilities'} if version < 11 else set())
         object_fields(unit, unit_keys, 'Battle unit')
         integer(unit['id'], 'Battle unit ID')
         require(unit['id'] not in ids, 'Duplicate battle unit ID.')
@@ -1003,12 +1287,22 @@ def _validate_save(data: dict, version: int) -> None:
         integer(unit['defense'], 'Battle unit defense')
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
+        if version >= 10:
+            integer(unit['cargo_penalty'], 'Carried cargo penalty', maximum=1)
+            expected_cargo = data['battle_adventure']['cargo_penalty'] if unit['id'] == 0 and data['battle_adventure'] else 0
+            require(unit['cargo_penalty'] == expected_cargo, 'Carried cargo differs from the adventure approach.')
         if version >= 7:
-            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace'), unique=True)
-            require('pin' not in unit['abilities'] or unit['kind'] == 'archer'
-                    or unit['kind'] == 'hero' and hero['relic'] == 'storm_quiver', 'This unit cannot learn Pin.')
-            require('brace' not in unit['abilities'] or unit['kind'] == 'hero' and hero['relic'] == 'watch_bell',
-                    'Only the Watch Bell grants a Brace ability.')
+            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap', 'rally', 'smoke', 'repulse', 'fly') if version >= 11 else ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
+            if version >= 11:
+                strings(unit['spent_abilities'], 'Spent abilities', ('smoke', 'repulse'), unique=True)
+                require(set(unit['spent_abilities']) <= set(unit['abilities']), 'Spent charge requires its ability.')
+                require(battle['sight_rules'] == 'terrain' or not set(unit['abilities']) & {'rally', 'smoke', 'repulse', 'fly'},
+                        'Older open-sight armies cannot gain new capabilities.')
+            relic_ability = RELICS[hero['relic']].battle_ability if hero['relic'] else None
+            allowed = ({relic_ability} - {None} if unit['kind'] == 'hero'
+                       else set(UNITS[unit['kind']].abilities))
+            require(set(unit['abilities']) <= allowed,
+                    'A battle ability is not granted by this troop or its equipped relic.')
             require(type(unit['pinned']) is bool, 'Invalid Pinned status.')
             integer(unit['pin_cooldown'], 'Pin cooldown', maximum=2)
             require(unit['pin_cooldown'] == 0 or 'pin' in unit['abilities'], 'Pin cooldown requires the ability.')
@@ -1047,9 +1341,27 @@ def _validate_save(data: dict, version: int) -> None:
     require(player_ids == troop_ids | {0} and enemies, 'Battle army does not match the campaign army.')
     if version >= 3 and data['battle_kind'] in ('defense', 'intercept'):
         require(rival_by_id.keys() <= expedition_ids, 'Expedition is missing a rival soldier.')
+    if version >= 10 and data['battle_adventure'] is not None:
+        province = provinces[tuple(data['battle_province'])]
+        require([unit['kind'] for unit in enemies] == province['site_guards'], 'Adventure defenders differ from the saved site roster.')
+        require(all(unit['hp'] <= hp for unit, hp in zip(enemies, province['site_guard_hp'])),
+                'Adventure defenders cannot regain wounds during an attempt.')
+    if version >= 11:
+        for team in ('player', 'enemy'):
+            require(sum(cloud['expires_before_team'] == team for cloud in battle['smoke_clouds'])
+                    <= sum(unit['team'] == team and 'smoke' in unit['spent_abilities']
+                           and (team == 'enemy' or unit['acted'] and unit['moved'])
+                           for unit in battle['units']),
+                    'Smoke requires its team’s spent charge and current player order.')
     hero_unit = next(unit for unit in battle['units'] if unit['id'] == 0)
     if battle['outcome'] == 'player':
-        if version >= 5 and battle['outcome_reason'] == 'hold':
+        if version >= 10 and battle['outcome_reason'] == 'escape':
+            require(hero_unit['hp'] > 0 and objective['kind'] == 'extract' and hero_unit['pos'] in objective['exits']
+                    and hero_unit['acted'] and hero_unit['moved'], 'Escape requires a living carrier who spent its order at an exit.')
+            require(any(unit['hp'] > 0 for unit in enemies) and not any(
+                unit['hp'] > 0 and HexGrid.distance(tuple(unit['pos']), tuple(hero_unit['pos'])) == 1 for unit in enemies),
+                'Escape requires an uncontested exit with surviving defenders.')
+        elif version >= 5 and battle['outcome_reason'] == 'hold':
             require(hero_unit['hp'] > 0 and objective['kind'] == 'hold'
                     and objective['progress'] == objective['required'], 'Hold victory is inconsistent.')
             target = tuple(objective['target'])
@@ -1064,8 +1376,8 @@ def _validate_save(data: dict, version: int) -> None:
         require(hero_unit['hp'] > 0 and any(unit['hp'] > 0 for unit in enemies), 'Unfinished battle already has a winner.')
         require(objective['kind'] != 'hold' or objective['progress'] < objective['required'], 'Unfinished hold objective is already complete.')
     elif version >= 5 and battle['outcome_reason'] == 'deadline':
-        require(hero_unit['hp'] > 0 and objective['kind'] == 'hold' and battle['round'] == objective['deadline']
-                and objective['progress'] < objective['required'] and any(unit['hp'] > 0 for unit in enemies),
+        require(hero_unit['hp'] > 0 and objective['kind'] in ('hold', 'extract') and battle['round'] == objective['deadline']
+                and (objective['kind'] == 'extract' or objective['progress'] < objective['required']) and any(unit['hp'] > 0 for unit in enemies),
                 'Objective deadline defeat is inconsistent.')
     else:
         require(hero_unit['hp'] == 0 or battle['round'] == 81, 'Battle defeat is inconsistent.')

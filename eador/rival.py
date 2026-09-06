@@ -160,4 +160,4 @@ class RivalState:
         self.army.clear()
         self.defeats += 1
         self.pos = STRONGHOLD
-        self.plan(state, delay=4)
+        self.plan(state, delay=state.rules.replacement_delay)

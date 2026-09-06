@@ -1,0 +1,22 @@
+{
+  "result_source": "a58b0ce",
+  "screen_source": "5941f60",
+  "recorded_source_hashes_match_commits": true,
+  "integrated_tests": {
+    "passed": 1083,
+    "seconds": 98.54
+  },
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "scene_runs": 20,
+    "failures": 0
+  },
+  "images_sha256": {
+    "screen-retry-briefing-125.png": "4f7bb5a3a9d6b1e2bbaffd5324792e071004d0c795dde4bbc82239501ac15865",
+    "hold-deadline-125.png": "434ddff12269e690fc18bd5a5a6d66eb8827a575371be8107da782ddd7f4bb5e",
+    "escape-125.png": "fe98d0d4f841636059b9a2bd919902b1735e250a83fb4e3355f0f3da11ee4fbf",
+    "hero-death-125.png": "63e8cb92555610471c70846454daef93f0e6dffcf695d65c19f6232ff0757f6e",
+    "screen-northern-result-125.png": "f725bd818a29f095c10eba5de43d4bf2abd656e9248504c2ce8a58347043a556",
+    "result-save-error-125.png": "4e798187843abce586f263ab2d88eeafb241653a3fbdd6a96e620bedc42e60ca"
+  }
+}

@@ -1,0 +1,4 @@
+{"elapsed_seconds": 3.3300602808594704e-07, "rss_bytes": 127827968, "frames": 0, "window_latency": {}, "status": "running", "journeys": 0}
+{"elapsed_seconds": 60.00700795801822, "rss_bytes": 326320128, "frames": 3418, "window_latency": {"p50_ms": 6.3467504805885255, "p95_ms": 19.168962491676197, "p99_ms": 33.51454397023189, "max_ms": 77.40729197394103, "samples": 3418}, "status": "running", "journeys": 17}
+{"elapsed_seconds": 120.01157645799685, "rss_bytes": 254492672, "frames": 6839, "window_latency": {"p50_ms": 7.197500031907111, "p95_ms": 21.14700002130121, "p99_ms": 35.88772522052753, "max_ms": 66.17700000060722, "samples": 3421}, "status": "running", "journeys": 36}
+{"elapsed_seconds": 180.0834840000025, "rss_bytes": 325140480, "frames": 10246, "window_latency": {"p50_ms": 7.241624989546835, "p95_ms": 21.211579290684305, "p99_ms": 36.691001973813414, "max_ms": 62.69516597967595, "samples": 3407}, "status": "completed", "journeys": 54}

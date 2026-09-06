@@ -12,6 +12,20 @@ From the repository root, with uv installed:
 uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py
 ```
 
+Add `--check-campaign` to exercise two complete linked campaigns in the extracted
+app. The direct journey uses four separate app processes; the recovery journey
+uses five, including a restart at the lost-capital recovery decision. Every
+changing order uses native player input. Tactical battles use the visible
+automatic-round control; this is campaign/save verification, not manual tactics
+or a human playtest. The final process restores the completed chronicle and
+returns to title. Settings persist at 125% reading size throughout.
+
+The check writes complete state checkpoints, event records and screenshots under
+`dist/shardbound/campaign-verification/`, isolated from player saves. Each fresh
+process loads through the title's quickload control and compares the entire saved
+State with the preceding process. These reports supplement the quick smoke check;
+they do not establish clean-account, Windows or human playtest acceptance.
+
 Generate shipping audio explicitly before packaging when composition or
 synthesis source changes:
 
@@ -117,9 +131,32 @@ open -W -n dist/shardbound/Shardbound.app --args --smoke-image /tmp/shardbound-l
 ```
 
 Without smoke arguments, `Shardbound.app` runs the game's ordinary entry point.
+For an independent playtest with separate saves and settings:
+
+```bash
+open -n dist/shardbound/Shardbound.app --args --data-dir /tmp/shardbound-playtest
+```
+
+**A / About this build** on the title and Field Guide shows the recorded version,
+source commit, development scope, credits, feedback instructions and actual data
+directory. Source launches identify themselves as a source checkout; frozen
+builds read their bundled manifest and identify modified source when applicable.
+The smoke check exercises this ordinary launch configuration with an isolated
+profile, reads every About page and checks its identity against the manifest.
+The short native smoke yields between frames at no more than 30 FPS; longer
+campaign verification uses the same paced native input driver as source checks.
+
 Normal player saves retain the game's configured location; smoke mode never
 uses those saves. The special flag is packaging verification, not a player
 feature or a substitute for a complete packaged campaign test.
+
+The separate `--campaign-check OUTPUT --phase N` verification entry runs one
+phase of the journey above; add `--recovery` consistently for all five recovery
+phases. Phase one requires a new output directory. The build snapshots only the
+three existing public-input policy helpers it needs, alongside the verifier;
+the frozen app does not import them from a source checkout. Normal launches do
+not execute these verification paths. The build manifest fingerprints their
+exact sources along with the application and packaging recipe.
 
 ## Evidence from the first local artifact
 
@@ -165,6 +202,52 @@ This historical archive predates the Guard/settings/audio packaging checks
 above. Updating the recipe or passing a source-mode smoke does not update that
 artifact or its evidence. Build and inspect a new frozen candidate only after
 the intended game and audio integration commits are assembled.
+
+## First-playtest checkpoint — 2026-09-06
+
+The preserved local archive at
+`dist/shardbound-checkpoints/f63aa6f2806c/Shardbound-macos-arm64.zip`
+contains source `f63aa6f2806cfa47395b27cd89d531dce67ec7bf`. It is
+**32,670,210 bytes**, SHA-256
+`f7a94054783ae42d5cbed66232512cb663c233eba9b1201e3509c8490def6b96`.
+The [retained manifest](evidence/shardbound-playtest-f63aa6f-build.json)
+records the exact inputs and extracted frozen application checks: native
+input, campaign/battle/Guard saves, settings Apply/Cancel/restart, Codex/rival
+rendering, and all fourteen installed audio assets with live mix/cleanup.
+
+This archive includes the control/flight roster, audio/display settings and
+initial Pack Hunt. It predates the final Pack Hunt deployment tuning, the
+four new active relics, and wrapped Labels. It remains a development build
+(`release_ready: false`), preserved separately from subsequent build output.
+The dirty flag reflects unrelated `.gitignore` work; snapshotted source hashes
+are recorded. Windows, a clean account and a full packaged campaign remain
+unverified. See [the playtest log](eador-playtests.md) for feedback status.
+
+## Integrated playable checkpoint — 2026-09-06
+
+The previous integrated Mac checkpoint is source `0e271756d35d` at
+`dist/shardbound-checkpoints/0e271756d35d/Shardbound-macos-arm64.zip`:
+**32,693,078 bytes**, SHA-256
+`c182ef2e1daf00633e0381441dfc02eeb4f95d6193fbdc2ef52dc05a6577a21c`.
+It includes Challenge-2, the eighth authored adventure and larger guidance
+text, with an updated player guide. [Manifest, launch report and inspected frames](evidence/shardbound-integrated-0e27175/README.md)
+retain the extracted frozen and LaunchServices checks. The earlier playtest
+archive is unchanged. This remains local development evidence; the native
+source campaign matrix is not a full packaged campaign test.
+
+## Ten-family development checkpoint — 2026-09-06
+
+The latest preserved Mac checkpoint is source `56f1ffb1036b` at
+`dist/shardbound-checkpoints/56f1ffb1036b/Shardbound-macos-arm64.zip`:
+**32,734,895 bytes**, SHA-256
+`c8a8a2a5bb3c9fe7f026dd7dccfddd3e03a2d237496502dc5357678f8165d3e1`.
+It includes Aerie Raid, Smuggler Screen, troop replacement, Tower infusion and
+larger title, purchase, Hero, reward/result, save, rival and campaign reading.
+[Manifest, launch checks and inspected frames](evidence/shardbound-package-56f1ffb/README.md)
+record extracted-runtime and LaunchServices smoke with isolated saves/settings,
+all shipping audio and a local ad-hoc signature. This is a development checkpoint;
+full packaged-campaign, Windows, clean-account and human checks remain open.
+Earlier archives and the original pending playtest are unchanged.
 
 ## Windows x64 plan — untested
 

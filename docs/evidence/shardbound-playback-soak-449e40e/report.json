@@ -1,0 +1,351 @@
+{
+  "actions": {
+    "auto_rounds": 14,
+    "battle_reading_cancel": 6,
+    "battle_save_load": 6,
+    "battles_resolved": 5,
+    "browser_save_load": 2,
+    "button": 5,
+    "choice_save_load": 5,
+    "click": 15,
+    "hero_Commander": 1,
+    "hero_Scout": 1,
+    "hero_Warrior": 1,
+    "key": 137,
+    "manual_moves": 6,
+    "reading_100": 2,
+    "reading_125": 1,
+    "relic_choices": 3,
+    "restart": 3,
+    "seed_7": 1,
+    "seed_8": 1,
+    "seed_9": 1,
+    "skill_choices": 2,
+    "wait": 1313,
+    "watched_playbacks": 14
+  },
+  "all_game_modules_from_snapshot": true,
+  "architecture": "arm64",
+  "backend": "PygletBackend",
+  "cleanup": {
+    "awake_helper_exited": true,
+    "temporary_saves_removed": true,
+    "window_closed": true
+  },
+  "completed_journeys": 2,
+  "elapsed_seconds": 90.15036125003826,
+  "finished_utc": "2026-09-06T12:04:40.288882+00:00",
+  "fps_cap": 60,
+  "frames": 4891,
+  "game_framework_last_change": "031918631e6444ccb95d23632a131abe376acf87",
+  "gl_renderer": "Apple M4",
+  "gl_vendor": "Apple",
+  "gl_version": "4.1 Metal - 90.5",
+  "hw.memsize": "25769803776",
+  "hw.model": "Mac16,13",
+  "input_interval_seconds": 0.05,
+  "last_actions": [
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattleScene",
+      "key",
+      "A"
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ],
+    [
+      "BattlePlaybackScene",
+      "wait",
+      null
+    ]
+  ],
+  "latency": {
+    "max_ms": 172.65500000212342,
+    "p50_ms": 13.352292007766664,
+    "p95_ms": 20.712687517516315,
+    "p99_ms": 55.39381718845122,
+    "samples": 4891
+  },
+  "latency_byte_order": "little",
+  "latency_file": "latency-ms.f64",
+  "latency_measurement": "Game.tick only: input dispatch, updates and real rendering; excludes pacing, driver setup, screenshots and report I/O",
+  "loaded_game_modules": {
+    "eador": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/__init__.py",
+    "eador.app": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/app.py",
+    "eador.art": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/art.py",
+    "eador.battle": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/battle.py",
+    "eador.battle_playback_scene": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/battle_playback_scene.py",
+    "eador.battle_trace": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/battle_trace.py",
+    "eador.campaign": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/campaign.py",
+    "eador.content": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/content.py",
+    "eador.difficulty": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/difficulty.py",
+    "eador.encounters": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/encounters.py",
+    "eador.model": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/model.py",
+    "eador.persistence": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/persistence.py",
+    "eador.preferences": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/preferences.py",
+    "eador.reading": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/reading.py",
+    "eador.rival": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/rival.py",
+    "eador.rival_scene": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/rival_scene.py",
+    "eador.scene": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/scene.py",
+    "eador.settings_scene": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/settings_scene.py",
+    "eador.sight": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/sight.py",
+    "eador.sound": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/sound.py",
+    "eador.style": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/style.py",
+    "eador.worldgen": "/private/tmp/shardbound-playback-soak-native-awake/source/eador/worldgen.py",
+    "saga2d": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/__init__.py",
+    "saga2d._fileio": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/_fileio.py",
+    "saga2d._scene_stack": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/_scene_stack.py",
+    "saga2d.actions": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/actions.py",
+    "saga2d.animation": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/animation.py",
+    "saga2d.assets": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/assets.py",
+    "saga2d.audio": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/audio.py",
+    "saga2d.backends": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/backends/__init__.py",
+    "saga2d.backends.base": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/backends/base.py",
+    "saga2d.backends.pyglet_backend": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/backends/pyglet_backend.py",
+    "saga2d.game": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/game.py",
+    "saga2d.hexgrid": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/hexgrid.py",
+    "saga2d.input": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/input.py",
+    "saga2d.rendering": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/__init__.py",
+    "saga2d.rendering._text": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/_text.py",
+    "saga2d.rendering.camera": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/camera.py",
+    "saga2d.rendering.layers": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/layers.py",
+    "saga2d.rendering.particles": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/particles.py",
+    "saga2d.rendering.shapes": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/shapes.py",
+    "saga2d.rendering.sprite": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/rendering/sprite.py",
+    "saga2d.save": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/save.py",
+    "saga2d.scene": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/scene.py",
+    "saga2d.settings": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/settings.py",
+    "saga2d.synth": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/synth.py",
+    "saga2d.ui": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/ui/__init__.py",
+    "saga2d.ui.base": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/ui/base.py",
+    "saga2d.ui.components": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/ui/components.py",
+    "saga2d.ui.layout": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/ui/layout.py",
+    "saga2d.ui.theme": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/ui/theme.py",
+    "saga2d.util": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/util/__init__.py",
+    "saga2d.util.collision": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/util/collision.py",
+    "saga2d.util.reactive": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/util/reactive.py",
+    "saga2d.util.timer": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/util/timer.py",
+    "saga2d.util.tween": "/private/tmp/shardbound-playback-soak-native-awake/source/saga2d/util/tween.py"
+  },
+  "machdep.cpu.brand_string": "Apple M4",
+  "memory": {
+    "comparison_windows_disjoint": false,
+    "first_window_elapsed_seconds": [
+      60.01286262500798,
+      90.15036125003826
+    ],
+    "first_window_mean_bytes": 279969792,
+    "first_window_samples": 2,
+    "growth_bytes": 0,
+    "growth_percent": 0.0,
+    "last_window_elapsed_seconds": [
+      60.01286262500798,
+      90.15036125003826
+    ],
+    "last_window_mean_bytes": 279969792,
+    "last_window_samples": 2,
+    "peak_sampled_rss_bytes": 303595520,
+    "process_peak_rss_bytes": 306331648
+  },
+  "pid": 46568,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "requested_seconds": 90.0,
+  "resolution": [
+    1280,
+    800
+  ],
+  "rss_samples": [
+    {
+      "elapsed_seconds": 7.080379873514175e-07,
+      "frames": 0,
+      "rss_bytes": 129400832,
+      "window_latency": {}
+    },
+    {
+      "elapsed_seconds": 60.01286262500798,
+      "frames": 3224,
+      "rss_bytes": 256344064,
+      "window_latency": {
+        "max_ms": 172.65500000212342,
+        "p50_ms": 13.328333501704037,
+        "p95_ms": 20.917314404505305,
+        "p99_ms": 56.50182552810292,
+        "samples": 3224
+      }
+    },
+    {
+      "elapsed_seconds": 90.15036125003826,
+      "frames": 4891,
+      "rss_bytes": 303595520,
+      "window_latency": {
+        "max_ms": 158.0137909622863,
+        "p50_ms": 13.38883297285065,
+        "p95_ms": 19.73051238455797,
+        "p99_ms": 53.64478021394446,
+        "samples": 1667
+      }
+    }
+  ],
+  "scene_frames": {
+    "BattlePlaybackScene": 4561,
+    "BattleScene": 100,
+    "CatalogScene": 15,
+    "ChoiceScene": 31,
+    "HelpScene": 2,
+    "HeroScene": 12,
+    "ResultScene": 5,
+    "SaveScene": 14,
+    "SettingsScene": 44,
+    "ShardScene": 82,
+    "TitleScene": 25
+  },
+  "scope": "Repeated prepared opening journeys; 8 seeds, 4 hero classes, both reading sizes, natural ordered battle playback and battle settings cancellation in one persistent hidden Pyglet window; silent audio driver. Wait steps are not input activations. Not full campaigns or human playtesting.",
+  "source_commit": "449e40e42f88948c1016b6b1a02348e55de49196",
+  "source_manifest": "manifest.json",
+  "source_snapshot_unchanged": true,
+  "started_utc": "2026-09-06T12:03:07.219632+00:00",
+  "status": "completed",
+  "temporary_save_directory": "/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-soak-saves-ayj6kicb",
+  "two_hour_duration_satisfied": false,
+  "window_pixels": [
+    2560,
+    1600
+  ]
+}

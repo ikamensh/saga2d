@@ -82,7 +82,7 @@ def test_preversioned_campaign_and_active_battle_migrate_without_new_rewards():
         assert restored.hero.skills == set() and restored.choice is None
         assert restored.provinces[restored.hero.pos].site_gold == 55
         assert restored.provinces[restored.hero.pos].site_relic is None
-        assert json.loads(restored.to_json())['schema_version'] == 8
+        assert json.loads(restored.to_json())['schema_version'] == 12
         if restored.battle:
             assert restored.battle.to_dict()['units'][0]['hp'] == old['battle']['units'][0]['hp']
             win(restored)
@@ -183,13 +183,15 @@ def test_rank_mastery_remains_an_option_at_later_levels():
     state = State.new(hero_class='Wizard')
     state.build('barracks')
     state.recruit('swordsman')
-    for destination in [(-2, 0), (-1, 0), (0, 0)]:
+    for destination in [(-2, 0), (-1, 0), (0, 0), (0, 1)]:
         if destination != state.hero.pos:
             state.travel(destination)
             win(state)
         while state.choice:
             state.choose('channeling' if state.choice.kind == 'skill' else state.choice.options[0].id)
         state.end_turn()
+        if state.provinces[destination].site_kind == 'relief_column':
+            continue  # Take the preserved ordinary Grove next door for this advancement journey.
         state.explore()
         win(state)
         while state.choice:

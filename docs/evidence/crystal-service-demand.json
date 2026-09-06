@@ -1,0 +1,501 @@
+{
+  "elapsed_seconds": 99.55529929196928,
+  "modes": [
+    "accessible",
+    "standard",
+    "challenge"
+  ],
+  "plans": [
+    "economy",
+    "sustain",
+    "spells",
+    "control",
+    "flight"
+  ],
+  "policy": "Read-only service quotes during unchanged final recovery decisions; no services execute; 8mana/3crystals/Tower and12HP-per-unit/2crystals/Temple; first affordable quote per campaign avoids counting repeat waits as independent purchases.",
+  "revision": "e0c2344628a5b8d568d793c4fb295e7113e013c5",
+  "rows_file": "crystal-service-demand.rows.json.gz",
+  "rows_sha256": "fac4bbc07ce046dc14b6e7dbd1baaabde1baccecf68edbf199ee2fc1ed28be89",
+  "seeds": 10,
+  "source_files_changed": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "c378c016f90c2f2c170ac4dcc0dc96e4031b85ecb94f5e432b17c7e802e5b17c",
+    "eador/codex.py": "383e43a066c0693e9630cf6c49d88b1477d3a6985b659203a43942dc663179d6",
+    "eador/content.py": "b9303f3aa2a4be98611f5032b3a141cff5c3a71881bc8a43c964b831c2385d03",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "23dbcada36bf49682bac596e1f67da5c8b9861257ae3b9e279d4f203d34ec444",
+    "eador/encounters.py": "dd79405285081d862d46b0290dda7e4a56bf832fe606b1a1b3904125271cfbc0",
+    "eador/model.py": "627051069c89277f7150f0a797277510139e2c2eb4d413530c93ae6b8a0e43a9",
+    "eador/persistence.py": "9661a716922e8397d1cc70cfb0e26d0f4c5461050d576a72d2c8fcf5a03cffcc",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "1982df3c6e980d4136b9aa7ab6c2bbd181dfd87a062c8f1d39e37b00d4697cad",
+    "eador/scene.py": "ce474ab1d2839db180a317195735d1631a6eb3255f70ac60bec5dd660d0f61e5",
+    "eador/settings_scene.py": "763e76feeb0cf3e448cfafedae7d37e817ea935335b4037e8ede4e2ac33e45ef",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "bb137fb1f6d09ffda0b953b3cf4fee07d11870d86d68de16e8f441c27cc40929",
+    "tools/audit_eador_crystal_demand.py": "3cefe2fd218f7dde6309be6a51e8df705b57cccaf93f07c1160284158f4e5888",
+    "tools/audit_eador_difficulty.py": "1ce5e2e4be33f413298679142e1b186291950d4803d6114712456b468dd634ac",
+    "tools/audit_eador_economy.py": "507402fd0a2d125cf3cbc66e553f85f9b5735db9bf3639709b207cca316263ab",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/stress_eador_control.py": "4e05a1b7a31b4ee77c50ee32ccacf0fa4c71587d1136f723e5f54472527d047e"
+  },
+  "summary": {
+    "accessible": {
+      "campaigns_with_affordable_quote": 832,
+      "demand": {
+        "affordable.both": 281,
+        "affordable.mana": 820,
+        "affordable.wounds": 412,
+        "insufficient_crystals.both": 14,
+        "missing_building.both": 224,
+        "missing_building.mana": 641,
+        "wait.both": 516,
+        "wait.mana": 1461,
+        "wait.wounds": 412
+      },
+      "first_quote_kinds": {
+        "both": 206,
+        "mana": 360,
+        "wounds": 266
+      },
+      "mean_first_quote_price": 3.7752403846153846,
+      "mean_first_quote_remaining": 25.51923076923077,
+      "mean_first_quote_turn": 10.27764423076923,
+      "mean_first_quote_turns": 1.4314903846153846,
+      "outcomes": {
+        "victory": 1800
+      },
+      "runs": 1800
+    },
+    "accessible/control": {
+      "campaigns_with_affordable_quote": 338,
+      "demand": {
+        "affordable.both": 191,
+        "affordable.mana": 545,
+        "affordable.wounds": 75,
+        "insufficient_crystals.both": 11,
+        "wait.both": 202,
+        "wait.mana": 545,
+        "wait.wounds": 75
+      },
+      "first_quote_kinds": {
+        "both": 127,
+        "mana": 193,
+        "wounds": 18
+      },
+      "mean_first_quote_price": 4.71301775147929,
+      "mean_first_quote_remaining": 21.807692307692307,
+      "mean_first_quote_turn": 9.976331360946746,
+      "mean_first_quote_turns": 1.6597633136094674,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "accessible/economy": {
+      "campaigns_with_affordable_quote": 81,
+      "demand": {
+        "affordable.wounds": 106,
+        "missing_building.both": 57,
+        "missing_building.mana": 118,
+        "wait.both": 57,
+        "wait.mana": 118,
+        "wait.wounds": 106
+      },
+      "first_quote_kinds": {
+        "wounds": 81
+      },
+      "mean_first_quote_price": 2.197530864197531,
+      "mean_first_quote_remaining": 30.160493827160494,
+      "mean_first_quote_turn": 10.950617283950617,
+      "mean_first_quote_turns": 1.1728395061728396,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "accessible/flight": {
+      "campaigns_with_affordable_quote": 100,
+      "demand": {
+        "affordable.wounds": 117,
+        "insufficient_crystals.both": 3,
+        "missing_building.both": 90,
+        "missing_building.mana": 151,
+        "wait.both": 90,
+        "wait.mana": 151,
+        "wait.wounds": 117
+      },
+      "first_quote_kinds": {
+        "wounds": 100
+      },
+      "mean_first_quote_price": 2.18,
+      "mean_first_quote_remaining": 28.96,
+      "mean_first_quote_turn": 11.42,
+      "mean_first_quote_turns": 1.04,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "accessible/spells": {
+      "campaigns_with_affordable_quote": 295,
+      "demand": {
+        "affordable.both": 90,
+        "affordable.mana": 275,
+        "affordable.wounds": 95,
+        "wait.both": 90,
+        "wait.mana": 275,
+        "wait.wounds": 95
+      },
+      "first_quote_kinds": {
+        "both": 79,
+        "mana": 167,
+        "wounds": 49
+      },
+      "mean_first_quote_price": 3.776271186440678,
+      "mean_first_quote_remaining": 26.708474576271186,
+      "mean_first_quote_turn": 9.983050847457626,
+      "mean_first_quote_turns": 1.3966101694915254,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "accessible/sustain": {
+      "campaigns_with_affordable_quote": 18,
+      "demand": {
+        "affordable.wounds": 19,
+        "missing_building.both": 77,
+        "missing_building.mana": 372,
+        "wait.both": 77,
+        "wait.mana": 372,
+        "wait.wounds": 19
+      },
+      "first_quote_kinds": {
+        "wounds": 18
+      },
+      "mean_first_quote_price": 2.111111111111111,
+      "mean_first_quote_remaining": 35.72222222222222,
+      "mean_first_quote_turn": 11.38888888888889,
+      "mean_first_quote_turns": 1.0555555555555556,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "challenge": {
+      "campaigns_with_affordable_quote": 1003,
+      "demand": {
+        "affordable.both": 1043,
+        "affordable.mana": 2680,
+        "affordable.wounds": 796,
+        "insufficient_crystals.both": 199,
+        "insufficient_crystals.mana": 178,
+        "insufficient_crystals.wounds": 22,
+        "missing_building.both": 932,
+        "missing_building.mana": 2421,
+        "wait.both": 2127,
+        "wait.mana": 5243,
+        "wait.wounds": 818
+      },
+      "first_quote_kinds": {
+        "both": 370,
+        "mana": 316,
+        "wounds": 317
+      },
+      "mean_first_quote_price": 4.872382851445663,
+      "mean_first_quote_remaining": 23.548354935194418,
+      "mean_first_quote_turn": 10.498504486540378,
+      "mean_first_quote_turns": 2.1994017946161515,
+      "outcomes": {
+        "playing": 9,
+        "victory": 1791
+      },
+      "runs": 1800
+    },
+    "challenge/control": {
+      "campaigns_with_affordable_quote": 348,
+      "demand": {
+        "affordable.both": 636,
+        "affordable.mana": 1681,
+        "affordable.wounds": 119,
+        "insufficient_crystals.both": 140,
+        "insufficient_crystals.mana": 142,
+        "insufficient_crystals.wounds": 10,
+        "wait.both": 776,
+        "wait.mana": 1823,
+        "wait.wounds": 129
+      },
+      "first_quote_kinds": {
+        "both": 191,
+        "mana": 155,
+        "wounds": 2
+      },
+      "mean_first_quote_price": 6.293103448275862,
+      "mean_first_quote_remaining": 18.316091954022987,
+      "mean_first_quote_turn": 9.862068965517242,
+      "mean_first_quote_turns": 2.7902298850574714,
+      "outcomes": {
+        "playing": 5,
+        "victory": 355
+      },
+      "runs": 360
+    },
+    "challenge/economy": {
+      "campaigns_with_affordable_quote": 132,
+      "demand": {
+        "affordable.wounds": 204,
+        "insufficient_crystals.both": 2,
+        "missing_building.both": 243,
+        "missing_building.mana": 508,
+        "wait.both": 243,
+        "wait.mana": 508,
+        "wait.wounds": 204
+      },
+      "first_quote_kinds": {
+        "wounds": 132
+      },
+      "mean_first_quote_price": 2.257575757575758,
+      "mean_first_quote_remaining": 32.28030303030303,
+      "mean_first_quote_turn": 11.477272727272727,
+      "mean_first_quote_turns": 1.2348484848484849,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "challenge/flight": {
+      "campaigns_with_affordable_quote": 153,
+      "demand": {
+        "affordable.wounds": 304,
+        "insufficient_crystals.both": 43,
+        "insufficient_crystals.mana": 36,
+        "insufficient_crystals.wounds": 12,
+        "missing_building.both": 334,
+        "missing_building.mana": 613,
+        "wait.both": 334,
+        "wait.mana": 613,
+        "wait.wounds": 316
+      },
+      "first_quote_kinds": {
+        "wounds": 153
+      },
+      "mean_first_quote_price": 2.3529411764705883,
+      "mean_first_quote_remaining": 29.098039215686274,
+      "mean_first_quote_turn": 12.477124183006536,
+      "mean_first_quote_turns": 1.1437908496732025,
+      "outcomes": {
+        "playing": 3,
+        "victory": 357
+      },
+      "runs": 360
+    },
+    "challenge/spells": {
+      "campaigns_with_affordable_quote": 355,
+      "demand": {
+        "affordable.both": 407,
+        "affordable.mana": 999,
+        "affordable.wounds": 153,
+        "insufficient_crystals.both": 12,
+        "wait.both": 419,
+        "wait.mana": 999,
+        "wait.wounds": 153
+      },
+      "first_quote_kinds": {
+        "both": 179,
+        "mana": 161,
+        "wounds": 15
+      },
+      "mean_first_quote_price": 5.653521126760563,
+      "mean_first_quote_remaining": 22.442253521126762,
+      "mean_first_quote_turn": 9.735211267605633,
+      "mean_first_quote_turns": 2.4816901408450702,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "challenge/sustain": {
+      "campaigns_with_affordable_quote": 15,
+      "demand": {
+        "affordable.wounds": 16,
+        "insufficient_crystals.both": 2,
+        "missing_building.both": 355,
+        "missing_building.mana": 1300,
+        "wait.both": 355,
+        "wait.mana": 1300,
+        "wait.wounds": 16
+      },
+      "first_quote_kinds": {
+        "wounds": 15
+      },
+      "mean_first_quote_price": 2.1333333333333333,
+      "mean_first_quote_remaining": 37.666666666666664,
+      "mean_first_quote_turn": 14.533333333333333,
+      "mean_first_quote_turns": 1.0666666666666667,
+      "outcomes": {
+        "playing": 1,
+        "victory": 359
+      },
+      "runs": 360
+    },
+    "standard": {
+      "campaigns_with_affordable_quote": 976,
+      "demand": {
+        "affordable.both": 784,
+        "affordable.mana": 2136,
+        "affordable.wounds": 623,
+        "insufficient_crystals.both": 96,
+        "insufficient_crystals.mana": 33,
+        "missing_building.both": 639,
+        "missing_building.mana": 1905,
+        "wait.both": 1497,
+        "wait.mana": 4070,
+        "wait.wounds": 623
+      },
+      "first_quote_kinds": {
+        "both": 336,
+        "mana": 313,
+        "wounds": 327
+      },
+      "mean_first_quote_price": 4.611680327868853,
+      "mean_first_quote_remaining": 24.921106557377048,
+      "mean_first_quote_turn": 10.778688524590164,
+      "mean_first_quote_turns": 2.050204918032787,
+      "outcomes": {
+        "victory": 1800
+      },
+      "runs": 1800
+    },
+    "standard/control": {
+      "campaigns_with_affordable_quote": 359,
+      "demand": {
+        "affordable.both": 500,
+        "affordable.mana": 1377,
+        "affordable.wounds": 79,
+        "insufficient_crystals.both": 69,
+        "insufficient_crystals.mana": 29,
+        "wait.both": 569,
+        "wait.mana": 1406,
+        "wait.wounds": 79
+      },
+      "first_quote_kinds": {
+        "both": 192,
+        "mana": 158,
+        "wounds": 9
+      },
+      "mean_first_quote_price": 5.991643454038997,
+      "mean_first_quote_remaining": 20.00557103064067,
+      "mean_first_quote_turn": 10.401114206128133,
+      "mean_first_quote_turns": 2.565459610027855,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "standard/economy": {
+      "campaigns_with_affordable_quote": 120,
+      "demand": {
+        "affordable.wounds": 179,
+        "insufficient_crystals.both": 2,
+        "missing_building.both": 177,
+        "missing_building.mana": 397,
+        "wait.both": 177,
+        "wait.mana": 397,
+        "wait.wounds": 179
+      },
+      "first_quote_kinds": {
+        "wounds": 120
+      },
+      "mean_first_quote_price": 2.25,
+      "mean_first_quote_remaining": 33.208333333333336,
+      "mean_first_quote_turn": 11.216666666666667,
+      "mean_first_quote_turns": 1.2583333333333333,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "standard/flight": {
+      "campaigns_with_affordable_quote": 136,
+      "demand": {
+        "affordable.wounds": 201,
+        "insufficient_crystals.both": 17,
+        "insufficient_crystals.mana": 4,
+        "missing_building.both": 223,
+        "missing_building.mana": 446,
+        "wait.both": 223,
+        "wait.mana": 446,
+        "wait.wounds": 201
+      },
+      "first_quote_kinds": {
+        "wounds": 136
+      },
+      "mean_first_quote_price": 2.2205882352941178,
+      "mean_first_quote_remaining": 29.125,
+      "mean_first_quote_turn": 12.007352941176471,
+      "mean_first_quote_turns": 1.1470588235294117,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "standard/spells": {
+      "campaigns_with_affordable_quote": 348,
+      "demand": {
+        "affordable.both": 284,
+        "affordable.mana": 759,
+        "affordable.wounds": 151,
+        "insufficient_crystals.both": 5,
+        "wait.both": 289,
+        "wait.mana": 759,
+        "wait.wounds": 151
+      },
+      "first_quote_kinds": {
+        "both": 144,
+        "mana": 155,
+        "wounds": 49
+      },
+      "mean_first_quote_price": 5.0344827586206895,
+      "mean_first_quote_remaining": 25.054597701149426,
+      "mean_first_quote_turn": 10.410919540229886,
+      "mean_first_quote_turns": 2.1839080459770117,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    },
+    "standard/sustain": {
+      "campaigns_with_affordable_quote": 13,
+      "demand": {
+        "affordable.wounds": 13,
+        "insufficient_crystals.both": 3,
+        "missing_building.both": 239,
+        "missing_building.mana": 1062,
+        "wait.both": 239,
+        "wait.mana": 1062,
+        "wait.wounds": 13
+      },
+      "first_quote_kinds": {
+        "wounds": 13
+      },
+      "mean_first_quote_price": 2,
+      "mean_first_quote_remaining": 36.61538461538461,
+      "mean_first_quote_turn": 14.153846153846153,
+      "mean_first_quote_turns": 1,
+      "outcomes": {
+        "victory": 360
+      },
+      "runs": 360
+    }
+  }
+}

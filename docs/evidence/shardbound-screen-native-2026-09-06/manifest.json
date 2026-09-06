@@ -1,0 +1,54 @@
+{
+  "source_revision": "493d16ef3af9d9f05279254fde3accc9fb121a1d",
+  "machine": "Mac16,13",
+  "cpu": "Apple M4",
+  "memory_bytes": 25769803776,
+  "python": "3.13.2",
+  "pyglet": "2.1.13",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "logical_resolution": [
+    1280,
+    800
+  ],
+  "window_size": [
+    1280,
+    800
+  ],
+  "framebuffer_size": [
+    2560,
+    1600
+  ],
+  "reading_scale": 125,
+  "full_suite": {
+    "passed": 1071,
+    "elapsed_seconds": 84.2
+  },
+  "input_activations": 1073,
+  "exact_save_reloads": 58,
+  "tactical_orders": 233,
+  "retained_sha256": {
+    "failed-retry/failed-attempt/hero-defeat-and-casualties.png": "185cd2a7ae6e60c44bfa683d47c0e831a499a42d5cd569b0f7e727b0736a7075",
+    "failed-retry/journey.json": "b3803a413ccc6634cc15a916f111545dbafe45a1c6d1334907c8e3a86e60ef31",
+    "failed-retry/retry/briefing-northern-125.png": "13bd94c1911888c3718682d94551bc4a19f3c0f65fba14338efc955bc03ffb95",
+    "failed-retry/retry/briefing-western-125.png": "4f7bb5a3a9d6b1e2bbaffd5324792e071004d0c795dde4bbc82239501ac15865",
+    "failed-retry/retry/screen-reward-kept-once.png": "3f59be808d9282ad0cb1f580e9636922a74a3313749775233b890f1a000a42ac",
+    "failed-retry/retry/screen-rout-victory.png": "984e175c4bca6e369b17598d1ea920a39bbe5cafc4ef3dc1021f636d6b57c695",
+    "northern/journey.json": "9ac77c606a4b95b40166290fa24e6b0003c3385f4747d382c515c6b867b53e69",
+    "northern/northern-ranger-flank.png": "71fc5676edf890382cb129bcab0b0aa6cc48c13c7d9970548fbb596f0ed36f3f",
+    "northern/rallied-ranger-keeps-unused-move.png": "6e6e63c57c6ba22bd96cc504b293ba305c4c93476170eaa4ebfe6c665136e9ab",
+    "northern/round-2-rally-forecast.png": "f1f4395c06b0b7efb37616929fc31a0809d50a1692336b4fdb6ddb0080f4478c",
+    "northern/screen-deployment.png": "a9eae6a0baabf64de088e14c4f1bf72f21a20089b0ee52a1dc61b590f6649af3",
+    "northern/screen-rout-victory.png": "d4d1dbaa2249812eb131496a70772cc7f309c69361b6e68c9fb253afcc45230f",
+    "scout/journey.json": "6461a878b37b1e278f285feabf530d9978067b0ebba52237589e132001d05834",
+    "scout/round-2-after-enemies.png": "cb213a25bbab6d1f9565ce5a856030f320ce67dd434e8100519b986d51aa6ede",
+    "scout/sapper-defeated-before-charge.png": "1755c1c999cc7c6dba9d4114527df4eea6b187b0d8ed5c3395bdf8bc30d8dd49",
+    "western/briefing-northern-125.png": "e06f6f61953f7db1b90e0d0ae9d8a513880b6394d98a28fc10b9fb50b9920ab2",
+    "western/briefing-western-125.png": "cd121a1f5ab46115e54085151a99f7d296b078a1cb65b2e817f7355b7a2611c7",
+    "western/codex-finite-smoke-125.png": "1eeeb12c19d6de150d05869eebdb6c9865dfc7ba6718371ff3e4b9bcff172238",
+    "western/journey.json": "3c52d784963df5e0ba2aed7c30b4e95d2b6f6812dddc28afe80ab0ffc344a507",
+    "western/round-2-after-enemies.png": "c028c32890365612696ec4bcfac319d2062baa262e39734e1c8048b7f90e4354",
+    "western/screen-deployment.png": "2f11c6fceb8bf5c451bec691e2dbc9a1fe43c980f13b8ed2d398758d5493894b",
+    "western-heal/journey.json": "c0b9443dbfb24a9d9772fe9c69408502b6484c775c269084fb31c9e3e03bf81c",
+    "western-heal/screen-rout-victory.png": "7daed00bf283f93c3ccdefcfe1bdfdf8c1c5af6b5cca3a373135c3c184b24f47"
+  }
+}

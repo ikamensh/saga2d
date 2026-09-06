@@ -814,6 +814,9 @@ class MapScene(Scene):
         self.effects.clear()
         self.view.reset(self.world)
         self._setup_camera()
+        # Reactive labels evaluate while the HUD is built. Hover targets belong
+        # to the old world and may be absent or out of bounds in the loaded one.
+        self._harvest_pos = self._hover_target = None
         self.ui.clear()
         self._build_hud()
         self.cursor = (0, 0)

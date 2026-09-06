@@ -26,6 +26,31 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound framework agent): independent Tribes regression
+  found during the screen-layer checks also reproduces on pre-layer
+  `a401607`. Save map seed 3, start seed 2, hover its fish at (10, 13), then
+  quick-load: the Harvest button evaluated a stale hover before the loaded
+  HUD was built. `codex/tribes-load-hover` clears those transient targets
+  first; public save/input regressions cover an absent resource and a smaller
+  loaded map. The development fuzzer now seeds title/world randomness as
+  well as inputs, and retains full failure tracebacks. Normal game launch
+  randomness is unchanged. This is a separate game fix, not a screen-layer
+  or framework persistence change; no Warband files were edited.
+
+- 2026-09-06 (Shardbound framework agent): isolated `codex/screen-layers`
+  adds `with scene.screen_layer(1):` for immediate screen drawing. The scope
+  works through existing game helpers, leaves world RenderLayer unchanged,
+  and cannot escape the owning scene. UI controls draw above these local
+  layers; children/later siblings now cover earlier text as well as shapes,
+  matching input order. This serves Shardbound's stationary feedback pills
+  and Tribes' floating text/toast composition. It extends the private stride
+  from Warband `0f089fa`: four suborders remain available per UI component,
+  so Minimap's `order + 1` frame stays above its image and below later UI.
+  No Warband source or worktree was edited. The changed scene stride should
+  be retained when merging its older stride-only implementation. Public
+  integration tests and `tools/demo_screen_layers.py --verify` cover local
+  composition, native pixels/input, UI overlap and modal isolation.
+
 - 2026-09-06 (Shardbound framework agent): isolated `codex/window-display`
   adopts committed Warband `Game.set_fullscreen(bool)` and adds read-only
   `Game.fullscreen` / `window_size` plus `set_window_size((w, h))`. Choosing a
@@ -144,3 +169,50 @@ know about, and read it before touching shared files.
   it caught a title tagline on a menu button and a codex column overrun).
   Tribes and Shardbound screens could use the same sweep. The pyglet backend
   now reports a Mac Control+click as the right button.
+
+- 2026-09-06 (Shardbound framework agent): display previews need a public snapshot
+  even when opened fullscreen. `Game.windowed_size` now reports actual native
+  windowed size or remembered restoration size while fullscreen; no game cache
+  guesses that state. This serves Shardbound and Warband settings cancellation
+  on top of the same reviewed display methods. The Shardbound Sound/Display UI
+  and startup/recovery policy remain in `eador/`, using the existing Settings
+  store. No Warband worktree or game source was changed. See
+  `docs/eador-display-settings.md` for launch overrides and verification.
+
+- 2026-09-06 (Shardbound research agent): isolated `codex/wrapped-label`
+  adds opt-in `Label(text, width=300, wrap=True)` for retained UI flow.
+  Shardbound reward descriptions and Warband's width-390 tutorial objective
+  need measured multiline height without manual placement of the next control.
+  The existing Scene paragraph algorithm moves to a private shared helper;
+  no new backend protocol or game rule is introduced. A private preparation
+  hook refreshes wrapped measurements before the existing input/draw layout
+  boundaries. No Warband worktree or game callers were edited. Checkpoint
+  `25cda6a` passes 888 full tests, both games' bounded fuzz runs and the native
+  font/reactive/paused/resize input example. Existing paragraph pixels match
+  actual prior `3923255` exactly. See `docs/framework-wrapped-label.md`.
+
+- 2026-09-06 (Shardbound framework agent): native resize/reading-size verification
+  exposed a Pyglet text-measurement cache collision: the key identified physical
+  glyph size but stored logical dimensions divided by an earlier viewport scale.
+  The cache now retains physical metrics and converts at the current scale. This
+  fixes over/under-measurement for all games without a new API or game-specific
+  policy. `tools/verify_text_measurement.py` compares warm/fresh measurements,
+  wrapped flow, exact pixels and native clicks in both resize directions. No
+  Warband worktree changed; Shardbound's scoped reading setting is separate.
+
+- 2026-09-06 (Shardbound framework agent): the game-owned Codex reading-size
+  increment uses existing wrapped Label/Column layout and Settings persistence.
+  It adds no framework API or global theme changes. Whole-entry pagination is
+  measured after UI attachment, and the scoped 100/125 preference explicitly
+  leaves other game screens unchanged. No Warband worktree was touched. See
+  `docs/eador-reading-size.md` for the vertical slice and remaining G10 scope.
+
+- 2026-09-06 (Shardbound framework agent): a malformed save version containing
+  5,000 characters expanded into an equally large SaveError and overflowed a
+  measured reward dialog. SaveManager now diagnoses wrong metadata types and
+  invalid timestamps/overflowing numbers without repeating their arbitrary
+  payload. Ordinary unsupported integer versions remain visible in the error.
+  This changes no accepted format, recovery policy or API; Tribes, Shardbound
+  and Warband callers all receive the same usable parser diagnostic. Real-file
+  tests preserve malformed bytes and backups through refused loads/writes.
+  No Warband worktree changed.

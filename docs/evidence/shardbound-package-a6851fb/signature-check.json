@@ -1,0 +1,13 @@
+{
+  "command": [
+    "codesign",
+    "--verify",
+    "--deep",
+    "--strict",
+    "/tmp/shardbound-playtest-a6851fb/Shardbound.app"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "",
+  "source_commit": "a6851fb65df5abcd1c923ab2c736921300a12ea6"
+}

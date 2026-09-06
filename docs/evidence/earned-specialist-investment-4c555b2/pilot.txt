@@ -1,0 +1,2 @@
+(0, 'Commander', 'ruins', 'economy', 'standard', 'direct') start 6 104 branches 10
+1 earned windows; 0 excluded; 10 branches

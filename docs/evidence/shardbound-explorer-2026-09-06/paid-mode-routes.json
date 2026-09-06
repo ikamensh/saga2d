@@ -1,0 +1,6666 @@
+{
+  "dirty_at_start": [],
+  "elapsed_seconds": 3.4452828749781474,
+  "journeys": [
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 0,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 0,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 0,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 5,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "accessible-1",
+      "seed": 0,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 1,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 1,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 1,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "accessible-1",
+      "seed": 1,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 2,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 2,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 2,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "accessible-1",
+      "seed": 2,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 7,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 7,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 7,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 5,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "accessible-1",
+      "seed": 7,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 19,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 19,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 6,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "accessible-1",
+      "seed": 19,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "accessible",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "accessible-1",
+      "seed": 19,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 0,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 0,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 0,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 5,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "standard-1",
+      "seed": 0,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 1,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 1,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 9,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 1,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "standard-1",
+      "seed": 1,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 2,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 2,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 2,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "standard-1",
+      "seed": 2,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "battle_log": [
+        "Advance, use cover, and protect your wounded.",
+        "Ranger hits Archer for 8.",
+        "Hero hits Archer for 12.",
+        "Archer hits Pikeman for 8.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Warden guards until its next turn.",
+        "Pikeman hits Militia for 4.",
+        "Militia retaliates for 8.",
+        "Dread Guard hits Militia for 5.",
+        "Militia retaliates for 7.",
+        "Warden hits Militia for 1.",
+        "Archer hits Dread Guard for 7.",
+        "Hero guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Warden guards until its next turn.",
+        "Ranger guards until its next turn.",
+        "Pikeman hits Archer for 7.",
+        "Archer retaliates for 8.",
+        "Dread Guard hits Militia for 5.",
+        "Militia retaliates for 7.",
+        "Warden swaps places with Dread Guard.",
+        "Ranger hits Pikeman for 4.",
+        "Warden swaps places with Hero.",
+        "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+      ],
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 30,
+      "orders": [
+        [
+          "attack",
+          [
+            5,
+            1006
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              2,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            0,
+            1006
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              0,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            3,
+            [
+              -1,
+              -1
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1005
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -1,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            1,
+            [
+              -1,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            2,
+            [
+              -2,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            4
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              -2,
+              -1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -1,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            1,
+            [
+              -3,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            3,
+            [
+              -2,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1007
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -3,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            0
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            4
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            5
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "attack",
+          [
+            5,
+            1005
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              0,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -3,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "swap",
+          [
+            4,
+            0
+          ],
+          {}
+        ],
+        [
+          "evacuate",
+          [],
+          {}
+        ]
+      ],
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 7,
+      "support": "ranger",
+      "terminal_battle": {
+        "hero_id": 0,
+        "log": [
+          "Advance, use cover, and protect your wounded.",
+          "Ranger hits Archer for 8.",
+          "Hero hits Archer for 12.",
+          "Archer hits Pikeman for 8.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Warden guards until its next turn.",
+          "Pikeman hits Militia for 4.",
+          "Militia retaliates for 8.",
+          "Dread Guard hits Militia for 5.",
+          "Militia retaliates for 7.",
+          "Warden hits Militia for 1.",
+          "Archer hits Dread Guard for 7.",
+          "Hero guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Warden guards until its next turn.",
+          "Ranger guards until its next turn.",
+          "Pikeman hits Archer for 7.",
+          "Archer retaliates for 8.",
+          "Dread Guard hits Militia for 5.",
+          "Militia retaliates for 7.",
+          "Warden swaps places with Dread Guard.",
+          "Ranger hits Pikeman for 4.",
+          "Warden swaps places with Hero.",
+          "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+        ],
+        "mana": 10,
+        "objective": {
+          "deadline": 6,
+          "exits": [
+            [
+              -3,
+              1
+            ]
+          ],
+          "kind": "extract",
+          "progress": 0,
+          "required": 0,
+          "target": null
+        },
+        "outcome": "player",
+        "outcome_reason": "escape",
+        "round": 3,
+        "sight_rules": "terrain",
+        "smoke_clouds": [],
+        "spell_costs": {
+          "bolt": 4,
+          "heal": 4
+        },
+        "spell_power": {
+          "bolt": 14,
+          "heal": 22
+        },
+        "spells": [
+          "heal"
+        ],
+        "terrain": [
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              1
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -2,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              -2
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              -1,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -2
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              0
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              0
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              0
+            ]
+          }
+        ],
+        "units": [
+          {
+            "abilities": [],
+            "acted": true,
+            "attack": 14,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 44,
+            "id": 0,
+            "kind": "hero",
+            "level": 3,
+            "max_hp": 44,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 11,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 28,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 11,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 21,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 11,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 2,
+            "hp": 21,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": true,
+            "attack": 11,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 5,
+            "hp": 46,
+            "id": 4,
+            "kind": "warden",
+            "level": 3,
+            "max_hp": 46,
+            "move_range": 2,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": true,
+            "attack": 9,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 1,
+            "hp": 26,
+            "id": 5,
+            "kind": "ranger",
+            "level": 2,
+            "max_hp": 26,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              0,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": true,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 9,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 0,
+            "id": 1005,
+            "kind": "pikeman",
+            "level": 1,
+            "max_hp": 28,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -1,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 1,
+            "hp": 0,
+            "id": 1006,
+            "kind": "archer",
+            "level": 1,
+            "max_hp": 20,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              1,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 12,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 21,
+            "id": 1007,
+            "kind": "guard",
+            "level": 1,
+            "max_hp": 42,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              3
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 38,
+            "id": 1008,
+            "kind": "warden",
+            "level": 1,
+            "max_hp": 38,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              3
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          }
+        ]
+      }
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "battle_log": [
+        "Advance, use cover, and protect your wounded.",
+        "Ranger hits Archer for 8.",
+        "Hero hits Archer for 12.",
+        "Archer hits Dread Guard for 7.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Warden guards until its next turn.",
+        "Pikeman braces until its next turn.",
+        "Dread Guard hits Militia for 7.",
+        "Militia retaliates for 7.",
+        "Warden hits Archer for 6.",
+        "Archer retaliates for 7.",
+        "Archer hits Dread Guard for 7.",
+        "Warden swaps places with Archer.",
+        "Hero guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Ranger guards until its next turn.",
+        "Pikeman hits Warden for 4.",
+        "Warden retaliates for 8.",
+        "Dread Guard hits Militia for 7.",
+        "Militia retaliates for 7.",
+        "Warden hits Militia for 1.",
+        "Militia retaliates for 7.",
+        "Ranger hits Pikeman for 6.",
+        "Warden swaps places with Hero.",
+        "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+      ],
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "orders": [
+        [
+          "attack",
+          [
+            5,
+            1006
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              2,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            0,
+            1006
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              0,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -3,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            3,
+            [
+              -2,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            1,
+            [
+              -3,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            2,
+            [
+              -2,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1007
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            4
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              -2,
+              -1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -1,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1007
+          ],
+          {}
+        ],
+        [
+          "swap",
+          [
+            4,
+            3
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            0
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            5
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "attack",
+          [
+            5,
+            1005
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              0,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            3,
+            [
+              -2,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -3,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -3,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "swap",
+          [
+            4,
+            0
+          ],
+          {}
+        ],
+        [
+          "evacuate",
+          [],
+          {}
+        ]
+      ],
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 7,
+      "support": "ranger",
+      "terminal_battle": {
+        "hero_id": 0,
+        "log": [
+          "Advance, use cover, and protect your wounded.",
+          "Ranger hits Archer for 8.",
+          "Hero hits Archer for 12.",
+          "Archer hits Dread Guard for 7.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Warden guards until its next turn.",
+          "Pikeman braces until its next turn.",
+          "Dread Guard hits Militia for 7.",
+          "Militia retaliates for 7.",
+          "Warden hits Archer for 6.",
+          "Archer retaliates for 7.",
+          "Archer hits Dread Guard for 7.",
+          "Warden swaps places with Archer.",
+          "Hero guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Ranger guards until its next turn.",
+          "Pikeman hits Warden for 4.",
+          "Warden retaliates for 8.",
+          "Dread Guard hits Militia for 7.",
+          "Militia retaliates for 7.",
+          "Warden hits Militia for 1.",
+          "Militia retaliates for 7.",
+          "Ranger hits Pikeman for 6.",
+          "Warden swaps places with Hero.",
+          "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+        ],
+        "mana": 10,
+        "objective": {
+          "deadline": 6,
+          "exits": [
+            [
+              -3,
+              1
+            ]
+          ],
+          "kind": "extract",
+          "progress": 0,
+          "required": 0,
+          "target": null
+        },
+        "outcome": "player",
+        "outcome_reason": "escape",
+        "round": 3,
+        "sight_rules": "terrain",
+        "smoke_clouds": [],
+        "spell_costs": {
+          "bolt": 4,
+          "heal": 4
+        },
+        "spell_power": {
+          "bolt": 14,
+          "heal": 22
+        },
+        "spells": [
+          "heal"
+        ],
+        "terrain": [
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              1
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -2,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              -2
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              -1,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -2
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              0
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              0
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              0
+            ]
+          }
+        ],
+        "units": [
+          {
+            "abilities": [],
+            "acted": true,
+            "attack": 14,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 44,
+            "id": 0,
+            "kind": "hero",
+            "level": 3,
+            "max_hp": 44,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 11,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 18,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 11,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 31,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 11,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 2,
+            "hp": 22,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": true,
+            "attack": 11,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 5,
+            "hp": 42,
+            "id": 4,
+            "kind": "warden",
+            "level": 3,
+            "max_hp": 46,
+            "move_range": 2,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": true,
+            "attack": 9,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 1,
+            "hp": 26,
+            "id": 5,
+            "kind": "ranger",
+            "level": 2,
+            "max_hp": 26,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              0,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": true,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 9,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 14,
+            "id": 1005,
+            "kind": "pikeman",
+            "level": 1,
+            "max_hp": 28,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -1,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 1,
+            "hp": 0,
+            "id": 1006,
+            "kind": "archer",
+            "level": 1,
+            "max_hp": 20,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              1,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 12,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 14,
+            "id": 1007,
+            "kind": "guard",
+            "level": 1,
+            "max_hp": 42,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              3
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 24,
+            "id": 1008,
+            "kind": "warden",
+            "level": 1,
+            "max_hp": 38,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -1,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          }
+        ]
+      }
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "battle_log": [
+        "Advance, use cover, and protect your wounded.",
+        "Hero hits Archer for 20.",
+        "Archer hits Pikeman for 7.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Warden guards until its next turn.",
+        "Acolyte guards until its next turn.",
+        "Pikeman hits Militia for 4.",
+        "Militia retaliates for 7.",
+        "Dread Guard hits Militia for 5.",
+        "Militia retaliates for 6.",
+        "Warden hits Militia for 1.",
+        "Heal restores 6 health to Militia.",
+        "Archer hits Dread Guard for 6.",
+        "Hero guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Warden guards until its next turn.",
+        "Pikeman hits Archer for 7.",
+        "Archer retaliates for 7.",
+        "Dread Guard hits Militia for 7.",
+        "Militia retaliates for 6.",
+        "Warden hits Archer for 6.",
+        "Warden swaps places with Hero.",
+        "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+      ],
+      "building_gold": 110,
+      "campaign_turn": 9,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "orders": [
+        [
+          "move",
+          [
+            0,
+            [
+              2,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            0,
+            1006
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              0,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            3,
+            [
+              -1,
+              -1
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1005
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -1,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            1,
+            [
+              -1,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            2,
+            [
+              -2,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            4
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            5
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              -2,
+              -1
+            ]
+          ],
+          {}
+        ],
+        [
+          "cast",
+          [
+            "heal",
+            2
+          ],
+          {
+            "caster_id": 5
+          }
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -1,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            1,
+            [
+              -3,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            3,
+            [
+              -2,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1007
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -3,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            0
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            4
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "move",
+          [
+            5,
+            [
+              0,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -3,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "swap",
+          [
+            4,
+            0
+          ],
+          {}
+        ],
+        [
+          "evacuate",
+          [],
+          {}
+        ]
+      ],
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 7,
+      "support": "healer",
+      "terminal_battle": {
+        "hero_id": 0,
+        "log": [
+          "Advance, use cover, and protect your wounded.",
+          "Hero hits Archer for 20.",
+          "Archer hits Pikeman for 7.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Warden guards until its next turn.",
+          "Acolyte guards until its next turn.",
+          "Pikeman hits Militia for 4.",
+          "Militia retaliates for 7.",
+          "Dread Guard hits Militia for 5.",
+          "Militia retaliates for 6.",
+          "Warden hits Militia for 1.",
+          "Heal restores 6 health to Militia.",
+          "Archer hits Dread Guard for 6.",
+          "Hero guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Warden guards until its next turn.",
+          "Pikeman hits Archer for 7.",
+          "Archer retaliates for 7.",
+          "Dread Guard hits Militia for 7.",
+          "Militia retaliates for 6.",
+          "Warden hits Archer for 6.",
+          "Warden swaps places with Hero.",
+          "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+        ],
+        "mana": 10,
+        "objective": {
+          "deadline": 6,
+          "exits": [
+            [
+              -3,
+              1
+            ]
+          ],
+          "kind": "extract",
+          "progress": 0,
+          "required": 0,
+          "target": null
+        },
+        "outcome": "player",
+        "outcome_reason": "escape",
+        "round": 3,
+        "sight_rules": "terrain",
+        "smoke_clouds": [],
+        "spell_costs": {
+          "bolt": 4,
+          "heal": 4
+        },
+        "spell_power": {
+          "bolt": 14,
+          "heal": 22
+        },
+        "spells": [
+          "heal"
+        ],
+        "terrain": [
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              1
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -2,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              -2
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              -1,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -2
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              0
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              0
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              0
+            ]
+          }
+        ],
+        "units": [
+          {
+            "abilities": [],
+            "acted": true,
+            "attack": 22,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 56,
+            "id": 0,
+            "kind": "hero",
+            "level": 3,
+            "max_hp": 56,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 1,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 10,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 21,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 10,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 32,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 10,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 2,
+            "hp": 15,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": true,
+            "attack": 10,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 5,
+            "hp": 46,
+            "id": 4,
+            "kind": "warden",
+            "level": 3,
+            "max_hp": 46,
+            "move_range": 2,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "heal"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 2,
+            "cargo_penalty": 0,
+            "defense": 2,
+            "hp": 26,
+            "id": 5,
+            "kind": "healer",
+            "level": 2,
+            "max_hp": 26,
+            "move_range": 3,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              0,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 9,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 7,
+            "id": 1005,
+            "kind": "pikeman",
+            "level": 1,
+            "max_hp": 28,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -1,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 1,
+            "hp": 0,
+            "id": 1006,
+            "kind": "archer",
+            "level": 1,
+            "max_hp": 20,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              1,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 12,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 24,
+            "id": 1007,
+            "kind": "guard",
+            "level": 1,
+            "max_hp": 42,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              3
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 38,
+            "id": 1008,
+            "kind": "warden",
+            "level": 1,
+            "max_hp": 38,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -1,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          }
+        ]
+      }
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "battle_log": [
+        "Advance, use cover, and protect your wounded.",
+        "Archer hits Archer for 9.",
+        "Hero hits Archer for 11.",
+        "Militia guards until its next turn.",
+        "Militia guards until its next turn.",
+        "Warden guards until its next turn.",
+        "Pikeman braces until its next turn.",
+        "Dread Guard hits Militia for 7.",
+        "Militia retaliates for 6.",
+        "Warden hits Militia for 3.",
+        "Warden swaps places with Hero.",
+        "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+      ],
+      "building_gold": 45,
+      "campaign_turn": 5,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 14,
+      "orders": [
+        [
+          "move",
+          [
+            3,
+            [
+              0,
+              -3
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            3,
+            1005
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -1,
+              -2
+            ]
+          ],
+          {}
+        ],
+        [
+          "attack",
+          [
+            0,
+            1005
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            2,
+            [
+              -2,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            1,
+            [
+              -3,
+              2
+            ]
+          ],
+          {}
+        ],
+        [
+          "move",
+          [
+            4,
+            [
+              -3,
+              1
+            ]
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            1
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            2
+          ],
+          {}
+        ],
+        [
+          "guard",
+          [
+            4
+          ],
+          {}
+        ],
+        [
+          "end_turn",
+          [],
+          {}
+        ],
+        [
+          "move",
+          [
+            0,
+            [
+              -3,
+              0
+            ]
+          ],
+          {}
+        ],
+        [
+          "swap",
+          [
+            4,
+            0
+          ],
+          {}
+        ],
+        [
+          "evacuate",
+          [],
+          {}
+        ]
+      ],
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "standard-1",
+      "seed": 7,
+      "support": null,
+      "terminal_battle": {
+        "hero_id": 0,
+        "log": [
+          "Advance, use cover, and protect your wounded.",
+          "Archer hits Archer for 9.",
+          "Hero hits Archer for 11.",
+          "Militia guards until its next turn.",
+          "Militia guards until its next turn.",
+          "Warden guards until its next turn.",
+          "Pikeman braces until its next turn.",
+          "Dread Guard hits Militia for 7.",
+          "Militia retaliates for 6.",
+          "Warden hits Militia for 3.",
+          "Warden swaps places with Hero.",
+          "The hero escapes with the recovered cargo. Surviving defenders withdraw."
+        ],
+        "mana": 14,
+        "objective": {
+          "deadline": 6,
+          "exits": [
+            [
+              -3,
+              1
+            ]
+          ],
+          "kind": "extract",
+          "progress": 0,
+          "required": 0,
+          "target": null
+        },
+        "outcome": "player",
+        "outcome_reason": "escape",
+        "round": 2,
+        "sight_rules": "terrain",
+        "smoke_clouds": [],
+        "spell_costs": {
+          "bolt": 4,
+          "heal": 4
+        },
+        "spell_power": {
+          "bolt": 14,
+          "heal": 22
+        },
+        "spells": [
+          "heal"
+        ],
+        "terrain": [
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -3,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              1
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -2,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -2,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              -2
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              -1,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              -1,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              -2
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              -1
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              0
+            ]
+          },
+          {
+            "kind": "marsh",
+            "pos": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              0,
+              3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              0
+            ]
+          },
+          {
+            "kind": "forest",
+            "pos": [
+              1,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              1,
+              2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              0
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              2,
+              1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -3
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -2
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              -1
+            ]
+          },
+          {
+            "kind": "plains",
+            "pos": [
+              3,
+              0
+            ]
+          }
+        ],
+        "units": [
+          {
+            "abilities": [],
+            "acted": true,
+            "attack": 14,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 44,
+            "id": 0,
+            "kind": "hero",
+            "level": 3,
+            "max_hp": 44,
+            "move_range": 5,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": true
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 10,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 22,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": true
+          },
+          {
+            "abilities": [
+              "rally"
+            ],
+            "acted": false,
+            "attack": 10,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 32,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              1
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": true
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 10,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 2,
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              0,
+              -3
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": true
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": true,
+            "attack": 10,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 5,
+            "hp": 46,
+            "id": 4,
+            "kind": "warden",
+            "level": 3,
+            "max_hp": 46,
+            "move_range": 2,
+            "moved": true,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "player",
+            "terrain_walk": true
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 9,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 3,
+            "hp": 28,
+            "id": 1004,
+            "kind": "pikeman",
+            "level": 1,
+            "max_hp": 28,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              0,
+              0
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": "brace",
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "pin"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 3,
+            "cargo_penalty": 0,
+            "defense": 1,
+            "hp": 0,
+            "id": 1005,
+            "kind": "archer",
+            "level": 1,
+            "max_hp": 20,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              1,
+              -2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [],
+            "acted": false,
+            "attack": 12,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 36,
+            "id": 1006,
+            "kind": "guard",
+            "level": 1,
+            "max_hp": 42,
+            "move_range": 3,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -3,
+              3
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          },
+          {
+            "abilities": [
+              "swap"
+            ],
+            "acted": false,
+            "attack": 8,
+            "attack_range": 1,
+            "cargo_penalty": 0,
+            "defense": 4,
+            "hp": 38,
+            "id": 1007,
+            "kind": "warden",
+            "level": 1,
+            "max_hp": 38,
+            "move_range": 2,
+            "moved": false,
+            "pin_cooldown": 0,
+            "pinned": false,
+            "pos": [
+              -2,
+              2
+            ],
+            "retaliated": false,
+            "safe_attacks": 0,
+            "skirmisher": false,
+            "source_id": null,
+            "spent_abilities": [],
+            "stance": null,
+            "team": "enemy",
+            "terrain_walk": false
+          }
+        ]
+      }
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 7,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 19,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 19,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "standard-1",
+      "seed": 19,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "standard",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "standard-1",
+      "seed": 19,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 0,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 0,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 0,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "challenge-1",
+      "seed": 0,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 9,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 1,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 9,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 1,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 1,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "challenge-1",
+      "seed": 1,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 48,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 29,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 2,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 48,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 30,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 2,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 20,
+        "mana_spent": 12,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 4
+      },
+      "building_gold": 110,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 28,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 2,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 9,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "challenge-1",
+      "seed": 2,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 34,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 9,
+      "enemy_survivors": 2,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 22,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 7,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 32,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 9,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 25,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 7,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 29,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 110,
+      "campaign_turn": 8,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 24,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 7,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "militia",
+          "level": 3
+        },
+        {
+          "kind": "archer",
+          "level": 3
+        },
+        {
+          "kind": "warden",
+          "level": 3
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 47,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 10,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "challenge-1",
+      "seed": 7,
+      "support": null
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 48,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 29,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 30,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 19,
+      "support": "ranger"
+    },
+    {
+      "approach": "south",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        },
+        {
+          "kind": "ranger",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 48,
+        "mana_spent": 8,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 3
+      },
+      "building_gold": 100,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Commander",
+      "hero_level": 3,
+      "hp_deficit": 30,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 98,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 19,
+      "support": "ranger"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        },
+        {
+          "kind": "healer",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 20,
+        "mana_spent": 12,
+        "outcome": "rout",
+        "player_deaths": 0,
+        "round": 4
+      },
+      "building_gold": 110,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Warrior",
+      "hero_level": 3,
+      "hp_deficit": 28,
+      "mana_spent": 4,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 29,
+      "player_deaths": 0,
+      "recruitment_gold": 100,
+      "reward_once_verified": true,
+      "round": 3,
+      "rules_id": "challenge-1",
+      "seed": 19,
+      "support": "healer"
+    },
+    {
+      "approach": "north",
+      "army": [
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "militia",
+          "level": 2
+        },
+        {
+          "kind": "archer",
+          "level": 2
+        },
+        {
+          "kind": "warden",
+          "level": 2
+        }
+      ],
+      "attack_pin_heal_forecasts_verified": true,
+      "auto": {
+        "hp_deficit": 62,
+        "mana_spent": 4,
+        "outcome": "rout",
+        "player_deaths": 1,
+        "round": 4
+      },
+      "building_gold": 45,
+      "campaign_turn": 7,
+      "enemy_survivors": 3,
+      "entry_crystals": 0,
+      "entry_gold": 0,
+      "every_order_exact_reload": true,
+      "hero_class": "Scout",
+      "hero_level": 3,
+      "hp_deficit": 12,
+      "mana_spent": 0,
+      "manual_outcome": "escape",
+      "mode": "challenge",
+      "order_count": 14,
+      "player_deaths": 0,
+      "recruitment_gold": 55,
+      "reward_once_verified": true,
+      "round": 2,
+      "rules_id": "challenge-1",
+      "seed": 19,
+      "support": null
+    }
+  ],
+  "manual_escapes": 60,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.2",
+  "revision": "5cdb39e1192996e40194bd28f567eff753eeccbc",
+  "source_files_changed_during_run": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "faa056bb50f5021ed16c76e4dfd22a11a84921248b5407b34d3e0e91399f4eb0",
+    "eador/codex.py": "ac6f07fee47a68da14bc9518dcabcfa56c483b498d6130d17af8bfd7f191442e",
+    "eador/content.py": "b9303f3aa2a4be98611f5032b3a141cff5c3a71881bc8a43c964b831c2385d03",
+    "eador/difficulty.py": "d2dc0373064aeec21b2d8ace28d3e7fc8061b1ef8744c2f1eac8528c10d297d7",
+    "eador/encounter_scene.py": "23dbcada36bf49682bac596e1f67da5c8b9861257ae3b9e279d4f203d34ec444",
+    "eador/encounters.py": "dd79405285081d862d46b0290dda7e4a56bf832fe606b1a1b3904125271cfbc0",
+    "eador/model.py": "627051069c89277f7150f0a797277510139e2c2eb4d413530c93ae6b8a0e43a9",
+    "eador/persistence.py": "71fff299ea4409dfe3dd1c674beb0e496f346682e29728bdb39dfa03520ad98c",
+    "eador/preferences.py": "dec226f2bc3b621ef0cca4a5b49434d3279f286526ddb17bd9c24eb0e29bce59",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "491fb1562ff5a7cec6920f99e8f6edb03164546f604e6cd546d9dea943f2c670",
+    "eador/scene.py": "c3496ec93b021020785987d9549eb591d3b520b457d4c3a7ec742b178eea7e8d",
+    "eador/settings_scene.py": "65e3984f1c59102b34db5a89dcfd188577ab374bb6b9e4c4ae3a2dedcd890b4b",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "bb137fb1f6d09ffda0b953b3cf4fee07d11870d86d68de16e8f441c27cc40929",
+    "saga2d/__init__.py": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/_scene_stack.py": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "d2e10d6e84ee0bcadde245f873bce1c216ec7505eed3b56b87a3648404112185",
+    "saga2d/backends/mock_backend.py": "18ac93641c51e9e4df9796a35bb7afbdf3c9431c73a3fcc338457ef45faf7f1e",
+    "saga2d/backends/pyglet_backend.py": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8",
+    "saga2d/game.py": "21f03dac8c2a2d450bc3dd32554d31a6b2dd4c882c41f8f8d7a64b4ff58bef2d",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/input.py": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29",
+    "saga2d/render3d.py": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996",
+    "saga2d/rendering/particles.py": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0",
+    "saga2d/rendering/shapes.py": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f",
+    "saga2d/rendering/sprite.py": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8",
+    "saga2d/save.py": "1b0735f793c47fb813e61e3113115d36fbb9aae0d9b95de618a78a0500d56266",
+    "saga2d/scene.py": "e7be356a3922cfdb3fd17c6a1500474266513e25ef4a34aebbed61fad59480d6",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/testing.py": "e73a33918038b50384ee380adf2473dde0e1c6bc8d6222d1a7264dcea63fc0f4",
+    "saga2d/ui/__init__.py": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933",
+    "saga2d/ui/base.py": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/theme.py": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "tests/eador/test_extraction_journeys.py": "b5378e1a715b33745f583aff978bd13d25283cd43a01fb7013dc240922bbe47e",
+    "tests/eador/test_stranded_explorer.py": "40866215f622fdc116665e3cf5ce870e98e24f2cf67d60e326767cdcc0089940",
+    "tools/audit_eador_extraction.py": "50332c13d4343789278abfe02f278e7bdddeee36bff9fa8f6381eed35ab1fe82",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/eador_control_campaign.py": "4eb25a987106af9a63c111f829107f7c8068f33a0d4b02974bfb44e47316c0ec",
+    "tools/eador_explorer_campaign.py": "1b7f773b9c247323e82cc57aa15399294deadd99d4b38f146d866b6fdd668bd4",
+    "tools/eador_extraction_campaign.py": "a73348493275070164bc4319ebbdb479888a327793968fd1075775fcdab250ea",
+    "tools/eador_hunt_campaign.py": "9206ba4e585548b2e62f4fccae70322162dea196ac77961ad3d7eaa189b9a915",
+    "tools/eador_linked_campaign.py": "27e5257770930406f7d4f4ac6bad97c86fc98aba49488399d433a8c16fc251b9",
+    "tools/eador_observatory_campaign.py": "2ef2ddee692424c70aa47ee763e0ebd07848318653c92e842b0a98035539d077",
+    "tools/eador_relic_campaign.py": "619384a5888a9f53d65ed82bc398578de4fbf684ab85917c3f5e52781ff2e3d6",
+    "tools/eador_roles_campaign.py": "c795ba1213dedbd1135daa5e132718611ec69092e8ed580c65437db0b88fbc75",
+    "tools/eador_vault_campaign.py": "c8fdaccca0129cef3199131af4348d20f0a3455933045e2bbab822723949a5fe"
+  }
+}

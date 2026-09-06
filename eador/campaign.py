@@ -183,7 +183,9 @@ def validate_campaign(data: dict) -> None:
     checkpoint.update(campaign=None, battle=None, battle_kind=None, battle_province=None,
                       choices=[], status='playing', turn=1, provinces=entry['provinces'], rival=entry['rival'])
     checkpoint['hero']['pos'] = [-2, 0]
-    _validate_save(checkpoint, 8)
+    if data['schema_version'] >= 10:
+        checkpoint['battle_adventure'] = None
+    _validate_save(checkpoint, data['schema_version'])
     if contract == 'rootward':
         for provinces in (data['provinces'], entry['provinces']):
             require(sum(p['site_kind'] == 'border_watch' for p in provinces) == 1,
@@ -225,7 +227,8 @@ def _arrive(state: State, candidate: State, troops, relics) -> None:
         troop.hp = troop.max_hp
     hero.relic = hero.relic if hero.relic in relics else next(iter(relics), None)
     candidate.hero, candidate.inventory = hero, relics
-    candidate.rival.plan(candidate, delay=2 if candidate.campaign.stage > 1 else 3)
+    candidate.rival.plan(candidate, delay=candidate.rules.arrival_delay if candidate.campaign.stage > 1
+                         else candidate.rules.opening_delay)
     candidate.log = [f'Stage {candidate.campaign.stage}: {candidate.campaign.title}.', candidate.campaign.objective,
                      f'Hero rank limit {candidate.hero_level_cap}; troop rank limit {candidate.troop_level_cap}.']
 
@@ -240,7 +243,7 @@ def advance(state: State, offer_id: str, troop_ids, relic_ids) -> None:
     if offer is None:
         raise RuleError('Choose one of the offered challenges.')
     troops, relics = _retinue(state, troop_ids, relic_ids)
-    candidate = State.new(offer.seed, state.hero.hero_class, theme=offer.theme)
+    candidate = State._new(offer.seed, state.hero.hero_class, offer.theme, state.rules_id)
     candidate.campaign = deepcopy(state.campaign)
     campaign = candidate.campaign
     campaign.completed[-1] = replace(campaign.completed[-1], garrison=tuple(
@@ -248,7 +251,7 @@ def advance(state: State, offer_id: str, troop_ids, relic_ids) -> None:
     campaign.stage += 1
     campaign.contract, campaign.phase, campaign.offers = offer.contract, 'playing', ()
     campaign.casualties = campaign.prior_attempt_turns = 0
-    candidate.gold, candidate.crystals = 100 + min(40, state.gold), 4 + min(2, state.crystals)
+    candidate.gold, candidate.crystals = state.expedition_funding()
     candidate.rival.gold = 80 if campaign.stage == 2 else 90
     if campaign.contract == 'foundries':
         candidate.provinces[FOUNDRIES[0]].name = 'North Foundry'
@@ -268,10 +271,12 @@ def recover(state: State, troop_ids, relic_ids) -> None:
     if state.campaign is None or state.campaign.phase != 'recovery' or state.battle or state.choice:
         raise RuleError('A recovery expedition is available only after the first lost shard.')
     troops, relics = _retinue(state, troop_ids, relic_ids)
+    gold, crystals = state.expedition_funding(recovery=True)
     data = json.loads(state.to_json())
     data.update(deepcopy(state.campaign.entry))
     data.update(campaign=None, battle=None, battle_kind=None, battle_province=None,
-                status='playing', choices=[], buildings=[], turn=1, gold=60, crystals=2)
+                status='playing', choices=[], buildings=[], turn=1,
+                gold=gold, crystals=crystals)
     data['hero']['pos'] = [-2, 0]
     data['actions_left'] = 3 if state.hero.hero_class == 'Scout' else 2
     candidate = State.from_json(json.dumps(data))

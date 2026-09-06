@@ -1,0 +1,12 @@
+{
+  "before_revision": "3923255",
+  "after_revision": "25cda6a",
+  "image_size": [
+    1800,
+    1200
+  ],
+  "before_sha256": "db0cb3886a659dedf03b4c6bed3fe0a7cb94057cf11964c598c81049e763db2b",
+  "after_sha256": "db0cb3886a659dedf03b4c6bed3fe0a7cb94057cf11964c598c81049e763db2b",
+  "pixel_difference": null,
+  "method": "Identical probe with actual archived prior saga2d, then current saga2d; PIL RGB difference has no bounding box."
+}

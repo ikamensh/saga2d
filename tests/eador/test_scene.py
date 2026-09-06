@@ -8,13 +8,13 @@ from eador.app import create_game
 
 
 def press(game, key):
-    game.backend.inject_key(key)
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).press(key)
 
 
 def click(game, x, y):
-    game.backend.inject_click(round(x), round(y))
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).click(x, y)
 
 
 def button(game, label):
@@ -465,7 +465,7 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         press(game, "r")
         press(game, "2")
         press(game, "escape")
-        for destination in ((-2, 0), (-1, 0), (0, 0), (1, 0)):
+        for destination in ((-2, 0), (-1, 0), (0, 0), (0, 1), (1, 0)):
             if state.hero.pos != destination:
                 click(game, *root.grid.center(destination))
                 press(game, "return")
@@ -473,6 +473,13 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
                 rest()
                 prepare()
             press(game, "x")
+            if state.provinces[destination].site_kind == 'relief_column':
+                from eador.encounter_scene import EncounterScene
+                assert isinstance(game.scene, EncounterScene)
+                before = state.to_json()
+                press(game, 'escape')  # The same reward remains at the ordinary Grove next door.
+                assert state.to_json() == before
+                continue
             battle()
             rest()
             prepare()
@@ -495,5 +502,36 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         assert isinstance(game.scene, ResultScene)
         assert game.scene.root.state.to_json() == won
         assert len(game.scenes) == 2
+    finally:
+        game._teardown()
+
+
+def test_exhausted_actions_show_complete_guidance_above_the_disabled_travel_control(tmp_path):
+    """Two real failed invasions retain readable next-step advice without spending again."""
+    from saga2d import Button, Label
+    from eador.model import State
+    from eador.scene import ShardScene
+
+    game = create_game(backend='mock', save_dir=tmp_path)
+    try:
+        scene = ShardScene(State.new(7))
+        game.push(scene)
+        for _ in range(2):
+            click(game, *scene.grid.center((-1, 0)))
+            press(game, 'return')
+            button(game, 'Retreat')
+        assert scene.state.actions_left == 0
+        hint = scene.ui.find(lambda c: isinstance(c, Label) and 'End the turn' in c.text)
+        assert hint is not None
+        travel = scene.ui.find(lambda c: isinstance(c, Button) and c.text == 'Invade province')
+        x, y, width, height = hint.bounds
+        assert x >= scene.edge and x + width <= game.width
+        assert y + height <= travel.bounds[1] and not travel.enabled
+        before = scene.state.to_json()
+        press(game, 'return'); press(game, 'x')
+        assert scene.state.to_json() == before
+        press(game, 'e')
+        assert scene.state.actions_left > 0
+        assert scene.ui.find(lambda c: isinstance(c, Label) and 'End the turn' in c.text) is None
     finally:
         game._teardown()

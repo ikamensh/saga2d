@@ -1,0 +1,15 @@
+{
+  "harness_matches_current_file": true,
+  "inspected_images": [
+    "00000-SettingsScene.png",
+    "final.png"
+  ],
+  "artifact_sha256": {
+    "final.png": "e6f4ed1237a1a62d50e69440036789e344c59f75681ab98cd2a849d783ae527f",
+    "report.json": "69824d29d5652ac6d14a1c5171a26907f60eea873d4daa64e2647a2517a164df",
+    "manifest.json": "1b700f8706983ff8c60c7f5cbd59e7d0d88d0fc4e9314da7d1998dcfaf580be5",
+    "latency-ms.f64": "6c6f7240602e9b6fdd4c9834c09e52d9c1d1e08fcf7e7605f284e903d3a88dbb",
+    "minutes.jsonl": "94c1d5d3edccb9a4a5fa4e702b032aaa89d8da15eadeebad416f6bb398c37fc0",
+    "00000-SettingsScene.png": "5c019f226f3a69a84f2e101ce796412cee101ba3a9fd86e30dff54fd9e801d45"
+  }
+}

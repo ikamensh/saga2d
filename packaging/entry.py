@@ -46,7 +46,7 @@ def verify_audio_playback(game, files: dict) -> None:
         deadline = time.monotonic() + seconds
         while time.monotonic() < deadline:
             game.tick()
-            time.sleep(.01)
+            time.sleep(1 / 30)
 
     game.audio.stop_music()
     longest_cue = max(record["seconds"] for name, record in files.items() if name.startswith("sounds/"))
@@ -95,31 +95,49 @@ def smoke(image_path: Path) -> None:
     from eador.scene import BattleScene, ShardScene, TitleScene
     from eador.preferences import load_preferences
     from eador.settings_scene import SettingsScene
-    from eador.style import build_theme
+    from eador.__main__ import create_session
+    from eador.diagnostics import DiagnosticScene
+    from eador.release import build_label
 
     image_path = image_path.resolve()
     image_path.parent.mkdir(parents=True, exist_ok=True)
     assets = Path(eador.__file__).resolve().parent / "assets"
     audio_files = decode_audio_catalogue(assets)
     with TemporaryDirectory(prefix="shardbound-smoke-saves-") as saves:
-        game = Game("Shardbound package verification", resolution=(1280, 800),
-                    visible=False, save_dir=Path(saves) / "saves", asset_path=assets, theme=build_theme())
+        game, title = create_session(['--data-dir', saves], title='Shardbound package verification', visible=False)
+        assert game.data_dir == Path(saves).resolve()
         from pyglet.window import key
 
         def press(symbol):
             game.backend.window.dispatch_event("on_key_press", symbol, 0)
             game.backend.window.dispatch_event("on_key_release", symbol, 0)
             game.tick(1 / 60)
+            time.sleep(1 / 30)
 
         def capture(suffix):
             game.tick(1 / 60)
             game.backend.capture_frame().save(image_path.with_stem(image_path.stem + suffix))
+            time.sleep(1 / 30)
 
         try:
             preferences = load_preferences(game)
             assert preferences.error is None
-            game.push(TitleScene(seed=7))
+            game.push(title)
             capture("")
+            press(key.A)
+            assert isinstance(game.scene, DiagnosticScene)
+            label = build_label()
+            assert label in game.scene.message and str(game.data_dir) in game.scene.message
+            if getattr(sys, 'frozen', False):
+                info = json.loads((Path(sys._MEIPASS) / 'release' / 'build-info.json').read_text(encoding='utf-8'))
+                assert info['source_commit'][:12] in label and info['version'] in label
+            about = game.scene
+            for index in range(about.pages):
+                assert about.page == index
+                capture(f'-about-{index + 1}')
+                press(key.PAGEDOWN)
+            press(key.ESCAPE)
+            assert game.scene is title
             press(key.O)
             assert isinstance(game.scene, SettingsScene)
             press(key.LEFT)
@@ -144,6 +162,15 @@ def smoke(image_path: Path) -> None:
             assert game.scene.state.to_json() == saved
             root = game.scene
             capture("-shard")
+            press(key.F1)
+            guide = game.scene
+            capture('-guide')
+            press(key.A)
+            assert isinstance(game.scene, DiagnosticScene) and build_label() in game.scene.message
+            press(key.ESCAPE)
+            assert game.scene is guide and root.state.to_json() == saved
+            press(key.ESCAPE)
+            assert game.scene is root
             press(key.C)
             assert isinstance(game.scene, CodexScene)
             press(key._4)
@@ -183,6 +210,10 @@ def smoke(image_path: Path) -> None:
                 "platform": platform.platform(),
                 "python": platform.python_version(),
                 "title_and_shard_rendered": True,
+                "about_build_label": label,
+                "about_pages_rendered": about.pages,
+                "guide_about_return_preserves_campaign": True,
+                "isolated_launch_data_directory": str(game.data_dir),
                 "save_load_roundtrip": True,
                 "codex_and_rival_rendered": True,
                 "battle_save_load_roundtrip": True,
@@ -213,7 +244,15 @@ def smoke(image_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    if "--smoke-image" in sys.argv:
+    if "--campaign-check" in sys.argv:
+        from campaign_check import run
+        parser = argparse.ArgumentParser(description="Verify one isolated packaged campaign phase")
+        parser.add_argument("--campaign-check", required=True, type=Path)
+        parser.add_argument("--phase", required=True, type=int, choices=range(1, 6))
+        parser.add_argument("--recovery", action="store_true")
+        args = parser.parse_args()
+        run(args.campaign_check, phase=args.phase, recovery=args.recovery)
+    elif "--smoke-image" in sys.argv:
         parser = argparse.ArgumentParser(description="Verify the packaged Shardbound runtime")
         parser.add_argument("--smoke-image", required=True, type=Path)
         smoke(parser.parse_args().smoke_image)

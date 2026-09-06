@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 
 source = Path(os.environ["SHARDBOUND_BUILD_SOURCE"])
+build_info = json.loads((source / 'release' / 'build-info.json').read_text(encoding='utf-8'))
 datas = [(str(source / "release"), "release")]
 for name in json.loads((source / "package-data.json").read_text(encoding="utf-8")):
     path = source / name
@@ -26,7 +27,7 @@ coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name="Shardboun
 if sys.platform == "darwin":
     app = BUNDLE(
         coll, name="Shardbound.app", bundle_identifier="org.saga2d.shardbound",
-        version="0.1.0",
+        version=build_info['version'].partition('-')[0],
         info_plist={
             "CFBundleDisplayName": "Shardbound",
             "NSHighResolutionCapable": True,

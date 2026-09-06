@@ -1,0 +1,18 @@
+{
+  "pilot_source": "e5a13ce",
+  "pilot_report_revision": "1b54ad598e675e0ee7ecc9492c049b0f1a7a3fe5",
+  "pilot_source_hash_matches_committed_tool": true,
+  "matrix": {
+    "command": "uv run python tools/prototype_eador_early_conversion.py --authored --repeat --report /tmp/authored-investment-matrix.json.gz",
+    "session_id": 63321,
+    "exit_code": 143,
+    "reason": "Stopped after user reported excessive CPU and battery use; root requested suspension of heavy tests.",
+    "aggregate_retained": false
+  },
+  "retained_files_sha256": {
+    "paid-sapper-control.json.gz": "85d042b8e9fa07673db267f2b5f13c3b0feaa28d0b22eb361bab1ee00287035f",
+    "authored-commander-pilot.json.gz": "4ea288d96486586a0f395a3890d42b45f032c8534d07d5a5abbef388915a2b94",
+    "original-assault-regression.txt": "6108c0f0150322ccf321e3a3e31b0176b87e7971aec826f59dbbea241183c530",
+    "interrupted-matrix.txt": "c1273b27d63b000911022ca470a1d26780402f93abac940b9f3ebf5aa835305f"
+  }
+}

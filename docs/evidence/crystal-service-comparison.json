@@ -1,0 +1,1173 @@
+{
+  "elapsed_seconds": 12.559372332994826,
+  "examples_file": "crystal-service-comparison.examples.json",
+  "examples_sha256": "709f1bd5636ad25a784f256530b87136d52c7b39b051372f061ca1a8c70b0f7b",
+  "modes": [
+    "accessible",
+    "standard",
+    "challenge"
+  ],
+  "plans": [
+    "economy",
+    "sustain",
+    "spells",
+    "control",
+    "flight"
+  ],
+  "policy": "Read-only service quotes during unchanged final recovery and post-battle decisions; no services execute; 8mana/3crystals/Tower,12HP-per-unit/2crystals/Temple, party24HP total max12each/4crystals/Temple; first affordable quote per phase/campaign avoids counting repeat waits as independent purchases; remaining actions expose cost0vs1.",
+  "revision": "58e4d4e5a4766af5a6e994a230615fe313b2dd3e",
+  "rows_file": "crystal-service-comparison.rows.json.gz",
+  "rows_sha256": "46cacffc4218b05e09a8c35b2c4995d7210cb0f517955a4191a523b78a9c5673",
+  "seeds": 1,
+  "source_files_changed": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "c378c016f90c2f2c170ac4dcc0dc96e4031b85ecb94f5e432b17c7e802e5b17c",
+    "eador/codex.py": "383e43a066c0693e9630cf6c49d88b1477d3a6985b659203a43942dc663179d6",
+    "eador/content.py": "b9303f3aa2a4be98611f5032b3a141cff5c3a71881bc8a43c964b831c2385d03",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "23dbcada36bf49682bac596e1f67da5c8b9861257ae3b9e279d4f203d34ec444",
+    "eador/encounters.py": "dd79405285081d862d46b0290dda7e4a56bf832fe606b1a1b3904125271cfbc0",
+    "eador/model.py": "627051069c89277f7150f0a797277510139e2c2eb4d413530c93ae6b8a0e43a9",
+    "eador/persistence.py": "9661a716922e8397d1cc70cfb0e26d0f4c5461050d576a72d2c8fcf5a03cffcc",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "1982df3c6e980d4136b9aa7ab6c2bbd181dfd87a062c8f1d39e37b00d4697cad",
+    "eador/scene.py": "ce474ab1d2839db180a317195735d1631a6eb3255f70ac60bec5dd660d0f61e5",
+    "eador/settings_scene.py": "763e76feeb0cf3e448cfafedae7d37e817ea935335b4037e8ede4e2ac33e45ef",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "bb137fb1f6d09ffda0b953b3cf4fee07d11870d86d68de16e8f441c27cc40929",
+    "tools/audit_eador_crystal_demand.py": "96b79f25f13441051adbe5893f9eb8b12bd3b82d247ff7e1ec84994f9ac3abac",
+    "tools/audit_eador_difficulty.py": "1ce5e2e4be33f413298679142e1b186291950d4803d6114712456b468dd634ac",
+    "tools/audit_eador_economy.py": "507402fd0a2d125cf3cbc66e553f85f9b5735db9bf3639709b207cca316263ab",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/stress_eador_control.py": "4e05a1b7a31b4ee77c50ee32ccacf0fa4c71587d1136f723e5f54472527d047e"
+  },
+  "summary": {
+    "accessible": {
+      "campaigns_with_affordable_quote": 94,
+      "demand": {
+        "affordable.both": 37,
+        "affordable.mana": 74,
+        "affordable.wounds": 49,
+        "insufficient_crystals.both": 1,
+        "missing_building.both": 19,
+        "missing_building.mana": 55,
+        "wait.both": 57,
+        "wait.mana": 129,
+        "wait.wounds": 49
+      },
+      "first_quote_kinds": {
+        "both": 29,
+        "mana": 31,
+        "wounds": 34
+      },
+      "mean_first_quote_price": 3.75531914893617,
+      "mean_first_quote_remaining": 25.22340425531915,
+      "mean_first_quote_turn": 10.351063829787234,
+      "mean_first_quote_turns": 1.372340425531915,
+      "outcomes": {
+        "victory": 180
+      },
+      "runs": 180,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 135,
+            "2": 45
+          },
+          "infusion_free_rest_covers": 60,
+          "infusion_offers": 72,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.688073394495413,
+          "mean_party_hp": 11.376146788990825,
+          "mean_targeted_equivalent_cost": 3.0825688073394497,
+          "mean_targeted_equivalent_orders": 1.5412844036697249,
+          "party_free_rest_covers": 84,
+          "party_higher_price": 63,
+          "party_lower_price": 10,
+          "party_offers": 109,
+          "points": 180
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 91,
+            "3": 30
+          },
+          "infusion_free_rest_covers": 12,
+          "infusion_offers": 62,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.82,
+          "mean_party_hp": 8.93,
+          "mean_targeted_equivalent_cost": 2.3,
+          "mean_targeted_equivalent_orders": 1.15,
+          "party_free_rest_covers": 84,
+          "party_higher_price": 86,
+          "party_lower_price": 1,
+          "party_offers": 100,
+          "points": 121
+        }
+      }
+    },
+    "accessible/control": {
+      "campaigns_with_affordable_quote": 35,
+      "demand": {
+        "affordable.both": 26,
+        "affordable.mana": 50,
+        "affordable.wounds": 10,
+        "insufficient_crystals.both": 1,
+        "wait.both": 27,
+        "wait.mana": 50,
+        "wait.wounds": 10
+      },
+      "first_quote_kinds": {
+        "both": 18,
+        "mana": 15,
+        "wounds": 2
+      },
+      "mean_first_quote_price": 5.171428571428572,
+      "mean_first_quote_remaining": 21.2,
+      "mean_first_quote_turn": 10.028571428571428,
+      "mean_first_quote_turns": 1.7428571428571429,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 24,
+          "infusion_offers": 36,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 4,
+          "mean_party_hp": 8,
+          "mean_targeted_equivalent_cost": 4,
+          "mean_targeted_equivalent_orders": 2,
+          "party_free_rest_covers": 1,
+          "party_higher_price": 0,
+          "party_lower_price": 0,
+          "party_offers": 1,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 26,
+            "3": 9
+          },
+          "infusion_free_rest_covers": 2,
+          "infusion_offers": 33,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.4814814814814814,
+          "mean_party_hp": 10.481481481481481,
+          "mean_targeted_equivalent_cost": 2.6666666666666665,
+          "mean_targeted_equivalent_orders": 1.3333333333333333,
+          "party_free_rest_covers": 22,
+          "party_higher_price": 19,
+          "party_lower_price": 1,
+          "party_offers": 27,
+          "points": 35
+        }
+      }
+    },
+    "accessible/economy": {
+      "campaigns_with_affordable_quote": 7,
+      "demand": {
+        "affordable.wounds": 7,
+        "missing_building.both": 6,
+        "missing_building.mana": 8,
+        "wait.both": 6,
+        "wait.mana": 8,
+        "wait.wounds": 7
+      },
+      "first_quote_kinds": {
+        "wounds": 7
+      },
+      "mean_first_quote_price": 2,
+      "mean_first_quote_remaining": 32.142857142857146,
+      "mean_first_quote_turn": 11.857142857142858,
+      "mean_first_quote_turns": 1,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 4.5,
+          "mean_party_hp": 11.916666666666666,
+          "mean_targeted_equivalent_cost": 4.166666666666667,
+          "mean_targeted_equivalent_orders": 2.0833333333333335,
+          "party_free_rest_covers": 32,
+          "party_higher_price": 10,
+          "party_lower_price": 10,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 13,
+            "3": 2
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.2666666666666666,
+          "mean_party_hp": 8.666666666666666,
+          "mean_targeted_equivalent_cost": 2.1333333333333333,
+          "mean_targeted_equivalent_orders": 1.0666666666666667,
+          "party_free_rest_covers": 13,
+          "party_higher_price": 14,
+          "party_lower_price": 0,
+          "party_offers": 15,
+          "points": 15
+        }
+      }
+    },
+    "accessible/flight": {
+      "campaigns_with_affordable_quote": 14,
+      "demand": {
+        "affordable.wounds": 18,
+        "missing_building.both": 8,
+        "missing_building.mana": 8,
+        "wait.both": 8,
+        "wait.mana": 8,
+        "wait.wounds": 18
+      },
+      "first_quote_kinds": {
+        "wounds": 14
+      },
+      "mean_first_quote_price": 2.142857142857143,
+      "mean_first_quote_remaining": 24.571428571428573,
+      "mean_first_quote_turn": 10.642857142857142,
+      "mean_first_quote_turns": 1.0714285714285714,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.5555555555555554,
+          "mean_party_hp": 11.555555555555555,
+          "mean_targeted_equivalent_cost": 2.5555555555555554,
+          "mean_targeted_equivalent_orders": 1.2777777777777777,
+          "party_free_rest_covers": 15,
+          "party_higher_price": 26,
+          "party_lower_price": 0,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 12,
+            "3": 7
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.0526315789473686,
+          "mean_party_hp": 10,
+          "mean_targeted_equivalent_cost": 2.210526315789474,
+          "mean_targeted_equivalent_orders": 1.105263157894737,
+          "party_free_rest_covers": 13,
+          "party_higher_price": 17,
+          "party_lower_price": 0,
+          "party_offers": 19,
+          "points": 19
+        }
+      }
+    },
+    "accessible/spells": {
+      "campaigns_with_affordable_quote": 32,
+      "demand": {
+        "affordable.both": 11,
+        "affordable.mana": 24,
+        "affordable.wounds": 8,
+        "wait.both": 11,
+        "wait.mana": 24,
+        "wait.wounds": 8
+      },
+      "first_quote_kinds": {
+        "both": 11,
+        "mana": 16,
+        "wounds": 5
+      },
+      "mean_first_quote_price": 3.625,
+      "mean_first_quote_remaining": 26.9375,
+      "mean_first_quote_turn": 10.09375,
+      "mean_first_quote_turns": 1.25,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 36,
+          "infusion_offers": 36,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": null,
+          "mean_party_hp": null,
+          "mean_targeted_equivalent_cost": null,
+          "mean_targeted_equivalent_orders": null,
+          "party_free_rest_covers": 0,
+          "party_higher_price": 0,
+          "party_lower_price": 0,
+          "party_offers": 0,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 24,
+            "3": 8
+          },
+          "infusion_free_rest_covers": 10,
+          "infusion_offers": 29,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.3157894736842106,
+          "mean_party_hp": 8.894736842105264,
+          "mean_targeted_equivalent_cost": 2.1052631578947367,
+          "mean_targeted_equivalent_orders": 1.0526315789473684,
+          "party_free_rest_covers": 16,
+          "party_higher_price": 18,
+          "party_lower_price": 0,
+          "party_offers": 19,
+          "points": 32
+        }
+      }
+    },
+    "accessible/sustain": {
+      "campaigns_with_affordable_quote": 6,
+      "demand": {
+        "affordable.wounds": 6,
+        "missing_building.both": 5,
+        "missing_building.mana": 39,
+        "wait.both": 5,
+        "wait.mana": 39,
+        "wait.wounds": 6
+      },
+      "first_quote_kinds": {
+        "wounds": 6
+      },
+      "mean_first_quote_price": 2,
+      "mean_first_quote_remaining": 33,
+      "mean_first_quote_turn": 11.166666666666666,
+      "mean_first_quote_turns": 1,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3,
+          "mean_party_hp": 10.75,
+          "mean_targeted_equivalent_cost": 2.5,
+          "mean_targeted_equivalent_orders": 1.25,
+          "party_free_rest_covers": 36,
+          "party_higher_price": 27,
+          "party_lower_price": 0,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 16,
+            "3": 4
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.6,
+          "mean_party_hp": 6.05,
+          "mean_targeted_equivalent_cost": 2.2,
+          "mean_targeted_equivalent_orders": 1.1,
+          "party_free_rest_covers": 20,
+          "party_higher_price": 18,
+          "party_lower_price": 0,
+          "party_offers": 20,
+          "points": 20
+        }
+      }
+    },
+    "challenge": {
+      "campaigns_with_affordable_quote": 100,
+      "demand": {
+        "affordable.both": 105,
+        "affordable.mana": 251,
+        "affordable.wounds": 92,
+        "insufficient_crystals.both": 14,
+        "insufficient_crystals.mana": 12,
+        "insufficient_crystals.wounds": 1,
+        "missing_building.both": 85,
+        "missing_building.mana": 254,
+        "wait.both": 200,
+        "wait.mana": 516,
+        "wait.wounds": 93
+      },
+      "first_quote_kinds": {
+        "both": 39,
+        "mana": 30,
+        "wounds": 31
+      },
+      "mean_first_quote_price": 4.98,
+      "mean_first_quote_remaining": 25.57,
+      "mean_first_quote_turn": 10.87,
+      "mean_first_quote_turns": 2.19,
+      "outcomes": {
+        "victory": 180
+      },
+      "runs": 180,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 135,
+            "2": 45
+          },
+          "infusion_free_rest_covers": 32,
+          "infusion_offers": 71,
+          "last_action_with_adjacent_rival": 36,
+          "mean_full_targeted_bill": 4.051282051282051,
+          "mean_party_hp": 10.564102564102564,
+          "mean_targeted_equivalent_cost": 3.3504273504273505,
+          "mean_targeted_equivalent_orders": 1.6752136752136753,
+          "party_free_rest_covers": 69,
+          "party_higher_price": 59,
+          "party_lower_price": 17,
+          "party_offers": 117,
+          "points": 180
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 114,
+            "3": 36
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 69,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.014925373134328,
+          "mean_party_hp": 9.477611940298507,
+          "mean_targeted_equivalent_cost": 2.462686567164179,
+          "mean_targeted_equivalent_orders": 1.2313432835820894,
+          "party_free_rest_covers": 80,
+          "party_higher_price": 106,
+          "party_lower_price": 3,
+          "party_offers": 134,
+          "points": 150
+        }
+      }
+    },
+    "challenge/control": {
+      "campaigns_with_affordable_quote": 34,
+      "demand": {
+        "affordable.both": 65,
+        "affordable.mana": 151,
+        "affordable.wounds": 20,
+        "insufficient_crystals.both": 10,
+        "insufficient_crystals.mana": 11,
+        "insufficient_crystals.wounds": 1,
+        "wait.both": 75,
+        "wait.mana": 162,
+        "wait.wounds": 21
+      },
+      "first_quote_kinds": {
+        "both": 21,
+        "mana": 13
+      },
+      "mean_first_quote_price": 6.852941176470588,
+      "mean_first_quote_remaining": 19.352941176470587,
+      "mean_first_quote_turn": 9.941176470588236,
+      "mean_first_quote_turns": 3,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 16,
+          "infusion_offers": 36,
+          "last_action_with_adjacent_rival": 15,
+          "mean_full_targeted_bill": null,
+          "mean_party_hp": null,
+          "mean_targeted_equivalent_cost": null,
+          "mean_targeted_equivalent_orders": null,
+          "party_free_rest_covers": 0,
+          "party_higher_price": 0,
+          "party_lower_price": 0,
+          "party_offers": 0,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 26,
+            "3": 8
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 34,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.8461538461538463,
+          "mean_party_hp": 10.692307692307692,
+          "mean_targeted_equivalent_cost": 2.3076923076923075,
+          "mean_targeted_equivalent_orders": 1.1538461538461537,
+          "party_free_rest_covers": 10,
+          "party_higher_price": 22,
+          "party_lower_price": 0,
+          "party_offers": 26,
+          "points": 34
+        }
+      }
+    },
+    "challenge/economy": {
+      "campaigns_with_affordable_quote": 10,
+      "demand": {
+        "affordable.wounds": 16,
+        "missing_building.both": 23,
+        "missing_building.mana": 56,
+        "wait.both": 23,
+        "wait.mana": 56,
+        "wait.wounds": 16
+      },
+      "first_quote_kinds": {
+        "wounds": 10
+      },
+      "mean_first_quote_price": 2.2,
+      "mean_first_quote_remaining": 37.5,
+      "mean_first_quote_turn": 13.5,
+      "mean_first_quote_turns": 1.1,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 18,
+          "mean_full_targeted_bill": 4.444444444444445,
+          "mean_party_hp": 9.833333333333334,
+          "mean_targeted_equivalent_cost": 4.388888888888889,
+          "mean_targeted_equivalent_orders": 2.1944444444444446,
+          "party_free_rest_covers": 28,
+          "party_higher_price": 7,
+          "party_lower_price": 10,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 20,
+            "3": 6
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.5384615384615383,
+          "mean_party_hp": 6.961538461538462,
+          "mean_targeted_equivalent_cost": 2.3846153846153846,
+          "mean_targeted_equivalent_orders": 1.1923076923076923,
+          "party_free_rest_covers": 20,
+          "party_higher_price": 22,
+          "party_lower_price": 1,
+          "party_offers": 26,
+          "points": 26
+        }
+      }
+    },
+    "challenge/flight": {
+      "campaigns_with_affordable_quote": 19,
+      "demand": {
+        "affordable.wounds": 34,
+        "insufficient_crystals.both": 4,
+        "insufficient_crystals.mana": 1,
+        "missing_building.both": 27,
+        "missing_building.mana": 60,
+        "wait.both": 27,
+        "wait.mana": 60,
+        "wait.wounds": 34
+      },
+      "first_quote_kinds": {
+        "wounds": 19
+      },
+      "mean_first_quote_price": 2.526315789473684,
+      "mean_first_quote_remaining": 30.473684210526315,
+      "mean_first_quote_turn": 12.052631578947368,
+      "mean_first_quote_turns": 1.0526315789473684,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.6666666666666665,
+          "mean_party_hp": 10.75,
+          "mean_targeted_equivalent_cost": 2.611111111111111,
+          "mean_targeted_equivalent_orders": 1.3055555555555556,
+          "party_free_rest_covers": 17,
+          "party_higher_price": 25,
+          "party_lower_price": 0,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 22,
+            "3": 8
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.066666666666667,
+          "mean_party_hp": 10.633333333333333,
+          "mean_targeted_equivalent_cost": 2.7333333333333334,
+          "mean_targeted_equivalent_orders": 1.3666666666666667,
+          "party_free_rest_covers": 21,
+          "party_higher_price": 21,
+          "party_lower_price": 2,
+          "party_offers": 30,
+          "points": 30
+        }
+      }
+    },
+    "challenge/spells": {
+      "campaigns_with_affordable_quote": 35,
+      "demand": {
+        "affordable.both": 40,
+        "affordable.mana": 100,
+        "affordable.wounds": 20,
+        "wait.both": 40,
+        "wait.mana": 100,
+        "wait.wounds": 20
+      },
+      "first_quote_kinds": {
+        "both": 18,
+        "mana": 17
+      },
+      "mean_first_quote_price": 5.457142857142857,
+      "mean_first_quote_remaining": 23.542857142857144,
+      "mean_first_quote_turn": 9.942857142857143,
+      "mean_first_quote_turns": 2.4,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 16,
+          "infusion_offers": 35,
+          "last_action_with_adjacent_rival": 3,
+          "mean_full_targeted_bill": 5.777777777777778,
+          "mean_party_hp": 12.555555555555555,
+          "mean_targeted_equivalent_cost": 5.111111111111111,
+          "mean_targeted_equivalent_orders": 2.5555555555555554,
+          "party_free_rest_covers": 6,
+          "party_higher_price": 2,
+          "party_lower_price": 7,
+          "party_offers": 9,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 26,
+            "3": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 35,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.888888888888889,
+          "mean_party_hp": 8.518518518518519,
+          "mean_targeted_equivalent_cost": 2.3703703703703702,
+          "mean_targeted_equivalent_orders": 1.1851851851851851,
+          "party_free_rest_covers": 14,
+          "party_higher_price": 22,
+          "party_lower_price": 0,
+          "party_offers": 27,
+          "points": 35
+        }
+      }
+    },
+    "challenge/sustain": {
+      "campaigns_with_affordable_quote": 2,
+      "demand": {
+        "affordable.wounds": 2,
+        "missing_building.both": 35,
+        "missing_building.mana": 138,
+        "wait.both": 35,
+        "wait.mana": 138,
+        "wait.wounds": 2
+      },
+      "first_quote_kinds": {
+        "wounds": 2
+      },
+      "mean_first_quote_price": 2,
+      "mean_first_quote_remaining": 60.5,
+      "mean_first_quote_turn": 18.5,
+      "mean_first_quote_turns": 1,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.611111111111111,
+          "mean_party_hp": 10.61111111111111,
+          "mean_targeted_equivalent_cost": 2.611111111111111,
+          "mean_targeted_equivalent_orders": 1.3055555555555556,
+          "party_free_rest_covers": 18,
+          "party_higher_price": 25,
+          "party_lower_price": 0,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 20,
+            "3": 5
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.76,
+          "mean_party_hp": 10.48,
+          "mean_targeted_equivalent_cost": 2.48,
+          "mean_targeted_equivalent_orders": 1.24,
+          "party_free_rest_covers": 15,
+          "party_higher_price": 19,
+          "party_lower_price": 0,
+          "party_offers": 25,
+          "points": 25
+        }
+      }
+    },
+    "standard": {
+      "campaigns_with_affordable_quote": 100,
+      "demand": {
+        "affordable.both": 115,
+        "affordable.mana": 223,
+        "affordable.wounds": 64,
+        "insufficient_crystals.both": 15,
+        "insufficient_crystals.mana": 6,
+        "missing_building.both": 91,
+        "missing_building.mana": 180,
+        "wait.both": 219,
+        "wait.mana": 409,
+        "wait.wounds": 64
+      },
+      "first_quote_kinds": {
+        "both": 41,
+        "mana": 25,
+        "wounds": 34
+      },
+      "mean_first_quote_price": 4.83,
+      "mean_first_quote_remaining": 23.4,
+      "mean_first_quote_turn": 10.63,
+      "mean_first_quote_turns": 2.08,
+      "outcomes": {
+        "victory": 180
+      },
+      "runs": 180,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 135,
+            "2": 45
+          },
+          "infusion_free_rest_covers": 56,
+          "infusion_offers": 72,
+          "last_action_with_adjacent_rival": 12,
+          "mean_full_targeted_bill": 4.275229357798165,
+          "mean_party_hp": 12.192660550458715,
+          "mean_targeted_equivalent_cost": 3.4128440366972477,
+          "mean_targeted_equivalent_orders": 1.7064220183486238,
+          "party_free_rest_covers": 53,
+          "party_higher_price": 55,
+          "party_lower_price": 20,
+          "party_offers": 109,
+          "points": 180
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 113,
+            "3": 40
+          },
+          "infusion_free_rest_covers": 3,
+          "infusion_offers": 69,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.475177304964539,
+          "mean_party_hp": 9.858156028368795,
+          "mean_targeted_equivalent_cost": 2.624113475177305,
+          "mean_targeted_equivalent_orders": 1.3120567375886525,
+          "party_free_rest_covers": 78,
+          "party_higher_price": 103,
+          "party_lower_price": 6,
+          "party_offers": 141,
+          "points": 153
+        }
+      }
+    },
+    "standard/control": {
+      "campaigns_with_affordable_quote": 36,
+      "demand": {
+        "affordable.both": 73,
+        "affordable.mana": 142,
+        "affordable.wounds": 6,
+        "insufficient_crystals.both": 13,
+        "insufficient_crystals.mana": 6,
+        "wait.both": 86,
+        "wait.mana": 148,
+        "wait.wounds": 6
+      },
+      "first_quote_kinds": {
+        "both": 22,
+        "mana": 13,
+        "wounds": 1
+      },
+      "mean_first_quote_price": 6.083333333333333,
+      "mean_first_quote_remaining": 18.805555555555557,
+      "mean_first_quote_turn": 10.11111111111111,
+      "mean_first_quote_turns": 2.5833333333333335,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 20,
+          "infusion_offers": 36,
+          "last_action_with_adjacent_rival": 3,
+          "mean_full_targeted_bill": 8,
+          "mean_party_hp": 19,
+          "mean_targeted_equivalent_cost": 4,
+          "mean_targeted_equivalent_orders": 2,
+          "party_free_rest_covers": 0,
+          "party_higher_price": 0,
+          "party_lower_price": 0,
+          "party_offers": 1,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 27,
+            "3": 9
+          },
+          "infusion_free_rest_covers": 1,
+          "infusion_offers": 36,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 4.193548387096774,
+          "mean_party_hp": 10.96774193548387,
+          "mean_targeted_equivalent_cost": 2.967741935483871,
+          "mean_targeted_equivalent_orders": 1.4838709677419355,
+          "party_free_rest_covers": 13,
+          "party_higher_price": 19,
+          "party_lower_price": 3,
+          "party_offers": 31,
+          "points": 36
+        }
+      }
+    },
+    "standard/economy": {
+      "campaigns_with_affordable_quote": 10,
+      "demand": {
+        "affordable.wounds": 15,
+        "missing_building.both": 29,
+        "missing_building.mana": 50,
+        "wait.both": 29,
+        "wait.mana": 50,
+        "wait.wounds": 15
+      },
+      "first_quote_kinds": {
+        "wounds": 10
+      },
+      "mean_first_quote_price": 2.6,
+      "mean_first_quote_remaining": 35.5,
+      "mean_first_quote_turn": 12,
+      "mean_first_quote_turns": 1.4,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 9,
+          "mean_full_targeted_bill": 5.166666666666667,
+          "mean_party_hp": 13.5,
+          "mean_targeted_equivalent_cost": 4.722222222222222,
+          "mean_targeted_equivalent_orders": 2.361111111111111,
+          "party_free_rest_covers": 22,
+          "party_higher_price": 8,
+          "party_lower_price": 18,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 20,
+            "3": 7
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 2.888888888888889,
+          "mean_party_hp": 8.592592592592593,
+          "mean_targeted_equivalent_cost": 2.2962962962962963,
+          "mean_targeted_equivalent_orders": 1.1481481481481481,
+          "party_free_rest_covers": 16,
+          "party_higher_price": 24,
+          "party_lower_price": 1,
+          "party_offers": 27,
+          "points": 27
+        }
+      }
+    },
+    "standard/flight": {
+      "campaigns_with_affordable_quote": 17,
+      "demand": {
+        "affordable.wounds": 24,
+        "insufficient_crystals.both": 1,
+        "missing_building.both": 25,
+        "missing_building.mana": 35,
+        "wait.both": 25,
+        "wait.mana": 35,
+        "wait.wounds": 24
+      },
+      "first_quote_kinds": {
+        "wounds": 17
+      },
+      "mean_first_quote_price": 2.4705882352941178,
+      "mean_first_quote_remaining": 24.235294117647058,
+      "mean_first_quote_turn": 11.823529411764707,
+      "mean_first_quote_turns": 1.1764705882352942,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.9444444444444446,
+          "mean_party_hp": 12.277777777777779,
+          "mean_targeted_equivalent_cost": 2.888888888888889,
+          "mean_targeted_equivalent_orders": 1.4444444444444444,
+          "party_free_rest_covers": 13,
+          "party_higher_price": 22,
+          "party_lower_price": 2,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 19,
+            "3": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.5714285714285716,
+          "mean_party_hp": 10.071428571428571,
+          "mean_targeted_equivalent_cost": 2.857142857142857,
+          "mean_targeted_equivalent_orders": 1.4285714285714286,
+          "party_free_rest_covers": 19,
+          "party_higher_price": 18,
+          "party_lower_price": 2,
+          "party_offers": 28,
+          "points": 28
+        }
+      }
+    },
+    "standard/spells": {
+      "campaigns_with_affordable_quote": 36,
+      "demand": {
+        "affordable.both": 42,
+        "affordable.mana": 81,
+        "affordable.wounds": 18,
+        "wait.both": 42,
+        "wait.mana": 81,
+        "wait.wounds": 18
+      },
+      "first_quote_kinds": {
+        "both": 19,
+        "mana": 12,
+        "wounds": 5
+      },
+      "mean_first_quote_price": 5.388888888888889,
+      "mean_first_quote_remaining": 23.833333333333332,
+      "mean_first_quote_turn": 10.166666666666666,
+      "mean_first_quote_turns": 2.2222222222222223,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 36,
+          "infusion_offers": 36,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": null,
+          "mean_party_hp": null,
+          "mean_targeted_equivalent_cost": null,
+          "mean_targeted_equivalent_orders": null,
+          "party_free_rest_covers": 0,
+          "party_higher_price": 0,
+          "party_lower_price": 0,
+          "party_offers": 0,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 27,
+            "3": 9
+          },
+          "infusion_free_rest_covers": 2,
+          "infusion_offers": 33,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.4482758620689653,
+          "mean_party_hp": 9.931034482758621,
+          "mean_targeted_equivalent_cost": 2.4827586206896552,
+          "mean_targeted_equivalent_orders": 1.2413793103448276,
+          "party_free_rest_covers": 13,
+          "party_higher_price": 22,
+          "party_lower_price": 0,
+          "party_offers": 29,
+          "points": 36
+        }
+      }
+    },
+    "standard/sustain": {
+      "campaigns_with_affordable_quote": 1,
+      "demand": {
+        "affordable.wounds": 1,
+        "insufficient_crystals.both": 1,
+        "missing_building.both": 37,
+        "missing_building.mana": 95,
+        "wait.both": 37,
+        "wait.mana": 95,
+        "wait.wounds": 1
+      },
+      "first_quote_kinds": {
+        "wounds": 1
+      },
+      "mean_first_quote_price": 2,
+      "mean_first_quote_remaining": 38,
+      "mean_first_quote_turn": 12,
+      "mean_first_quote_turns": 1,
+      "outcomes": {
+        "victory": 36
+      },
+      "runs": 36,
+      "service_points": {
+        "after_battle": {
+          "actions": {
+            "1": 27,
+            "2": 9
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.611111111111111,
+          "mean_party_hp": 10.61111111111111,
+          "mean_targeted_equivalent_cost": 2.611111111111111,
+          "mean_targeted_equivalent_orders": 1.3055555555555556,
+          "party_free_rest_covers": 18,
+          "party_higher_price": 25,
+          "party_lower_price": 0,
+          "party_offers": 36,
+          "points": 36
+        },
+        "final_recovery": {
+          "actions": {
+            "2": 20,
+            "3": 6
+          },
+          "infusion_free_rest_covers": 0,
+          "infusion_offers": 0,
+          "last_action_with_adjacent_rival": 0,
+          "mean_full_targeted_bill": 3.1538461538461537,
+          "mean_party_hp": 9.538461538461538,
+          "mean_targeted_equivalent_cost": 2.4615384615384617,
+          "mean_targeted_equivalent_orders": 1.2307692307692308,
+          "party_free_rest_covers": 17,
+          "party_higher_price": 20,
+          "party_lower_price": 0,
+          "party_offers": 26,
+          "points": 26
+        }
+      }
+    }
+  }
+}

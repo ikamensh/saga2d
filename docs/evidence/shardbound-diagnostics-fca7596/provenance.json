@@ -1,0 +1,15 @@
+{
+  "source_commit": "fca759636d85fe54637062de306df985e154ba7b",
+  "artifact_sha256": {
+    "README.md": "4f94b6c201f3d9a9341715b4f77ca28a5fc851327a48ace938b118f7bfb484b8",
+    "applied-warden-after-error.png": "f4d5fa2f719a727128f6cc9096f813ce1023cd6bcd41cbd9cb1440e98d84e6a1",
+    "linked-fuzz.json": "c517e7de21a9ae2b407e03d1f3580319515ce7588f57eddaebc845f1d0345c78",
+    "matrix.json": "4cf9ec5661e6d0c8562b2b608a4b4ede7718289b759c3f12a4eb7fd182bdfde3",
+    "ordinary-replacement-matrix.json": "f381171ba0c7ede7e35e4fe06285d9b443f5e96797e2c362162afc4b6cfc7e06",
+    "ordinary-saves-matrix.json": "bd638c7b5735c8509ad65429fe780a077b811234b3afb9f0803c4d9686dfcead",
+    "review-skyrider-after-error.png": "4f1b9232d0132083b58a85755222194a2e6c5acf55d32f80b63fd75f5658119f",
+    "save-load-125-page-1.png": "7dc081b85077b1146192118233ca763c43e7521e1773cba1508f6ec4023a4a19",
+    "save-load-125-page-2.png": "8b8143d3b65ded5235268bf7a98e71b469d32a6c7e59bc841c483df13c8d4f01",
+    "save-selected-slot-after-error.png": "867c4c23cf4ba49b46298cce454d6faeb0f75d76d4d25e661002629471ac657b"
+  }
+}

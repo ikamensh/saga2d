@@ -2,6 +2,7 @@
 import pytest
 
 from eador.model import HERO_CLASSES, State
+from eador.difficulty import DIFFICULTIES
 from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
 
 
@@ -38,7 +39,8 @@ def test_ruins_trade_a_valuable_pike_checkpoint_for_a_weaker_flank():
     state = State.new(7, theme='ruins')
     checkpoint = state.provinces[(0, 0)]
     assert {'pikeman', 'archer'} <= set(checkpoint.guards)
-    assert checkpoint.site_kind == 'barrow'
+    assert checkpoint.site_kind == 'aerie_raid'
+    assert state.provinces[(1, 0)].site_kind == 'barrow'
     flanks = [[state.provinces[pos] for pos in road[1:-1]] for road in (NORTH_ROAD, SOUTH_ROAD)]
     weaker = min(flanks, key=lambda provinces: sum(sum(p.guard_hp) for p in provinces))
     assert sum(sum(p.guard_hp) for p in weaker) < sum(sum(p.guard_hp) for p in max(flanks, key=lambda ps: sum(sum(p.guard_hp) for p in ps)))
@@ -57,10 +59,12 @@ def test_theme_identity_and_active_hold_survive_save_migration_without_world_gen
     state = State.from_json(legacy)
     assert state.theme == 'frontier'
     current = json.loads(state.to_json())
-    assert current['schema_version'] == 8
+    assert current['schema_version'] == 12
     assert current['provinces'] == before['provinces']
     for unit in before['battle']['units']:
-        unit.update(abilities=[], pinned=False, pin_cooldown=0)
+        unit.update(abilities=[], pinned=False, pin_cooldown=0, cargo_penalty=0, spent_abilities=[])
+    before['battle']['objective']['exits'] = []
+    before['battle'].update(sight_rules='open', smoke_clouds=[])
     assert current['battle'] == before['battle']
     while not state.battle.outcome:
         state.battle.auto_turn()
@@ -103,7 +107,8 @@ def test_every_theme_places_one_optional_watch_away_from_the_home_shrine():
         assert state.provinces[state.hero.pos].site_kind == 'shrine'
 
 
-def test_a_hundred_seeds_per_theme_keep_connected_capitals_variety_and_valid_content():
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_a_hundred_seeds_per_theme_keep_connected_capitals_variety_and_valid_content(difficulty):
     """Random placement cannot erase routes, break saved rosters or strand the opening."""
     from eador.content import SITES
     from eador.model import UNITS
@@ -111,7 +116,7 @@ def test_a_hundred_seeds_per_theme_keep_connected_capitals_variety_and_valid_con
     for theme in THEMES:
         worlds, flank_sides = set(), set()
         for seed in range(100):
-            state = State.new(seed, theme=theme)
+            state = State.new(seed, theme=theme, difficulty=difficulty)
             assert len(state.provinces) == 19
             assert set(state.grid.reachable(state.hero.pos, 19)) == state.grid.cells
             assert state.grid.path(state.hero.pos, (2, 0))
@@ -133,7 +138,8 @@ def test_a_hundred_seeds_per_theme_keep_connected_capitals_variety_and_valid_con
             assert flank_sides == {-1, 1}
 
 
-def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_every_theme():
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_every_theme(difficulty):
     """A sensible first purchase leaves every opening direction viable, across 100 seeds."""
     from eador.model import HERO_CLASSES
     from eador.worldgen import THEMES
@@ -142,7 +148,7 @@ def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_eve
         for seed in range(100):
             for hero_class in HERO_CLASSES:
                 for target in (None, (-2, 1), (-1, -1), (-1, 0)):
-                    state = State.new(seed, hero_class, theme=theme)
+                    state = State.new(seed, hero_class, theme=theme, difficulty=difficulty)
                     state.build('barracks')
                     state.recruit('swordsman')
                     state.explore() if target is None else state.travel(target)

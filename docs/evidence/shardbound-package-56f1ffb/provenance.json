@@ -1,0 +1,32 @@
+{
+  "source": "56f1ffb1036b0a1e1a74bbc20d6ee0812e38c7e6",
+  "source_package_build_hashes_verified_against_commit": true,
+  "dirty_flag_explained": "Unrelated .gitignore edit only; recorded flag preserved.",
+  "artifact": {
+    "bytes": 32734895,
+    "file": "Shardbound-macos-arm64.zip",
+    "sha256": "c8a8a2a5bb3c9fe7f026dd7dccfddd3e03a2d237496502dc5357678f8165d3e1"
+  },
+  "inspected_images": [
+    "packaged-smoke-battle.png",
+    "packaged-smoke-shard.png",
+    "packaged-smoke-settings.png",
+    "packaged-smoke-codex.png",
+    "launchservices.png",
+    "packaged-smoke.png",
+    "packaged-smoke-rival.png"
+  ],
+  "artifact_sha256": {
+    "packaged-smoke-battle.png": "28258c0331514914f16e1c34856460bdf35baebe4edb8593cb8a6808546be55c",
+    "packaged-smoke-shard.png": "47358bed69869a408d27517a9df9e118fa9a99749643017de26d158509822620",
+    "codesign.txt": "f0da40c4f43949aa6732baf9acefc2abb3507991919bac426e9df7973a7ed207",
+    "launchservices.json": "9dd7d122bcbf99721e0ec56f073f1170631468778a1d49650ee2ee380a22248d",
+    "packaged-smoke-settings.png": "c34e8e31936f0309848cd3b73b63270a5ed745caa5fbb8c5273c4be02663b0b3",
+    "build-manifest.json": "e428b75d8cca18d6bfdeb8b065c21f65731b5be4e685837cbe03895e86f87656",
+    "packaged-smoke-codex.png": "59106fda98853fa60ae371e034193f3d0726809b809dc1af47c69a8df7ed0b51",
+    "launchservices.png": "f4da27c7bf7f14e4c687639a919eff291f7f0502a89f2917fe37704bb8ab2cf2",
+    "packaged-smoke.png": "f4da27c7bf7f14e4c687639a919eff291f7f0502a89f2917fe37704bb8ab2cf2",
+    "packaged-smoke.json": "061dd44acc3d1e4f6b969ee32fc2905c3c17ee1ead7acdbd71d5c6606e8eef4c",
+    "packaged-smoke-rival.png": "98317f7024695bbf5ce2b22962a8d25de40e94a44596fc201e7b15dd9fd7c72c"
+  }
+}

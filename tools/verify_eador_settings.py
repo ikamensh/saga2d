@@ -6,6 +6,7 @@ Settings is reached through the title and in-game guide using native keys.
 """
 
 import argparse
+import json
 import os
 from pathlib import Path
 import sys
@@ -14,11 +15,12 @@ from tempfile import TemporaryDirectory
 os.environ.setdefault("SAGA2D_SILENT", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from eador.app import create_game# noqa: E402
-from eador.preferences import DEFAULTS, load_preferences  # noqa: E402
+from eador.app import create_game  # noqa: E402
+from eador.preferences import DEFAULTS, load_preferences, reduced_motion  # noqa: E402
 from eador.scene import HelpScene, TitleScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
-from pyglet.window import key  # noqa: E402
+from saga2d import Button  # noqa: E402
+from pyglet.window import key, mouse  # noqa: E402
 
 
 def press(game, symbol):
@@ -26,6 +28,100 @@ def press(game, symbol):
     game.tick(1 / 60)
     game.backend.window.dispatch_event("on_key_release", symbol, 0)
     game.tick(1 / 60)
+
+
+def click(game, label):
+    control = game.scene.ui.find(lambda child: isinstance(child, Button) and child.text == label)
+    assert control is not None, label
+    x, y, w, h = control.bounds
+    window = game.backend.window
+    scale = min(window.width / game.width, window.height / game.height)
+    px = (window.width - game.width * scale) / 2 + (x + w / 2) * scale
+    py = (window.height - game.height * scale) / 2 + (game.height - y - h / 2) * scale
+    window.dispatch_event("on_mouse_press", round(px), round(py), mouse.LEFT, 0)
+    window.dispatch_event("on_mouse_release", round(px), round(py), mouse.LEFT, 0)
+    game.tick(1 / 60)
+
+
+def verify_display(out):
+    observations = []
+
+    def capture(game, name):
+        for _ in range(3):
+            game.tick(1 / 60)
+        game.backend.capture_frame().save(out / f"{name}.png")
+        observations.append(dict(name=name, fullscreen=game.fullscreen, window_size=game.window_size,
+                                 windowed_size=game.windowed_size, canvas=game.resolution,
+                                 reduced_motion=reduced_motion(game)))
+        assert game.resolution == (1280, 800)
+
+    with TemporaryDirectory(prefix="shardbound-display-preferences-") as directory:
+        data = Path(directory)
+        game = create_game("Shardbound display verification", visible=False, save_dir=data / "saves")
+        try:
+            title = TitleScene()
+            game.push(title)
+            game.tick(1 / 60)
+            game.backend.window.set_size(940, 720)  # Simulates an OS resize outside the Game API.
+            game.tick(1 / 60)
+            assert game.window_size == game.windowed_size == (940, 720)
+            press(game, key.O)
+            click(game, "Display")
+            capture(game, "display-os-resized")
+            click(game, "Go fullscreen")
+            capture(game, "display-fullscreen-preview")
+            click(game, "Cancel")  # Native mouse coordinates cross letterboxing.
+            assert game.scene is title and not game.fullscreen and game.window_size == (940, 720)
+            game.set_fullscreen(True)
+            press(game, key.O)
+            for symbol in (key.D, key.RIGHT, key.DOWN, key.RIGHT, key.DOWN, key.RIGHT):
+                press(game, symbol)
+            assert game.fullscreen and game.windowed_size == (960, 600) and reduced_motion(game)
+            capture(game, "display-reduced-motion-preview")
+            press(game, key.ESCAPE)
+            assert game.fullscreen and game.windowed_size == (940, 720) and not reduced_motion(game)
+            game.set_fullscreen(False)
+            assert game.window_size == (940, 720)
+            # Apply both tabs, then exercise the actual startup restoration path.
+            press(game, key.O)
+            click(game, "Display")
+            click(game, "+")
+            click(game, "Go fullscreen")
+            click(game, "Reduce motion")
+            click(game, "Sound")
+            press(game, key.LEFT)
+            click(game, "Apply")
+            assert game.fullscreen and game.windowed_size == (960, 600)
+        finally:
+            game._teardown()
+            game.backend.quit()
+        game = create_game("Shardbound display restart", save_dir=data / "saves")
+        try:
+            game.backend.window.set_visible(False)
+            assert game.fullscreen and game.windowed_size == (960, 600)
+            assert reduced_motion(game) and game.audio.get_volume("master") == .7
+            game.push(TitleScene())
+            press(game, key.O)
+            press(game, key.D)
+            capture(game, "display-restarted-fullscreen")
+            press(game, key.ESCAPE)
+            game.set_fullscreen(False)
+            assert game.window_size == (960, 600)
+            press(game, key.O)
+            press(game, key.D)
+            capture(game, "display-restored-windowed")
+        finally:
+            game._teardown()
+            game.backend.quit()
+        game = create_game("Shardbound hidden smoke display", visible=False, save_dir=data / "saves")
+        try:
+            assert not game.fullscreen and game.window_size == (1280, 800)
+            game.push(TitleScene())
+            capture(game, "display-hidden-launch-override")
+        finally:
+            game._teardown()
+            game.backend.quit()
+    (out / "display-report.json").write_text(json.dumps(observations, indent=2) + "\n")
 
 
 def main():
@@ -39,9 +135,10 @@ def main():
             data = Path(directory)
             if scenario == "damaged":
                 (data / "settings.json").write_bytes(b"\xffdamaged")
-            game = create_game("Shardbound settings verification", resolution=resolution,
+            game = create_game("Shardbound settings verification", resolution=(1280, 800),
                         visible=False, save_dir=data / "saves")
             try:
+                game.set_window_size(resolution)
                 prefs = load_preferences(game)
                 if scenario == "write-error":
                     prefs.save()
@@ -97,7 +194,8 @@ def main():
             finally:
                 game._teardown()
                 game.backend.quit()
-    print(f"Native title/guide settings, recovery, preview/cancel and campaign-load independence passed: {args.out}")
+    verify_display(args.out)
+    print(f"Native display preview/restart, title/guide settings, recovery, preview/cancel and campaign-load independence passed: {args.out}")
 
 
 if __name__ == "__main__":

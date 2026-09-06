@@ -23,6 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from tools.cpu_budget import CpuBudget  # noqa: E402
 from saga2d import Game  # noqa: E402
 from tribes import ai, mapgen  # noqa: E402
 from tribes.model import World  # noqa: E402
@@ -54,16 +55,20 @@ def check_world(world: World) -> None:
     assert 1 <= world.round <= 31, ("round", world.round)
 
 
-def ai_games(seeds: range) -> int:
+def ai_games(seeds: range, *, budget: CpuBudget | None = None) -> int:
     failures = 0
     outcomes: Counter[str] = Counter()
     for seed in seeds:
+        if budget:
+            budget.checkpoint()
         rng = random.Random(seed)
         size, tribes = rng.choice((11, 14, 18)), rng.choice((2, 3, 4))
         try:
             world = mapgen.generate(seed=seed, size=size, tribe_count=tribes, human=None)
             check_world(world)
             for _turn in range(400):
+                if budget:
+                    budget.checkpoint()
                 if world.winner is not None:
                     break
                 ai.take_turn(world, world.current, rng)
@@ -81,10 +86,14 @@ def ai_games(seeds: range) -> int:
 MONKEY_KEYS = [k for keys in MapScene.controls for k in ((keys,) if isinstance(keys, str) else keys)] + list("12345sn")
 
 
-def monkey_runs(seeds: range, steps: int = 600) -> int:
+def monkey_runs(seeds: range, steps: int = 600, *, budget: CpuBudget | None = None) -> int:
+    """Each seed reproduces title/world choices as well as the input stream."""
     failures = 0
     for seed in seeds:
+        if budget:
+            budget.checkpoint()
         rng = random.Random(seed)
+        random.seed(seed)  # Title/NewGameScene use the global RNG; only this development tool seeds it.
         with tempfile.TemporaryDirectory() as save_dir:
             game = Game("Monkey", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=save_dir)
             try:
@@ -94,6 +103,8 @@ def monkey_runs(seeds: range, steps: int = 600) -> int:
                     game.backend.inject_key(key)
                     game.tick(1 / 60)
                 for _step in range(steps):
+                    if budget:
+                        budget.checkpoint()
                     roll = rng.random()
                     if roll < 0.45:
                         game.backend.inject_key(rng.choice(MONKEY_KEYS), shift=rng.random() < 0.1)
@@ -106,6 +117,8 @@ def monkey_runs(seeds: range, steps: int = 600) -> int:
                     else:
                         game.backend.inject_drag(rng.randrange(1280), rng.randrange(800), rng.uniform(-40, 40), rng.uniform(-40, 40), button="right")
                     for _ in range(rng.choice((1, 1, 2, 6))):
+                        if budget:
+                            budget.checkpoint()
                         game.tick(1 / 60)
                     if game.scene is None:
                         break
@@ -113,7 +126,7 @@ def monkey_runs(seeds: range, steps: int = 600) -> int:
             except Exception:
                 failures += 1
                 print(f"monkey seed {seed}, stack {[type(s).__name__ for s in game.scenes]}:")
-                traceback.print_exc(limit=6)
+                traceback.print_exc()
             finally:
                 game._teardown()
     print(f"monkey runs: {len(seeds)} played, {failures} failed")
@@ -125,8 +138,16 @@ def main() -> None:
     parser.add_argument("--games", type=int, default=60)
     parser.add_argument("--monkey", type=int, default=20)
     parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--cpu-percent", type=float, default=25,
+                        help="CPU allowance as a percent of one core (default 25; 100 for explicit stress)")
     args = parser.parse_args()
-    failures = ai_games(range(args.seed, args.seed + args.games)) + monkey_runs(range(args.seed, args.seed + args.monkey))
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    failures = (ai_games(range(args.seed, args.seed + args.games), budget=budget)
+                + monkey_runs(range(args.seed, args.seed + args.monkey), budget=budget))
+    budget.checkpoint()
     sys.exit(1 if failures else 0)
 
 

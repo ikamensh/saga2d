@@ -1,0 +1,602 @@
+[
+  {
+    "kind": "build",
+    "page": 1,
+    "pages": 1,
+    "items": [
+      "barracks",
+      "archery",
+      "temple",
+      "mage_tower",
+      "market"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 17
+  },
+  {
+    "kind": "build",
+    "page": 1,
+    "pages": 2,
+    "items": [
+      "barracks",
+      "archery",
+      "temple",
+      "mage_tower"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 14
+  },
+  {
+    "kind": "build",
+    "page": 2,
+    "pages": 2,
+    "items": [
+      "market"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "recruit",
+    "page": 1,
+    "pages": 3,
+    "items": [
+      "militia",
+      "swordsman",
+      "archer",
+      "healer",
+      "pikeman"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 17
+  },
+  {
+    "kind": "recruit",
+    "page": 2,
+    "pages": 3,
+    "items": [
+      "ranger",
+      "warden",
+      "sapper",
+      "adept"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 14
+  },
+  {
+    "kind": "recruit",
+    "page": 3,
+    "pages": 3,
+    "items": [
+      "skyrider"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "recruit",
+    "page": 1,
+    "pages": 4,
+    "items": [
+      "militia",
+      "swordsman",
+      "archer"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 2,
+    "pages": 4,
+    "items": [
+      "healer",
+      "pikeman",
+      "ranger"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 3,
+    "pages": 4,
+    "items": [
+      "warden",
+      "sapper",
+      "adept"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 4,
+    "pages": 4,
+    "items": [
+      "skyrider"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "framebuffer": [
+      2560,
+      1440
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "build",
+    "page": 1,
+    "pages": 1,
+    "items": [
+      "barracks",
+      "archery",
+      "temple",
+      "mage_tower",
+      "market"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 17
+  },
+  {
+    "kind": "build",
+    "page": 1,
+    "pages": 2,
+    "items": [
+      "barracks",
+      "archery",
+      "temple",
+      "mage_tower"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 14
+  },
+  {
+    "kind": "build",
+    "page": 2,
+    "pages": 2,
+    "items": [
+      "market"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "recruit",
+    "page": 1,
+    "pages": 3,
+    "items": [
+      "militia",
+      "swordsman",
+      "archer",
+      "healer",
+      "pikeman"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 17
+  },
+  {
+    "kind": "recruit",
+    "page": 2,
+    "pages": 3,
+    "items": [
+      "ranger",
+      "warden",
+      "sapper",
+      "adept"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 14
+  },
+  {
+    "kind": "recruit",
+    "page": 3,
+    "pages": 3,
+    "items": [
+      "skyrider"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "recruit",
+    "page": 1,
+    "pages": 4,
+    "items": [
+      "militia",
+      "swordsman",
+      "archer"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 2,
+    "pages": 4,
+    "items": [
+      "healer",
+      "pikeman",
+      "ranger"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 3,
+    "pages": 4,
+    "items": [
+      "warden",
+      "sapper",
+      "adept"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 4,
+    "pages": 4,
+    "items": [
+      "skyrider"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "framebuffer": [
+      2560,
+      1600
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "build",
+    "page": 1,
+    "pages": 1,
+    "items": [
+      "barracks",
+      "archery",
+      "temple",
+      "mage_tower",
+      "market"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 17
+  },
+  {
+    "kind": "build",
+    "page": 1,
+    "pages": 2,
+    "items": [
+      "barracks",
+      "archery",
+      "temple",
+      "mage_tower"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 14
+  },
+  {
+    "kind": "build",
+    "page": 2,
+    "pages": 2,
+    "items": [
+      "market"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "recruit",
+    "page": 1,
+    "pages": 3,
+    "items": [
+      "militia",
+      "swordsman",
+      "archer",
+      "healer",
+      "pikeman"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 17
+  },
+  {
+    "kind": "recruit",
+    "page": 2,
+    "pages": 3,
+    "items": [
+      "ranger",
+      "warden",
+      "sapper",
+      "adept"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 14
+  },
+  {
+    "kind": "recruit",
+    "page": 3,
+    "pages": 3,
+    "items": [
+      "skyrider"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 5
+  },
+  {
+    "kind": "recruit",
+    "page": 1,
+    "pages": 4,
+    "items": [
+      "militia",
+      "swordsman",
+      "archer"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 2,
+    "pages": 4,
+    "items": [
+      "healer",
+      "pikeman",
+      "ranger"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 3,
+    "pages": 4,
+    "items": [
+      "warden",
+      "sapper",
+      "adept"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 11
+  },
+  {
+    "kind": "recruit",
+    "page": 4,
+    "pages": 4,
+    "items": [
+      "skyrider"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "framebuffer": [
+      3840,
+      2160
+    ],
+    "labels": 5
+  }
+]

@@ -1,0 +1,105 @@
+{
+  "source_revision": "8b686c337dc8f3dc5b56813ade0144a19e2ba6e7",
+  "backend": "pyglet",
+  "capture": "Unedited native hidden-window PNGs; public key/mouse commands. Silent audio.",
+  "command": "python tools/verify_eador_campaign_reading.py --output /tmp/shardbound-campaign-reading-8b686c3",
+  "reading_sizes": [
+    100,
+    125
+  ],
+  "window_sizes": [
+    [
+      1280,
+      720
+    ],
+    [
+      1280,
+      800
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "matrix_layouts": 570,
+  "prepared_cases": 16,
+  "input_activations": 999,
+  "exact_save_reloads": 4,
+  "full_suite": {
+    "passed": 1126,
+    "seconds": 104.42
+  },
+  "tribes_fuzz": {
+    "seed": 17,
+    "games": 60,
+    "monkey": 20,
+    "failed": 0
+  },
+  "inspection": "All seven retained frames and the remaining second long-path diagnostic page were opened and inspected.",
+  "artifacts": {
+    "focus-reflow-125.png": {
+      "sha256": "026d0ead8e1f21979043074eb45e924091384642cb3183d5359d70cfdc20c231",
+      "bytes": 613420,
+      "pixels": [
+        3840,
+        2160
+      ]
+    },
+    "linked-fuzz.json": {
+      "sha256": "6dbc49a84281ff11edc40fd9ac1a557a31821fb0ec130f278b73091a657df0ca",
+      "bytes": 10371
+    },
+    "long-path-error-page-1.png": {
+      "sha256": "6da71b30ac5dfe70bb8b54547c9c1e55b2394f629412e0b41afcb39312a7b2de",
+      "bytes": 235764,
+      "pixels": [
+        2560,
+        1600
+      ]
+    },
+    "long-path-return-to-retinue-125.png": {
+      "sha256": "d31ea13b88465c4d8370002d23a704422aa1badc4c6a7d48ff20fe0cf5e4e05e",
+      "bytes": 291550,
+      "pixels": [
+        2560,
+        1600
+      ]
+    },
+    "matrix.json": {
+      "sha256": "6a0ff5343d4c7a7893ed96bb9a5ada0a8cca42c6fa0c4007e8b8e359d43158c7",
+      "bytes": 161193
+    },
+    "saved-challenge1-recover-125-page-1.png": {
+      "sha256": "64369ddd83c14e8067119dd0864a0bd0329756c15e6331b3dc0fdc946212faf6",
+      "bytes": 341911,
+      "pixels": [
+        2560,
+        1440
+      ]
+    },
+    "standard-departure-100-page-1.png": {
+      "sha256": "d9e8dda0132433017ca0726208bbe4534d1e8e631c94d3b3033404557f722e55",
+      "bytes": 300272,
+      "pixels": [
+        2560,
+        1440
+      ]
+    },
+    "standard-departure-save-error-125-page-2.png": {
+      "sha256": "16ccba249c40c10bd47d38d7f6b2c81041be1737ffe930a7a3029e8cdc2e0017",
+      "bytes": 511389,
+      "pixels": [
+        3840,
+        2160
+      ]
+    },
+    "throne-completed-125-page-1.png": {
+      "sha256": "9e7bed3e415628b31265cef72dc94abcd213b8359ce205655ffe95e085d755a7",
+      "bytes": 247131,
+      "pixels": [
+        2560,
+        1440
+      ]
+    }
+  }
+}

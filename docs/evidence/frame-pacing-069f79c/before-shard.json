@@ -1,0 +1,39 @@
+{
+  "source_commit": "219bcf94136db9cd0fe2ac81f7e8a636be657e60",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "scene": "shard",
+  "rows": [
+    {
+      "phase": "active",
+      "seconds": 2.003132583980914,
+      "frames": 331,
+      "fps": 165.241184056918,
+      "cpu_percent": 90.12603631119411
+    },
+    {
+      "phase": "unfocused",
+      "seconds": 2.0003261249512434,
+      "frames": 348,
+      "fps": 173.9716317550381,
+      "cpu_percent": 91.039004954474
+    },
+    {
+      "phase": "hidden",
+      "seconds": 2.000602499989327,
+      "frames": 358,
+      "fps": 178.94609249059215,
+      "cpu_percent": 89.63374783394336
+    },
+    {
+      "phase": "restored",
+      "seconds": 2.0012009579804726,
+      "frames": 354,
+      "fps": 176.89377900220566,
+      "cpu_percent": 89.04572991001876
+    }
+  ],
+  "game_time": 8.005250708025414,
+  "input_presses": 4,
+  "closed": true,
+  "scope": "One hidden native window; synthetic native focus/visibility events; no battery measurement."
+}

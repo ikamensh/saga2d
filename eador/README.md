@@ -2,8 +2,8 @@
 
 An Eador-inspired strategy game built on Saga2D. Develop a stronghold,
 explore guarded sites, lead a persistent army through hex battles, and
-capture Duskspire before the rival takes Westwatch. It is an independently
-implemented single-shard adaptation with procedural art.
+capture Duskspire before the rival takes Westwatch. Its three-shard linked
+campaign and quick standalone mode use original content and procedural art.
 
 From the repository root:
 
@@ -12,8 +12,34 @@ uv sync --extra dev
 uv run python -m eador                       # title and hero selection
 uv run python -m eador --seed 7              # start immediately as Commander
 uv run python -m eador --seed 7 --hero Wizard --theme elderwild
+uv run python -m eador --campaign --seed 7 --hero Commander
+uv run python -m eador --campaign --seed 7 --difficulty accessible
+uv run python -m eador --data-dir /tmp/shardbound-playtest
 uv run python -m pytest tests/eador -q
 ```
+
+This is a development build. **A / About this build** on the title or Field
+Guide shows the version, installed build identity, current scope, unfinished
+work, credits and feedback instructions. It also shows the actual save and
+settings directory. `--data-dir PATH` gives a playtest its own profile, keeping
+both saves and settings under that directory. The same argument works with the
+packaged application. Returning to About or changing reading size does not
+change your campaign or title selections.
+
+On the title, **L** begins a linked campaign with your hero and seed, starting
+in Frontier. **Enter** starts one standalone shard in your selected world.
+Linked victories offer two next challenges, followed by a choice of up to
+two surviving veterans and two relics. Use **Left/Right**, **Up/Down** and
+**Space** to choose a retinue, then **Enter** to depart; **Esc** returns to
+challenge comparison. Learned skills persist, traveling health and mana
+recover, and local holdings and buildings stay behind. A first lost capital
+offers one recovery expedition; another loss ends the run. See the
+[linked campaign guide](../docs/eador-linked-ui.md) for carryover and saves.
+**J** opens your current contract, numbered map objectives, rank limits and
+recovery status. Its numbered **Locate** controls select a required province
+without spending an action. The final ritual's briefing shows the deployment,
+seal, defending army and deadline before you commit the assault. Retinue
+pages also have mouse-accessible **Previous / Next** controls.
 
 `--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard`; `--theme` accepts
 `frontier`, `elderwild` or `ruins`. With `--seed` they start that world directly;
@@ -29,8 +55,27 @@ retains its previous version, opened explicitly with **Backup** or
 reported without replacing live play; recover a backup and save to another
 manual slot. **Save & title** asks for a slot and leaves only after writing it.
 
-**O** opens sound settings from the title or field guide. Arrow keys or the
-visible buttons adjust volume and mute; **Enter** applies, **Esc** cancels.
+Choose **Accessible / Standard / Challenge** on the title with **1 / 2 / 3**,
+or use `--difficulty accessible|standard|challenge`. Accessible starts with
+130 gold and more generous recovery; Standard starts with 100 gold; Challenge
+starts with 90 gold, earns 80% of base realm gold production and has shorter
+rival preparation windows. The choice is fixed for a run. Loading preserves
+that save's exact rules, including earlier Challenge recovery rates. **H**
+shows the actual next-turn recovery; campaign briefings show actual arrival
+and recovery funds.
+
+**O** opens settings from the title or field guide. **S / D** selects Sound
+or Display. Arrow keys or visible buttons adjust volume, mute, window size,
+fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
+Reading size offers 100/125% for the title, Codex, Field Guide, expedition briefings,
+Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival plans and campaign transitions/plans. Press **T** in these screens to open that setting directly.
+The map's campaign facts and battle objectives, unit facts, forecasts, guidance
+and history share this setting. **F2 / Text size** opens it on the map or in battle;
+**T** still retreats during battle. **L / Battle log** reads the complete history.
+Compact map/board markers, large titles and command buttons keep their normal sizes.
+Reduced motion keeps units and battle damage/healing numbers still while
+highlighting each action in order. The logical
+canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
 loading another campaign. Damaged settings are reported and kept until you
 explicitly choose retained recovery. Original campaign/battle music and action
@@ -39,7 +84,7 @@ and mix review remain part of release preparation.
 
 ## Your first turns
 
-1. Start with Commander. You have 100 gold, two militia, an archer and your
+1. Start with Commander on Standard. You have 100 gold, two militia, an archer and your
    hero. Press **B**, then **1** to build Barracks for 45 gold. Close with
    **Esc**, press **R**, then **2** to recruit a Swordsman for 45 gold.
 2. Close recruitment and press **X** to explore Westwatch's guarded site.
@@ -49,7 +94,9 @@ and mix review remain part of release preparation.
    the front line; forest and hills reduce incoming attack damage.
 4. Press **E** after your units act to let the enemy take its turn. **A**
    plays your remaining actions and the enemy turn automatically for one
-   round; repeat it if you want assistance with the encounter.
+   round. Moves, abilities and reactions are shown in order; watch them or
+   press **Space** to finish playback. Battle orders resume afterward.
+   Repeat **A** if you want assistance with the next round.
 5. After victory, press **E** to return with treasure and experience.
    Resolve any skill or relic decisions with **1/2**. Keeping a relic adds
    it to your inventory; **H**, then its number equips it. Press **E**
@@ -86,10 +133,14 @@ adds mana to support the two spells already learned.
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
 | Title | Left / Right / click world | Choose Frontier, Elderwild or Ruins |
+| Title | 1 / 2 / 3 | Choose Accessible, Standard or Challenge |
+| Title | L | Start a linked campaign |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
-| Title / guide | O | Open sound settings |
-| Settings | Up / Down, Left / Right | Select a row, adjust volume or mute |
+| Title / guide | O | Open sound and display settings |
+| Title / guide | A | Read build identity, scope, credits and feedback instructions |
+| Settings | S / D | Select Sound / Display |
+| Settings | Up / Down, Left / Right | Select a row, adjust its value |
 | Settings | Enter / Esc | Apply preferences / cancel live preview |
 | Shard | Click province | Select and inspect it |
 | Shard | Tab | Cycle provinces adjacent to the hero |
@@ -99,27 +150,42 @@ adds mana to support the two spells already learned.
 | Shard | Enter / Space | Travel to or invade the selected adjacent province |
 | Shard | X | Explore the hero's current province; preview authored expeditions |
 | Expedition briefing | Enter / Esc | Enter for one action / return without spending |
+| Adventure briefing | 1 / 2 | Compare deployment, fee or reward choices |
+| Expedition briefing | T | Adjust reading size with live preview and Apply/Cancel |
 | Shard | B / R | Open construction / recruitment |
 | Shard / decision | H | Inspect skills and equip relics |
 | Shard, battle, guide, hero or decision | C | Open the rules codex |
 | Codex | 1–6 / Tab / Shift+Tab | Select / cycle categories |
 | Codex | Arrows / Page Up / Page Down | Turn pages |
 | Decision | 1 / 2 | Choose the corresponding skill or reward |
-| Hero | 1–4 / U | Equip a visible relic / unequip |
+| Hero | Visible number / U | Equip the corresponding visible relic / unequip |
 | Hero | Left / Right | Previous / next inventory page |
-| Catalogue | Number key / click | Buy the corresponding building or troop |
+| Hero | I | Infuse mana with a Mage Tower; review the exact cost and gain first |
+| Hero, Build, Recruit | T | Adjust reading size and return to the same first visible item |
+| Battle / shard result | T / C / F6 | Read larger text / inspect Codex / browse saves before continuing |
+| Catalogue | Number key / click | Buy the corresponding visible building or troop |
+| Recruitment | Left / Right or Previous / Next | Change troop page |
 | Shard | E | End campaign turn |
-| Battle | Click friendly unit / Tab | Select unit / cycle units that can still act |
+| Battle | Click friendly unit / Tab | Select unit / cycle units with an action or movement left |
 | Battle | Click empty hex / enemy | Move / attack with selected unit |
 | Battle | Arrows / Page Up / Page Down | Aim at neighboring hexes (Page keys provide the other two diagonals) |
 | Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
-| Battle | F | Cycle enemy targets, or friendly targets while aiming Heal |
-| Battle | 1 / 2, then click target | Cast Arcane Bolt / Heal |
-| Objective battle | O | Aim at the seal |
+| Battle | F | Cycle enemies, or legal targets for the selected order |
+| Map / Battle | F2 / Text size | Read larger game facts, then return to the same selection and aimed order |
+| Battle | L / Battle log | Read complete events without spending an order |
+| Battle | M / Read message | Read a complete message when it exceeds the footer |
+| Battle | 1 / 2, then click target | Hero Bolt / Heal with the selected Acolyte, otherwise the hero |
+| Battle | S, then F / click target / Enter | Exchange a Warden with an adjacent ally |
+| Battle | Q, then F / click target / Enter | Rally an adjacent Pinned ally with Militia |
+| Battle | D, then F / click hex / Enter | Place a Sapper's finite Smoke screen |
+| Battle | R, then F / click target / Enter | Preview and Repulse an enemy with a Rune Adept |
+| Objective battle | O | Aim at the seal or cycle exits |
+| Extraction battle | V | Evacuate with an unspent hero on an uncontested exit |
 | Battle | P, then F / click target / Enter | Aim Pin with an Archer or Storm Quiver hero |
 | Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
 | Battle | E | End round, or accept a completed battle's result |
 | Battle | A | Auto-play one round |
+| Battle playback | Space / Enter / Esc / Finish playback | Finish watching resolved actions and resume play |
 | Battle | T / Retreat button | Withdraw with surviving troops and a gold penalty |
 | Shard, battle or decision | F5 / F9 | Quicksave / quickload Manual 1 |
 | Title, shard, battle or decision | F6 | Open all saves |
@@ -131,6 +197,12 @@ adds mana to support the two spells already learned.
 | Battle | Esc | Cancel spell targeting, otherwise open guide |
 | Catalogue or guide | Esc | Close overlay |
 
+During ordered playback, **F2** opens settings and **L** opens the complete
+battle log; these screens pause playback. Saves contain the resolved turn.
+Loading resumes from that saved state, with a completed battle's result ready
+to accept. Playback takes at most eight game seconds and can be finished at
+any point with its visible button or shortcut.
+
 ## Rules and scope
 
 The campaign has 19 connected provinces, a single controllable hero and a
@@ -140,7 +212,8 @@ eastern approach has four, and Duskspire has seven. Travel and site
 exploration spend campaign actions: two per turn, or three for Scout.
 Construction and recruitment spend resources without consuming actions;
 recruitment is available in any province you control. There is one guarded
-site per eligible province, resolved in a single expedition.
+site per eligible province. Each can be cleared once; failed attempts leave
+surviving defenders wounded for a later retry.
 
 | Class | Difference |
 |---|---|
@@ -151,9 +224,39 @@ site per eligible province, resolved in a single expedition.
 
 Other classes have five troop slots. Troops are individual fighters, not
 stacks. Victories improve the hero and surviving veterans; dead troops are
-lost. The five recruitable types are Militia, Swordsman, Archer, Acolyte and Pikeman.
-Acolytes improve campaign recovery; spellcasting belongs to the hero.
-Pikemen share the Barracks with Swordsmen and provide a defensive front line.
+lost. Ten recruitable roles have different orders and costs. Militia fill
+cheap front-line slots; Swordsmen provide stronger melee attacks; Archers
+offer ranged damage and Pin; Pikemen Brace against melee approaches.
+
+Acolytes improve campaign recovery and can Heal a wounded ally within four
+hexes. Select the Acolyte, press **2**, then **F** and **Enter** or click a
+highlighted ally. The preview shows actual HP restored. Heal spends that
+Acolyte's order and remaining movement, using the same finite mana as the
+hero. The hero keeps its own order.
+
+Rangers can shoot and then use their remaining movement. Moving before
+shooting gives no second move, and Pin still slows the escape. After firing,
+the status reads **Can move** and blue hexes show the available retreat.
+Wardens use **S** to exchange places with an adjacent ally. Both units spend
+their remaining movement; the Warden spends its action, while the ally keeps
+any unspent action. Guard, Brace and Pin remain unchanged. Ranger and Warden are
+on recruitment's second page; **Left/Right** or **Previous/Next** changes pages.
+
+Militia can **Rally** with **Q**, clearing an adjacent ally's Pin. The green
+forecast shows that ally's actual reachable hexes after Rally. The Militia
+spends its own action and movement; the ally keeps its existing spent orders.
+Sappers cost 60 gold and one crystal after Marketplace construction. **D**
+places one Smoke screen per battle within three visible hexes. It blocks
+both sides' ranged attacks, Pin and spells through that hex until the Sapper's
+next turn. The cloud badge and **Smoke · 0** persist across loading.
+
+Rune Adepts cost 65 gold and two crystals after Mage Tower construction.
+**R** uses one Repulse per battle to push an adjacent enemy one hex away,
+without damage or changing its spent orders. The landing is previewed and
+must be empty; Guard and Brace anchor enemies against displacement.
+Skyriders cost 85 gold and three crystals after Temple construction. Their
+four-hex flight crosses occupied or rough ground, with an empty landing.
+Pin still slows them and melee attacks still face Brace.
 
 Each level offers two class disciplines. Choose a new discipline or deepen
 one already learned, up to rank three. Commander balances recruitment and
@@ -162,23 +265,94 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Eight sites have different defending parties and gold/crystal rewards:
-Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove, Border Watch and Explorer's Camp. The Watch shows its layout and rewards before you commit
+Sites have different defending parties, rewards and objectives. Ordinary
+guarded ruins sit alongside authored adventures such as Border Watch,
+Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory,
+Stranded Explorer, Smuggler Screen, Aerie Raid, Relief Column and Runebound
+Causeway. The Codex describes the current catalogue and its saved rewards.
+The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
-defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of eight
+defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of twelve
 relics to gain healing or damage spells, avoid retaliation, cross difficult
-terrain, improve army recovery or reduce recruitment costs. Duplicate
+terrain, improve army recovery, reduce recruitment costs, or give the hero
+Smoke, Repulse, Swap or Rally. One relic is equipped at a time. Duplicate
 relics can instead be distilled into four crystals. These choices belong
 to this adaptation; they do not reproduce the commercial game's catalogue.
 
+Courier's Crossing, Supply Cache and Sealed Vault ask you to carry cargo out of a defended
+battlefield. Their briefing compares two approaches with **1/2** and shows
+the actual deployment, exits, defenders and reward before **Enter** commits
+an action. **Esc** returns for free. At the Crossing, a guide costs 20 gold
+and changes your deployment; at the Cache, a larger reward slows your hero.
+The Ruins Vault offers a second escape door for two crystals.
+During battle, **O** cycles marked exits. Reach one with an unspent hero action
+and no adjacent enemy, then use **V** to Evacuate with all surviving troops.
+Moving or being delivered by a Warden keeps the hero's action; attacking,
+casting or Guarding spends it. Rout also wins. Escape before the eighth enemy
+phase ends; failed attempts retain wounded defenders and spent fees, while
+success pays the chosen reward once. The Codex shows saved approach details.
+
+Elderwild's Pack Hunt puts six wolves on both sides of a forest divide.
+Stand together for free or pay 20 gold to deploy north of the forest.
+The same finite pack and reward remain. Defeat every defender while keeping
+your hero alive; there is no seal or exit objective. Ordinary rout battles
+force a retreat through exhaustion after 80 rounds.
+
+Broken Observatory asks you to hold a central hill. Spend two crystals to
+clear a forest lane for both armies, or retain its cover for free. Stranded
+Explorer separates the hero and one escort, when present, from the main
+party across a marsh. Choose the northern or southern assembly for free,
+then return the hero to the western exit by round six or rout the patrol.
+The briefing identifies the actual isolated party before entry.
+
+Smuggler Screen offers western or northern formations against a Sapper, two
+Archers, a Warden and a Dread Guard. Smoke blocks friendly ranged orders and
+spells too; Rally clears Pin without restoring spent actions. Choose a route
+around the screen, rescue exposed troops or stop the Sapper before it acts.
+Both formations face the same finite defenders and offer 60 gold, two crystals
+and a Veil Censer. A failed attempt preserves killed guards and wounded survivors.
+
+Aerie Raid offers western and northern deployments against two Skyriders, an
+Archer and a Pikeman. Flight crosses the marsh and occupied hexes, but still
+needs an empty landing. Block useful landings, Brace the next melee approach,
+or reposition with Swap and Repulse. Both formations offer 60 gold, two
+crystals and a Watch Bell; wounded survivors persist after a failed attempt.
+
+Frontier's Relief Column asks you to hold a signal for two consecutive
+uncontested enemy turns by round four, or rout its four defenders. Intercept
+the Militia before it Rallies a pinned Skyrider, receive the landing from a
+western assembly, or occupy the useful landing cells with a larger party.
+Both assemblies are free. Its reward varies by shard and is shown before
+entry; an unchanged ordinary site offers the same reward elsewhere. After a
+failed attempt, defeated enemies stay gone and survivors keep their wounds;
+a lost veteran needs a fresh paid replacement.
+
+Ruins' Runebound Causeway asks you to extract cargo through a guarded marsh
+by round five, or rout the defenders. Its free western assembly leaves room
+to focus the Rune Adept, anchor your carrier with Guard, or occupy its Repulse
+landing. A Warden can deliver an unspent hero to the northeastern exit;
+attacking, casting or Guarding spends the action needed to Evacuate. Prepare
+mana before entry: Tower infusion can buy time at the cost of crystals and
+one campaign action. The saved reward has an unchanged ordinary source
+elsewhere, and defeated defenders stay gone on retry. There are twelve
+authored encounter patterns so far.
+
 | Building | Cost | Benefit |
 |---|---|---|
-| Barracks | 45 gold | Recruit Swordsmen and Pikemen |
-| Archery Range | 55 gold | Recruit Archers |
-| Temple | 65 gold | Recruit Acolytes, learn Heal, improve recovery |
-| Mage Tower | 75 gold + 2 crystals | Learn Arcane Bolt and gain 4 maximum mana |
-| Marketplace | 60 gold | Add 8 gold income each turn |
+| Barracks | 45 gold | Recruit Swordsmen, Pikemen and Wardens |
+| Archery Range | 55 gold | Recruit Archers and Rangers |
+| Temple | 65 gold | Recruit Acolytes and Skyriders, learn Heal, improve recovery |
+| Mage Tower | 75 gold + 2 crystals | Recruit Rune Adepts, learn Arcane Bolt, gain 4 maximum mana and unlock mana infusion |
+| Marketplace | 60 gold | Recruit Sappers and add 8 gold income each turn |
+
+Once an army is full, **R → M** opens troop replacement. Choose the veteran,
+choose a fresh recruit from the usual catalog, then review the exact cost.
+**Replace veteran** permanently retires the named troop, losing its rank and
+experience with no refund or reserve. It buys a rank-one recruit in the same
+army slot at the ordinary price and spends one campaign action. The review
+shows health, role, both upkeep totals and any missing prerequisite or resources.
+Cancel spends nothing. Keeping the army and resting remains an alternative;
+ordinary recruitment into an empty slot still costs no campaign action.
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
 deducted each campaign turn. If every province neighboring Westwatch is
@@ -189,7 +363,15 @@ Unpaid troops leave, preserving higher levels and experience first; among
 equal veterans, more expensive/newer recruits leave first. Outlying owned
 provinces still produce income.
 
-Ending the turn restores health on friendly land and 4 mana, unless the
+With a Mage Tower, open **H**, then **I** to spend **3 crystals and one hero
+action** for up to **8 mana**, capped at your maximum. The Hero screen quotes
+the actual gain and explains unavailable orders. You must be in your own
+territory, outside a battle or pending choice; encirclement blocks infusion
+at Westwatch. Infusion leaves the turn and rival in place. Resting remains
+the ordinary free recovery option, while ending a turn also advances the rival.
+
+Ending the turn restores health on friendly land and mana according to the
+saved mode, unless the
 hero is inside encircled Westwatch. Before skill and relic modifiers,
 Arcane Bolt deals 14 damage; Heal restores up to 16 health
 to a living ally. Both cost 4 mana, have a range of four hexes and use the
@@ -197,7 +379,10 @@ hero's action. A move can precede an attack or spell; attacking or casting
 ends that unit's movement unless the Scout's Skirmisher discipline allows
 an attack followed by movement. Surviving adjacent targets can retaliate once
 per full round. Forest and marsh cost extra movement; forest and hills
-provide cover. Ranged attacks use distance without line-of-sight blocking.
+provide cover. Intervening forest blocks ranged attacks, Pin and spells;
+forest at a shooter or target provides cover without itself blocking the shot.
+Smoke also blocks shots into or out of its hex, while self-healing still works.
+Older saved active battles retain their original sight and capabilities.
 
 **G** spends a unit's remaining movement and action on **Guard**, adding two
 defense until its next turn. A Pikeman uses **Brace** instead: the first
@@ -211,9 +396,10 @@ Capture Duskspire to win; taking every province is unnecessary. If the
 rival reaches a province containing your hero, you fight a defensive
 battle. Other guarded provinces fight its expedition using the same
 tactical rules, with lasting losses on both sides. Losing
-Westwatch ends the campaign. Retreating or losing an ordinary battle keeps
+Westwatch loses the shard; a linked campaign may still have its one recovery.
+Retreating or losing an ordinary battle keeps
 survivors' wounds and costs up to 20 gold; defending territory is lost on
-retreat. New shard becomes available after victory or defeat.
+retreat. Return to the title to begin another run after victory or defeat.
 
 This slice has no astral metacampaign, diplomatic simulation, karma,
 rebellions, multiclassing, multiplayer, fog of war or
@@ -221,7 +407,7 @@ the original games' large content catalogue. The rival has a finite
 expedition and treasury, with a fixed recruitment plan. Tactical morale,
 stamina and spell preparation are simplified
 away. Hero mana replaces Eador's prepared spells and gem costs; crystals
-here fund construction rather than individual casts.
+fund construction, specialist recruits, mana infusion and some expedition approaches.
 
 ## Game and framework
 

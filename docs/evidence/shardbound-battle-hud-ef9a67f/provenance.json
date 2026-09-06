@@ -1,0 +1,33 @@
+{
+  "accepted_source": "ef9a67f92cc2f7bd542832e6f13a5a824d6353ba",
+  "original_report_heads_preserved": true,
+  "fingerprint_comparison": {
+    "hud-verification.json": {
+      "recorded_sources": 150,
+      "different_from_commit": []
+    },
+    "forecast-verification.json": {
+      "recorded_sources": 150,
+      "different_from_commit": []
+    },
+    "linked-fuzz.json": {
+      "recorded_sources": 66,
+      "different_from_commit": []
+    },
+    "dense-report.json": {
+      "recorded_sources": 2,
+      "different_from_commit": []
+    }
+  },
+  "full_suite": "1156 passed in149.43s",
+  "tribes_fuzz": "60AIgames/20sceneruns, nofailures",
+  "linked_fuzz": "12modelcampaigns/12sceneruns,2226inputs,2238ticks,2message-readerinputs",
+  "images": {
+    "explorer-125.png": "9972a10b5fe35c0aa16f5a0e32e175da2897275b6061a7517e908485da92deca",
+    "pin-guard-125.png": "3ee862601eb208df4c6314113068bb3794503d2b97162583f5bb2f2d2557bf5a",
+    "swordsman-125.png": "4444fecf2f74025fd28b6d37c1a71d79de987c7d341023a2b7ca72149ef46084",
+    "applied-autosave-error.png": "1504b6647a027b6a478bbb2477168f092080a856d3dffc1ca4ee66b1bcde7292",
+    "error-page-1.png": "a5b190e4f2be8f0707edbb0eb912d2dadc44b8882b46d113ed2d889624f55c9c",
+    "guard-smoke-125.png": "cbefaa80ca835e4f709e20a86d6d12579d09c277c947665f3c12171d6b16b1dc"
+  }
+}

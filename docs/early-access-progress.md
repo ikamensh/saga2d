@@ -7,6 +7,124 @@ the current goal is substantially broader.
 Entries below are chronological checkpoints; their measurements apply to
 the named source snapshot, and later entries supersede earlier feature gaps.
 
+## Current playable checkpoint — 2026-09-06
+
+The latest preserved Mac development archive is clean source **a6851fb**:
+[build identity, screenshots and verification](evidence/shardbound-package-a6851fb/README.md).
+It now includes the CPU caps, an in-game About screen and `--data-dir PATH` for
+isolated saves/settings. The About screen identifies the actual packaged source
+and explains current scope, unfinished work, controls, credits and local feedback.
+The [local store-description draft](shardbound-store-draft.md) remains unpublished.
+These use existing game screens and framework file configuration; no new
+framework API or schema was needed.
+
+Eleven focused integration tests pass on this source. Native title checks cover
+216 configurations, 15 About pages and 372 inputs; their pre-commit source hashes
+match the candidate. The extracted frozen app and LaunchServices smoke pass,
+including exact build identity, About return, saves, settings and installed audio.
+Six packaged frames and three larger-text source About pages were inspected.
+The fresh independent UI-only attempt encountered a locked Mac and observed no
+game, so G09 gains no walkthrough or human-playtest credit. Test processes ended.
+The full packaged campaigns and sustained candidate checks are not yet repeated
+for this archive. **All G01–G19 gates remain incomplete.**
+
+Later [paid investment checks](eador-authored-investment-comparison.md) reproduce
+the small Sapper timing tradeoff on current source and through native controls:
+51 inputs, seven exact reloads, and 12 versus 23 missing HP from the same earned
+army after Smoke-now versus Guard-now. Both finish R4 without deaths at two mana.
+Preparation is model-owned and the continuation uses automatic rounds; this is
+neither a full native paid campaign nor optimal manual play. A real Sealed Vault
+regression also fixed a harness detour that could explore away from its named
+target. Audit CLIs now honor the 25% CPU allowance and default to a bounded case.
+
+[Three persistent paid army plans](eador-army-plans.md) complete first Standard
+seed-7 Foundries→Throne model pilots while maintaining different recruitment and
+retinue policies. Their differences matter: sustain takes 35 total shard turns
+and four casualties, mobile takes 44/32, control takes 82/22 and loses all its
+troops in the final battle. These outcomes establish execution, not three viable
+or balanced manual builds. All 897 public commands resume from exact saved states;
+capital recovery was not needed or tested. The next depth work must test deliberate
+protection, movement and control decisions from these actual earned formations.
+Fifteen combined audit/budget/journey tests pass on `64cfe7a`; all jobs ended.
+This work changes only development tools, tests and evidence. The game/framework
+bytes remain those in the preserved `a6851fb` archive.
+
+## Earlier playable checkpoint — 2026-09-06
+
+**Later source changes:** [frame pacing and test CPU budgets](evidence/frame-pacing-069f79c/README.md)
+address the user's CPU/battery report. Normal play now sleeps between frames
+(60 FPS cap, 15 inactive); native policy checks cap at 30 FPS and model fuzzers
+default to a cooperative 25% of one core. Heavy jobs run serially. Native map,
+battle/input, independent example and display checks pass. The `219bcf9` two-hour
+soak was deliberately cancelled at 583 seconds; its cleanup is verified and it
+does not count as completed sustained testing. The large stress job also ended
+early with exit 143. The archive below predates the CPU changes.
+
+[Earned discipline journeys](eador-content-acceptance.md) now cover all eight
+preferred paths through rank 2, rank 3, departures and actual recovery: sixteen
+model runs and eight native recovered campaigns, with 3,874 inputs and 102 exact
+reloads. Those reports name their own source `03a0493`. Native/model retinue orders
+differ, so no whole-state equality between those policies is claimed. Paired
+manual hero builds and three distinct complete paid armies remain G03/G04 gaps.
+
+The preserved Mac development build is clean source **219bcf9**, with twelve
+authored encounter patterns and ordered battle playback. It includes three
+linked shards, three difficulties, ten recruitable roles, twelve relics,
+paid troop replacement, Tower infusion, complete tactical forecasts/history,
+measured campaign/battle HUDs and 100/125 reading settings.
+[Archive, source identity and verification](evidence/shardbound-package-219bcf9/README.md)
+identify the exact playable checkpoint. **All G01–G19 gates remain incomplete.**
+
+The combined source suite passes **1,207 tests**. The extracted frozen app
+completes direct and lost-capital recovery campaigns across nine processes:
+**984 native inputs, 17 UI save/reloads and seven exact process joins**. Both
+routes reload their completed ending and return to title at 125% reading size.
+The policies use automatic rounds and visible Finish playback, so they verify
+campaign/save behavior without claiming manual tactics or human playtime.
+Installed assets/audio, LaunchServices and the local ad-hoc signature pass.
+Six actual package screenshots were inspected; independent package review found
+no issue with the archive, source mappings, import closure or journey receipts.
+
+[Runebound Causeway](eador-causeway.md) brings authored pattern coverage to
+**12/12**. Its seven paid native plans pass 1,645 inputs and 93 exact reloads,
+including Tower infusion, a deadline loss and finite wounded manual retry.
+An unchanged ordinary site retains the same reward. Independent review compares
+3,000 complete worlds and reproduces 806 exact command/save reloads. Its named
+source passes 300 random campaigns, 10,009 random scene inputs, Tribes fuzz and
+the complete briefing matrix. Counts alone do not close G05 or prove enjoyment.
+
+[Ordered battle playback](eador-battle-feedback.md) shows movement, abilities
+and reactions in sequence. Space/Finish skips it; reduced motion keeps pieces
+still. Rules resolve once, saves record that completed turn, and modal input
+cannot issue another battle order. Three clean-source native journeys retain
+393 inputs, seven reloads and 637 watched frames. Independent lifecycle review
+passes 25 tests. Its named 300-campaign/20-scene stress run checks 47,716 trace
+events and 10,004 random inputs. The [combined Causeway journeys](eador-causeway-feedback-integration.md)
+add 610 native inputs and 34 reloads; both final saves are byte-exact with the
+pre-playback runs. These reports keep their own source revisions.
+
+The combined checkpoint also passes 12 linked model campaigns, 12 scene runs,
+3,004 random inputs and 327 inputs verified inert during playback, plus Tribes'
+60 AI games and 20 random-input runs. The [90-second native playback probe](evidence/shardbound-playback-soak-449e40e/README.md)
+verifies the adapted paced driver on an earlier source. It is not the two-hour
+candidate soak or evidence of no memory growth.
+
+Causeway, its shared duplicate-source/reward handling, battle traces and playback
+stay in Shardbound. Saga2D's existing scenes, layers, input ownership and measured
+UI primitives suffice. The [Scene.measure example](framework-ui-measurement.md)
+remains independent of this game; this increment adds no framework API or schema.
+
+The [resource attribution study](eador-resource-breakpoints.md) still identifies
+later policies that stop buying while income continues. Causeway demonstrates a
+local crystals-versus-time choice without establishing recurring economic depth.
+Human/listening feedback, clean-account and Windows execution, remaining balance,
+complete display/content acceptance and sustained candidate stress remain open.
+The UI-only blind opening attempt observed no game: CUA reported a locked Mac
+on both attempts. It supplies no walkthrough or human-playtest credit.
+
+Earlier [c8ec2e2](evidence/shardbound-package-c8ec2e2/README.md) and
+[56f1ffb](evidence/shardbound-package-56f1ffb/README.md) archives remain preserved.
+
 ## Baseline audit — 2026-09-05
 
 - Authoritative baseline: `2d26787`; only unrelated `.gitignore` work was
@@ -261,3 +379,310 @@ complete linked UI, broader content/build/economy choices, settings and
 presentation, then a new packaged candidate and candidate-specific stress.
 The shipping logical canvas uses letterboxing for smaller windows; arbitrary
 logical resizing and text scaling are not established by that evidence.
+
+## Support roles and extraction controls — 2026-09-06
+
+- `b3485fe` exposes Acolyte healing, Ranger movement after shooting and Warden
+  Swap through mouse and keyboard, with exact forecasts and paged recruitment.
+  Signed combat feedback respects reduced motion. Its layering uses the small
+  shared `Scene.screen_layer()` scope; rules and effect styling stay in Eador.
+  See [support-role evidence](eador-roles.md) and the independent
+  [framework layering demo](framework-screen-layers.md).
+- `93b5cf8` adds two authored carry-and-escape layouts with four approach
+  choices, persistent wounded defenders and exactly recorded rewards. The
+  integrated briefing, numbered exits, explicit Evacuate button and Codex
+  make both missions manually playable. Four native paid-army routes pass,
+  with 65–137 inputs and 2–5 exact reloads each. The existing full linked
+  Rootward/Gate input journey also passes. See
+  [extraction rules and UI evidence](eador-extraction.md).
+- `7148998` fixes a separately reproduced Tribes quick-load stale-hover bug.
+  Public regressions and native checks cover missing resources and smaller
+  maps; the development fuzzer now reproduces both world and input seeds.
+- `c691ded` retains native departure/recovery checks when every autosave is
+  damaged, including refusal, a fresh manual checkpoint, arrival and exact
+  reload. Arrival guidance now fits the screen while preserving damaged files.
+- The integration suite passes 810 tests; both games' ordinary fuzz runs pass.
+  The content/role expansion, twelve-relic target, difficulty and human
+  playtests remain open, alongside the other G01–G19 requirements. These
+  source increments have not updated the historical packaged artifact.
+
+## Linked progression, display and economy baseline — 2026-09-06
+
+- `00df6c4` makes the three-shard campaign playable through the title, challenge
+  comparison, explicit veteran/relic selection, recovery and ending screens.
+  `14dcd39` adds the J contract panel, numbered map targets, final ritual
+  pre-entry briefing and mouse controls for larger retinues. Complete native
+  Rootward/Gate and Foundries/Throne journeys, including recovery, used 356
+  and 377 input activations with 11 and 13 exact manual save/reloads. Captured
+  screens were inspected and clipped captions corrected. These are automated
+  journey counts; their short runtime is not a measure of human pacing.
+  See [eador-linked-ui.md](eador-linked-ui.md).
+- V8 rule evidence includes 880 complete linked routes across heroes and
+  challenge choices, plus 300 randomized runs entering all three stages.
+  Every hero has a manual final-seal victory with defenders still alive.
+  See [eador-campaign.md](eador-campaign.md) for source-specific reports,
+  policy limits and replay commands.
+- An unreadable set of rolling autosaves no longer traps a ready departure
+  or recovery. An exact current manual checkpoint can protect the transition;
+  stale snapshots cannot. Damaged files remain intact. Native journeys
+  exercise refusal, a fresh manual save, departure and exact reloading of the
+  pre-departure state. Save-browser labels identify stage, contract and
+  departure/recovery/completed/lost phase (`645b545`).
+- Native window sizing, fullscreen and restoration are reusable Saga2D
+  operations, with a separate game-owned preference screen. Apply/Cancel,
+  startup overrides, Retina sizing and a resized-window/fullscreen roundtrip
+  were exercised through native input and screenshots. See
+  [framework-display.md](framework-display.md) and
+  [eador-display-settings.md](eador-display-settings.md). Text scaling is still
+  absent; the motion preference's combat presentation is a later increment.
+- The historical `31a2c88` two-hour native soak completed: 429,506 frames,
+  577 journeys, p95 11.988 ms and bounded RSS plateaus. The retained
+  [soak report](soak.md) names the machine, source snapshot, timing samples
+  and memory limits. It predates current campaign, role, audio and display
+  changes and does not pass the current candidate's G15 requirement.
+- The read-only v9 [economy audit](eador-economy-v9.md) (`5c13b5e`, measured
+  source `cfaf982`) completed 3,600 matched victories: 100 seeds, three worlds,
+  four heroes and three fixed build policies. Marketplace-first was faster;
+  Mage-Tower-first suffered fewer retreats. All plans eventually share a
+  military/healing core, and crystals were spent only 0 / 0 / 2 on average.
+  This is route robustness and evidence of an open economy gap, not difficulty
+  balance or completion of G07. No opportunistic balance changes were made.
+
+## Control retinue and Ruins extraction — 2026-09-06
+
+- The integrated roster has ten recruits and eight distinct combat abilities.
+  `c8f9fa4` provides saved finite Smoke/Repulse, Militia Rally, Skyrider flight
+  and terrain sight. UI controls show exact Rally reach, Repulse landings,
+  cloud duration/charges and crystal recruitment costs. The paid combined
+  Watch route (`7d42eba`) passes through native input with 158 activations and
+  eight exact reloads; all seven allies survive a hold victory. Separate
+  native Smoke, Rally and Repulse journeys pass. See
+  [control UI evidence](eador-control-ui.md).
+- Troop silhouettes (`3fd1212`) distinguish the canister-bearing Sapper,
+  tablet-bearing Adept and mounted Skyrider. Native review caught wings and
+  spears obscuring adjacent health labels; existing screen layers now place
+  statuses/HP above pieces and feedback above those labels.
+- `69174ca` completes the [Sealed Vault tranche](eador-vault.md): the same
+  purchased army escapes the free route in round four or spends two crystals
+  for round two, with real differences in mana and wounds. Both native routes,
+  finite retries, exact old-save continuation and 300 randomized campaigns
+  pass. This brings authored battlefield families to five, not twelve.
+- Combined source passes **843 tests**. Ordinary Tribes and linked Shardbound
+  fuzz runs also pass after the control changes. Source/UI evidence does not
+  update the historical frozen artifact or satisfy candidate-specific stress.
+
+G01–G19 remain incomplete. Twelve relics, more meaningful authored patterns,
+whole-campaign build/difficulty comparisons and ability-aware automatic play
+are continuing. A new frozen artifact, candidate-specific stress, Windows
+runtime, text scaling, human playtests and listening review remain required.
+
+## Authored rout presentation and combined control integration — 2026-09-06
+
+- Merged the validated control/flight automatic policy and finite Smoke-order
+  validation; its source-specific evidence and attrition debt are in
+  [eador-control-model.md](eador-control-model.md).
+- Pack Hunt's initial model tracer now uses an explicit game-owned encounter
+  objective. Its briefing and Codex describe the rout objective, show
+  each deployment and fee, and preserve cancellation and saved entry decisions.
+  Tactical rout battles now state their objective above the board. All site
+  briefings show their remaining finite defender HP.
+- This is the presentation checkpoint, not completion of Pack Hunt's authored
+  content gate: manual route comparison and deployment tuning are still in
+  progress. No Saga2D scenario API was added.
+- Combined source passed **861 full tests**, 60 Tribes AI games and 20 random
+  Tribes input runs, plus 12 linked model campaigns and 12 linked scene runs
+  (2,227 inputs). Both Pack Hunt entry choices were captured and inspected
+  natively: 22 inputs, two exact quicksave/reloads, free cancellation, correct
+  rout briefing/board/Codex. Final reward/guardian copy passed 11 focused tests.
+
+## Twelve relics, completed Pack Hunt and reusable text flow — 2026-09-06
+
+- `3923255` completes Pack Hunt's sixth authored family with three paid-army
+  manual plans and finite failed-attempt/retry evidence. The free Commander
+  plan takes three rounds; its 20-gold northern approach takes two and saves
+  four HP. A cheaper Warrior/Pikeman formation also wins, with greater wounds.
+  The rout has no separate mission deadline, but the global 80-round exhaustion
+  still applies; current briefing/board/Codex disclose this. See
+  [Pack Hunt evidence](eador-pack-hunt.md). Twelve authored families remain
+  required; ordinary source sites such as Muster Yard do not count as authored
+  battlefield families merely because they have a new reward.
+- `9d52700` integrates twelve discoverable relics, including the hero's
+  Smoke, Repulse, Swap and Rally alternatives. New reward sources preserve old
+  equipment availability across 100 seeds per theme. Saved existing sites and
+  battle capabilities retain their prior identities. All four rewards were
+  earned, reloaded, kept and equipped through native input; original icons and
+  long descriptions were inspected. [Relic presentation](eador-relic-art.md)
+  records the game-owned art and truthful capability/charge guidance.
+- `d1c9fea` adds a native earned Censer journey: fund the army, escape with the
+  reward, equip it, and hold a later Watch with every ally alive. The journey
+  uses 251 input activations and 12 exact reloads; forecast/result screenshots
+  were inspected. Paired model routes measure only one HP saved in the first
+  enemy phase, and a poor screen blocks friendly healing. This is a modest
+  tactical option, not proof of equipment balance. Earned-use journeys for the
+  remaining three relics are still being integrated.
+- Saga2D now provides `Label(text, width=300, wrap=True)`. Measured wrapping,
+  reactive font/text changes and the next control's hit bounds reflow together,
+  including beneath paused overlays. This shares the existing paragraph
+  algorithm and preserves its native pixels; no game rules entered the
+  framework. The [independent example and retained evidence](framework-wrapped-label.md)
+  cover native input, text bounds, fonts and resizing. This primitive alone does
+  not provide Shardbound text scaling.
+- Combined main passes **896 tests**, with source-specific Tribes and Shardbound
+  fuzz evidence retained for the integrated control, content and layout work.
+- A preserved Mac development artifact at source `f63aa6f2806c` was offered for
+  an opening playtest. It predates final Pack Hunt tuning and the four new
+  relics. [The playtest log](eador-playtests.md) records the exact artifact and
+  pending feedback; no human playtest is counted yet.
+
+G01–G19 remain incomplete. The next increments address earned relic use, the
+seventh authored encounter and larger reference text. Difficulty selection,
+whole-campaign balance/pacing, complete text scaling, candidate-specific stress,
+Windows runtime, human playtests and listening review remain open.
+
+## Earned relic use through the complete input path — 2026-09-06
+
+- All four new relics now have native earned-use journeys at the same integrated
+  source `a288171`: Censer/Watch hold, Rune/Ruins Gate recovery hold,
+  Badge/Elderwild Gate exchange hold, and Drum/Watch Pin removal followed by rout.
+  Purchases, rewards, equipment and both linked departures use visible controls;
+  1,316 input activations and 45 exact reloads pass. Both Gate routes complete
+  their linked campaigns. [Retained relic evidence](eador-active-relics.md#native-earned-use-verification)
+  includes reports, inspected forecasts/results and the explicit tactical limits.
+- The shared test driver now rejects missing command adapters. Previously a
+  forwarded method could mutate the model without UI input; public recovery
+  and battle-movement regressions reproduce that gap. The stricter path passes
+  all 904 tests and all four native journeys.
+- Model evidence varies 400 continuations from four earned checkpoints, with
+  16,038 full-save checks, and separately validates 300 random campaigns. These
+  counts establish saved-order robustness, not 400 independently generated
+  worlds or equipment balance.
+
+G01–G19 remain incomplete. Broken Observatory, scoped larger Codex text and
+difficulty design continue independently; global text scaling, content depth,
+economy/pacing, platform, candidate stress and human feedback remain open.
+
+## Observatory choices and larger reference text — 2026-09-06
+
+- Broken Observatory is the seventh authored family, using the existing hold
+  objective, finite guards and saved approach data. Native purchased Sapper and
+  paired Rune armies pass 610 inputs and 26 exact reloads at `46a5aa8`, with all
+  allies alive. The same Rune orders show the two-crystal lane saves six wounds,
+  with no phase saved. [Reports and inspected images](eador-observatory.md)
+  preserve that limited comparison alongside finite retry and old-save evidence.
+- Codex reading size now offers 100/125%, with measured whole-entry pages and
+  persistent Apply/Cancel/restart/recovery. It explicitly affects reference
+  content only. A native resize regression found and fixed cached text metrics
+  being reused at the wrong scale; the framework caches physical glyph metrics
+  and converts them at the current viewport scale, without a new public method.
+  [Reading-size verification](eador-reading-size.md) includes old and current
+  saved rules. Root inspected larger entries, Settings and the paid Observatory.
+- Combined integration passes 924 tests, the independent native resize metrics,
+  pixels and clicks in both directions, Tribes' 60-game/20-scene fuzz and
+  Shardbound's 12-campaign/12-scene linked fuzz. These are development checkpoints.
+
+G01–G19 remain incomplete. Three-mode difficulty is under model review and
+matched evaluation; its UI is next. Global text scaling, remaining authored
+patterns, campaign economy/pacing, platform checks and human feedback remain open.
+
+## Saved realm modes and honest economic readouts — 2026-09-06
+
+- Three title/CLI modes now select frozen, saved realm parameters. Old saves
+  acquire Standard metadata without replaying grants or changing live battles.
+  Map, Hero, Rival, save browser and linked briefings show the saved mode, actual
+  production modifier, capped recovery and model-owned expedition funding.
+- Native `3638b69` runs select all three modes, purchase and recover an army,
+  change the next-run choice and reload exact progress in fresh Games. Three
+  complete linked input journeys use 1,108 activations and 35 exact reloads;
+  Accessible also loses a realm, launches its funded recovery and completes.
+  [Source hashes, inputs and inspected images](evidence/shardbound-difficulty-2026-09-06/README.md)
+  preserve the scope. The combined source passes 958 tests and both games'
+  bounded fuzz checks.
+- The matched 32,400-run model audit finds Accessible's plans finish sooner
+  with fewer casualties on average. Challenge's sustain plan has a long mana
+  recovery tail, and every plan leaves excess crystals. Difficulty selection
+  is implemented; tuning and meaningful recurring resource sinks remain work
+  in progress. No difficulty or campaign policy entered Saga2D.
+
+G01–G19 remain incomplete. Larger guidance text and the eighth authored encounter
+are separate increments. Content depth, economy/pacing, candidate-specific
+stress, platforms and human feedback remain open.
+
+## Readable decisions and the ninth encounter — 2026-09-06
+
+Smuggler Screen is integrated at `5941f60`. Its paid western, northern and
+smaller Scout plans exercise Smoke, Rally, flanking and finite failed-attempt
+recovery. All five native journeys pass with the new measured result panels:
+1,073 inputs and 58 exact reloads. The integrated suite passed 1,083 tests;
+both games' bounded fuzz checks passed. [Retained evidence](evidence/shardbound-results-screen-5941f60/README.md)
+separately attributes the eight-outcome result matrix and current Screen runs.
+The earlier `0e27175` Mac artifact predates these changes.
+
+G01–G19 remain incomplete. Reward reading, explicit paid troop replacement,
+remaining campaign layouts, economy/pacing, content depth, candidate stress,
+platform checks and human feedback remain active work.
+
+## Paid role access and larger decision screens — 2026-09-06
+
+At `ad9026b`, players can explicitly retire a veteran and buy a fresh recruit in
+the same formation slot. The review shows lost rank/XP, full cost, one-action
+payment, role and upkeep. Its native saved Warden assault demonstrates a manual
+Swap → Heal rescue, while the retained comparisons keep ordinary rest and its
+lower-cost outcomes visible. This does not resolve the economy gate.
+
+Reward choices and campaign plans now use the same 100/125 reading setting.
+The replacement native matrix passes 120 complete reviews and 1,170 inputs;
+the integrated suite passes 1,108 tests. Real filesystem-error overflow bugs
+were reproduced and fixed before the checkpoint. [Evidence and inspected frames](evidence/shardbound-replacement-ad9026b/README.md)
+distinguish this source from earlier artifacts and isolated model stress.
+
+G01–G19 remain incomplete. Remaining reading layouts, replacement input stress,
+additional authored patterns, economic balance, candidate-specific stress,
+platform verification and human feedback remain active work.
+
+## Complete save metadata and a smaller framework interface — 2026-09-06
+
+Saves now show complete phase metadata, including results awaiting acceptance,
+and page whole slots around larger text or actual filesystem errors. Explicit
+backup restoration and failed save-before-title recovery pass through native
+controls. Rival intelligence also supports the shared reading size with its
+complete current orders, finite army and economic/breakout advice.
+
+`Scene.measure(component)` removes the repeated temporary attachment needed
+to measure prospective UI trees. It supplies the actual theme/font context
+without taking ownership or activating controls; save and rival layouts use it.
+The independent example verifies that measured cards match their eventual
+rendered sizes. No game or pagination policy entered Saga2D.
+
+At `f3a59e2`, the suite passes 1,119 tests and both games' bounded stress checks.
+Native verification covers the independent example, 54 save pages and 90 rival
+layouts. [Retained checks and inspected frames](evidence/framework-ui-measurement-f3a59e2/README.md)
+preserve source attribution. Replacement scene stress is now integrated too;
+[its report](eador-replacement-fuzz.md) separates random input coverage from
+the dedicated successful paid journeys.
+
+G01–G19 remain incomplete. Campaign transitions/retinue and tactical/HUD
+reading, the tenth and remaining authored patterns, meaningful economy,
+candidate-specific stress, platforms and human feedback remain active work.
+
+## Ten authored families and complete campaign reading — 2026-09-06
+
+Aerie Raid is integrated, using existing flight, Brace, Swap and Repulse on a
+marsh-divided battlefield. Two free deployment approaches and a cheaper Scout
+army have paid public-command and native-input victories. The finite failed
+sortie/retry retains wounds and pays its reward once. Aerie brings the current
+authored family count to ten; G05's twelve-family floor is still open.
+
+The title and campaign transitions now use the shared 100/125 reading setting.
+Selected new-run settings, retinue IDs and visible keyboard focus survive
+settings changes and resize. Valid unusually long save paths no longer turn a
+failed title or departure load into a layout crash: complete diagnostics page
+without losing characters. Independent review reproduced the transition bug
+before the fix. The shard's exhausted-action hint also fits its actual native
+sidebar. [Integrated verification](evidence/shardbound-integrated-56f1ffb/README.md)
+records 1,142 passing tests, both bounded fuzz checks and the native retries.
+
+G01–G19 remain incomplete. Tactical/HUD reading, the remaining two authored
+families, meaningful economy and pacing, oversized errors in remaining review
+screens, candidate stress, platform verification and human feedback remain active.
+The fresh Mac development package at `56f1ffb` passes isolated extracted and
+LaunchServices smoke checks. Earlier artifacts retain their original attribution.

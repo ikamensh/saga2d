@@ -1,0 +1,22 @@
+{
+  "implementation_revision": "a431f47e444eccfd3d2569b76b099801ef09e1b3",
+  "full_tests": {
+    "passed": 1148,
+    "seconds": 117.79
+  },
+  "native_diagnostics": {
+    "pages": 25,
+    "inputs": 93
+  },
+  "tribes": {
+    "ai_games": 60,
+    "scene_runs": 20,
+    "failures": 0
+  },
+  "all_recorded_diagnostic_source_hashes_match_implementation": true,
+  "source_report_heads_preserved": true,
+  "artifact_sha256": {
+    "linked.json": "be352873c52ca2307e5aa43115bfec29647a5a0a3629fd07e69f0e72563ee151",
+    "diagnostics.json": "01c2320485a46e149793ae02c911ef08c036d88c9dadbef8b72b1dbcdef3d7c0"
+  }
+}

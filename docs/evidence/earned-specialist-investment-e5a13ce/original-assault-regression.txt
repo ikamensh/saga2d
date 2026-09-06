@@ -1,0 +1,22 @@
+keep_now auto False ready 6 result victory 6 deaths 4
+keep_rest1 auto False ready 7 result victory 7 deaths 4
+tower_now auto False ready 6 result victory 6 deaths 4
+tower_rest1 auto False ready 7 result failed_assault 7 deaths 6
+sapper auto False ready 7 result failed_assault 7 deaths 6
+adept auto False ready 7 result failed_assault 7 deaths 6
+skyrider auto False ready 7 result failed_assault 7 deaths 6
+full_staged auto False ready 9 result failed_assault 10 deaths 5
+keep_rest3 auto False ready 9 result victory 9 deaths 3
+tower_rest3 auto False ready 9 result victory 9 deaths 3
+full_fund_first auto False ready 10 result failed_assault 11 deaths 6
+tower_rest3 auto True ready 9 result victory 10 deaths 2
+sapper_militia auto False ready 7 result failed_assault 7 deaths 4
+adept_militia auto False ready 7 result failed_assault 7 deaths 6
+skyrider_militia auto False ready 7 result victory 7 deaths 5
+full_staged_tanks auto False ready 9 result failed_assault 10 deaths 6
+keep_rest1 heal_first False ready 7 result failed_assault 7 deaths 6
+adept heal_first False ready 7 result failed_assault 7 deaths 6
+full_staged heal_first False ready 9 result failed_assault 10 deaths 6
+tower_rest3 heal_first False ready 9 result victory 9 deaths 4
+staged paid retry victory 14 160
+/tmp/early-conversion-original-regression.json.gz

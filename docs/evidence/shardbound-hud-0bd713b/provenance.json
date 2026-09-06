@@ -1,0 +1,41 @@
+{
+  "source_commit": "0bd713b45588f227ba07fa248c9e4a149b65998c",
+  "native_backend": "pyglet",
+  "source_files_changed": false,
+  "logical_resolution": [
+    1280,
+    800
+  ],
+  "actual_window_sizes": [
+    [
+      1280,
+      720
+    ],
+    [
+      1280,
+      800
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "reading_percent": [
+    100,
+    125
+  ],
+  "full_suite": "1152 passed in 115.43s",
+  "artifacts_sha256": {
+    "complete-message-1.png": "83eb62ad1267cb8fee12e7d3de55e3f61eb9688a99c3f2762234b14446a27cac",
+    "saved-challenge-1-125.png": "50c58fb4661b6cee4eb27a08d5ec0169e23cc756cd2250ddeae8e302a72302d2",
+    "paid-full-army-125.png": "84f42d8e5a76f2c1a5f6493027e6f97f7fd6aab8fa6f73c01609e1017a0bb667",
+    "standard-opening-100.png": "c675442ff62945167c8ab01b235f1f2f536dab6807f93a7eb296dcff0d4fca36",
+    "linked-opening-125.png": "b9ef78e79e94e19c7bd8d924cb544ac110a0e5bb4751e50494fd29846d6b9c8c",
+    "tests.txt": "649c0b841b81190b44ab2b7b1c4187d7e05e1f949a5bf8130e412ab19948848a",
+    "linked-fuzz.json": "2e9e830b74b39a716e9a865a777219ca9ae6fca61b495525665afb571f509590",
+    "tribes-fuzz.txt": "0524df46246b57a5c3b74a14f7de01627a9c932b1d8b1741258cbb9d16a0099e",
+    "saved-encircled-125.png": "96de9a15a433bddfcec2b3690b51c1d0f40e90a627b4fe5238b3cbec16d2f74d",
+    "matrix.json": "3bb981875bbb7dd44f2c82811ca803ca1fe4d21e5de9b37372752ca41045c43b",
+    "complete-message-link.png": "131a3b521ed03ec7a9b072d774d1a3ca1c99e44a7c42bda97e33678b20683fca"
+  }
+}

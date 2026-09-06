@@ -1,0 +1,29 @@
+{
+  "implementation_revision": "086ce14bc9dade83752f793b651d2583a0d4751e",
+  "all_recorded_native_source_hashes_match_implementation": true,
+  "recorded_report_head_preserved": true,
+  "full_tests": {
+    "passed": 1144,
+    "seconds": 117.02,
+    "note": "Final verifier change only retains the Wizard input report; production and test code are identical to the full run."
+  },
+  "independent_review": "28 focused tests plus native hover/settings/aim/spell probe; missing arrow guidance corrected and regression protected.",
+  "artifact_sha256": {
+    "pin-125.png": "bcee3ce44999bee0ca092c1a914b7cfec71542ca20659d761cca4736dbf55c70",
+    "rally-125.png": "0062e71050c8b939cac5f3c23fe08b535c8452c819e2925e3731a28b13eb9af3",
+    "heal-125.png": "0d85b5cf6fe048b8f66bbc97dfff5d59cde1a8015b7b7dbd4d4b0abf9a531439",
+    "saved-sight-125.png": "c44438f5382f77274b520c5aa48dcf6467dfe2ee1608496ab7e5f3bb141fb6d5",
+    "watch-journey.json": "22cbc32901b003737df74c1675d1a3af74eede91ac3437e94baf064f915fb111",
+    "guided-journey.json": "6860d1abce127983da18730fd9ee807776d45fbd6d3602a817f4b0bd93ee28c9",
+    "bolt-journey.json": "c6f677b1e3dcffa394a266061dd926c90e32ab1b1e40eca0fef3bf8c943d3f03",
+    "swap-125.png": "3f460a5cdff605be95aa8201a513f5bec722661f87de2540112e2d4b7637f2a9",
+    "native.json": "e79f14b0fd8d358884b9e36eccd0aad49a822394bbde6c3f91b57012d06dbd58",
+    "bolt-125.png": "56385efe8dceb8d13cb5775cc36dbc4d45ec56a4ec850c91256a3ef03fa0251d",
+    "reading-scope.png": "1e088884e1b799beb00a58e4d11cacb16fb44067e67c70a8e9fa61f5270289bb",
+    "rally-journey.json": "ba53ee062c4f890bf9d9272edaf1f5f34db5435c7ab1a9c637af8f3655c13dce",
+    "keyboard-guidance-125.png": "8f14800f635b5b1668b1d21d9414218db5c4e82d84a2fff87b1544a4740f5312",
+    "sight-journey.json": "1e5e31358d25c62b778c3d363a51a8a083498bfc72744591288a863502a12f3b",
+    "repulse-journey.json": "0f33ec2077dcd7c8f21c7a2e6a9e803b1f9fb3210705353e3657ecda11b1f5e5",
+    "smoke-journey.json": "dce1ccedeee5531f58cb8f9e4c9ac3987e7bd1f6f3cdf371dba21c21db1ab8e7"
+  }
+}

@@ -1,0 +1,4718 @@
+[
+  {
+    "case": "01-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Keep Moonstone",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "02-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 1",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "03-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Keep Storm Quiver",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "04-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 2",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "05-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "06-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "07-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 3",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "08-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Keep Ember Lens",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "09-relic-vanguard_drum",
+    "kind": "relic",
+    "context": "vanguard_drum",
+    "options": [
+      "Keep Vanguard Drum",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "10-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Keep Wayfarer Boots",
+      "Sell for 35 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "11-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "12-relic-watch_bell",
+    "kind": "relic",
+    "context": "watch_bell",
+    "options": [
+      "Keep Watch Bell",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "13-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 35 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "14-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Keep Merchant Seal",
+      "Sell for 50 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "15-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "16-relic-veil_censer",
+    "kind": "relic",
+    "context": "veil_censer",
+    "options": [
+      "Keep Veil Censer",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "17-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "18-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Keep Iron Crown",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "19-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "20-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "21-relic-porter_rune",
+    "kind": "relic",
+    "context": "porter_rune",
+    "options": [
+      "Keep Porter\u2019s Rune",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "22-relic-oak_standard",
+    "kind": "relic",
+    "context": "oak_standard",
+    "options": [
+      "Keep Oak Standard",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "23-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 50 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "24-relic-mirror_badge",
+    "kind": "relic",
+    "context": "mirror_badge",
+    "options": [
+      "Keep Mirror Badge",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "25-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 1",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "26-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 2",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "27-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 3",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "28-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "29-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "30-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "31-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 1",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "32-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 2",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "33-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 3",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "34-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "35-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "36-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "37-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 1",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "38-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 2",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "39-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 3",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "40-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "41-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "42-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "01-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Keep Moonstone",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "02-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 1",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "03-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Keep Storm Quiver",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "04-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 2",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "05-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "06-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "07-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 3",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "08-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Keep Ember Lens",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "09-relic-vanguard_drum",
+    "kind": "relic",
+    "context": "vanguard_drum",
+    "options": [
+      "Keep Vanguard Drum",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "10-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Keep Wayfarer Boots",
+      "Sell for 35 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "11-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "12-relic-watch_bell",
+    "kind": "relic",
+    "context": "watch_bell",
+    "options": [
+      "Keep Watch Bell",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "13-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 35 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "14-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Keep Merchant Seal",
+      "Sell for 50 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "15-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "16-relic-veil_censer",
+    "kind": "relic",
+    "context": "veil_censer",
+    "options": [
+      "Keep Veil Censer",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "17-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "18-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Keep Iron Crown",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "19-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "20-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "21-relic-porter_rune",
+    "kind": "relic",
+    "context": "porter_rune",
+    "options": [
+      "Keep Porter\u2019s Rune",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "22-relic-oak_standard",
+    "kind": "relic",
+    "context": "oak_standard",
+    "options": [
+      "Keep Oak Standard",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "23-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 50 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "24-relic-mirror_badge",
+    "kind": "relic",
+    "context": "mirror_badge",
+    "options": [
+      "Keep Mirror Badge",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "25-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 1",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "26-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 2",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "27-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 3",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "28-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "29-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "30-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "31-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 1",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "32-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 2",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "33-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 3",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "34-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "35-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "36-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "37-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 1",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "38-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 2",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "39-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 3",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "40-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "41-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "42-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "01-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Keep Moonstone",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "02-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 1",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "03-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Keep Storm Quiver",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "04-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 2",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "05-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "06-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "07-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 3",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "08-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Keep Ember Lens",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "09-relic-vanguard_drum",
+    "kind": "relic",
+    "context": "vanguard_drum",
+    "options": [
+      "Keep Vanguard Drum",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "10-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Keep Wayfarer Boots",
+      "Sell for 35 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "11-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "12-relic-watch_bell",
+    "kind": "relic",
+    "context": "watch_bell",
+    "options": [
+      "Keep Watch Bell",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "13-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 35 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "14-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Keep Merchant Seal",
+      "Sell for 50 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "15-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "16-relic-veil_censer",
+    "kind": "relic",
+    "context": "veil_censer",
+    "options": [
+      "Keep Veil Censer",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "17-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "18-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Keep Iron Crown",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "19-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "20-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "21-relic-porter_rune",
+    "kind": "relic",
+    "context": "porter_rune",
+    "options": [
+      "Keep Porter\u2019s Rune",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "22-relic-oak_standard",
+    "kind": "relic",
+    "context": "oak_standard",
+    "options": [
+      "Keep Oak Standard",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "23-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 50 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "24-relic-mirror_badge",
+    "kind": "relic",
+    "context": "mirror_badge",
+    "options": [
+      "Keep Mirror Badge",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "25-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 1",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "26-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 2",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "27-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 3",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "28-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "29-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "30-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "31-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 1",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "32-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 2",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "33-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 3",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "34-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "35-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "36-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "37-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 1",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "38-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 2",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "39-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 3",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "40-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "41-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 2"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "42-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 3"
+    ],
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "01-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Keep Moonstone",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "02-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 1",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "03-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Keep Storm Quiver",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "04-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 2",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "05-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "06-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "07-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 3",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "08-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Keep Ember Lens",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "09-relic-vanguard_drum",
+    "kind": "relic",
+    "context": "vanguard_drum",
+    "options": [
+      "Keep Vanguard Drum",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "10-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Keep Wayfarer Boots",
+      "Sell for 35 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "11-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "12-relic-watch_bell",
+    "kind": "relic",
+    "context": "watch_bell",
+    "options": [
+      "Keep Watch Bell",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "13-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 35 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "14-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Keep Merchant Seal",
+      "Sell for 50 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "15-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "16-relic-veil_censer",
+    "kind": "relic",
+    "context": "veil_censer",
+    "options": [
+      "Keep Veil Censer",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "17-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "18-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Keep Iron Crown",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "19-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "20-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "21-relic-porter_rune",
+    "kind": "relic",
+    "context": "porter_rune",
+    "options": [
+      "Keep Porter\u2019s Rune",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "22-relic-oak_standard",
+    "kind": "relic",
+    "context": "oak_standard",
+    "options": [
+      "Keep Oak Standard",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "23-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 50 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "24-relic-mirror_badge",
+    "kind": "relic",
+    "context": "mirror_badge",
+    "options": [
+      "Keep Mirror Badge",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "25-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 1",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "26-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 2",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "27-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 3",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "28-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "29-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "30-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "31-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 1",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "32-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 2",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "33-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 3",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "34-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "35-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "36-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "37-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 1",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "38-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 2",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "39-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 3",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 7,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "40-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "41-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 2"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "42-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 3"
+    ],
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "labels": 5,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "01-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Keep Moonstone",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "02-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 1",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "03-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Keep Storm Quiver",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "04-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 2",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "05-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "06-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "07-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 3",
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "08-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Keep Ember Lens",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "09-relic-vanguard_drum",
+    "kind": "relic",
+    "context": "vanguard_drum",
+    "options": [
+      "Keep Vanguard Drum",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "10-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Keep Wayfarer Boots",
+      "Sell for 35 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "11-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "12-relic-watch_bell",
+    "kind": "relic",
+    "context": "watch_bell",
+    "options": [
+      "Keep Watch Bell",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "13-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 35 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "14-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Keep Merchant Seal",
+      "Sell for 50 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "15-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 2"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "16-relic-veil_censer",
+    "kind": "relic",
+    "context": "veil_censer",
+    "options": [
+      "Keep Veil Censer",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "17-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "18-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Keep Iron Crown",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "19-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 3"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "20-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "21-relic-porter_rune",
+    "kind": "relic",
+    "context": "porter_rune",
+    "options": [
+      "Keep Porter\u2019s Rune",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "22-relic-oak_standard",
+    "kind": "relic",
+    "context": "oak_standard",
+    "options": [
+      "Keep Oak Standard",
+      "Sell for 40 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "23-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 50 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "24-relic-mirror_badge",
+    "kind": "relic",
+    "context": "mirror_badge",
+    "options": [
+      "Keep Mirror Badge",
+      "Sell for 45 gold"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "25-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 1",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "26-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 2",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "27-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 3",
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "28-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "29-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 2"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "30-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 3"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "31-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 1",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "32-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 2",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "33-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 3",
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "34-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "35-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 2"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "36-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 3"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "37-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 1",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "38-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 2",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "39-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 3",
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "40-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 1"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "41-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 2"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "42-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 3"
+    ],
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "01-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Keep Moonstone",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "02-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 1",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "03-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Keep Storm Quiver",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "04-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 2",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "05-relic-storm_quiver",
+    "kind": "relic",
+    "context": "storm_quiver",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "06-relic-moonstone",
+    "kind": "relic",
+    "context": "moonstone",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "07-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Quartermaster 3",
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "08-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Keep Ember Lens",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "09-relic-vanguard_drum",
+    "kind": "relic",
+    "context": "vanguard_drum",
+    "options": [
+      "Keep Vanguard Drum",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "10-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Keep Wayfarer Boots",
+      "Sell for 35 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "11-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "12-relic-watch_bell",
+    "kind": "relic",
+    "context": "watch_bell",
+    "options": [
+      "Keep Watch Bell",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "13-relic-wayfarer_boots",
+    "kind": "relic",
+    "context": "wayfarer_boots",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 35 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "14-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Keep Merchant Seal",
+      "Sell for 50 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "15-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 2"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "16-relic-veil_censer",
+    "kind": "relic",
+    "context": "veil_censer",
+    "options": [
+      "Keep Veil Censer",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "17-relic-ember_lens",
+    "kind": "relic",
+    "context": "ember_lens",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "18-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Keep Iron Crown",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "19-skill-commander",
+    "kind": "skill",
+    "context": "Commander",
+    "options": [
+      "Tactician 3"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "20-relic-iron_crown",
+    "kind": "relic",
+    "context": "iron_crown",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "21-relic-porter_rune",
+    "kind": "relic",
+    "context": "porter_rune",
+    "options": [
+      "Keep Porter\u2019s Rune",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "22-relic-oak_standard",
+    "kind": "relic",
+    "context": "oak_standard",
+    "options": [
+      "Keep Oak Standard",
+      "Sell for 40 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "23-relic-merchant_seal",
+    "kind": "relic",
+    "context": "merchant_seal",
+    "options": [
+      "Distill the duplicate",
+      "Sell for 50 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "24-relic-mirror_badge",
+    "kind": "relic",
+    "context": "mirror_badge",
+    "options": [
+      "Keep Mirror Badge",
+      "Sell for 45 gold"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "25-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 1",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "26-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 2",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "27-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Duelist 3",
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "28-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "29-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 2"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "30-skill-warrior",
+    "kind": "skill",
+    "context": "Warrior",
+    "options": [
+      "Vigor 3"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "31-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 1",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "32-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 2",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "33-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Pathfinder 3",
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "34-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "35-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 2"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "36-skill-scout",
+    "kind": "skill",
+    "context": "Scout",
+    "options": [
+      "Skirmisher 3"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "37-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 1",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "38-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 2",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "39-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Channeling 3",
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 7,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "40-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 1"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "41-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 2"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "42-skill-wizard",
+    "kind": "skill",
+    "context": "Wizard",
+    "options": [
+      "Restoration 3"
+    ],
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "labels": 5,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  }
+]

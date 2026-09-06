@@ -52,7 +52,7 @@ def test_older_active_battles_migrate_without_changing_their_exact_continuation(
     """Adding defensive orders does not reroll older combat or its automatic outcome."""
     fixtures = Path(__file__).parent / 'fixtures'
     state = State.from_json((fixtures / f'{fixture}.json').read_text())
-    assert json.loads(state.to_json())['schema_version'] == 8
+    assert json.loads(state.to_json())['schema_version'] == 12
     state = State.from_json(state.to_json())
     while state.battle.outcome is None:
         state.battle.auto_turn()

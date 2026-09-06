@@ -1,0 +1,690 @@
+{
+  "adaptive_interception": true,
+  "dirty": [],
+  "elapsed_seconds": 2.262161208956968,
+  "mana_reserve": 8,
+  "modes": [
+    "challenge"
+  ],
+  "plans": [
+    "economy",
+    "sustain",
+    "spells"
+  ],
+  "policy": "Fixed purchased plans; disclosed site itineraries; first/free approaches; explicit automatic tactics; live-position rival interception; 8 mana assault reserve; unchanged six-HP wound tolerance; 60-turn/40-assault policy bounds.",
+  "revision": "445b0699012b1fa8410fba07c15b1875911a7eb7",
+  "routes": [
+    "direct",
+    "north",
+    "south"
+  ],
+  "rows_file": "difficulty-worst-combined.rows.json.gz",
+  "rows_sha256": "bd25c710729c505bc90a1b974890a4bb1503908c6b96150f2530f13a35d6a355",
+  "rules_id_override": null,
+  "seeds": 100,
+  "source_files_changed": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "ac6214e1cc94478353f50506de74a3f6e603092e44644c78a0b21871818525b2",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "9963514ecaf74ec9da7a3457190d597fe7eaca8352541c051c5e707cf3cb452f",
+    "eador/codex.py": "ac6f07fee47a68da14bc9518dcabcfa56c483b498d6130d17af8bfd7f191442e",
+    "eador/content.py": "fcc7142e177618814bb1c9f0a412631d2ebdf6e0ba72f65297f374d370b79271",
+    "eador/difficulty.py": "d75d01f9457c1a91853f40eec693ef8ab0ac0583f2655235a10dc2077ad4b41a",
+    "eador/encounter_scene.py": "23dbcada36bf49682bac596e1f67da5c8b9861257ae3b9e279d4f203d34ec444",
+    "eador/encounters.py": "64ae542765127e6dd7802c271cd3a78b7ae5ea0d8f9911e12ef44d800d285647",
+    "eador/model.py": "627051069c89277f7150f0a797277510139e2c2eb4d413530c93ae6b8a0e43a9",
+    "eador/persistence.py": "71fff299ea4409dfe3dd1c674beb0e496f346682e29728bdb39dfa03520ad98c",
+    "eador/preferences.py": "dec226f2bc3b621ef0cca4a5b49434d3279f286526ddb17bd9c24eb0e29bce59",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "491fb1562ff5a7cec6920f99e8f6edb03164546f604e6cd546d9dea943f2c670",
+    "eador/scene.py": "ea7c8c53b81eb054b529e0a65977b1842c07f6e8492b20b1b18a8f855636bb10",
+    "eador/settings_scene.py": "65e3984f1c59102b34db5a89dcfd188577ab374bb6b9e4c4ae3a2dedcd890b4b",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "7eb609e81a44cb71f388337a5b0bf41a0d67fe196472b58a6f853d7306b75972",
+    "tools/audit_eador_difficulty.py": "1ce5e2e4be33f413298679142e1b186291950d4803d6114712456b468dd634ac",
+    "tools/audit_eador_economy.py": "507402fd0a2d125cf3cbc66e553f85f9b5735db9bf3639709b207cca316263ab",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/stress_eador_control.py": "4e05a1b7a31b4ee77c50ee32ccacf0fa4c71587d1136f723e5f54472527d047e"
+  },
+  "summary": {
+    "challenge/elderwild/Warrior/sustain/direct": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 2,
+        "battle.conquest": 8,
+        "battle.intercept": 4,
+        "battle.site": 8,
+        "final_advance": 4,
+        "final_wait.mana": 4,
+        "final_wait.wounds": 4
+      },
+      "deserters": 0,
+      "max_turns": 12,
+      "mean_building_gold": 110,
+      "mean_casualties": 5.5,
+      "mean_crystals_left": 30,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 248.5,
+      "mean_mana_spent": 38,
+      "mean_recovery_turns": 2.5,
+      "mean_recruitment_gold": 225,
+      "mean_turns": 11.5,
+      "mean_upkeep_gold": 81,
+      "median_turns": 11.5,
+      "outcomes": {
+        "victory": 2
+      },
+      "p90_turns": 12,
+      "runs": 2,
+      "stop_reasons": {
+        "victory": 2
+      }
+    },
+    "challenge/elderwild/Warrior/sustain/south": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 4,
+        "battle.conquest": 14,
+        "battle.intercept": 5,
+        "battle.site": 10,
+        "final_advance": 5,
+        "final_wait.mana": 6,
+        "final_wait.wounds": 3
+      },
+      "deserters": 0,
+      "max_turns": 16,
+      "mean_building_gold": 110,
+      "mean_casualties": 6,
+      "mean_crystals_left": 66.5,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 587,
+      "mean_mana_spent": 52,
+      "mean_recovery_turns": 3,
+      "mean_recruitment_gold": 247.5,
+      "mean_turns": 15.5,
+      "mean_upkeep_gold": 107.5,
+      "median_turns": 15.5,
+      "outcomes": {
+        "victory": 2
+      },
+      "p90_turns": 16,
+      "runs": 2,
+      "stop_reasons": {
+        "victory": 2
+      }
+    },
+    "challenge/elderwild/Wizard/sustain/direct": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 12,
+        "battle.conquest": 52,
+        "battle.intercept": 27,
+        "battle.site": 52,
+        "final_advance": 28,
+        "final_wait.mana": 39,
+        "final_wait.wounds": 14
+      },
+      "deserters": 0,
+      "max_turns": 15,
+      "mean_building_gold": 110,
+      "mean_casualties": 7.153846153846154,
+      "mean_crystals_left": 38,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 227.23076923076923,
+      "mean_mana_spent": 53.38461538461539,
+      "mean_recovery_turns": 3.1538461538461537,
+      "mean_recruitment_gold": 270,
+      "mean_turns": 12.307692307692308,
+      "mean_upkeep_gold": 84.46153846153847,
+      "median_turns": 12,
+      "outcomes": {
+        "victory": 13
+      },
+      "p90_turns": 14,
+      "runs": 13,
+      "stop_reasons": {
+        "victory": 13
+      }
+    },
+    "challenge/elderwild/Wizard/sustain/south": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 2,
+        "battle.conquest": 12,
+        "battle.intercept": 5,
+        "battle.site": 10,
+        "final_advance": 7,
+        "final_wait.mana": 11,
+        "final_wait.wounds": 4
+      },
+      "deserters": 0,
+      "max_turns": 21,
+      "mean_building_gold": 110,
+      "mean_casualties": 6,
+      "mean_crystals_left": 13,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 893,
+      "mean_mana_spent": 74.5,
+      "mean_recovery_turns": 5.5,
+      "mean_recruitment_gold": 192,
+      "mean_turns": 19,
+      "mean_upkeep_gold": 142,
+      "median_turns": 19.0,
+      "outcomes": {
+        "victory": 2
+      },
+      "p90_turns": 21,
+      "runs": 2,
+      "stop_reasons": {
+        "victory": 2
+      }
+    },
+    "challenge/frontier/Scout/sustain/direct": {
+      "battle_defeats": 2,
+      "decisions": {
+        "adaptive_interception_steps": 15,
+        "battle.conquest": 66,
+        "battle.intercept": 34,
+        "battle.site": 64,
+        "final_advance": 37,
+        "final_wait.mana": 53,
+        "final_wait.wounds": 25
+      },
+      "deserters": 0,
+      "max_turns": 17,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.25,
+      "mean_crystals_left": 21.5625,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 348.25,
+      "mean_mana_spent": 37.75,
+      "mean_recovery_turns": 3.3125,
+      "mean_recruitment_gold": 188.6875,
+      "mean_turns": 12.625,
+      "mean_upkeep_gold": 87.125,
+      "median_turns": 12.0,
+      "outcomes": {
+        "victory": 16
+      },
+      "p90_turns": 17,
+      "runs": 16,
+      "stop_reasons": {
+        "victory": 16
+      }
+    },
+    "challenge/frontier/Scout/sustain/north": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 10,
+        "battle.defense": 2,
+        "battle.intercept": 3,
+        "battle.site": 10,
+        "final_advance": 5,
+        "final_wait.mana": 6,
+        "final_wait.wounds": 3
+      },
+      "deserters": 0,
+      "max_turns": 16,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.5,
+      "mean_crystals_left": 19.5,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 518,
+      "mean_mana_spent": 46,
+      "mean_recovery_turns": 3,
+      "mean_recruitment_gold": 174.5,
+      "mean_turns": 14.5,
+      "mean_upkeep_gold": 102.5,
+      "median_turns": 14.5,
+      "outcomes": {
+        "victory": 2
+      },
+      "p90_turns": 16,
+      "runs": 2,
+      "stop_reasons": {
+        "victory": 2
+      }
+    },
+    "challenge/frontier/Scout/sustain/south": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 4,
+        "battle.conquest": 14,
+        "battle.intercept": 6,
+        "battle.site": 10,
+        "final_advance": 6,
+        "final_wait.mana": 8,
+        "final_wait.wounds": 4
+      },
+      "deserters": 0,
+      "max_turns": 16,
+      "mean_building_gold": 110,
+      "mean_casualties": 4,
+      "mean_crystals_left": 28,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 855.5,
+      "mean_mana_spent": 50,
+      "mean_recovery_turns": 4,
+      "mean_recruitment_gold": 141,
+      "mean_turns": 16,
+      "mean_upkeep_gold": 115,
+      "median_turns": 16.0,
+      "outcomes": {
+        "victory": 2
+      },
+      "p90_turns": 16,
+      "runs": 2,
+      "stop_reasons": {
+        "victory": 2
+      }
+    },
+    "challenge/frontier/Warrior/sustain/direct": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 10,
+        "battle.conquest": 40,
+        "battle.intercept": 24,
+        "battle.site": 40,
+        "final_advance": 24,
+        "final_wait.mana": 24,
+        "final_wait.wounds": 21
+      },
+      "deserters": 0,
+      "max_turns": 15,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.2,
+      "mean_crystals_left": 19.9,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 360.3,
+      "mean_mana_spent": 40,
+      "mean_recovery_turns": 3,
+      "mean_recruitment_gold": 174.6,
+      "mean_turns": 12.4,
+      "mean_upkeep_gold": 86,
+      "median_turns": 11.5,
+      "outcomes": {
+        "victory": 10
+      },
+      "p90_turns": 14,
+      "runs": 10,
+      "stop_reasons": {
+        "victory": 10
+      }
+    },
+    "challenge/frontier/Warrior/sustain/north": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 50,
+        "battle.defense": 10,
+        "battle.intercept": 19,
+        "battle.site": 50,
+        "final_advance": 29,
+        "final_wait.mana": 35,
+        "final_wait.wounds": 17
+      },
+      "deserters": 0,
+      "max_turns": 16,
+      "mean_building_gold": 110,
+      "mean_casualties": 5.1,
+      "mean_crystals_left": 31.6,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 504.1,
+      "mean_mana_spent": 50.4,
+      "mean_recovery_turns": 3.8,
+      "mean_recruitment_gold": 202.7,
+      "mean_turns": 15.7,
+      "mean_upkeep_gold": 123.4,
+      "median_turns": 16.0,
+      "outcomes": {
+        "victory": 10
+      },
+      "p90_turns": 16,
+      "runs": 10,
+      "stop_reasons": {
+        "victory": 10
+      }
+    },
+    "challenge/frontier/Warrior/sustain/south": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 4,
+        "battle.conquest": 18,
+        "battle.intercept": 6,
+        "battle.site": 15,
+        "final_advance": 8,
+        "final_wait.mana": 11,
+        "final_wait.wounds": 6
+      },
+      "deserters": 0,
+      "max_turns": 17,
+      "mean_building_gold": 110,
+      "mean_casualties": 5.666666666666667,
+      "mean_crystals_left": 36.666666666666664,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 648,
+      "mean_mana_spent": 49.333333333333336,
+      "mean_recovery_turns": 3.6666666666666665,
+      "mean_recruitment_gold": 165.33333333333334,
+      "mean_turns": 16.333333333333332,
+      "mean_upkeep_gold": 115.33333333333333,
+      "median_turns": 17,
+      "outcomes": {
+        "victory": 3
+      },
+      "p90_turns": 17,
+      "runs": 3,
+      "stop_reasons": {
+        "victory": 3
+      }
+    },
+    "challenge/frontier/Wizard/sustain/direct": {
+      "battle_defeats": 10,
+      "decisions": {
+        "adaptive_interception_steps": 35,
+        "battle.conquest": 162,
+        "battle.defense": 1,
+        "battle.intercept": 96,
+        "battle.site": 152,
+        "final_advance": 109,
+        "final_wait.mana": 162,
+        "final_wait.wounds": 78
+      },
+      "deserters": 0,
+      "max_turns": 20,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.026315789473684,
+      "mean_crystals_left": 23.94736842105263,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 367.5,
+      "mean_mana_spent": 58.026315789473685,
+      "mean_recovery_turns": 4.394736842105263,
+      "mean_recruitment_gold": 222.02631578947367,
+      "mean_turns": 14.263157894736842,
+      "mean_upkeep_gold": 103.57894736842105,
+      "median_turns": 12.0,
+      "outcomes": {
+        "victory": 38
+      },
+      "p90_turns": 20,
+      "runs": 38,
+      "stop_reasons": {
+        "victory": 38
+      }
+    },
+    "challenge/frontier/Wizard/sustain/north": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 4,
+        "battle.defense": 1,
+        "battle.intercept": 2,
+        "battle.site": 5,
+        "final_advance": 3,
+        "final_wait.mana": 3,
+        "final_wait.wounds": 2
+      },
+      "deserters": 0,
+      "max_turns": 15,
+      "mean_building_gold": 110,
+      "mean_casualties": 3,
+      "mean_crystals_left": 24,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 493,
+      "mean_mana_spent": 62,
+      "mean_recovery_turns": 3,
+      "mean_recruitment_gold": 169,
+      "mean_turns": 15,
+      "mean_upkeep_gold": 118,
+      "median_turns": 15,
+      "outcomes": {
+        "victory": 1
+      },
+      "p90_turns": 15,
+      "runs": 1,
+      "stop_reasons": {
+        "victory": 1
+      }
+    },
+    "challenge/frontier/Wizard/sustain/south": {
+      "battle_defeats": 1,
+      "decisions": {
+        "adaptive_interception_steps": 8,
+        "battle.conquest": 54,
+        "battle.defense": 1,
+        "battle.intercept": 19,
+        "battle.site": 45,
+        "final_advance": 29,
+        "final_wait.mana": 39,
+        "final_wait.wounds": 15
+      },
+      "deserters": 0,
+      "max_turns": 25,
+      "mean_building_gold": 110,
+      "mean_casualties": 7,
+      "mean_crystals_left": 29.22222222222222,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 597.4444444444445,
+      "mean_mana_spent": 67.22222222222223,
+      "mean_recovery_turns": 4.444444444444445,
+      "mean_recruitment_gold": 231.66666666666666,
+      "mean_turns": 17.555555555555557,
+      "mean_upkeep_gold": 129,
+      "median_turns": 17,
+      "outcomes": {
+        "victory": 9
+      },
+      "p90_turns": 25,
+      "runs": 9,
+      "stop_reasons": {
+        "victory": 9
+      }
+    },
+    "challenge/ruins/Wizard/sustain/direct": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 3,
+        "battle.conquest": 12,
+        "battle.intercept": 7,
+        "battle.site": 12,
+        "final_advance": 7,
+        "final_wait.mana": 9,
+        "final_wait.wounds": 6
+      },
+      "deserters": 0,
+      "max_turns": 14,
+      "mean_building_gold": 110,
+      "mean_casualties": 2.6666666666666665,
+      "mean_crystals_left": 76.33333333333333,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 501.6666666666667,
+      "mean_mana_spent": 56,
+      "mean_recovery_turns": 3.3333333333333335,
+      "mean_recruitment_gold": 180,
+      "mean_turns": 12.666666666666666,
+      "mean_upkeep_gold": 95.33333333333333,
+      "median_turns": 12,
+      "outcomes": {
+        "victory": 3
+      },
+      "p90_turns": 14,
+      "runs": 3,
+      "stop_reasons": {
+        "victory": 3
+      }
+    },
+    "challenge/ruins/Wizard/sustain/south": {
+      "battle_defeats": 0,
+      "decisions": {
+        "adaptive_interception_steps": 1,
+        "battle.conquest": 6,
+        "battle.intercept": 2,
+        "battle.site": 5,
+        "final_advance": 3,
+        "final_wait.mana": 3,
+        "final_wait.wounds": 1
+      },
+      "deserters": 0,
+      "max_turns": 16,
+      "mean_building_gold": 110,
+      "mean_casualties": 4,
+      "mean_crystals_left": 31,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 780,
+      "mean_mana_spent": 66,
+      "mean_recovery_turns": 3,
+      "mean_recruitment_gold": 124,
+      "mean_turns": 16,
+      "mean_upkeep_gold": 119,
+      "median_turns": 16,
+      "outcomes": {
+        "victory": 1
+      },
+      "p90_turns": 16,
+      "runs": 1,
+      "stop_reasons": {
+        "victory": 1
+      }
+    },
+    "challenge/sustain": {
+      "battle_defeats": 13,
+      "decisions": {
+        "adaptive_interception_steps": 100,
+        "battle.conquest": 522,
+        "battle.defense": 15,
+        "battle.intercept": 259,
+        "battle.site": 488,
+        "final_advance": 304,
+        "final_wait.mana": 413,
+        "final_wait.wounds": 203
+      },
+      "deserters": 0,
+      "max_turns": 25,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.017543859649122,
+      "mean_crystals_left": 28.37719298245614,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 416.12280701754383,
+      "mean_mana_spent": 52.42982456140351,
+      "mean_recovery_turns": 3.789473684210526,
+      "mean_recruitment_gold": 211.51754385964912,
+      "mean_turns": 14.157894736842104,
+      "mean_upkeep_gold": 102.17543859649123,
+      "median_turns": 12.5,
+      "outcomes": {
+        "victory": 114
+      },
+      "p90_turns": 18,
+      "runs": 114,
+      "stop_reasons": {
+        "victory": 114
+      }
+    },
+    "challenge/sustain/direct": {
+      "battle_defeats": 12,
+      "decisions": {
+        "adaptive_interception_steps": 77,
+        "battle.conquest": 340,
+        "battle.defense": 1,
+        "battle.intercept": 192,
+        "battle.site": 328,
+        "final_advance": 209,
+        "final_wait.mana": 291,
+        "final_wait.wounds": 148
+      },
+      "deserters": 0,
+      "max_turns": 20,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.134146341463414,
+      "mean_crystals_left": 27.28048780487805,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 342.6341463414634,
+      "mean_mana_spent": 50.573170731707314,
+      "mean_recovery_turns": 3.731707317073171,
+      "mean_recruitment_gold": 215.8780487804878,
+      "mean_turns": 13.28048780487805,
+      "mean_upkeep_gold": 94.34146341463415,
+      "median_turns": 12.0,
+      "outcomes": {
+        "victory": 82
+      },
+      "p90_turns": 19,
+      "runs": 82,
+      "stop_reasons": {
+        "victory": 82
+      }
+    },
+    "challenge/sustain/north": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 64,
+        "battle.defense": 13,
+        "battle.intercept": 24,
+        "battle.site": 65,
+        "final_advance": 37,
+        "final_wait.mana": 44,
+        "final_wait.wounds": 22
+      },
+      "deserters": 0,
+      "max_turns": 16,
+      "mean_building_gold": 110,
+      "mean_casualties": 5.153846153846154,
+      "mean_crystals_left": 29.153846153846153,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 505.38461538461536,
+      "mean_mana_spent": 50.61538461538461,
+      "mean_recovery_turns": 3.6153846153846154,
+      "mean_recruitment_gold": 195.76923076923077,
+      "mean_turns": 15.461538461538462,
+      "mean_upkeep_gold": 119.76923076923077,
+      "median_turns": 16,
+      "outcomes": {
+        "victory": 13
+      },
+      "p90_turns": 16,
+      "runs": 13,
+      "stop_reasons": {
+        "victory": 13
+      }
+    },
+    "challenge/sustain/south": {
+      "battle_defeats": 1,
+      "decisions": {
+        "adaptive_interception_steps": 23,
+        "battle.conquest": 118,
+        "battle.defense": 1,
+        "battle.intercept": 43,
+        "battle.site": 95,
+        "final_advance": 58,
+        "final_wait.mana": 78,
+        "final_wait.wounds": 33
+      },
+      "deserters": 0,
+      "max_turns": 25,
+      "mean_building_gold": 110,
+      "mean_casualties": 6.105263157894737,
+      "mean_crystals_left": 32.578947368421055,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 672.2105263157895,
+      "mean_mana_spent": 61.68421052631579,
+      "mean_recovery_turns": 4.157894736842105,
+      "mean_recruitment_gold": 203.47368421052633,
+      "mean_turns": 17.05263157894737,
+      "mean_upkeep_gold": 123.94736842105263,
+      "median_turns": 16,
+      "outcomes": {
+        "victory": 19
+      },
+      "p90_turns": 21,
+      "runs": 19,
+      "stop_reasons": {
+        "victory": 19
+      }
+    }
+  },
+  "worst_from": "docs/evidence/difficulty-matched-plans.rows.json.gz"
+}
