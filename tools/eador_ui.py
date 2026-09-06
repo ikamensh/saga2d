@@ -99,13 +99,16 @@ class PlayerState:
         self.player.press('return')
         self.enter_briefing('return')
 
-    def explore(self):
+    def explore(self, *, approach=None):
         assert isinstance(self.player.game.scene, ShardScene)
         self.player.press('x')
-        self.enter_briefing('x')
+        self.enter_briefing('x', approach=approach)
 
-    def enter_briefing(self, shortcut):
+    def enter_briefing(self, shortcut, *, approach=None):
         if isinstance(self.player.game.scene, EncounterScene):
+            if approach is not None:
+                index = next(index for index, choice in enumerate(self.player.game.scene.approaches) if choice.id == approach)
+                self.player.press(str(index + 1))
             self.player.briefings.append(self.player.game.scene.definition.name)
             before = self.to_json()
             self.player.capture('briefing-' + self.player.game.scene.definition.name.lower().replace(' ', '-'))
@@ -114,6 +117,8 @@ class PlayerState:
             # Repeat the visible action that opened it, before accepting.
             self.player.press(shortcut)
             assert isinstance(self.player.game.scene, EncounterScene)
+            if approach is not None:
+                self.player.press(str(index + 1))
             self.player.press('return')
             assert isinstance(self.player.game.scene, BattleScene)
 

@@ -10,7 +10,7 @@ remain; 45 gold is an initial sale-price hypothesis.
 | --- | --- | --- |
 | Veil Censer | Courier's Crossing, replacing its duplicate Merchant Seal. Lost Caravan retains the Seal. | One Smoke charge, with the Sapper's exact rules. Spends the hero's order and blocks friendly ranged spells too; melee and moving clear counter it. |
 | Porter's Rune | Supply Cache, replacing its duplicate Oak Standard. Elder Grove retains Oak. | One Repulse charge, with the Rune Adept's exact rules. Adjacent only; Guard/Brace anchors and occupied/edge landings prevent displacement. A hero who Repulses cannot also evacuate that turn. |
-| Mirror Badge | A new Signal Post on Ruins' western flank, proposed (-1, 1), with Warden/Archer/Brigand guards. | Existing Swap. The hero takes the exposed position and spends its order; both units spend movement. The rescued ally keeps only its already-unspent action. |
+| Mirror Badge | The planned Sealed Vault on Ruins' western flank, (-1, 1), replacing its duplicate Iron Crown after the roster is stable. Old Barrow retains the Crown. | Existing Swap. The hero takes the exposed position and spends its order; both units spend movement. The rescued ally keeps only its already-unspent action. |
 | Vanguard Drum | A new Muster Yard on Frontier's western flank, proposed (-1, 1), with Archer/Brigand/Brigand guards. | Existing Militia Rally. Trades the hero's attack or Heal for one adjacent ally's mobility. Removes Pin only; no healing, cargo removal, cooldown refund or refreshed action. |
 
 A flight relic is deliberately omitted: it would risk replacing Wayfarer
@@ -29,7 +29,7 @@ authored adventure patterns under G05.
   contester without killing it, then complete the hold. Paired anchored and
   blocked-landing saves must reject unchanged. An exit case must wait for
   another hero order or use a troop Adept instead.
-- Win Signal Post with an ordinary purchased army. At Gate, use Mirror Badge
+- Win Sealed Vault with an ordinary purchased army. At Gate, use Mirror Badge
   to extract a wounded holder while preserving its unspent attack. Save/reload
   and finish the hold. Show the explicit refusal to evacuate immediately
   after the hero's own Swap.

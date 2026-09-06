@@ -265,6 +265,34 @@ def test_title_continue_loads_slot_one_and_is_disabled_without_a_save(game) -> N
     assert isinstance(scene, MapScene) and scene.seed == 11 and scene.tribe.stars == 42
 
 
+@pytest.mark.parametrize('saved_size', [11, 14])
+def test_quick_load_clears_a_harvest_hover_from_the_previous_map(game, saved_size) -> None:
+    """A hovered fish may be absent or outside the loaded map; neither can poison its HUD."""
+    saved = new_game(seed=3, size=saved_size)
+    game.push(saved)
+    game.tick(1 / 60)
+    press(game, 'f5')
+    expected = saved.world.to_dict()
+    current = new_game(seed=2, size=14)
+    game.clear_and_push(current)
+    game.tick(1 / 60)
+    fish = (10, 13)
+    assert current.world.can_harvest(current.human, fish) is None
+    assert not saved.world.in_bounds(fish) or saved.world.tile(fish).resource is None
+    current.camera.center_on(*tile_center(fish))
+    hover_tile(game, current, fish)
+    assert current.btn_harvest.visible and current.btn_harvest.text == 'Catch fish'
+
+    press(game, 'f9')
+    assert current.seed == 3 and current.world.to_dict() == expected
+    assert not current.btn_harvest.visible
+    # The restored map remains usable, and a second load has no lingering hover.
+    press(game, 'tab')
+    assert current.selected is not None
+    press(game, 'f9')
+    assert current.world.to_dict() == expected
+
+
 def test_pause_menu_returns_to_the_title(play) -> None:
     game, scene = play
     press(game, "escape")

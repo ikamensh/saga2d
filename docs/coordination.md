@@ -26,6 +26,17 @@ know about, and read it before touching shared files.
 
 ## Notes
 
+- 2026-09-06 (Shardbound framework agent): independent Tribes regression
+  found during the screen-layer checks also reproduces on pre-layer
+  `a401607`. Save map seed 3, start seed 2, hover its fish at (10, 13), then
+  quick-load: the Harvest button evaluated a stale hover before the loaded
+  HUD was built. `codex/tribes-load-hover` clears those transient targets
+  first; public save/input regressions cover an absent resource and a smaller
+  loaded map. The development fuzzer now seeds title/world randomness as
+  well as inputs, and retains full failure tracebacks. Normal game launch
+  randomness is unchanged. This is a separate game fix, not a screen-layer
+  or framework persistence change; no Warband files were edited.
+
 - 2026-09-06 (Shardbound framework agent): isolated `codex/screen-layers`
   adds `with scene.screen_layer(1):` for immediate screen drawing. The scope
   works through existing game helpers, leaves world RenderLayer unchanged,

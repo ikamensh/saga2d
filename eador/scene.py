@@ -614,7 +614,7 @@ class BattleScene(Screen):
         centers = [geometry.center(p) for p in b.terrain]
         left, right = min(p[0] for p in centers) - .866, max(p[0] for p in centers) + .866
         top, bottom = min(p[1] for p in centers) - 1, max(p[1] for p in centers) + 1
-        objective_space = 52 if b.objective.kind == "hold" else 0
+        objective_space = 80 if b.objective.kind == 'extract' else 52 if b.objective.kind == 'hold' else 0
         size = min((self.edge - 100) / (right - left), (h - 288 - objective_space) / (bottom - top))
         origin = (self.edge / 2 - (left + right) / 2 * size, (h - 50 + objective_space) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
@@ -644,9 +644,21 @@ class BattleScene(Screen):
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
         if b.objective.kind == "hold":
             self.button("Locate seal", self.edge - 188, 109, 162, self.locate_objective, shortcut="O")
+        elif b.objective.kind == 'extract':
+            self.button('Locate exit', self.edge - 362, 109, 156, self.locate_objective, shortcut='O')
+            self.button('Evacuate', self.edge - 194, 109, 156, self.evacuate, shortcut='V',
+                        primary=True, enabled=b.evacuation_blocked_reason is None)
 
     def locate_objective(self):
-        self.cursor = self.hover = self.battle.objective.target
+        objective = self.battle.objective
+        if objective.kind == 'extract':
+            index = (objective.exits.index(self.cursor) + 1) % len(objective.exits) if self.cursor in objective.exits else 0
+            self.cursor = self.hover = objective.exits[index]
+        else:
+            self.cursor = self.hover = objective.target
+
+    def evacuate(self):
+        self.act(self.battle.evacuate, checkpoint=True, cue='confirm')
 
     def act(self, callback, *, checkpoint=False, cue="attack_hit"):
         before = {u.id: u.hp for u in self.battle.units}
@@ -831,6 +843,13 @@ class BattleScene(Screen):
             self.text(f"HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}",
                       38, 108, size=12, color=GOLD)
             self.text("End enemy turns on the seal with no adjacent enemy; rout also wins.", 38, 137, size=10, color=MUTED)
+        elif b.objective.kind == 'extract':
+            self.box(26, 100, self.edge - 52, 88)
+            self.text(f'ESCAPE WITH CARGO · By round {b.objective.deadline}', 38, 111, size=12, color=GOLD)
+            self.text('Hero on an exit, no adjacent foes, unspent hero order; rout also wins.',
+                      38, 142, size=10, color=MUTED)
+            self.text(b.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.',
+                      38, 165, size=10, color=GOLD if b.evacuation_blocked_reason else TEAL)
         self.text("TACTICAL COMMAND", x, 30, size=10, color=GOLD)
         self.text("Your army", x, 57, size=30, serif=True)
         allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
@@ -844,7 +863,10 @@ class BattleScene(Screen):
             self.text(f"{selected.hp} / {selected.max_hp} HP", x, 198, size=13, color=TEAL)
             self.bar(x, 225, 300, selected.hp, selected.max_hp)
             self.text(f"Attack {selected.attack}   Defense {selected.effective_defense}", x, 246, size=13)
-            movement = f"Move {selected.effective_move_range}" + (" (Pinned)" if selected.pinned else "")
+            penalties = ['Pinned'] if selected.pinned else []
+            if selected.cargo_penalty:
+                penalties.append(f'Cargo −{selected.cargo_penalty}')
+            movement = f"Move {selected.effective_move_range}" + (f" ({', '.join(penalties)})" if penalties else '')
             self.text(f"{movement}   Range {selected.attack_range}", x, 272, size=12, color=MUTED)
             status = ("Guard +2" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
                       "Can move" if selected.acted and b.reachable(selected.id) else
@@ -901,6 +923,9 @@ class BattleScene(Screen):
                 art.terrain_detail(self, b.terrain[pos], cx, cy + 12, pos[0] * 23 + pos[1], .35)
             if pos == b.objective.target:
                 art.seal(self, self.grid, pos, label=not any(unit.alive and unit.pos == pos for unit in b.units))
+            elif b.objective.kind == 'extract' and pos in b.objective.exits:
+                art.exit_marker(self, self.grid, pos, b.objective.exits.index(pos) + 1,
+                                label=not any(unit.alive and unit.pos == pos for unit in b.units))
             if pos == self.hover:
                 art.outline(self, points, GOLD, 2)
         for u in sorted((u for u in b.units if u.hp > 0), key=lambda u: self.grid.center(u.pos)[1]):
@@ -1203,12 +1228,15 @@ class ResultScene(Screen):
         self.box(x, y, 540, 270)
         if self.is_battle:
             b = s.battle
-            title = ("The seal is secured" if b.outcome_reason == "hold" else "Time has run out" if b.outcome_reason == "deadline"
+            title = ('The cargo is safe' if b.outcome_reason == 'escape' else
+                     "The seal is secured" if b.outcome_reason == "hold" else "Time has run out" if b.outcome_reason == "deadline"
                      else "Victory" if b.outcome == "player" else "The army is broken")
             standing = sum(u.hp > 0 for u in b.units if u.team == "player")
             lost = sum(u.hp == 0 for u in b.units if u.team == "player" and u.id != 0)
             detail = f"{standing} standing  ·  {lost} troops lost  ·  {b.round} battle rounds"
-            subtitle = (("Surviving defenders withdraw. Claim the site's reward." if s.battle_kind == "site" else
+            subtitle = ('Your surviving army escapes with the recovered cargo.' if b.outcome_reason == 'escape' else
+                        'The cargo was not extracted. The site remains uncleared.' if b.outcome_reason == 'deadline' and b.objective.kind == 'extract' else
+                        ("Surviving defenders withdraw. Claim the site's reward." if s.battle_kind == "site" else
                          "The defenders withdraw. Duskspire and its seal are yours.") if b.outcome_reason == "hold" else
                         "The seal was not secured. The defenders retain their ground." if b.outcome_reason == "deadline" else
                         "Survivors carry their wounds and experience home.")

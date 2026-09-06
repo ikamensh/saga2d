@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from eador.battle import Battle, SPELLS
 from eador.content import RELICS, SITES, SKILLS
+from eador.encounters import ENCOUNTERS
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
@@ -159,9 +160,22 @@ class CodexScene(Screen):
                        + (saved_healing_note if older_acolytes
                           else "Skills and relics modify the cost and healing.")),
                 _Entry("Brace", f"Pikemen and Watch Bell heroes · No mana · {brace_hero}",
-                       "Use Guard to spend the remaining order. The first adjacent melee attacker takes a normal hit before striking; "
-                       "a lethal hit cancels its attack. One reaction, expiring next own turn. Ranged attacks avoid it. "
-                       "Other units Guard for +2 defense instead."),
+                       "Guard spends the order. The first adjacent melee attacker takes a normal hit before striking; lethal damage cancels its attack. "
+                       "One reaction, expiring next own turn. Ranged fire avoids it. Other units gain +2 defense."),
+            ]
+            extraction = battle.objective.kind == 'extract'
+            escape_status = (battle.evacuation_blocked_reason or "Ready: the hero can Evacuate now.") if extraction else "Only extraction adventures use this order."
+            deadline = (f"Round {battle.round} of {battle.objective.deadline} · {len(battle.objective.exits)} marked exits"
+                        if extraction else "See each site for its deadline and exits")
+            movement = (f"Hero move allowance: {hero.effective_move_range} · Cargo: {-hero.cargo_penalty} · Pin: {-2 if hero.pinned else 0}"
+                        if extraction else "Full Cache cargo: -1 hero movement · Pin: -2 movement")
+            entries += [
+                _Entry("Evacuate", escape_status,
+                       "Arrival alone never wins. Hero on exit, unspent action, no adjacent living enemy: Evacuate spends action and movement. "
+                       "Warden Swap preserves the hero's action; its attack, spell or Guard spends it."),
+                _Entry("Cargo and the escape clock", deadline + " · " + movement,
+                       "Pin and cargo reduce movement (minimum 1), but cannot block Evacuate. Escape before the last enemy phase ends, "
+                       "or rout every defender for the same reward. Hero death loses; all other survivors escape."),
             ]
             return entries
         if category == "Buildings":
@@ -173,11 +187,30 @@ class CodexScene(Screen):
                           f"Your rank: {state.hero.skill_ranks.get(kind, 0)}", spec.description)
                     for kind, spec in SKILLS.items()]
         if category == "Sites":
-            return [_Entry(spec.name, f"Base reward: {spec.gold} gold · {spec.crystals} "
-                          f"{'crystal' if spec.crystals == 1 else 'crystals'} · {RELICS[spec.relic].name}",
-                          f"{spec.description} Base guardians: " + ", ".join(
-                              f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items()) + ".")
-                    for spec in SITES.values()]
+            entries = []
+            for kind, spec in SITES.items():
+                entries.append(_Entry(spec.name, f"Base reward: {spec.gold} gold · {spec.crystals} "
+                                      f"{'crystal' if spec.crystals == 1 else 'crystals'} · {RELICS[spec.relic].name}",
+                                      f"{spec.description} Base guardians: " + ", ".join(
+                                          f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items()) + "."))
+                for option in spec.approaches:
+                    attempt = state.battle_adventure
+                    current = (attempt is not None and state.provinces[state.battle_province].site_kind == kind
+                               and attempt.approach == option.id)
+                    gold, crystals, relic = ((attempt.gold, attempt.crystals, attempt.relic) if current
+                                             else (spec.gold + option.bonus_gold, spec.crystals, spec.relic))
+                    fee = f"{option.gold_cost} gold" + (f" / {option.crystals_cost} crystals" if option.crystals_cost else "")
+                    reward = f"{gold} gold / {crystals} crystals" + (f" / {RELICS[relic].name}" if relic else "")
+                    facts = ((f"Current attempt · Paid at entry: {fee} · Saved reward: {reward}") if current
+                             else f"Entry fee: {fee} · Base reward: {reward}")
+                    description = option.description + f" Evacuate by round {ENCOUNTERS[option.encounter].deadline}, or rout all defenders."
+                    if option.gold_cost or option.crystals_cost:
+                        description += " The fee is not refunded after retreat or defeat."
+                    entries.append(_Entry(f"{spec.name}: {option.title}", facts, description))
+            entries.append(_Entry("Failure, retry and finite rewards", "One site · One reward · Wounded defenders persist",
+                                  "A retry spends one campaign action and its chosen fee; surviving defenders keep their wounds. "
+                                  "Failure gives no reward or victory XP and loses up to 20 more gold. Success pays the chosen reward once and closes the site."))
+            return entries
         return [_Entry(spec.name, f"Sell when found: {spec.value} gold · "
                       f"{'Equipped' if state.hero.relic == kind else 'Owned' if kind in state.inventory else 'Not owned'}",
                       spec.description + " " + self.relic_sources(kind))
@@ -202,7 +235,7 @@ class CodexScene(Screen):
             "Hero and Acolytes share mana. Spell values include skills and relics; counts use this battle's saved capabilities.",
             "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
             "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
-            "Explore an owned, uncleared site using one action. These are base definitions; map briefs show saved rewards and surviving guards.",
+            "Explore an owned, uncleared site using one action. Approach choices follow their site; the active choice shows its saved reward.",
             "Equip one relic between battles. Recorded sources belong to this saved shard; cleared sites cannot award their reward again.",
         )
         self.paragraph(introductions[self.category], x + 24, y + 163, width=992, size=13)
