@@ -72,7 +72,6 @@ from tribes.scene import MapScene, TechScene, RewardScene
 class NetworkMapScene(MapScene):
     def __init__(self, session, match=None):
         self.session = session
-        self._finished = False
         self._revision = session.revision
         data = session.state
         super().__init__(World.from_dict(data['world']), data['seed'], player=session.player)
@@ -121,11 +120,6 @@ class NetworkMapScene(MapScene):
     def update(self, dt):
         super().update(dt)
         self.btn_end_turn.enabled = self.session.ready and self.world.current == self.human and self.world.winner is None
-
-    def _check_game_over(self):
-        if not self._finished and self.world.winner is not None:
-            self._finished = True
-            super()._check_game_over()
 
     def _score_text(self):
         turn = 'Your turn' if self.world.current == self.human else 'Opponent’s turn'

@@ -1262,12 +1262,12 @@ class GameOverScene(_Overlay):
         panel.style = RESULTS_STYLE
         rounds = min(world.round, MAX_ROUNDS)
         cities = len(world.tribe_cities(scene.human))
-        panel.add(Label(
-            f"{_plural(rounds, 'round')} · {cities} {'city' if cities == 1 else 'cities'} held · "
-            f"{_plural(scene.stats['cities_taken'], 'capture')} · {_plural(scene.stats['units_killed'], 'kill')} · "
-            f"{_plural(scene.stats['units_lost'], 'unit')} lost",
-            text_style="body",
-        ))
+        multiplayer = sum(tribe.human for tribe in world.tribes) > 1
+        summary = f"{_plural(rounds, 'round')} · {cities} {'city' if cities == 1 else 'cities'} held"
+        if not multiplayer:
+            summary += (f" · {_plural(scene.stats['cities_taken'], 'capture')} · {_plural(scene.stats['units_killed'], 'kill')} · "
+                        f"{_plural(scene.stats['units_lost'], 'unit')} lost")
+        panel.add(Label(summary, text_style="body"))
         points = world.score_breakdown(scene.human, final=True)
         report = Column(spacing=2, width=330)
         report.add(Label("Your score", text_style="heading"))
@@ -1290,14 +1290,17 @@ class GameOverScene(_Overlay):
         panel.add(Row(report, standings, spacing=24))
         panel.add(Label("Victory +1,000 · Early finish +50 per round remaining", text_style="sub"))
         self.score_error = None
-        try:
-            rank = HighScores(self.game.data_dir).record(world, tribe=scene.human, seed=scene.seed, run_id=scene.run_id)
-            message = f"Your run's best: #{rank} locally" if rank is not None else "Outside the local top 10"
-            panel.add(Label(f"{message} · {world.size}×{world.size} · {len(world.tribes)} tribes", text_style="hud", text_color=GOLD))
-        except SaveError as error:
-            self.score_error = str(error)
-            panel.add(Label("Score could not be saved. Open High scores for details.", text_style="sub", text_color=BAD))
-        panel.add(Row(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=165),
+        if multiplayer:
+            panel.add(Label("Multiplayer match · 2 human tribes", text_style="hud", text_color=GOLD))
+        else:
+            try:
+                rank = HighScores(self.game.data_dir).record(world, tribe=scene.human, seed=scene.seed, run_id=scene.run_id)
+                message = f"Your run's best: #{rank} locally" if rank is not None else "Outside the local top 10"
+                panel.add(Label(f"{message} · {world.size}×{world.size} · {len(world.tribes)} tribes", text_style="hud", text_color=GOLD))
+            except SaveError as error:
+                self.score_error = str(error)
+                panel.add(Label("Score could not be saved. Open High scores for details.", text_style="sub", text_color=BAD))
+        panel.add(Row(Button("Play solo" if multiplayer else "New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=165),
                       Button("High scores", shortcut="L", on_click=self.high_scores, style=GHOST_BUTTON, width=165),
                       Button("Back to title", hotkey="T", on_click=self.back_to_title, style=GHOST_BUTTON, width=165),
                       Button("Quit", hotkey="Q", on_click=self.quit, style=GHOST_BUTTON, width=165), spacing=8))

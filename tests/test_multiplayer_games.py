@@ -319,3 +319,69 @@ def test_shardbound_guest_can_depart_to_the_next_campaign_shard(tmp_path):
         game.close()
         client.close()
         host.close()
+
+
+def test_tribes_online_results_do_not_enter_the_offline_high_score_board(tmp_path):
+    """Two-human finishes show their scores without ranking against solo AI matches."""
+    from saga2d import Game
+    from tribes.multiplayer import TribesMatch, NetworkMapScene
+    from tribes.scene import GameOverScene
+    from tribes.scores import HighScores
+    from tribes.style import build_theme
+    match = TribesMatch()
+    while match.world.winner is None:
+        match.apply(match.world.current, {'action': 'end_turn'})
+    host = MatchHost('tribes', match.apply, match.snapshot, address=('127.0.0.1', 0), token='test')
+    client = MatchClient('tribes', host.address, token='test')
+    game = Game('online result', backend='mock', theme=build_theme(), save_dir=tmp_path)
+    try:
+        converge(host, client, lambda: client.ready)
+        game.push(NetworkMapScene(client))
+        game.tick(.03)
+        assert isinstance(game.scene, GameOverScene)
+        assert game.scene.map_scene.human == 1
+        assert HighScores(game.data_dir).load() == []
+        assert any(t['text'] == 'Multiplayer match · 2 human tribes' for t in game.backend.texts)
+        game.scene.back_to_title()
+        assert client.closed
+    finally:
+        game.close()
+        client.close()
+        host.close()
+
+
+def test_warband_host_clock_runs_under_its_menu_and_pauses_on_disconnect(tmp_path):
+    """The actual host scene owns time independently of the local pause overlay."""
+    from saga2d import Game
+    from warband.multiplayer import WarbandMatch, NetworkGameScene
+    from warband.style import build_theme
+    match = WarbandMatch()
+    host = MatchHost('warband', match.apply, match.snapshot, address=('127.0.0.1', 0), token='test')
+    client = MatchClient('warband', host.address, token='test')
+    game = Game('host clock', backend='mock', theme=build_theme(), save_dir=tmp_path)
+    try:
+        converge(host, client, lambda: client.ready)
+        scene = NetworkGameScene(host, match)
+        game.push(scene)
+        game.backend.inject_key('f10')
+        game.tick(.03)
+        assert game.scene is not scene
+        before = match.world.tick
+        deadline = time.monotonic() + 3
+        while match.world.tick < before + 4 and time.monotonic() < deadline:
+            time.sleep(.01)
+            game.tick(.03)
+            client.poll()
+        assert match.world.tick >= before + 4
+        assert scene.world.tick >= before + 2
+        client.close()
+        game.tick(.03)
+        assert not host.ready
+        stopped = match.world.tick
+        time.sleep(.12)
+        game.tick(.03)
+        assert match.world.tick == stopped
+    finally:
+        game.close()
+        client.close()
+        host.close()
