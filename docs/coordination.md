@@ -227,3 +227,11 @@ know about, and read it before touching shared files.
   concurrent Tribes score work; no main game files were changed by this task.
   Keep network scene overrides when integrating that score work. See
   `docs/multiplayer.md` in the multiplayer branch.
+
+- 2026-09-06 (multiplayer task, complete): `62de78f` incorporates main through
+  `706a6c9`, preserves its score/progression work, and keeps two-human Tribes
+  finishes out of the solo high-score board. The full suite passed (1,547),
+  followed by all 15 game multiplayer integration tests including the added
+  host-clock check. Native separate-process evidence for all three games is in
+  `docs/evidence/multiplayer-2026-09-06`. Main's checkout was not fast-forwarded,
+  following the ownership protocol above.

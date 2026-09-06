@@ -1,0 +1,5 @@
+/private/tmp/saga2d-multiplayer/tribes-title.png
+/private/tmp/saga2d-multiplayer/tribes-join.png
+/private/tmp/saga2d-multiplayer/tribes-match.png
+/private/tmp/saga2d-multiplayer/tribes-result.png
+tribes: native guest commands accepted by separate host process

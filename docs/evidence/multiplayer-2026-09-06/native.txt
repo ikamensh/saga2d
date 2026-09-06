@@ -1,0 +1,13 @@
+/private/tmp/saga2d-multiplayer/tribes-title.png
+/private/tmp/saga2d-multiplayer/tribes-join.png
+/private/tmp/saga2d-multiplayer/tribes-match.png
+/private/tmp/saga2d-multiplayer/tribes-result.png
+tribes: native guest commands accepted by separate host process
+/private/tmp/saga2d-multiplayer/warband-title.png
+/private/tmp/saga2d-multiplayer/warband-join.png
+/private/tmp/saga2d-multiplayer/warband-match.png
+warband: native guest commands accepted by separate host process
+/private/tmp/saga2d-multiplayer/eador-title.png
+/private/tmp/saga2d-multiplayer/eador-join.png
+/private/tmp/saga2d-multiplayer/eador-match.png
+eador: native guest commands accepted by separate host process
