@@ -33,14 +33,17 @@ def fixture(seed, metrics):
             for uid, kind in enumerate(kinds, 1)]
     hp, mana = (48 if hero_class == 'Warrior' else 36), (16 if hero_class == 'Wizard' else 10)
     hero = Hero('Alden', hero_class, (-2, 0), hp // 2, hp, mana, mana, army)
-    encounter = (None, 'border_watch', 'last_gate')[seed % 3]
+    encounter = (None, 'border_watch', 'last_gate', 'courier_direct', 'courier_guided', 'supply_cache')[seed % 6]
     metrics['fixtures.' + (encounter or 'rout')] += 1
-    return Battle.create(hero, enemies, 'forest', {'bolt', 'heal'}, seed, encounter=encounter)
+    return Battle.create(hero, enemies, 'forest', {'bolt', 'heal'}, seed, encounter=encounter,
+                         cargo_penalty=int(encounter == 'supply_cache' and seed % 2 == 1))
 
 
 def issue(battle, command, unit_id, target):
     if command in ('move', 'attack', 'pin', 'swap'):
         getattr(battle, command)(unit_id, target)
+    elif command == 'evacuate':
+        battle.evacuate()
     elif command == 'guard':
         battle.guard(unit_id)
     else:
@@ -63,6 +66,8 @@ def exercise(seed, metrics):
                 ('bolt', battle.spell_targets('bolt', caster_id=unit.id))) for target in targets]
             if not unit.acted:
                 options.append(('guard', None))
+            if unit.id == battle.hero_id and battle.evacuation_blocked_reason is None:
+                options.append(('evacuate', None))
             if not options:
                 continue
             command, target_id = rng.choice(options)

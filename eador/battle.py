@@ -453,7 +453,7 @@ class Battle:
             self._move(unit, destination)
 
     def _escape_costs(self) -> dict[Pos, float]:
-        """Actual carrier paths, including rough terrain, bodies and the carried burden."""
+        """Actual terrain and occupancy costs, compared by callers with the carrier’s move budget."""
         hero = self.unit(self.hero_id)
         occupied = {other.pos for other in self.units if other.alive and other.id != hero.id}
         costs = self.grid.reachable(hero.pos, 100, blocked=occupied,
@@ -479,6 +479,9 @@ class Battle:
     def _withdraw(self, unit: BattleUnit) -> None:
         """Mobile ranged troops spend their unused move to reduce immediate exposure."""
         if self.objective.kind == 'hold' and (unit.team == 'enemy' or unit.pos == self.objective.target):
+            return
+        if self.objective.kind == 'extract' and unit.team == 'enemy' and any(
+                self.grid.distance(unit.pos, exit) <= 1 for exit in self.objective.exits):
             return
         reachable = self.reachable(unit.id)
         enemies = [other for other in self.units if other.alive and other.team != unit.team]

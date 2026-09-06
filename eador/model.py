@@ -442,7 +442,10 @@ class State:
         if province.explored or province.site is None:
             raise RuleError('This province has no unexplored site.')
         options = self.adventure_approaches()
-        selected = next((option for option in options if option.id == (options[0].id if approach is None else approach)), None) if options else None
+        selected = None
+        if options:
+            selected_id = options[0].id if approach is None else approach
+            selected = next((option for option in options if option.id == selected_id), None)
         if approach is not None and selected is None:
             raise RuleError('Choose one of the offered adventure approaches.')
         if selected and (self.gold < selected.gold_cost or self.crystals < selected.crystals_cost):

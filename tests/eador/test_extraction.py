@@ -3,6 +3,7 @@ import pytest
 
 from eador.battle import Battle, BattleObjective, BattleUnit
 from eador.model import RuleError, SaveFormatError
+from tools.eador_extraction_campaign import prepared_crossing
 
 
 def escape_fixture():
@@ -100,17 +101,6 @@ def test_frontier_crossing_advertises_two_real_approaches_and_extraction_exits()
     assert [(u.kind, u.hp) for u in battles[0].units if u.team == 'enemy'] == [
         (u.kind, u.hp) for u in battles[1].units if u.team == 'enemy']
 
-
-def prepared_crossing():
-    """The same bought support army clears its Watch, then travels to the southern crossing."""
-    from tests.eador.test_roles import prepare_support_watch
-    from tools.eador_campaign import finish_battle, march_to, rest
-    state = prepare_support_watch()
-    finish_battle(state)
-    march_to(state, (0, 2))
-    if not state.actions_left:
-        rest(state, defend=False)
-    return state
 
 
 def test_paid_entry_is_atomic_saved_once_and_retry_preserves_defender_wounds():
@@ -215,3 +205,50 @@ def test_malformed_extraction_attempts_cannot_change_or_repeat_the_contract(dama
         data['battle']['objective'] = {'kind': 'rout', 'target': None, 'progress': 0, 'required': 0, 'deadline': None, 'exits': []}
     with pytest.raises(SaveFormatError):
         State.from_json(json.dumps(data))
+
+
+def test_an_unaffordable_or_empty_approach_is_atomic():
+    state = prepared_crossing()
+    state.gold = 19  # Resource-boundary fixture, not a paid playthrough.
+    before = state.to_json()
+    for approach in ('guided', ''):
+        with pytest.raises(RuleError):
+            state.explore(approach=approach)
+        assert state.to_json() == before
+
+
+def test_healing_at_an_exit_spends_the_action_needed_to_escape():
+    battle = escape_fixture()
+    battle.move(0, (-3, 1))
+    battle.unit(1).hp = 20
+    battle.cast('heal', 1)
+    before = battle.to_dict()
+    with pytest.raises(RuleError, match='acted'):
+        battle.evacuate()
+    assert battle.to_dict() == before
+
+
+def test_waiting_out_a_paid_adventure_loses_the_fee_and_cargo_reward():
+    from eador.model import State
+    state = prepared_crossing()
+    gold = state.gold
+    state.explore(approach='guided')
+    # Return no orders: the defenders retain their exits and the clock advances.
+    while state.battle.outcome is None:
+        state.battle.end_turn()
+        state = State.from_json(state.to_json())
+    assert state.battle.outcome_reason == 'deadline' and state.battle.round == 8
+    before_xp = state.hero.xp
+    state.resolve_battle()
+    assert not state.provinces[(0, 2)].explored and state.battle_adventure is None
+    assert state.hero.xp == before_xp and not state.choice
+    assert state.gold == gold - 40  # Guided fee and existing defeat loss.
+
+
+def test_a_mobile_enemy_shooter_keeps_contesting_its_exit_after_firing():
+    battle = escape_fixture()
+    defender = battle.unit(1000)
+    defender.kind, defender.skirmisher, defender.pos = 'ranger', True, (-2, 1)
+    battle.end_turn()
+    assert battle.unit(0).hp < battle.unit(0).max_hp
+    assert any(battle.grid.distance(defender.pos, exit) <= 1 for exit in battle.objective.exits)
