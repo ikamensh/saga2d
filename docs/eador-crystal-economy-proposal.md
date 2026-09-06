@@ -134,6 +134,19 @@ save continuation, an Adept competing for the same crystals, losing the last
 travel action, battle/reward/blockade refusals, and the retained assault/pursuit
 choices. The model does not claim native input coverage before root's UI work.
 
+The integrated production checkpoint passes **1,049 full tests**. Both existing
+regression fuzzers pass (60 Tribes AI games / 20 random-input runs, and 12 Shardbound
+campaigns / 12 scene runs). A clean-source infusion-aware run then checks 100
+campaigns: **103 accepted / 1,244 refused infusions**, with matching quotes,
+unchanged refused states and exact saved consequences. Thirty additional linked
+campaigns start evenly across the three stages: **24 accepted / 275 refused**,
+including 11 recovery transitions. These runs use Standard; the separate earned
+Accessible pursuit case and existing difficulty suite remain distinct coverage.
+Random prefixes do not claim victories: forced defeat/recovery cleanup is
+recorded separately in [campaign fuzz](evidence/eador-infusion-fuzz.json) and
+[linked fuzz](evidence/eador-infusion-linked-fuzz.json). Game sources remain
+unchanged throughout both measured runs at `a276529`.
+
 Evidence: [read-only comparison](evidence/crystal-service-comparison.json),
 [exact comparison rows](evidence/crystal-service-comparison.rows.json.gz),
 [executed prototype branches](evidence/crystal-service-prototype.json),
