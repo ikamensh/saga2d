@@ -1,0 +1,242 @@
+[
+  {
+    "run": "model-direct",
+    "skill": "quartermaster",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "6b57ea3e64e7d2ec84679673b5873c82a5f59c213e081c19957b4c8abc842364"
+  },
+  {
+    "run": "model-direct",
+    "skill": "tactician",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "77ab2f14c07817e87f6510ecea8fb95b98e87ac59cf9f67f1d79a4e7b143ac89"
+  },
+  {
+    "run": "model-direct",
+    "skill": "duelist",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "f73a19a16d6dbddb8528cfa1f6857af9aa2529df0739404e89e75a4a3a21ef24"
+  },
+  {
+    "run": "model-direct",
+    "skill": "vigor",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "d02829de35be53bf530cbb8c2f61410af543484c6e637abeb65982fae876fba1"
+  },
+  {
+    "run": "model-direct",
+    "skill": "pathfinder",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "1080c8576292e1a61b4a58dd73fed5371e8fe499adc0744ef7abe1885579af07"
+  },
+  {
+    "run": "model-direct",
+    "skill": "skirmisher",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "5d8a8c3ee00a5e05e7caf2a733a6a8eaa54e5c1c8abb68d48f4cbae4affa1a58"
+  },
+  {
+    "run": "model-direct",
+    "skill": "channeling",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "b469b33f6c0d18c4b0ec16cf916b3822dda4cd4098e902d613990db2135b70d1"
+  },
+  {
+    "run": "model-direct",
+    "skill": "restoration",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 5,
+    "final_sha256": "53a8cdeea8627026f4f32071adc425ee3bd1131d15a2185189f139a2cb045c79"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "quartermaster",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "4d1c5d49839f64681fabfd65502ee50b4dbd1021d7002db5c9426d8a23650dd1"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "tactician",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "93c0261bfa3e323bdd889efe09e146dfa1a910717120ceeab0df13bd86e47b62"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "duelist",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "c40445a9837f15c9ac73e1def69f9e30de936904d88bd17eb6a0aada1548540d"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "vigor",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "785dbd3017cff75b54596333d656f93034d2598eb97d322011283f4d50e471f7"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "pathfinder",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "2dfa443fc9fd239578550de776036e3f444102b4c84a81754ec6345b9e6a5f17"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "skirmisher",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "30b1f975ff9edb4a707f8746335676488bebec5e1166fd2468b478d8d35f3c81"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "channeling",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "f234e96039c29666bf328c5ebcd94da39515201fbde4fc93ca7a7a0dda5bd69f"
+  },
+  {
+    "run": "model-recovery",
+    "skill": "restoration",
+    "phase": "completed",
+    "inputs": 0,
+    "reloads": 0,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "f7bf71282947b148e4ea85b3af17ad877217011bb2cb836d748db32923663cba"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "quartermaster",
+    "phase": "completed",
+    "inputs": 477,
+    "reloads": 13,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "3da1bbb449a56daf7380cd75bf606e7e031b92f69f9ee1e33e12127ac9adcca0"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "tactician",
+    "phase": "completed",
+    "inputs": 456,
+    "reloads": 12,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "0409bd0cd327321cef64498906f9ec8e7960d05982d80ba82cff1920c91d84fa"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "duelist",
+    "phase": "completed",
+    "inputs": 490,
+    "reloads": 13,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "499790cb122cd260320eb3fb33ca92dd08ecde9a4d2a5bfc054b4ba6d5e06600"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "vigor",
+    "phase": "completed",
+    "inputs": 492,
+    "reloads": 13,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "ea1fcdd9a6643d6a1698a2852fff64659dfedda1a16d3de73c78065ded40eb1b"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "pathfinder",
+    "phase": "completed",
+    "inputs": 489,
+    "reloads": 14,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "a13e3f71cd1642c6dcb54085bd2a465cfb28163c002ff13e4672d4d917247f7a"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "skirmisher",
+    "phase": "completed",
+    "inputs": 464,
+    "reloads": 11,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "058e6056379044122a7114da4f9cb6bcc1e3d0abc95a0804ca3c4ae2a3143b32"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "channeling",
+    "phase": "completed",
+    "inputs": 509,
+    "reloads": 13,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "e71cb057f730b38f70e013ac2845ab9e4e1dacb915413108ddc5a61100b8a7c4"
+  },
+  {
+    "run": "native-recovery",
+    "skill": "restoration",
+    "phase": "completed",
+    "inputs": 497,
+    "reloads": 13,
+    "decisions": 17,
+    "checkpoints": 7,
+    "final_sha256": "61cba9e6302affc4db9558081eff5eaa254e963ff2efab5760d600292e1a970f"
+  }
+]
