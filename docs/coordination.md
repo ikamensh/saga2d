@@ -140,3 +140,12 @@ know about, and read it before touching shared files.
   and startup/recovery policy remain in `eador/`, using the existing Settings
   store. No Warband worktree or game source was changed. See
   `docs/eador-display-settings.md` for launch overrides and verification.
+
+- 2026-09-06 (Shardbound research agent): isolated `codex/wrapped-label`
+  adds opt-in `Label(text, width=300, wrap=True)` for retained UI flow.
+  Shardbound reward descriptions and Warband's width-390 tutorial objective
+  need measured multiline height without manual placement of the next control.
+  The existing Scene paragraph algorithm moves to a private shared helper;
+  no new backend protocol or game rule is introduced. A private preparation
+  hook refreshes wrapped measurements before the existing input/draw layout
+  boundaries. No Warband worktree or game callers are being edited.
