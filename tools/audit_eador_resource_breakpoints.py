@@ -24,18 +24,21 @@ from eador.model import BUILDINGS, RECRUITABLE, RuleError, State, UNITS
 from eador.worldgen import THEMES
 from tools.audit_eador_difficulty import DifficultyTrial
 from tools.audit_eador_economy import PLANS
+from tools.cpu_budget import CpuBudget
 
 FUNDS_ERRORS = {'Not enough gold or crystals.', 'Infusion requires 3 crystals.'}
 COMMANDS = {'build', 'recruit', 'replace_troop', 'infuse', 'travel', 'explore',
             'end_turn', 'resolve_battle', 'retreat', 'choose', 'equip'}
 
 
-def public_quote(encoded, orders, *, name, gold, crystals, kind):
+def public_quote(encoded, orders, *, name, gold, crystals, kind, budget=None):
     """Try only the announced orders on an independent complete save."""
     state = State.from_json(encoded)
     original = state.to_json()
     reason = None
     for command, args, kwargs in orders:
+        if budget:
+            budget.checkpoint()
         before = state.to_json()
         try:
             getattr(state, command)(*args, **kwargs)
@@ -50,7 +53,7 @@ def public_quote(encoded, orders, *, name, gold, crystals, kind):
                 blocked_reason=reason, source_sha256=hashlib.sha256(original.encode()).hexdigest())
 
 
-def options(state):
+def options(state, *, budget=None):
     if state.status != 'playing' or state.battle or state.choice:
         return None
     encoded = state.to_json()
@@ -58,10 +61,12 @@ def options(state):
     for kind, spec in BUILDINGS.items():
         if kind not in state.buildings:
             quotes.append(public_quote(encoded, [('build', (kind,), {})], name='build.' + kind,
-                                       gold=spec.cost, crystals=spec.crystals, kind='building'))
+                                       gold=spec.cost, crystals=spec.crystals, kind='building', budget=budget))
     outgoing = min(state.hero.army, key=lambda t: (t.level, t.xp, t.id), default=None)
     present = {t.kind for t in state.hero.army}
     for kind in RECRUITABLE:
+        if budget:
+            budget.checkpoint()
         if kind in present:
             continue
         orders = []
@@ -84,7 +89,7 @@ def options(state):
                          crystals=crystals, affordable=False, funds_blocked=False, blocked_reason=reason)
         else:
             quote = public_quote(encoded, orders, name=('replace.' if replacing else 'recruit.') + kind,
-                                 gold=price, crystals=crystals, kind='missing_role_package')
+                                 gold=price, crystals=crystals, kind='missing_role_package', budget=budget)
         quote.update(outgoing=asdict(outgoing) if replacing else None,
                      prerequisites=[o[1][0] for o in orders if o[0] == 'build'])
         quotes.append(quote)
@@ -99,7 +104,7 @@ def options(state):
             if approach.gold_cost or approach.crystals_cost:
                 quotes.append(public_quote(encoded, [('explore', (), dict(approach=approach.id))],
                                            name='approach.' + approach.id, kind='local_approach',
-                                           gold=approach.gold_cost, crystals=approach.crystals_cost))
+                                           gold=approach.gold_cost, crystals=approach.crystals_cost, budget=budget))
     assert state.to_json() == encoded, 'Quotes changed the real campaign'
     available = [q for q in quotes if q['affordable'] or q['funds_blocked']]
     # A stronger upper bound distinguishes one affordable order from being able
@@ -120,7 +125,7 @@ def options(state):
                           gold=completion_gold, crystals=completion_crystals)
     else:
         completion = public_quote(encoded, completion_orders, name='remaining_buildings_and_role',
-                                  kind='catalogue_upper_bound', gold=completion_gold, crystals=completion_crystals)
+                                  kind='catalogue_upper_bound', gold=completion_gold, crystals=completion_crystals, budget=budget)
     return dict(turn=state.turn, gold=state.gold, crystals=state.crystals, actions=state.actions_left,
                 income=state.income, upkeep=state.upkeep, crystal_income=state.crystal_income,
                 army_size=len(state.hero.army), capacity=state.hero.max_army,
@@ -133,8 +138,9 @@ def options(state):
 
 class Ledger:
     """Read-only observer around the commands used by the unchanged development trial."""
-    def __init__(self, state):
+    def __init__(self, state, *, budget=None):
         self.state = state
+        self.budget = budget
         self.flows = defaultdict(Counter)
         self.events = []
         self.points = []
@@ -151,13 +157,15 @@ class Ledger:
         self.flows[source].update(gold=gold, crystals=crystals)
 
     def observe(self, phase):
-        point = options(self.state)
+        point = options(self.state, budget=self.budget)
         if point:
             point.update(phase=phase, event_index=len(self.events),
                          flows={key: dict(value) for key, value in self.flows.items()})
             self.points.append(point)
 
     def command(self, command, *args, **kwargs):
+        if self.budget:
+            self.budget.checkpoint()
         state = self.state
         gold, crystals, turn = state.gold, state.crystals, state.turn
         context = dict(battle_kind=state.battle_kind, province=state.battle_province,
@@ -200,13 +208,14 @@ class Ledger:
         return result
 
 
-def measured(case):
-    trial = DifficultyTrial(*case)
-    ledger = Ledger(trial.state)
+def measured(case, *, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
+    trial = DifficultyTrial(*case, budget=budget)
+    ledger = Ledger(trial.state, budget=budget)
     trial.state = ledger
     result = trial.run()
     # The observer must preserve the full policy output and actual final save.
-    baseline = DifficultyTrial(*case).run()
+    baseline = DifficultyTrial(*case, budget=budget).run()
     assert result == baseline, 'Attribution changed a public campaign outcome'
     constrained = [i for i, p in enumerate(ledger.points) if p['funds_blocked']]
     last = constrained[-1] if constrained else -1
@@ -227,22 +236,34 @@ def measured(case):
                 decisions=ledger.points, events=ledger.events, endpoints=endpoints)
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--hero', choices=('Commander', 'Warrior', 'Scout', 'Wizard'), default='Commander')
+    parser.add_argument('--theme', choices=THEMES, help='limit the audit to one world theme')
+    parser.add_argument('--difficulty', choices=DIFFICULTIES, help='limit the audit to one difficulty')
+    parser.add_argument('--plan', choices=PLANS, help='limit the audit to one development plan')
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/resource-breakpoints.json')
-    args = parser.parse_args()
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve(),
                *(ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                 'eador_campaign.py', 'stress_eador_control.py'))]
+                 'eador_campaign.py', 'stress_eador_control.py', 'cpu_budget.py'))]
     fingerprints = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     before = fingerprints()
     rows = []
-    for theme in THEMES:
-        for mode in DIFFICULTIES:
-            for plan in PLANS:
-                row = measured((args.seed, args.hero, theme, plan, mode, 'direct'))
+    themes = [args.theme] if args.theme else list(THEMES)
+    modes = [args.difficulty] if args.difficulty else list(DIFFICULTIES)
+    plans = [args.plan] if args.plan else list(PLANS)
+    for theme in themes:
+        for mode in modes:
+            for plan in plans:
+                row = measured((args.seed, args.hero, theme, plan, mode, 'direct'), budget=budget)
                 rows.append(row)
                 point = row['endpoints'].get('lasting_breakpoint')
                 print(theme, mode, plan, row['result']['status'], row['result']['turns'],
@@ -278,7 +299,8 @@ def main():
     rows_path.write_bytes(gzip.compress(json.dumps(rows, separators=(',', ':')).encode(), mtime=0))
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=before, source_files_changed_during_run=[], seed=args.seed, hero=args.hero,
-                  campaigns=len(rows), matched_unobserved_outcomes=True, summary=summary,
+                  themes=themes, difficulties=modes, plans=plans,
+                  campaigns=len(rows), matched_unobserved_outcomes=True, summary=summary, cpu_percent=budget.percent,
                   after_individual_breakpoint={k: dict(v) for k, v in after_breakpoint.items()},
                   scope='Observed unchanged public paid policies. Actual command deltas reconcile both currencies. '
                         'Detached public quotes for unbuilt buildings, absent-role recruitment/replacement with '

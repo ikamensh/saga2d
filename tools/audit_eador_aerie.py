@@ -1,6 +1,7 @@
 """Replay paid Aerie plans with exact saves and retain a compressed, source-attributed report."""
 import argparse
 from dataclasses import replace
+from functools import partial
 import gzip
 import hashlib
 import json
@@ -15,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from eador.battle import Battle
 from eador.model import RuleError, State
 from tools.audit_eador_extraction import PaidState
+from tools.cpu_budget import CpuBudget
 from tools.eador_aerie_campaign import (prepare_aerie, aerie_western_route, aerie_northern_route,
                                        aerie_scout_route, aerie_failed_sortie, aerie_retry_route)
 from tools.eador_extraction_campaign import AdventureOrders
@@ -88,12 +90,14 @@ class RecordedOrders(AdventureOrders):
                     mana_spent=self.state.hero.mana-b.mana, flight_only_landings=self.flight_landings)
 
 
-def settle_once(play):
+def settle_once(play, *, budget=None):
     state = play.state
     gold, crystals, reward = state.gold, state.crystals, state.battle_adventure
     state.resolve_battle()
     assert (state.gold, state.crystals) == (gold+reward.gold, crystals+reward.crystals)
     while state.choice:
+        if budget:
+            budget.checkpoint()
         state.choose(state.choice.options[0].id)
     text = state.to_json()
     for command in (state.explore, state.resolve_battle):
@@ -107,25 +111,27 @@ def settle_once(play):
     return json.loads(text)
 
 
-def measure():
+def measure(*, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *ROOT.joinpath('tools').glob('eador_*.py'), Path(__file__).resolve(),
-                      ROOT/'tools/audit_eador_extraction.py'])
+                      ROOT/'tools/audit_eador_extraction.py', ROOT/'tools/cpu_budget.py'])
     hashes = {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
-    commander = prepare_aerie(state=Purchases(State.new(7, theme='ruins')))
-    scout = prepare_aerie('Scout', party='ground', state=Purchases(State.new(7, 'Scout', theme='ruins')))
+    commander = prepare_aerie(state=Purchases(State.new(7, theme='ruins')), budget=budget)
+    scout = prepare_aerie('Scout', party='ground', state=Purchases(State.new(7, 'Scout', theme='ruins')), budget=budget)
     parties = {name:dict(snapshot=json.loads(paid.to_json()), purchases=paid.purchases)
                for name, paid in [('commander',commander), ('scout',scout)]}
     plans = {}
+    record_orders = partial(RecordedOrders, budget=budget)
     for name, route, paid in [('western',aerie_western_route,commander),
                               ('northern',aerie_northern_route,commander), ('scout',aerie_scout_route,scout)]:
-        play = route(State.from_json(paid.to_json()), orders_type=RecordedOrders)
+        play = route(State.from_json(paid.to_json()), orders_type=record_orders)
         plans[name] = play.report()
         assert play.battle.outcome_reason == 'rout' and not plans[name]['dead']
-        plans[name]['settled'] = settle_once(play)
-    sustain = aerie_western_route(State.from_json(commander.to_json()), heal=True, orders_type=RecordedOrders)
-    plans['western-heal'] = {**sustain.report(), 'settled':settle_once(sustain)}
-    failure = aerie_failed_sortie(State.from_json(commander.to_json()), orders_type=RecordedOrders)
+        plans[name]['settled'] = settle_once(play, budget=budget)
+    sustain = aerie_western_route(State.from_json(commander.to_json()), heal=True, orders_type=record_orders)
+    plans['western-heal'] = {**sustain.report(), 'settled':settle_once(sustain, budget=budget)}
+    failure = aerie_failed_sortie(State.from_json(commander.to_json()), orders_type=record_orders)
     plans['failed-sortie'] = failure.report()
     state = failure.state
     gold, crystals, xp = state.gold, state.crystals, state.hero.xp
@@ -133,19 +139,25 @@ def measure():
     assert (state.gold,state.crystals,state.hero.xp) == (gold-20,crystals,xp) and state.choice is None
     plans['failed-sortie']['settled'] = json.loads(state.to_json())
     replacement = Purchases(State.from_json(state.to_json())); replacement.recruit('skyrider')
-    retry = aerie_retry_route(replacement, orders_type=RecordedOrders)
-    plans['retry'] = {**retry.report(), 'purchases':replacement.purchases, 'settled':settle_once(retry)}
+    retry = aerie_retry_route(replacement, orders_type=record_orders)
+    plans['retry'] = {**retry.report(), 'purchases':replacement.purchases, 'settled':settle_once(retry, budget=budget)}
     assert all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest for name,digest in hashes.items())
     return dict(source_revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
-                source_sha256=hashes, python=platform.python_version(), platform=platform.platform(),
+                source_sha256=hashes, python=platform.python_version(), platform=platform.platform(), cpu_percent=budget.percent,
                 parties=parties, plans=plans, scope='Actual seed-seven Standard purchases and manual model orders; no native or optimal-play claim.')
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/aerie-production.json.gz'))
-    args = parser.parse_args()
-    report = measure()
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    report = measure(budget=budget)
     payload = (json.dumps(report, separators=(',', ':'))+'\n').encode()
     args.output.write_bytes(gzip.compress(payload,mtime=0) if args.output.suffix == '.gz' else payload)
     for name, plan in report['plans'].items():

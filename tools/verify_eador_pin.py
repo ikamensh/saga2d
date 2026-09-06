@@ -15,13 +15,46 @@ from saga2d import Button
 from eador.app import create_game
 from eador.model import State
 from eador.scene import BattleScene, ShardScene, TitleScene
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import finish_battle, march_to, provision_army, rest
 from tools.eador_ui import PlayerInput
 
 
-def verify(output):
+def prepare_watch_bell(*, budget=None):
+    """Earn the Bell through paid campaign orders, then enter a battle where the hero can Brace."""
+    budget = CpuBudget(25) if budget is None else budget
+    state = State.new(7)
+    state.build('barracks')
+    state.recruit('swordsman')
+    state.explore()
+    finish_battle(state, budget=budget)
+    rest(state, budget=budget)
+    provision_army(state)
+    watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
+    march_to(state, watch, budget=budget)
+    rest(state, budget=budget)
+    provision_army(state)
+    march_to(state, watch, budget=budget)
+    if not state.actions_left:
+        rest(state, budget=budget)
+        march_to(state, watch, budget=budget)
+    state.explore()
+    finish_battle(state, budget=budget)
+    assert 'watch_bell' in state.inventory
+    state.equip('watch_bell')
+    if not state.actions_left:
+        rest(state, budget=budget)
+    destination = next(pos for pos in state.grid.neighbors(state.hero.pos)
+                       if state.provinces[pos].owner == 'neutral')
+    state.travel(destination)
+    assert state.battle and state.battle.unit(0).can_brace
+    return state
+
+
+def verify(output, *, budget=None):
     from pyglet.window import key, mouse
 
+    budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='shardbound-pin-') as directory:
         game = create_game('Shardbound Pin', resolution=(1280, 800), visible=False,
@@ -92,31 +125,7 @@ def verify(output):
             assert isinstance(game.scene, ShardScene)
 
             # Earn the Bell through public campaign commands, then show its real hero order.
-            state = State.new(7)
-            state.build('barracks')
-            state.recruit('swordsman')
-            state.explore()
-            finish_battle(state)
-            rest(state)
-            provision_army(state)
-            watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
-            march_to(state, watch)
-            rest(state)
-            provision_army(state)
-            march_to(state, watch)
-            if not state.actions_left:
-                rest(state)
-                march_to(state, watch)
-            state.explore()
-            finish_battle(state)
-            assert 'watch_bell' in state.inventory
-            state.equip('watch_bell')
-            if not state.actions_left:
-                rest(state)
-            destination = next(pos for pos in state.grid.neighbors(state.hero.pos)
-                               if state.provinces[pos].owner == 'neutral')
-            state.travel(destination)
-            assert state.battle and state.battle.unit(0).can_brace
+            state = prepare_watch_bell(budget=budget)
             game.clear_and_push(ShardScene(State.from_json(state.to_json())))
             tick(game)
             button = game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Brace')
@@ -128,10 +137,22 @@ def verify(output):
         finally:
             game._teardown()
             game.backend.quit()
-    print(f'Native Pin forecast/status/cooldown/reload and earned Watch Bell hero passed: {output}')
+    print(f'Native Pin forecast/status/cooldown/reload and earned Watch Bell hero passed '
+          f'(model CPU allowance {budget.percent}%): {output}')
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out', type=Path, default=Path('/tmp/shardbound-pin'))
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Model preparation CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.out, budget=budget)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--out', type=Path, default=Path('/tmp/shardbound-pin'))
-    verify(parser.parse_args().out)
+    main()

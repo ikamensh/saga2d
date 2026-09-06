@@ -4,14 +4,14 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders
 
 
-def prepare_aerie(hero_class='Commander', *, party='flight', state=None):
+def prepare_aerie(hero_class='Commander', *, party='flight', state=None, budget=None):
     if party not in ('flight', 'ground'):
         raise ValueError('Choose the flight or ground preparation.')
     state = State.new(7, hero_class, theme='ruins') if state is None else state
-    state.explore(); finish_battle(state)
+    state.explore(); finish_battle(state, budget=budget)
     state.build('market')
     for destination in ((-1, -1), (-1, 0)):
-        march_to(state, destination); rest(state)
+        march_to(state, destination, budget=budget); rest(state, budget=budget)
     kinds = ('pikeman', 'adept', 'skyrider') if party == 'flight' else (
         ('pikeman', 'warden', 'archer') if state.hero.hero_class == 'Commander' else ('pikeman', 'warden'))
     for kind in kinds:
@@ -25,14 +25,14 @@ def prepare_aerie(hero_class='Commander', *, party='flight', state=None):
             if spec.building in state.buildings and state.gold >= state.recruit_cost(kind) and state.crystals >= state.recruit_crystal_cost(kind):
                 state.recruit(kind)
                 break
-            rest(state)
+            rest(state, budget=budget)
         else:
             raise AssertionError(f'Could not fund {spec.name}.')
     for _ in range(48):
-        march_to(state, (0, 0))
+        march_to(state, (0, 0), budget=budget)
         if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the Aerie recovered.')
 
 
