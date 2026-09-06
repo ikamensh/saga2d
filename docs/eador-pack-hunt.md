@@ -114,7 +114,18 @@ lured Hunt entries, with 47,373 state checks and 12,544 unchanged-state command
 rejections. Twenty scene runs add 10,003 random input events, 20 battle reloads,
 19 choice reloads and 45 result reloads. Seven victories and 293 defeats are
 outcomes of this random robustness policy, not a difficulty verdict. Source
-hashes remained unchanged throughout each run.
+hashes remained unchanged throughout each run. The final three native replays
+use checkpoint `8d36f46`, which adds the corrected 80-round exhaustion wording;
+17 focused Hunt tests also pass there. The game rules are unchanged from the
+full-suite and fuzz checkpoint.
+
+Retained evidence: [random campaigns and scene input report](evidence/shardbound-pack-hunt-2026-09-06/fuzz.json),
+[compact native journey](evidence/shardbound-pack-hunt-2026-09-06/compact/journey.json),
+[lure native journey](evidence/shardbound-pack-hunt-2026-09-06/lure/journey.json),
+and [Warrior native journey](evidence/shardbound-pack-hunt-2026-09-06/spears/journey.json).
+Each native directory also retains inspected captures of its briefing,
+deployment or result. These reports identify the exact source revisions and
+hashes they tested; later content changes require their own verification.
 
 ```sh
 python -m pytest tests/eador/test_pack_hunt.py tests/eador/test_hunt_journey_scene.py -q
