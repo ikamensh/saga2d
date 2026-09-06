@@ -19,10 +19,17 @@ _UNREACHABLE = 10**6
 def take_turn(world: World, tribe: int, rng: random.Random) -> None:
     """Play the whole turn for *tribe* (which must be current), then end it."""
     assert world.current == tribe and world.winner is None
+    _choose_rewards(world, tribe)
+    if not world.tribe_units(tribe):
+        _train(world, tribe, rng)  # protect an affordable recovery unit from economic spending
     _research(world, tribe)
     _harvest(world, tribe)
     _choose_rewards(world, tribe)
     _train(world, tribe, rng)
+    if world.surrender_reason(tribe) is not None:
+        world.surrender(tribe)
+        world.end_turn()
+        return
     for unit in _units_in_play(world, tribe):
         _act(world, unit, rng)
     for unit in _units_in_play(world, tribe):

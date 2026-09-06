@@ -4,19 +4,19 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders
 
 
-def prepare_screen(hero_class='Commander', *, state=None):
+def prepare_screen(hero_class='Commander', *, state=None, budget=None):
     state = State.new(7, hero_class, theme='elderwild') if state is None else state
     state.build('barracks')
     for _ in range(8):
         if state.gold >= state.recruit_cost('warden'):
             state.recruit('warden')
             break
-        rest(state)
+        rest(state, budget=budget)
     else:
         raise AssertionError('Could not fund the Warden')
-    state.explore(); finish_battle(state)
+    state.explore(); finish_battle(state, budget=budget)
     for pos in ((-1, -1), (-1, 0)):
-        march_to(state, pos); rest(state)
+        march_to(state, pos, budget=budget); rest(state, budget=budget)
     for _ in range(48):
         assert state.status == 'playing'
         if 'archery' not in state.buildings and state.gold >= BUILDINGS['archery'].cost:
@@ -24,16 +24,16 @@ def prepare_screen(hero_class='Commander', *, state=None):
         if 'archery' in state.buildings and state.gold >= state.recruit_cost('ranger'):
             state.recruit('ranger')
             break
-        rest(state)
+        rest(state, budget=budget)
     else:
         raise AssertionError('Could not fund the Ranger')
     for pos in ((-1, 1), (-1, 2), (0, -1)):
-        march_to(state, pos)
+        march_to(state, pos, budget=budget)
     for _ in range(48):
-        march_to(state, (0, -1))
+        march_to(state, (0, -1), budget=budget)
         if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the Screen with the purchased party recovered')
 
 

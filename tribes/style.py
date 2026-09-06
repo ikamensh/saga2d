@@ -8,6 +8,8 @@ appear as keycaps.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from saga2d import Style, TextStyle, Theme, fonts
 
 Color = tuple[int, int, int, int]
@@ -26,6 +28,7 @@ HAIRLINE: Color = (255, 255, 255, 30)
 
 PANEL_STYLE = Style(background_color=PANEL_BG, border_color=HAIRLINE, border_width=1, padding=14, radius=12)
 OVERLAY_STYLE = Style(background_color=(16, 20, 32, 242), border_color=HAIRLINE, border_width=1, padding=22, radius=16)
+RESULTS_STYLE = replace(OVERLAY_STYLE, background_color=(16, 20, 32, 255), padding=16)
 GHOST_BUTTON = Style(font=SEMIBOLD, background_color=(255, 255, 255, 22), hover_color=(255, 255, 255, 48), press_color=(255, 255, 255, 84),
                      border_color=(255, 255, 255, 42), border_width=1, padding=8, radius=8)
 ACTION_BUTTON = Style(font=SEMIBOLD, background_color=(58, 122, 224, 255), hover_color=(86, 148, 242, 255), press_color=(140, 190, 255, 255),
@@ -60,4 +63,3 @@ def build_theme() -> Theme:
             "floating": TextStyle(18, (255, 255, 255, 255), EXTRABOLD),
         },
     )
-

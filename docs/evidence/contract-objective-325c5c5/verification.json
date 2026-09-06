@@ -1,0 +1,276 @@
+{
+  "source_commit": "5ec7e56b8edce2fc717c2d4ce403a9b062c8d5fa",
+  "source_sha256": {
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/encounter_scene.py": "c567a3c4bbec55de4950681f3b7b5a6a5e7c04c545498f5aa6ce0ed2faad7d76",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/release.py": "4bf603144c1bf6232feb366b004ac5dad60c32dbb0547d054a4033ef24be21c4",
+    "eador/settings_scene.py": "cf16efa9d04153ea94c4ac50862c871fae6d04feb4b02d48aea13dd07a53f9ca",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/codex.py": "db7c5b451767786490a926483183979a16285b4d67f2d22d158c269a9816dee0",
+    "eador/diagnostics.py": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c",
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/scene.py": "d0b1a7e32a2e4d7d48edd59befac245a9b1411e2088ce63257acff8bfadfb636",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/worldgen.py": "0c89b6d52208f9cc929e67caae09790f4b1407903806fe87f0f01d0320ac79a3",
+    "eador/content.py": "6dbac37f87693364516ea10c3c19e96b67892df4d74d224c15f824dc900128db",
+    "eador/replacement_scene.py": "84a98abcae1255ffb4fc351f4c209e61dfa6c70f3d69f6f85fa7a19991b8568c",
+    "eador/battle_playback_scene.py": "5399c1dff3d26e06259ac06169ef24ecc65feb5343e7d56d00537d543fcc27a2",
+    "eador/campaign_scene.py": "5cc53defc1e45160ebbf649407a993864aca5071542995d919a1bf0569e427dd",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/rival_scene.py": "4a3a15bb4a36fc6d10c7d5ebdd07a37faba0def606ce1e3ff8af35170d48a21b",
+    "eador/art.py": "46e1d88a47249f76640a9ee15bb69f42457ad6621369b5a4679c8d9686cb866d",
+    "eador/__main__.py": "52578ae4ab65a0dfd8852f2eb49d128b5559e2953bcf90486f10f7c4a89cfd14",
+    "eador/battle_trace.py": "57e1736fcb430a66c800d4268d1c1fe63c38ad19cbbb85b648ea53a1006f051c",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/battle.py": "4bf00295ff562299252a4ac6a4cc847055124fcf42c4a0532b09413c344c89f4",
+    "eador/encounters.py": "66878812c1406fbbc1dc3d1d3d98cf9d067e3f01d6f9cfccb1e8649719c0737d",
+    "saga2d/save.py": "e1002496a7fc01f2dbebb2831aba001ea3d1b725800a06911160a58ea0597c01",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/_scene_stack.py": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a",
+    "saga2d/render3d.py": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b",
+    "saga2d/game.py": "88d7fe87e0336c3896b518261e712ba13317b6a217577d707277002a06392e41",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/__init__.py": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b",
+    "saga2d/scene.py": "ae417745d4aa23e6cc470ef0fddb2fd762b1606423c1e3c5cbe51396ac3fd477",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4",
+    "saga2d/input.py": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/testing.py": "2814fc064da9449495c5b06bfe8aab52d2bbfb43f87c7a6559c18e21f141615a",
+    "saga2d/ui/theme.py": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/__init__.py": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/ui/base.py": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "saga2d/backends/mock_backend.py": "ea727de241ca980a3aaa1206bd76fc0a742e762a936d2a2d6c6ea2ed9f18f198",
+    "saga2d/backends/pyglet_backend.py": "fa75f2526f33e329971088769e4564f550b505ad9e74c2235da39ad6850294bb",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "b4b63019bf80fbf24a7b7b8806bb9dbf71dd4cade4c35cf949008fda71df67cc",
+    "saga2d/rendering/shapes.py": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/particles.py": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0",
+    "saga2d/rendering/sprite.py": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996",
+    "tests/eador/test_shard_reading.py": "373e84e9ea5a00c2fd05261ac8cfccac5b6397d0ce3446000b281eafaeadb22c",
+    "tools/eador_ui.py": "00be82dda4f002519f75688252aa472456f051cf31c0d82aaca440d5ae8b508b",
+    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2",
+    "tools/verify_eador_campaign_reading.py": "52a47d2e72f1712d4982e9ab719a5de9ea6cf7a9f9449b89c27f79d3b1d262cf",
+    "tools/verify_eador_shard_reading.py": "99c14951eb3eb391401977b3f779064bf1c4d5a3d019d553fb633f9f405c7c38",
+    "tools/verify_eador_guidance.py": "283df54a9572baf11fa025c7635b33d8aa903939fbf10384d42de3c20ccafe4a"
+  },
+  "script_sha256": "5f6b4c11f5183f643cc69ac1e49a90a0792e96cc2e1c4d79b12f3a37dbb8a4da",
+  "original_path": "/tmp/shardbound-manual-control-6648690.json.gz",
+  "original_sha256": "ed8d42e9887c70f637f463ff3072f7e1cc40ee5050f131e3b820f658e7b18ac3",
+  "historical_gate_source": "docs/evidence/shardbound-army-plans-cd351a9/control.json.gz",
+  "historical_gate_sha256": "6609eb4f334a956f6d6873e378b0b87bdd6901f3ad2f4688226265b8ede0b72a",
+  "backend": "pyglet",
+  "window": [
+    1280,
+    720
+  ],
+  "text_percent": 125,
+  "cpu_percent": 25,
+  "native_fps": 30,
+  "elapsed_seconds": 8.113162333029322,
+  "cpu_seconds": 2.055539,
+  "rows": [
+    {
+      "case": "foundries",
+      "labels": 47,
+      "state_sha256": "b701d385592415b1a5ca0ad2b340918301ef8a5e73979c53a17737e04e6b72d6",
+      "exact_state": true,
+      "selected_provinces": 3,
+      "campaign_plan_return": true,
+      "f5_f9": true
+    },
+    {
+      "case": "gate",
+      "labels": 47,
+      "state_sha256": "d69432b717827e96a88a7d6375435f64da3cd9af69e6d6814e9478ddd319fbb0",
+      "exact_state": true,
+      "selected_provinces": 3,
+      "campaign_plan_return": true,
+      "f5_f9": true
+    },
+    {
+      "case": "earned-ending",
+      "exact_state": true,
+      "state_sha256": "41e97d10883df114ef97a9a31b31dc25bbefbf093e37a43123012fcecb3d2058",
+      "casualties": [
+        1,
+        0,
+        1
+      ],
+      "f5_f9": true
+    }
+  ],
+  "inputs": [
+    [
+      "ShardScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        166,
+        446
+      ]
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        286,
+        376
+      ]
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        486,
+        446
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "j"
+    ],
+    [
+      "CampaignPlanScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f5"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f9"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f2"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        166,
+        446
+      ]
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        286,
+        376
+      ]
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        486,
+        446
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "j"
+    ],
+    [
+      "CampaignPlanScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f5"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f9"
+    ],
+    [
+      "CampaignScene",
+      "key",
+      "t"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "return"
+    ],
+    [
+      "CampaignScene",
+      "key",
+      "f5"
+    ],
+    [
+      "CampaignScene",
+      "key",
+      "f9"
+    ],
+    [
+      "CampaignScene",
+      "key",
+      "return"
+    ]
+  ],
+  "reloads": 3,
+  "window_closed": true,
+  "scope": "Three saved presentation cases. Foundries and ending are untouched checkpoints from the completed directed journal; Gate uses a public offer from a historical paid departure. Exact-state native input checks and screenshots, not another campaign playthrough."
+}

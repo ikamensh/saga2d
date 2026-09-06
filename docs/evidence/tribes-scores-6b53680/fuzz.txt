@@ -1,0 +1,7 @@
+Command: uv run python tools/fuzz.py
+CPU allowance: default 25% of one core
+AI games: 60 played, 0 failed, outcomes {'score': 43, 'domination': 17}
+monkey runs: 20 played, 0 failed
+
+The temporary save-directory isolation change made after this run is checked
+separately by the monkey-isolation run recorded alongside this file.

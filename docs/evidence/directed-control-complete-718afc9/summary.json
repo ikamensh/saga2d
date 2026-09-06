@@ -1,0 +1,1524 @@
+{
+  "commands": 556,
+  "automatic_commands": 0,
+  "initial_turn": 6,
+  "final": {
+    "turn": 3,
+    "status": "victory",
+    "gold": 61,
+    "crystals": 3,
+    "hero": {
+      "army": [
+        {
+          "hp": 18,
+          "id": 6,
+          "kind": "adept",
+          "level": 3,
+          "max_hp": 36,
+          "xp": 0
+        },
+        {
+          "hp": 16,
+          "id": 7,
+          "kind": "skyrider",
+          "level": 3,
+          "max_hp": 36,
+          "xp": 0
+        },
+        {
+          "hp": 28,
+          "id": 11,
+          "kind": "militia",
+          "level": 2,
+          "max_hp": 28,
+          "xp": 9
+        },
+        {
+          "hp": 26,
+          "id": 12,
+          "kind": "healer",
+          "level": 2,
+          "max_hp": 26,
+          "xp": 3
+        }
+      ],
+      "hero_class": "Wizard",
+      "hp": 43,
+      "level": 4,
+      "mana": 6,
+      "max_hp": 48,
+      "max_mana": 26,
+      "name": "Alden",
+      "pos": [
+        2,
+        0
+      ],
+      "relic": "moonstone",
+      "skill_ranks": {
+        "channeling": 2,
+        "restoration": 1
+      },
+      "xp": 40
+    },
+    "campaign": {
+      "casualties": 1,
+      "completed": [
+        {
+          "casualties": 1,
+          "contract": "westwatch",
+          "garrison": [
+            "sapper",
+            "healer"
+          ],
+          "hero_level": 3,
+          "stage": 1,
+          "theme": "frontier",
+          "turns": 9
+        },
+        {
+          "casualties": 0,
+          "contract": "foundries",
+          "garrison": [
+            "militia",
+            "healer",
+            "sapper"
+          ],
+          "hero_level": 4,
+          "stage": 2,
+          "theme": "ruins",
+          "turns": 4
+        },
+        {
+          "casualties": 1,
+          "contract": "throne",
+          "garrison": [],
+          "hero_level": 4,
+          "stage": 3,
+          "theme": "elderwild",
+          "turns": 3
+        }
+      ],
+      "contract": "throne",
+      "entry": {
+        "provinces": [
+          {
+            "capital": true,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [],
+            "guards": [],
+            "income": 16,
+            "name": "Westwatch",
+            "owner": "player",
+            "pos": [
+              -2,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [
+              20,
+              16
+            ],
+            "site_guards": [
+              "brigand",
+              "goblin"
+            ],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "plains"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              20
+            ],
+            "guards": [
+              "brigand"
+            ],
+            "income": 12,
+            "name": "Amber Fields",
+            "owner": "neutral",
+            "pos": [
+              -2,
+              1
+            ],
+            "site": "Lost Caravan",
+            "site_crystals": 0,
+            "site_gold": 65,
+            "site_guard_hp": [
+              20,
+              20,
+              20
+            ],
+            "site_guards": [
+              "brigand",
+              "brigand",
+              "brigand"
+            ],
+            "site_kind": "caravan",
+            "site_relic": "merchant_seal",
+            "terrain": "plains"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              16
+            ],
+            "guards": [
+              "goblin"
+            ],
+            "income": 5,
+            "name": "Old Hollow",
+            "owner": "neutral",
+            "pos": [
+              -2,
+              2
+            ],
+            "site": "Wolf Den",
+            "site_crystals": 1,
+            "site_gold": 40,
+            "site_guard_hp": [
+              17,
+              17,
+              17
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf"
+            ],
+            "site_kind": "den",
+            "site_relic": "storm_quiver",
+            "terrain": "marsh"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              17
+            ],
+            "guards": [
+              "wolf"
+            ],
+            "income": 5,
+            "name": "Briarwood",
+            "owner": "neutral",
+            "pos": [
+              -1,
+              -1
+            ],
+            "site": "Supply Cache",
+            "site_crystals": 2,
+            "site_gold": 40,
+            "site_guard_hp": [
+              17,
+              17,
+              17,
+              16
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "goblin"
+            ],
+            "site_kind": "supply_cache",
+            "site_relic": "porter_rune",
+            "terrain": "marsh"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              17
+            ],
+            "guards": [
+              "wolf"
+            ],
+            "income": 5,
+            "name": "Silverford",
+            "owner": "neutral",
+            "pos": [
+              -1,
+              0
+            ],
+            "site": "Elder Grove",
+            "site_crystals": 3,
+            "site_gold": 35,
+            "site_guard_hp": [
+              16,
+              17,
+              20
+            ],
+            "site_guards": [
+              "goblin",
+              "wolf",
+              "brigand"
+            ],
+            "site_kind": "grove",
+            "site_relic": "oak_standard",
+            "terrain": "marsh"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              20
+            ],
+            "guards": [
+              "brigand"
+            ],
+            "income": 12,
+            "name": "Winding Vale",
+            "owner": "neutral",
+            "pos": [
+              -1,
+              1
+            ],
+            "site": "Pack Hunt",
+            "site_crystals": 1,
+            "site_gold": 55,
+            "site_guard_hp": [
+              17,
+              17,
+              17,
+              17,
+              17,
+              17
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "wolf",
+              "wolf",
+              "wolf"
+            ],
+            "site_kind": "pack_hunt",
+            "site_relic": "storm_quiver",
+            "terrain": "plains"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              16
+            ],
+            "guards": [
+              "goblin"
+            ],
+            "income": 6,
+            "name": "Mossfell",
+            "owner": "neutral",
+            "pos": [
+              -1,
+              2
+            ],
+            "site": "Explorer’s Camp",
+            "site_crystals": 1,
+            "site_gold": 40,
+            "site_guard_hp": [
+              16,
+              17
+            ],
+            "site_guards": [
+              "goblin",
+              "wolf"
+            ],
+            "site_kind": "explorer_camp",
+            "site_relic": "wayfarer_boots",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              17,
+              17,
+              17,
+              16
+            ],
+            "guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "goblin"
+            ],
+            "income": 5,
+            "name": "Raven Hill",
+            "owner": "neutral",
+            "pos": [
+              0,
+              -2
+            ],
+            "site": "Border Watch",
+            "site_crystals": 2,
+            "site_gold": 50,
+            "site_guard_hp": [
+              28,
+              20,
+              20
+            ],
+            "site_guards": [
+              "pikeman",
+              "archer",
+              "brigand"
+            ],
+            "site_kind": "border_watch",
+            "site_relic": "watch_bell",
+            "terrain": "marsh"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              17,
+              17,
+              17,
+              16
+            ],
+            "guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "goblin"
+            ],
+            "income": 5,
+            "name": "Greenwater",
+            "owner": "neutral",
+            "pos": [
+              0,
+              -1
+            ],
+            "site": "Smuggler Screen",
+            "site_crystals": 2,
+            "site_gold": 60,
+            "site_guard_hp": [
+              26,
+              20,
+              20,
+              38,
+              42
+            ],
+            "site_guards": [
+              "sapper",
+              "archer",
+              "archer",
+              "warden",
+              "guard"
+            ],
+            "site_kind": "smuggler_screen",
+            "site_relic": "veil_censer",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              17,
+              17,
+              17,
+              16
+            ],
+            "guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "goblin"
+            ],
+            "income": 4,
+            "name": "Mire Crossing",
+            "owner": "neutral",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Wolf Den",
+            "site_crystals": 1,
+            "site_gold": 40,
+            "site_guard_hp": [
+              17,
+              17,
+              17
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf"
+            ],
+            "site_kind": "den",
+            "site_relic": "storm_quiver",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              20,
+              20
+            ],
+            "guards": [
+              "brigand",
+              "archer"
+            ],
+            "income": 12,
+            "name": "Old Causeway",
+            "owner": "neutral",
+            "pos": [
+              0,
+              1
+            ],
+            "site": "Lost Caravan",
+            "site_crystals": 0,
+            "site_gold": 65,
+            "site_guard_hp": [
+              20,
+              20,
+              20
+            ],
+            "site_guards": [
+              "brigand",
+              "brigand",
+              "brigand"
+            ],
+            "site_kind": "caravan",
+            "site_relic": "merchant_seal",
+            "terrain": "plains"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              17,
+              17,
+              17,
+              16
+            ],
+            "guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "goblin"
+            ],
+            "income": 6,
+            "name": "Sunken Road",
+            "owner": "neutral",
+            "pos": [
+              0,
+              2
+            ],
+            "site": "Wolf Den",
+            "site_crystals": 1,
+            "site_gold": 40,
+            "site_guard_hp": [
+              17,
+              17,
+              17
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf"
+            ],
+            "site_kind": "den",
+            "site_relic": "storm_quiver",
+            "terrain": "marsh"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              42,
+              42,
+              17,
+              16
+            ],
+            "guards": [
+              "guard",
+              "guard",
+              "wolf",
+              "goblin"
+            ],
+            "income": 6,
+            "name": "Ashen Marsh",
+            "owner": "neutral",
+            "pos": [
+              1,
+              -2
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [
+              20,
+              16,
+              42
+            ],
+            "site_guards": [
+              "brigand",
+              "goblin",
+              "guard"
+            ],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              42,
+              42,
+              17,
+              16
+            ],
+            "guards": [
+              "guard",
+              "guard",
+              "wolf",
+              "goblin"
+            ],
+            "income": 4,
+            "name": "Frostmere",
+            "owner": "neutral",
+            "pos": [
+              1,
+              -1
+            ],
+            "site": "Forgotten Tower",
+            "site_crystals": 3,
+            "site_gold": 40,
+            "site_guard_hp": [
+              16,
+              16,
+              42
+            ],
+            "site_guards": [
+              "goblin",
+              "goblin",
+              "guard"
+            ],
+            "site_kind": "tower",
+            "site_relic": "ember_lens",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              42,
+              42,
+              17,
+              16
+            ],
+            "guards": [
+              "guard",
+              "guard",
+              "wolf",
+              "goblin"
+            ],
+            "income": 5,
+            "name": "Cinderwood",
+            "owner": "neutral",
+            "pos": [
+              1,
+              0
+            ],
+            "site": "Wolf Den",
+            "site_crystals": 1,
+            "site_gold": 40,
+            "site_guard_hp": [
+              17,
+              17,
+              17,
+              42
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "guard"
+            ],
+            "site_kind": "den",
+            "site_relic": "storm_quiver",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              42,
+              17,
+              20
+            ],
+            "guards": [
+              "guard",
+              "wolf",
+              "archer"
+            ],
+            "income": 11,
+            "name": "High Pass",
+            "owner": "neutral",
+            "pos": [
+              1,
+              1
+            ],
+            "site": "Lost Caravan",
+            "site_crystals": 0,
+            "site_gold": 65,
+            "site_guard_hp": [
+              20,
+              20,
+              20,
+              42
+            ],
+            "site_guards": [
+              "brigand",
+              "brigand",
+              "brigand",
+              "guard"
+            ],
+            "site_kind": "caravan",
+            "site_relic": "merchant_seal",
+            "terrain": "plains"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              42,
+              42,
+              17,
+              16
+            ],
+            "guards": [
+              "guard",
+              "guard",
+              "wolf",
+              "goblin"
+            ],
+            "income": 5,
+            "name": "Lost Reach",
+            "owner": "rival",
+            "pos": [
+              2,
+              -2
+            ],
+            "site": "Wolf Den",
+            "site_crystals": 1,
+            "site_gold": 40,
+            "site_guard_hp": [
+              17,
+              17,
+              17,
+              42
+            ],
+            "site_guards": [
+              "wolf",
+              "wolf",
+              "wolf",
+              "guard"
+            ],
+            "site_kind": "den",
+            "site_relic": "storm_quiver",
+            "terrain": "forest"
+          },
+          {
+            "capital": false,
+            "crystals": 1,
+            "explored": false,
+            "guard_hp": [
+              42,
+              42,
+              17,
+              16
+            ],
+            "guards": [
+              "guard",
+              "guard",
+              "wolf",
+              "goblin"
+            ],
+            "income": 6,
+            "name": "Blackfen",
+            "owner": "rival",
+            "pos": [
+              2,
+              -1
+            ],
+            "site": "Forgotten Tower",
+            "site_crystals": 3,
+            "site_gold": 40,
+            "site_guard_hp": [
+              16,
+              16,
+              42
+            ],
+            "site_guards": [
+              "goblin",
+              "goblin",
+              "guard"
+            ],
+            "site_kind": "tower",
+            "site_relic": "ember_lens",
+            "terrain": "forest"
+          },
+          {
+            "capital": true,
+            "crystals": 0,
+            "explored": false,
+            "guard_hp": [
+              42,
+              42,
+              42,
+              42,
+              17,
+              17,
+              20
+            ],
+            "guards": [
+              "guard",
+              "guard",
+              "guard",
+              "guard",
+              "wolf",
+              "wolf",
+              "archer"
+            ],
+            "income": 16,
+            "name": "Duskspire",
+            "owner": "rival",
+            "pos": [
+              2,
+              0
+            ],
+            "site": null,
+            "site_crystals": 0,
+            "site_gold": 0,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": null,
+            "site_relic": null,
+            "terrain": "forest"
+          }
+        ],
+        "rival": {
+          "army": [
+            {
+              "hp": 42,
+              "id": 1,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 42,
+              "id": 2,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 42,
+              "id": 3,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "guard",
+              "max_hp": 42
+            },
+            {
+              "hp": 20,
+              "id": 5,
+              "kind": "archer",
+              "max_hp": 20
+            },
+            {
+              "hp": 20,
+              "id": 6,
+              "kind": "archer",
+              "max_hp": 20
+            }
+          ],
+          "defeats": 0,
+          "gold": 90,
+          "intent": "attack",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            -1
+          ],
+          "target": [
+            1,
+            -1
+          ],
+          "turns_until_action": 2
+        }
+      },
+      "offers": [],
+      "phase": "completed",
+      "prior_attempt_turns": 0,
+      "recovery_used": false,
+      "seed": 7,
+      "stage": 3
+    }
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "commands": 185,
+      "campaign_rests": 3,
+      "enemy_phases": 16,
+      "purchases": [
+        {
+          "command": "infuse",
+          "args": [],
+          "gold_spent": 0,
+          "crystals_spent": 3
+        },
+        {
+          "command": "replace_troop",
+          "args": [
+            1,
+            "adept"
+          ],
+          "gold_spent": 65,
+          "crystals_spent": 2
+        },
+        {
+          "command": "replace_troop",
+          "args": [
+            3,
+            "skyrider"
+          ],
+          "gold_spent": 85,
+          "crystals_spent": 3
+        },
+        {
+          "command": "infuse",
+          "args": [],
+          "gold_spent": 0,
+          "crystals_spent": 3
+        }
+      ],
+      "net_rest_gold": 115,
+      "net_rest_crystals": 3,
+      "spells": [
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 0
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 5,
+          "mana_spent": 3,
+          "healed_hp": 16
+        },
+        {
+          "spell": "heal",
+          "caster": 5,
+          "mana_spent": 3,
+          "healed_hp": 20
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 17
+        },
+        {
+          "spell": "heal",
+          "caster": 5,
+          "mana_spent": 3,
+          "healed_hp": 24
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 5,
+          "mana_spent": 3,
+          "healed_hp": 24
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 5,
+          "mana_spent": 3,
+          "healed_hp": 23
+        }
+      ]
+    },
+    {
+      "stage": 2,
+      "commands": 244,
+      "campaign_rests": 3,
+      "enemy_phases": 17,
+      "purchases": [
+        {
+          "command": "build",
+          "args": [
+            "market"
+          ],
+          "gold_spent": 60,
+          "crystals_spent": 0
+        },
+        {
+          "command": "build",
+          "args": [
+            "temple"
+          ],
+          "gold_spent": 65,
+          "crystals_spent": 0
+        },
+        {
+          "command": "recruit",
+          "args": [
+            "healer"
+          ],
+          "gold_spent": 45,
+          "crystals_spent": 0
+        },
+        {
+          "command": "recruit",
+          "args": [
+            "sapper"
+          ],
+          "gold_spent": 60,
+          "crystals_spent": 1
+        },
+        {
+          "command": "build",
+          "args": [
+            "mage_tower"
+          ],
+          "gold_spent": 75,
+          "crystals_spent": 2
+        },
+        {
+          "command": "infuse",
+          "args": [],
+          "gold_spent": 0,
+          "crystals_spent": 3
+        }
+      ],
+      "net_rest_gold": 148,
+      "net_rest_crystals": 17,
+      "spells": [
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 11
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 16
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 15
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 16
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 24
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 19
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 12
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 20
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 26
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 26
+        },
+        {
+          "spell": "heal",
+          "caster": 9,
+          "mana_spent": 3,
+          "healed_hp": 15
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        }
+      ]
+    },
+    {
+      "stage": 3,
+      "commands": 127,
+      "campaign_rests": 2,
+      "enemy_phases": 11,
+      "purchases": [
+        {
+          "command": "build",
+          "args": [
+            "market"
+          ],
+          "gold_spent": 60,
+          "crystals_spent": 0
+        },
+        {
+          "command": "build",
+          "args": [
+            "temple"
+          ],
+          "gold_spent": 65,
+          "crystals_spent": 0
+        },
+        {
+          "command": "recruit",
+          "args": [
+            "healer"
+          ],
+          "gold_spent": 45,
+          "crystals_spent": 0
+        },
+        {
+          "command": "recruit",
+          "args": [
+            "sapper"
+          ],
+          "gold_spent": 60,
+          "crystals_spent": 1
+        },
+        {
+          "command": "build",
+          "args": [
+            "mage_tower"
+          ],
+          "gold_spent": 75,
+          "crystals_spent": 2
+        }
+      ],
+      "net_rest_gold": 101,
+      "net_rest_crystals": -0,
+      "spells": [
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        },
+        {
+          "spell": "bolt",
+          "caster": 0,
+          "mana_spent": 2,
+          "healed_hp": 0
+        },
+        {
+          "spell": "heal",
+          "caster": 12,
+          "mana_spent": 3,
+          "healed_hp": 8
+        },
+        {
+          "spell": "heal",
+          "caster": 12,
+          "mana_spent": 3,
+          "healed_hp": 15
+        },
+        {
+          "spell": "heal",
+          "caster": 12,
+          "mana_spent": 3,
+          "healed_hp": 18
+        },
+        {
+          "spell": "heal",
+          "caster": 12,
+          "mana_spent": 3,
+          "healed_hp": 12
+        },
+        {
+          "spell": "heal",
+          "caster": 0,
+          "mana_spent": 3,
+          "healed_hp": 26
+        },
+        {
+          "spell": "heal",
+          "caster": 12,
+          "mana_spent": 3,
+          "healed_hp": 26
+        }
+      ]
+    }
+  ],
+  "battles": [
+    {
+      "command": 33,
+      "stage": 1,
+      "turn": 6,
+      "kind": "intercept",
+      "province": [
+        0,
+        -1
+      ],
+      "rounds": 3,
+      "outcome": "player",
+      "mana": 8,
+      "fallen": []
+    },
+    {
+      "command": 95,
+      "stage": 1,
+      "turn": 8,
+      "kind": "conquest",
+      "province": [
+        1,
+        0
+      ],
+      "rounds": 6,
+      "outcome": "player",
+      "mana": 10,
+      "fallen": []
+    },
+    {
+      "command": 184,
+      "stage": 1,
+      "turn": 9,
+      "kind": "conquest",
+      "province": [
+        2,
+        0
+      ],
+      "rounds": 10,
+      "outcome": "player",
+      "mana": 1,
+      "fallen": [
+        {
+          "id": 2,
+          "kind": "militia"
+        }
+      ]
+    },
+    {
+      "command": 200,
+      "stage": 2,
+      "turn": 1,
+      "kind": "conquest",
+      "province": [
+        -1,
+        0
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 20,
+      "fallen": []
+    },
+    {
+      "command": 212,
+      "stage": 2,
+      "turn": 1,
+      "kind": "conquest",
+      "province": [
+        0,
+        -1
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 20,
+      "fallen": []
+    },
+    {
+      "command": 235,
+      "stage": 2,
+      "turn": 2,
+      "kind": "conquest",
+      "province": [
+        0,
+        0
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 17,
+      "fallen": []
+    },
+    {
+      "command": 264,
+      "stage": 2,
+      "turn": 2,
+      "kind": "conquest",
+      "province": [
+        0,
+        1
+      ],
+      "rounds": 3,
+      "outcome": "player",
+      "mana": 17,
+      "fallen": []
+    },
+    {
+      "command": 302,
+      "stage": 2,
+      "turn": 3,
+      "kind": "conquest",
+      "province": [
+        1,
+        0
+      ],
+      "rounds": 3,
+      "outcome": "player",
+      "mana": 19,
+      "fallen": []
+    },
+    {
+      "command": 350,
+      "stage": 2,
+      "turn": 3,
+      "kind": "intercept",
+      "province": [
+        1,
+        -1
+      ],
+      "rounds": 4,
+      "outcome": "player",
+      "mana": 12,
+      "fallen": []
+    },
+    {
+      "command": 428,
+      "stage": 2,
+      "turn": 4,
+      "kind": "conquest",
+      "province": [
+        2,
+        0
+      ],
+      "rounds": 8,
+      "outcome": "player",
+      "mana": 0,
+      "fallen": []
+    },
+    {
+      "command": 442,
+      "stage": 3,
+      "turn": 1,
+      "kind": "conquest",
+      "province": [
+        -2,
+        1
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 22,
+      "fallen": []
+    },
+    {
+      "command": 452,
+      "stage": 3,
+      "turn": 1,
+      "kind": "conquest",
+      "province": [
+        -1,
+        1
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 22,
+      "fallen": []
+    },
+    {
+      "command": 471,
+      "stage": 3,
+      "turn": 2,
+      "kind": "conquest",
+      "province": [
+        0,
+        1
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 22,
+      "fallen": []
+    },
+    {
+      "command": 496,
+      "stage": 3,
+      "turn": 2,
+      "kind": "conquest",
+      "province": [
+        1,
+        1
+      ],
+      "rounds": 2,
+      "outcome": "player",
+      "mana": 18,
+      "fallen": []
+    },
+    {
+      "command": 556,
+      "stage": 3,
+      "turn": 3,
+      "kind": "conquest",
+      "province": [
+        2,
+        0
+      ],
+      "rounds": 7,
+      "outcome": "player",
+      "mana": 6,
+      "fallen": [
+        {
+          "id": 13,
+          "kind": "sapper"
+        }
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "after_commands": 65,
+      "text": "The R2 Adept attack on the Brigand was adjacent and took five retaliation damage, contrary to its stated intent. Marsh slows movement but gives no forest-style defense. These were director errors, not incorrect game forecasts; future attacks retain their actual public forecast and can assert expected damage/reaction before execution."
+    },
+    {
+      "after_commands": 87,
+      "text": "One requested move was rejected as occupied/out of reach during R5. The recorder retained all preceding successful commands; this continuation resumes that resulting state and does not rewind or replay an alternate history."
+    },
+    {
+      "after_commands": 97,
+      "text": "After the root-directed first 97 commands, economic_depth_design takes delegated agent direction of the T9 Duskspire garrison battle. The historical earned opening used autoplay; this delegated continuation uses explicit player orders, no autoplay, no decision-search simulations, no rewinds and no edited game state. Stop at this battle outcome or an actual retreat."
+    },
+    {
+      "after_commands": 139,
+      "text": "At command 139, the arriving Guard occupied the newly freed (0,1) hex and killed the level-three Militia after the first Guard's attack. I underestimated the overlap of the two melee threats. The death is retained without rewind and limits what this attempt can establish about role balance."
+    },
+    {
+      "after_commands": 182,
+      "text": "The delegated garrison attempt uses explicit public player orders and actual enemy phases only. One level-three Militia was lost to overlapping Guard attacks; the remaining army is preserved. No resources, state fields, or failed commands were rewound."
+    },
+    {
+      "after_commands": 183,
+      "text": "The delegated capital battle (commands 98–183) won in round 10 with one actual Militia casualty and one mana remaining. Root now accepts the earned result. No battle rewinds, autoplay or replacement funding occurred. This directed first-shard continuation still began from the retained historical autoplay opening."
+    },
+    {
+      "after_commands": 184,
+      "text": "Continue the same earned Control journey through Foundries, matching the proposed army plan's middle contract. Carry the paid Adept and Skyrider in visible roster order, plus the two owned relics. This preserves expensive specialist roles while leaving the surviving Sapper and Acolyte as the liberated shard's garrison; their replacements must be paid from the new expedition's real funds."
+    },
+    {
+      "after_commands": 185,
+      "text": "Delegated agent economic_depth_design begins the Foundries segment at command 186, following root's command 185 departure selection. This segment preserves the earned carryover and uses explicit public commands and actual enemy phases only, with no autoplay, search branches, state edits, rewinds or rerolls. Stop at the first stage-two departure or terminal defeat, with a thirty-campaign-turn development bound."
+    },
+    {
+      "after_commands": 254,
+      "text": "The South Foundry round-two Sapper move to (2,-3) was rejected after four preceding moves had persisted. I reused the earlier reachability list even though the Skyrider and Adept now blocked the path. The journey resumes the resulting state without rewind; inspect new paths before the replacement order."
+    },
+    {
+      "after_commands": 428,
+      "text": "Root confirmed the unmodified saved Foundries departure at command428: seven victories, no stage-two casualties, no rewind, no pending reward. Continue the originally selected Control plan through Break the Throne, carrying the earned Adept and Skyrider plus Moonstone and Oak Standard. This is the ordinary rout finale; it does not cover the alternate Gate deadline."
+    },
+    {
+      "after_commands": 429,
+      "text": "Delegated agent economic_depth_design begins the final Throne segment at command 430 after root's command 429 departure selection. Use the earned Adept and Skyrider carryover, explicit public commands and actual enemy phases only. No autoplay, search branches, saved-field edits, rewinds or rerolls. Stop at completed campaign or actual defeat, with a thirty-campaign-turn development bound."
+    },
+    {
+      "after_commands": 524,
+      "text": "Capital round-two error at command 524: I moved Sapper 13 out of forest to add four damage, but failed to account for two Guards selecting its lower HP before the northern Wolf's hit. The real 10+10+4 sequence killed it. This is an agent tactical mistake, retained without rewind or replacement; the remaining army continues the actual final battle."
+    }
+  ],
+  "scope": "Agent-directed continuation from the retained historical turn-6 autoplay opening. Stage command counts attribute each advance to its departure stage. No human, alternate-route, recovery, balance or release-readiness claim."
+}

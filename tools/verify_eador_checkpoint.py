@@ -13,17 +13,19 @@ from eador.campaign_scene import CampaignScene
 from eador.model import State
 from eador.persistence import AUTO_SLOTS, CampaignSaves
 from eador.scene import ShardScene
+from tools.cpu_budget import CpuBudget
 from tools.eador_linked_campaign import lose_shard, play_stage
 from tools.eador_ui import PlayerInput
 
 
-def verify(output, *, backend='pyglet', recovery=False):
+def verify(output, *, backend='pyglet', recovery=False, budget=None):
     """Prepare an earned transition, retain damaged autosaves, and follow the manual-save remedy."""
+    budget = CpuBudget(25) if budget is None else budget
     state = State.new_campaign()
     if recovery:
-        lose_shard(state)
+        lose_shard(state, budget=budget)
     else:
-        state = play_stage(state)
+        state = play_stage(state, budget=budget)
     phase = state.campaign.phase
     with TemporaryDirectory(prefix='shardbound-checkpoint-') as directory:
         save_dir = Path(directory) / 'saves'
@@ -32,6 +34,7 @@ def verify(output, *, backend='pyglet', recovery=False):
         try:
             saves = CampaignSaves(game.save_manager)
             for _ in AUTO_SLOTS:
+                budget.checkpoint()
                 saves.autosave(state)
             paths = list(save_dir.glob('*.json'))
             assert len(paths) == len(AUTO_SLOTS)
@@ -48,6 +51,7 @@ def verify(output, *, backend='pyglet', recovery=False):
             assert isinstance(game.scene, CampaignScene) and state.to_json() == before
             assert game.scene.troop_ids == selected and 'Autosave failed' in game.scene.message
             player.capture(phase + '-blocked')
+            budget.checkpoint()
             player.press('f5')
             player.press('return')
             assert isinstance(game.scene, ShardScene) and state.campaign.phase == 'playing'
@@ -55,16 +59,27 @@ def verify(output, *, backend='pyglet', recovery=False):
             assert 'Arrived.' in game.scene.message
             assert all(path.read_bytes() == b'Damaged autosave' for path in paths)
             player.capture(phase + '-arrival')
+            budget.checkpoint()
             player.press('f9')
             assert isinstance(game.scene, CampaignScene) and player.state.to_json() == before
             print(f'{phase.title()} checkpoint refusal, manual remedy and exact reload passed ({backend})')
         finally:
-            game._teardown()
+            game.close()
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-checkpoints'))
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    for recovery in (False, True):
+        verify(args.output, recovery=recovery, budget=budget)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-checkpoints'))
-    args = parser.parse_args()
-    for recovery in (False, True):
-        verify(args.output, recovery=recovery)
+    main()

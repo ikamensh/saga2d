@@ -1,6 +1,7 @@
 """Check shared reading size through native Guide/Settings input and restart."""
 
 import argparse
+from functools import partial
 import json
 import os
 import sys
@@ -15,6 +16,7 @@ from eador.app import create_game
 from eador.encounter_scene import EncounterScene
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, HelpScene, ShardScene, TitleScene
+from tools.cpu_budget import CpuBudget
 from tools.eador_ui import PlayerInput
 
 
@@ -33,11 +35,11 @@ def check_reading_layout(scene):
     return len(labels)
 
 
-def prepared_briefings():
+def prepared_briefings(*, budget=None):
     """Actual paid routes plus retreat checkpoints; no injected units, prices or wounds."""
     from eador.model import State, UNITS
     from tools.eador_campaign import finish_battle, march_to, rest
-    from tools.eador_extraction_campaign import prepare_adventure
+    from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure
     from tools.eador_explorer_campaign import prepare_explorer
     from tools.eador_hunt_campaign import prepare_pack_hunt
     from tools.eador_observatory_campaign import prepare_observatory
@@ -48,58 +50,65 @@ def prepared_briefings():
     from tools.eador_relief_campaign import prepare_relief
     from tools.eador_causeway_campaign import prepare_causeway, causeway_failed_attempt
 
-    cases = [('relief', prepare_relief(), None), ('causeway', prepare_causeway(), None),
-             ('crossing', prepare_adventure(), None),
-             ('cache', prepare_adventure(theme='elderwild'), None),
-             ('vault', prepare_vault(), None), ('hunt', prepare_pack_hunt(), None),
-             ('observatory', prepare_observatory(), None),
-             ('aerie', prepare_aerie(), None),
-             ('aerie-scout', prepare_aerie('Scout', party='ground'), None),
-             ('screen-commander', prepare_screen(), None),
-             ('screen-scout', prepare_screen('Scout'), None),
-             ('explorer-ranger', prepare_explorer(), None),
-             ('explorer-acolyte', prepare_explorer('Warrior', support='healer'), None),
-             ('explorer-alone', prepare_explorer('Scout', support=None), None)]
+    budget = CpuBudget(25) if budget is None else budget
+    orders = partial(AdventureOrders, budget=budget)
+    cases = [('relief', prepare_relief(budget=budget), None), ('causeway', prepare_causeway(budget=budget), None),
+             ('crossing', prepare_adventure(budget=budget), None),
+             ('cache', prepare_adventure(theme='elderwild', budget=budget), None),
+             ('vault', prepare_vault(budget=budget), None), ('hunt', prepare_pack_hunt(budget=budget), None),
+             ('observatory', prepare_observatory(budget=budget), None),
+             ('aerie', prepare_aerie(budget=budget), None),
+             ('aerie-scout', prepare_aerie('Scout', party='ground', budget=budget), None),
+             ('screen-commander', prepare_screen(budget=budget), None),
+             ('screen-scout', prepare_screen('Scout', budget=budget), None),
+             ('explorer-ranger', prepare_explorer(budget=budget), None),
+             ('explorer-acolyte', prepare_explorer('Warrior', support='healer', budget=budget), None),
+             ('explorer-alone', prepare_explorer('Scout', support=None, budget=budget), None)]
     watch = State.new(7)
-    watch.build('barracks'); watch.recruit('pikeman'); watch.explore(); finish_battle(watch)
+    watch.build('barracks'); watch.recruit('pikeman'); watch.explore(); finish_battle(watch, budget=budget)
     for pos in ((-1, -1), (0, -2)):
-        march_to(watch, pos); rest(watch)
+        march_to(watch, pos, budget=budget); rest(watch, budget=budget)
     cases.append(('watch', watch, None))
-    gate = prepare_relic_gate('porter_rune')
+    gate = prepare_relic_gate('porter_rune', budget=budget)
     gate.retreat()
     cases.append(('gate-retry', gate, (2, 0)))
-    wounded = prepare_observatory()
+    wounded = prepare_observatory(budget=budget)
     wounded.explore(approach='clear'); wounded.battle.auto_turn(); wounded.retreat()
+    budget.checkpoint()
     province = wounded.provinces[wounded.hero.pos]
     assert 0 < sum(province.site_guard_hp) < sum(UNITS[kind].hp for kind in province.site_guards)
     cases.append(('observatory-wounded', wounded, None))
-    screened = prepare_screen()
+    screened = prepare_screen(budget=budget)
     screened.explore(approach='western'); screened.battle.auto_turn(); screened.retreat()
+    budget.checkpoint()
     cases.append(('screen-wounded', screened, None))
-    aerie = aerie_failed_sortie(prepare_aerie()).state
+    aerie = aerie_failed_sortie(prepare_aerie(budget=budget), orders_type=orders).state
     aerie.resolve_battle()
     cases.append(('aerie-wounded', aerie, None))
-    causeway = causeway_failed_attempt(prepare_causeway()).state
+    causeway = causeway_failed_attempt(prepare_causeway(budget=budget), orders_type=orders).state
     causeway.resolve_battle()
     cases.append(('causeway-wounded', causeway, None))
-    poor = prepare_adventure()
+    poor = prepare_adventure(budget=budget)
     poor.build('archery'); poor.build('market'); poor.recruit('ranger')
     poor.explore(approach='guided'); poor.retreat()
     assert poor.actions_left and poor.gold < poor.adventure_approaches()[1].gold_cost
     cases.append(('crossing-fee-blocked', poor, None))
+    budget.checkpoint()
     return [(name, state.to_json(), destination) for name, state, destination in cases]
 
 
-def verify_briefing_matrix(game, *, native=False, output=None):
+def verify_briefing_matrix(game, *, native=False, output=None, budget=None):
     """Review every current authored approach at both sizes without spending its entry cost."""
     from eador.model import State
 
-    cases = prepared_briefings()
+    budget = CpuBudget(25) if budget is None else budget
+    cases = prepared_briefings(budget=budget)
     player = PlayerInput(game, native=native, output=output)
     metrics = []
     for size in ((1280, 720), (1280, 800), (1920, 1080)):
         game.set_window_size(size)
         for name, snapshot, destination in cases:
+            budget.checkpoint()
             state = State.from_json(snapshot)
             before = state.to_json()
             game.clear_and_push(ShardScene(state))
@@ -114,6 +123,7 @@ def verify_briefing_matrix(game, *, native=False, output=None):
                 player.press('left' if percent == 100 else 'right')
                 player.button('Apply')
                 for index in range(max(1, len(game.scene.approaches))):
+                    budget.checkpoint()
                     if game.scene.approaches:
                         if percent == 100:
                             player.press(str(index + 1))
@@ -139,7 +149,8 @@ def verify_briefing_matrix(game, *, native=False, output=None):
     return metrics
 
 
-def verify(output, *, matrix=False):
+def verify(output, *, matrix=False, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='eador-guidance-') as directory:
         saves = Path(directory) / 'saves'
@@ -165,6 +176,7 @@ def verify(output, *, matrix=False):
                 player.press(key)
             assert reading_scale(game) == 125
             for size in ((1280, 720), (1280, 800), (1920, 1080)):
+                budget.checkpoint()
                 game.set_window_size(size)
                 game.tick(1 / 60)
                 metrics.append(dict(screen='guide', window=game.window_size,
@@ -176,7 +188,7 @@ def verify(output, *, matrix=False):
             player.press('escape')
             assert isinstance(game.scene, HelpScene) and player.state.to_json() == saved
             from tools.eador_observatory_campaign import prepare_observatory
-            state = prepare_observatory()
+            state = prepare_observatory(budget=budget)
             before = state.to_json()
             game.clear_and_push(ShardScene(state))
             player.press('x')
@@ -184,6 +196,7 @@ def verify(output, *, matrix=False):
             assert isinstance(game.scene, EncounterScene)
             approach, definition = game.scene.approach, game.scene.definition
             for size in ((1280, 720), (1280, 800), (1920, 1080)):
+                budget.checkpoint()
                 game.set_window_size(size)
                 game.tick(1 / 60)
                 metrics.append(dict(screen='observatory-clear-briefing', window=game.window_size,
@@ -199,12 +212,12 @@ def verify(output, *, matrix=False):
             assert state.battle.terrain == dict(definition.terrain)
             player.reload(state.to_json())
             if matrix:
-                metrics.extend(verify_briefing_matrix(game, native=True, output=output / 'matrix'))
+                metrics.extend(verify_briefing_matrix(game, native=True, output=output / 'matrix', budget=budget))
         finally:
-            game._teardown()
-            game.backend.quit()
+            game.close()
         game = create_game(visible=False, save_dir=saves)
         try:
+            budget.checkpoint()
             from eador.model import State
             game.push(ShardScene(State.from_json(saved)))
             player = PlayerInput(game, native=True, output=output)
@@ -213,15 +226,24 @@ def verify(output, *, matrix=False):
             check_reading_layout(game.scene)
             player.capture('guide-restarted-125')
         finally:
-            game._teardown()
-            game.backend.quit()
+            game.close()
     (output / 'matrix.json').write_text(json.dumps(metrics, indent=2) + '\n')
     print(f'Native guidance preview, Cancel, Apply, resize and restart passed: {output}')
 
 
-if __name__ == '__main__':
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-guidance'))
     parser.add_argument('--matrix', action='store_true', help='review every current paid approach at both sizes')
-    args = parser.parse_args()
-    verify(args.output, matrix=args.matrix)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.output, matrix=args.matrix, budget=budget)
+
+
+if __name__ == '__main__':
+    main()

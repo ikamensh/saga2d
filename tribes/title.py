@@ -15,6 +15,7 @@ from saga2d import Anchor, Button, Camera, Column, Label, Row, Scene
 from tribes import mapgen
 from tribes.effects import play_sound
 from tribes.rules import TRIBES
+from tribes.score_scene import HighScoresScene
 from tribes.scene import HelpScene, load_game, new_game
 from tribes.style import ACTION_BUTTON, GHOST_BUTTON, MENU_BUTTON, OVERLAY_STYLE
 from tribes.textures import FOG, TILE
@@ -61,13 +62,15 @@ class TitleScene(Scene):
     def _build_menu(self) -> None:
         has_save = self.game.save_manager.load(1) is not None
         menu = Column(spacing=10, anchor=Anchor.CENTER, margin=0)
-        menu.add(Label("", height=150))  # leaves room for the title drawn above
+        self._title_space = Label("", height=190)
+        menu.add(self._title_space)
         menu.add(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=300))
         cont = Button("Continue", hotkey="C", on_click=self.continue_game, style=MENU_BUTTON, width=300)
         cont.enabled = has_save
         menu.add(cont)
         menu.add(Button("Multiplayer", shortcut="M", on_click=self.multiplayer, style=MENU_BUTTON, width=300))
         menu.add(Button("How to play", hotkey="H", on_click=self.how_to_play, style=MENU_BUTTON, width=300))
+        menu.add(Button("High scores", shortcut="L", on_click=self.high_scores, style=MENU_BUTTON, width=300))
         menu.add(Button("Quit", hotkey="Q", on_click=self.quit, style=MENU_BUTTON, width=300))
         menu.add(Label("Continue resumes save slot 1" if has_save else "No saved game yet — F5 saves during play", text_style="caption"))
         self.ui.add(menu)
@@ -80,7 +83,7 @@ class TitleScene(Scene):
     def draw(self) -> None:
         w, h = self.game.resolution
         self.draw_rect(0, 0, w, h, (10, 12, 22, 150))
-        cy = h / 2 - 185
+        cy = self._title_space.bounds[1] + 75
         glow = 0.5 + 0.5 * math.sin(self.time * 1.6)
         for spread, alpha in ((3, 40), (2, 70)):
             self.draw_text("TRIBES", w / 2 + spread, cy + spread, style="hero", color=(0, 0, 0, alpha + int(20 * glow)), anchor_x="center", anchor_y="center")
@@ -113,6 +116,10 @@ class TitleScene(Scene):
     def how_to_play(self) -> None:
         self.sfx("button")
         self.game.push(HelpScene())
+
+    def high_scores(self) -> None:
+        self.sfx("button")
+        self.game.push(HighScoresScene(size=self.size, tribes=self.tribes))
 
     def quit(self) -> None:
         self.game.quit()

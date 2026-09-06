@@ -814,3 +814,31 @@ families, meaningful economy and pacing, oversized errors in remaining review
 screens, candidate stress, platform verification and human feedback remain active.
 The fresh Mac development package at `56f1ffb` passes isolated extracted and
 LaunchServices smoke checks. Earlier artifacts retain their original attribution.
+
+## Directed Control completion and bounded verification — 2026-09-06
+
+The Control continuation now reaches the three-shard ending through 556 explicit
+saved commands. Its historical opening used autoplay; the directed journal
+starts at first-shard turn 6. Fifteen subsequent battles include two retained
+troop deaths and actual paid replacements, buildings, mana and recovery. The
+Foundries and Throne finish at turns 4 and 3. This supplies one complete directed
+continuation, not matched evidence for every army plan or optimal balance.
+
+At `75c2b60`, the framework cleanup change passes 280 integration tests and an
+independent two-session native shutdown example. All 556 original commands
+replay exactly through the changed framework. The native run then verifies 556
+command/save/reload joins through 2,403 inputs in 193.74 seconds, averaging
+25.24% of one CPU core. The [retained original journal, replay and screenshots](evidence/directed-control-complete-718afc9/README.md)
+separate the historical opening, deterministic replay and actual native input.
+
+Screenshot review exposed a missing reminder of the shard's contract requirement.
+At `325c5c5`, the map displays the complete existing objective and ending records
+use singular casualty copy correctly. [Focused tests and native saved cases](evidence/contract-objective-325c5c5/README.md)
+cover five contracts in tests and three native presentation cases at larger text.
+The earlier full journey remains attributed to its original source.
+
+Game play remains capped at 60 FPS active / 15 inactive, native test input at
+30 FPS, and long development tools target 25% of one core. Expensive owned jobs
+run serially and have exited. Cancelled large matrices and soak were not restarted.
+G01–G19 remain incomplete; matched build comparisons, content depth, current
+candidate stress, platform checks and independent human feedback remain work.

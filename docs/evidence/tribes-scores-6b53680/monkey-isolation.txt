@@ -1,0 +1,2 @@
+AI games: 0 played, 0 failed, outcomes {}
+monkey runs: 2 played, 0 failed

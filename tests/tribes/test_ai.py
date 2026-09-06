@@ -7,7 +7,7 @@ import pytest
 
 from tribes import ai, mapgen
 from tribes.model import Tile, World
-from tribes.rules import MAX_ROUNDS, Terrain, UnitType
+from tribes.rules import MAX_ROUNDS, Resource, Tech, Terrain, UnitType
 
 
 def flat_world(size: int = 10, tribes: int = 2) -> World:
@@ -46,6 +46,78 @@ def test_ai_stops_acting_once_it_has_won() -> None:
     world.spawn_unit(0, UnitType.WARRIOR, (8, 8))  # standing on the enemy capital
     world.spawn_unit(0, UnitType.WARRIOR, (4, 4))
     ai.take_turn(world, 0, random.Random(1))
+    assert world.winner == 0
+
+
+def test_surrounded_ai_without_an_army_surrenders_its_occupied_cities() -> None:
+    """An armyless AI cannot recruit under occupation, even with a full treasury."""
+    world = flat_world()
+    city = world.capital_of(0)
+    world.spawn_unit(1, UnitType.WARRIOR, city.pos)
+    world.tribes[0].stars = 100
+
+    ai.take_turn(world, 0, random.Random(1))
+
+    assert not world.tribes[0].alive
+    assert city.tribe == 1
+    assert world.winner == 1
+    assert any("surrendered" in line for line in world.log)
+    assert World.from_dict(world.to_dict()).tribes[0].surrendered
+    check_invariants(world)
+
+
+@pytest.mark.parametrize("round_number,stars,army,occupied", [
+    (1, 0, False, False),  # future income funds a recovery
+    (MAX_ROUNDS, 2, False, False),  # can recruit now
+    (MAX_ROUNDS, 1, False, False),  # a solvent empire can still win on score
+    (1, 0, True, True),  # surviving army can liberate the city
+])
+def test_ai_keeps_playing_when_it_can_fight_or_rebuild(round_number, stars, army, occupied) -> None:
+    """Lack of cash alone is not defeat; remaining income and troops matter."""
+    world = flat_world()
+    world.round = round_number
+    world.tribes[0].stars = stars
+    city = world.capital_of(0)
+    if occupied:
+        world.spawn_unit(1, UnitType.WARRIOR, city.pos)
+    if army:
+        world.spawn_unit(0, UnitType.WARRIOR, (4, 4))
+
+    ai.take_turn(world, 0, random.Random(1))
+
+    assert not world.tribes[0].surrendered
+    assert world.tribes[0].alive
+    check_invariants(world)
+
+
+def test_armyless_ai_uses_city_rewards_to_recover_before_conceding() -> None:
+    """An affordable harvest can unlock recruitment cash even on the final round."""
+    world = flat_world()
+    world.round = MAX_ROUNDS
+    tribe = world.tribes[0]
+    tribe.stars = 1
+    tribe.techs.update((Tech.CONSTRUCTION, Tech.HUNTING))
+    city = world.capital_of(0)
+    city.level, city.population = 2, 2
+    world.tile((1, 2)).resource = Resource.GAME
+
+    ai.take_turn(world, 0, random.Random(1))
+
+    assert tribe.alive and not tribe.surrendered
+    assert world.tribe_units(0)
+    check_invariants(world)
+
+
+def test_cash_shortage_on_the_final_round_does_not_forfeit_a_score_victory() -> None:
+    """The round limit already ends play; a leading empire should not concede for lack of cash."""
+    world = flat_world()
+    world.round = MAX_ROUNDS
+    world.tribes[0].stars = 1
+    world.tribes[0].techs.update(Tech)
+
+    ai.take_turn(world, 0, random.Random(1))
+    assert world.tribes[0].alive
+    ai.take_turn(world, 1, random.Random(1))
     assert world.winner == 0
 
 
