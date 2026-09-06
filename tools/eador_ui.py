@@ -3,6 +3,8 @@
 The same driver works against mock input and native pyglet event dispatch. Reads
 come from the current saved game; every changing command goes through its UI.
 """
+import time
+
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HeroScene, ResultScene, ShardScene
 from eador.encounter_scene import EncounterScene
 from saga2d import Button
@@ -12,10 +14,20 @@ class PlayerInput:
     def __init__(self, game, *, native=False, output=None, finish_actions=True):
         self.game, self.native, self.output = game, native, output
         self.finish_actions = finish_actions
+        self._next_tick = 0.0
         self.events = []
         self.briefings = []
         self.reloads = 0
         self.state = PlayerState(self)
+
+    def _tick(self):
+        """Pace native rendering at 30 FPS; retain the fixed simulation step in every backend."""
+        if self.native:
+            remaining = self._next_tick - time.monotonic()
+            if remaining > 0:
+                time.sleep(remaining)
+            self._next_tick = time.monotonic() + 1 / 30
+        self.game.tick(1 / 60)
 
     @property
     def root(self):
@@ -31,7 +43,7 @@ class PlayerInput:
         else:
             self.game.backend.inject_key(name)
             self.game.backend.inject_key(name, type='key_release')
-        self.game.tick(1 / 60)
+        self._tick()
         if self.finish_actions:
             self.finish_playback()
 
@@ -48,7 +60,7 @@ class PlayerInput:
         else:
             self.game.backend.inject_click(round(x), round(y))
             self.game.backend.inject_release(round(x), round(y))
-        self.game.tick(1 / 60)
+        self._tick()
         if self.finish_actions:
             self.finish_playback()
 
@@ -62,7 +74,7 @@ class PlayerInput:
 
     def capture(self, name, *, settle=True):
         for _ in range(110 if settle and isinstance(self.game.scene, BattleScene) else 1):
-            self.game.tick(1 / 60)
+            self._tick()
         if self.native and self.output is not None:
             self.output.mkdir(parents=True, exist_ok=True)
             self.game.backend.capture_frame().save(self.output / f'{name}.png')

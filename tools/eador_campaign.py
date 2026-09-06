@@ -23,13 +23,15 @@ class CampaignMetrics:
     building_gold: int = 0
 
 
-def finish_battle(state, metrics=None):
+def finish_battle(state, metrics=None, *, budget=None):
     """Resolve real tactics; measure net battle wounds before advancement can heal."""
     metrics = metrics or CampaignMetrics()
     battle = state.battle
     before = {u.id: u.hp for u in battle.units if u.team == 'player'}
     mana = battle.mana
     for _ in range(80):
+        if budget:
+            budget.checkpoint()
         if battle.outcome:
             break
         battle.auto_turn()
@@ -69,27 +71,31 @@ def provision_army(state, metrics=None):
         state.equip(battle_relic)
 
 
-def march_to(state, destination, metrics=None):
+def march_to(state, destination, metrics=None, *, budget=None):
     """Follow a route, resolving real encounters and refilling actions when needed."""
     metrics = metrics or CampaignMetrics()
     for _ in range(24):
+        if budget:
+            budget.checkpoint()
         if state.hero.pos == destination or state.status != 'playing':
             return
         if not state.actions_left:
-            rest(state, defend=False, metrics=metrics)
+            rest(state, defend=False, metrics=metrics, budget=budget)
             if state.status != 'playing':
                 return
         state.travel(state.grid.path(state.hero.pos, destination)[1])
         if state.battle:
-            finish_battle(state, metrics)
+            finish_battle(state, metrics, budget=budget)
     raise AssertionError('The army could not reach its destination.')
 
 
-def rest(state, defend=True, metrics=None):
+def rest(state, defend=True, metrics=None, *, budget=None):
     """A visible approaching army calls for interception before another leisurely rest."""
     metrics = metrics or CampaignMetrics()
+    if budget:
+        budget.checkpoint()
     if defend and state.rival.army and state.grid.distance(state.rival.pos, (-2, 0)) <= 2:
-        march_to(state, state.rival.pos, metrics)
+        march_to(state, state.rival.pos, metrics, budget=budget)
     if state.status == 'playing':
         before = {t.id: t.hp for t in state.hero.army}
         hero_hp, mana = state.hero.hp, state.hero.mana
@@ -99,10 +105,10 @@ def rest(state, defend=True, metrics=None):
             max(0, t.hp - before[t.id]) for t in state.hero.army)
         metrics.mana_recovered += state.hero.mana - mana
         if state.battle:
-            finish_battle(state, metrics)
+            finish_battle(state, metrics, budget=budget)
 
 
-def play_campaign(state, route=None, metrics=None, *, reload_state=State.from_json):
+def play_campaign(state, route=None, metrics=None, *, reload_state=State.from_json, budget=None):
     """Explore and invest along a route that includes both capitals, then try to win."""
     metrics = metrics or CampaignMetrics()
     if 'barracks' not in state.buildings:
@@ -113,28 +119,32 @@ def play_campaign(state, route=None, metrics=None, *, reload_state=State.from_js
         state.recruit('swordsman')
         metrics.recruitment_gold += before - state.gold
     for province in (route or state.grid.path(state.hero.pos, (2, 0)))[:-1]:
+        if budget:
+            budget.checkpoint()
         if state.status != 'playing':
             return state
         if province != state.hero.pos:
-            march_to(state, province, metrics)
+            march_to(state, province, metrics, budget=budget)
             if state.status != 'playing':
                 return state
-            rest(state, metrics=metrics)
+            rest(state, metrics=metrics, budget=budget)
             provision_army(state, metrics)
-        march_to(state, province, metrics)
+        march_to(state, province, metrics, budget=budget)
         if state.status != 'playing':
             return state
         if not state.provinces[province].explored:
             if not state.actions_left:
-                rest(state, metrics=metrics)
-                march_to(state, province, metrics)
+                rest(state, metrics=metrics, budget=budget)
+                march_to(state, province, metrics, budget=budget)
             if state.status != 'playing':
                 return state
             state.explore()
-            finish_battle(state, metrics)
-        rest(state, metrics=metrics)
+            finish_battle(state, metrics, budget=budget)
+        rest(state, metrics=metrics, budget=budget)
         provision_army(state, metrics)
     for _ in range(24):
+        if budget:
+            budget.checkpoint()
         if state.status != 'playing':
             break
         provision_army(state, metrics)
@@ -142,16 +152,16 @@ def play_campaign(state, route=None, metrics=None, *, reload_state=State.from_js
                              [troop.max_hp - troop.hp for troop in state.hero.army])
         if missing_health > 6 or state.hero.mana < state.hero.max_mana - 4:
             metrics.recovery_turns += 1
-            rest(state, metrics=metrics)
+            rest(state, metrics=metrics, budget=budget)
             continue
         state.travel(state.grid.path(state.hero.pos, (2, 0))[1])
         if state.battle:
-            finish_battle(state, metrics)
+            finish_battle(state, metrics, budget=budget)
         assert len({t.id for t in state.hero.army}) == len(state.hero.army)
         assert all(0 < t.hp <= t.max_hp for t in state.hero.army)
         assert 0 < state.hero.hp <= state.hero.max_hp
         assert 0 <= state.hero.mana <= state.hero.max_mana
         state = reload_state(state.to_json())
         if state.status == 'playing':
-            rest(state, metrics=metrics)
+            rest(state, metrics=metrics, budget=budget)
     return state

@@ -33,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from saga2d import Button# noqa: E402
 
+from tools.cpu_budget import CpuBudget  # noqa: E402
 from eador.app import create_game# noqa: E402
 from eador.battle_playback_scene import BattlePlaybackScene
 from eador.diagnostics import DiagnosticScene
@@ -194,7 +195,7 @@ def replacement_order(state: State, outgoing_id: int, kind: str, metrics: Counte
     return outgoing_id
 
 
-def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = False) -> None:
+def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = False, budget: CpuBudget | None = None) -> None:
     """Random commands include rejections, which must leave the save unchanged."""
     rng = random.Random(seed)
     theme = tuple(THEMES)[seed % len(THEMES)]
@@ -205,7 +206,7 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
         # short random prefixes alone almost never discover a departure.
         from tools.eador_linked_campaign import play_stage, travel_selection
         for _ in range(seed % 3):
-            state = play_stage(state)
+            state = play_stage(state, budget=budget)
             assert state.campaign.phase == 'departure', 'linked setup did not win its prior shard'
             state.advance(state.campaign.offers[(seed // 3) % 2].id, **travel_selection(state))
             metrics['setup_completed_shards'] += 1
@@ -214,6 +215,8 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
     metrics[f'campaign_theme.{theme}'] += 1
     retired_ids = set()
     for _ in range(steps):
+        if budget:
+            budget.checkpoint()
         check_state(state)
         metrics['state_checks'] += 1
         assert not retired_ids.intersection(t.id for t in state.hero.army), 'retired troop reappeared on the shard'
@@ -372,6 +375,8 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
     # A bounded random prefix is not a completed campaign. Finish every case
     # through public commands, recording these forced actions separately.
     for _ in range(160):
+        if budget:
+            budget.checkpoint()
         check_state(state)
         metrics['state_checks'] += 1
         if state.choice:
@@ -410,7 +415,7 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
         raise AssertionError(f'seed {seed}: campaign did not end after 160 cleanup commands')
 
 
-def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = None) -> None:
+def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = None, budget: CpuBudget | None = None) -> None:
     """Mix purposeful input with random clicks/keys, checking each rendered tick."""
     rng = random.Random(seed)
     with tempfile.TemporaryDirectory(prefix='shardbound-fuzz-') as save_dir:
@@ -429,6 +434,8 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
             return next((s for s in game.scenes if isinstance(s, ShardScene)), None)
 
         def tick():
+            if budget:
+                budget.checkpoint()
             game.tick(1 / 60)
             metrics['input_ticks'] += 1
             playback = [s for s in game.scenes if isinstance(s, BattlePlaybackScene)]
@@ -812,8 +819,14 @@ def main() -> None:
     parser.add_argument('--campaigns', type=int, help='model runs; defaults to --seeds')
     parser.add_argument('--scenes', type=int, help='scene runs; defaults to --seeds')
     parser.add_argument('--events', type=int, help='minimum total random input activations, excluding setup/cleanup/releases')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     parser.add_argument('--report', type=Path, help='write actual metrics and run metadata to JSON')
     args = parser.parse_args()
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     if args.seeds < 1 or args.steps < 1:
         parser.error('--seeds and --steps must be positive')
     campaign_count = args.seeds if args.campaigns is None else args.campaigns
@@ -828,14 +841,14 @@ def main() -> None:
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=project, text=True).splitlines()
     source_files = [*project.joinpath('eador').glob('*.py'), *project.joinpath('saga2d').rglob('*.py'), Path(__file__).resolve(),
-                    project / 'tools/eador_campaign.py', project / 'tools/eador_linked_campaign.py']
+                    project / 'tools/eador_campaign.py', project / 'tools/eador_linked_campaign.py', project / 'tools/cpu_budget.py']
     source_hashes = {str(path.relative_to(project)): hashlib.sha256(path.read_bytes()).hexdigest()
                      for path in sorted(source_files)}
     for index, seed in enumerate(range(args.seed, args.seed + campaign_count)):
         if index % 25 == 0 or index + 1 == campaign_count:
             print(f'Campaign seed {seed} ({index + 1}/{campaign_count})', flush=True)
         try:
-            campaign_run(seed, args.steps, campaigns, linked=args.linked)
+            campaign_run(seed, args.steps, campaigns, linked=args.linked, budget=budget)
         finally:
             if sys.exc_info()[0] is not None:
                 print(f'Failed campaign seed {seed}', file=sys.stderr, flush=True)
@@ -843,7 +856,8 @@ def main() -> None:
     for index, seed in enumerate(range(args.seed, args.seed + scene_count)):
         print(f'Scene seed {seed} ({index + 1}/{scene_count})', flush=True)
         scene_run(seed, args.steps, scenes,
-                  events=math.ceil(args.events / scene_count) if args.events is not None else None)
+                  events=math.ceil(args.events / scene_count) if args.events is not None else None, budget=budget)
+    budget.checkpoint()
     print(f'Campaign metrics: {dict(sorted(campaigns.items()))}')
     print(f'Scene metrics: {dict(sorted(scenes.items()))}')
     elapsed = time.perf_counter() - started
@@ -852,7 +866,7 @@ def main() -> None:
         report = {'revision': revision, 'linked': args.linked, 'dirty_at_start': dirty, 'seed': args.seed, 'campaigns': campaign_count,
                   'scenes': scene_count, 'steps': args.steps, 'requested_random_events': args.events,
                   'platform': platform.platform(), 'machine': platform.machine(), 'python': platform.python_version(),
-                  'elapsed_seconds': elapsed, 'campaign_seconds': campaign_seconds,
+                  'elapsed_seconds': elapsed, 'campaign_seconds': campaign_seconds, 'cpu_percent': args.cpu_percent,
                   'campaign_metrics': dict(campaigns), 'scene_metrics': dict(scenes), 'source_sha256': source_hashes,
                   'replacement_policy': 'Half of camp replacement samples seek an available role; others include invalid identities/kinds. '
                                         'Ordinary recruitment remains separate. Last-action next-turn probes are copies, not live-policy turns.',
