@@ -79,6 +79,10 @@ def inspect_briefing(player):
         guards = player.state.provinces[player.state.hero.pos].site_guards
         assert ('one Smoke charge' in text) == ('sapper' in guards)
         assert ('Warden swaps' in text) == ('warden' in guards)
+        if 'guard' not in guards:
+            assert 'southern Guard' not in text
+        if guards.count('archer') < 2:
+            assert 'northern bowmen' not in text
         if 'sapper' in guards:
             assert 'both sides' in text
         assert 'Defeated guards stay defeated' in text

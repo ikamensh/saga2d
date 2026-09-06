@@ -4,7 +4,7 @@ from collections import Counter
 
 from saga2d import Anchor, Button, Column, Component, HexGrid, Label, Row
 from eador import art
-from eador.content import RELICS
+from eador.content import RELICS, SITES
 from eador.encounters import ENCOUNTERS
 from eador.model import UNITS
 from eador.preferences import reading_scale
@@ -82,7 +82,10 @@ class EncounterScene(Screen):
                                    on_click=lambda index=index: self.choose_approach(index),
                                    style=PRIMARY if index == self.approach_index else None)
                              for index, approach in enumerate(self.approaches)), spacing=20))
-            top.append(label(self.approach.description, color=GOLD))
+            description = self.approach.description
+            if p.site_kind == 'smuggler_screen' and Counter(self.guards) != Counter(SITES[p.site_kind].guards):
+                description = f'Free. {self.approach.title} against the surviving defenders shown below.'
+            top.append(label(description, color=GOLD))
 
         left_width, right_width = 640, 392
         orders = Column(
