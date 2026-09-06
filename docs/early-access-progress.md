@@ -24,17 +24,18 @@ their actual source fingerprints rather than being relabeled as package tests.
 
 The extracted frozen app and macOS app-launch smoke pass with isolated saves,
 settings restart and all shipping audio assets. Seven package screenshots were
-inspected. Full packaged-campaign play, tactical/HUD scaling, the remaining two
+inspected. Full packaged-campaign play, the remaining two
 authored families, meaningful recurring economic choices, human/listening
 feedback, Windows/clean-account execution and candidate-specific stress remain
-open. Newer source adds measured tactical forecasts and complete long-path save
-diagnostics; these changes are not included in this preserved package.
+open. Newer source adds measured campaign and battle HUDs, complete tactical
+forecasts/objectives, battle history and long-path save diagnostics; these
+changes are not included in this preserved package.
 
 Saga2D now measures unattached UI trees using their eventual font/theme context;
 its independent runnable example verifies rendering and input ownership. Campaign,
 encounter, pagination and economy rules remain in Shardbound.
 
-Source after this package passes **1,149 tests**. [Tactical forecasts](eador-forecast-reading.md)
+Source after this package passes **1,156 tests**. [Tactical forecasts](eador-forecast-reading.md)
 support shared 100/125 reading through F2 while T remains Retreat. The
 [native matrix](evidence/shardbound-forecast-086ce14/README.md) records 96 layouts,
 865 inputs and 21 exact reloads. [Complete save diagnostics](eador-diagnostics.md)
@@ -44,7 +45,17 @@ bounded fuzz and the full suite pass. [Complete tactical objectives](eador-battl
 now scale too, with measured board placement and explicit hold reset/escape rules.
 The [objective matrix](evidence/shardbound-objectives-3fd3412/README.md) passes
 126 layouts, 970 inputs and 21 reloads, plus an independent 18-layout picking
-review and Aerie's native western route. Unit HUD, action guidance and logs remain.
+review and Aerie's native western route.
+
+[Campaign HUD reading](eador-shard-reading.md) preserves full realm, hero,
+province and army facts; its source-attributed native matrix has 2,394 layouts,
+4,685 inputs and 127 exact reloads. [Battle HUD and history](eador-battle-hud-reading.md)
+now scale selected-unit facts, spell ownership, guidance and complete events.
+Native checks cover 222 views across all ten troop roles, 1,065 inputs, 37 exact
+reloads and real applied-autosave failure. Status markers remain clear of health
+text, and the board stays fixed when orders change the log. The integrated full
+suite and both games' bounded fuzz checks pass. These are source checks, not
+candidate/platform or human-readability acceptance.
 
 The [resource attribution study](eador-resource-breakpoints.md) reconciles 27
 unchanged campaigns and 10,762 real detached quotes. Available investments still
