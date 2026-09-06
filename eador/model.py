@@ -107,6 +107,15 @@ class Troop:
     xp: int = 0
 
 
+@dataclass(frozen=True)
+class InfusionPreview:
+    """Capped potential mana gain, fixed price, and the reason an order is blocked."""
+    mana: int
+    crystals: int
+    actions: int
+    blocked_reason: str | None = None
+
+
 @dataclass
 class Hero:
     name: str
@@ -454,6 +463,38 @@ class State:
             self.hero.max_mana += 4
             self.hero.mana += 4
         self.log.append(f'Built {spec.name}.')
+
+    def infusion_preview(self) -> InfusionPreview:
+        """Quote an optional Tower infusion without spending mana, currency or an action."""
+        mana = min(8, self.hero.max_mana - self.hero.mana)
+        try:
+            self._ready(action=True)
+        except RuleError as error:
+            reason = str(error)
+        else:
+            if self.provinces[self.hero.pos].owner != 'player':
+                reason = 'Infuse in one of your provinces.'
+            elif self.encircled and self.hero.pos == (-2, 0):
+                reason = 'Encirclement blocks infusion at Westwatch.'
+            elif 'mage_tower' not in self.buildings:
+                reason = 'Build a Mage Tower to infuse mana.'
+            elif not mana:
+                reason = 'Mana is already full.'
+            elif self.crystals < 3:
+                reason = 'Infusion requires 3 crystals.'
+            else:
+                reason = None
+        return InfusionPreview(mana, 3, 1, reason)
+
+    def infuse(self) -> None:
+        """Trade crystals and one campaign action for up to eight mana in a supplied camp."""
+        quote = self.infusion_preview()
+        if quote.blocked_reason:
+            raise RuleError(quote.blocked_reason)
+        self.crystals -= quote.crystals
+        self.actions_left -= quote.actions
+        self.hero.mana += quote.mana
+        self.log.append(f'Infused {quote.mana} mana for {quote.crystals} crystals and one action.')
 
     def recruit_crystal_cost(self, kind: str) -> int:
         if kind not in RECRUITABLE:
