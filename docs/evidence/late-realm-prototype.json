@@ -1,0 +1,7858 @@
+{
+  "caveat": "NON-PRODUCTION runtime experiments, not a supported new saved rules profile. No production registry, frozen ID, model command, tactical formula or schema changed. Nine selected paid plan pairs, not a balance matrix. Outpost bankruptcy and combined hero/garrison deployment are intentionally not invented by the prototype.",
+  "examples_sha256": "709f1bd5636ad25a784f256530b87136d52c7b39b051372f061ca1a8c70b0f7b",
+  "late_current_cash": {
+    "ordinary": [
+      {
+        "after": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 37,
+          "gold": 366,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 51,
+          "mana": 6,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 303,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 3
+          },
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        "command": "build",
+        "kind": "archery"
+      },
+      {
+        "after": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 35,
+          "gold": 291,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 51,
+          "mana": 10,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 303,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 3
+          },
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        "command": "build",
+        "kind": "mage_tower"
+      },
+      {
+        "after": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 38,
+              "id": 7,
+              "kind": "warden",
+              "level": 1,
+              "max_hp": 38,
+              "xp": 0
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 32,
+          "gold": 252,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 51,
+          "mana": 18,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 303,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 3
+          },
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 11
+        },
+        "command": "replace Warden then infuse",
+        "infusion": {
+          "actions": 1,
+          "blocked_reason": null,
+          "crystals": 3,
+          "mana": 8
+        },
+        "quote": {
+          "actions": 1,
+          "blocked_reason": null,
+          "crystals": 0,
+          "gold": 39,
+          "incoming": {
+            "hp": 38,
+            "id": 7,
+            "kind": "warden",
+            "level": 1,
+            "max_hp": 38,
+            "xp": 0
+          },
+          "outgoing": {
+            "hp": 32,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 6
+          },
+          "upkeep_after": 11,
+          "upkeep_before": 10
+        }
+      },
+      {
+        "after": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 38,
+              "id": 7,
+              "kind": "warden",
+              "level": 1,
+              "max_hp": 38,
+              "xp": 0
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 35,
+          "gold": 292,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 51,
+          "mana": 18,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 341,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 2
+          },
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 11
+        },
+        "command": "end_turn"
+      }
+    ],
+    "remittance-r1": [
+      {
+        "after": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 37,
+          "gold": 366,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 43,
+          "mana": 6,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 303,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 3
+          },
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        "command": "build",
+        "kind": "archery"
+      },
+      {
+        "after": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 35,
+          "gold": 291,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 43,
+          "mana": 10,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 303,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 3
+          },
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        "command": "build",
+        "kind": "mage_tower"
+      },
+      {
+        "after": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 38,
+              "id": 7,
+              "kind": "warden",
+              "level": 1,
+              "max_hp": 38,
+              "xp": 0
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 32,
+          "gold": 252,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 43,
+          "mana": 18,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 303,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 3
+          },
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 11
+        },
+        "command": "replace Warden then infuse",
+        "infusion": {
+          "actions": 1,
+          "blocked_reason": null,
+          "crystals": 3,
+          "mana": 8
+        },
+        "quote": {
+          "actions": 1,
+          "blocked_reason": null,
+          "crystals": 0,
+          "gold": 39,
+          "incoming": {
+            "hp": 38,
+            "id": 7,
+            "kind": "warden",
+            "level": 1,
+            "max_hp": 38,
+            "xp": 0
+          },
+          "outgoing": {
+            "hp": 32,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 6
+          },
+          "upkeep_after": 11,
+          "upkeep_before": 10
+        }
+      },
+      {
+        "after": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 38,
+              "id": 7,
+              "kind": "warden",
+              "level": 1,
+              "max_hp": 38,
+              "xp": 0
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "level": 3,
+              "max_hp": 32,
+              "xp": 6
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "level": 3,
+              "max_hp": 28,
+              "xp": 6
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "level": 3,
+              "max_hp": 42,
+              "xp": 3
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 9
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "level": 2,
+              "max_hp": 38,
+              "xp": 6
+            }
+          ],
+          "crystals": 35,
+          "gold": 284,
+          "heartwood": {
+            "capital": false,
+            "crystals": 1,
+            "explored": true,
+            "guard_hp": [],
+            "guards": [],
+            "income": 5,
+            "name": "Heartwood",
+            "owner": "player",
+            "pos": [
+              0,
+              0
+            ],
+            "site": "Buried Shrine",
+            "site_crystals": 2,
+            "site_gold": 45,
+            "site_guard_hp": [],
+            "site_guards": [],
+            "site_kind": "shrine",
+            "site_relic": "moonstone",
+            "terrain": "hills"
+          },
+          "hero_hp": 44,
+          "hero_rank": 3,
+          "hero_xp": 28,
+          "income": 43,
+          "mana": 18,
+          "rival": {
+            "army": [],
+            "defeats": 1,
+            "gold": 341,
+            "intent": "recruit",
+            "next_troop_id": 7,
+            "pos": [
+              2,
+              0
+            ],
+            "target": [
+              2,
+              0
+            ],
+            "turns_until_action": 2
+          },
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 11
+        },
+        "command": "end_turn"
+      }
+    ]
+  },
+  "parameters": {
+    "outpost-o1": {
+      "actions": 1,
+      "automatic_healing": false,
+      "destination": "adjacent owned province",
+      "fresh_troops": 2,
+      "price_and_upkeep": "ordinary public costs"
+    },
+    "remittance-r1": {
+      "full_outside_provinces": 2,
+      "further_gold_percent": 25
+    }
+  },
+  "plans": [
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "economy",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.market",
+          "gold": 40,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 105,
+          "gold_before": 85,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 60,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 67,
+          "gold_before": 40,
+          "income": 33,
+          "ordinary_income": 33,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 2,
+          "turn": 3
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 69,
+          "gold_before": 42,
+          "income": 33,
+          "ordinary_income": 33,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 85,
+          "gold_before": 55,
+          "income": 38,
+          "ordinary_income": 38,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 119,
+          "gold_before": 91,
+          "income": 38,
+          "ordinary_income": 38,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 177,
+          "gold_before": 144,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 218,
+          "gold_before": 177,
+          "income": 51,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 259,
+          "gold_before": 218,
+          "income": 51,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 355,
+          "gold_before": 314,
+          "income": 51,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 421,
+          "gold_before": 380,
+          "income": 51,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 462,
+          "gold_before": 421,
+          "income": 51,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 40,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "fd496be0ae929a85b1ba8cce13b7939d2aca38933f68fedcf211ab4a2bc3022f",
+        "gold_left": 487,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "market",
+            60,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            3,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 266,
+          "battles": 9,
+          "building_gold": 170,
+          "defeats": 0,
+          "end_turns": 11,
+          "hp_recovered": 111,
+          "lost_troops": 2,
+          "mana_recovered": 20,
+          "mana_spent": 32,
+          "recovery_turns": 1,
+          "recruitment_gold": 123
+        },
+        "mode": "standard",
+        "plan": "economy",
+        "purchases": {
+          "build.barracks": 1,
+          "build.market": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            22
+          ],
+          [
+            "archer",
+            3,
+            2
+          ],
+          [
+            "swordsman",
+            3,
+            29
+          ],
+          [
+            "swordsman",
+            3,
+            36
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 12,
+        "upkeep_gold": 94
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "economy",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.market",
+          "gold": 40,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 105,
+          "gold_before": 85,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 60,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 67,
+          "gold_before": 40,
+          "income": 33,
+          "ordinary_income": 33,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 2,
+          "turn": 3
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 69,
+          "gold_before": 42,
+          "income": 33,
+          "ordinary_income": 33,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 85,
+          "gold_before": 55,
+          "income": 38,
+          "ordinary_income": 38,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 119,
+          "gold_before": 91,
+          "income": 38,
+          "ordinary_income": 38,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 173,
+          "gold_before": 144,
+          "income": 39,
+          "ordinary_income": 43,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 206,
+          "gold_before": 173,
+          "income": 43,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 239,
+          "gold_before": 206,
+          "income": 43,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 327,
+          "gold_before": 294,
+          "income": 43,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 385,
+          "gold_before": 352,
+          "income": 43,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 418,
+          "gold_before": 385,
+          "income": 43,
+          "ordinary_income": 51,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 40,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "427e2e4733c9eda58fcca7433d6f68b8af4db8f1e9911d5fe7c313bd9740e7a4",
+        "gold_left": 443,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "market",
+            60,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            3,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 266,
+          "battles": 9,
+          "building_gold": 170,
+          "defeats": 0,
+          "end_turns": 11,
+          "hp_recovered": 111,
+          "lost_troops": 2,
+          "mana_recovered": 20,
+          "mana_spent": 32,
+          "recovery_turns": 1,
+          "recruitment_gold": 123
+        },
+        "mode": "standard",
+        "plan": "economy",
+        "purchases": {
+          "build.barracks": 1,
+          "build.market": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            22
+          ],
+          [
+            "archer",
+            3,
+            2
+          ],
+          [
+            "swordsman",
+            3,
+            29
+          ],
+          [
+            "swordsman",
+            3,
+            36
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 12,
+        "upkeep_gold": 94
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "sustain",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.temple",
+          "gold": 35,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 92,
+          "gold_before": 80,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 2,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 46,
+          "gold_before": 27,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 64,
+          "gold_before": 47,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 70,
+          "gold_before": 50,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 135,
+          "gold_before": 115,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 185,
+          "gold_before": 160,
+          "income": 35,
+          "ordinary_income": 35,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 218,
+          "gold_before": 185,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 251,
+          "gold_before": 218,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 339,
+          "gold_before": 306,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 397,
+          "gold_before": 364,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 430,
+          "gold_before": 397,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 463,
+          "gold_before": 430,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 43,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 2,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "a3101bcb1be76bfd90d556d9a31ff91527eaf7b439a0bd4e2b4e8dd138b6e34e",
+        "gold_left": 488,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "healer",
+            45,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 282,
+          "battles": 9,
+          "building_gold": 110,
+          "defeats": 0,
+          "end_turns": 12,
+          "hp_recovered": 116,
+          "lost_troops": 3,
+          "mana_recovered": 28,
+          "mana_spent": 40,
+          "recovery_turns": 2,
+          "recruitment_gold": 123
+        },
+        "mode": "standard",
+        "plan": "sustain",
+        "purchases": {
+          "build.barracks": 1,
+          "build.temple": 1,
+          "recruit.healer": 1,
+          "recruit.swordsman": 2
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            32
+          ],
+          [
+            "archer",
+            3,
+            12
+          ],
+          [
+            "swordsman",
+            3,
+            12
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 13,
+        "upkeep_gold": 108
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "sustain",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.temple",
+          "gold": 35,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 92,
+          "gold_before": 80,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 2,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 46,
+          "gold_before": 27,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 64,
+          "gold_before": 47,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 70,
+          "gold_before": 50,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 135,
+          "gold_before": 115,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 181,
+          "gold_before": 160,
+          "income": 31,
+          "ordinary_income": 35,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 206,
+          "gold_before": 181,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 231,
+          "gold_before": 206,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 311,
+          "gold_before": 286,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 361,
+          "gold_before": 336,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 386,
+          "gold_before": 361,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 411,
+          "gold_before": 386,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 43,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 2,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "8ed7bcfbd54ec3e29c16fef7a4953d95f86d2a731de3c5660fe1ba31654ab2ce",
+        "gold_left": 436,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "healer",
+            45,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 282,
+          "battles": 9,
+          "building_gold": 110,
+          "defeats": 0,
+          "end_turns": 12,
+          "hp_recovered": 116,
+          "lost_troops": 3,
+          "mana_recovered": 28,
+          "mana_spent": 40,
+          "recovery_turns": 2,
+          "recruitment_gold": 123
+        },
+        "mode": "standard",
+        "plan": "sustain",
+        "purchases": {
+          "build.barracks": 1,
+          "build.temple": 1,
+          "recruit.healer": 1,
+          "recruit.swordsman": 2
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            32
+          ],
+          [
+            "archer",
+            3,
+            12
+          ],
+          [
+            "swordsman",
+            3,
+            12
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 13,
+        "upkeep_gold": 108
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "spells",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.mage_tower",
+          "gold": 25,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 82,
+          "gold_before": 70,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 37,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 83,
+          "gold_before": 62,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 103,
+          "gold_before": 84,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 38,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 87,
+          "gold_before": 63,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 74,
+          "gold_before": 54,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 124,
+          "gold_before": 99,
+          "income": 35,
+          "ordinary_income": 35,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 157,
+          "gold_before": 124,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 190,
+          "gold_before": 157,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 278,
+          "gold_before": 245,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 336,
+          "gold_before": 303,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 369,
+          "gold_before": 336,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 402,
+          "gold_before": 369,
+          "income": 43,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 2,
+        "crystals_left": 41,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 2,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "d2d5f73a881d0ffa73506b9954df16ba3bfcddcad2c9e31f4899781c9ca6a3f7",
+        "gold_left": 427,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "mage_tower",
+            75,
+            2
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 219,
+          "battles": 9,
+          "building_gold": 185,
+          "defeats": 0,
+          "end_turns": 12,
+          "hp_recovered": 112,
+          "lost_troops": 1,
+          "mana_recovered": 44,
+          "mana_spent": 60,
+          "recovery_turns": 2,
+          "recruitment_gold": 117
+        },
+        "mode": "standard",
+        "plan": "spells",
+        "purchases": {
+          "build.barracks": 1,
+          "build.mage_tower": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            2
+          ],
+          [
+            "militia",
+            3,
+            32
+          ],
+          [
+            "archer",
+            3,
+            28
+          ],
+          [
+            "swordsman",
+            3,
+            27
+          ],
+          [
+            "swordsman",
+            2,
+            14
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 13,
+        "upkeep_gold": 100
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "spells",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.mage_tower",
+          "gold": 25,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 82,
+          "gold_before": 70,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 37,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 83,
+          "gold_before": 62,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 103,
+          "gold_before": 84,
+          "income": 25,
+          "ordinary_income": 25,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 38,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 87,
+          "gold_before": 63,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 74,
+          "gold_before": 54,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 120,
+          "gold_before": 99,
+          "income": 31,
+          "ordinary_income": 35,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 145,
+          "gold_before": 120,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 170,
+          "gold_before": 145,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 250,
+          "gold_before": 225,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 300,
+          "gold_before": 275,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 325,
+          "gold_before": 300,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 350,
+          "gold_before": 325,
+          "income": 35,
+          "ordinary_income": 43,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 2,
+        "crystals_left": 41,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 2,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "64b86ed13352240164796248f60d2c0954ee98c804a0ebbce7c5d71622d6a100",
+        "gold_left": 375,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "mage_tower",
+            75,
+            2
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 219,
+          "battles": 9,
+          "building_gold": 185,
+          "defeats": 0,
+          "end_turns": 12,
+          "hp_recovered": 112,
+          "lost_troops": 1,
+          "mana_recovered": 44,
+          "mana_spent": 60,
+          "recovery_turns": 2,
+          "recruitment_gold": 117
+        },
+        "mode": "standard",
+        "plan": "spells",
+        "purchases": {
+          "build.barracks": 1,
+          "build.mage_tower": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            2
+          ],
+          [
+            "militia",
+            3,
+            32
+          ],
+          [
+            "archer",
+            3,
+            28
+          ],
+          [
+            "swordsman",
+            3,
+            27
+          ],
+          [
+            "swordsman",
+            2,
+            14
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 13,
+        "upkeep_gold": 100
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "economy",
+        "challenge",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.market",
+          "gold": 30,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 90,
+          "gold_before": 75,
+          "income": 19,
+          "ordinary_income": 19,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 45,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 45,
+          "gold_before": 25,
+          "income": 26,
+          "ordinary_income": 26,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 105,
+          "gold_before": 85,
+          "income": 26,
+          "ordinary_income": 26,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 40,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 48,
+          "gold_before": 26,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 99,
+          "gold_before": 79,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 150,
+          "gold_before": 124,
+          "income": 36,
+          "ordinary_income": 36,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 205,
+          "gold_before": 175,
+          "income": 40,
+          "ordinary_income": 40,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 290,
+          "gold_before": 260,
+          "income": 40,
+          "ordinary_income": 40,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 347,
+          "gold_before": 315,
+          "income": 40,
+          "ordinary_income": 40,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 8
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 31,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 5,
+          "battle.intercept": 2,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 0,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "dd7a88452f7b6d9aa33e6668ded793612c4b83eb023d51554e557481302e94ba",
+        "gold_left": 347,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "market",
+            60,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            10,
+            "recruit",
+            "swordsman",
+            25,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 298,
+          "battles": 11,
+          "building_gold": 170,
+          "defeats": 0,
+          "end_turns": 9,
+          "hp_recovered": 130,
+          "lost_troops": 3,
+          "mana_recovered": 16,
+          "mana_spent": 28,
+          "recovery_turns": 0,
+          "recruitment_gold": 148
+        },
+        "mode": "challenge",
+        "plan": "economy",
+        "purchases": {
+          "build.barracks": 1,
+          "build.market": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 4
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            19
+          ],
+          [
+            "swordsman",
+            3,
+            34
+          ],
+          [
+            "swordsman",
+            3,
+            18
+          ],
+          [
+            "swordsman",
+            3,
+            15
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "challenge-2",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 10,
+        "upkeep_gold": 72
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "economy",
+        "challenge",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.market",
+          "gold": 30,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 90,
+          "gold_before": 75,
+          "income": 19,
+          "ordinary_income": 19,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 45,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 45,
+          "gold_before": 25,
+          "income": 26,
+          "ordinary_income": 26,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 105,
+          "gold_before": 85,
+          "income": 26,
+          "ordinary_income": 26,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 40,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 48,
+          "gold_before": 26,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 99,
+          "gold_before": 79,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 147,
+          "gold_before": 124,
+          "income": 33,
+          "ordinary_income": 36,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 196,
+          "gold_before": 172,
+          "income": 34,
+          "ordinary_income": 40,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 275,
+          "gold_before": 251,
+          "income": 34,
+          "ordinary_income": 40,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 326,
+          "gold_before": 300,
+          "income": 34,
+          "ordinary_income": 40,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 8
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 31,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 5,
+          "battle.intercept": 2,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 0,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "c2e27d96c1ec6346b571bb0e650915ffe612e22416b423a67f4d1fc12393e9de",
+        "gold_left": 326,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "market",
+            60,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            10,
+            "recruit",
+            "swordsman",
+            25,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 298,
+          "battles": 11,
+          "building_gold": 170,
+          "defeats": 0,
+          "end_turns": 9,
+          "hp_recovered": 130,
+          "lost_troops": 3,
+          "mana_recovered": 16,
+          "mana_spent": 28,
+          "recovery_turns": 0,
+          "recruitment_gold": 148
+        },
+        "mode": "challenge",
+        "plan": "economy",
+        "purchases": {
+          "build.barracks": 1,
+          "build.market": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 4
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            19
+          ],
+          [
+            "swordsman",
+            3,
+            34
+          ],
+          [
+            "swordsman",
+            3,
+            18
+          ],
+          [
+            "swordsman",
+            3,
+            15
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "challenge-2",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 10,
+        "upkeep_gold": 72
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "sustain",
+        "challenge",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.temple",
+          "gold": 25,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 78,
+          "gold_before": 70,
+          "income": 12,
+          "ordinary_income": 12,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 72,
+          "gold_before": 58,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "build.barracks",
+          "gold": 27,
+          "turn": 3
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 81,
+          "gold_before": 67,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 42,
+          "gold_before": 28,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 126,
+          "gold_before": 112,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 171,
+          "gold_before": 151,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 220,
+          "gold_before": 196,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 299,
+          "gold_before": 275,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 323,
+          "gold_before": 299,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 372,
+          "gold_before": 348,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 396,
+          "gold_before": 372,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 420,
+          "gold_before": 396,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 469,
+          "gold_before": 445,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 13,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 43,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 5,
+          "battle.intercept": 3,
+          "battle.site": 4,
+          "final_advance": 3,
+          "final_wait.actions": 0,
+          "final_wait.mana": 3,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "c34f1904782ef281a966e1d03bd402578a31c1983a7d4290a6bcf0c947feba03",
+        "gold_left": 494,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "healer",
+            45,
+            0
+          ],
+          [
+            3,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 269,
+          "battles": 12,
+          "building_gold": 110,
+          "defeats": 0,
+          "end_turns": 13,
+          "hp_recovered": 129,
+          "lost_troops": 2,
+          "mana_recovered": 36,
+          "mana_spent": 52,
+          "recovery_turns": 3,
+          "recruitment_gold": 123
+        },
+        "mode": "challenge",
+        "plan": "sustain",
+        "purchases": {
+          "build.barracks": 1,
+          "build.temple": 1,
+          "recruit.healer": 1,
+          "recruit.swordsman": 2
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            4,
+            14
+          ],
+          [
+            "archer",
+            4,
+            32
+          ],
+          [
+            "swordsman",
+            3,
+            4
+          ],
+          [
+            "swordsman",
+            3,
+            37
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "challenge-2",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 14,
+        "upkeep_gold": 116
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "sustain",
+        "challenge",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.temple",
+          "gold": 25,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 78,
+          "gold_before": 70,
+          "income": 12,
+          "ordinary_income": 12,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 72,
+          "gold_before": 58,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "build.barracks",
+          "gold": 27,
+          "turn": 3
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 81,
+          "gold_before": 67,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 42,
+          "gold_before": 28,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 126,
+          "gold_before": 112,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 168,
+          "gold_before": 151,
+          "income": 27,
+          "ordinary_income": 30,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 211,
+          "gold_before": 193,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 284,
+          "gold_before": 266,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 302,
+          "gold_before": 284,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 345,
+          "gold_before": 327,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 363,
+          "gold_before": 345,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 381,
+          "gold_before": 363,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 424,
+          "gold_before": 406,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 13,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 43,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 5,
+          "battle.intercept": 3,
+          "battle.site": 4,
+          "final_advance": 3,
+          "final_wait.actions": 0,
+          "final_wait.mana": 3,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "1f0bc13f7abb63c1490c5a8b343ddb56a1daf5d0f8181db265409d4be03ab808",
+        "gold_left": 449,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "healer",
+            45,
+            0
+          ],
+          [
+            3,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 269,
+          "battles": 12,
+          "building_gold": 110,
+          "defeats": 0,
+          "end_turns": 13,
+          "hp_recovered": 129,
+          "lost_troops": 2,
+          "mana_recovered": 36,
+          "mana_spent": 52,
+          "recovery_turns": 3,
+          "recruitment_gold": 123
+        },
+        "mode": "challenge",
+        "plan": "sustain",
+        "purchases": {
+          "build.barracks": 1,
+          "build.temple": 1,
+          "recruit.healer": 1,
+          "recruit.swordsman": 2
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            4,
+            14
+          ],
+          [
+            "archer",
+            4,
+            32
+          ],
+          [
+            "swordsman",
+            3,
+            4
+          ],
+          [
+            "swordsman",
+            3,
+            37
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "challenge-2",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 14,
+        "upkeep_gold": 116
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "spells",
+        "challenge",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.mage_tower",
+          "gold": 15,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 68,
+          "gold_before": 60,
+          "income": 12,
+          "ordinary_income": 12,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 23,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 64,
+          "gold_before": 48,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 79,
+          "gold_before": 65,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 14,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 57,
+          "gold_before": 39,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 104,
+          "gold_before": 88,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 151,
+          "gold_before": 129,
+          "income": 30,
+          "ordinary_income": 30,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 168,
+          "gold_before": 144,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 247,
+          "gold_before": 223,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 271,
+          "gold_before": 247,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 320,
+          "gold_before": 296,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 344,
+          "gold_before": 320,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 368,
+          "gold_before": 344,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 417,
+          "gold_before": 393,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 13,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 2,
+        "crystals_left": 41,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 5,
+          "battle.intercept": 3,
+          "battle.site": 4,
+          "final_advance": 3,
+          "final_wait.actions": 0,
+          "final_wait.mana": 3,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "5380f1a28e786b193aee1a219099b3bd59c349495a68801c37649e6b5841ff93",
+        "gold_left": 442,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "mage_tower",
+            75,
+            2
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            32,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 246,
+          "battles": 12,
+          "building_gold": 185,
+          "defeats": 0,
+          "end_turns": 13,
+          "hp_recovered": 132,
+          "lost_troops": 3,
+          "mana_recovered": 52,
+          "mana_spent": 72,
+          "recovery_turns": 3,
+          "recruitment_gold": 110
+        },
+        "mode": "challenge",
+        "plan": "spells",
+        "purchases": {
+          "build.barracks": 1,
+          "build.mage_tower": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "archer",
+            4,
+            30
+          ],
+          [
+            "swordsman",
+            3,
+            42
+          ],
+          [
+            "swordsman",
+            2,
+            34
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "challenge-2",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 14,
+        "upkeep_gold": 106
+      }
+    },
+    {
+      "case": [
+        0,
+        "Commander",
+        "frontier",
+        "spells",
+        "challenge",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.mage_tower",
+          "gold": 15,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 68,
+          "gold_before": 60,
+          "income": 12,
+          "ordinary_income": 12,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 23,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 64,
+          "gold_before": 48,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 79,
+          "gold_before": 65,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 14,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 57,
+          "gold_before": 39,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 104,
+          "gold_before": 88,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 148,
+          "gold_before": 129,
+          "income": 27,
+          "ordinary_income": 30,
+          "provinces": 4,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 159,
+          "gold_before": 141,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 232,
+          "gold_before": 214,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 250,
+          "gold_before": 232,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 293,
+          "gold_before": 275,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 311,
+          "gold_before": 293,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 329,
+          "gold_before": 311,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 10
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 372,
+          "gold_before": 354,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 13,
+          "upkeep": 10
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 2,
+        "crystals_left": 41,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 5,
+          "battle.intercept": 3,
+          "battle.site": 4,
+          "final_advance": 3,
+          "final_wait.actions": 0,
+          "final_wait.mana": 3,
+          "final_wait.wounds": 0,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "33f8e9469dae7d58d68b9140c589541c7285ae41b8a8995033c195e18f70667a",
+        "gold_left": 397,
+        "hero": "Commander",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "mage_tower",
+            75,
+            2
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            39,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            32,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 246,
+          "battles": 12,
+          "building_gold": 185,
+          "defeats": 0,
+          "end_turns": 13,
+          "hp_recovered": 132,
+          "lost_troops": 3,
+          "mana_recovered": 52,
+          "mana_spent": 72,
+          "recovery_turns": 3,
+          "recruitment_gold": 110
+        },
+        "mode": "challenge",
+        "plan": "spells",
+        "purchases": {
+          "build.barracks": 1,
+          "build.mage_tower": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "archer",
+            4,
+            30
+          ],
+          [
+            "swordsman",
+            3,
+            42
+          ],
+          [
+            "swordsman",
+            2,
+            34
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "challenge-2",
+        "seed": 0,
+        "skills": {
+          "quartermaster": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "frontier",
+        "turns": 14,
+        "upkeep_gold": 106
+      }
+    },
+    {
+      "case": [
+        7,
+        "Scout",
+        "elderwild",
+        "economy",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.market",
+          "gold": 40,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 105,
+          "gold_before": 85,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 60,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 62,
+          "gold_before": 40,
+          "income": 28,
+          "ordinary_income": 28,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 129,
+          "gold_before": 107,
+          "income": 28,
+          "ordinary_income": 28,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 64,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 68,
+          "gold_before": 44,
+          "income": 32,
+          "ordinary_income": 32,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 127,
+          "gold_before": 103,
+          "income": 32,
+          "ordinary_income": 32,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 214,
+          "gold_before": 177,
+          "income": 42,
+          "ordinary_income": 42,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 5
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 197,
+          "gold_before": 164,
+          "income": 42,
+          "ordinary_income": 42,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 230,
+          "gold_before": 197,
+          "income": 42,
+          "ordinary_income": 42,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 9
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 36,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 1,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 1,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "2b152a4874ddd3cbeb84bcb7fbc779f248a29e743918297cef63d127818403db",
+        "gold_left": 255,
+        "hero": "Scout",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "market",
+            60,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 296,
+          "battles": 9,
+          "building_gold": 170,
+          "defeats": 0,
+          "end_turns": 8,
+          "hp_recovered": 102,
+          "lost_troops": 3,
+          "mana_recovered": 16,
+          "mana_spent": 28,
+          "recovery_turns": 1,
+          "recruitment_gold": 180
+        },
+        "mode": "standard",
+        "plan": "economy",
+        "purchases": {
+          "build.barracks": 1,
+          "build.market": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 4
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            11
+          ],
+          [
+            "swordsman",
+            3,
+            35
+          ],
+          [
+            "swordsman",
+            2,
+            10
+          ],
+          [
+            "swordsman",
+            2,
+            32
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 7,
+        "skills": {
+          "pathfinder": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "elderwild",
+        "turns": 9,
+        "upkeep_gold": 55
+      }
+    },
+    {
+      "case": [
+        7,
+        "Scout",
+        "elderwild",
+        "economy",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.market",
+          "gold": 40,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 105,
+          "gold_before": 85,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 60,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 62,
+          "gold_before": 40,
+          "income": 28,
+          "ordinary_income": 28,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 129,
+          "gold_before": 107,
+          "income": 28,
+          "ordinary_income": 28,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 64,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 68,
+          "gold_before": 44,
+          "income": 32,
+          "ordinary_income": 32,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 127,
+          "gold_before": 103,
+          "income": 32,
+          "ordinary_income": 32,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 208,
+          "gold_before": 177,
+          "income": 36,
+          "ordinary_income": 42,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 5
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 185,
+          "gold_before": 158,
+          "income": 36,
+          "ordinary_income": 42,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 212,
+          "gold_before": 185,
+          "income": 36,
+          "ordinary_income": 42,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 9
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 36,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 1,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 1,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "59e844651f5107c1276ab0fa46279ee78321992eb288b9b7913bf436214361f7",
+        "gold_left": 237,
+        "hero": "Scout",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "market",
+            60,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 296,
+          "battles": 9,
+          "building_gold": 170,
+          "defeats": 0,
+          "end_turns": 8,
+          "hp_recovered": 102,
+          "lost_troops": 3,
+          "mana_recovered": 16,
+          "mana_spent": 28,
+          "recovery_turns": 1,
+          "recruitment_gold": 180
+        },
+        "mode": "standard",
+        "plan": "economy",
+        "purchases": {
+          "build.barracks": 1,
+          "build.market": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 4
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            11
+          ],
+          [
+            "swordsman",
+            3,
+            35
+          ],
+          [
+            "swordsman",
+            2,
+            10
+          ],
+          [
+            "swordsman",
+            2,
+            32
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 7,
+        "skills": {
+          "pathfinder": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "elderwild",
+        "turns": 9,
+        "upkeep_gold": 55
+      }
+    },
+    {
+      "case": [
+        7,
+        "Scout",
+        "elderwild",
+        "sustain",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.temple",
+          "gold": 35,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 92,
+          "gold_before": 80,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 2,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 41,
+          "gold_before": 27,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 100,
+          "gold_before": 86,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 96,
+          "gold_before": 80,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 147,
+          "gold_before": 131,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 225,
+          "gold_before": 197,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 247,
+          "gold_before": 220,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 7
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 227,
+          "gold_before": 202,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 9
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 36,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 1,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 1,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "e7e1b88b16f0094dfc3301b59c3a889843f6ef5694cdf59f8dcf527a12519d62",
+        "gold_left": 252,
+        "hero": "Scout",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "healer",
+            45,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            8,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 269,
+          "battles": 9,
+          "building_gold": 110,
+          "defeats": 0,
+          "end_turns": 8,
+          "hp_recovered": 111,
+          "lost_troops": 3,
+          "mana_recovered": 20,
+          "mana_spent": 32,
+          "recovery_turns": 1,
+          "recruitment_gold": 180
+        },
+        "mode": "standard",
+        "plan": "sustain",
+        "purchases": {
+          "build.barracks": 1,
+          "build.temple": 1,
+          "recruit.healer": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "healer",
+            3,
+            30
+          ],
+          [
+            "swordsman",
+            3,
+            6
+          ],
+          [
+            "swordsman",
+            2,
+            22
+          ],
+          [
+            "swordsman",
+            1,
+            16
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 7,
+        "skills": {
+          "pathfinder": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "elderwild",
+        "turns": 9,
+        "upkeep_gold": 54
+      }
+    },
+    {
+      "case": [
+        7,
+        "Scout",
+        "elderwild",
+        "sustain",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.temple",
+          "gold": 35,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 92,
+          "gold_before": 80,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 2,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 41,
+          "gold_before": 27,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 100,
+          "gold_before": 86,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 96,
+          "gold_before": 80,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 147,
+          "gold_before": 131,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 219,
+          "gold_before": 197,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 235,
+          "gold_before": 214,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 7
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 209,
+          "gold_before": 190,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 9
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 0,
+        "crystals_left": 36,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 1,
+          "battle.site": 4,
+          "final_advance": 1,
+          "final_wait.actions": 0,
+          "final_wait.mana": 1,
+          "final_wait.wounds": 1,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "2bd99527719c8e6eb243f5a7788bff107dad518c69f9cc7f318000b4b41c98e9",
+        "gold_left": 234,
+        "hero": "Scout",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            2,
+            "recruit",
+            "healer",
+            45,
+            0
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            4,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            8,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 269,
+          "battles": 9,
+          "building_gold": 110,
+          "defeats": 0,
+          "end_turns": 8,
+          "hp_recovered": 111,
+          "lost_troops": 3,
+          "mana_recovered": 20,
+          "mana_spent": 32,
+          "recovery_turns": 1,
+          "recruitment_gold": 180
+        },
+        "mode": "standard",
+        "plan": "sustain",
+        "purchases": {
+          "build.barracks": 1,
+          "build.temple": 1,
+          "recruit.healer": 1,
+          "recruit.swordsman": 3
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "healer",
+            3,
+            30
+          ],
+          [
+            "swordsman",
+            3,
+            6
+          ],
+          [
+            "swordsman",
+            2,
+            22
+          ],
+          [
+            "swordsman",
+            1,
+            16
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 7,
+        "skills": {
+          "pathfinder": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "elderwild",
+        "turns": 9,
+        "upkeep_gold": 54
+      }
+    },
+    {
+      "case": [
+        7,
+        "Scout",
+        "elderwild",
+        "spells",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.mage_tower",
+          "gold": 25,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 82,
+          "gold_before": 70,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 37,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 78,
+          "gold_before": 62,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 92,
+          "gold_before": 78,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 27,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 70,
+          "gold_before": 52,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 76,
+          "gold_before": 60,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 155,
+          "gold_before": 126,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 5
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 130,
+          "gold_before": 105,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 155,
+          "gold_before": 130,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 180,
+          "gold_before": 155,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 230,
+          "gold_before": 205,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 255,
+          "gold_before": 230,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 280,
+          "gold_before": 255,
+          "income": 34,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 9
+        }
+      ],
+      "experiment": "ordinary",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 2,
+        "crystals_left": 46,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 2,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 2,
+          "final_wait.wounds": 3,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "0beded55099c9f916c34e27c22b8b1c550e9ff97887e42f4049a1f589e20461c",
+        "gold_left": 305,
+        "hero": "Scout",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "mage_tower",
+            75,
+            2
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 311,
+          "battles": 10,
+          "building_gold": 185,
+          "defeats": 0,
+          "end_turns": 12,
+          "hp_recovered": 122,
+          "lost_troops": 3,
+          "mana_recovered": 32,
+          "mana_spent": 40,
+          "recovery_turns": 4,
+          "recruitment_gold": 180
+        },
+        "mode": "standard",
+        "plan": "spells",
+        "purchases": {
+          "build.barracks": 1,
+          "build.mage_tower": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 4
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            32
+          ],
+          [
+            "swordsman",
+            3,
+            21
+          ],
+          [
+            "swordsman",
+            2,
+            6
+          ],
+          [
+            "swordsman",
+            2,
+            32
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 7,
+        "skills": {
+          "pathfinder": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "elderwild",
+        "turns": 13,
+        "upkeep_gold": 87
+      }
+    },
+    {
+      "case": [
+        7,
+        "Scout",
+        "elderwild",
+        "spells",
+        "standard",
+        "direct"
+      ],
+      "cash_flow": [
+        {
+          "command": "build.mage_tower",
+          "gold": 25,
+          "turn": 1
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 82,
+          "gold_before": 70,
+          "income": 16,
+          "ordinary_income": 16,
+          "provinces": 1,
+          "shortfall": 0,
+          "turn": 1,
+          "upkeep": 4
+        },
+        {
+          "command": "build.barracks",
+          "gold": 37,
+          "turn": 2
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 78,
+          "gold_before": 62,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 2,
+          "upkeep": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 92,
+          "gold_before": 78,
+          "income": 20,
+          "ordinary_income": 20,
+          "provinces": 2,
+          "shortfall": 0,
+          "turn": 3,
+          "upkeep": 6
+        },
+        {
+          "command": "build.temple",
+          "gold": 27,
+          "turn": 4
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 70,
+          "gold_before": 52,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 4,
+          "upkeep": 6
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 76,
+          "gold_before": 60,
+          "income": 24,
+          "ordinary_income": 24,
+          "provinces": 3,
+          "shortfall": 0,
+          "turn": 5,
+          "upkeep": 8
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 149,
+          "gold_before": 126,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 6,
+          "upkeep": 5
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 118,
+          "gold_before": 99,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 7,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 137,
+          "gold_before": 118,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 8,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 156,
+          "gold_before": 137,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 9,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 200,
+          "gold_before": 181,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 10,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 219,
+          "gold_before": 200,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 11,
+          "upkeep": 9
+        },
+        {
+          "command": "end_turn",
+          "gold_after": 238,
+          "gold_before": 219,
+          "income": 28,
+          "ordinary_income": 34,
+          "provinces": 5,
+          "shortfall": 0,
+          "turn": 12,
+          "upkeep": 9
+        }
+      ],
+      "experiment": "remittance-r1",
+      "result": {
+        "adaptive_interception": false,
+        "building_crystals": 2,
+        "crystals_left": 46,
+        "deserters": 0,
+        "events": {
+          "battle.conquest": 4,
+          "battle.intercept": 2,
+          "battle.site": 4,
+          "final_advance": 2,
+          "final_wait.actions": 0,
+          "final_wait.mana": 2,
+          "final_wait.wounds": 3,
+          "shortfall_turns": 0
+        },
+        "final_save_sha256": "b6253fea02866478c6c66b5e256cf980548dd7d0fa9049a810f3ceffb48f9443",
+        "gold_left": 263,
+        "hero": "Scout",
+        "hero_rank": 4,
+        "investments": [
+          [
+            1,
+            "build",
+            "mage_tower",
+            75,
+            2
+          ],
+          [
+            2,
+            "build",
+            "barracks",
+            45,
+            0
+          ],
+          [
+            3,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            4,
+            "build",
+            "temple",
+            65,
+            0
+          ],
+          [
+            5,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ],
+          [
+            7,
+            "recruit",
+            "swordsman",
+            45,
+            0
+          ]
+        ],
+        "mana_reserve": null,
+        "metrics": {
+          "battle_hp_attrition": 311,
+          "battles": 10,
+          "building_gold": 185,
+          "defeats": 0,
+          "end_turns": 12,
+          "hp_recovered": 122,
+          "lost_troops": 3,
+          "mana_recovered": 32,
+          "mana_spent": 40,
+          "recovery_turns": 4,
+          "recruitment_gold": 180
+        },
+        "mode": "standard",
+        "plan": "spells",
+        "purchases": {
+          "build.barracks": 1,
+          "build.mage_tower": 1,
+          "build.temple": 1,
+          "recruit.swordsman": 4
+        },
+        "recruitment_crystals": 0,
+        "retreat_gold": 0,
+        "roster": [
+          [
+            "militia",
+            3,
+            32
+          ],
+          [
+            "swordsman",
+            3,
+            21
+          ],
+          [
+            "swordsman",
+            2,
+            6
+          ],
+          [
+            "swordsman",
+            2,
+            32
+          ]
+        ],
+        "route": "direct",
+        "rules_id": "standard-1",
+        "seed": 7,
+        "skills": {
+          "pathfinder": 3
+        },
+        "status": "victory",
+        "stop_reason": "victory",
+        "theme": "elderwild",
+        "turns": 13,
+        "upkeep_gold": 87
+      }
+    }
+  ],
+  "pursuit": [
+    {
+      "final": {
+        "actions": 0,
+        "army": [
+          {
+            "hp": 32,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 20,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 34,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 36,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "crystals": 23,
+        "gold": 197,
+        "heartwood": {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        "hero_hp": 44,
+        "hero_rank": 3,
+        "hero_xp": 20,
+        "income": 48,
+        "mana": 2,
+        "rival": {
+          "army": [],
+          "defeats": 1,
+          "gold": 176,
+          "intent": "recruit",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            0
+          ],
+          "target": [
+            2,
+            0
+          ],
+          "turns_until_action": 5
+        },
+        "shortfall": 0,
+        "turn": 6,
+        "upkeep": 9
+      },
+      "final_save_sha256": "43d23f87f57c8d5420256813c0fbf5e94d258be880e061f70727ffaea51a918f",
+      "lost_hero_troops": [
+        1
+      ],
+      "operations": [
+        {
+          "command": "intercept with explicit auto combat",
+          "state": {
+            "actions": 0,
+            "army": [
+              {
+                "hp": 32,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 20,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 3
+              },
+              {
+                "hp": 34,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 3,
+                "max_hp": 42,
+                "xp": 0
+              },
+              {
+                "hp": 36,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              }
+            ],
+            "crystals": 23,
+            "gold": 197,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 20,
+            "income": 48,
+            "mana": 2,
+            "rival": {
+              "army": [],
+              "defeats": 1,
+              "gold": 176,
+              "intent": "recruit",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                0
+              ],
+              "target": [
+                2,
+                0
+              ],
+              "turns_until_action": 5
+            },
+            "shortfall": 0,
+            "turn": 6,
+            "upkeep": 9
+          }
+        }
+      ],
+      "policy": "intercept",
+      "quote": null
+    },
+    {
+      "final": {
+        "actions": 1,
+        "army": [
+          {
+            "hp": 29,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 20,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 42,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 34,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "crystals": 26,
+        "gold": 230,
+        "heartwood": {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        "hero_hp": 44,
+        "hero_rank": 3,
+        "hero_xp": 20,
+        "income": 43,
+        "mana": 8,
+        "rival": {
+          "army": [],
+          "defeats": 1,
+          "gold": 208,
+          "intent": "recruit",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            0
+          ],
+          "target": [
+            2,
+            0
+          ],
+          "turns_until_action": 5
+        },
+        "shortfall": 0,
+        "turn": 7,
+        "upkeep": 10
+      },
+      "final_save_sha256": "dfbba78355b34b9de01d5dccee24178d2431890ac330d2d397bba107185a6092",
+      "lost_hero_troops": [],
+      "operations": [
+        {
+          "command": "end_turn: actual rival operation",
+          "state": {
+            "actions": 2,
+            "army": [
+              {
+                "hp": 31,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 29,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 38,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 26,
+            "gold": 205,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "rival",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 38,
+            "mana": 12,
+            "rival": {
+              "army": [
+                {
+                  "hp": 16,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 208,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                0,
+                0
+              ],
+              "target": [
+                -1,
+                0
+              ],
+              "turns_until_action": 2
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        },
+        {
+          "command": "intercept after waiting with explicit auto combat",
+          "state": {
+            "actions": 1,
+            "army": [
+              {
+                "hp": 29,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 20,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 3
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 3,
+                "max_hp": 42,
+                "xp": 0
+              },
+              {
+                "hp": 34,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              }
+            ],
+            "crystals": 26,
+            "gold": 230,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 20,
+            "income": 43,
+            "mana": 8,
+            "rival": {
+              "army": [],
+              "defeats": 1,
+              "gold": 208,
+              "intent": "recruit",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                0
+              ],
+              "target": [
+                2,
+                0
+              ],
+              "turns_until_action": 5
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        }
+      ],
+      "policy": "rest",
+      "quote": null
+    },
+    {
+      "final": {
+        "actions": 1,
+        "army": [
+          {
+            "hp": 29,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 20,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 42,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 34,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "crystals": 21,
+        "gold": 155,
+        "heartwood": {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        "hero_hp": 44,
+        "hero_rank": 3,
+        "hero_xp": 20,
+        "income": 43,
+        "mana": 14,
+        "rival": {
+          "army": [],
+          "defeats": 1,
+          "gold": 208,
+          "intent": "recruit",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            0
+          ],
+          "target": [
+            2,
+            0
+          ],
+          "turns_until_action": 5
+        },
+        "shortfall": 0,
+        "turn": 7,
+        "upkeep": 10
+      },
+      "final_save_sha256": "df409a57da93e36b5edf2a405c35be9b57575584c98017a4b8b73b1976a70383",
+      "lost_hero_troops": [],
+      "operations": [
+        {
+          "command": "build Mage Tower then infuse",
+          "state": {
+            "actions": 0,
+            "army": [
+              {
+                "hp": 18,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 16,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 36,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 18,
+            "gold": 97,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 43,
+            "mana": 18,
+            "rival": {
+              "army": [
+                {
+                  "hp": 16,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 176,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                1,
+                -1
+              ],
+              "target": [
+                0,
+                0
+              ],
+              "turns_until_action": 1
+            },
+            "shortfall": 0,
+            "turn": 6,
+            "upkeep": 10
+          }
+        },
+        {
+          "command": "end_turn: actual rival operation",
+          "state": {
+            "actions": 2,
+            "army": [
+              {
+                "hp": 31,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 29,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 38,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 21,
+            "gold": 130,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "rival",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 38,
+            "mana": 18,
+            "rival": {
+              "army": [
+                {
+                  "hp": 16,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 208,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                0,
+                0
+              ],
+              "target": [
+                -1,
+                0
+              ],
+              "turns_until_action": 2
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        },
+        {
+          "command": "intercept after waiting with explicit auto combat",
+          "state": {
+            "actions": 1,
+            "army": [
+              {
+                "hp": 29,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 20,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 3
+              },
+              {
+                "hp": 42,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 3,
+                "max_hp": 42,
+                "xp": 0
+              },
+              {
+                "hp": 34,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              }
+            ],
+            "crystals": 21,
+            "gold": 155,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 20,
+            "income": 43,
+            "mana": 14,
+            "rival": {
+              "army": [],
+              "defeats": 1,
+              "gold": 208,
+              "intent": "recruit",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                0
+              ],
+              "target": [
+                2,
+                0
+              ],
+              "turns_until_action": 5
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        }
+      ],
+      "policy": "tower_infuse",
+      "quote": null
+    },
+    {
+      "final": {
+        "actions": 1,
+        "army": [
+          {
+            "hp": 31,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 29,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 36,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 38,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "crystals": 26,
+        "gold": 170,
+        "heartwood": {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        "hero_hp": 44,
+        "hero_rank": 3,
+        "hero_xp": 20,
+        "income": 43,
+        "mana": 12,
+        "rival": {
+          "army": [],
+          "defeats": 1,
+          "gold": 208,
+          "intent": "recruit",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            0
+          ],
+          "target": [
+            2,
+            0
+          ],
+          "turns_until_action": 5
+        },
+        "shortfall": 0,
+        "turn": 7,
+        "upkeep": 10
+      },
+      "final_save_sha256": "dd990f601f043aff2ee2259c0ceaad595887eee9e2cf945c08d917af36540c95",
+      "lost_hero_troops": [],
+      "operations": [
+        {
+          "command": "PROTOTYPE dispatch outpost",
+          "quote": {
+            "actions": 1,
+            "added_upkeep": 4,
+            "crystals": 0,
+            "gold": 56,
+            "kinds": [
+              "pikeman",
+              "pikeman"
+            ],
+            "target": [
+              0,
+              0
+            ]
+          },
+          "state": {
+            "actions": 0,
+            "army": [
+              {
+                "hp": 18,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 16,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 36,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 23,
+            "gold": 116,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [
+                28,
+                28
+              ],
+              "guards": [
+                "pikeman",
+                "pikeman"
+              ],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 43,
+            "mana": 6,
+            "rival": {
+              "army": [
+                {
+                  "hp": 16,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 176,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                1,
+                -1
+              ],
+              "target": [
+                0,
+                0
+              ],
+              "turns_until_action": 1
+            },
+            "shortfall": 0,
+            "turn": 6,
+            "upkeep": 14
+          }
+        },
+        {
+          "command": "end_turn: actual rival operation",
+          "state": {
+            "actions": 2,
+            "army": [
+              {
+                "hp": 31,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 29,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 38,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 26,
+            "gold": 145,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "rival",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 38,
+            "mana": 12,
+            "rival": {
+              "army": [
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 2,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 208,
+              "intent": "return",
+              "next_troop_id": 7,
+              "pos": [
+                0,
+                0
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 1
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        },
+        {
+          "command": "intercept after waiting with explicit auto combat",
+          "state": {
+            "actions": 1,
+            "army": [
+              {
+                "hp": 31,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 29,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 3
+              },
+              {
+                "hp": 36,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 3,
+                "max_hp": 42,
+                "xp": 0
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              }
+            ],
+            "crystals": 26,
+            "gold": 170,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 20,
+            "income": 43,
+            "mana": 12,
+            "rival": {
+              "army": [],
+              "defeats": 1,
+              "gold": 208,
+              "intent": "recruit",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                0
+              ],
+              "target": [
+                2,
+                0
+              ],
+              "turns_until_action": 5
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        }
+      ],
+      "policy": "outpost_pikes",
+      "quote": {
+        "actions": 1,
+        "added_upkeep": 4,
+        "crystals": 0,
+        "gold": 56,
+        "kinds": [
+          "pikeman",
+          "pikeman"
+        ],
+        "target": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "final": {
+        "actions": 1,
+        "army": [
+          {
+            "hp": 31,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 29,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 36,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 38,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "crystals": 26,
+        "gold": 118,
+        "heartwood": {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        "hero_hp": 44,
+        "hero_rank": 3,
+        "hero_xp": 20,
+        "income": 43,
+        "mana": 12,
+        "rival": {
+          "army": [],
+          "defeats": 1,
+          "gold": 208,
+          "intent": "recruit",
+          "next_troop_id": 7,
+          "pos": [
+            2,
+            0
+          ],
+          "target": [
+            2,
+            0
+          ],
+          "turns_until_action": 5
+        },
+        "shortfall": 0,
+        "turn": 7,
+        "upkeep": 10
+      },
+      "final_save_sha256": "0011c08bd9c75a1bd3a58002af8fb1baa69dce3f76e05f9cc8c3b5fcea86e980",
+      "lost_hero_troops": [],
+      "operations": [
+        {
+          "command": "build archery",
+          "state": {
+            "actions": 1,
+            "army": [
+              {
+                "hp": 18,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 16,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 36,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 23,
+            "gold": 117,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 43,
+            "mana": 6,
+            "rival": {
+              "army": [
+                {
+                  "hp": 16,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 176,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                1,
+                -1
+              ],
+              "target": [
+                0,
+                0
+              ],
+              "turns_until_action": 1
+            },
+            "shortfall": 0,
+            "turn": 6,
+            "upkeep": 10
+          }
+        },
+        {
+          "command": "PROTOTYPE dispatch outpost",
+          "quote": {
+            "actions": 1,
+            "added_upkeep": 4,
+            "crystals": 0,
+            "gold": 53,
+            "kinds": [
+              "pikeman",
+              "archer"
+            ],
+            "target": [
+              0,
+              0
+            ]
+          },
+          "state": {
+            "actions": 0,
+            "army": [
+              {
+                "hp": 18,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 16,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 36,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 23,
+            "gold": 64,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [
+                28,
+                20
+              ],
+              "guards": [
+                "pikeman",
+                "archer"
+              ],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 43,
+            "mana": 6,
+            "rival": {
+              "army": [
+                {
+                  "hp": 16,
+                  "id": 1,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 20,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 176,
+              "intent": "attack",
+              "next_troop_id": 7,
+              "pos": [
+                1,
+                -1
+              ],
+              "target": [
+                0,
+                0
+              ],
+              "turns_until_action": 1
+            },
+            "shortfall": 0,
+            "turn": 6,
+            "upkeep": 14
+          }
+        },
+        {
+          "command": "end_turn: actual rival operation",
+          "state": {
+            "actions": 2,
+            "army": [
+              {
+                "hp": 31,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 29,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 0
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 0
+              },
+              {
+                "hp": 38,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 9
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 3
+              }
+            ],
+            "crystals": 26,
+            "gold": 93,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "rival",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 12,
+            "income": 38,
+            "mana": 12,
+            "rival": {
+              "army": [
+                {
+                  "hp": 24,
+                  "id": 5,
+                  "kind": "guard",
+                  "max_hp": 42
+                },
+                {
+                  "hp": 10,
+                  "id": 6,
+                  "kind": "archer",
+                  "max_hp": 20
+                }
+              ],
+              "defeats": 0,
+              "gold": 208,
+              "intent": "return",
+              "next_troop_id": 7,
+              "pos": [
+                0,
+                0
+              ],
+              "target": [
+                1,
+                -1
+              ],
+              "turns_until_action": 1
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        },
+        {
+          "command": "intercept after waiting with explicit auto combat",
+          "state": {
+            "actions": 1,
+            "army": [
+              {
+                "hp": 31,
+                "id": 1,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 29,
+                "id": 2,
+                "kind": "militia",
+                "level": 3,
+                "max_hp": 32,
+                "xp": 3
+              },
+              {
+                "hp": 28,
+                "id": 3,
+                "kind": "archer",
+                "level": 3,
+                "max_hp": 28,
+                "xp": 3
+              },
+              {
+                "hp": 36,
+                "id": 4,
+                "kind": "swordsman",
+                "level": 3,
+                "max_hp": 42,
+                "xp": 0
+              },
+              {
+                "hp": 38,
+                "id": 5,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              },
+              {
+                "hp": 38,
+                "id": 6,
+                "kind": "swordsman",
+                "level": 2,
+                "max_hp": 38,
+                "xp": 6
+              }
+            ],
+            "crystals": 26,
+            "gold": 118,
+            "heartwood": {
+              "capital": false,
+              "crystals": 1,
+              "explored": true,
+              "guard_hp": [],
+              "guards": [],
+              "income": 5,
+              "name": "Heartwood",
+              "owner": "player",
+              "pos": [
+                0,
+                0
+              ],
+              "site": "Buried Shrine",
+              "site_crystals": 2,
+              "site_gold": 45,
+              "site_guard_hp": [],
+              "site_guards": [],
+              "site_kind": "shrine",
+              "site_relic": "moonstone",
+              "terrain": "hills"
+            },
+            "hero_hp": 44,
+            "hero_rank": 3,
+            "hero_xp": 20,
+            "income": 43,
+            "mana": 12,
+            "rival": {
+              "army": [],
+              "defeats": 1,
+              "gold": 208,
+              "intent": "recruit",
+              "next_troop_id": 7,
+              "pos": [
+                2,
+                0
+              ],
+              "target": [
+                2,
+                0
+              ],
+              "turns_until_action": 5
+            },
+            "shortfall": 0,
+            "turn": 7,
+            "upkeep": 10
+          }
+        }
+      ],
+      "policy": "outpost_bow",
+      "quote": {
+        "actions": 1,
+        "added_upkeep": 4,
+        "crystals": 0,
+        "gold": 53,
+        "kinds": [
+          "pikeman",
+          "archer"
+        ],
+        "target": [
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "revision": "456742cb7da50fb1d72d16990aff12e16a8be0e2",
+  "source_files_changed_during_run": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "1890ee60548d27d73acda78a20b651aa50087b9b2c791af378daefacecec1ae4",
+    "eador/codex.py": "dbb12fff9abdc2c386963474a5c89996541c03ba1e6718f03e071dc4e62a84c1",
+    "eador/content.py": "d6c2a8683d4a283d093de46473c8af20042ddb53e39f404395cc4f4e87dc5a35",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "45e40e8e57163824fb6e2d6cef59bab518ddb7fe8e12ad63de69b53c781c572e",
+    "eador/encounters.py": "234632f98aa1d5f83191fc8a584e0afc177fec64c1f5695fa33080002fa15a2b",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/persistence.py": "9661a716922e8397d1cc70cfb0e26d0f4c5461050d576a72d2c8fcf5a03cffcc",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "b62f11321cb583759700c0ec43c7f1ed6ff5c916601f6f32cb2a0cc6ab06aa49",
+    "eador/replacement_scene.py": "95ca38ee23c7a7dbd792ce283616978aaba738a12b2988d6f3ef12054b4b1057",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "1982df3c6e980d4136b9aa7ab6c2bbd181dfd87a062c8f1d39e37b00d4697cad",
+    "eador/scene.py": "2f9bc878b7244d82bf0a44804b3a592a011cf45f2bf49cedfbb9a2d9ee505fa1",
+    "eador/settings_scene.py": "3bc3b6c1d3d01f8ede3986a87281a63f94e22403acf1d264a79f2b9d359786ab",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "496564d953ad05457be6fe214ddd14367925d725d36bc667b66db6b2efbd17ef",
+    "tools/audit_eador_difficulty.py": "1ce5e2e4be33f413298679142e1b186291950d4803d6114712456b468dd634ac",
+    "tools/audit_eador_economy.py": "507402fd0a2d125cf3cbc66e553f85f9b5735db9bf3639709b207cca316263ab",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/prototype_eador_late_realm.py": "6317620e10187738594a24bcf72eb9833584ac3749946f640ce9f79128d21e16",
+    "tools/stress_eador_control.py": "4e05a1b7a31b4ee77c50ee32ccacf0fa4c71587d1136f723e5f54472527d047e"
+  }
+}
