@@ -74,6 +74,8 @@ accepts `'clear'` for the paired comparison.
 The same checkpoint passes 300 randomized campaigns and 20 mock scene runs
 with 10,003 random inputs; both approaches were reached and source hashes
 remained unchanged. This is reliability evidence, not a campaign win-rate
-benchmark. Native briefing/control/result evidence is retained separately as
-it finishes. This content increment does not complete G05: it is one
+benchmark. The [native journeys](evidence/shardbound-observatory-2026-09-06/native/README.md)
+at integrated source `46a5aa8` replay all three purchased armies and approaches
+through 610 inputs and 26 exact reloads. Briefing, Smoke/Repulse forecasts and
+all three results were visually inspected. This content increment does not complete G05: it is one
 battlefield family, and its two approaches are not two authored patterns.
