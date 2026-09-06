@@ -1,0 +1,58 @@
+{
+  "source_commit": "3947ec2307a4066dc404816a9a6642961bc2bf0f",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "command": "python tools/verify_eador_rival_reading.py --output /tmp/shardbound-rival-reading-final",
+  "additional_native_command": "python tools/verify_eador_rival.py --output /tmp/shardbound-rival-reading-journey",
+  "additional_native_passed": true,
+  "logical_canvas": [
+    1280,
+    800
+  ],
+  "native_states": 15,
+  "native_layouts": 90,
+  "native_inputs": 818,
+  "exact_reload": 1,
+  "tests_passed": 1113,
+  "tests_seconds": 140.89,
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "monkey_runs": 20,
+    "seed": 17,
+    "failures": 0
+  },
+  "linked_fuzz": {
+    "campaigns": 60,
+    "scene_runs": 20,
+    "input_events": 3730,
+    "seed": 17,
+    "failures": 0
+  },
+  "source_sha256": {
+    "eador/rival_scene.py": "e0c9b83a85c6afac837d80e6733b72e87df6330e377c3a18e767e9f6cf602d41",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/reading.py": "b62f11321cb583759700c0ec43c7f1ed6ff5c916601f6f32cb2a0cc6ab06aa49",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/settings_scene.py": "3bc3b6c1d3d01f8ede3986a87281a63f94e22403acf1d264a79f2b9d359786ab",
+    "eador/scene.py": "2f9bc878b7244d82bf0a44804b3a592a011cf45f2bf49cedfbb9a2d9ee505fa1",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/backends/pyglet_backend.py": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8",
+    "tools/verify_eador_rival_reading.py": "4ebca493af8b5314271b875727b996e20db615b0c1d2b12a489f63125fb7ef8e",
+    "tools/verify_eador_rival.py": "12d6fe612d7f64b3130bd8c2a6c608549b39dc01beb715ec42265773cf16b66b",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/eador_ui.py": "9a3d99b3a287203b88d6eb3ce9f782011df5ae4dc9827aa383053e528708446b",
+    "tests/eador/test_rival_scene.py": "e92600203214398c1b8f2ba3b0817752177737932d6158c3a53080e7b1811717"
+  },
+  "artifact_sha256": {
+    "defeated-125.png": "a94bdffcb4761bb1393f2e99f432430b65cb3babd58fc758acf7201f82676ea9",
+    "encircled-125.png": "d211226e70c32883b5d85d0650eda67742c1ed0ae8637a7a239835d9ca3a478d",
+    "intercept-survivors-125.png": "775aefae4cde9e163cf00560453c8f4e8c2850a17cdb63ebf1d7ff63328daef9",
+    "linked-fuzz.json": "6bb84bba792a5478b6aad1d69dbe0176fc530ff1118472d9839ebaf396cb51c2",
+    "matrix.json": "e3b7a51dc3275b617c45750ef74ab06e7689eb171b72c938aba6bec06fa6a255",
+    "opening-100.png": "f47f29dc6530d6c57abe967e061c4970c6c65af01b5d1c2aad3f465336e8da9b",
+    "opening-125.png": "6d94e501e7dfba58ef43f1926891fe88d2da395ef227000393a97d9d7f2b6c1c",
+    "saved-challenge-1-125.png": "ae2bcf8f7cc8862eb5fc38d9b5a3ed303b646e351c0e14c491d8170e81214ce8"
+  }
+}

@@ -76,3 +76,62 @@ def test_encirclement_and_unpaid_upkeep_are_visible_before_ending_a_turn(tmp_pat
         assert "deserted" in rendered_text(game)
     finally:
         game._teardown()
+
+
+def test_rival_reading_size_cancel_apply_and_restart_preserve_saved_forces(tmp_path):
+    """The actual conquered expedition reflows through Settings and remains unchanged when located."""
+    from saga2d import Label
+    from eador.preferences import reading_scale
+    from eador.rival_scene import RivalScene
+    from tools.eador_ui import PlayerInput
+    from tools.verify_eador_guidance import check_reading_layout
+
+    state = State.new(7)
+    for _ in range(state.rival.turns_until_action):
+        state.end_turn()
+    before = state.to_json()
+    saves = tmp_path / 'saves'
+    game = create_game(backend='mock', save_dir=saves)
+    try:
+        game.push(ShardScene(state))
+        player = PlayerInput(game)
+        player.press('v')
+        for key in ('t', 'right', 'escape'):
+            player.press(key)
+        assert isinstance(game.scene, RivalScene) and reading_scale(game) == 100
+        assert not (tmp_path / 'settings.json').exists()
+        for key in ('t', 'right', 'return'):
+            player.press(key)
+        assert isinstance(game.scene, RivalScene) and reading_scale(game) == 125
+        check_reading_layout(game.scene)
+        texts = [label.text for label in game.scene.ui.find_all(lambda item: isinstance(item, Label))]
+        assert any(state.provinces[state.rival.target].name in text for text in texts)
+        assert any(f'{state.rival.gold} gold' in text for text in texts)
+        for troop in state.rival.army:
+            assert f'{troop.hp}/{troop.max_hp} health' in texts
+        player.press('e')
+        assert state.to_json() == before
+        player.button('Locate expedition')
+        assert player.root.selected == state.rival.pos
+        player.reload(before)
+    finally:
+        game._teardown()
+    game = create_game(backend='mock', save_dir=saves)
+    try:
+        root = ShardScene(State.from_json(before))
+        game.push(root)
+        player = PlayerInput(game)
+        player.press('v')
+        assert reading_scale(game) == 125
+        check_reading_layout(game.scene)
+        player.press('l')
+        assert game.scene is root and root.selected == root.state.rival.pos
+        assert root.state.to_json() == before
+    finally:
+        game._teardown()
+
+
+def test_earned_rival_operations_and_old_rules_remain_complete_at_both_reading_sizes(tmp_path):
+    """Every current order, wounded survivor, paid refit and old-rule warning is read without issuing a command."""
+    from tools.verify_eador_rival_reading import verify
+    verify(tmp_path, backend='mock')
