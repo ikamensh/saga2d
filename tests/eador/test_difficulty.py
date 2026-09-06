@@ -167,3 +167,22 @@ def test_replay_starts_the_same_policy_without_mutating_the_finished_or_live_run
     assert replay.to_json() == initial and state.to_json() == saved
     replay.end_turn()
     assert state.to_json() == saved
+
+
+@pytest.mark.parametrize('mode,gold,loses_acolyte', [('standard', 0, True), ('challenge', 5, False)])
+def test_recovery_forecasts_this_turns_paid_survivors_before_the_treasury_changes(mode, gold, loses_acolyte):
+    """A valid wounded-army fixture isolates unpaid support and the exact payment phase."""
+    from eador.model import Troop, UNITS
+    state = State.new(7, difficulty=mode)
+    # Controlled roster/resource fixture, not an additional earned campaign claim.
+    state.hero.army = [Troop(i, 'skyrider', 10, UNITS['skyrider'].hp, xp=1) for i in range(1, 6)]
+    state.hero.army.append(Troop(6, 'healer', 10, UNITS['healer'].hp))
+    state.next_troop_id, state.gold, state.hero.hp = 7, gold, 12
+    state = State.from_json(state.to_json())
+    before = state.to_json()
+    forecast = state.recovery_preview()
+    assert state.to_json() == before
+    state.end_turn()
+    assert any(t.kind == 'healer' for t in state.hero.army) is not loses_acolyte
+    assert state.hero.hp == 12 + forecast.hero_hp
+    assert all(t.hp == 10 + forecast.army_hp for t in state.hero.army)

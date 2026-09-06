@@ -303,10 +303,11 @@ class State:
         """Read the coming rest without spending a turn or copying recovery rules."""
         if self.encircled and self.hero.pos == (-2, 0):
             return RecoveryPreview(0, 0, 0, 'Encirclement blocks recovery at Westwatch.')
+        departing = {troop.id for troop in self._unpaid_troops()}
         recovery = (self.rules.army_recovery + (3 if 'temple' in self.buildings else 0)
                     + self.hero.skill_ranks.get('quartermaster', 0)
                     + (3 if self.hero.relic == 'oak_standard' else 0)
-                    + (2 if any(t.kind == 'healer' for t in self.hero.army) else 0))
+                    + (2 if any(t.kind == 'healer' and t.id not in departing for t in self.hero.army) else 0))
         hero_recovery = recovery + 2 + 2 * self.hero.skill_ranks.get('vigor', 0)
         return RecoveryPreview(min(self.hero.max_hp - self.hero.hp, hero_recovery), recovery,
                                min(self.hero.max_mana - self.hero.mana, self.rules.mana_recovery))
@@ -336,6 +337,17 @@ class State:
     @property
     def upkeep_shortfall(self) -> int:
         return max(0, self.upkeep - self.gold - self.income)
+
+    def _unpaid_troops(self) -> list[Troop]:
+        """Project deterministic desertions against this turn's available treasury."""
+        shortfall, departing = self.upkeep_shortfall, []
+        for troop in sorted(self.hero.army,
+                            key=lambda t: (t.level, t.xp, -UNITS[t.kind].upkeep, -t.id)):
+            if shortfall <= 0:
+                break
+            departing.append(troop)
+            shortfall -= UNITS[troop.kind].upkeep
+        return departing
 
     @property
     def spells(self) -> set[str]:
@@ -647,8 +659,8 @@ class State:
 
     def end_turn(self) -> None:
         self._ready()
-        while self.upkeep_shortfall:
-            deserter = min(self.hero.army, key=lambda troop: (troop.level, troop.xp, -UNITS[troop.kind].upkeep, -troop.id))
+        recovery = self.recovery_preview()
+        for deserter in self._unpaid_troops():
             self.hero.army.remove(deserter)
             self.log.append(f'Unpaid upkeep: level {deserter.level} {UNITS[deserter.kind].name} deserted.')
         earnings = self.income - self.upkeep
@@ -656,7 +668,6 @@ class State:
         self.crystals += self.crystal_income
         self.turn += 1
         self.actions_left = 3 if self.hero.hero_class == 'Scout' else 2
-        recovery = self.recovery_preview()
         can_rest = recovery.blocked_reason is None
         if can_rest:
             self.hero.hp += recovery.hero_hp
