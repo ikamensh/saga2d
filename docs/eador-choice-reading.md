@@ -48,3 +48,6 @@ uv run python tools/verify_eador_choices.py --output /tmp/shardbound-choice-read
 recording backend, plus immediate quicksave/quickload error visibility,
 oversized malformed version diagnostics and preserved damaged-file bytes.
 The matrix is layout and command evidence, not a campaign balance or play-quality claim.
+
+The [retained native evidence](evidence/shardbound-choice-reading-2026-09-06/README.md)
+includes the source-attributed matrix and six inspected representative frames.
