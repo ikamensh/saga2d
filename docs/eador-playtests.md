@@ -18,3 +18,12 @@ whether an unfamiliar player understands or enjoys the game.
 
 Keep this archive unchanged so any feedback can be reproduced against its exact
 source. Later builds and their observations should receive separate entries.
+
+## Available updated checkpoint — 2026-09-06
+
+The separately preserved `0e271756d35d` Mac development build includes the
+eighth authored encounter, twelve relics, three saved modes and larger guidance
+text. [Exact identity and verification](evidence/shardbound-integrated-0e27175/README.md)
+are recorded. It is available for subsequent feedback; no new request or human
+observation is counted, and the original pending playtest remains attributable
+to its earlier artifact.

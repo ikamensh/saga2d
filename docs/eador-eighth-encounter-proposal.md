@@ -1,5 +1,10 @@
 # Eighth encounter: prefer a split rescue
 
+Historical design record. The accepted prototype was subsequently absorbed
+and deleted; current content, paid routes, source guarantees and failure checks
+are described in `eador-stranded-explorer.md`. Measurements below describe the
+earlier standalone battle probe, before production-site travel was added.
+
 Design probe, 2026-09-06. This is a proposal using the current rules, not a new
 registered site or a G05 completion claim. The release criteria require useful
 decisions, visible consequences and complete alternatives; another seal with
@@ -91,9 +96,9 @@ The full layout, ending units, battle logs, public orders and source hashes are
 in `docs/evidence/stranded-explorer-prototype.json`, from `dcb626a` after merging
 main's Standard-compatible schema v12. Run:
 
-```sh
-PYTHONPATH=. python tools/prototype_eador_rescue.py --verbose --report /tmp/rescue-prototype.json
-```
+The removed prototype can be recovered from that recorded source revision.
+For current production replay use `prepare_explorer()` and `explorer_route()`
+from `tools/eador_explorer_campaign.py`.
 
 ## Before this could become an accepted eighth pattern
 

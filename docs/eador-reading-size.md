@@ -1,6 +1,6 @@
 # Reading size
 
-The Field Codex offers **Text size** (`T`), opening Settings directly on
+The Field Codex and expedition briefings offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -10,9 +10,11 @@ This setting enlarges the Codex category introduction and each entry's title,
 facts and description across Troops, Abilities, Buildings, Skills, Sites and
 Relics. The Field Guide uses the same value for all four numbered headings, their prose
 and the quick-reference line. Its two measured columns preserve all sections at
-both sizes. Navigation buttons, large screen titles and page count keep their
+both sizes. Expedition briefings enlarge objective headings/instructions,
+resource and approach facts, rewards, map legends, defender counts/health and
+entry messages. Navigation buttons, large screen titles and page count keep their
 normal size. Other screens—including tactical forecasts, HUD, recruitment, rewards, equipment,
-saves, campaign plans and encounter briefings—keep their existing text sizes.
+saves and campaign plans—keep their existing text sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
 
@@ -54,6 +56,7 @@ the same explicit recovery semantics.
 ```bash
 uv run python -m pytest tests/eador/test_codex_scale.py tests/eador/test_codex.py tests/eador/test_preferences_scene.py -q
 uv run python tools/verify_eador_reading.py --matrix --output /tmp/shardbound-reading
+uv run python tools/verify_eador_guidance.py --matrix --output /tmp/shardbound-guidance
 ```
 
 The public integration journeys cover visible controls and keyboard parity,
@@ -92,15 +95,23 @@ frames show the reading change; the paid Observatory and earned Smoke frames
 preserve the long saved-value cases.
 
 
-## Extending the one reading policy
+## One reading policy and the remaining layouts
 
-The next bounded layout conversion is expedition briefings: objective, approach
-cost, reward, surviving defenders and retreat/retry facts must all fit enlarged
-beside the actual deployment preview. The old 450-wide instruction column has
-about 227 logical pixels before its fixed reward block. The shipped hold prose
-measured 348 pixels at 125% through attached wrapped Labels at 1280×720; merely
-multiplying the existing draw font would collide with the reward. A wider,
-measured composition should precede extending the Settings scope notice.
+Expedition briefings now compose their objective and deployment side by side,
+then rewards and defenders, followed by the entry message and controls. The
+window height follows measured content, up to 780 on the 800-pixel logical canvas.
+The map uses its original 21-pixel hexes in a reserved layout component; no
+terrain, deployment, objective or fee rule is reconstructed by layout code.
+Each defender type has its own measured Label. Larger lists use two columns,
+keeping each name/count together and the wounded-health summary below them.
+Approach selection survives Settings and Codex overlays. Canceling the briefing
+spends nothing; only its original entry command spends the selected fee/action.
+
+This replaces an actual fixed-position limit: the old 450-wide instruction
+column had about 227 logical pixels before its reward block. The shipped hold
+prose measured 348 pixels at 125% through attached wrapped Labels at 1280×720.
+Simply increasing the font would have collided with the reward. The scene now
+measures whole groups and leaves text at the selected size.
 
 Later conversions should reuse this same preference. Recruitment, reward and
 Hero screens need measured complete rows/cards and visible-entry shortcuts;
@@ -121,3 +132,28 @@ Cancel, Apply, Codex return, three native window sizes and settings restart.
 `tools/verify_eador_guidance.py` retains frames and checks reading bounds and
 text/control separation. Its 100/125 Guide and Settings frames were inspected on
 macOS Retina; the historical Codex matrix above remains separately attributed.
+
+
+The subsequent briefing matrix on the same base passed 96 approach views: every
+then-current authored encounter at 100/125 in all three native windows, including
+actual paid preparations, a wounded Observatory retry, an unaffordable Crossing
+fee and the linked final Gate. Another six records cover the Guide/Observatory
+tracer. Native extraction, rout, hold, blocked-fee and final-Gate frames were
+inspected. These are content-snapshot counts; new authored sites need their own
+public preparation in the matrix.
+
+
+After integrating Explorer model `e041337`, the guidance matrix covers all 13
+current encounter definitions: 132 approach views plus six Guide/Observatory
+tracer records. The actual paid Ranger, Acolyte and smaller Scout parties appear
+in both Explorer approaches at 100/125 in all three native windows. The briefing
+names the isolated troop from the current army and selected deployment, using
+“army slot 5” rather than implying a tactical troop ID; the smaller party says
+the hero starts alone. No saved troop capabilities or entry commands change.
+The wider defender column keeps all four Explorer names and wounded HP distinct
+at 125%, without reducing font size or changing the deployment geometry.
+
+The [retained guidance evidence](evidence/shardbound-guidance-2026-09-06/README.md)
+contains this final source-attributed matrix and six inspected frames. The
+isolated full suite passed 1,029 tests; 27 focused guidance, extraction,
+Observatory and Codex checks passed.

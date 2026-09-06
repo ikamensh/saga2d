@@ -147,3 +147,12 @@ def test_native_opening_driver_funds_its_support_purchase_in_every_mode(tmp_path
     report = verify(tmp_path, backend='mock')
     assert {row['mode'] for row in report['modes']} == {'accessible', 'standard', 'challenge'}
     assert all(row['fresh_game_restarts'] == 1 for row in report['modes'])
+
+
+def test_recorded_challenge_keeps_its_original_rest_and_linked_funding_through_current_controls(tmp_path):
+    """Load actual earlier saves after starting today's Challenge; visible commands preserve exact continuation."""
+    from tools.verify_eador_difficulty import verify_recorded_challenge
+
+    reports = verify_recorded_challenge(tmp_path, backend='mock')
+    assert {row['case'] for row in reports} == {'rest', 'advance', 'recover'}
+    assert all(row['rules_id'] == 'challenge-1' and row['exact_save_reloads'] == 1 for row in reports)
