@@ -260,7 +260,8 @@ def terrain_detail(scene, terrain, x, y, seed, scale=1):
         village(scene, x, y + 6 * scale, .8 * scale)
 
 
-def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False):
+def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False, name_label=True):
+    """Draw a province; compact maps may lay out the complete name separately."""
     x, y = grid.center(pos)
     s = grid.size / 78
     points = grid.corners(pos)
@@ -283,7 +284,7 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False)
         scene.draw_circle(x + 39 * s, y - 24 * s, 9 * s, INK)
         scene.draw_text("?", x + 39 * s, y - 24 * s, color=GOLD, font_size=12,
                         anchor_x="center", anchor_y="center")
-    if data.name:
+    if data.name and name_label:
         scene.draw_rect(x - 53 * s, y + 25 * s, 106 * s, 21 * s, (23, 37, 33, 218), radius=3)
         scene.draw_text(data.name, x, y + 35 * s, font_size=max(9, round(10 * s)), color=TEXT,
                         anchor_x="center", anchor_y="center")
