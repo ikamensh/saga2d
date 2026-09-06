@@ -465,7 +465,7 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         press(game, "r")
         press(game, "2")
         press(game, "escape")
-        for destination in ((-2, 0), (-1, 0), (0, 0), (1, 0)):
+        for destination in ((-2, 0), (-1, 0), (0, 0), (0, 1), (1, 0)):
             if state.hero.pos != destination:
                 click(game, *root.grid.center(destination))
                 press(game, "return")
@@ -473,6 +473,13 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
                 rest()
                 prepare()
             press(game, "x")
+            if state.provinces[destination].site_kind == 'relief_column':
+                from eador.encounter_scene import EncounterScene
+                assert isinstance(game.scene, EncounterScene)
+                before = state.to_json()
+                press(game, 'escape')  # The same reward remains at the ordinary Grove next door.
+                assert state.to_json() == before
+                continue
             battle()
             rest()
             prepare()

@@ -65,7 +65,7 @@ class SiteSpec:
     guards: tuple[str, ...]
     gold: int
     crystals: int
-    relic: str
+    relic: str | None
     encounter: str | None = None
     approaches: tuple[AdventureApproach, ...] = ()
 
@@ -125,6 +125,12 @@ SITES = {
         ('pikeman', 'archer', 'guard', 'warden'), 55, 1, 'wayfarer_boots', 'explorer_north', (
             AdventureApproach('north', 'Assemble to the north', 'Free. The main force begins north of the return exit. Your hero and fifth troop, if present, start isolated east of the marsh.', 'explorer_north'),
             AdventureApproach('south', 'Assemble to the south', 'Free. The main force begins near the southern patrol. Your hero and fifth troop, if present, start isolated east of the marsh.', 'explorer_south'),
+        )),
+    # The generated province retains its displaced ordinary site's exact reward.
+    'relief_column': SiteSpec('Relief Column', 'Hold the signal for two uncontested enemy turns by round 4, or rout the relief force. Its Militia can Rally a pinned Skyrider.',
+        ('skyrider', 'militia', 'archer', 'guard'), 0, 0, None, 'relief_forward', (
+            AdventureApproach('forward', 'Intercept the support', 'Free. Deploy near the signal and the approaching support. A living Militia can clear Pin before its Skyrider lands.', 'relief_forward'),
+            AdventureApproach('western', 'Receive the relief column', 'Free. Assemble west of the signal. Absorb the landing, then clear contesters before the final scoring turns.', 'relief_western'),
         )),
 
 }

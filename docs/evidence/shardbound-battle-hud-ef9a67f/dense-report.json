@@ -1,0 +1,27 @@
+{
+  "source_sha256": {
+    "eador/scene.py": "52b9947da37eb89c2cbcfdedcc360c784b4f1de9d7d78f11360e7f4fb306be07",
+    "eador/diagnostics.py": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c"
+  },
+  "inputs": 20,
+  "cases": [
+    {
+      "case": "dense-smoke",
+      "guarded_unit": 0,
+      "cloud": [
+        -3,
+        1
+      ],
+      "grid_size": 32.45454545454545,
+      "footer_top": 632
+    },
+    {
+      "case": "pinned",
+      "unit": 0,
+      "stance": "guard",
+      "grid_size": 32.54545454545455,
+      "footer_top": 632
+    }
+  ],
+  "source_unchanged": true
+}

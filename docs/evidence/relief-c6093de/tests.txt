@@ -1,0 +1,38 @@
+........................................................................ [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+........................................................................ [ 24%]
+........................................................................ [ 30%]
+........................................................................ [ 36%]
+........................................................................ [ 43%]
+........................................................................ [ 49%]
+........................................................................ [ 55%]
+........................................................................ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 73%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 92%]
+........................................................................ [ 98%]
+................                                                         [100%]
+=============================== warnings summary ===============================
+tests/framework/test_render3d.py: 8 warnings
+tests/tribes/test_scene.py: 5184 warnings
+tests/tribes/test_view.py: 1332 warnings
+  /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-relief/saga2d/render3d.py:370: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    small = np.stack([np.asarray(Image.fromarray(plane, "F").resize(size, Image.Resampling.BOX)) for plane in planes], axis=-1)
+
+tests/framework/test_render3d.py: 2 warnings
+tests/tribes/test_scene.py: 1296 warnings
+tests/tribes/test_view.py: 333 warnings
+  /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-relief/saga2d/render3d.py:373: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    return Image.fromarray(np.concatenate([rgb, alpha], axis=-1).round().clip(0, 255).astype(np.uint8), "RGBA")
+
+tests/framework/test_render3d.py: 2 warnings
+tests/tribes/test_scene.py: 1296 warnings
+tests/tribes/test_view.py: 333 warnings
+  /Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-relief/saga2d/render3d.py:400: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+    return Image.fromarray(np.concatenate([rgb, alpha[..., None]], axis=-1).round().astype(np.uint8), "RGBA")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1168 passed, 9786 warnings in 195.87s (0:03:15)
