@@ -35,7 +35,7 @@ army after Smoke-now versus Guard-now. Both finish R4 without deaths at two mana
 Preparation is model-owned and the continuation uses automatic rounds; this is
 neither a full native paid campaign nor optimal manual play. A real Sealed Vault
 regression also fixed a harness detour that could explore away from its named
-target. Audit CLIs now honor the 25% CPU allowance and default to a bounded case.
+target. Investment audit CLIs honor the 25% CPU allowance and default to a bounded case.
 
 [Three persistent paid army plans](eador-army-plans.md) complete first Standard
 seed-7 Foundries→Throne model pilots while maintaining different recruitment and
@@ -48,6 +48,18 @@ protection, movement and control decisions from these actual earned formations.
 Fifteen combined audit/budget/journey tests pass on `64cfe7a`; all jobs ended.
 This work changes only development tools, tests and evidence. The game/framework
 bytes remain those in the preserved `a6851fb` archive.
+
+[Older audit CPU limits](evidence/audit-pacing-8312c84/README.md) now cover nine
+previously unrestricted standalone commands, including preparation and repeats.
+The 62 focused integration checks and two small serial CLI probes pass; all
+Saga2D jobs ended. These tools retain existing matrix choices and add small-case
+filters to the economic comparisons. No cancelled stress work was restarted.
+
+[Two earned order comparisons](evidence/army-decisions-474b41a/README.md) carry
+actual casualties through immediate paid replenishment: protecting the Adept
+avoids 65 gold/2 crystals, while withdrawing the Warden transfers the loss to
+Militia, saving 35 gold at the cost of four living HP. These local examples do
+not establish three complete manual plans, and G04 remains incomplete.
 
 ## Earlier playable checkpoint — 2026-09-06
 

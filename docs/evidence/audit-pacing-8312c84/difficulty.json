@@ -1,0 +1,183 @@
+{
+  "adaptive_interception": false,
+  "cpu_percent": 25,
+  "dirty": [
+    " M .gitignore",
+    " M CLAUDE.md",
+    " M README.md",
+    " M docs/early-access-progress.md",
+    " M tools/audit_eador_campaign.py",
+    " M tools/audit_eador_crystal_demand.py",
+    " M tools/audit_eador_difficulty.py",
+    " M tools/audit_eador_disciplines.py",
+    " M tools/audit_eador_economy.py",
+    " M tools/audit_eador_worlds.py",
+    " M tools/eador_extraction_campaign.py",
+    " M tools/eador_linked_campaign.py",
+    " M tools/eador_relic_campaign.py",
+    " M tools/stress_eador_control.py",
+    " M tools/stress_eador_relics.py",
+    " M tools/stress_eador_roles.py",
+    "?? tests/eador/test_army_decisions.py",
+    "?? tests/tools/test_audit_cli_budget.py",
+    "?? tests/tools/test_campaign_audit_budget.py",
+    "?? tests/tools/test_stress_budget.py",
+    "?? tools/audit_eador_army_decisions.py"
+  ],
+  "elapsed_seconds": 0.697262917063199,
+  "heroes": [
+    "Commander"
+  ],
+  "mana_reserve": null,
+  "modes": [
+    "standard"
+  ],
+  "plans": [
+    "economy"
+  ],
+  "policy": "Fixed purchased plans; disclosed site itineraries; first/free approaches; explicit automatic tactics; original fixed-destination rival interception; within-four-of-maximum assault mana; unchanged six-HP wound tolerance; 60-turn/40-assault policy bounds.",
+  "revision": "1aab5b7a047b0e801c00bdc96543fdfb5d115e9d",
+  "routes": [
+    "direct"
+  ],
+  "rows_file": "shardbound-paced-difficulty.rows.json.gz",
+  "rows_sha256": "cd0fd21f0a55d3c931afea8105bc344dca7adc716580e7132e030c1c2434dfab",
+  "rules_id_override": null,
+  "seeds": 10,
+  "source_files_changed": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "52578ae4ab65a0dfd8852f2eb49d128b5559e2953bcf90486f10f7c4a89cfd14",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "46e1d88a47249f76640a9ee15bb69f42457ad6621369b5a4679c8d9686cb866d",
+    "eador/battle.py": "ba19db6ded9a9844b852cc73bdfc33c14d7a9ba6d981e6b85a36fe0f16bc519c",
+    "eador/battle_playback_scene.py": "5399c1dff3d26e06259ac06169ef24ecc65feb5343e7d56d00537d543fcc27a2",
+    "eador/battle_trace.py": "57e1736fcb430a66c800d4268d1c1fe63c38ad19cbbb85b648ea53a1006f051c",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "6ad5769c6d1ce1f8eb9db56d84cc5e65a972a778d24053129d92bbc3af5442a0",
+    "eador/codex.py": "db7c5b451767786490a926483183979a16285b4d67f2d22d158c269a9816dee0",
+    "eador/content.py": "6dbac37f87693364516ea10c3c19e96b67892df4d74d224c15f824dc900128db",
+    "eador/diagnostics.py": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "c567a3c4bbec55de4950681f3b7b5a6a5e7c04c545498f5aa6ce0ed2faad7d76",
+    "eador/encounters.py": "66878812c1406fbbc1dc3d1d3d98cf9d067e3f01d6f9cfccb1e8649719c0737d",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c",
+    "eador/release.py": "4bf603144c1bf6232feb366b004ac5dad60c32dbb0547d054a4033ef24be21c4",
+    "eador/replacement_scene.py": "84a98abcae1255ffb4fc351f4c209e61dfa6c70f3d69f6f85fa7a19991b8568c",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "4a3a15bb4a36fc6d10c7d5ebdd07a37faba0def606ce1e3ff8af35170d48a21b",
+    "eador/scene.py": "54dfaba09428580ca307506bf8f16fd20e242c213a65edbe210f150c040205bd",
+    "eador/settings_scene.py": "cf16efa9d04153ea94c4ac50862c871fae6d04feb4b02d48aea13dd07a53f9ca",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "0c89b6d52208f9cc929e67caae09790f4b1407903806fe87f0f01d0320ac79a3",
+    "tools/audit_eador_difficulty.py": "a0936628d6605e66bb166c9116e5cad29e2d12fe230627ade8a2ff939857b750",
+    "tools/audit_eador_economy.py": "1d235ff048abdff999a4dde78b4bcfc3224f9bc7370055dd1c1c0c5512c19a0f",
+    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2",
+    "tools/eador_campaign.py": "f697a6a0d790b72c0e6cd473acf83b85ef17e2dd6578f832e1f05978dc0f83e9",
+    "tools/stress_eador_control.py": "c041ceca925445e654a9e97597f692741c8e3d6be90bb12b04069766c1c7ab1c"
+  },
+  "summary": {
+    "standard/economy": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 45,
+        "battle.intercept": 10,
+        "battle.site": 40,
+        "final_advance": 14,
+        "final_wait.wounds": 1
+      },
+      "deserters": 0,
+      "max_turns": 12,
+      "mean_building_gold": 170,
+      "mean_casualties": 2.2,
+      "mean_crystals_left": 55.1,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 483.4,
+      "mean_mana_spent": 38.8,
+      "mean_recovery_turns": 0.1,
+      "mean_recruitment_gold": 194,
+      "mean_turns": 10.5,
+      "mean_upkeep_gold": 88,
+      "median_turns": 10.0,
+      "outcomes": {
+        "victory": 10
+      },
+      "p90_turns": 11,
+      "runs": 10,
+      "stop_reasons": {
+        "victory": 10
+      }
+    },
+    "standard/economy/direct": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 45,
+        "battle.intercept": 10,
+        "battle.site": 40,
+        "final_advance": 14,
+        "final_wait.wounds": 1
+      },
+      "deserters": 0,
+      "max_turns": 12,
+      "mean_building_gold": 170,
+      "mean_casualties": 2.2,
+      "mean_crystals_left": 55.1,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 483.4,
+      "mean_mana_spent": 38.8,
+      "mean_recovery_turns": 0.1,
+      "mean_recruitment_gold": 194,
+      "mean_turns": 10.5,
+      "mean_upkeep_gold": 88,
+      "median_turns": 10.0,
+      "outcomes": {
+        "victory": 10
+      },
+      "p90_turns": 11,
+      "runs": 10,
+      "stop_reasons": {
+        "victory": 10
+      }
+    },
+    "standard/ruins/Commander/economy/direct": {
+      "battle_defeats": 0,
+      "decisions": {
+        "battle.conquest": 45,
+        "battle.intercept": 10,
+        "battle.site": 40,
+        "final_advance": 14,
+        "final_wait.wounds": 1
+      },
+      "deserters": 0,
+      "max_turns": 12,
+      "mean_building_gold": 170,
+      "mean_casualties": 2.2,
+      "mean_crystals_left": 55.1,
+      "mean_crystals_spent": 0,
+      "mean_gold_left": 483.4,
+      "mean_mana_spent": 38.8,
+      "mean_recovery_turns": 0.1,
+      "mean_recruitment_gold": 194,
+      "mean_turns": 10.5,
+      "mean_upkeep_gold": 88,
+      "median_turns": 10.0,
+      "outcomes": {
+        "victory": 10
+      },
+      "p90_turns": 11,
+      "runs": 10,
+      "stop_reasons": {
+        "victory": 10
+      }
+    }
+  },
+  "themes": [
+    "ruins"
+  ],
+  "worst_from": null
+}

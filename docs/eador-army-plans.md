@@ -100,3 +100,13 @@ especially keeping ranged troops out of melee and deciding when specialist
 orders justify their purchase. Adding content IDs or altering game balance from
 these three automatic outcomes would outrun the evidence. Actual capital-loss
 recovery for these three rosters remains unverified.
+
+## First earned order comparisons
+
+[Two exact saved decisions](evidence/army-decisions-474b41a/README.md) now continue
+through real rewards and immediate paid replenishment. Using three ready
+attackers before the wounded Adept preserves it and avoids a 65-gold/2-crystal
+replacement, with the same round and mana. Withdrawing the wounded Warden saves
+35 replacement gold but transfers the casualty to Militia and leaves four less
+living HP. Both are local model-command examples; no rest, native continuation
+or complete manual campaign is claimed. G04 remains incomplete.

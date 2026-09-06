@@ -1,0 +1,2 @@
+10/10 paid campaigns checked
+{('standard', 'victory'): 10}
