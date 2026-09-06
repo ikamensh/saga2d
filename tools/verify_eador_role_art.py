@@ -19,12 +19,13 @@ from tools.eador_ui import PlayerInput
 
 
 class TroopSheet(Screen):
+    kinds = [('archer', 'Archer'), ('ranger', 'Ranger'), ('swordsman', 'Swordsman'),
+             ('warden', 'Warden'), ('Wizard', 'Wizard'), ('healer', 'Acolyte')]
+
     def draw(self):
         self.text('SHARDBOUND / TROOP SILHOUETTES', 50, 35, size=28, serif=True)
         self.text('Original vector pieces · same rendering at battle and retinue scales', 50, 79, size=14, color=MUTED)
-        kinds = [('archer', 'Archer'), ('ranger', 'Ranger'), ('swordsman', 'Swordsman'),
-                 ('warden', 'Warden'), ('Wizard', 'Wizard'), ('healer', 'Acolyte')]
-        for i, (kind, label) in enumerate(kinds):
+        for i, (kind, label) in enumerate(self.kinds):
             x = 155 + 192 * i
             self.text(label, x, 125, size=19, center=True, color=TEAL)
             art.piece(self, x, 272, kind, 'player', scale=1.8)

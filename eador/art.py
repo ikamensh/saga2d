@@ -40,6 +40,20 @@ def seal(scene, grid, pos, *, label=True):
         scene.text("SEAL" if grid.size >= 30 else "S", x, y - 6, size=8, color=GOLD, center=True)
 
 
+def exit_marker(scene, grid, pos, number, *, label=True):
+    """A numbered doorway remains distinguishable from the seal without color."""
+    x, y = grid.center(pos)
+    outline(scene, grid.corners(pos), TEAL, 3)
+    size = grid.size
+    left, top = x - size * .30, y - size * .40
+    scene.draw_line(left, y + size * .24, left, top, TEAL, width=2)
+    scene.draw_line(left, top, x + size * .30, top, TEAL, width=2)
+    scene.draw_line(x + size * .30, top, x + size * .30, y + size * .24, TEAL, width=2)
+    if label:
+        scene.text(f'EXIT {number}' if size >= 30 else str(number), x, y + size * .34,
+                   size=8 if size >= 30 else 7, color=TEAL, center=True)
+
+
 def backdrop(scene, width, height):
     """Quiet star field and engraved orbit lines around the floating shard."""
     rng = random.Random(918)
@@ -185,6 +199,85 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
                             (x + 22 * s, y - 15 * s)], (207, 211, 193, 255))
         scene.draw_line(x - 14 * s, y - 12 * s, x - 26 * s, y - 24 * s, fur, 5 * s)
         scene.draw_circle(x + 18 * s, y - 23 * s, 1.5 * s, INK)
+        return
+    if lower == "sapper":
+        # A low work helmet, apron, side canister and curling plume read as a
+        # field engineer rather than another sword-and-shield infantry piece.
+        leather = (170, 133, 87, 255)
+        scene.draw_rect(x - 17 * s, y - 21 * s, 28 * s, 25 * s, color, radius=4 * s)
+        for dx in (-8, 7):
+            scene.draw_line(x + dx * s, y, x + dx * s, y + 12 * s, TEXT, 5 * s)
+        scene.draw_polygon([(x - 10 * s, y - 18 * s), (x + 6 * s, y - 18 * s),
+                            (x + 10 * s, y + 5 * s), (x - 14 * s, y + 5 * s)], leather)
+        scene.draw_line(x - 12 * s, y - 15 * s, x + 7 * s, y - 5 * s, GOLD, 2 * s)
+        scene.draw_circle(x - 3 * s, y - 27 * s, 9 * s, TEXT)
+        scene.draw_rect(x - 16 * s, y - 36 * s, 26 * s, 8 * s, color, radius=3 * s)
+        scene.draw_line(x - 19 * s, y - 28 * s, x + 13 * s, y - 28 * s, GOLD, 3 * s)
+        for dx in (-7, 1):
+            scene.draw_circle(x + dx * s, y - 26 * s, 3.5 * s, INK)
+            scene.draw_circle(x + dx * s, y - 26 * s, 1.5 * s, BLUE)
+        scene.draw_line(x + 7 * s, y - 14 * s, x + 20 * s, y - 6 * s, color, 6 * s)
+        scene.draw_rect(x + 14 * s, y - 10 * s, 17 * s, 22 * s, shade(leather, -28), radius=4 * s)
+        outline(scene, [(x + 14 * s, y - 7 * s), (x + 31 * s, y - 7 * s),
+                        (x + 31 * s, y + 9 * s), (x + 14 * s, y + 9 * s)], GOLD, 2 * s)
+        scene.draw_rect(x + 18 * s, y - 15 * s, 9 * s, 6 * s, TEXT)
+        for dx, dy, radius in ((22, -21, 4), (18, -28, 5), (24, -36, 6)):
+            scene.draw_circle(x + dx * s, y + dy * s, radius * s, (159, 173, 170, 255))
+        return
+    if lower == "adept":
+        # No wizard hat or healer staff: a diamond tablet, floating rune and
+        # extended palm give the Adept a compact, directional silhouette.
+        rune = (192, 170, 222, 255)
+        scene.draw_polygon([(x - 7 * s, y - 19 * s), (x - 17 * s, y + 9 * s),
+                            (x, y + 3 * s), (x + 15 * s, y + 10 * s),
+                            (x + 8 * s, y - 19 * s)], color)
+        scene.draw_line(x - 6 * s, y - 16 * s, x, y + 1 * s, rune, 3 * s)
+        scene.draw_line(x + 6 * s, y - 16 * s, x, y + 1 * s, rune, 3 * s)
+        scene.draw_circle(x, y - 26 * s, 8 * s, TEXT)
+        scene.draw_polygon([(x - 9 * s, y - 27 * s), (x - 7 * s, y - 36 * s),
+                            (x + 7 * s, y - 36 * s), (x + 9 * s, y - 27 * s)], shade(color, -18))
+        scene.draw_line(x - 5 * s, y - 29 * s, x + 5 * s, y - 29 * s, GOLD, 2 * s)
+        outline(scene, [(x, y - 49 * s), (x + 6 * s, y - 43 * s),
+                        (x, y - 37 * s), (x - 6 * s, y - 43 * s)], rune, 2 * s)
+        scene.draw_polygon([(x - 20 * s, y - 23 * s), (x - 10 * s, y - 9 * s),
+                            (x - 19 * s, y + 3 * s), (x - 28 * s, y - 10 * s)], shade(rune, -32))
+        outline(scene, [(x - 20 * s, y - 23 * s), (x - 10 * s, y - 9 * s),
+                        (x - 19 * s, y + 3 * s), (x - 28 * s, y - 10 * s)], GOLD, 2 * s)
+        scene.draw_line(x + 8 * s, y - 13 * s, x + 20 * s, y - 21 * s, color, 5 * s)
+        scene.draw_line(x + 22 * s, y - 14 * s, x + 22 * s, y - 28 * s, TEXT, 4 * s)
+        for dx in (28, 34):
+            scene.draw_line(x + dx * s, y - 28 * s, x + (dx + 4) * s, y - 21 * s, rune, 2 * s)
+            scene.draw_line(x + (dx + 4) * s, y - 21 * s, x + dx * s, y - 14 * s, rune, 2 * s)
+        return
+    if lower == "skyrider":
+        # A rider on an outstretched bird makes flight visible even when the
+        # piece shrinks to a retinue slot; no mounted unit shares these wings.
+        feather = (192, 197, 183, 255)
+        for direction in (-1, 1):
+            wing = [(x + direction * dx * s, y + dy * s) for dx, dy in
+                    ((3, -12), (21, -33), (37, -38), (29, -17), (22, -3), (12, 3))]
+            scene.draw_polygon(wing, feather)
+            for dx, dy in ((14, -13), (21, -20), (28, -27)):
+                scene.draw_line(x + direction * dx * s, y + dy * s,
+                                x + direction * (dx + 2) * s, y + (dy + 11) * s, INK, 2 * s)
+        scene.draw_polygon([(x - 7 * s, y - 16 * s), (x + 11 * s, y - 17 * s),
+                            (x + 15 * s, y - 4 * s), (x + 4 * s, y + 8 * s),
+                            (x - 13 * s, y + 2 * s)], shade(feather, -26))
+        scene.draw_polygon([(x - 5 * s, y), (x - 16 * s, y + 13 * s),
+                            (x - 3 * s, y + 8 * s), (x + 5 * s, y + 11 * s)], feather)
+        scene.draw_circle(x + 13 * s, y - 15 * s, 7 * s, TEXT)
+        scene.draw_polygon([(x + 18 * s, y - 18 * s), (x + 28 * s, y - 14 * s),
+                            (x + 20 * s, y - 10 * s)], GOLD)
+        scene.draw_circle(x + 15 * s, y - 17 * s, 1.5 * s, INK)
+        scene.draw_polygon([(x - 8 * s, y - 15 * s), (x - 6 * s, y - 29 * s),
+                            (x + 4 * s, y - 29 * s), (x + 9 * s, y - 13 * s)], color)
+        scene.draw_line(x + 1 * s, y - 14 * s, x - 1 * s, y - 1 * s, color, 5 * s)
+        scene.draw_circle(x - 1 * s, y - 34 * s, 6 * s, TEXT)
+        scene.draw_polygon([(x - 8 * s, y - 35 * s), (x - 1 * s, y - 44 * s),
+                            (x + 6 * s, y - 35 * s)], color)
+        scene.draw_line(x + 7 * s, y - 22 * s, x + 20 * s, y - 44 * s, GOLD, 2 * s)
+        scene.draw_polygon([(x + 17 * s, y - 43 * s), (x + 25 * s, y - 51 * s),
+                            (x + 22 * s, y - 39 * s)], TEXT)
         return
     if lower == "ranger":
         # A low hood, trailing cloak and wide stride distinguish mobile fire

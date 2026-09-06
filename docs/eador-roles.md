@@ -93,12 +93,13 @@ checks use clean source hashes from the same revision:
 Reproduce with `python -m pytest tests/eador/test_roles.py -q`,
 `python tools/stress_eador_roles.py --cases 1000 --report /tmp/roles.json`, and
 `python tools/fuzz_eador.py --campaigns 300 --scenes 0 --steps 180` from the
-source checkout. UI/native verification and a soak of the later integrated
-candidate remain separate release work.
+source checkout. These reports do not include UI/native verification or a soak
+of the later integrated candidate.
 
 After merging the independent all-class final-seal journeys and display
 primitives at `8f4d2da`, the combined suite passed 713 tests. The role game
-rules are unchanged from the retained `79b2d49` stress snapshot.
+rules were unchanged from the retained `79b2d49` stress snapshot.
+
 ## Player controls and presentation
 
 Recruitment uses pages of five with mouse Previous/Next controls and Left/Right
@@ -148,5 +149,7 @@ At this integration checkpoint, **765 tests passed**. The general native
 input/save/window-size journey and 12 model + 12 linked scene fuzz runs also
 passed (2,247 input events, 1,861 randomized). A separate Tribes fuzz run found
 a pre-existing stale hover during quick-load; it reproduces before screen
-layers and is being corrected independently, rather than attributed to or
-hidden by the Shardbound controls.
+layers. Separate fix `7148998` clears old hover targets before rebuilding the
+loaded HUD. Its public regressions and native checks cover both a missing
+resource and a smaller loaded map. All 60 AI and 20 random-input Tribes runs
+subsequently passed; the fuzzer now seeds world generation as well as inputs.

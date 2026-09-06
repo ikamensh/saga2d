@@ -272,3 +272,117 @@ def test_older_saved_acolyte_reference_never_advertises_an_unavailable_order(tmp
         assert state.to_json() == before and not list(tmp_path.iterdir())
     finally:
         game._teardown()
+
+
+def test_saved_guided_extraction_reference_quotes_the_paid_contract_and_current_order(tmp_path):
+    """A paid, reloaded attempt exposes its escape rules and exact reward without spending an order."""
+    from eador.codex import CodexScene
+    from eador.content import RELICS
+    from tools.eador_extraction_campaign import prepared_crossing
+
+    state = prepared_crossing()
+    # A saved-site reward fixture checks that current loot is not replaced by the base table.
+    state.provinces[state.hero.pos].site_gold = 61
+    state.explore(approach='guided')
+    state = State.from_json(state.to_json())
+    game = create_game('Extraction reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        press(game, '2')
+        press(game, 'end')
+        text = rendered_text(game)
+        assert 'Evacuate' in text and 'Arrival alone never wins' in text
+        assert 'unspent action' in text and 'no adjacent living enemy' in text
+        assert state.battle.evacuation_blocked_reason in text
+        assert f'Round {state.battle.round} of {state.battle.objective.deadline}' in text
+        assert f'{len(state.battle.objective.exits)} marked exits' in text
+        assert 'enemy phase' in text and 'rout every defender' in text
+        press(game, '5')
+        while 'Hire a guide' not in rendered_text(game):
+            assert game.scene.page + 1 < game.scene.pages
+            press(game, 'right')
+        text = rendered_text(game)
+        reward = state.battle_adventure
+        assert 'Current attempt' in text and 'Paid at entry: 20 gold' in text
+        assert f'{reward.gold} gold / {reward.crystals} crystals / {RELICS[reward.relic].name}' in text
+        assert 'fee is not refunded' in text
+        press(game, 'end')
+        text = rendered_text(game)
+        assert 'surviving defenders keep their wounds' in text
+        assert 'one campaign action' in text and 'reward once' in text
+        press(game, 'escape')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
+
+
+def test_full_cache_reference_matches_saved_cargo_reward_and_spent_hero_via_mouse(tmp_path):
+    """The burden and reward belong to the chosen attempt; inspecting them cannot refund its spent order."""
+    from eador.codex import CodexScene
+    from tools.eador_extraction_campaign import prepare_adventure
+
+    state = prepare_adventure(theme='elderwild')
+    state.explore(approach='full')
+    state.battle.guard(0)
+    state = State.from_json(state.to_json())
+    game = create_game('Cargo reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        game.tick(1 / 60)
+        click_button(game, 'Abilities')
+        click_button(game, 'Next')
+        click_button(game, 'Next')
+        text = rendered_text(game)
+        assert state.battle.evacuation_blocked_reason in text
+        assert f'Hero move allowance: {state.battle.unit(0).effective_move_range}' in text
+        assert 'Cargo: -1' in text and 'Pin and cargo reduce movement (minimum 1), but cannot block Evacuate' in text
+        click_button(game, 'Sites')
+        while 'Carry the full cache' not in rendered_text(game):
+            click_button(game, 'Next')
+        text = rendered_text(game)
+        assert 'Travel light' in text and 'Carry the full cache' in text
+        assert 'Current attempt' in text and f'Saved reward: {state.battle_adventure.gold} gold' in text
+        assert '1 less movement this battle, minimum 1' in text
+        click_button(game, 'Close codex')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
+
+
+def test_direct_route_reference_reports_real_pin_and_current_round_after_reload(tmp_path):
+    """A naturally pinned courier sees the saved allowance, rather than its full base movement."""
+    from eador.codex import CodexScene
+    from tools.eador_extraction_campaign import AdventureOrders, crossing_route, prepared_crossing
+
+    checkpoints = []
+
+    class RecordOrders(AdventureOrders):
+        def do(self, command, *args, **kwargs):
+            super().do(command, *args, **kwargs)
+            if self.battle.unit(0).pinned and self.battle.outcome is None:
+                checkpoints.append(self.state.to_json())
+
+    crossing_route(prepared_crossing(), 'direct', orders_type=RecordOrders)
+    state = State.from_json(checkpoints[0])
+    game = create_game('Pinned courier reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        press(game, '2')
+        press(game, 'end')
+        text = rendered_text(game)
+        assert f'Hero move allowance: {state.battle.unit(0).effective_move_range}' in text
+        assert 'Cargo: 0' in text and 'Pin: -2' in text
+        assert f'Round {state.battle.round} of {state.battle.objective.deadline}' in text
+        press(game, 'escape')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()

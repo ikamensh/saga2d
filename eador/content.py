@@ -86,6 +86,12 @@ SITES = {
             AdventureApproach('full', 'Carry the full cache', 'Gain 40 extra gold on success; your hero has 1 less movement this battle, minimum 1.',
                               'supply_cache', cargo_penalty=1, bonus_gold=40),
         )),
+    'sealed_vault': SiteSpec('Sealed Vault', 'Extract the regalia through the eastern crossfire by round 8, or rout its watchful guards.',
+        ('warden', 'archer', 'archer', 'guard'), 60, 1, 'iron_crown', 'vault_crossfire', (
+            AdventureApproach('crossfire', 'Face the crossfire', 'Keep your crystals. Only the guarded eastern exit is open.', 'vault_crossfire'),
+            AdventureApproach('unseal', 'Unseal the floodgate', 'Spend 2 crystals to open a second, southern exit. The cost is lost on retreat.',
+                              'vault_unsealed', crystals_cost=2),
+        )),
 }
 
 

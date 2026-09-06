@@ -262,6 +262,32 @@ presentation, then a new packaged candidate and candidate-specific stress.
 The shipping logical canvas uses letterboxing for smaller windows; arbitrary
 logical resizing and text scaling are not established by that evidence.
 
+## Support roles and extraction controls — 2026-09-06
+
+- `b3485fe` exposes Acolyte healing, Ranger movement after shooting and Warden
+  Swap through mouse and keyboard, with exact forecasts and paged recruitment.
+  Signed combat feedback respects reduced motion. Its layering uses the small
+  shared `Scene.screen_layer()` scope; rules and effect styling stay in Eador.
+  See [support-role evidence](eador-roles.md) and the independent
+  [framework layering demo](framework-screen-layers.md).
+- `93b5cf8` adds two authored carry-and-escape layouts with four approach
+  choices, persistent wounded defenders and exactly recorded rewards. The
+  integrated briefing, numbered exits, explicit Evacuate button and Codex
+  make both missions manually playable. Four native paid-army routes pass,
+  with 65–137 inputs and 2–5 exact reloads each. The existing full linked
+  Rootward/Gate input journey also passes. See
+  [extraction rules and UI evidence](eador-extraction.md).
+- `7148998` fixes a separately reproduced Tribes quick-load stale-hover bug.
+  Public regressions and native checks cover missing resources and smaller
+  maps; the development fuzzer now reproduces both world and input seeds.
+- `c691ded` retains native departure/recovery checks when every autosave is
+  damaged, including refusal, a fresh manual checkpoint, arrival and exact
+  reload. Arrival guidance now fits the screen while preserving damaged files.
+- The integration suite passes 810 tests; both games' ordinary fuzz runs pass.
+  The content/role expansion, twelve-relic target, difficulty and human
+  playtests remain open, alongside the other G01–G19 requirements. These
+  source increments have not updated the historical packaged artifact.
+
 ## Linked progression, display and economy baseline — 2026-09-06
 
 - `00df6c4` makes the three-shard campaign playable through the title, challenge
