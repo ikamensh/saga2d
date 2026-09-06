@@ -299,18 +299,24 @@ class CodexScene(Screen):
                           f"Your rank: {state.hero.skill_ranks.get(kind, 0)}", spec.description)
                     for kind, spec in SKILLS.items()]
         if category == "Sites":
+            def reward_text(gold, crystals, relic):
+                return f"{gold} gold / {crystals} crystal{'s' if crystals != 1 else ''}" + (f" / {RELICS[relic].name}" if relic else "")
+
             entries = []
             for kind, spec in SITES.items():
-                recorded = next((p for p in state.provinces.values() if p.site_kind == kind), None)
                 variable = kind == 'relief_column'
-                base = ((recorded.site_gold, recorded.site_crystals, recorded.site_relic) if variable and recorded
-                        else (spec.gold, spec.crystals, spec.relic))
-                def reward_text(gold, crystals, relic):
-                    return f"{gold} gold / {crystals} crystal{'s' if crystals != 1 else ''}" + (f" / {RELICS[relic].name}" if relic else "")
-                base_facts = (('Recorded reward: ' + reward_text(*base)) if recorded else
-                              'Reward varies by shard; no Relief source is recorded here.') if variable else (
-                              f"Base reward: {spec.gold} gold · {spec.crystals} "
-                              f"{'crystal' if spec.crystals == 1 else 'crystals'}" + (f" · {RELICS[spec.relic].name}" if spec.relic else ''))
+                base = (spec.gold, spec.crystals, spec.relic)
+                if variable:
+                    recorded = next((p for p in state.provinces.values() if p.site_kind == kind), None)
+                    if recorded:
+                        base = (recorded.site_gold, recorded.site_crystals, recorded.site_relic)
+                        base_facts = 'Recorded reward: ' + reward_text(*base)
+                    else:
+                        base_facts = 'Reward varies by shard; no Relief source is recorded here.'
+                else:
+                    base_facts = (f"Base reward: {spec.gold} gold · {spec.crystals} "
+                                  f"{'crystal' if spec.crystals == 1 else 'crystals'}" +
+                                  (f" · {RELICS[spec.relic].name}" if spec.relic else ''))
                 entries.append(_Entry(spec.name, base_facts,
                                       f"{spec.description} Base guardians: " + ", ".join(
                                           f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items()) + "."))

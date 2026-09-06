@@ -83,7 +83,7 @@ class EncounterScene(Screen):
                                    style=PRIMARY if index == self.approach_index else None)
                              for index, approach in enumerate(self.approaches)), spacing=20))
             description = self.approach.description
-            if p.site_kind in ('smuggler_screen', 'aerie_raid') and Counter(self.guards) != Counter(SITES[p.site_kind].guards):
+            if p.site_kind in ('smuggler_screen', 'aerie_raid', 'relief_column') and Counter(self.guards) != Counter(SITES[p.site_kind].guards):
                 description = f'Free. {self.approach.title} against the surviving defenders shown below.'
             top.append(label(description, color=GOLD))
 
@@ -147,6 +147,14 @@ class EncounterScene(Screen):
 
     def instructions(self):
         definition = self.definition
+        hold_advice = 'Guard shields a holder; Pikemen Brace against melee. Ranged attacks bypass Brace.'
+        if self.province.site_kind == 'relief_column':
+            advice = []
+            if 'militia' in self.guards:
+                advice.append("Militia clears adjacent allies' Pin.")
+            if 'skyrider' in self.guards:
+                advice.append('Skyrider crosses occupied cells; deny its landing or remove support.')
+            hold_advice = ' '.join(advice) or 'The surviving defenders shown keep their wounds in either approach.'
         carrier = 'Your hero carries the cargo. Reach an exit with an unspent hero action, then choose Evacuate.'
         if self.province.site_kind == 'stranded_explorer':
             isolated = [f'{UNITS[troop.kind].name} (army slot {index})'
@@ -178,7 +186,7 @@ class EncounterScene(Screen):
             f"Hold the marked hex with any living ally for {definition.hold_turns} consecutive enemy turns. "
             "Adjacent enemies contest it; empty or contested control resets progress.",
             f"Before round {definition.deadline} ends, secure the seal or defeat every defender. Hero death loses immediately.",
-            "Guard shields a holder; Pikemen Brace against melee. Ranged attacks bypass Brace.",
+            hold_advice,
         ) if definition.objective == 'hold' else (
             'Defeat every defender to claim the reward. Exhaustion forces retreat after 80 rounds.',
             'Keep your hero alive. Hero death ends the expedition immediately.',
