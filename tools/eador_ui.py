@@ -109,7 +109,7 @@ class PlayerState:
     def __getattr__(self, name):
         value = getattr(self.player.root.state, name)
         if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches',
-                                            'recovery_preview', 'infusion_preview', 'expedition_funding'):
+                                            'recovery_preview', 'infusion_preview', 'expedition_funding', 'replacement_preview'):
             raise AssertionError(f'No input adapter for campaign command {name!r}')
         return value
 
@@ -159,6 +159,41 @@ class PlayerState:
         before = len(self.hero.army)
         self.catalog('r', name)
         assert len(self.hero.army) == before + 1 and self.hero.army[-1].kind == name
+
+    def replace_troop(self, outgoing_id, kind):
+        from eador.model import State
+        from eador.replacement_scene import ReplacementScene
+
+        assert isinstance(self.player.game.scene, ShardScene)
+        quote = self.replacement_preview(outgoing_id, kind)
+        assert quote.blocked_reason is None, quote.blocked_reason
+        before = self.to_json()
+        expected = State.from_json(before)
+        expected.replace_troop(outgoing_id, kind)  # Oracle copy; the live command uses input below.
+        self.player.press('r')
+        self.player.press('m')
+        chooser = self.player.game.scene
+        assert isinstance(chooser, ReplacementScene) and chooser.kind is None
+        while outgoing_id not in chooser.visible_troops:
+            assert chooser.page + 1 < chooser.pages, f'No visible veteran #{outgoing_id}'
+            self.player.press('right')
+        self.player.press(str(chooser.visible_troops.index(outgoing_id) + 1))
+        catalog = self.player.game.scene
+        assert isinstance(catalog, CatalogScene) and catalog.outgoing_id == outgoing_id
+        while kind not in catalog.visible_items:
+            assert catalog.page + 1 < catalog.pages, f'Catalog has no item {kind}'
+            self.player.press('right')
+        self.player.press(str(catalog.visible_items.index(kind) + 1))
+        review = self.player.game.scene
+        assert isinstance(review, ReplacementScene) and review.quote == quote and not review.applied
+        assert self.to_json() == before, 'Choosing a replacement spent resources before confirmation'
+        self.player.capture(f'replacement-{outgoing_id}-{kind}-review')
+        self.player.press('return')
+        assert review.applied and self.to_json() == expected.to_json(), 'Replacement differs from its public command'
+        self.player.capture(f'replacement-{outgoing_id}-{kind}-applied')
+        self.player.press('return')
+        assert isinstance(self.player.game.scene, ShardScene) and len(self.player.game.scenes) == 1
+        assert self.to_json() == expected.to_json(), 'Returning to the shard repeated the purchase'
 
     def catalog(self, shortcut, name):
         assert isinstance(self.player.game.scene, ShardScene)
