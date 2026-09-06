@@ -1,0 +1,30 @@
+{
+  "implementation_revision": "d7eab814e6e61e1bd5f8330de1a6dd6461b3f690",
+  "recorded_report_head_preserved": true,
+  "all_recorded_source_hashes_match_implementation": true,
+  "full_tests": {
+    "passed": 1123,
+    "seconds": 98.29
+  },
+  "tribes": {
+    "ai_games": 60,
+    "scene_runs": 20,
+    "failures": 0
+  },
+  "inspected_images": [
+    "long-path-125-page-1.png",
+    "long-path-125-page-4.png",
+    "wizard-ruins-challenge-125.png",
+    "directory-save-125.png",
+    "restarted-settings-125.png"
+  ],
+  "artifact_sha256": {
+    "directory-save-125.png": "b72698c72b20d9a9312c285054a932a67ebaf48b3750796020b9cb1ff252c58f",
+    "wizard-ruins-challenge-125.png": "3023074450b233557dcf4fbf4102433d1fc76f5cf9fdd558a21988b4fe5f8e78",
+    "linked.json": "b155c733abcf160642d177c33f2c4139e8191734c7bbc7255f73517139920d8c",
+    "long-path-125-page-4.png": "4c6a16c46e3f8264fdc3aae48b3e30c4f8cc48a0fc38e989ec2c172fa01cb53d",
+    "long-path-125-page-1.png": "2df993d88b15ab0966541ff8a763c58654ac09a386cc278f01bad62ac8ba367f",
+    "native.json": "a5367597af974f9037d8a44ca626db0db95f3a3e464f999153fc205c27e83b6f",
+    "restarted-settings-125.png": "caff12f1fd55c22f1b0c6d76624fc7a3412eb56c4ced81a5baa2a2240e296d9c"
+  }
+}
