@@ -48,8 +48,8 @@ class PlayerInput:
             self.game.backend.inject_release(round(x), round(y))
         self.game.tick(1 / 60)
 
-    def capture(self, name):
-        for _ in range(110 if isinstance(self.game.scene, BattleScene) else 1):
+    def capture(self, name, *, settle=True):
+        for _ in range(110 if settle and isinstance(self.game.scene, BattleScene) else 1):
             self.game.tick(1 / 60)
         if self.native and self.output is not None:
             self.output.mkdir(parents=True, exist_ok=True)
@@ -134,7 +134,9 @@ class PlayerState:
         assert isinstance(self.player.game.scene, ShardScene)
         self.player.press(shortcut)
         assert isinstance(self.player.game.scene, CatalogScene)
-        self.player.press(str(index + 1))
+        for _ in range(index // 5):
+            self.player.press('right')
+        self.player.press(str(index % 5 + 1))
         self.player.press('escape')
 
     def choose(self, ident):

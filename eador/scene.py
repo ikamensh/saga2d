@@ -18,6 +18,7 @@ from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
 from eador.worldgen import THEMES
 from eador.sound import set_music
+from eador.preferences import reduced_motion
 
 
 class Screen(Scene):
@@ -458,17 +459,26 @@ class ShardScene(Screen):
 class CatalogScene(Screen):
     transparent = True
     pop_on_cancel = True
+    controls = {'left': 'previous_page', 'right': 'next_page'}
 
     def __init__(self, root, kind):
         super().__init__()
-        self.root, self.kind = root, kind
+        self.root, self.kind, self.page = root, kind, 0
+
+    def previous_page(self):
+        self.page = max(0, self.page - 1)
+        self.refresh()
+
+    def next_page(self):
+        self.page = min((len(self.items) - 1) // 5, self.page + 1)
+        self.refresh()
 
     def refresh(self):
         super().refresh()
         self.x, self.y = self.game.width / 2 - 360, self.game.height / 2 - 300
         self.items = list(BUILDINGS) if self.kind == "build" else list(RECRUITABLE)
         s = self.root.state
-        for i, name in enumerate(self.items):
+        for i, name in enumerate(self.items[self.page * 5:self.page * 5 + 5]):
             spec = BUILDINGS[name] if self.kind == "build" else UNITS[name]
             built = self.kind == "build" and name in s.buildings
             locked = self.kind == "recruit" and spec.building and spec.building not in s.buildings
@@ -479,7 +489,13 @@ class CatalogScene(Screen):
             self.button("Built" if built else "Locked" if locked else f"{cost} gold", self.x + 548,
                         self.y + 123 + i * 77, 143, lambda name=name: self.purchase(name), shortcut=str(i + 1),
                         enabled=not built and not locked and affordable and available)
-        self.button("Back to shard", self.x + 22, self.y + 535, 676, self.game.pop, hotkey="Esc")
+        if len(self.items) > 5:
+            self.button('Previous', self.x + 22, self.y + 535, 130, self.previous_page, enabled=self.page > 0)
+            self.button('Next', self.x + 164, self.y + 535, 120, self.next_page,
+                        enabled=(self.page + 1) * 5 < len(self.items))
+            self.button('Back to shard', self.x + 306, self.y + 535, 392, self.game.pop, hotkey='Esc')
+        else:
+            self.button("Back to shard", self.x + 22, self.y + 535, 676, self.game.pop, hotkey="Esc")
 
     def purchase(self, name):
         callback = self.root.state.build if self.kind == "build" else self.root.state.recruit
@@ -494,7 +510,7 @@ class CatalogScene(Screen):
         self.text("WESTWATCH / STRONGHOLD", x + 24, y + 22, size=10, color=GOLD)
         self.text("Build your kingdom" if self.kind == "build" else "Raise an army", x + 24, y + 46, size=31, serif=True)
         self.text(f"{s.gold} gold   ·   {s.crystals} crystals   ·   {len(s.hero.army)}/{s.hero.max_army} troops", x + 24, y + 94, size=12, color=MUTED)
-        for i, name in enumerate(self.items):
+        for i, name in enumerate(self.items[self.page * 5:self.page * 5 + 5]):
             yy = y + 127 + i * 77
             spec = BUILDINGS[name] if self.kind == "build" else UNITS[name]
             self.rule(x + 22, yy - 9, 676)
@@ -507,8 +523,16 @@ class CatalogScene(Screen):
                     description = f"Requires {BUILDINGS[spec.building].name}. " + description
                 elif name == "pikeman":
                     description += ". G: Brace strikes first against melee."
+                if name == 'healer':
+                    description += '. Heal uses its order and shared mana.'
+                elif name == 'ranger':
+                    description += '. Shoot before moving to retain movement.'
+                elif name == 'warden':
+                    description += '. S swaps places with an adjacent ally.'
             self.paragraph(description, x + 26, yy + 29, width=500, size=11)
-        self.text(textwrap.shorten(self.message or "Buildings are permanent. Recruit in any province you control.", width=93, placeholder="…"),
+        hint = (f'Page {self.page + 1}/{(len(self.items) + 4) // 5} · Left/Right changes page; numbers buy visible troops.'
+                if len(self.items) > 5 else 'Buildings are permanent. Recruit in any province you control.')
+        self.text(textwrap.shorten(self.message or hint, width=93, placeholder="…"),
                   x + 24, y + 507, size=11, color=GOLD)
 
 
@@ -540,7 +564,7 @@ class HelpScene(Screen):
         sections = [
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
-            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace against melee. Terrain grants cover. Spells cost mana and the hero's action."),
+            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
             ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
         ]
         for i, (title, body) in enumerate(sections):
@@ -603,11 +627,14 @@ class BattleScene(Screen):
         if selected and selected.can_pin:
             self.button("Pin · wait" if selected.pin_cooldown else "Pin", x, 291, 172, self.pin, shortcut="P",
                         primary=self.targeting == "pin", enabled=not selected.acted and not selected.pin_cooldown and b.outcome is None)
-        hero_ready = b.unit(0).hp > 0 and not b.unit(0).acted and b.outcome is None
+        elif selected and selected.can_swap:
+            self.button('Swap ally', x, 291, 172, self.swap, shortcut='S', primary=self.targeting == 'swap',
+                        enabled=bool(b.swap_targets(selected.id)))
         self.button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", x, 378, 300, self.bolt, hotkey="1",
-                    enabled="bolt" in b.spells and b.mana >= b.spell_cost("bolt") and hero_ready)
-        self.button(f"Healing light · {b.spell_cost('heal')} mana", x, 428, 300, self.heal, hotkey="2",
-                    enabled="heal" in b.spells and b.mana >= b.spell_cost("heal") and hero_ready)
+                    enabled=bool(b.spell_targets('bolt')))
+        healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
+        self.button(f"{healer} Heal · {b.spell_cost('heal')} mana", x, 428, 300, self.heal, hotkey="2",
+                    enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster)))
         self.button("Auto-play one round", x, 518, 300, self.auto_round, hotkey="A", enabled=b.outcome is None)
         self.button("Retreat", x, 568, 300, self.retreat, hotkey="T", danger=True, enabled=b.outcome is None)
         self.button("End battle round", x, h - 93, 300, self.end_turn,
@@ -681,12 +708,35 @@ class BattleScene(Screen):
                         if self.targeting else "")
         self.refresh()
 
+    def swap(self):
+        self.targeting = None if self.targeting == 'swap' else 'swap'
+        self.message = ('Swap: choose an adjacent ally. Both moves are spent; the ally keeps its unspent action.'
+                        if self.targeting else '')
+        self.refresh()
+
+    @property
+    def heal_caster(self):
+        selected = self.battle.unit(self.selected) if self.selected is not None else None
+        return selected.id if selected and selected.can_heal else 0
+
+    def action_targets(self):
+        if self.targeting == 'pin':
+            return self.battle.pin_targets(self.selected)
+        if self.targeting == 'swap':
+            return self.battle.swap_targets(self.selected)
+        if self.targeting in ('bolt', 'heal'):
+            return self.battle.spell_targets(self.targeting, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
+        return self.battle.targets(self.selected) if self.selected is not None else []
+
     def choose_spell(self, name):
-        if name not in self.battle.spells:
+        caster = self.heal_caster if name == 'heal' else 0
+        if caster == 0 and name not in self.battle.spells:
             self.message = "Build a Temple for Heal or a Mage Tower for Arcane Bolt."
             return
         self.targeting = None if self.targeting == name else name
-        self.message = ("Choose a wounded ally" if name == "heal" else "Choose an enemy") + " within 4 hexes of your hero."
+        source = 'the selected Acolyte' if caster != 0 else 'your hero'
+        self.message = (("Choose a wounded ally" if name == "heal" else "Choose an enemy") +
+                        f" within 4 hexes of {source}. Casting spends that unit's order." if self.targeting else '')
         self.refresh()
 
     def bolt(self):
@@ -696,7 +746,8 @@ class BattleScene(Screen):
         self.choose_spell("heal")
 
     def next_unit(self):
-        units = [u for u in self.battle.units if u.team == "player" and u.hp > 0 and not u.acted]
+        units = [u for u in self.battle.units if u.team == "player" and u.hp > 0
+                 and (not u.acted or self.battle.reachable(u.id))]
         if units:
             ids = [u.id for u in units]
             self.selected = ids[(ids.index(self.selected) + 1) % len(ids)] if self.selected in ids else ids[0]
@@ -713,8 +764,8 @@ class BattleScene(Screen):
             self.cursor = self.hover = pos
 
     def next_target(self):
-        team = "player" if self.targeting == "heal" else "enemy"
-        targets = [u.pos for u in self.battle.units if u.hp > 0 and u.team == team]
+        targets = [u.pos for u in self.action_targets()] if self.targeting else [
+            u.pos for u in self.battle.units if u.hp > 0 and u.team == 'enemy']
         if targets:
             index = (targets.index(self.cursor) + 1) % len(targets) if self.cursor in targets else 0
             self.cursor = self.hover = targets[index]
@@ -749,8 +800,11 @@ class BattleScene(Screen):
             if unit:
                 if self.targeting == "pin":
                     self.act(lambda: self.battle.pin(self.selected, unit.id))
+                elif self.targeting == 'swap':
+                    self.act(lambda: self.battle.swap(self.selected, unit.id), cue='move')
                 else:
-                    self.act(lambda: self.battle.cast(self.targeting, unit.id), cue=self.targeting)
+                    self.act(lambda: self.battle.cast(self.targeting, unit.id,
+                             caster_id=self.heal_caster if self.targeting == 'heal' else 0), cue=self.targeting)
             else:
                 self.message = "Aim at a unit. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
@@ -793,11 +847,13 @@ class BattleScene(Screen):
             movement = f"Move {selected.effective_move_range}" + (" (Pinned)" if selected.pinned else "")
             self.text(f"{movement}   Range {selected.attack_range}", x, 272, size=12, color=MUTED)
             status = ("Guard +2" if selected.stance == "guard" else "Braced" if selected.stance == "brace" else
+                      "Can move" if selected.acted and b.reachable(selected.id) else
                       "Spent" if selected.acted else "Moved" if selected.moved else "Ready")
             self.text(status, x + 193, 199, size=12, color=GOLD)
         self.rule(x, 336, 300)
-        self.text(f"SPELLBOOK   /   {b.mana} MANA", x, 353, size=10, color=BLUE)
-        self.text("Spells use mana and the hero's action.", x, 479, size=11, color=MUTED)
+        self.text(f"SHARED MANA   /   {b.mana} REMAINING", x, 353, size=10, color=BLUE)
+        self.text('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else 'Spells spend the hero’s order.',
+                  x, 479, size=11, color=MUTED)
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
         if hovered:
             self.text(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", x, 630, size=13, color=GOLD)
@@ -805,23 +861,31 @@ class BattleScene(Screen):
             if pin_target:
                 damage, retaliation = b.pin_preview(selected.id, hovered.id)
                 self.text(f"Pin {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
-            elif selected and self.targeting != "pin" and hovered in b.targets(selected.id):
+            elif self.targeting in ('bolt', 'heal') and hovered in self.action_targets():
+                amount = b.spell_preview(self.targeting, hovered.id, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
+                self.text(f'Restore {amount} HP' if self.targeting == 'heal' else f'Deal {amount} HP damage',
+                          x, 655, size=12, color=TEAL if self.targeting == 'heal' else RED)
+            elif self.targeting == 'swap' and hovered in self.action_targets():
+                self.text('Exchange positions', x, 655, size=12, color=TEAL)
+            elif selected and not self.targeting and hovered in b.targets(selected.id):
                 damage, retaliation = b.preview(selected.id, hovered.id)
                 self.text(f"Deal {damage}  /  Take {retaliation}", x, 655, size=12, color=RED)
             else:
                 self.text(f"Attack {hovered.attack}  ·  Defense {hovered.effective_defense}  ·  Range {hovered.attack_range}",
                           x, 655, size=11, color=MUTED)
-            detail = (f"Next turn: Move {max(1, hovered.move_range - 2)} · may still attack." if pin_target else
+            detail = ('Ally keeps order; both moves spent.' if self.targeting == 'swap' else
+                      f'{b.spell_cost(self.targeting)} shared mana · caster spends its order.' if self.targeting in ('bolt', 'heal') else
+                      f"Next turn: Move {max(1, hovered.move_range - 2)} · may still attack." if pin_target else
                       f"Pinned: Move {hovered.effective_move_range} · may still attack." if hovered.pinned else
                       "Brace strikes first against melee." if hovered.stance == "brace" else
                       f"Terrain: {b.terrain[hovered.pos].title()}" + (" · Guard +2 defense" if hovered.stance == "guard" else ""))
             self.text(detail, x, 679, size=11, color=MUTED)
         else:
-            self.paragraph("G: Guard / Brace. P: Pin with an Archer or Storm Quiver. Pin halves damage and slows movement for one turn.",
+            self.paragraph("G: Guard / Brace. P: Pin. S: Warden Swap. 2: Heal with a selected Acolyte, otherwise your hero.",
                            x, 630, size=11)
         self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
-        reachable = b.reachable(self.selected) if selected and not selected.acted and b.outcome is None and not self.targeting else set()
-        targets = {u.id for u in (b.pin_targets(self.selected) if self.targeting == "pin" else b.targets(self.selected))} if selected and not selected.acted and b.outcome is None else set()
+        reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting else set()
+        targets = {u.id for u in self.action_targets()} if b.outcome is None else set()
         for pos in sorted(b.terrain, key=lambda p: self.grid.center(p)[1]):
             cx, cy = self.grid.center(pos)
             points = [(cx + (px - cx) * .95, cy + (py - cy) * .95) for px, py in self.grid.corners(pos)]
@@ -842,7 +906,7 @@ class BattleScene(Screen):
         for u in sorted((u for u in b.units if u.hp > 0), key=lambda u: self.grid.center(u.pos)[1]):
             cx, cy = self.grid.center(u.pos)
             if u.id in targets:
-                self.draw_circle(cx, cy + 7, 25, RED)
+                self.draw_circle(cx, cy + 7, 25, TEAL if self.targeting in ('heal', 'swap') else RED)
             art.piece(self, cx, cy - 1, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, self.grid.size / 43),
                       selected=u.id == self.selected, spent=u.acted)
             if u.stance:
@@ -854,10 +918,14 @@ class BattleScene(Screen):
             self.draw_rect(cx - 29, cy + 29, 58, 16, INK, radius=3)
             self.text(f"{u.hp}/{u.max_hp}", cx, cy + 29, size=10, center=True)
             self.bar(cx - 26, cy + 46, 52, u.hp, u.max_hp, TEAL if u.team == "player" else RED)
-        for started, pos, change in self.floats:
-            cx, cy = self.grid.center(pos)
-            self.text(f"{change:+}", cx, cy - 48 - (self.clock - started) * 20, size=23,
-                      color=TEAL if change > 0 else RED, center=True)
+        with self.screen_layer(1):
+            for started, pos, change in self.floats:
+                cx, cy = self.grid.center(pos)
+                drift = 0 if reduced_motion(self.game) else (self.clock - started) * 20
+                yy = cy - 48 - drift
+                self.draw_rect(cx - 31, yy - 2, 62, 35, INK, radius=4)
+                self.text(f"{change:+}", cx, yy, size=23,
+                          color=TEAL if change > 0 else RED, center=True)
         self.rule(26, h - 122, self.edge - 52)
         for i, line in enumerate(b.log[-3:]):
             self.text(textwrap.shorten(line, width=105, placeholder="…"), 30, h - 102 + i * 24,

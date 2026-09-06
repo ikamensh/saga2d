@@ -4,7 +4,8 @@ The game-owned model at `79b2d49` adds tactical Acolyte healing and two new
 recruits. This is progress toward G04/G08, not completion of either gate.
 There are seven recruitable roles and eight relics. No new authored encounter,
 entry choice, obstacle system or framework strategy abstraction is claimed.
-Root-owned controls, descriptions and artwork are a separate integration step.
+The model evidence below belongs to its original revision. The player-control
+integration described at the end is a later checkpoint.
 
 ## Orders and costs
 
@@ -92,5 +93,57 @@ checks use clean source hashes from the same revision:
 Reproduce with `python -m pytest tests/eador/test_roles.py -q`,
 `python tools/stress_eador_roles.py --cases 1000 --report /tmp/roles.json`, and
 `python tools/fuzz_eador.py --campaigns 300 --scenes 0 --steps 180` from the
-source checkout. UI/native verification and a soak of the later integrated
-candidate remain separate release work.
+source checkout. These reports do not include UI/native verification or a soak
+of the later integrated candidate.
+
+## Player controls and presentation
+
+Recruitment uses pages of five with mouse Previous/Next controls and Left/Right
+keys. Numbered purchases always refer to the visible page. Ranger and Warden
+occupy the second page; locked entries show their building requirement and
+each role explains its distinct order. Their original vector pieces have
+different silhouettes at battle and roster sizes; Acolytes have a rounded
+vestment/staff treatment instead of the Wizard's pointed hat.
+
+Selecting a Warden exposes **Swap ally / S**. Selecting a current Acolyte makes
+**2** and the Heal button spend that unit's order; the label names the caster
+and the panel shows shared mana. Hero Bolt retains its own caster. **F** cycles
+legal targets for the chosen order, with friendly markers for Heal and Swap.
+Healing previews use the actual clamped restoration, not the spell's maximum.
+An acted Ranger with unused movement remains selectable with Tab and shows
+**Can move** plus its reachable hexes. Reduced motion keeps the transient
+damage/healing feedback still without changing combat or its display lifetime.
+
+The retained `tools/verify_eador_roles.py` journey starts at the title, applies
+reduced motion, purchases all facilities/troops and reaches Watch on turn seven
+through real player controls. It shoots and repositions the Ranger, swaps the
+wounded seal holder, then heals the extracted ally using the Acolyte. It wins
+by holding the seal with all allies alive and defenders still standing. Six
+save/reloads compare complete serialized states between orders and result;
+claiming the site rewards it once. The shared opening policy lives in
+`tools/eador_roles_campaign.py`, so native input and model checks use the same
+paid preparation rather than separate hand-built winning fixtures.
+
+Independent review also completed Swap and Heal with F → Enter, and exercised
+page bounds, locked/invisible purchase keys, invalid Swap, cancellation and a
+spent Warden's disabled shortcut before and after reload. Current and v8 Codex
+pages were inspected: an older active Acolyte is explicitly identified as
+noncasting, preserving the save's original capabilities. This establishes
+usable controls for the existing manual plan; a human first-run evaluation,
+broader build balance and release-candidate soak remain separate work.
+
+The integrated native journey passed with 157 input activations and six exact
+reloads. All six role screenshots were inspected, including a seven-HP Heal
+forecast followed by the matching readable feedback. A clipped Swap hint was
+shortened. The damage-pill overlap exposed a general draw-order limitation:
+Saga2D's [screen-layer scope](framework-screen-layers.md) now lets its background
+cover lower text, while effect timing, styling and motion preferences remain
+in Shardbound. The independent framework demo verifies text/image coverage,
+overlapping controls and modal isolation.
+
+At this integration checkpoint, **765 tests passed**. The general native
+input/save/window-size journey and 12 model + 12 linked scene fuzz runs also
+passed (2,247 input events, 1,861 randomized). A separate Tribes fuzz run found
+a pre-existing stale hover during quick-load; it reproduces before screen
+layers and is being corrected independently, rather than attributed to or
+hidden by the Shardbound controls.

@@ -345,7 +345,26 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     target = rng.choice(battle.pin_targets(unit.id))
                     click(*scene.grid.center(target.pos))
                     metrics['pin_inputs'] += 1
-            elif roll < .5:
+            elif roll < .50:
+                wardens = [u for u in battle.units if u.team == 'player' and battle.swap_targets(u.id)]
+                if wardens:
+                    unit = rng.choice(wardens)
+                    press('tab')
+                    click(*scene.grid.center(unit.pos))
+                    press('s')
+                    click(*scene.grid.center(rng.choice(battle.swap_targets(unit.id)).pos))
+                    metrics['swap_inputs'] += 1
+            elif roll < .56:
+                healers = [u for u in battle.units if u.team == 'player' and u.can_heal
+                           and battle.spell_targets('heal', caster_id=u.id)]
+                if healers:
+                    unit = rng.choice(healers)
+                    press('tab')
+                    click(*scene.grid.center(unit.pos))
+                    press('2')
+                    click(*scene.grid.center(rng.choice(battle.spell_targets('heal', caster_id=unit.id)).pos))
+                    metrics['acolyte_heal_inputs'] += 1
+            elif roll < .62:
                 press(rng.choice(('left', 'right', 'up', 'down', 'pageup', 'pagedown', 'f', '1', '2')))
                 press('return')
                 metrics['keyboard_tactical_inputs'] += 1
@@ -477,7 +496,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     else:
                         press(rng.choice(('left', 'right', 'u', 'c', 'escape', 'escape')))
                 elif isinstance(scene, CatalogScene):
-                    press(rng.choice(('1', '2', '3', '4', '5', 'escape', 'escape')))
+                    press(rng.choice(('1', '2', '3', '4', '5', 'left', 'right', 'escape', 'escape')))
                 elif rng.random() < .15:
                     roll = rng.random()
                     if roll < .4:
