@@ -32,6 +32,17 @@ ENCOUNTERS = {
     ),
 }
 
+# One assembly, several manual plans: finish the caster, anchor the carrier,
+# occupy its push landing, or take a mobile ranged flank through the marsh.
+ENCOUNTERS['runebound_causeway'] = EncounterSpec(
+    'Runebound Causeway',
+    tuple(((q, r), 'marsh' if q in (0, 1) and (q, r) != (0, 0) else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-3, 0), (-2, -1), (-3, 1), (-2, 0), (-2, 1), (-3, 2), (-2, 2)),
+    ((0, 0), (2, -1), (2, 1), (-3, 3)),
+    exits=((3, -3),), deadline=5, objective='extract',
+)
+
 
 _RELIEF_MARSH = {(-1, -2), (1, -3), (-2, -1), (-1, -1), (-1, 0), (-1, 1), (-1, 2)}
 ENCOUNTERS['relief_forward'] = EncounterSpec(

@@ -68,6 +68,7 @@ class SiteSpec:
     relic: str | None
     encounter: str | None = None
     approaches: tuple[AdventureApproach, ...] = ()
+    inherited_reward: bool = False
 
 
 SITES = {
@@ -131,7 +132,12 @@ SITES = {
         ('skyrider', 'militia', 'archer', 'guard'), 0, 0, None, 'relief_forward', (
             AdventureApproach('forward', 'Intercept the support', 'Free. Deploy near the signal and the approaching support. A living Militia can clear Pin before its Skyrider lands.', 'relief_forward'),
             AdventureApproach('western', 'Receive the relief column', 'Free. Assemble west of the signal. Absorb the landing, then clear contesters before the final scoring turns.', 'relief_western'),
-        )),
+        ), inherited_reward=True),
+    'runebound_causeway': SiteSpec('Runebound Causeway', 'Extract the recovered cargo through a guarded causeway by round 5, or rout the defenders. Prioritize the Rune Adept, anchor against Repulse, or block its landing.',
+        ('adept', 'pikeman', 'ranger', 'guard'), 0, 0, None, 'runebound_causeway', (
+            AdventureApproach('western', 'Assemble west of the causeway', 'Free. Assemble west of the marsh. Your cargo slows the hero by 1; clear the northeastern exit.',
+                              'runebound_causeway', cargo_penalty=1),
+        ), inherited_reward=True),
 
 }
 

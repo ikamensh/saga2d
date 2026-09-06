@@ -104,22 +104,25 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
     if fallback and not any(province.site_relic == SITES[fallback].relic for province in provinces.values()):
         _site(provinces[(-2, 1)], fallback)
     if theme == 'frontier':
-        _relief(provinces)
+        _authored_duplicate(provinces, 'relief_column')
+    elif theme == 'ruins':
+        _authored_duplicate(provinces, 'runebound_causeway', reserved={(1, 0)})
     for province in provinces.values():
         province.guard_hp = [UNITS[kind].hp for kind in province.guards]
         province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
     return provinces
 
 
-def _relief(provinces: dict[Pos, Province]) -> None:
+def _authored_duplicate(provinces: dict[Pos, Province], kind: str, *, reserved=()) -> None:
     """Replace one duplicate ordinary site, preserving its cheaper reward route.
 
     Fixed authored sites and the western fallback are ineligible. The unchanged
     duplicate is no farther east and has the same reward and no larger roster.
-    Province conquest, income and the displaced reward never change.
+    Province conquest, income and the displaced reward never change. Ruins also
+    reserves the direct road's ordinary Crown source for its unchanged route.
     """
     for province in sorted(provinces.values(), key=lambda p: p.pos):
-        if province.pos[0] < 0 or province.site_kind not in FRONTIER_SITES:
+        if province.pos[0] < 0 or province.pos in reserved or province.site_kind not in FRONTIER_SITES:
             continue
         reward = province.site_gold, province.site_crystals, province.site_relic
         if any(other.pos != province.pos and other.pos[0] <= province.pos[0]
@@ -127,12 +130,12 @@ def _relief(provinces: dict[Pos, Province]) -> None:
                and (other.site_gold, other.site_crystals, other.site_relic) == reward
                and Counter(other.site_guards) <= Counter(province.site_guards)
                for other in provinces.values()):
-            spec = SITES['relief_column']
-            province.site, province.site_kind = spec.name, 'relief_column'
+            spec = SITES[kind]
+            province.site, province.site_kind = spec.name, kind
             # Authored finite roster: never append the normal eastern Guard.
             province.site_guards = list(spec.guards)
             return
-    raise ValueError('Frontier has no duplicate ordinary reward route for Relief.')
+    raise ValueError(f'No duplicate ordinary reward route for {SITES[kind].name}.')
 
 
 def _site(province: Province, kind: str) -> None:

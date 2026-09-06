@@ -1,0 +1,14 @@
+# Independent Causeway acceptance
+
+Reviewed production f526310cc40753e77d7a99cf37efa25636fbffec and the complete runtime delta through 1a20e5451a9940f59993d6575db6a84b98c7033b. No actionable correctness or architectural finding within the requested scope.
+
+- 17 focused Causeway integration tests passed at f526310 (30.20 s). The final-copy briefing regression passed again at 1a20e54 (0.68 s).
+- Independently loaded the actual c8ec2e2 world generator from Git and compared 1,000 seeds for each of Frontier, Elderwild, and Ruins (3,000 complete world comparisons). Frontier and Elderwild were exact; Ruins changed exactly one optional site, only name/kind and finite defender kind/HP fields. Every reward and unchanged witness remained exact, including the reserved direct Crown at (1,0). Selected positions independently matched 405/492/81/22.
+- An independent public-command adapter reloaded the complete State after all 806 recorded mutating campaign/battle commands. Existing authored itineraries were reused; no stats, mana, positions, rewards, or currencies were injected. Five paid preparation checkpoints, ten tactical plans, actual infusion, deliberate deadline failure, and manual three-round retry matched the documented costs and outcomes. All successful parties survived; rewards were settled exactly once, and rejected repeat settlement/exploration left state exact.
+- Complementary public saved retry: retreat after a living Adept spent Repulse. The next attempt preserved Adept/Pike/Ranger/Guard HP 5/28/22/35, and correctly refreshed the per-battle Repulse charge. At both text sizes the briefing kept live-caster advice. Current-attempt Codex used its saved reward; a Frontier without Causeway explicitly reported no recorded source. 22 mock UI inputs plus one exact UI save/load. Repeated successfully at final-copy source 1a20e54.
+- The shared duplicate helper has two concrete game-owned callers. The inherited-reward content flag replaces a hardcoded Relief identity test and supports both real sources. Battle rules, save schema, AI, and Saga2D are unchanged. No broader strategy primitive is justified by this content addition.
+- The final runtime delta only shortens deployment text and removes the redundant dead-caster sentence; the live-Adept advice and explicit finite roster remain truthful. The production audit replacing temporary prototype implementations is a sensible simplification.
+
+Artifacts: /tmp/review_causeway_public.py; /tmp/review-causeway-public-f526310.json.gz; /tmp/review_causeway_live.py.
+
+Limitations: this is independent code/public-command review, not human playtesting, optimal-play proof, all-difficulty tactical acceptance, or native visual approval. Production agent/root own full/fuzz/native checks. Review ran in an isolated temporary worktree, with no edits to production source.

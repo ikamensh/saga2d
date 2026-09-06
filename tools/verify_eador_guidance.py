@@ -46,8 +46,10 @@ def prepared_briefings():
     from tools.eador_screen_campaign import prepare_screen
     from tools.eador_aerie_campaign import prepare_aerie, aerie_failed_sortie
     from tools.eador_relief_campaign import prepare_relief
+    from tools.eador_causeway_campaign import prepare_causeway, causeway_failed_attempt
 
-    cases = [('relief', prepare_relief(), None), ('crossing', prepare_adventure(), None),
+    cases = [('relief', prepare_relief(), None), ('causeway', prepare_causeway(), None),
+             ('crossing', prepare_adventure(), None),
              ('cache', prepare_adventure(theme='elderwild'), None),
              ('vault', prepare_vault(), None), ('hunt', prepare_pack_hunt(), None),
              ('observatory', prepare_observatory(), None),
@@ -77,6 +79,9 @@ def prepared_briefings():
     aerie = aerie_failed_sortie(prepare_aerie()).state
     aerie.resolve_battle()
     cases.append(('aerie-wounded', aerie, None))
+    causeway = causeway_failed_attempt(prepare_causeway()).state
+    causeway.resolve_battle()
+    cases.append(('causeway-wounded', causeway, None))
     poor = prepare_adventure()
     poor.build('archery'); poor.build('market'); poor.recruit('ranger')
     poor.explore(approach='guided'); poor.retreat()

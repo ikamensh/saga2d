@@ -157,6 +157,9 @@ class EncounterScene(Screen):
                               (' or remove support.' if 'militia' in self.guards else '.'))
             hold_advice = ' '.join(advice) or 'The surviving defenders shown keep their wounds in either approach.'
         carrier = 'Your hero carries the cargo. Reach an exit with an unspent hero action, then choose Evacuate.'
+        extraction_advice = 'A Warden can deliver an unspent hero. Attacking, casting or Guarding prevents evacuation this turn.'
+        if self.province.site_kind == 'runebound_causeway' and 'adept' in self.guards:
+            extraction_advice += ' Rune Adept has one Repulse charge: finish it, Guard/Brace, or fill its push landing.'
         if self.province.site_kind == 'stranded_explorer':
             isolated = [f'{UNITS[troop.kind].name} (army slot {index})'
                         for index, (troop, pos) in enumerate(zip(self.root.state.hero.army, definition.player_positions[1:]), 1)
@@ -182,7 +185,7 @@ class EncounterScene(Screen):
         return (
             carrier,
             f'Clear adjacent foes. Escape or rout all defenders by round {definition.deadline}. Hero death loses immediately.',
-            'A Warden can deliver an unspent hero. Attacking, casting or Guarding prevents evacuation this turn.',
+            extraction_advice,
         ) if definition.objective == 'extract' else (
             f"Hold the marked hex with any living ally for {definition.hold_turns} consecutive enemy turns. "
             "Adjacent enemies contest it; empty or contested control resets progress.",
