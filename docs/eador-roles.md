@@ -149,5 +149,7 @@ At this integration checkpoint, **765 tests passed**. The general native
 input/save/window-size journey and 12 model + 12 linked scene fuzz runs also
 passed (2,247 input events, 1,861 randomized). A separate Tribes fuzz run found
 a pre-existing stale hover during quick-load; it reproduces before screen
-layers and is being corrected independently, rather than attributed to or
-hidden by the Shardbound controls.
+layers. Separate fix `7148998` clears old hover targets before rebuilding the
+loaded HUD. Its public regressions and native checks cover both a missing
+resource and a smaller loaded map. All 60 AI and 20 random-input Tribes runs
+subsequently passed; the fuzzer now seeds world generation as well as inputs.

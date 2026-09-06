@@ -5,7 +5,7 @@ This is a bounded G05 increment: two authored extraction layouts and their
 entry decisions. A layout's two approaches do not count as two patterns.
 The third proposed Ruins vault, more encounters, and completion of the release
 gates remain future work. Native approach controls, exit markers and result
-presentation belong to the following UI integration checkpoint.
+presentation are covered by the later UI integration evidence below.
 
 ## Decisions with consequences
 
@@ -146,3 +146,51 @@ and `prepare_adventure(..., state=None)` for a real-input State adapter. Its
 subclass `AdventureOrders.do` to dispatch the same orders through controls.
 The source-only evidence above does not establish native UI quality, revised
 packaging or a soak of this newer candidate.
+
+## Player controls and native verification — 2026-09-06
+
+The briefing compares both approaches without changing campaign state. It
+shows available gold/crystals and actions, actual deployment and exits,
+surviving defender health, the selected burden or fee and the resulting loot.
+Number keys or buttons select an approach; Enter commits and Esc returns for
+free. During combat, O cycles the exits and V explicitly evacuates. Its
+disabled reason states the current obstacle. The army panel includes cargo
+and Pin in the actual movement allowance; terminal escape has its own result.
+
+`tools/verify_eador_extraction.py` buys and prepares an ordinary army through
+player controls, cancels and reopens the chosen briefing, then replays the
+public manual plan with clicks and aimed keyboard actions. It checks exact
+attack/Pin/Heal forecasts, disabled evacuation, exit cycling, saved choices
+and once-only rewards. Native pyglet runs completed all four approaches:
+
+| Choice | Escape round | Input activations | Exact save/reloads |
+|---|---:|---:|---:|
+| Crossing: Direct | 3 | 137 | 5 |
+| Crossing: Guided | 2 | 115 | 4 |
+| Cache: Light | 1 | 65 | 2 |
+| Cache: Full | 2 | 88 | 4 |
+
+Screenshots were inspected for both briefings, cargo movement, ready exits,
+target previews and the result. Inspection caught briefing text overlapping
+the rewards and approach diagram; shorter measured paragraphs and spacing
+corrected it. The final Light briefing and existing Watch/final-Gate briefings
+were rendered and inspected after that fix. A complete native Rootward/Gate
+campaign still passed with 356 inputs and 11 exact reloads.
+
+The Codex (`fe34320`) explains saved approach fees/rewards, finite retries,
+unspent evacuation orders and the current carrier's movement/readiness.
+Seven native states include a genuinely Pinned carrier, a spent hero, a ready
+exit and ordinary map play. Its saved reward regression uses a non-base reward
+to catch accidentally displaying registry loot instead of the active attempt.
+
+At UI integration, **810 full tests passed**, followed by 16 focused
+extraction/campaign tests after simplifying the entry callback and checking
+crystal fees too. Twelve linked model and twelve scene fuzz runs passed
+(2,247 inputs, 1,861 randomized), as did Tribes' 60 AI and 20 random-input runs.
+This is source/UI evidence, not an updated packaged release or human playtest.
+
+```sh
+uv run python tools/verify_eador_extraction.py --theme frontier --approach guided --output /tmp/extraction-guided
+uv run python tools/verify_eador_extraction.py --theme elderwild --approach full --output /tmp/extraction-full
+uv run python tools/verify_eador_extraction_codex.py
+```

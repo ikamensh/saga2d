@@ -198,15 +198,28 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Eight sites have different defending parties and gold/crystal rewards:
+Ten sites have different defending parties and gold/crystal rewards:
 Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove, Border Watch and Explorer's Camp. The Watch shows its layout and rewards before you commit
+Grove, Border Watch, Explorer's Camp, Courier's Crossing and Supply Cache.
+The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
 defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of eight
 relics to gain healing or damage spells, avoid retaliation, cross difficult
 terrain, improve army recovery or reduce recruitment costs. Duplicate
 relics can instead be distilled into four crystals. These choices belong
 to this adaptation; they do not reproduce the commercial game's catalogue.
+
+Courier's Crossing and Supply Cache ask you to carry cargo out of a defended
+battlefield. Their briefing compares two approaches with **1/2** and shows
+the actual deployment, exits, defenders and reward before **Enter** commits
+an action. **Esc** returns for free. At the Crossing, a guide costs 20 gold
+and changes your deployment; at the Cache, a larger reward slows your hero.
+During battle, **O** cycles marked exits. Reach one with an unspent hero action
+and no adjacent enemy, then use **V** to Evacuate with all surviving troops.
+Moving or being delivered by a Warden keeps the hero's action; attacking,
+casting or Guarding spends it. Rout also wins. Escape before the eighth enemy
+phase ends; failed attempts retain wounded defenders and spent fees, while
+success pays the chosen reward once. The Codex shows saved approach details.
 
 | Building | Cost | Benefit |
 |---|---|---|

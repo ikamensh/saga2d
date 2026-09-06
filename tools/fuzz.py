@@ -82,9 +82,11 @@ MONKEY_KEYS = [k for keys in MapScene.controls for k in ((keys,) if isinstance(k
 
 
 def monkey_runs(seeds: range, steps: int = 600) -> int:
+    """Each seed reproduces title/world choices as well as the input stream."""
     failures = 0
     for seed in seeds:
         rng = random.Random(seed)
+        random.seed(seed)  # Title/NewGameScene use the global RNG; only this development tool seeds it.
         with tempfile.TemporaryDirectory() as save_dir:
             game = Game("Monkey", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=save_dir)
             try:
@@ -113,7 +115,7 @@ def monkey_runs(seeds: range, steps: int = 600) -> int:
             except Exception:
                 failures += 1
                 print(f"monkey seed {seed}, stack {[type(s).__name__ for s in game.scenes]}:")
-                traceback.print_exc(limit=6)
+                traceback.print_exc()
             finally:
                 game._teardown()
     print(f"monkey runs: {len(seeds)} played, {failures} failed")
