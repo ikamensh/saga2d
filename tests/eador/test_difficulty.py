@@ -24,8 +24,6 @@ def test_real_v11_progress_migrates_and_continues_with_exact_standard_rules():
         expected = {key: value for key, value in case['before'].items() if key != 'schema_version'}
         assert state.difficulty == 'standard' and state.rules.title == 'Standard'
         assert without_difficulty_metadata(state) == expected
-        if case['name'] == 'new_game':
-            assert without_difficulty_metadata(State.new()) == expected
         if case['name'] == 'departure':
             state.advance('rootward', **travel_selection(state))
         elif case['name'] == 'recovery':

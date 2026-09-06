@@ -54,7 +54,7 @@ class RivalScene(Screen):
         rival = s.rival
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 215))
         self.box(x, y, 880, 652)
-        self.text("THE DUSKSPIRE EXPEDITION", x + 28, y + 28, size=11, color=RED)
+        self.text(f"THE DUSKSPIRE EXPEDITION · {s.rules.title.upper()}", x + 28, y + 28, size=11, color=RED)
         self.text(rival_order(s), x + 28, y + 57, size=25, serif=True)
         self.text(f"At {s.provinces[rival.pos].name}  ·  {len(rival.army)} surviving troops",
                   x + 28, y + 100, size=12, color=MUTED)
@@ -85,7 +85,7 @@ class RivalScene(Screen):
                       f"Reclaim any of: {routes}. If gold and income cannot pay upkeep, "
                       "less experienced troops leave first.")
         else:
-            advice = ("Travel into the expedition's province to intercept it. Stand in its target province "
-                      "to defend. Casualties and wounds persist after every fight; a weakened expedition "
-                      "returns home to pay for recovery. Its orders may change after a battle.")
+            advice = (f"After its defeat, the first paid replacement waits {s.rules.replacement_delay} turns. "
+                      "Intercept by entering its province, or defend its target. Wounds and casualties persist; "
+                      "weakened troops return to Duskspire to pay for recovery. A battle can change its orders.")
         self.paragraph(advice, x + 28, y + 483, width=824, size=13)

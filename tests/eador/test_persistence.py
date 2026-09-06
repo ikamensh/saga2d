@@ -178,12 +178,12 @@ def test_linked_descriptions_keep_battle_decisions_and_completed_ending(tmp_path
     assert 'Stage 3/3' in detail and finished.campaign.title in detail and 'Campaign completed' in detail
 
 
-def test_standalone_save_descriptions_keep_the_existing_format(tmp_path):
-    """Single-shard saves retain their familiar description without campaign-only vocabulary."""
+def test_standalone_save_descriptions_include_saved_difficulty_without_campaign_phases(tmp_path):
+    """Single-shard saves disclose their mode alongside the hero, turn and world."""
     saves = CampaignSaves(SaveManager(tmp_path))
     state = State.new(7)
     saves.save(state)
-    assert saves.entries()[0].detail == 'Turn 1 · Commander · Shard 7'
+    assert saves.entries()[0].detail == 'Standard · Turn 1 · Commander · Shard 7'
     state.explore()
     saves.save(state)
-    assert saves.entries()[0].detail == 'Turn 1 · Commander · Shard 7 · Battle round 1'
+    assert saves.entries()[0].detail == 'Standard · Turn 1 · Commander · Shard 7 · Battle round 1'

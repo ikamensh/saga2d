@@ -109,7 +109,8 @@ class PlayerState:
 
     def __getattr__(self, name):
         value = getattr(self.player.root.state, name)
-        if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches'):
+        if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches',
+                                            'recovery_preview', 'expedition_funding'):
             raise AssertionError(f'No input adapter for campaign command {name!r}')
         return value
 

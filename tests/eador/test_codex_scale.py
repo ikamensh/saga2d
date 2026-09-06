@@ -61,7 +61,7 @@ def test_codex_reading_preview_cancel_apply_and_restart_keep_progress_and_readin
 
 def test_reading_mouse_controls_match_keyboard_and_failed_apply_keeps_edits_open(tmp_path):
     """The visible reading +/- row and keys share preview; a disk error cannot commit it."""
-    from eador.preferences import codex_text_scale, load_preferences
+    from eador.preferences import reading_scale, load_preferences
 
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
     try:
@@ -84,21 +84,21 @@ def test_reading_mouse_controls_match_keyboard_and_failed_apply_keeps_edits_open
             x, y, width, height = button.bounds
             player.click(x + width / 2, y + height / 2)
         reading_button('+')
-        assert codex_text_scale(game) == 125
+        assert reading_scale(game) == 125
         player.press('left')
-        assert codex_text_scale(game) == 100
+        assert reading_scale(game) == 100
         player.press('right')
         reading_button('−')
-        assert codex_text_scale(game) == 100
+        assert reading_scale(game) == 100
         reading_button('+')
         player.button('Apply')
         assert isinstance(game.scene, SettingsScene)
         assert 'Could not apply' in game.scene.message
-        assert codex_text_scale(game) == 125 and prefs['codex_text_scale'] == 100
+        assert reading_scale(game) == 125 and prefs['codex_text_scale'] == 100
         assert prefs.path.read_bytes() == before
         player.button('Cancel')
         assert game.scene.visible_entries[0].title == anchor
-        assert codex_text_scale(game) == 100
+        assert reading_scale(game) == 100
         assert prefs.path.read_bytes() == before
     finally:
         game._teardown()
@@ -106,7 +106,7 @@ def test_reading_mouse_controls_match_keyboard_and_failed_apply_keeps_edits_open
 
 def test_reading_corruption_recovery_is_explicit_and_preserves_displaced_bytes(tmp_path):
     """A damaged file must not be overwritten by ordinary Apply of the reading size."""
-    from eador.preferences import codex_text_scale
+    from eador.preferences import reading_scale
 
     path = tmp_path / 'settings.json'
     damaged = b'{"codex_text_scale": 125.0}'
@@ -123,7 +123,7 @@ def test_reading_corruption_recovery_is_explicit_and_preserves_displaced_bytes(t
         assert isinstance(game.scene, SettingsScene)
         assert path.read_bytes() == damaged
         player.button('Preserve damaged file & use defaults')
-        assert codex_text_scale(game) == 100
+        assert reading_scale(game) == 100
         player.button('Cancel')
         assert path.read_bytes() == damaged
         assert not list(tmp_path.glob('settings.recovery-*.json'))
@@ -138,14 +138,14 @@ def test_reading_corruption_recovery_is_explicit_and_preserves_displaced_bytes(t
 
 
 def test_old_preferences_gain_default_reading_size_without_rewriting_on_load(tmp_path):
-    from eador.preferences import codex_text_scale, load_preferences
+    from eador.preferences import reading_scale, load_preferences
 
     path = tmp_path / 'settings.json'
     old = b'{"master": 0.6, "reduced_motion": true}'
     path.write_bytes(old)
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
     try:
-        assert codex_text_scale(game) == 100
+        assert reading_scale(game) == 100
         assert not load_preferences(game).error
         assert game.audio.get_volume('master') == .6
         assert path.read_bytes() == old
@@ -197,7 +197,7 @@ def test_both_reading_sizes_preserve_all_current_and_older_entries_after_resize(
 
 @pytest.mark.parametrize('value', ['true', '125.0', '126', '0', 'NaN', '"125"', 'null'])
 def test_invalid_reading_preference_is_reported_without_rewriting_file(tmp_path, value):
-    from eador.preferences import codex_text_scale, load_preferences
+    from eador.preferences import reading_scale, load_preferences
 
     path = tmp_path / 'settings.json'
     raw = '{"codex_text_scale": ' + value + '}'
@@ -205,7 +205,7 @@ def test_invalid_reading_preference_is_reported_without_rewriting_file(tmp_path,
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
     try:
         assert load_preferences(game).error
-        assert codex_text_scale(game) == 100
+        assert reading_scale(game) == 100
         assert path.read_text() == raw
     finally:
         game._teardown()

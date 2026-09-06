@@ -13,7 +13,7 @@ from saga2d import Label
 from eador.app import create_game
 from eador.codex import CATEGORIES, CodexScene
 from eador.model import State
-from eador.preferences import codex_text_scale
+from eador.preferences import reading_scale
 from eador.scene import ShardScene
 from tools.eador_ui import PlayerInput
 
@@ -59,7 +59,7 @@ def verify_matrix(game, output):
                 player.button('Text size')
                 player.press('right' if percent == 125 else 'left')
                 player.button('Apply')
-                assert codex_text_scale(game) == percent
+                assert reading_scale(game) == percent
                 for index, category in enumerate(CATEGORIES):
                     player.press(str(index + 1))
                     seen = []
@@ -135,7 +135,7 @@ def verify(output, *, matrix=False):
             game.push(CodexScene(root))
             game.tick(1 / 60)
             check_page(game.scene)
-            assert codex_text_scale(game) == 125
+            assert reading_scale(game) == 125
             PlayerInput(game, native=True, output=output).capture('restarted-125')
             if matrix:
                 results = verify_matrix(game, output / 'matrix')

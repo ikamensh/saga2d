@@ -48,7 +48,8 @@ class CampaignPlanScene(Screen):
         campaign = state.campaign
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 225))
         self.box(x, y, 900, 660)
-        self.text(f'YOUR CAMPAIGN · STAGE {campaign.stage} OF 3', x + 28, y + 24, size=11, color=GOLD)
+        self.text(f'YOUR CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}',
+                  x + 28, y + 24, size=11, color=GOLD)
         self.text(campaign.title, x + 28, y + 52, size=30, serif=True)
         self.paragraph(campaign.objective, x + 28, y + 104, width=844, size=14, color=TEXT)
         self.text('NUMBERED OBJECTIVES ON YOUR MAP', x + 28, y + 166, size=10, color=GOLD)
@@ -66,8 +67,9 @@ class CampaignPlanScene(Screen):
                        x + 28, y + 428, width=844, size=12)
         self.text(f'Rank limits this stage: hero {state.hero_level_cap} · troops {state.troop_level_cap}. '
                   'Experience pauses at the limit.', x + 28, y + 506, size=12, color=GOLD)
+        gold, crystals = state.expedition_funding(recovery=True)
         self.paragraph('Recovery spent: another lost capital ends this campaign.' if campaign.recovery_used else
-                       'One recovery remains if Westwatch falls: restart this same world with 60 gold and two crystals, '
+                       f'One recovery remains if Westwatch falls: restart this same world with {gold} gold and {crystals} crystals, '
                        'your learned skills and chosen surviving retinue.', x + 28, y + 538, width=844, size=11)
 
 
@@ -217,13 +219,15 @@ class CampaignScene(Screen):
 
     def to_title(self):
         state = self.root.state
-        self.game.clear_and_push(TitleScene(state.campaign.seed + 1, hero_class=state.hero.hero_class))
+        self.game.clear_and_push(TitleScene(state.campaign.seed + 1, hero_class=state.hero.hero_class,
+                                           difficulty=state.difficulty))
 
     def draw(self):
         x, y, state, campaign = self.x, self.y, self.root.state, self.campaign
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 232))
         self.box(x, y, 1080, 700)
-        self.text(f'LINKED CAMPAIGN · STAGE {campaign.stage} OF 3', x + 36, y + 25, size=11, color=GOLD)
+        self.text(f'LINKED CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}',
+                  x + 36, y + 25, size=11, color=GOLD)
         title = ('Choose the next challenge' if self.step == 'offers' else
                  'Choose your recovery expedition' if self.phase == 'recovery' else
                  'Choose who travels with you' if self.step == 'retinue' else
@@ -240,7 +244,8 @@ class CampaignScene(Screen):
                 self.paragraph(offer.description, left + 20, y + 233, width=446, size=13, color=TEXT)
             next_stage = campaign.stage + 1
             army = 'four Dread Guards and two Archers' if next_stage == 3 else 'the usual six-soldier expedition'
-            self.paragraph(f'The next rival begins with {army}, {90 if next_stage == 3 else 80} gold, and a two-turn first warning. '
+            self.paragraph(f'The next rival begins with {army}, {90 if next_stage == 3 else 80} gold, '
+                           f'and its first operation in {state.rules.arrival_delay} turns. '
                            'It still pays for healing and replacements. Inspect its plan after arrival.',
                            x + 36, y + 421, width=1008, size=14)
             self.paragraph('Next, choose up to two veterans and two relics. Bring your hero’s skills; build a new local realm. '
@@ -269,7 +274,7 @@ class CampaignScene(Screen):
                           f'{UNITS[item.kind].upkeep} gold upkeep per turn.' if self.column == 0 else RELICS[item].description)
                 self.paragraph(detail, x + 36, y + 516, width=1008, size=12, color=TEAL)
             recovery = self.phase == 'recovery'
-            gold, crystals = (60, 2) if recovery else (100 + min(40, state.gold), 4 + min(2, state.crystals))
+            gold, crystals = state.expedition_funding(recovery=recovery)
             offer = next((offer for offer in campaign.offers if offer.id == self.offer_id), None)
             destination = campaign.title if recovery else offer.title
             self.text(f'{destination} · {gold} gold · {crystals} crystals · {len(self.troop_ids)} veterans + {3 - len(self.troop_ids)} new Militia',

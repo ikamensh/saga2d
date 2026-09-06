@@ -13,6 +13,7 @@ from saga2d import Anchor, Button, HexGrid, InputEvent, SaveError, Scene
 
 from eador import art
 from eador.content import RELICS, SITES, SKILLS
+from eador.difficulty import DIFFICULTIES
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, State
 from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
@@ -105,11 +106,12 @@ class TitleScene(Screen):
     controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves",
                 "left": "previous_theme", "right": "next_theme"}
 
-    def __init__(self, seed=7, *, theme="frontier", hero_class="Commander"):
+    def __init__(self, seed=7, *, theme="frontier", hero_class="Commander", difficulty="standard"):
         super().__init__()
         self.seed = seed
         self.hero_class = hero_class
         self.world_theme = theme
+        self.difficulty = difficulty
 
     def on_enter(self):
         from eador.preferences import load_preferences
@@ -122,11 +124,15 @@ class TitleScene(Screen):
         w, h = self.game.resolution
         x, width = w / 2 - 100, w / 2 + 40
         for i, name in enumerate(HERO_CLASSES):
-            self.button(name, x + i * (width + 12) / 4, 280, (width - 36) / 4,
+            self.button(name, x + i * (width + 12) / 4, 270, (width - 36) / 4,
                         lambda name=name: self.choose(name), primary=name == self.hero_class)
         for i, (ident, theme) in enumerate(THEMES.items()):
-            self.button(theme.name, x + i * (width + 12) / 3, 418, (width - 24) / 3,
+            self.button(theme.name, x + i * (width + 12) / 3, 395, (width - 24) / 3,
                         lambda ident=ident: self.choose_theme(ident), primary=ident == self.world_theme)
+        for i, (ident, rules) in enumerate(DIFFICULTIES.items()):
+            self.button(rules.title, x + i * (width + 12) / 3, 535, (width - 24) / 3,
+                        lambda ident=ident: self.choose_difficulty(ident), shortcut=str(i + 1),
+                        primary=ident == self.difficulty)
         self.button("Linked campaign", w / 2 - 348, h - 124, 336, self.start_campaign, shortcut="L", primary=True)
         self.button("Enter single shard", w / 2 + 12, h - 124, 336, self.start, hotkey="Enter")
         self.button("Load shard", w / 2 - 202, h - 72, 196, self.browse_saves, hotkey="F6")
@@ -148,6 +154,10 @@ class TitleScene(Screen):
         self.world_theme = theme
         self.refresh()
 
+    def choose_difficulty(self, difficulty):
+        self.difficulty = difficulty
+        self.refresh()
+
     def next_theme(self):
         themes = list(THEMES)
         self.choose_theme(themes[(themes.index(self.world_theme) + 1) % len(themes)])
@@ -157,11 +167,11 @@ class TitleScene(Screen):
         self.choose_theme(themes[(themes.index(self.world_theme) - 1) % len(themes)])
 
     def start(self):
-        state = State.new(self.seed, self.hero_class, theme=self.world_theme)
+        state = State.new(self.seed, self.hero_class, theme=self.world_theme, difficulty=self.difficulty)
         self.enter_state(state)
 
     def start_campaign(self):
-        self.enter_state(State.new_campaign(self.seed, self.hero_class))
+        self.enter_state(State.new_campaign(self.seed, self.hero_class, difficulty=self.difficulty))
 
     def enter_state(self, state):
         root = ShardScene(state)
@@ -190,10 +200,12 @@ class TitleScene(Screen):
                                    capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
             art.province(self, grid, pos, data)
         self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
-        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 244, size=11, color=GOLD)
-        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 336, width=width, size=13)
-        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 382, size=11, color=GOLD)
-        self.paragraph(THEMES[self.world_theme].description, x, 476, width=width, size=13)
+        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 239, size=11, color=GOLD)
+        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 326, width=width, size=13)
+        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 369, size=11, color=GOLD)
+        self.paragraph(THEMES[self.world_theme].description, x, 449, width=width, size=13)
+        self.text("DIFFICULTY   ·   Fixed for this run", x, 509, size=11, color=GOLD)
+        self.paragraph(DIFFICULTIES[self.difficulty].description, x, 588, width=width, size=12)
         notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
                                   if self.preferences.error else "")
         self.text(notice or f"Seed {self.seed} · Linked: three stages from Frontier. Single shard: your selected world.",
@@ -379,14 +391,16 @@ class ShardScene(Screen):
         self.rule(24, 90, self.edge - 48)
         header_center = (338 + self.edge - 177) / 2
         self.text("SHARDBOUND", header_center, 24, size=27, serif=True, center=True)
-        self.text(f"{THEMES[s.theme].name.upper()}   /   SHARD {s.seed}", header_center, 61, size=10, color=GOLD, center=True)
+        self.text(f"{THEMES[s.theme].name.upper()}  /  SHARD {s.seed}  /  {s.rules.title.upper()}",
+                  header_center, 61, size=10, color=GOLD, center=True)
         self.text("WESTWATCH ENCIRCLED" if s.encircled else "YOUR DOMINION", x, 24,
                   size=10, color=RED if s.encircled else MUTED)
         self.text(f"{s.gold} gold", x, 48, size=22, color=GOLD, serif=True)
         self.text(f"{s.crystals} crystals", x + 160, 52, size=15, color=BLUE)
         self.text(f"Income +{s.income}   ·   Upkeep −{s.upkeep}   / turn", x, 84, size=11,
                   color=RED if s.upkeep_shortfall else MUTED)
-        self.rule(x, 112, 300)
+        self.text(f"Realm gold yield: {s.rules.gold_percent}% of base production", x, 102, size=9, color=MUTED)
+        self.rule(x, 120, 300)
         self.text(f"{s.hero.name}, the {s.hero.hero_class}", x, 132, size=21, serif=True)
         self.text(f"LEVEL {s.hero.level}  ·  {s.hero.xp} XP  ·  {s.actions_left} ACTIONS LEFT", x, 166, size=10, color=GOLD)
         self.text(f"Health {s.hero.hp}/{s.hero.max_hp}", x, 192, size=12, color=TEAL)
@@ -399,7 +413,7 @@ class ShardScene(Screen):
         self.text("SELECTED PROVINCE", x, 279, size=10, color=MUTED)
         self.text(p.name, x, 302, size=27, serif=True)
         province_income = 0 if s.encircled and p.pos == (-2, 0) else p.income
-        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  +{province_income} gold", x, 344,
+        self.text(f"{p.terrain.title()}  ·  {p.owner.title()}  ·  {province_income} base gold", x, 344,
                   size=12, color=art.OWNERS[p.owner])
         if s.rival.army and self.selected == s.rival.pos:
             self.text(f"Expedition: {len(s.rival.army)} troops · V for strengths", x, 369, size=11, color=RED)
@@ -557,13 +571,52 @@ class HelpScene(Screen):
         super().__init__()
         self.root = root
 
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._reading_display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
     def refresh(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 340, self.game.height / 2 - 280
-        self.button("Return to game", self.x + 26, self.y + 481, 212, self.game.pop, shortcut="Esc", primary=True)
-        self.button("Codex", self.x + 249, self.y + 481, 192, self.root.codex, shortcut="C")
-        self.button("Save & title", self.x + 452, self.y + 481, 202, self.title, shortcut="S")
-        self.button("Settings", self.x + 504, self.y + 8, 150, self.open_settings, shortcut="O")
+        self.x, self.y = self.game.width / 2 - 520, self.game.height / 2 - 350
+        self._reading_display = self.game.window_size, reading_scale(self.game)
+        scale = self._reading_display[1] / 100
+        sections = (
+            ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
+            ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
+            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
+            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
+        )
+        blocks = [Column(
+            Label(title, width=472, wrap=True, font="Georgia", font_size=round(17 * scale), text_color=TEAL),
+            Label(body, width=472, wrap=True, font="Verdana", font_size=round(12 * scale), text_color=MUTED),
+            spacing=8,
+        ) for title, body in sections]
+        # Attach before measuring. Equal measured row heights align section tops;
+        # Columns then place all prose and the following quick-reference line.
+        for block in blocks:
+            self.ui.add(block)
+        rows = []
+        for pair in (blocks[:2], blocks[2:]):
+            height = max(block.get_preferred_size()[1] for block in pair)
+            rows.append(Row(*(Column(block, height=height) for block in pair), spacing=40))
+        objective = "J campaign objectives" if self.root.state.campaign else "Capture Duskspire to win"
+        content = Column(*rows, Label("F5 quicksave  /  F9 quickload  /  F6 save slots  /  " + objective,
+                                     width=984, wrap=True, font="Verdana", font_size=round(11 * scale), text_color=GOLD),
+                         spacing=28, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 142)))
+        self.ui.add(content)
+        if content.get_preferred_size()[1] > 464:
+            raise ValueError(f"Field Guide does not fit at {scale:.0%}")
+        self.button("Return to game", self.x + 28, self.y + 634, 260, self.game.pop, shortcut="Esc", primary=True)
+        self.button("Codex", self.x + 402, self.y + 634, 200, self.root.codex, shortcut="C")
+        self.button("Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
+        self.button("Settings", self.x + 862, self.y + 26, 150, self.open_settings, shortcut="O")
 
     def title(self):
         self.game.push(SaveScene(self.root, mode="save", return_to_title=True))
@@ -571,21 +624,11 @@ class HelpScene(Screen):
     def draw(self):
         x, y = self.x, self.y
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 210))
-        self.box(x, y, 680, 560)
+        self.box(x, y, 1040, 700)
         self.text("A FIELD GUIDE", x + 28, y + 26, size=11, color=GOLD)
         self.text("Claim a broken world", x + 28, y + 54, size=32, serif=True)
-        sections = [
-            ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
-            ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
-            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
-            ("04   Grow and counterattack", "Win battles for skills; H equips relics. V shows the rival's army and orders. Intercept or defend, then strike while it rebuilds."),
-        ]
-        for i, (title, body) in enumerate(sections):
-            yy = y + 119 + i * 84
-            self.text(title, x + 28, yy, size=17, serif=True, color=TEAL)
-            self.paragraph(body, x + 28, yy + 28, width=624, size=12)
-        objective = "J campaign objectives" if self.root.state.campaign else "Capture Duskspire to win"
-        self.text("F5 quicksave  /  F9 quickload  /  F6 save slots  /  " + objective, x + 28, y + 459, size=11, color=GOLD)
+        self.rule(x + 28, y + 118, 984)
+        self.rule(x + 28, y + 620, 984)
 
 
 class BattleScene(Screen):
@@ -1107,7 +1150,8 @@ class SaveScene(Screen):
                 self.message = f"Saved to {entry.label}."
                 if self.return_to_title:
                     self.game.clear_and_push(TitleScene(self.root.state.seed, theme=self.root.state.theme,
-                                                       hero_class=self.root.state.hero.hero_class))
+                                                       hero_class=self.root.state.hero.hero_class,
+                                                       difficulty=self.root.state.difficulty))
                     return
             self.refresh()
 
@@ -1258,9 +1302,14 @@ class HeroScene(Screen):
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
         self.box(x, y, 820, 732)
         self.text(hero.name, x + 28, y + 24, size=29, color=GOLD, serif=True)
+        self.text(f"{s.rules.title} realm", x + 566, y + 36, size=12, color=GOLD)
         self.text(f"Level {hero.level} {hero.hero_class}   ·   {hero.hp}/{hero.max_hp} health   ·   {hero.mana}/{hero.max_mana} mana",
                   x + 28, y + 68, size=12, color=MUTED)
-        self.rule(x + 28, y + 103, 764)
+        recovery = s.recovery_preview()
+        rest = (recovery.blocked_reason or
+                f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.")
+        self.text(rest, x + 28, y + 90, size=10, color=RED if recovery.blocked_reason else MUTED)
+        self.rule(x + 28, y + 112, 764)
         self.text("LEARNED DISCIPLINES", x + 28, y + 119, size=10, color=GOLD)
         if not hero.skill_ranks:
             self.paragraph("Win battles to gain experience. Each level lets you deepen a discipline or try the other path.",
@@ -1312,7 +1361,8 @@ class ResultScene(Screen):
             game.pop()  # tactical battlefield; reveal the existing campaign
         else:
             self.game.clear_and_push(TitleScene(self.root.state.seed + 1, theme=self.root.state.theme,
-                                               hero_class=self.root.state.hero.hero_class))
+                                               hero_class=self.root.state.hero.hero_class,
+                                               difficulty=self.root.state.difficulty))
 
     def save_game(self):
         self.root.save_game()

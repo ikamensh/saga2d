@@ -1,6 +1,12 @@
 # Three difficulty choices
 
-Proposal for root review, 2026-09-06. **No difficulty rules are implemented.**
+Original candidate design, 2026-09-06. These profiles are now implemented in
+schema v12, with title/CLI selection and saved-rule readouts. The
+[matched model audit](eador-difficulty-model.md) and
+[native input evidence](evidence/shardbound-difficulty-2026-09-06/README.md)
+record the results. Challenge recovery pacing and the crystal economy remain
+unresolved; this document preserves the first candidate's rationale.
+
 Keep Standard exactly equal to the current game. Add Accessible for learning and
 recovering from an expensive mistake, and Challenge for earlier investment and
 interception decisions. Start with realm resources, recovery and the finite

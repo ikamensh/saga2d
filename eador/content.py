@@ -111,6 +111,11 @@ SITES = {
             AdventureApproach('clear', 'Clear the central lane', 'Spend 2 crystals to clear the central forest. Both armies gain the open firing lane; the cost is lost on retreat.',
                               'observatory_clear', crystals_cost=2),
         )),
+    'stranded_explorer': SiteSpec('Stranded Explorer', 'Recover a trail kit beyond the marsh, then regroup at the western exit by round 6, or rout the patrol.',
+        ('pikeman', 'archer', 'guard', 'warden'), 55, 1, 'wayfarer_boots', 'explorer_north', (
+            AdventureApproach('north', 'Assemble to the north', 'Free. The main force begins north of the return exit. Your hero and fifth troop, if present, start isolated east of the marsh.', 'explorer_north'),
+            AdventureApproach('south', 'Assemble to the south', 'Free. The main force begins near the southern patrol. Your hero and fifth troop, if present, start isolated east of the marsh.', 'explorer_south'),
+        )),
 
 }
 
