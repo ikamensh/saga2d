@@ -8,12 +8,16 @@ Every command checks health, occupancy, ownership and save roundtrips. Scene
 runs use mock-backend input and visible button bounds, including unfinished
 battle saves, title/load, retreats and starting another shard after defeat.
 Unexpected exceptions fail immediately; the printed seed reproduces the run.
+Replacement samples mix available roles with refused selections; last-action
+copies probe the following rival turn without advancing the random live policy.
+Retirements, battle deaths and those copied probes have separate counters.
 """
 
 from __future__ import annotations
 
 import argparse
 from collections import Counter, deque
+from dataclasses import asdict
 import hashlib
 import json
 import math
@@ -108,6 +112,85 @@ def check_state(state: State) -> None:
     assert State.from_json(saved).to_json() == saved, 'save roundtrip changed state'
 
 
+def replacement_order(state: State, outgoing_id: int, kind: str, metrics: Counter) -> int | None:
+    """Check one real order, its exact refusal/retirement, and paired saved consequences."""
+    before = state.to_json()
+    restored = State.from_json(before)
+    try:
+        quote = state.replacement_preview(outgoing_id, kind)
+    except RuleError as error:
+        reason = str(error)
+    else:
+        reason = quote.blocked_reason
+    assert state.to_json() == before, 'replacement quote mutated state'
+    if reason:
+        for current in (state, restored):
+            try:
+                current.replace_troop(outgoing_id, kind)
+            except RuleError as error:
+                assert str(error) == reason, 'replacement refusal disagreed with its quote'
+            else:
+                raise AssertionError('Replacement accepted a refused forecast')
+            assert current.to_json() == before, 'rejected replacement mutated state'
+        metrics['rejected_replacement_orders'] += 1
+        metrics['rejected_commands'] += 1
+        return None
+    expected = json.loads(before)
+    army = expected['hero']['army']
+    index = next(i for i, troop in enumerate(army) if troop['id'] == outgoing_id)
+    assert asdict(quote.outgoing) == army[index]
+    assert quote.incoming.id == state.next_troop_id
+    assert quote.incoming.kind == kind and quote.incoming.level == 1 and quote.incoming.xp == 0
+    assert quote.incoming.hp == quote.incoming.max_hp
+    assert (quote.gold, quote.crystals) == (state.recruit_cost(kind), state.recruit_crystal_cost(kind))
+    army[index] = asdict(quote.incoming)
+    expected['gold'] -= quote.gold
+    expected['crystals'] -= quote.crystals
+    expected['actions_left'] -= quote.actions
+    expected['next_troop_id'] += 1
+    assert quote.actions == 1 and quote.upkeep_before == state.upkeep
+    full = len(state.hero.army) == state.hero.max_army
+    for current in (state, restored):
+        current.replace_troop(outgoing_id, kind)
+        assert current.upkeep == quote.upkeep_after
+        actual = json.loads(current.to_json())
+        assert actual['log'][:-1] == expected['log']
+        assert {k: v for k, v in actual.items() if k != 'log'} == {
+            k: v for k, v in expected.items() if k != 'log'}, 'replacement changed unrelated state'
+    assert state.to_json() == restored.to_json(), 'save changed replacement consequences'
+    metrics['replace_troop'] += 1
+    metrics['replacement_full_army'] += full
+    metrics['replacement_same_role'] += quote.outgoing.kind == kind
+    metrics['replacement_retired_veterans'] += quote.outgoing.level > 1
+    metrics['replacement_retired_rank_total'] += quote.outgoing.level
+    metrics['replacement_retired_xp_total'] += quote.outgoing.xp
+    metrics['replacement_gold'] += quote.gold
+    metrics['replacement_crystals'] += quote.crystals
+    metrics['replacement_incoming.' + kind] += 1
+    if not state.actions_left:
+        # An optional saved branch checks the actual lost travel opportunity and
+        # the following rival/upkeep operation without advancing the random policy.
+        after = state.to_json()
+        target = state.grid.neighbors(state.hero.pos)[0]
+        try:
+            state.travel(target)
+        except RuleError as error:
+            assert 'No campaign actions' in str(error)
+        else:
+            raise AssertionError('Replacement did not spend the last travel action')
+        assert state.to_json() == after
+        advanced = State.from_json(after)
+        advanced.end_turn(); restored.end_turn()
+        assert advanced.to_json() == restored.to_json(), 'save changed replacement next-turn consequences'
+        check_state(advanced)
+        metrics['replacement_saved_next_turn_probes'] += 1
+        metrics['replacement_probe_territory_losses'] += sum(
+            province.owner == 'player' and advanced.provinces[pos].owner == 'rival'
+            for pos, province in state.provinces.items())
+        metrics['replacement_probe_defenses'] += advanced.battle_kind == 'defense'
+    return outgoing_id
+
+
 def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = False) -> None:
     """Random commands include rejections, which must leave the save unchanged."""
     rng = random.Random(seed)
@@ -126,9 +209,14 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
         metrics[f'linked_start_stage.{state.campaign.stage}'] += 1
     theme = state.theme
     metrics[f'campaign_theme.{theme}'] += 1
+    retired_ids = set()
     for _ in range(steps):
         check_state(state)
         metrics['state_checks'] += 1
+        assert not retired_ids.intersection(t.id for t in state.hero.army), 'retired troop reappeared on the shard'
+        if (state.battle or state.choice or state.status != 'playing') and rng.random() < .10:
+            outgoing = rng.choice(state.hero.army).id if state.hero.army else 0
+            assert replacement_order(state, outgoing, rng.choice(RECRUITABLE), metrics) is None
         if state.choice:
             option = rng.choice(state.choice.options)
             restored = State.from_json(state.to_json())
@@ -151,13 +239,17 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
                     current.recover(**selection)
             assert state.to_json() == restored.to_json(), 'save changed linked transition consequences'
             metrics['linked_' + phase] += 1
+            # Fresh shard/recovery identities are scoped to the new expedition.
+            retired_ids.clear()
             continue
         if state.status != 'playing':
             break
         if state.battle:
             if state.battle.outcome:
                 metrics['battle_' + state.battle.outcome] += 1
+                old_ids = {troop.id for troop in state.hero.army}
                 state.resolve_battle()
+                metrics['battle_troop_losses'] += len(old_ids - {troop.id for troop in state.hero.army})
             elif state.battle.objective.kind == 'extract' and rng.random() < .20:
                 before = state.to_json()
                 restored = State.from_json(before)
@@ -212,7 +304,24 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
                 assert state.to_json() == restored.to_json(), 'save changed battle continuation'
                 metrics['battle_rounds'] += 1
             continue
-        command = rng.choice(('build', 'recruit', 'travel', 'travel', 'explore', 'end_turn', 'equip', 'infuse'))
+        command = rng.choice(('build', 'recruit', 'replace_troop', 'travel', 'travel', 'explore', 'end_turn', 'equip', 'infuse'))
+        if command == 'replace_troop':
+            # Half the samples seek an available role; the other half include
+            # unknown/retired identities and unowned prerequisites or funds.
+            if state.hero.army and rng.random() < .5:
+                outgoing = rng.choice(state.hero.army).id
+                before = state.to_json()
+                available = [kind for kind in RECRUITABLE
+                             if state.replacement_preview(outgoing, kind).blocked_reason is None]
+                assert state.to_json() == before, 'scanning replacement offers mutated state'
+                kind = rng.choice(available or RECRUITABLE)
+            else:
+                outgoing = rng.choice([0, state.next_troop_id + 1, *sorted(retired_ids), *(t.id for t in state.hero.army)])
+                kind = rng.choice([*RECRUITABLE, 'unknown', 'guard'])
+            retired = replacement_order(state, outgoing, kind, metrics)
+            if retired is not None:
+                retired_ids.add(retired)
+            continue
         before = state.to_json()
         try:
             if command == 'build':
@@ -638,7 +747,8 @@ def main() -> None:
     project = Path(__file__).resolve().parents[1]
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=project, text=True).splitlines()
-    source_files = [*project.joinpath('eador').glob('*.py'), *project.joinpath('saga2d').rglob('*.py'), Path(__file__).resolve()]
+    source_files = [*project.joinpath('eador').glob('*.py'), *project.joinpath('saga2d').rglob('*.py'), Path(__file__).resolve(),
+                    project / 'tools/eador_campaign.py', project / 'tools/eador_linked_campaign.py']
     source_hashes = {str(path.relative_to(project)): hashlib.sha256(path.read_bytes()).hexdigest()
                      for path in sorted(source_files)}
     for index, seed in enumerate(range(args.seed, args.seed + campaign_count)):
@@ -664,6 +774,8 @@ def main() -> None:
                   'platform': platform.platform(), 'machine': platform.machine(), 'python': platform.python_version(),
                   'elapsed_seconds': elapsed, 'campaign_seconds': campaign_seconds,
                   'campaign_metrics': dict(campaigns), 'scene_metrics': dict(scenes), 'source_sha256': source_hashes,
+                  'replacement_policy': 'Half of camp replacement samples seek an available role; others include invalid identities/kinds. '
+                                        'Ordinary recruitment remains separate. Last-action next-turn probes are copies, not live-policy turns.',
                   'source_files_changed_during_run': [str(path.relative_to(project)) for path in sorted(source_files)
                                                      if hashlib.sha256(path.read_bytes()).hexdigest() != source_hashes[str(path.relative_to(project))]]}
         args.report.parent.mkdir(parents=True, exist_ok=True)
