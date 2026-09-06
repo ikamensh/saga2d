@@ -1,7 +1,7 @@
 # Reading size
 
 The Field Codex, expedition briefings, Build/Recruit catalogs, troop replacement,
-Hero, reward choices, results and campaign plan offer **Text size** (`T`), opening Settings directly on
+Hero, reward choices, results, Saves, rival and campaign plans offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -18,11 +18,13 @@ availability reasons, current resources and purchase messages. Hero enlarges
 stats, recovery and infusion quotes, learned disciplines, relic descriptions
 and action messages. Battle and shard results enlarge conclusion details,
 consequences and save/load messages. Reward choices keep their complete option
-cards; campaign plans enlarge objectives, live progress and saved rules. Troop
+cards; campaign plans enlarge objectives, live progress and saved rules. Rival
+plans enlarge the full order, location, finite army, upkeep/refit prices and
+interception or breakout advice. Troop
 replacement enlarges the outgoing roster, lost rank/XP, incoming role and exact
 cost/upkeep review. Navigation and
 purchase buttons, large screen titles and page count keep their normal size.
-Other screens—including tactical forecasts, HUD, saves and campaign departures
+Other screens—including tactical forecasts, HUD and campaign departures
 and retinue selection—keep their existing text sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
@@ -123,7 +125,7 @@ Simply increasing the font would have collided with the reward. The scene now
 measures whole groups and leaves text at the selected size.
 
 Later conversions should reuse this same preference. Campaign departure and
-retinue selection, Rival and Saves need their own content flow. Tactical forecasts, HUD values,
+retinue selection and Rival need their own content flow. Tactical forecasts, HUD values,
 unit badges and setting/control labels require a separate coordinated layout
 pass. Changing the global theme or every `Screen.text` call cannot provide that:
 most calls pass explicit sizes and positions, and buttons have fixed 40-pixel

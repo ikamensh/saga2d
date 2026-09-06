@@ -166,6 +166,9 @@ def test_linked_descriptions_keep_battle_decisions_and_completed_ending(tmp_path
         if state.battle.outcome:
             break
         state.battle.auto_turn()
+    saves.save(state)
+    detail = saves.entries()[0].detail
+    assert 'Victory result pending' in detail
     state.resolve_battle()
     assert state.choice is not None
     saves.save(state)
