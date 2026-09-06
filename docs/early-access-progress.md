@@ -9,6 +9,43 @@ the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Current playable checkpoint — 2026-09-06
 
+The latest preserved Mac development archive is clean source **a6851fb**:
+[build identity, screenshots and verification](evidence/shardbound-package-a6851fb/README.md).
+It now includes the CPU caps, an in-game About screen and `--data-dir PATH` for
+isolated saves/settings. The About screen identifies the actual packaged source
+and explains current scope, unfinished work, controls, credits and local feedback.
+The [local store-description draft](shardbound-store-draft.md) remains unpublished.
+These use existing game screens and framework file configuration; no new
+framework API or schema was needed.
+
+Eleven focused integration tests pass on this source. Native title checks cover
+216 configurations, 15 About pages and 372 inputs; their pre-commit source hashes
+match the candidate. The extracted frozen app and LaunchServices smoke pass,
+including exact build identity, About return, saves, settings and installed audio.
+Six packaged frames and three larger-text source About pages were inspected.
+The fresh independent UI-only attempt encountered a locked Mac and observed no
+game, so G09 gains no walkthrough or human-playtest credit. Test processes ended.
+The full packaged campaigns and sustained candidate checks are not yet repeated
+for this archive. **All G01–G19 gates remain incomplete.**
+
+## Earlier playable checkpoint — 2026-09-06
+
+**Later source changes:** [frame pacing and test CPU budgets](evidence/frame-pacing-069f79c/README.md)
+address the user's CPU/battery report. Normal play now sleeps between frames
+(60 FPS cap, 15 inactive); native policy checks cap at 30 FPS and model fuzzers
+default to a cooperative 25% of one core. Heavy jobs run serially. Native map,
+battle/input, independent example and display checks pass. The `219bcf9` two-hour
+soak was deliberately cancelled at 583 seconds; its cleanup is verified and it
+does not count as completed sustained testing. The large stress job also ended
+early with exit 143. The archive below predates the CPU changes.
+
+[Earned discipline journeys](eador-content-acceptance.md) now cover all eight
+preferred paths through rank 2, rank 3, departures and actual recovery: sixteen
+model runs and eight native recovered campaigns, with 3,874 inputs and 102 exact
+reloads. Those reports name their own source `03a0493`. Native/model retinue orders
+differ, so no whole-state equality between those policies is claimed. Paired
+manual hero builds and three distinct complete paid armies remain G03/G04 gaps.
+
 The preserved Mac development build is clean source **219bcf9**, with twelve
 authored encounter patterns and ordered battle playback. It includes three
 linked shards, three difficulties, ten recruitable roles, twelve relics,

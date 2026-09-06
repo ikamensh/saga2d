@@ -1,0 +1,849 @@
+{
+  "architecture": "arm64",
+  "artifact": {
+    "bytes": 32792562,
+    "file": "Shardbound-macos-arm64.zip",
+    "sha256": "fcb92ef1a01be9d52168ae8b1ffb655c1ab95c1447e7b6fe1ef8c01f46abec27"
+  },
+  "built_at_utc": "2026-09-06T14:21:00.442432+00:00",
+  "files": {
+    "Contents/Frameworks/PIL/_avif.cpython-313-darwin.so": {
+      "bytes": 73648,
+      "sha256": "3c0b3e77e6a01eb85c844078e9b587a798f452bdc35047156302e6fc6569e176"
+    },
+    "Contents/Frameworks/PIL/_imaging.cpython-313-darwin.so": {
+      "bytes": 568912,
+      "sha256": "162763c34abf84083da9d45b06b202d9884e2e9e69e2a77900c43d2edab2cd1a"
+    },
+    "Contents/Frameworks/PIL/_imagingcms.cpython-313-darwin.so": {
+      "bytes": 98032,
+      "sha256": "82f60321fac918d2a32181cbf9429808ca8e99960169d0f7b764a0e4e444a041"
+    },
+    "Contents/Frameworks/PIL/_imagingmath.cpython-313-darwin.so": {
+      "bytes": 73680,
+      "sha256": "b89997e20e527934efb8ace709bd33d35ed148883576e2d5d83deb6564245368"
+    },
+    "Contents/Frameworks/PIL/_imagingtk.cpython-313-darwin.so": {
+      "bytes": 70528,
+      "sha256": "b3210177cfbe572418714950116a8149c67c21ef68686b9845578671f3cd1887"
+    },
+    "Contents/Frameworks/PIL/_webp.cpython-313-darwin.so": {
+      "bytes": 75904,
+      "sha256": "1eb3f8073af3a8ce803154351b12aec78535eb0c98fa511250023b35aa2145db"
+    },
+    "Contents/Frameworks/base_library.zip": {
+      "symlink": "../Resources/base_library.zip"
+    },
+    "Contents/Frameworks/eador": {
+      "symlink": "../Resources/eador"
+    },
+    "Contents/Frameworks/libXau.6.dylib": {
+      "bytes": 69760,
+      "sha256": "05fc2b5c80a5f0f55cfc17c3828fc31dc1d478ab5e8d75efae629b2ca206bd55"
+    },
+    "Contents/Frameworks/libavif.16.3.0.dylib": {
+      "bytes": 2965872,
+      "sha256": "19eb899f3027324983a096d8edf348c64debfc1091c40d674375ec77aa4ab012"
+    },
+    "Contents/Frameworks/libjpeg.62.4.0.dylib": {
+      "bytes": 649856,
+      "sha256": "9c6a8498bf5e4beeb0aafcea0d1ff3ec2a9a1f7b2b6a98a3a216ac38b814af89"
+    },
+    "Contents/Frameworks/liblcms2.2.dylib": {
+      "bytes": 521728,
+      "sha256": "62b15b6b525a61bf2cbaaa2038d571bc1909dab0d678d6a1b49d0c720a8a06da"
+    },
+    "Contents/Frameworks/liblzma.5.dylib": {
+      "bytes": 323328,
+      "sha256": "09fd13961cfae96f20b253e12a55c0f0a97c752306298843ea7a512cdfe4ade6"
+    },
+    "Contents/Frameworks/libopenjp2.2.5.4.dylib": {
+      "bytes": 662656,
+      "sha256": "b96d82ef1d7276b9f7224552fa78c9d0a297cefdc47f81b1b5a170efa3a2c942"
+    },
+    "Contents/Frameworks/libpython3.13.dylib": {
+      "bytes": 18376000,
+      "sha256": "95c00b6787a9418a28507c6f3e4ab7a18d153d76022e913829e6874e124b2164"
+    },
+    "Contents/Frameworks/libsharpyuv.0.dylib": {
+      "bytes": 85856,
+      "sha256": "e49cd1d0edeaf830cc01d980a29b29cf8b8356f4b66ad209145bc4bb8d79434a"
+    },
+    "Contents/Frameworks/libtiff.6.dylib": {
+      "bytes": 766048,
+      "sha256": "5cb927573ac461a2b8c9c48cb1e9ecc2cd2f2d785d298b765af760a3403d5a47"
+    },
+    "Contents/Frameworks/libwebp.7.dylib": {
+      "bytes": 512832,
+      "sha256": "c5bfadd36a7cc5f59224a4a1d457ed04f9529a3434ecde8b72a28ebc36a55425"
+    },
+    "Contents/Frameworks/libwebpdemux.2.dylib": {
+      "bytes": 69616,
+      "sha256": "07c41f47c7b18325092a0b3630788d2f75bce2321ef5e2e346292106c90cf026"
+    },
+    "Contents/Frameworks/libwebpmux.3.dylib": {
+      "bytes": 105856,
+      "sha256": "aa92a2fee6b2fb7233c1c40afafd0e44524231aebd8e29392cb1fde160437630"
+    },
+    "Contents/Frameworks/libxcb.1.1.0.dylib": {
+      "bytes": 276160,
+      "sha256": "2bed8a7817105810bc3369b6b1531bf0854a98335d665f84d110b01f0a5a9eb3"
+    },
+    "Contents/Frameworks/libz.1.3.1.zlib-ng.dylib": {
+      "bytes": 176416,
+      "sha256": "165e1429d2229ed6ca112b84abe59a47714f366606adaf9e79e2701b93d03986"
+    },
+    "Contents/Frameworks/numpy-2.4.2.dist-info": {
+      "symlink": "../Resources/numpy-2.4.2.dist-info"
+    },
+    "Contents/Frameworks/numpy/_core/_multiarray_tests.cpython-313-darwin.so": {
+      "bytes": 138160,
+      "sha256": "3afd452301ad63e2d99ca19a4ce34d8286cf0c67545ebc363ec5445d2a457c45"
+    },
+    "Contents/Frameworks/numpy/_core/_multiarray_umath.cpython-313-darwin.so": {
+      "bytes": 3674656,
+      "sha256": "780b7fe3505decab3b794a1a63f6a9b0ea04fc70a5a20f61f0bf6beb6b5013da"
+    },
+    "Contents/Frameworks/numpy/fft/_pocketfft_umath.cpython-313-darwin.so": {
+      "bytes": 346096,
+      "sha256": "746230666b2259ccc2305611c6fd1164d8bbf6c0d98e76aa8c54f33b563521cc"
+    },
+    "Contents/Frameworks/numpy/linalg/_umath_linalg.cpython-313-darwin.so": {
+      "bytes": 172064,
+      "sha256": "4c16c45df13a10774ec1d5d43a38fdfeeed8aee818d6bb6ed761c45f8272c724"
+    },
+    "Contents/Frameworks/numpy/random/_bounded_integers.cpython-313-darwin.so": {
+      "bytes": 296224,
+      "sha256": "27918bf9a5235c0e9951a61b4a461317bb81d0519f39147e742f566dff8dac6b"
+    },
+    "Contents/Frameworks/numpy/random/_common.cpython-313-darwin.so": {
+      "bytes": 248736,
+      "sha256": "211cc10231e346df73cc7b24bd30bf59dd8a22daf659203963e4cce01b5cf006"
+    },
+    "Contents/Frameworks/numpy/random/_generator.cpython-313-darwin.so": {
+      "bytes": 665584,
+      "sha256": "b6c3673974088ef86d000f9e5c667294fdc1ac676e4ca26067c737993166d296"
+    },
+    "Contents/Frameworks/numpy/random/_mt19937.cpython-313-darwin.so": {
+      "bytes": 149520,
+      "sha256": "e11bd9a5d19fcbce9ba7122b17233866e21fd9e1546d76b6f3435cfa7828124f"
+    },
+    "Contents/Frameworks/numpy/random/_pcg64.cpython-313-darwin.so": {
+      "bytes": 150704,
+      "sha256": "e32db547d8c25433260be66cb1330c2215c68cdac5adc4fb825ad930c3911f3e"
+    },
+    "Contents/Frameworks/numpy/random/_philox.cpython-313-darwin.so": {
+      "bytes": 133088,
+      "sha256": "487de5e70d548baaa320cbc4abd4e9b3ffb7694ef871f27bd3599e19763bafa5"
+    },
+    "Contents/Frameworks/numpy/random/_sfc64.cpython-313-darwin.so": {
+      "bytes": 114768,
+      "sha256": "029491f651fca5ea703fcc73b2a527512732b540894c92c31931747f7569eefc"
+    },
+    "Contents/Frameworks/numpy/random/bit_generator.cpython-313-darwin.so": {
+      "bytes": 206816,
+      "sha256": "a403c0811891f38daf3acf883681c80a0d8ca02b2565fae74a4e547553399fef"
+    },
+    "Contents/Frameworks/numpy/random/mtrand.cpython-313-darwin.so": {
+      "bytes": 542736,
+      "sha256": "36521a359df48d238de68826be034a0aff85f5c70516b8d3a64a8a9803786785"
+    },
+    "Contents/Frameworks/release": {
+      "symlink": "../Resources/release"
+    },
+    "Contents/Info.plist": {
+      "bytes": 848,
+      "sha256": "6a36dddea196c99d546f51185e048ca8906a602399ec74752b56629320f227d8"
+    },
+    "Contents/MacOS/Shardbound": {
+      "bytes": 7235456,
+      "sha256": "7621d4dc922fb39bddd6fdc46c9b6f2fc1c6285498e193d4ea9c9810db9bed20"
+    },
+    "Contents/Resources/PIL": {
+      "symlink": "../Frameworks/PIL"
+    },
+    "Contents/Resources/base_library.zip": {
+      "bytes": 1397246,
+      "sha256": "93b3167f37d8b771fbdd4d56d3e7fce2978f8c1ee02eb1e400737298751807a3"
+    },
+    "Contents/Resources/eador/README.md": {
+      "bytes": 28122,
+      "sha256": "635a561524daa23959a684bf1cb5559be13dfd70f8b081267d72238716a2cfa9"
+    },
+    "Contents/Resources/eador/assets/AUDIO-PROVENANCE.md": {
+      "bytes": 804,
+      "sha256": "26e4bc2b663502d7c9aa6ac8f8aff38313aaa6961c877e90bd4138e4235f15aa"
+    },
+    "Contents/Resources/eador/assets/audio-manifest.json": {
+      "bytes": 6743,
+      "sha256": "af5037fe003b0df4c6b4cd5f2533cabb242c71eb80a9b07b180d14a7d2fcf6a5"
+    },
+    "Contents/Resources/eador/assets/music/battle.wav": {
+      "bytes": 5644844,
+      "sha256": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2"
+    },
+    "Contents/Resources/eador/assets/music/campaign.wav": {
+      "bytes": 8467244,
+      "sha256": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a"
+    },
+    "Contents/Resources/eador/assets/sounds/attack_hit.wav": {
+      "bytes": 22094,
+      "sha256": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d"
+    },
+    "Contents/Resources/eador/assets/sounds/bolt.wav": {
+      "bytes": 36206,
+      "sha256": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df"
+    },
+    "Contents/Resources/eador/assets/sounds/confirm.wav": {
+      "bytes": 23418,
+      "sha256": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d"
+    },
+    "Contents/Resources/eador/assets/sounds/defeat.wav": {
+      "bytes": 151748,
+      "sha256": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf"
+    },
+    "Contents/Resources/eador/assets/sounds/end_turn.wav": {
+      "bytes": 52964,
+      "sha256": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552"
+    },
+    "Contents/Resources/eador/assets/sounds/guard.wav": {
+      "bytes": 41850,
+      "sha256": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945"
+    },
+    "Contents/Resources/eador/assets/sounds/heal.wav": {
+      "bytes": 70604,
+      "sha256": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c"
+    },
+    "Contents/Resources/eador/assets/sounds/level_up.wav": {
+      "bytes": 106766,
+      "sha256": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968"
+    },
+    "Contents/Resources/eador/assets/sounds/move.wav": {
+      "bytes": 28268,
+      "sha256": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f"
+    },
+    "Contents/Resources/eador/assets/sounds/refuse.wav": {
+      "bytes": 26062,
+      "sha256": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6"
+    },
+    "Contents/Resources/eador/assets/sounds/reward.wav": {
+      "bytes": 59138,
+      "sha256": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700"
+    },
+    "Contents/Resources/eador/assets/sounds/victory.wav": {
+      "bytes": 191438,
+      "sha256": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274"
+    },
+    "Contents/Resources/icon-windowed.icns": {
+      "bytes": 110199,
+      "sha256": "b90a3b56e59169be0f86fe0410699f42ccaa16a0c85d980ef0eb6068032f0b36"
+    },
+    "Contents/Resources/libXau.6.dylib": {
+      "symlink": "../Frameworks/libXau.6.dylib"
+    },
+    "Contents/Resources/libavif.16.3.0.dylib": {
+      "symlink": "../Frameworks/libavif.16.3.0.dylib"
+    },
+    "Contents/Resources/libjpeg.62.4.0.dylib": {
+      "symlink": "../Frameworks/libjpeg.62.4.0.dylib"
+    },
+    "Contents/Resources/liblcms2.2.dylib": {
+      "symlink": "../Frameworks/liblcms2.2.dylib"
+    },
+    "Contents/Resources/liblzma.5.dylib": {
+      "symlink": "../Frameworks/liblzma.5.dylib"
+    },
+    "Contents/Resources/libopenjp2.2.5.4.dylib": {
+      "symlink": "../Frameworks/libopenjp2.2.5.4.dylib"
+    },
+    "Contents/Resources/libpython3.13.dylib": {
+      "symlink": "../Frameworks/libpython3.13.dylib"
+    },
+    "Contents/Resources/libsharpyuv.0.dylib": {
+      "symlink": "../Frameworks/libsharpyuv.0.dylib"
+    },
+    "Contents/Resources/libtiff.6.dylib": {
+      "symlink": "../Frameworks/libtiff.6.dylib"
+    },
+    "Contents/Resources/libwebp.7.dylib": {
+      "symlink": "../Frameworks/libwebp.7.dylib"
+    },
+    "Contents/Resources/libwebpdemux.2.dylib": {
+      "symlink": "../Frameworks/libwebpdemux.2.dylib"
+    },
+    "Contents/Resources/libwebpmux.3.dylib": {
+      "symlink": "../Frameworks/libwebpmux.3.dylib"
+    },
+    "Contents/Resources/libxcb.1.1.0.dylib": {
+      "symlink": "../Frameworks/libxcb.1.1.0.dylib"
+    },
+    "Contents/Resources/libz.1.3.1.zlib-ng.dylib": {
+      "symlink": "../Frameworks/libz.1.3.1.zlib-ng.dylib"
+    },
+    "Contents/Resources/numpy": {
+      "symlink": "../Frameworks/numpy"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/INSTALLER": {
+      "bytes": 2,
+      "sha256": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/METADATA": {
+      "bytes": 6608,
+      "sha256": "67823aca536aca254a9b49a5de1f896b4a631b38992b13867d2cf5b97ece5c46"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/RECORD": {
+      "bytes": 84465,
+      "sha256": "d47d12aa2bdbf62792cdb797d8d0330769121c7df65591dc4d9593bf9961e246"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/REQUESTED": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/WHEEL": {
+      "bytes": 122,
+      "sha256": "a5fa49ef7bbd7f99f88dd454c0b7e2e5eec792738810217a54e384f4e4eebab6"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/entry_points.txt": {
+      "bytes": 220,
+      "sha256": "ec26fade0c8bdac211a6c1dd003a65eb16885b925395423e93fcaa115af4052c"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/LICENSE.txt": {
+      "bytes": 46826,
+      "sha256": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt": {
+      "bytes": 1018,
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING": {
+      "bytes": 690,
+      "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE": {
+      "bytes": 20785,
+      "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt": {
+      "bytes": 1414,
+      "sha256": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md": {
+      "bytes": 1514,
+      "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE": {
+      "bytes": 1543,
+      "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md": {
+      "bytes": 1498,
+      "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt": {
+      "bytes": 2266,
+      "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE": {
+      "bytes": 1593,
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md": {
+      "bytes": 3511,
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md": {
+      "bytes": 2745,
+      "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md": {
+      "bytes": 2926,
+      "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md": {
+      "bytes": 1154,
+      "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md": {
+      "bytes": 1509,
+      "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md": {
+      "bytes": 1226,
+      "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md": {
+      "bytes": 332,
+      "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9"
+    },
+    "Contents/Resources/release/LICENSE": {
+      "bytes": 1075,
+      "sha256": "2dd9083999dd489890c90f0397cd2ef0ae4183e2b5b3cfd6482fcf670461adf1"
+    },
+    "Contents/Resources/release/build-info.json": {
+      "bytes": 16571,
+      "sha256": "ebe6d6f544e17de3ae28334b8017b58c862b457be813282a6177da7d02538ae2"
+    },
+    "Contents/Resources/release/build-tools.txt": {
+      "bytes": 2959,
+      "sha256": "8a1534a4a5ab1e8e7b9f388e8f18155e728db5437393b5460a9154616b1e7245"
+    },
+    "Contents/Resources/release/credits.md": {
+      "bytes": 1035,
+      "sha256": "26fb0274d426e9f9f17e2373a47d2e1015538c062b5a162cb71a4b4073600ebb"
+    },
+    "Contents/Resources/release/licenses/CPython-LICENSE.txt": {
+      "bytes": 13809,
+      "sha256": "78b12c3a81360b357002334f0e70ea0e92eebf7a9b358805c03c48484945f3bb"
+    },
+    "Contents/Resources/release/licenses/Pillow/pillow-12.1.1.dist-info/licenses/LICENSE": {
+      "bytes": 68061,
+      "sha256": "30178bf7aff9f8dc82afed35086cd378a9064e77fcb4380485f38b5da3377052"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/LICENSE.txt": {
+      "bytes": 46826,
+      "sha256": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt": {
+      "bytes": 1018,
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING": {
+      "bytes": 690,
+      "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE": {
+      "bytes": 20785,
+      "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt": {
+      "bytes": 1414,
+      "sha256": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md": {
+      "bytes": 1514,
+      "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE": {
+      "bytes": 1543,
+      "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md": {
+      "bytes": 1498,
+      "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt": {
+      "bytes": 2266,
+      "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE": {
+      "bytes": 1593,
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md": {
+      "bytes": 3511,
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md": {
+      "bytes": 2745,
+      "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md": {
+      "bytes": 2926,
+      "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md": {
+      "bytes": 1154,
+      "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md": {
+      "bytes": 1509,
+      "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md": {
+      "bytes": 1226,
+      "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md": {
+      "bytes": 332,
+      "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy/_core/include/numpy/random/LICENSE.txt": {
+      "bytes": 1018,
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy/ma/LICENSE": {
+      "bytes": 1593,
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy/random/LICENSE.md": {
+      "bytes": 3511,
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    "Contents/Resources/release/licenses/pyglet/pyglet-2.1.13.dist-info/licenses/LICENSE": {
+      "bytes": 1546,
+      "sha256": "57e7eecb673c8d40cf3192633c4807fba8c81685329a37e1b763e1556d5ded34"
+    },
+    "Contents/Resources/release/licenses/pyinstaller/pyinstaller-6.22.2.dist-info/licenses/COPYING.txt": {
+      "bytes": 32138,
+      "sha256": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245"
+    },
+    "Contents/Resources/release/player-guide.md": {
+      "bytes": 28122,
+      "sha256": "635a561524daa23959a684bf1cb5559be13dfd70f8b081267d72238716a2cfa9"
+    },
+    "Contents/Resources/release/runtime-uv.lock": {
+      "bytes": 81520,
+      "sha256": "28fcee73a09809b13722b01c282c6ae2ac8dd263a3c388cae8a84205b24c354c"
+    },
+    "Contents/_CodeSignature/CodeResources": {
+      "bytes": 35528,
+      "sha256": "7f3bde01a07afb578f8ee5e40792e4d73bfc5a74a4171532c18500bba9f11be4"
+    }
+  },
+  "package_data": {
+    "eador/README.md": {
+      "bytes": 28122,
+      "sha256": "635a561524daa23959a684bf1cb5559be13dfd70f8b081267d72238716a2cfa9"
+    },
+    "eador/assets/AUDIO-PROVENANCE.md": {
+      "bytes": 804,
+      "sha256": "26e4bc2b663502d7c9aa6ac8f8aff38313aaa6961c877e90bd4138e4235f15aa"
+    },
+    "eador/assets/audio-manifest.json": {
+      "bytes": 6743,
+      "sha256": "af5037fe003b0df4c6b4cd5f2533cabb242c71eb80a9b07b180d14a7d2fcf6a5"
+    },
+    "eador/assets/music/battle.wav": {
+      "bytes": 5644844,
+      "sha256": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2"
+    },
+    "eador/assets/music/campaign.wav": {
+      "bytes": 8467244,
+      "sha256": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a"
+    },
+    "eador/assets/sounds/attack_hit.wav": {
+      "bytes": 22094,
+      "sha256": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d"
+    },
+    "eador/assets/sounds/bolt.wav": {
+      "bytes": 36206,
+      "sha256": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df"
+    },
+    "eador/assets/sounds/confirm.wav": {
+      "bytes": 23418,
+      "sha256": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d"
+    },
+    "eador/assets/sounds/defeat.wav": {
+      "bytes": 151748,
+      "sha256": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf"
+    },
+    "eador/assets/sounds/end_turn.wav": {
+      "bytes": 52964,
+      "sha256": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552"
+    },
+    "eador/assets/sounds/guard.wav": {
+      "bytes": 41850,
+      "sha256": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945"
+    },
+    "eador/assets/sounds/heal.wav": {
+      "bytes": 70604,
+      "sha256": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c"
+    },
+    "eador/assets/sounds/level_up.wav": {
+      "bytes": 106766,
+      "sha256": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968"
+    },
+    "eador/assets/sounds/move.wav": {
+      "bytes": 28268,
+      "sha256": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f"
+    },
+    "eador/assets/sounds/refuse.wav": {
+      "bytes": 26062,
+      "sha256": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6"
+    },
+    "eador/assets/sounds/reward.wav": {
+      "bytes": 59138,
+      "sha256": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700"
+    },
+    "eador/assets/sounds/victory.wav": {
+      "bytes": 191438,
+      "sha256": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274"
+    }
+  },
+  "packages": {
+    "Pillow": "12.1.1",
+    "numpy": "2.4.2",
+    "pyglet": "2.1.13",
+    "pyinstaller": "6.22.2",
+    "pyinstaller-hooks-contrib": "2026.7"
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "product": "Shardbound",
+  "python": "3.13.2",
+  "release_ready": false,
+  "smoke": {
+    "about_build_label": "0.1.0-development \u00b7 a6851fb65df5",
+    "about_pages_rendered": 2,
+    "asset_path": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-jg2q6625/Shardbound.app/Contents/Resources/eador/assets",
+    "audio_catalogue_decoded_and_played": true,
+    "audio_files": {
+      "music/battle.wav": {
+        "bytes": 5644844,
+        "channels": 2,
+        "frames": 1411200,
+        "sample_rate": 44100,
+        "seconds": 32.0,
+        "sha256": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2"
+      },
+      "music/campaign.wav": {
+        "bytes": 8467244,
+        "channels": 2,
+        "frames": 2116800,
+        "sample_rate": 44100,
+        "seconds": 48.0,
+        "sha256": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a"
+      },
+      "sounds/attack_hit.wav": {
+        "bytes": 22094,
+        "channels": 1,
+        "frames": 11025,
+        "sample_rate": 44100,
+        "seconds": 0.25,
+        "sha256": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d"
+      },
+      "sounds/bolt.wav": {
+        "bytes": 36206,
+        "channels": 1,
+        "frames": 18081,
+        "sample_rate": 44100,
+        "seconds": 0.41,
+        "sha256": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df"
+      },
+      "sounds/confirm.wav": {
+        "bytes": 23418,
+        "channels": 1,
+        "frames": 11687,
+        "sample_rate": 44100,
+        "seconds": 0.26501133786848075,
+        "sha256": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d"
+      },
+      "sounds/defeat.wav": {
+        "bytes": 151748,
+        "channels": 1,
+        "frames": 75852,
+        "sample_rate": 44100,
+        "seconds": 1.72,
+        "sha256": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf"
+      },
+      "sounds/end_turn.wav": {
+        "bytes": 52964,
+        "channels": 1,
+        "frames": 26460,
+        "sample_rate": 44100,
+        "seconds": 0.6,
+        "sha256": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552"
+      },
+      "sounds/guard.wav": {
+        "bytes": 41850,
+        "channels": 1,
+        "frames": 20903,
+        "sample_rate": 44100,
+        "seconds": 0.47399092970521545,
+        "sha256": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945"
+      },
+      "sounds/heal.wav": {
+        "bytes": 70604,
+        "channels": 1,
+        "frames": 35280,
+        "sample_rate": 44100,
+        "seconds": 0.8,
+        "sha256": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c"
+      },
+      "sounds/level_up.wav": {
+        "bytes": 106766,
+        "channels": 1,
+        "frames": 53361,
+        "sample_rate": 44100,
+        "seconds": 1.21,
+        "sha256": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968"
+      },
+      "sounds/move.wav": {
+        "bytes": 28268,
+        "channels": 1,
+        "frames": 14112,
+        "sample_rate": 44100,
+        "seconds": 0.32,
+        "sha256": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f"
+      },
+      "sounds/refuse.wav": {
+        "bytes": 26062,
+        "channels": 1,
+        "frames": 13009,
+        "sample_rate": 44100,
+        "seconds": 0.29498866213151925,
+        "sha256": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6"
+      },
+      "sounds/reward.wav": {
+        "bytes": 59138,
+        "channels": 1,
+        "frames": 29547,
+        "sample_rate": 44100,
+        "seconds": 0.67,
+        "sha256": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700"
+      },
+      "sounds/victory.wav": {
+        "bytes": 191438,
+        "channels": 1,
+        "frames": 95697,
+        "sample_rate": 44100,
+        "seconds": 2.17,
+        "sha256": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274"
+      }
+    },
+    "audio_live_mix_and_cleanup": true,
+    "battle_save_load_roundtrip": true,
+    "codex_and_rival_rendered": true,
+    "cwd": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-jg2q6625",
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-jg2q6625/Shardbound.app/Contents/MacOS/Shardbound",
+    "frozen": true,
+    "guard_save_load_roundtrip": true,
+    "guide_about_return_preserves_campaign": true,
+    "image": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-build-information/dist/shardbound/packaged-smoke.png",
+    "isolated_launch_data_directory": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-smoke-saves-g0echpgb",
+    "native_input_journey": true,
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "save_load_roundtrip": true,
+    "settings_apply_cancel_restart": true,
+    "title_and_shard_rendered": true
+  },
+  "source_commit": "a6851fb65df5abcd1c923ab2c736921300a12ea6",
+  "source_sha256": {
+    "campaign_check.py": "72bd626d0ea354c209b0832c32b4f795395edddd93f9e901fdc145d6f2a20400",
+    "eador/README.md": "635a561524daa23959a684bf1cb5559be13dfd70f8b081267d72238716a2cfa9",
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "52578ae4ab65a0dfd8852f2eb49d128b5559e2953bcf90486f10f7c4a89cfd14",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "46e1d88a47249f76640a9ee15bb69f42457ad6621369b5a4679c8d9686cb866d",
+    "eador/assets/AUDIO-PROVENANCE.md": "26e4bc2b663502d7c9aa6ac8f8aff38313aaa6961c877e90bd4138e4235f15aa",
+    "eador/assets/audio-manifest.json": "af5037fe003b0df4c6b4cd5f2533cabb242c71eb80a9b07b180d14a7d2fcf6a5",
+    "eador/assets/music/battle.wav": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2",
+    "eador/assets/music/campaign.wav": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a",
+    "eador/assets/sounds/attack_hit.wav": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d",
+    "eador/assets/sounds/bolt.wav": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df",
+    "eador/assets/sounds/confirm.wav": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d",
+    "eador/assets/sounds/defeat.wav": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf",
+    "eador/assets/sounds/end_turn.wav": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552",
+    "eador/assets/sounds/guard.wav": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945",
+    "eador/assets/sounds/heal.wav": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c",
+    "eador/assets/sounds/level_up.wav": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968",
+    "eador/assets/sounds/move.wav": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f",
+    "eador/assets/sounds/refuse.wav": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6",
+    "eador/assets/sounds/reward.wav": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700",
+    "eador/assets/sounds/victory.wav": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274",
+    "eador/battle.py": "ba19db6ded9a9844b852cc73bdfc33c14d7a9ba6d981e6b85a36fe0f16bc519c",
+    "eador/battle_playback_scene.py": "5399c1dff3d26e06259ac06169ef24ecc65feb5343e7d56d00537d543fcc27a2",
+    "eador/battle_trace.py": "57e1736fcb430a66c800d4268d1c1fe63c38ad19cbbb85b648ea53a1006f051c",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "6ad5769c6d1ce1f8eb9db56d84cc5e65a972a778d24053129d92bbc3af5442a0",
+    "eador/codex.py": "db7c5b451767786490a926483183979a16285b4d67f2d22d158c269a9816dee0",
+    "eador/content.py": "6dbac37f87693364516ea10c3c19e96b67892df4d74d224c15f824dc900128db",
+    "eador/diagnostics.py": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "c567a3c4bbec55de4950681f3b7b5a6a5e7c04c545498f5aa6ce0ed2faad7d76",
+    "eador/encounters.py": "66878812c1406fbbc1dc3d1d3d98cf9d067e3f01d6f9cfccb1e8649719c0737d",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c",
+    "eador/release.py": "4bf603144c1bf6232feb366b004ac5dad60c32dbb0547d054a4033ef24be21c4",
+    "eador/replacement_scene.py": "84a98abcae1255ffb4fc351f4c209e61dfa6c70f3d69f6f85fa7a19991b8568c",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "4a3a15bb4a36fc6d10c7d5ebdd07a37faba0def606ce1e3ff8af35170d48a21b",
+    "eador/scene.py": "54dfaba09428580ca307506bf8f16fd20e242c213a65edbe210f150c040205bd",
+    "eador/settings_scene.py": "cf16efa9d04153ea94c4ac50862c871fae6d04feb4b02d48aea13dd07a53f9ca",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "0c89b6d52208f9cc929e67caae09790f4b1407903806fe87f0f01d0320ac79a3",
+    "entry.py": "1bd1508b2041cd73a9050ad23d88457a0ac7aa1c61d90233d19adceb5b61438e",
+    "package-data.json": "8403fe88b450c73e34d028688dd963ac6b686f11fef388f6e2fb29ed5eaa0ec9",
+    "release/LICENSE": "2dd9083999dd489890c90f0397cd2ef0ae4183e2b5b3cfd6482fcf670461adf1",
+    "release/build-tools.txt": "8a1534a4a5ab1e8e7b9f388e8f18155e728db5437393b5460a9154616b1e7245",
+    "release/credits.md": "26fb0274d426e9f9f17e2373a47d2e1015538c062b5a162cb71a4b4073600ebb",
+    "release/licenses/CPython-LICENSE.txt": "78b12c3a81360b357002334f0e70ea0e92eebf7a9b358805c03c48484945f3bb",
+    "release/licenses/Pillow/pillow-12.1.1.dist-info/licenses/LICENSE": "30178bf7aff9f8dc82afed35086cd378a9064e77fcb4380485f38b5da3377052",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/LICENSE.txt": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9",
+    "release/licenses/numpy/numpy/_core/include/numpy/random/LICENSE.txt": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+    "release/licenses/numpy/numpy/ma/LICENSE": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+    "release/licenses/numpy/numpy/random/LICENSE.md": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+    "release/licenses/pyglet/pyglet-2.1.13.dist-info/licenses/LICENSE": "57e7eecb673c8d40cf3192633c4807fba8c81685329a37e1b763e1556d5ded34",
+    "release/licenses/pyinstaller/pyinstaller-6.22.2.dist-info/licenses/COPYING.txt": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245",
+    "release/player-guide.md": "635a561524daa23959a684bf1cb5559be13dfd70f8b081267d72238716a2cfa9",
+    "release/runtime-uv.lock": "28fcee73a09809b13722b01c282c6ae2ac8dd263a3c388cae8a84205b24c354c",
+    "saga2d/__init__.py": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/_scene_stack.py": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "b4b63019bf80fbf24a7b7b8806bb9dbf71dd4cade4c35cf949008fda71df67cc",
+    "saga2d/backends/mock_backend.py": "ea727de241ca980a3aaa1206bd76fc0a742e762a936d2a2d6c6ea2ed9f18f198",
+    "saga2d/backends/pyglet_backend.py": "fa75f2526f33e329971088769e4564f550b505ad9e74c2235da39ad6850294bb",
+    "saga2d/game.py": "d4c9f507ec63409a04df1805aa53468750eacc39f2fdc5fe42ef4dd7ad1adcb2",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/input.py": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29",
+    "saga2d/render3d.py": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996",
+    "saga2d/rendering/particles.py": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0",
+    "saga2d/rendering/shapes.py": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f",
+    "saga2d/rendering/sprite.py": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8",
+    "saga2d/save.py": "e1002496a7fc01f2dbebb2831aba001ea3d1b725800a06911160a58ea0597c01",
+    "saga2d/scene.py": "ae417745d4aa23e6cc470ef0fddb2fd762b1606423c1e3c5cbe51396ac3fd477",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/testing.py": "e73a33918038b50384ee380adf2473dde0e1c6bc8d6222d1a7264dcea63fc0f4",
+    "saga2d/ui/__init__.py": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933",
+    "saga2d/ui/base.py": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/theme.py": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "shardbound.spec": "cd2c832e47ce7164959f7afea521daabf80d8d4f6c455471ce3b2769d24cd31f",
+    "tools/__init__.py": "cc6c419ccbf7b0095267c2a64c9b4884986050497dd7b108cad50138da8f5413",
+    "tools/build_eador.py": "94afbae7a8b13397196b5bb5ded0b194718e299ba6214cae9b23784ed6c7c7f0",
+    "tools/build_eador_audio.py": "452ba80db8687fe243482093c19a1acbeaa83f38b29f0fc84e2276ee8a5720e7",
+    "tools/eador_campaign.py": "f697a6a0d790b72c0e6cd473acf83b85ef17e2dd6578f832e1f05978dc0f83e9",
+    "tools/eador_linked_campaign.py": "6888ff9dce8bd5e812e19b61ff8b9c55687e5efb964f17748547fde81b4e4e45",
+    "tools/eador_ui.py": "35234301e541955a34151afa26fb16fd8a1713d2096e1ff92065031e564e2a96"
+  },
+  "spec_sha256": "cd2c832e47ce7164959f7afea521daabf80d8d4f6c455471ce3b2769d24cd31f",
+  "validation_scope": "Local host only; no clean account, Windows, signing or notarization claim.",
+  "version": "0.1.0-development",
+  "working_tree_dirty": false
+}

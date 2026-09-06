@@ -100,6 +100,11 @@ class Screen(Scene):
         from eador.settings_scene import SettingsScene
         self.game.push(SettingsScene())
 
+    def about(self):
+        from eador.diagnostics import DiagnosticScene
+        from eador.release import about_text
+        self.game.push(DiagnosticScene(about_text(self.game), title='About Shardbound', body_color=TEXT))
+
 
 class TitleScene(Screen):
     controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves",
@@ -206,6 +211,7 @@ class TitleScene(Screen):
         self.button('New seed', w / 2 + 6, h - 72, 196, self.next_seed, shortcut='N')
         self.button('Settings', w - 178, 26, 152, self.open_settings, shortcut='O')
         self.button('Text size', 26, 26, 176, self.open_text_settings, shortcut='T')
+        self.button('About this build', 26, h - 72, 232, self.about, shortcut='A')
 
     def load_game(self, slot=1, *, backup=False):
         loaded = super().load_game(slot, backup=backup)
@@ -835,6 +841,7 @@ class HelpScene(Screen):
         self.button("Codex", self.x + 402, self.y + 634, 200, self.root.codex, shortcut="C")
         self.button("Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
         self.button("Settings", self.x + 862, self.y + 26, 150, self.open_settings, shortcut="O")
+        self.button('About this build', self.x + 602, self.y + 26, 244, self.about, shortcut='A')
 
     def title(self):
         self.game.push(SaveScene(self.root, mode="save", return_to_title=True))

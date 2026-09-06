@@ -1,0 +1,3 @@
+Command: uv run --extra dev python -m pytest -q tests/eador/test_discipline_journeys.py tests/eador/test_progression.py
+Result: 40 passed in 3.33s
+Source: game/framework 1b54ad5; final tool and test files committed as 03a0493.

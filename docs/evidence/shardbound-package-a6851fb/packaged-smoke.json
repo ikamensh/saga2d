@@ -1,0 +1,136 @@
+{
+  "frozen": true,
+  "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-jg2q6625/Shardbound.app/Contents/MacOS/Shardbound",
+  "cwd": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-jg2q6625",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.2",
+  "title_and_shard_rendered": true,
+  "about_build_label": "0.1.0-development \u00b7 a6851fb65df5",
+  "about_pages_rendered": 2,
+  "guide_about_return_preserves_campaign": true,
+  "isolated_launch_data_directory": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-smoke-saves-g0echpgb",
+  "save_load_roundtrip": true,
+  "codex_and_rival_rendered": true,
+  "battle_save_load_roundtrip": true,
+  "guard_save_load_roundtrip": true,
+  "native_input_journey": true,
+  "audio_catalogue_decoded_and_played": true,
+  "audio_live_mix_and_cleanup": true,
+  "asset_path": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-jg2q6625/Shardbound.app/Contents/Resources/eador/assets",
+  "audio_files": {
+    "music/battle.wav": {
+      "sha256": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2",
+      "bytes": 5644844,
+      "channels": 2,
+      "frames": 1411200,
+      "sample_rate": 44100,
+      "seconds": 32.0
+    },
+    "music/campaign.wav": {
+      "sha256": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a",
+      "bytes": 8467244,
+      "channels": 2,
+      "frames": 2116800,
+      "sample_rate": 44100,
+      "seconds": 48.0
+    },
+    "sounds/attack_hit.wav": {
+      "sha256": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d",
+      "bytes": 22094,
+      "channels": 1,
+      "frames": 11025,
+      "sample_rate": 44100,
+      "seconds": 0.25
+    },
+    "sounds/bolt.wav": {
+      "sha256": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df",
+      "bytes": 36206,
+      "channels": 1,
+      "frames": 18081,
+      "sample_rate": 44100,
+      "seconds": 0.41
+    },
+    "sounds/confirm.wav": {
+      "sha256": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d",
+      "bytes": 23418,
+      "channels": 1,
+      "frames": 11687,
+      "sample_rate": 44100,
+      "seconds": 0.26501133786848075
+    },
+    "sounds/defeat.wav": {
+      "sha256": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf",
+      "bytes": 151748,
+      "channels": 1,
+      "frames": 75852,
+      "sample_rate": 44100,
+      "seconds": 1.72
+    },
+    "sounds/end_turn.wav": {
+      "sha256": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552",
+      "bytes": 52964,
+      "channels": 1,
+      "frames": 26460,
+      "sample_rate": 44100,
+      "seconds": 0.6
+    },
+    "sounds/guard.wav": {
+      "sha256": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945",
+      "bytes": 41850,
+      "channels": 1,
+      "frames": 20903,
+      "sample_rate": 44100,
+      "seconds": 0.47399092970521545
+    },
+    "sounds/heal.wav": {
+      "sha256": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c",
+      "bytes": 70604,
+      "channels": 1,
+      "frames": 35280,
+      "sample_rate": 44100,
+      "seconds": 0.8
+    },
+    "sounds/level_up.wav": {
+      "sha256": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968",
+      "bytes": 106766,
+      "channels": 1,
+      "frames": 53361,
+      "sample_rate": 44100,
+      "seconds": 1.21
+    },
+    "sounds/move.wav": {
+      "sha256": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f",
+      "bytes": 28268,
+      "channels": 1,
+      "frames": 14112,
+      "sample_rate": 44100,
+      "seconds": 0.32
+    },
+    "sounds/refuse.wav": {
+      "sha256": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6",
+      "bytes": 26062,
+      "channels": 1,
+      "frames": 13009,
+      "sample_rate": 44100,
+      "seconds": 0.29498866213151925
+    },
+    "sounds/reward.wav": {
+      "sha256": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700",
+      "bytes": 59138,
+      "channels": 1,
+      "frames": 29547,
+      "sample_rate": 44100,
+      "seconds": 0.67
+    },
+    "sounds/victory.wav": {
+      "sha256": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274",
+      "bytes": 191438,
+      "channels": 1,
+      "frames": 95697,
+      "sample_rate": 44100,
+      "seconds": 2.17
+    }
+  },
+  "image": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/.claude/worktrees/shardbound-build-information/dist/shardbound/packaged-smoke.png",
+  "settings_apply_cancel_restart": true
+}
