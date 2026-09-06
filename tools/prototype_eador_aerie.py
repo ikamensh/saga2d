@@ -6,6 +6,7 @@ ordinary Battle orders. Delete/absorb after the design decision.
 from __future__ import annotations
 
 import argparse
+import gzip
 from dataclasses import asdict, replace
 import hashlib
 import json
@@ -224,7 +225,7 @@ def source_audit():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=Path('/tmp/aerie-prototype.json'))
+    parser.add_argument('--output', type=Path, default=Path('/tmp/aerie-prototype.json.gz'))
     parser.add_argument('--interactive', choices=PARTIES)
     args = parser.parse_args()
     if args.interactive:
@@ -258,7 +259,8 @@ def main():
                   plans={name:play.report() for name,play in plays.items()},
                   ability_counterfactual='Same initial unit with only fly removed cannot reach either recorded landing; this is a query, not a played order.')
     assert all(hashlib.sha256((root/name).read_bytes()).hexdigest()==digest for name,digest in hashes.items())
-    args.output.write_text(json.dumps(report,indent=2)+'\n')
+    payload = (json.dumps(report, indent=2) + '\n').encode()
+    args.output.write_bytes(gzip.compress(payload, mtime=0) if args.output.suffix == '.gz' else payload)
     for name,p in plays.items():
         r=p.report(); print(name,r['reason'],r['round'],'dead',r['dead'],'HP',r['missing_hp_including_dead'],
                             'mana',r['mana_spent'],'orders',r['order_count'],'flight-only',r['flight_only_landings'])
