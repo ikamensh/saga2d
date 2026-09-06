@@ -113,3 +113,17 @@ ENCOUNTERS['observatory_covered'] = EncounterSpec(
 ENCOUNTERS['observatory_clear'] = replace(ENCOUNTERS['observatory_covered'],
     terrain=tuple((pos, 'plains' if pos == (-1, 0) else terrain)
                   for pos, terrain in ENCOUNTERS['observatory_covered'].terrain))
+
+
+_EXPLORER_MARSH = {(0, -1), (0, 0), (0, 1), (-1, 0)}
+_EXPLORER_FOREST = {(-1, -1), (1, 1), (-2, 2)}
+ENCOUNTERS['explorer_north'] = EncounterSpec(
+    'Stranded Explorer',
+    tuple(((q, r), 'marsh' if (q, r) in _EXPLORER_MARSH else 'forest' if (q, r) in _EXPLORER_FOREST else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((3, -1), (-3, 0), (-3, 1), (-2, -1), (-2, 0), (2, -1), (-2, 1)),
+    ((1, 0), (1, -2), (0, 2), (-1, 2), (2, 0), (2, 1), (3, -3)),
+    exits=((-3, 1),), deadline=6, objective='extract',
+)
+ENCOUNTERS['explorer_south'] = replace(ENCOUNTERS['explorer_north'],
+    player_positions=((3, -1), (-2, 3), (-1, 3), (-2, 2), (-2, 1), (2, -1), (-3, 3)))
