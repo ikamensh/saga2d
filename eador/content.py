@@ -105,6 +105,13 @@ SITES = {
             AdventureApproach('lure', 'Lure the pack north', 'Pay 20 gold to deploy north of the forest divider. The same pack remains; the fee is lost on retreat.',
                               'hunt_lured', gold_cost=20),
         )),
+    'broken_observatory': SiteSpec('Broken Observatory', 'Secure the hill seal for two uncontested enemy turns by round 8, or rout the separated marksmen.',
+        ('guard', 'archer', 'archer', 'archer'), 55, 3, 'ember_lens', 'observatory_covered', (
+            AdventureApproach('covered', 'Use the covered approach', 'Free. Forest divides the firing lanes and slows movement through the central approach.', 'observatory_covered'),
+            AdventureApproach('clear', 'Clear the central lane', 'Spend 2 crystals to clear the central forest. Both armies gain the open firing lane; the cost is lost on retreat.',
+                              'observatory_clear', crystals_cost=2),
+        )),
+
 }
 
 
