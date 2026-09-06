@@ -59,8 +59,8 @@ and recovery funds.
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
 Reading size offers 100/125% for the Codex, Field Guide, expedition briefings,
-Build, Recruit and Hero screens. Press **T** in the Codex, briefing, purchase
-or Hero screen to open that setting directly.
+Build, Recruit, Hero and result screens. Press **T** in the Codex, briefing,
+purchase, Hero or result screen to open that setting directly.
 **T** opens it directly from a briefing; other screens currently keep their sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
@@ -147,6 +147,7 @@ adds mana to support the two spells already learned.
 | Hero | Left / Right | Previous / next inventory page |
 | Hero | I | Infuse mana with a Mage Tower; review the exact cost and gain first |
 | Hero, Build, Recruit | T | Adjust reading size and return to the same first visible item |
+| Battle / shard result | T / C / F6 | Read larger text / inspect Codex / browse saves before continuing |
 | Catalogue | Number key / click | Buy the corresponding visible building or troop |
 | Recruitment | Left / Right or Previous / Next | Change troop page |
 | Shard | E | End campaign turn |

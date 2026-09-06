@@ -22,8 +22,11 @@ current approach at both reading sizes and all three supported window sizes.
 The extracted frozen app and macOS app-launch smoke pass with isolated saves,
 settings restart and all shipping audio assets. Screenshots were inspected.
 
-The next work concerns recurring economic choices, the ninth authored encounter
-and readable purchase catalogues. Resource surpluses, complete text scaling,
+Source development after that packaged checkpoint adds readable purchase
+catalogues and Hero equipment, with an optional Tower infusion command. These
+changes are not in the preserved `0e27175` app. The next work concerns recurring
+economic choices, the ninth authored encounter and readable reward decisions.
+Resource surpluses, complete text scaling,
 human playtests, Windows/clean-account execution and candidate-specific stress
 remain open. The README's first framework example is now an asset-free runnable
 game; its mouse and keyboard controls were exercised with mock and native input.
