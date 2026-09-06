@@ -87,6 +87,7 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _site(provinces[(0, 2)], 'courier_crossing')
     elif theme == 'elderwild':
         _site(provinces[(-1, -1)], 'supply_cache')
+        _site(provinces[(-1, 1)], 'pack_hunt')
     elif theme == 'ruins':
         _site(provinces[(-1, 1)], 'sealed_vault')
     _site(provinces[(-2, 2)], 'den')

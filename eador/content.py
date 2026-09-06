@@ -92,6 +92,12 @@ SITES = {
             AdventureApproach('unseal', 'Unseal the floodgate', 'Spend 2 crystals to open a second, southern exit. The cost is lost on retreat.',
                               'vault_unsealed', crystals_cost=2),
         )),
+    'pack_hunt': SiteSpec('Pack Hunt', 'Rout the wolves closing from both sides of the wooded divide.',
+        ('wolf',) * 6, 55, 1, 'storm_quiver', 'hunt_compact', (
+            AdventureApproach('compact', 'Stand together', 'Free. Keep the compact central formation against pressure from both flanks.', 'hunt_compact'),
+            AdventureApproach('lure', 'Lure the pack north', 'Pay 20 gold to deploy north of the forest divider. The same pack remains; the fee is lost on retreat.',
+                              'hunt_lured', gold_cost=20),
+        )),
 }
 
 

@@ -181,9 +181,13 @@ class Battle:
         costs = {'bolt': max(1, 4 - ranks.get('channeling', 0)), 'heal': max(1, 4 - ranks.get('restoration', 0))}
         power = {'bolt': 14 + (6 if hero.relic == 'ember_lens' else 0),
                  'heal': 16 + 4 * ranks.get('restoration', 0) + (6 if hero.relic == 'moonstone' else 0)}
-        objective = (BattleObjective('extract', deadline=definition.deadline, exits=definition.exits) if definition and definition.exits
-                     else BattleObjective('hold', definition.seal, 0, definition.hold_turns, definition.deadline) if definition
-                     else BattleObjective())
+        objective = BattleObjective()
+        if definition and definition.objective == 'extract':
+            objective = BattleObjective('extract', deadline=definition.deadline, exits=definition.exits)
+        elif definition and definition.objective == 'hold':
+            objective = BattleObjective('hold', definition.seal, 0, definition.hold_turns, definition.deadline)
+        elif definition and definition.objective != 'rout':
+            raise ValueError(f'Unknown authored objective: {definition.objective!r}')
         return cls(units, tiles, hero.mana, set(spells), log=['Advance, use cover, and protect your wounded.'],
                    spell_costs=costs, spell_power=power, objective=objective)
 

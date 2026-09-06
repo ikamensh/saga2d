@@ -1046,30 +1046,36 @@ def _validate_save(data: dict, version: int) -> None:
         object_fields(objective, {f.name for f in fields(BattleObjective)} - ({'exits'} if version < 10 else set()), 'Objective')
         require(objective['kind'] in (('rout', 'hold', 'extract') if version >= 10 else ('rout', 'hold')), 'Unknown battle objective.')
         if version >= 10:
+            from eador.encounters import ENCOUNTERS
             province = provinces[tuple(data['battle_province'])]
-            extraction_site = data['battle_kind'] == 'site' and province['site_kind'] is not None and SITES[province['site_kind']].approaches
-            require(bool(extraction_site) == (objective['kind'] == 'extract'), 'This adventure requires its extraction objective.')
-            if objective['kind'] == 'extract':
-                from eador.encounters import ENCOUNTERS
-                attempt = data['battle_adventure']
-                require(attempt is not None, 'Extraction requires a recorded adventure approach.')
-                province = provinces[tuple(data['battle_province'])]
-                options = SITES[province['site_kind']].approaches if province['site_kind'] else ()
+            options = (SITES[province['site_kind']].approaches
+                       if data['battle_kind'] == 'site' and province['site_kind'] else ())
+            attempt = data['battle_adventure']
+            require(bool(options) == (attempt is not None), 'This adventure requires its recorded approach.')
+            if attempt is not None:
                 selected = next((option for option in options if option.id == attempt['approach'] and option.encounter == attempt['encounter']), None)
                 require(selected is not None, 'Adventure approach does not belong to this site.')
                 require(province['owner'] == 'player' and not province['explored'] and hero['pos'] == province['pos'],
-                        'An extraction requires the carrier at its controlled, unexplored site.')
+                        'An adventure requires the hero at its controlled, unexplored site.')
                 require(attempt['cargo_penalty'] == selected.cargo_penalty, 'Cargo differs from the selected approach.')
                 require((attempt['gold'], attempt['crystals'], attempt['relic']) == (
                     province['site_gold'] + selected.bonus_gold, province['site_crystals'], province['site_relic']),
                     'Adventure rewards differ from the saved site and selected approach.')
-                require(objective['deadline'] == ENCOUNTERS[attempt['encounter']].deadline, 'Deadline differs from the selected approach.')
+                definition = ENCOUNTERS[attempt['encounter']]
+                require(objective['kind'] == definition.objective, 'Objective differs from the selected approach.')
+                require(objective['deadline'] == (None if definition.objective == 'rout' else definition.deadline),
+                        'Deadline differs from the selected approach.')
+                if definition.objective == 'hold':
+                    require(objective['target'] == list(definition.seal) and objective['required'] == definition.hold_turns,
+                            'Hold objective differs from the selected approach.')
+            if objective['kind'] == 'extract':
+                require(attempt is not None, 'Extraction requires a recorded adventure approach.')
                 require(isinstance(objective['exits'], list) and 1 <= len(objective['exits']) <= 2, 'Extraction needs one or two exits.')
                 exits = [position(pos, 'Exit') for pos in objective['exits']]
                 require(len(set(exits)) == len(exits) and set(exits) <= cells, 'Invalid or duplicate exits.')
                 require(tuple(exits) == ENCOUNTERS[attempt['encounter']].exits, 'Exits differ from the selected approach.')
             else:
-                require(objective['exits'] == [] and data['battle_adventure'] is None, 'Only extraction objectives have exits or an approach.')
+                require(objective['exits'] == [], 'Only extraction objectives have exits.')
         integer(objective['required'], 'Objective required turns', maximum=80)
         integer(objective['progress'], 'Objective progress', maximum=objective['required'])
         if objective['kind'] == 'extract':
@@ -1170,11 +1176,11 @@ def _validate_save(data: dict, version: int) -> None:
     require(player_ids == troop_ids | {0} and enemies, 'Battle army does not match the campaign army.')
     if version >= 3 and data['battle_kind'] in ('defense', 'intercept'):
         require(rival_by_id.keys() <= expedition_ids, 'Expedition is missing a rival soldier.')
-    if version >= 10 and objective['kind'] == 'extract':
+    if version >= 10 and data['battle_adventure'] is not None:
         province = provinces[tuple(data['battle_province'])]
-        require([unit['kind'] for unit in enemies] == province['site_guards'], 'Extraction defenders differ from the saved site roster.')
+        require([unit['kind'] for unit in enemies] == province['site_guards'], 'Adventure defenders differ from the saved site roster.')
         require(all(unit['hp'] <= hp for unit, hp in zip(enemies, province['site_guard_hp'])),
-                'Extraction defenders cannot regain wounds during an attempt.')
+                'Adventure defenders cannot regain wounds during an attempt.')
     if version >= 11:
         for team in ('player', 'enemy'):
             require(sum(cloud['expires_before_team'] == team for cloud in battle['smoke_clouds'])
