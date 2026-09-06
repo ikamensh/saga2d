@@ -757,6 +757,7 @@ class World:
         world._next_id = data["next_id"]
         world.log = list(data["log"])
         for t, saved in zip(world.tribes, data["tribes"]):
+            t.human = saved["human"]
             t.name = saved["name"]
             t.color = tuple(saved["color"])
             t.stars = saved["stars"]

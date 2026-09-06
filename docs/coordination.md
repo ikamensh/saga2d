@@ -216,3 +216,14 @@ know about, and read it before touching shared files.
   and Warband callers all receive the same usable parser diagnostic. Real-file
   tests preserve malformed bytes and backups through refused loads/writes.
   No Warband worktree changed.
+
+- 2026-09-06 (multiplayer task): work is isolated on `codex/multiplayer`, at
+  `.claude/worktrees/multiplayer`, combining current main with the committed
+  Warband branch. Saga2D gains `MatchHost`/`MatchClient`, a host/join form/lobby,
+  and `Scene.on_close` for connections that survive covered scenes. Tribes and
+  Warband get two human factions; Shardbound gets shared-realm co-op. Games own
+  permitted commands, validation, turns/simulation and state schemas. Real
+  sockets and separate-process native input checks cover all three. Main has
+  concurrent Tribes score work; no main game files were changed by this task.
+  Keep network scene overrides when integrating that score work. See
+  `docs/multiplayer.md` in the multiplayer branch.

@@ -199,9 +199,9 @@ class EncounterScene(Screen):
 
     def enter(self):
         if self.kind == 'site':
-            command = lambda: self.root.state.explore(approach=self.approach.id if self.approach else None)
+            command = lambda: self.root.order("explore", approach=self.approach.id if self.approach else None)
         else:
-            command = lambda: self.root.state.travel(self.destination)
+            command = lambda: self.root.order("travel", self.destination)
         if self.command(command):
             if not self.checkpoint(self.root.state):
                 self.root.message = self.message

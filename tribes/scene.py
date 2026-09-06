@@ -62,11 +62,11 @@ class MapScene(Scene):
         ("f1", "slash", "question"): "open_help",
     }
 
-    def __init__(self, world: World, seed: int, *, settings: dict[str, Any] | None = None, stats: dict[str, int] | None = None) -> None:
+    def __init__(self, world: World, seed: int, *, settings: dict[str, Any] | None = None, stats: dict[str, int] | None = None, player: int | None = None) -> None:
         self.world = world
         self.seed = seed
         self.rng = random.Random(seed)
-        self.human = next(t.id for t in world.tribes if t.human)
+        self.human = next(t.id for t in world.tribes if t.human) if player is None else player
         self.cursor: Pos = (0, 0)
         self.selected_unit: int | None = None
         self.selected_city: int | None = None
@@ -484,6 +484,14 @@ class MapScene(Scene):
         self._refresh_selection()
         hop(self.view.unit_sprite(unit.id), tile_center(unit.pos), height=14, speed=320)
         self.effects.add(Pulse(tile_center(city.pos), rgba(self.tribe.color, 150), radius=(8, 34), rings=1, duration=0.45))
+
+    def research(self, tech: Tech) -> bool:
+        self.world.research(self.human, tech)
+        return True
+
+    def choose_reward(self, city: City, reward: Reward) -> bool:
+        self.world.choose_reward(city, reward)
+        return True
 
     def harvest(self, pos: Pos) -> None:
         tile = self.world.tile(pos)
@@ -969,7 +977,8 @@ class TechScene(_Overlay):
 
     def buy(self, tech: Tech) -> None:
         world, scene = self.world, self.map_scene
-        world.research(scene.human, tech)
+        if not scene.research(tech):
+            return
         scene.say(f"Learned {tech.value.title()}")
         scene.sfx("research")
         capital = world.capital_of(scene.human)
@@ -1134,7 +1143,8 @@ class RewardScene(_Overlay):
 
     def pick(self, reward: Reward) -> None:
         scene = self.map_scene
-        scene.world.choose_reward(self.city, reward)
+        if not scene.choose_reward(self.city, reward):
+            return
         center = tile_center(self.city.pos)
         scene.effects.add(Pulse(center, rgba(scene.tribe.color), radius=(12, TILE * 1.3), rings=3, duration=1.0))
         scene.say(f"{self.city.name}: {REWARDS[reward].name}")

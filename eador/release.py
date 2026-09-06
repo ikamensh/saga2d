@@ -24,7 +24,7 @@ THE CURRENT GAME
 Lead one hero and a persistent army through three linked shards, or play a standalone shard. Four heroes, three world themes and three difficulties offer different starts. Develop your realm, counter the rival's finite expedition and command hex battles. Twelve authored encounter patterns include rout, hold and extraction objectives. Manual orders and optional automatic rounds share the same rules.
 
 WHAT IS STILL UNFINISHED
-This is a development checkpoint, not an Early Access release. Strategic balance, onboarding and presentation are still being evaluated. Audio listening and human playtests remain outstanding. Windows and clean-account installations have not been verified. The app uses a development icon and system fonts. There is no multiplayer, diplomacy or astral metacampaign.
+This is a development checkpoint, not an Early Access release. Strategic balance, onboarding and presentation are still being evaluated. Audio listening and human playtests remain outstanding. Windows and clean-account installations have not been verified. The app uses a development icon and system fonts. Two-player shared-realm co-op is available on LAN/private VPN. Competitive multiplayer, diplomacy and an astral metacampaign are not implemented.
 
 CONTROLS AND ACCESSIBILITY
 The Field Guide (F1 during play) explains your first turns. The Codex (C during play) contains rules, troops, skills and adventures. Every visible keycap names a keyboard control. Settings offer sound, display, reduced motion and larger reading text. Space finishes battle playback. F6 opens saves; F5/F9 save/load Manual 1.

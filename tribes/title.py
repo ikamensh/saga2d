@@ -66,6 +66,7 @@ class TitleScene(Scene):
         cont = Button("Continue", hotkey="C", on_click=self.continue_game, style=MENU_BUTTON, width=300)
         cont.enabled = has_save
         menu.add(cont)
+        menu.add(Button("Multiplayer", shortcut="M", on_click=self.multiplayer, style=MENU_BUTTON, width=300))
         menu.add(Button("How to play", hotkey="H", on_click=self.how_to_play, style=MENU_BUTTON, width=300))
         menu.add(Button("Quit", hotkey="Q", on_click=self.quit, style=MENU_BUTTON, width=300))
         menu.add(Label("Continue resumes save slot 1" if has_save else "No saved game yet — F5 saves during play", text_style="caption"))
@@ -79,7 +80,7 @@ class TitleScene(Scene):
     def draw(self) -> None:
         w, h = self.game.resolution
         self.draw_rect(0, 0, w, h, (10, 12, 22, 150))
-        cy = h / 2 - 120
+        cy = h / 2 - 185
         glow = 0.5 + 0.5 * math.sin(self.time * 1.6)
         for spread, alpha in ((3, 40), (2, 70)):
             self.draw_text("TRIBES", w / 2 + spread, cy + spread, style="hero", color=(0, 0, 0, alpha + int(20 * glow)), anchor_x="center", anchor_y="center")
@@ -91,6 +92,11 @@ class TitleScene(Scene):
             play_sound(name)
 
     # -- Menu actions ------------------------------------------------------------
+
+    def multiplayer(self) -> None:
+        from saga2d import MatchMenu
+        from tribes.multiplayer import TribesMatch, NetworkMapScene
+        self.game.push(MatchMenu("Tribes multiplayer", "tribes-v1", TribesMatch, NetworkMapScene))
 
     def new_game(self) -> None:
         self.sfx("button")

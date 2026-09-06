@@ -409,7 +409,7 @@ survivors' wounds and costs up to 20 gold; defending territory is lost on
 retreat. Return to the title to begin another run after victory or defeat.
 
 This slice has no astral metacampaign, diplomatic simulation, karma,
-rebellions, multiclassing, multiplayer, fog of war or
+rebellions, multiclassing, competitive multiplayer, fog of war or
 the original games' large content catalogue. The rival has a finite
 expedition and treasury, with a fixed recruitment plan. Tactical morale,
 stamina and spell preparation are simplified
@@ -450,3 +450,9 @@ Watch Bell grants the hero Brace through **G**, even for a ranged hero.
 New worlds place Storm Quiver in Wolf Den, Watch Bell at Border Watch, and
 Wayfarer Boots at Explorer's Camp. Older saves retain their recorded rewards
 and active battles.
+
+## Co-op
+
+Press **M / Co-op** on the title to host or join a two-player shared campaign.
+Both partners command the same realm and army. See the
+[multiplayer guide](../docs/multiplayer.md) for LAN/VPN setup and limitations.
