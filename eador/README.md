@@ -14,8 +14,17 @@ uv run python -m eador --seed 7              # start immediately as Commander
 uv run python -m eador --seed 7 --hero Wizard --theme elderwild
 uv run python -m eador --campaign --seed 7 --hero Commander
 uv run python -m eador --campaign --seed 7 --difficulty accessible
+uv run python -m eador --data-dir /tmp/shardbound-playtest
 uv run python -m pytest tests/eador -q
 ```
+
+This is a development build. **A / About this build** on the title or Field
+Guide shows the version, installed build identity, current scope, unfinished
+work, credits and feedback instructions. It also shows the actual save and
+settings directory. `--data-dir PATH` gives a playtest its own profile, keeping
+both saves and settings under that directory. The same argument works with the
+packaged application. Returning to About or changing reading size does not
+change your campaign or title selections.
 
 On the title, **L** begins a linked campaign with your hero and seed, starting
 in Frontier. **Enter** starts one standalone shard in your selected world.
@@ -129,6 +138,7 @@ adds mana to support the two spells already learned.
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
 | Title / guide | O | Open sound and display settings |
+| Title / guide | A | Read build identity, scope, credits and feedback instructions |
 | Settings | S / D | Select Sound / Display |
 | Settings | Up / Down, Left / Right | Select a row, adjust its value |
 | Settings | Enter / Esc | Apply preferences / cancel live preview |

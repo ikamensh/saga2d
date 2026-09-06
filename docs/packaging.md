@@ -131,6 +131,21 @@ open -W -n dist/shardbound/Shardbound.app --args --smoke-image /tmp/shardbound-l
 ```
 
 Without smoke arguments, `Shardbound.app` runs the game's ordinary entry point.
+For an independent playtest with separate saves and settings:
+
+```bash
+open -n dist/shardbound/Shardbound.app --args --data-dir /tmp/shardbound-playtest
+```
+
+**A / About this build** on the title and Field Guide shows the recorded version,
+source commit, development scope, credits, feedback instructions and actual data
+directory. Source launches identify themselves as a source checkout; frozen
+builds read their bundled manifest and identify modified source when applicable.
+The smoke check exercises this ordinary launch configuration with an isolated
+profile, reads every About page and checks its identity against the manifest.
+The short native smoke yields between frames at no more than 30 FPS; longer
+campaign verification uses the same paced native input driver as source checks.
+
 Normal player saves retain the game's configured location; smoke mode never
 uses those saves. The special flag is packaging verification, not a player
 feature or a substitute for a complete packaged campaign test.
