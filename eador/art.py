@@ -164,7 +164,7 @@ def expedition(scene, grid, pos, troops):
 
 
 def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
-    """Distinct silhouettes for ranged troops, casters, infantry and heroes."""
+    """Role silhouettes stay distinct at battle and smaller retinue scales."""
     s = scale
     color = TEAL if team == "player" else RED
     if spent:
@@ -186,6 +186,55 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
         scene.draw_line(x - 14 * s, y - 12 * s, x - 26 * s, y - 24 * s, fur, 5 * s)
         scene.draw_circle(x + 18 * s, y - 23 * s, 1.5 * s, INK)
         return
+    if lower == "ranger":
+        # A low hood, trailing cloak and wide stride distinguish mobile fire
+        # from the Archer's upright pose and pointed cap.
+        scene.draw_polygon([(x - 5 * s, y - 28 * s), (x - 26 * s, y + 3 * s),
+                            (x - 8 * s, y), (x + 8 * s, y - 17 * s)], shade(color, -24))
+        scene.draw_line(x - 3 * s, y - 1 * s, x - 15 * s, y + 12 * s, GOLD, 5 * s)
+        scene.draw_line(x + 5 * s, y - 1 * s, x + 14 * s, y + 10 * s, GOLD, 5 * s)
+        scene.draw_polygon([(x - 10 * s, y + 1 * s), (x - 6 * s, y - 20 * s),
+                            (x + 8 * s, y - 22 * s), (x + 13 * s, y - 2 * s)], color)
+        scene.draw_polygon([(x - 10 * s, y - 20 * s), (x - 8 * s, y - 32 * s),
+                            (x + 1 * s, y - 38 * s), (x + 11 * s, y - 31 * s),
+                            (x + 13 * s, y - 19 * s)], color)
+        scene.draw_polygon([(x - 3 * s, y - 29 * s), (x + 7 * s, y - 30 * s),
+                            (x + 9 * s, y - 20 * s), (x - 3 * s, y - 21 * s)], INK)
+        scene.draw_line(x + 1 * s, y - 27 * s, x + 7 * s, y - 27 * s, TEXT, 2 * s)
+        bow = [(x + 17 * s, y - 36 * s), (x + 25 * s, y - 27 * s),
+               (x + 28 * s, y - 13 * s), (x + 25 * s, y), (x + 20 * s, y + 6 * s)]
+        for a, b in zip(bow, bow[1:]):
+            scene.draw_line(*a, *b, GOLD, 3 * s)
+        scene.draw_line(*bow[0], *bow[-1], TEXT, s)
+        scene.draw_line(x + 5 * s, y - 12 * s, x + 26 * s, y - 14 * s, color, 4 * s)
+        scene.draw_line(x + 7 * s, y - 17 * s, x + 32 * s, y - 19 * s, TEXT, 1.5 * s)
+        scene.draw_polygon([(x + 32 * s, y - 22 * s), (x + 37 * s, y - 19 * s),
+                            (x + 32 * s, y - 16 * s)], TEXT)
+        return
+    if lower == "warden":
+        # Broad armor, a tower shield and an open gauntlet read as extraction,
+        # rather than the Swordsman's narrow shield and raised blade.
+        scene.draw_polygon([(x - 16 * s, y - 21 * s), (x + 14 * s, y - 21 * s),
+                            (x + 17 * s, y + 5 * s), (x - 14 * s, y + 5 * s)], color)
+        for dx in (-7, 10):
+            scene.draw_line(x + dx * s, y + 1 * s, x + dx * s, y + 13 * s, TEXT, 6 * s)
+        scene.draw_polygon([(x - 10 * s, y - 25 * s), (x - 9 * s, y - 35 * s),
+                            (x, y - 40 * s), (x + 10 * s, y - 35 * s),
+                            (x + 11 * s, y - 25 * s)], TEXT)
+        scene.draw_rect(x - 6 * s, y - 30 * s, 13 * s, 4 * s, INK)
+        scene.draw_line(x + 13 * s, y - 15 * s, x + 25 * s, y - 5 * s, color, 7 * s)
+        scene.draw_rect(x + 22 * s, y - 12 * s, 7 * s, 10 * s, TEXT)
+        scene.draw_line(x + 24 * s, y - 13 * s, x + 24 * s, y - 17 * s, TEXT, 3 * s)
+        shield = [(x - 29 * s, y - 25 * s), (x - 3 * s, y - 25 * s),
+                  (x, y + 8 * s), (x - 15 * s, y + 16 * s), (x - 29 * s, y + 8 * s)]
+        scene.draw_polygon(shield, shade(color, -20))
+        outline(scene, shield, GOLD, 2.5 * s)
+        for direction, yy in ((1, -12), (-1, 0)):
+            end = x + (-15 + 7 * direction) * s
+            scene.draw_line(x + (-15 - 7 * direction) * s, y + yy * s, end, y + yy * s, TEXT, 2.5 * s)
+            scene.draw_line(end - 4 * direction * s, y + (yy - 4) * s, end, y + yy * s, TEXT, 2.5 * s)
+            scene.draw_line(end - 4 * direction * s, y + (yy + 4) * s, end, y + yy * s, TEXT, 2.5 * s)
+        return
     if lower == "commander":
         scene.draw_polygon([(x - 11 * s, y - 21 * s), (x - 23 * s, y + 6 * s),
                             (x + 19 * s, y + 7 * s), (x + 8 * s, y - 21 * s)], GOLD)
@@ -204,7 +253,18 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
                         (x + 13 * s, y + 5 * s)], GOLD, 2 * s)
         scene.draw_line(x + 13 * s, y - 28 * s, x + 13 * s, y + 5 * s, TEXT, 1)
         scene.draw_polygon([(x - 10 * s, y - 24 * s), (x, y - 38 * s), (x + 10 * s, y - 24 * s)], color)
-    elif any(name in lower for name in ("mage", "wizard", "healer", "shaman")):
+    elif lower in ("healer", "acolyte"):
+        # Rounded vestments and a ring staff distinguish support from a wizard.
+        scene.draw_circle(x, y - 25 * s, 11 * s, color)
+        scene.draw_circle(x, y - 24 * s, 6 * s, skin)
+        scene.draw_line(x - 6 * s, y - 17 * s, x - 3 * s, y + 1 * s, TEXT, 3 * s)
+        scene.draw_line(x + 6 * s, y - 17 * s, x + 3 * s, y + 1 * s, TEXT, 3 * s)
+        scene.draw_line(x + 18 * s, y + 7 * s, x + 18 * s, y - 32 * s, GOLD, 3 * s)
+        scene.draw_circle(x + 18 * s, y - 37 * s, 8 * s, GOLD)
+        scene.draw_circle(x + 18 * s, y - 37 * s, 5 * s, INK)
+        scene.draw_polygon([(x + 18 * s, y - 41 * s), (x + 21 * s, y - 37 * s),
+                            (x + 18 * s, y - 33 * s), (x + 15 * s, y - 37 * s)], TEXT)
+    elif any(name in lower for name in ("mage", "wizard", "shaman")):
         scene.draw_line(x + 17 * s, y + 7 * s, x + 17 * s, y - 38 * s, GOLD, 3 * s)
         scene.draw_circle(x + 17 * s, y - 39 * s, 6 * s, BLUE)
         scene.draw_polygon([(x - 11 * s, y - 28 * s), (x + 1 * s, y - 48 * s),
