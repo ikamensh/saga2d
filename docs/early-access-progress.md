@@ -9,74 +9,58 @@ the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Current playable checkpoint — 2026-09-06
 
-The preserved Mac development build is source **56f1ffb**. It includes the
-three-shard campaign, three saved difficulty modes, ten authored adventure
-families, ten recruitable roles, twelve relics, paid troop replacement, Tower
-infusion and 100/125 reading size for title, reference, purchase, choice, result,
-save, rival and campaign screens. [Exact artifact and verification](evidence/shardbound-package-56f1ffb/README.md)
-identify what is playable; all G01–G19 release gates remain incomplete.
+The preserved Mac development build is clean source **c8ec2e2**. It includes
+three linked shards, three difficulty modes, eleven authored adventure patterns,
+ten recruitable roles, twelve relics, paid troop replacement, Tower infusion,
+measured campaign/battle HUDs, complete tactical forecasts/objectives/history,
+long save diagnostics and shared 100/125 reading for the supported screens.
+[Exact artifact and verification](evidence/shardbound-package-c8ec2e2/README.md)
+identify what is playable. **All G01–G19 release gates remain incomplete.**
 
-This source passes 1,142 tests and both games' bounded fuzz checks. The integrated
-Aerie failed-sortie/retry passes 664 native inputs and 65 exact reloads; the
-216-layout title matrix also passes. The separate campaign-reading increment
-retains 570 native layouts, 999 inputs and four exact reloads. These reports keep
-their actual source fingerprints rather than being relabeled as package tests.
+The full source suite passes **1,171 tests**. The extracted frozen app completes
+a direct linked campaign and a lost-capital recovery campaign across nine
+separate app processes: **802 native inputs, 17 UI save/reloads and seven exact
+process-to-process State restorations**. Each route reloads its completed ending
+and returns to title; the recovery route also restarts at the recovery decision.
+These policies use the visible automatic-round control, so this is campaign/save
+verification, not a manual-tactics or human playtest result. Settings persist at
+125% reading size. The quick installed-asset/audio smoke, LaunchServices app
+launch and local ad-hoc signature checks pass. Twelve package images were inspected.
 
-The extracted frozen app and macOS app-launch smoke pass with isolated saves,
-settings restart and all shipping audio assets. Seven package screenshots were
-inspected. Full packaged-campaign play, the remaining authored
-pattern, meaningful recurring economic choices, human/listening
-feedback, Windows/clean-account execution and candidate-specific stress remain
-open. Newer source adds measured campaign and battle HUDs, complete tactical
-forecasts/objectives, battle history and long-path save diagnostics; these
-changes and Relief Column are not included in this preserved package.
+[Relief Column](eador-relief.md) is the eleventh authored pattern. Its two free
+assemblies use existing hold, Rally, flight, Pin and Repulse rules, and an unchanged
+ordinary site offers the same reward. Sixty paid manual plans across three modes
+and five seeds preserve all arriving units, with 1,740 exact full-State order
+reloads. Seven native journeys pass 1,202 inputs and 71 reloads, including veteran
+loss, a fresh paid recruit and finite wounded retry. Its named source also passes
+300 model campaigns, 10,009 random scene inputs, 60 linked model runs and Tribes'
+fuzz checks. A later earned retry test fixes advice that mentioned already-dead
+support. These source reports retain their exact revisions; they are not relabeled
+as packaged full-content or release-scale stress. Content coverage is **11/12**.
 
-Saga2D now measures unattached UI trees using their eventual font/theme context;
-its independent runnable example verifies rendering and input ownership. Campaign,
-encounter, pagination and economy rules remain in Shardbound.
-
-Source after this package passes **1,168 tests**. [Tactical forecasts](eador-forecast-reading.md)
-support shared 100/125 reading through F2 while T remains Retreat. The
-[native matrix](evidence/shardbound-forecast-086ce14/README.md) records 96 layouts,
-865 inputs and 21 exact reloads. [Complete save diagnostics](eador-diagnostics.md)
-preserve the selected slot, quoted replacement and already-applied purchase through
-long errors and hidden/batched input. Combined-source native diagnostics, both games'
-bounded fuzz and the full suite pass. [Complete tactical objectives](eador-battle-objective-reading.md)
-now scale too, with measured board placement and explicit hold reset/escape rules.
-The [objective matrix](evidence/shardbound-objectives-3fd3412/README.md) passes
-126 layouts, 970 inputs and 21 reloads, plus an independent 18-layout picking
-review and Aerie's native western route.
-
-[Campaign HUD reading](eador-shard-reading.md) preserves full realm, hero,
-province and army facts; its source-attributed native matrix has 2,394 layouts,
-4,685 inputs and 127 exact reloads. [Battle HUD and history](eador-battle-hud-reading.md)
-now scale selected-unit facts, spell ownership, guidance and complete events.
-Native checks cover 222 views across all ten troop roles, 1,065 inputs, 37 exact
-reloads and real applied-autosave failure. Status markers remain clear of health
-text, and the board stays fixed when orders change the log. The integrated full
-suite and both games' bounded fuzz checks pass. These are source checks, not
-candidate/platform or human-readability acceptance.
+The source-attributed [campaign HUD](eador-shard-reading.md),
+[battle HUD/history](eador-battle-hud-reading.md), [objectives](eador-battle-objective-reading.md),
+[forecasts](eador-forecast-reading.md) and [save diagnostics](eador-diagnostics.md)
+retain their full layout/input matrices separately from the bounded packaged
+journeys. Saga2D's small `Scene.measure` primitive measures unattached UI using
+the eventual font/theme context; an independent example verifies its rendering
+and input ownership. Campaign, encounter, pagination and economy rules stay in
+Shardbound. This packaging increment adds no framework API.
 
 The [resource attribution study](eador-resource-breakpoints.md) reconciles 27
-unchanged campaigns and 10,762 real detached quotes. Available investments still
-compete at earlier turns; later tested policies stop buying while rewards and
-income continue. No unproven tax or currency sink was added.
+unchanged campaigns and 10,762 real detached quotes. Earlier investments compete
+for money, but the tested later policies stop buying while income continues.
+No unproven tax or currency sink was added. The twelfth encounter and ordered
+enemy-action feedback are isolated work in progress, outside this archive.
+Meaningful recurring economic choices, human/listening feedback, clean-account
+and Windows execution, the remaining complete display/content acceptance and
+candidate-specific sustained stress remain open.
 
-[Relief Column](eador-relief.md) is integrated as the eleventh authored pattern.
-It uses existing hold, Rally, flight, Pin and Repulse rules, with two free
-assemblies and a preserved ordinary site offering the same reward. Sixty paid
-manual plans across three modes and five seeds preserve every arriving unit,
-with 1,740 exact full-State order reloads. Seven native journeys pass 1,202
-inputs and 71 reloads, including veteran loss, a fresh paid recruit and a retry
-against only the surviving wounded defenders. The full suite passes 1,168
-tests; 300 model campaigns, 10,009 random scene inputs, 60 linked model runs
-and Tribes' fuzz checks pass on the identical integrated source. This is
-11/12 pattern coverage; G05 and the broader release gates remain incomplete.
-
-A [three-minute native run](evidence/shardbound-reading-soak-a431f47/README.md)
-completed 54 repeated journeys and 10,246 frames on the earlier reading source.
-Its timing and overlapping RSS windows are retained as bounded measurements;
-this is not the required two-hour candidate stress or evidence of no memory leak.
+The [three-minute native run](evidence/shardbound-reading-soak-a431f47/README.md)
+retains 54 repeated journeys, 10,246 frames and bounded timing/RSS measurements
+on an earlier source. It is not the two-hour candidate soak or evidence of no
+memory leak. The previous [56f1ffb archive](evidence/shardbound-package-56f1ffb/README.md)
+remains preserved rather than being overwritten or assigned newer verification.
 
 ## Baseline audit — 2026-09-05
 
