@@ -528,3 +528,21 @@ The earlier `0e27175` Mac artifact predates these changes.
 G01–G19 remain incomplete. Reward reading, explicit paid troop replacement,
 remaining campaign layouts, economy/pacing, content depth, candidate stress,
 platform checks and human feedback remain active work.
+
+## Paid role access and larger decision screens — 2026-09-06
+
+At `ad9026b`, players can explicitly retire a veteran and buy a fresh recruit in
+the same formation slot. The review shows lost rank/XP, full cost, one-action
+payment, role and upkeep. Its native saved Warden assault demonstrates a manual
+Swap → Heal rescue, while the retained comparisons keep ordinary rest and its
+lower-cost outcomes visible. This does not resolve the economy gate.
+
+Reward choices and campaign plans now use the same 100/125 reading setting.
+The replacement native matrix passes 120 complete reviews and 1,170 inputs;
+the integrated suite passes 1,108 tests. Real filesystem-error overflow bugs
+were reproduced and fixed before the checkpoint. [Evidence and inspected frames](evidence/shardbound-replacement-ad9026b/README.md)
+distinguish this source from earlier artifacts and isolated model stress.
+
+G01–G19 remain incomplete. Remaining reading layouts, replacement input stress,
+additional authored patterns, economic balance, candidate-specific stress,
+platform verification and human feedback remain active work.
