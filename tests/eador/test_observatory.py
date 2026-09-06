@@ -32,7 +32,11 @@ def test_actual_prior_barrow_save_keeps_its_site_and_complete_continuation():
     assert state.provinces[(-1, 0)].site_kind == 'barrow'
     assert not any(p.site_kind == 'broken_observatory' for p in state.provinces.values())
     finish_battle(state)
-    assert json.loads(state.to_json()) == json.loads((fixtures / 'v11_ruins_barrow_battle_result.json').read_text())
+    actual = json.loads(state.to_json())
+    expected = json.loads((fixtures / 'v11_ruins_barrow_battle_result.json').read_text())
+    assert actual.pop('rules_id') == 'standard-1'
+    actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual == expected
 
 
 def test_a_purchased_rune_army_can_keep_the_forest_and_push_the_final_contester_off_the_hill():

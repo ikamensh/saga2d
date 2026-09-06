@@ -13,6 +13,7 @@ from saga2d import Anchor, Button, HexGrid, InputEvent, SaveError, Scene
 
 from eador import art
 from eador.content import RELICS, SITES, SKILLS
+from eador.difficulty import DIFFICULTIES
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, State
 from eador.persistence import MANUAL_SLOTS, CampaignSaves
 from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RED, TEAL, TEXT, build_theme
@@ -105,11 +106,12 @@ class TitleScene(Screen):
     controls = {("return", "space"): "start", "tab": "next_class", "f9": "load_game", "f6": "browse_saves",
                 "left": "previous_theme", "right": "next_theme"}
 
-    def __init__(self, seed=7, *, theme="frontier", hero_class="Commander"):
+    def __init__(self, seed=7, *, theme="frontier", hero_class="Commander", difficulty="standard"):
         super().__init__()
         self.seed = seed
         self.hero_class = hero_class
         self.world_theme = theme
+        self.difficulty = difficulty
 
     def on_enter(self):
         from eador.preferences import load_preferences
@@ -122,11 +124,15 @@ class TitleScene(Screen):
         w, h = self.game.resolution
         x, width = w / 2 - 100, w / 2 + 40
         for i, name in enumerate(HERO_CLASSES):
-            self.button(name, x + i * (width + 12) / 4, 280, (width - 36) / 4,
+            self.button(name, x + i * (width + 12) / 4, 270, (width - 36) / 4,
                         lambda name=name: self.choose(name), primary=name == self.hero_class)
         for i, (ident, theme) in enumerate(THEMES.items()):
-            self.button(theme.name, x + i * (width + 12) / 3, 418, (width - 24) / 3,
+            self.button(theme.name, x + i * (width + 12) / 3, 395, (width - 24) / 3,
                         lambda ident=ident: self.choose_theme(ident), primary=ident == self.world_theme)
+        for i, (ident, rules) in enumerate(DIFFICULTIES.items()):
+            self.button(rules.title, x + i * (width + 12) / 3, 535, (width - 24) / 3,
+                        lambda ident=ident: self.choose_difficulty(ident), shortcut=str(i + 1),
+                        primary=ident == self.difficulty)
         self.button("Linked campaign", w / 2 - 348, h - 124, 336, self.start_campaign, shortcut="L", primary=True)
         self.button("Enter single shard", w / 2 + 12, h - 124, 336, self.start, hotkey="Enter")
         self.button("Load shard", w / 2 - 202, h - 72, 196, self.browse_saves, hotkey="F6")
@@ -148,6 +154,10 @@ class TitleScene(Screen):
         self.world_theme = theme
         self.refresh()
 
+    def choose_difficulty(self, difficulty):
+        self.difficulty = difficulty
+        self.refresh()
+
     def next_theme(self):
         themes = list(THEMES)
         self.choose_theme(themes[(themes.index(self.world_theme) + 1) % len(themes)])
@@ -157,11 +167,11 @@ class TitleScene(Screen):
         self.choose_theme(themes[(themes.index(self.world_theme) - 1) % len(themes)])
 
     def start(self):
-        state = State.new(self.seed, self.hero_class, theme=self.world_theme)
+        state = State.new(self.seed, self.hero_class, theme=self.world_theme, difficulty=self.difficulty)
         self.enter_state(state)
 
     def start_campaign(self):
-        self.enter_state(State.new_campaign(self.seed, self.hero_class))
+        self.enter_state(State.new_campaign(self.seed, self.hero_class, difficulty=self.difficulty))
 
     def enter_state(self, state):
         root = ShardScene(state)
@@ -190,10 +200,12 @@ class TitleScene(Screen):
                                    capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
             art.province(self, grid, pos, data)
         self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
-        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 244, size=11, color=GOLD)
-        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 336, width=width, size=13)
-        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 382, size=11, color=GOLD)
-        self.paragraph(THEMES[self.world_theme].description, x, 476, width=width, size=13)
+        self.text("CHOOSE YOUR HERO   ·   Tab to cycle", x, 239, size=11, color=GOLD)
+        self.paragraph(HERO_CLASSES[self.hero_class].description, x, 326, width=width, size=13)
+        self.text("CHOOSE YOUR WORLD   ·   Left / Right to cycle", x, 369, size=11, color=GOLD)
+        self.paragraph(THEMES[self.world_theme].description, x, 449, width=width, size=13)
+        self.text("DIFFICULTY   ·   Fixed for this run", x, 509, size=11, color=GOLD)
+        self.paragraph(DIFFICULTIES[self.difficulty].description, x, 588, width=width, size=12)
         notice = self.message or ("Sound settings could not be read. Open Settings (O) to recover them."
                                   if self.preferences.error else "")
         self.text(notice or f"Seed {self.seed} · Linked: three stages from Frontier. Single shard: your selected world.",
@@ -1107,7 +1119,8 @@ class SaveScene(Screen):
                 self.message = f"Saved to {entry.label}."
                 if self.return_to_title:
                     self.game.clear_and_push(TitleScene(self.root.state.seed, theme=self.root.state.theme,
-                                                       hero_class=self.root.state.hero.hero_class))
+                                                       hero_class=self.root.state.hero.hero_class,
+                                                       difficulty=self.root.state.difficulty))
                     return
             self.refresh()
 
@@ -1312,7 +1325,8 @@ class ResultScene(Screen):
             game.pop()  # tactical battlefield; reveal the existing campaign
         else:
             self.game.clear_and_push(TitleScene(self.root.state.seed + 1, theme=self.root.state.theme,
-                                               hero_class=self.root.state.hero.hero_class))
+                                               hero_class=self.root.state.hero.hero_class,
+                                               difficulty=self.root.state.difficulty))
 
     def save_game(self):
         self.root.save_game()

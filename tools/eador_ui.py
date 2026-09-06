@@ -89,7 +89,14 @@ class PlayerBattle:
         self.player, self.battle = player, battle
 
     def __getattr__(self, name):
-        return getattr(self.battle, name)
+        value = getattr(self.battle, name)
+        queries = ('unit', 'reachable', 'has_sight', 'targets', 'preview', 'spell_cost', 'to_dict',
+                   'pin_targets', 'pin_preview', 'repulse_targets', 'repulse_preview',
+                   'smoke_targets', 'smoke_preview', 'rally_targets', 'rally_preview',
+                   'swap_targets', 'spell_targets', 'spell_preview')
+        if callable(value) and name not in queries:
+            raise AssertionError(f'No input adapter for battle command {name!r}')
+        return value
 
     def auto_turn(self):
         assert isinstance(self.player.game.scene, BattleScene)
@@ -101,7 +108,10 @@ class PlayerState:
         self.player = player
 
     def __getattr__(self, name):
-        return getattr(self.player.root.state, name)
+        value = getattr(self.player.root.state, name)
+        if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches'):
+            raise AssertionError(f'No input adapter for campaign command {name!r}')
+        return value
 
     @property
     def battle(self):

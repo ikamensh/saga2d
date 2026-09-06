@@ -1,8 +1,8 @@
 # Four further relic choices
 
-Accepted direction, 2026-09-06; **not implemented**. Validate the v11 roster
-before adding these hero capabilities. The current game has eight relics;
-this proposal reaches twelve without another combat subsystem or stat bonuses.
+Accepted direction, 2026-09-06; now implemented after the v11 roster, with
+[earned journeys and explicit balance limits](eador-active-relics.md).
+The extension reaches twelve without another combat subsystem or stat bonuses.
 One equipped slot remains the constraint. Ordinary keep/sell/duplicate choices
 remain; 45 gold is an initial sale-price hypothesis.
 

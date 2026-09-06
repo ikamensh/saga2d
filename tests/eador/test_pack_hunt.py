@@ -36,6 +36,7 @@ def test_real_prior_battles_keep_their_recorded_world_and_exact_continuation(fix
     actual = json.loads(state.to_json())
     expected = json.loads((fixtures / f'{fixture}_result.json').read_text())
     actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual.pop('rules_id') == 'standard-1'
     assert actual == expected
 
 

@@ -217,7 +217,8 @@ class CampaignScene(Screen):
 
     def to_title(self):
         state = self.root.state
-        self.game.clear_and_push(TitleScene(state.campaign.seed + 1, hero_class=state.hero.hero_class))
+        self.game.clear_and_push(TitleScene(state.campaign.seed + 1, hero_class=state.hero.hero_class,
+                                           difficulty=state.difficulty))
 
     def draw(self):
         x, y, state, campaign = self.x, self.y, self.root.state, self.campaign

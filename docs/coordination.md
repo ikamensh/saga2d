@@ -152,3 +152,19 @@ know about, and read it before touching shared files.
   `25cda6a` passes 888 full tests, both games' bounded fuzz runs and the native
   font/reactive/paused/resize input example. Existing paragraph pixels match
   actual prior `3923255` exactly. See `docs/framework-wrapped-label.md`.
+
+- 2026-09-06 (Shardbound framework agent): native resize/reading-size verification
+  exposed a Pyglet text-measurement cache collision: the key identified physical
+  glyph size but stored logical dimensions divided by an earlier viewport scale.
+  The cache now retains physical metrics and converts at the current scale. This
+  fixes over/under-measurement for all games without a new API or game-specific
+  policy. `tools/verify_text_measurement.py` compares warm/fresh measurements,
+  wrapped flow, exact pixels and native clicks in both resize directions. No
+  Warband worktree changed; Shardbound's scoped reading setting is separate.
+
+- 2026-09-06 (Shardbound framework agent): the game-owned Codex reading-size
+  increment uses existing wrapped Label/Column layout and Settings persistence.
+  It adds no framework API or global theme changes. Whole-entry pagination is
+  measured after UI attachment, and the scoped 100/125 preference explicitly
+  leaves other game screens unchanged. No Warband worktree was touched. See
+  `docs/eador-reading-size.md` for the vertical slice and remaining G10 scope.

@@ -40,7 +40,7 @@ def test_loading_a_v6_archer_battle_preserves_its_exact_automatic_continuation()
     fixture = Path(__file__).parent / 'fixtures'
     original = json.loads((fixture / 'v6_archer_battle.json').read_text())
     state = State.from_json(json.dumps(original))
-    assert json.loads(state.to_json())['schema_version'] == 11
+    assert json.loads(state.to_json())['schema_version'] == 12
     assert json.loads(state.to_json())['provinces'] == original['provinces']
     assert json.loads(state.to_json())['inventory'] == original['inventory']
     assert not any(unit.can_pin for unit in state.battle.units)

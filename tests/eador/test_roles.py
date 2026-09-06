@@ -66,6 +66,7 @@ def test_a_v8_active_acolyte_keeps_its_exact_prior_continuation():
     actual = json.loads(state.to_json())
     expected = json.loads((fixture / 'v8_acolyte_battle_result.json').read_text())
     actual.pop('schema_version'); expected.pop('schema_version')
+    assert actual.pop('rules_id') == 'standard-1'
     assert actual.pop('battle_adventure') is None
     assert actual == expected
 

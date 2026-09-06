@@ -27,8 +27,9 @@ PLANS = {
 
 class Trial:
     """A measured player policy; every mutation calls the shipped State/Battle interface."""
-    def __init__(self, seed, hero_class, theme, plan):
-        self.state = State.new(seed, hero_class, theme=theme)
+    def __init__(self, seed, hero_class, theme, plan, *, state=None, route=None):
+        self.state = State.new(seed, hero_class, theme=theme) if state is None else state
+        self.route = route
         self.seed, self.hero_class, self.theme, self.plan = seed, hero_class, theme, plan
         self.metrics = CampaignMetrics()
         self.plan_step = 0
@@ -120,7 +121,7 @@ class Trial:
     def run(self):
         state = self.state
         self.invest()
-        itinerary = state.grid.path(state.hero.pos, (2, 0))[:-1]
+        itinerary = (self.route or state.grid.path(state.hero.pos, (2, 0)))[:-1]
         for province in itinerary:
             if state.status != 'playing' or state.turn >= 60 or self.stop_reason:
                 break
