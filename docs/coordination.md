@@ -161,3 +161,10 @@ know about, and read it before touching shared files.
   policy. `tools/verify_text_measurement.py` compares warm/fresh measurements,
   wrapped flow, exact pixels and native clicks in both resize directions. No
   Warband worktree changed; Shardbound's scoped reading setting is separate.
+
+- 2026-09-06 (Shardbound framework agent): the game-owned Codex reading-size
+  increment uses existing wrapped Label/Column layout and Settings persistence.
+  It adds no framework API or global theme changes. Whole-entry pagination is
+  measured after UI attachment, and the scoped 100/125 preference explicitly
+  leaves other game screens unchanged. No Warband worktree was touched. See
+  `docs/eador-reading-size.md` for the vertical slice and remaining G10 scope.

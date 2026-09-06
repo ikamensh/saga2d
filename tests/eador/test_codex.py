@@ -26,6 +26,16 @@ def click_button(game, label):
     game.tick(1 / 60)
 
 
+def category_text(game, *, mouse=False):
+    """Read a whole category through paging; font/content may move page breaks."""
+    press(game, 'home')
+    text = rendered_text(game)
+    while game.scene.ui.find(lambda child: isinstance(child, Button) and child.text == 'Next').enabled:
+        click_button(game, 'Next') if mouse else press(game, 'right')
+        text += ' ' + rendered_text(game)
+    return text
+
+
 def test_keyboard_browses_categories_and_pages_then_returns_without_changing_state(tmp_path):
     """Browsing can reach entries beyond page one without spending, saving, or ending a turn."""
     from eador.codex import CodexScene
@@ -103,9 +113,9 @@ def test_reference_prices_include_current_hero_recruitment_discounts(tmp_path):
         game.tick(1 / 60)
         assert f"Recruit for {state.recruit_cost('swordsman')} gold now (base {UNITS['swordsman'].cost})" in rendered_text(game)
         assert "Requires Barracks" in rendered_text(game)
-        press(game, 'end')
+        text = category_text(game)
         for kind in ('adept', 'skyrider'):
-            assert f"{state.recruit_cost(kind)} gold + {state.recruit_crystal_cost(kind)} crystals" in rendered_text(game)
+            assert f"{state.recruit_cost(kind)} gold + {state.recruit_crystal_cost(kind)} crystals" in text
         assert state.to_json() == before
     finally:
         game._teardown()
@@ -207,13 +217,11 @@ def test_current_relic_sources_and_equipped_pin_capability_are_visible_with_mous
         assert '2 capable / 2 ready' in rendered_text(game)
         click_button(game, 'Relics')
         assert 'Explorer’s Camp' in rendered_text(game)
-        click_button(game, 'Next')
-        click_button(game, 'Next')
-        assert 'Border Watch' in rendered_text(game) and 'Wolf Den' in rendered_text(game)
+        text = category_text(game, mouse=True)
+        assert 'Border Watch' in text and 'Wolf Den' in text
         click_button(game, 'Sites')
-        click_button(game, 'Next')
-        click_button(game, 'Next')
-        assert 'Explorer’s Camp' in rendered_text(game) and 'Wayfarer Boots' in rendered_text(game)
+        text = category_text(game, mouse=True)
+        assert 'Explorer’s Camp' in text and 'Wayfarer Boots' in text
         click_button(game, 'Close codex')
         assert state.to_json() == before
     finally:
@@ -234,8 +242,7 @@ def test_paid_watch_army_can_read_its_role_orders_and_costs_without_spending_the
         game.push(CodexScene(root))
         game.tick(1 / 60)
         click_button(game, 'Abilities')
-        click_button(game, 'Next')
-        text = rendered_text(game)
+        text = category_text(game, mouse=True)
         assert 'Ranger: shoot then move' in text and 'Moving first gives no second move' in text
         assert 'No Pin' in text and 'terrain costs' in text
         assert 'Swap' in text and "Spend your action and both remaining moves" in text
@@ -269,13 +276,11 @@ def test_older_saved_acolyte_reference_never_advertises_an_unavailable_order(tmp
         game.push(root)
         before = state.to_json()
         game.push(CodexScene(root))
-        press(game, 'right')
-        text = rendered_text(game)
+        text = category_text(game)
         assert 'Acolyte' in text and '2 army recovery' in text
         assert 'shared mana' in text and 'This older battle retains its noncasting Acolytes' in text
         press(game, '2')
-        press(game, 'right')
-        text = rendered_text(game)
+        text = category_text(game)
         assert 'Current battle: 0 of 1 Acolytes have Heal' in text
         assert 'This older battle retains its noncasting Acolytes' in text
         press(game, 'escape')
@@ -354,9 +359,7 @@ def test_full_cache_reference_matches_saved_cargo_reward_and_spent_hero_via_mous
         assert f'Hero move allowance: {state.battle.unit(0).effective_move_range}' in text
         assert 'Cargo: -1' in text and 'Pin and cargo reduce movement (minimum 1), but cannot block Evacuate' in text
         click_button(game, 'Sites')
-        while 'Carry the full cache' not in rendered_text(game):
-            click_button(game, 'Next')
-        text = rendered_text(game)
+        text = category_text(game, mouse=True)
         assert 'Travel light' in text and 'Carry the full cache' in text
         assert 'Current attempt' in text and f'Saved reward: {state.battle_adventure.gold} gold' in text
         assert '1 less movement this battle, minimum 1' in text

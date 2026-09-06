@@ -56,8 +56,9 @@ def verify(output):
             capture("guide")
             press(key.ESCAPE)
             press(key.C)
-            press(key.END)
-            assert any(entry.title == "Pikeman" for entry in game.scene.entries[game.scene.page * 3:game.scene.page * 3 + 3])
+            while not any(entry.title == "Pikeman" for entry in game.scene.visible_entries):
+                assert game.scene.page + 1 < game.scene.pages
+                press(key.RIGHT)
             capture("pikeman-codex")
             press(key.ESCAPE)
             press(key.TAB)
