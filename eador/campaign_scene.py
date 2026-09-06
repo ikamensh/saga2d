@@ -23,6 +23,8 @@ def campaign_targets(state):
 
 
 class CampaignPlanScene(Screen):
+    """Read the current contract and locate its targets without changing campaign progress."""
+
     transparent = True
     pop_on_cancel = True
 
@@ -30,47 +32,80 @@ class CampaignPlanScene(Screen):
         super().__init__()
         self.root = root
 
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
     def refresh(self):
+        from saga2d import Anchor, Button, Column, Label, Row
+        from eador.preferences import reading_scale
+
         super().refresh()
-        self.x, self.y = (self.game.width - 900) / 2, (self.game.height - 660) / 2
-        for index, (pos, _, _) in enumerate(campaign_targets(self.root.state)):
-            self.button('Locate', self.x + 698, self.y + 188 + index * 52, 174,
-                        lambda pos=pos: self.locate(pos), shortcut=str(index + 1))
-        self.button('Return to shard', self.x + 592, self.y + 590, 280, self.game.pop, shortcut='Esc')
-        self.button('Hero & relics', self.x + 28, self.y + 590, 220, self.root.hero_details, shortcut='H')
+        state, campaign = self.root.state, self.root.state.campaign
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+
+        def label(text, size=12, *, width=1064, color=MUTED):
+            return Label(text, width=width, wrap=True, font='Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        heading = Column(label(f'YOUR CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}', 11, color=GOLD),
+                         Label(campaign.title, width=1064, wrap=True, font='Georgia', font_size=30, text_color=TEXT),
+                         label(campaign.objective.replace(' or rout ', '\nor rout '), 14, color=TEXT), spacing=12)
+        rows = []
+        for index, (pos, name, complete) in enumerate(campaign_targets(state)):
+            rows.append(Row(label(f'{index + 1}. {name}', 16, width=600, color=TEAL if complete else TEXT),
+                            label('Complete / held' if complete else 'Still required', 11, width=242,
+                                  color=TEAL if complete else MUTED),
+                            Button('Locate', on_click=lambda pos=pos: self.locate(pos),
+                                   shortcut=str(index + 1), width=174, height=40), spacing=24))
+        objectives = Column(label('NUMBERED OBJECTIVES ON YOUR MAP', 10, color=GOLD), *rows, spacing=12)
+        readiness = label(state.assault_blocked_reason or
+                          'Duskspire is open to assault. Prepare your army and protect Westwatch.', color=GOLD)
+        travel = Column(label('The final shard' if campaign.stage == 3 else 'Between shards', 13, width=520, color=TEAL),
+                        label('Victory completes this three-shard campaign. There is no further departure; '
+                              'your earned skills, veterans and relics stay with the completed chronicle.' if campaign.stage == 3 else
+                              'After a victory, carry your learned skills, up to two veterans and two relics. '
+                              'The new expedition has three troops; unfilled places become fresh Militia. '
+                              'Local buildings, holdings and remaining wealth stay on this shard.', width=520), spacing=10)
+        gold, crystals = state.expedition_funding(recovery=True)
+        limits = Column(label('Rank and recovery', 13, width=520, color=TEAL),
+                        label(f'Rank limits this stage: hero {state.hero_level_cap} · troops {state.troop_level_cap}. '
+                              'Experience pauses at the limit.', width=520, color=GOLD),
+                        label('Recovery spent: another lost capital ends this campaign.' if campaign.recovery_used else
+                              f'One recovery remains if Westwatch falls: restart this same world with {gold} gold and {crystals} crystals, '
+                              'your learned skills and chosen surviving retinue.', 11, width=520), spacing=10)
+        self.ui.add(Column(travel, limits))
+        height = max(block.get_preferred_size()[1] for block in (travel, limits))
+        rules = Row(*(Column(block, height=height) for block in (travel, limits)), spacing=24)
+        content = Column(heading, objectives, readiness, rules, spacing=24)
+        self.ui.add(content)
+        self.panel_height = content.get_preferred_size()[1] + 120
+        if self.panel_height > self.game.height - 40:
+            raise ValueError(f'Campaign plan {campaign.title!r} does not fit at {scale:.0%}')
+        self.x, self.y = (self.game.width - 1120) / 2, (self.game.height - self.panel_height) / 2
+        self.ui.clear()
+        self.ui.add(Column(content, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 24))))
+        bottom = self.y + self.panel_height - 68
+        self.button('Hero & relics', self.x + 28, bottom, 220, self.root.hero_details, shortcut='H')
+        self.button('Text size', self.x + 268, bottom, 200, self.open_text_settings, shortcut='T')
+        self.button('Return to shard', self.x + 812, bottom, 280, self.game.pop, shortcut='Esc')
 
     def locate(self, pos):
         self.root.selected = pos
         self.game.pop()
 
     def draw(self):
-        x, y, state = self.x, self.y, self.root.state
-        campaign = state.campaign
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 225))
-        self.box(x, y, 900, 660)
-        self.text(f'YOUR CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}',
-                  x + 28, y + 24, size=11, color=GOLD)
-        self.text(campaign.title, x + 28, y + 52, size=30, serif=True)
-        self.paragraph(campaign.objective, x + 28, y + 104, width=844, size=14, color=TEXT)
-        self.text('NUMBERED OBJECTIVES ON YOUR MAP', x + 28, y + 166, size=10, color=GOLD)
-        for index, (_, label, complete) in enumerate(campaign_targets(state)):
-            self.text(f'{index + 1}. {label}', x + 28, y + 192 + index * 52, size=16,
-                      color=TEAL if complete else TEXT)
-            self.text('Complete / held' if complete else 'Still required', x + 501, y + 198 + index * 52,
-                      size=11, color=TEAL if complete else MUTED)
-        self.paragraph(state.assault_blocked_reason or 'Duskspire is open to assault. Prepare your army and protect Westwatch.',
-                       x + 28, y + 360, width=844, size=12, color=GOLD)
-        self.rule(x + 28, y + 406, 844)
-        self.paragraph('After a victory, carry your learned skills, up to two veterans and two relics. '
-                       'The new expedition has three troops; unfilled places become fresh Militia. '
-                       'Local buildings, holdings and remaining wealth stay on this shard.',
-                       x + 28, y + 428, width=844, size=12)
-        self.text(f'Rank limits this stage: hero {state.hero_level_cap} · troops {state.troop_level_cap}. '
-                  'Experience pauses at the limit.', x + 28, y + 506, size=12, color=GOLD)
-        gold, crystals = state.expedition_funding(recovery=True)
-        self.paragraph('Recovery spent: another lost capital ends this campaign.' if campaign.recovery_used else
-                       f'One recovery remains if Westwatch falls: restart this same world with {gold} gold and {crystals} crystals, '
-                       'your learned skills and chosen surviving retinue.', x + 28, y + 538, width=844, size=11)
+        self.box(self.x, self.y, 1120, self.panel_height)
 
 
 class CampaignScene(Screen):
