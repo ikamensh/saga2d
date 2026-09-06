@@ -12,7 +12,8 @@ Shrine, Watch, Cache, Hunt, Den, Explorer's Camp, Muster Yard, Observatory, Vaul
 and all other fixed relic sources remain; Elderwild's Grove fallback preserves
 Oak Standard if this replacement removes its last procedural source.
 
-Both approaches are free and keep the same terrain, finite enemy roster and
+The Commander preparation spends 198 gold on its buildings and recruits; the
+Scout spends 205, with no crystal recruitment cost. Both approaches are free and keep the same terrain, finite enemy roster and
 reward. **Western column** puts the combined army behind its front marksman;
 **northern assembly** brings the support toward the northern firing lane. There
 is no isolated carrier, escape action, central seal, extra fee or bonus.
@@ -101,3 +102,8 @@ The shared guidance matrix includes real paid Commander, smaller Scout and
 wounded retry preparations at 100/125% reading sizes and three supported window
 sizes. Its mock geometry/nonmutation checks pass. Root's native verifier and
 screenshots are still pending; no visual approval is claimed here.
+
+The retained [model evidence](evidence/shardbound-screen-2026-09-06/README.md)
+records source `783f8d6`: 1,048 full tests, the four exact saved manual plans,
+300 randomized campaigns and 20 mock scene runs with 10,003 random input
+activations. This is model/robustness evidence, not native or release approval.

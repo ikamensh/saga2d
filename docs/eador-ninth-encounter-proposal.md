@@ -1,6 +1,9 @@
 # Ninth encounter: develop the Smuggler Screen
 
-Design probe, 2026-09-06. The accepted direction is a rout against an enemy
+Historical design probe, 2026-09-06. The accepted prototype was absorbed into
+[Smuggler Screen](eador-smuggler-screen.md) and deleted after its production
+manual journeys passed. Measurements below describe the earlier detached battle
+comparison. The accepted direction is a rout against an enemy
 Sapper, two Archers, a Warden and a Dread Guard. This document records the
 comparison before production content, approaches or campaign consequences.
 It does not establish a ninth accepted pattern or complete G05.
@@ -16,13 +19,15 @@ a new enemy resource system, which is outside this content increment.
 
 ## Reproduce the pure model comparison
 
-`tools/prototype_eador_screen.py` is deliberately throwaway. It temporarily
+`tools/prototype_eador_screen.py`, available at source `d117b89`, was deliberately
+throwaway. It temporarily
 registers a local `EncounterSpec` during ordinary `Battle.create`, removes it,
 then uses public manual commands. Every attack/Heal checks its exact immediate
 forecast; every command serializes and reloads the whole Battle. The ordinary
 campaign preparation remains unchanged after these detached battles.
 
 ```sh
+# In an isolated checkout of d117b89:
 PYTHONPATH=. python tools/prototype_eador_screen.py --output /tmp/screen.json
 ```
 
