@@ -35,3 +35,7 @@ therefore required for the original Saves failure.
 
 Campaign and Title retain their existing diagnostic presentation. This increment
 does not claim that every game message has been converted to the new view.
+
+The [retained Mac evidence](evidence/shardbound-diagnostics-fca7596/README.md)
+records the verified source, full suite, native input matrices, fuzz results and
+five inspected screenshots.
