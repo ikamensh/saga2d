@@ -1,0 +1,14 @@
+{
+  "input_activations": 9,
+  "confirmations": 3,
+  "resolution": [
+    900,
+    760
+  ],
+  "window_size": [
+    720,
+    608
+  ],
+  "initial_height": 192,
+  "expanded_height": 368
+}
