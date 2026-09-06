@@ -14,12 +14,13 @@ sys.path.insert(0, str(ROOT))
 from eador.app import create_game
 from eador.scene import BattleScene, ChoiceScene, ResultScene, TitleScene
 from tools.audit_eador_extraction import PaidState
-from tools.eador_observatory_campaign import prepare_observatory, observatory_route
+from tools.eador_observatory_campaign import prepare_observatory, observatory_route, observatory_rune_route
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_control import ControlOrders
 
 
-def verify(output, *, backend='pyglet', approach='clear'):
+def verify(output, *, backend='pyglet', approach='clear', support='sapper'):
+    route = {'sapper': observatory_route, 'adept': observatory_rune_route}[support]
     output.mkdir(parents=True, exist_ok=True)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *[ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_roles_campaign.py',
@@ -35,10 +36,10 @@ def verify(output, *, backend='pyglet', approach='clear'):
             game.push(TitleScene(7, theme='ruins'))
             player.press('return')
             state = PaidState(player.state)
-            prepare_observatory(state)
+            prepare_observatory(state, support=support)
             gold, crystals = state.gold, state.crystals
             selected = next(choice for choice in state.adventure_approaches() if choice.id == approach)
-            play = observatory_route(state, approach, orders_type=ControlOrders)
+            play = route(state, approach, orders_type=ControlOrders)
             battle, reward = state.battle, state.battle_adventure
             assert battle.outcome_reason == 'hold' and isinstance(game.scene, ResultScene)
             assert all(u.alive for u in battle.units if u.team == 'player')
@@ -48,7 +49,7 @@ def verify(output, *, backend='pyglet', approach='clear'):
             player.reload(state.to_json())
             battle = state.battle
             survivors = [dict(kind=u.kind, hp=u.hp, max_hp=u.max_hp) for u in battle.units if u.team == 'player']
-            report = dict(approach=approach, backend=backend, source_revision=revision,
+            report = dict(support=support, approach=approach, backend=backend, source_revision=revision,
                           source_sha256=hashes, platform=platform.platform(),
                           outcome_reason=battle.outcome_reason, campaign_turn=state.turn, battle_rounds=battle.round,
                           fee_gold=selected.gold_cost, fee_crystals=selected.crystals_cost,
@@ -71,7 +72,7 @@ def verify(output, *, backend='pyglet', approach='clear'):
             assert all(hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
                        for name, digest in hashes.items()), 'Sources changed during the journey'
             (output / 'journey.json').write_text(json.dumps(report, indent=2) + '\n')
-            print(f'Observatory/{approach}: hold round {report["battle_rounds"]}, {len(player.events)} inputs, '
+            print(f'Observatory/{support}/{approach}: hold round {report["battle_rounds"]}, {len(player.events)} inputs, '
                   f'{player.reloads} exact reloads ({backend})', flush=True)
             return report
         finally:
@@ -81,5 +82,7 @@ def verify(output, *, backend='pyglet', approach='clear'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-observatory'))
+    parser.add_argument('--plan', choices=('sapper-clear', 'adept-covered', 'adept-clear'), default='sapper-clear')
     args = parser.parse_args()
-    verify(args.output)
+    support, approach = args.plan.split('-')
+    verify(args.output, support=support, approach=approach)
