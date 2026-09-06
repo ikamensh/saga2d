@@ -1,0 +1,61 @@
+{
+  "revision": "25cda6a551956364ee6b94027634221b82b2b717",
+  "full_suite": {
+    "passed": 888,
+    "seconds": 34.17
+  },
+  "framework_suite": {
+    "passed": 239
+  },
+  "tribes_fuzz": {
+    "command": "python tools/fuzz.py --games 60 --monkey 20",
+    "ai_games": 60,
+    "ai_failures": 0,
+    "outcomes": {
+      "score": 42,
+      "domination": 18
+    },
+    "input_runs": 20,
+    "input_failures": 0
+  },
+  "source_sha256": {
+    "saga2d/__init__.py": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/_scene_stack.py": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "d2e10d6e84ee0bcadde245f873bce1c216ec7505eed3b56b87a3648404112185",
+    "saga2d/backends/mock_backend.py": "18ac93641c51e9e4df9796a35bb7afbdf3c9431c73a3fcc338457ef45faf7f1e",
+    "saga2d/backends/pyglet_backend.py": "53b00dee8269cf1181edb5067e269a0233aa55f3b7597737a5e0e480598e9d4b",
+    "saga2d/game.py": "21f03dac8c2a2d450bc3dd32554d31a6b2dd4c882c41f8f8d7a64b4ff58bef2d",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/input.py": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29",
+    "saga2d/render3d.py": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996",
+    "saga2d/rendering/particles.py": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0",
+    "saga2d/rendering/shapes.py": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f",
+    "saga2d/rendering/sprite.py": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8",
+    "saga2d/save.py": "1b0735f793c47fb813e61e3113115d36fbb9aae0d9b95de618a78a0500d56266",
+    "saga2d/scene.py": "e7be356a3922cfdb3fd17c6a1500474266513e25ef4a34aebbed61fad59480d6",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/testing.py": "e73a33918038b50384ee380adf2473dde0e1c6bc8d6222d1a7264dcea63fc0f4",
+    "saga2d/ui/__init__.py": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933",
+    "saga2d/ui/base.py": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/theme.py": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "tools/demo_wrapped_label.py": "a840e5e458957192bc29b6da41fd391e724aff3f92888fa4a977602eb2b6efbe"
+  }
+}

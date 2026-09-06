@@ -148,4 +148,7 @@ know about, and read it before touching shared files.
   The existing Scene paragraph algorithm moves to a private shared helper;
   no new backend protocol or game rule is introduced. A private preparation
   hook refreshes wrapped measurements before the existing input/draw layout
-  boundaries. No Warband worktree or game callers are being edited.
+  boundaries. No Warband worktree or game callers were edited. Checkpoint
+  `25cda6a` passes 888 full tests, both games' bounded fuzz runs and the native
+  font/reactive/paused/resize input example. Existing paragraph pixels match
+  actual prior `3923255` exactly. See `docs/framework-wrapped-label.md`.
