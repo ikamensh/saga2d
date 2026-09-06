@@ -219,9 +219,10 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Eleven sites have different defending parties and gold/crystal rewards:
+Twelve sites have different defending parties and gold/crystal rewards:
 Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove, Border Watch, Explorer's Camp, Courier's Crossing, Supply Cache and Sealed Vault.
+Grove, Border Watch, Explorer's Camp, Courier's Crossing, Supply Cache,
+Sealed Vault and Pack Hunt.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
 defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of eight
@@ -242,6 +243,12 @@ Moving or being delivered by a Warden keeps the hero's action; attacking,
 casting or Guarding spends it. Rout also wins. Escape before the eighth enemy
 phase ends; failed attempts retain wounded defenders and spent fees, while
 success pays the chosen reward once. The Codex shows saved approach details.
+
+Elderwild's Pack Hunt puts six wolves on both sides of a forest divide.
+Stand together for free or pay 20 gold to deploy north of the forest.
+The same finite pack and reward remain. Defeat every defender while keeping
+your hero alive; there is no seal or exit objective. Ordinary rout battles
+force a retreat through exhaustion after 80 rounds.
 
 | Building | Cost | Benefit |
 |---|---|---|
