@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field, replace
 
 from saga2d import HexGrid
@@ -10,6 +11,7 @@ from eador.model import Hero, Pos, RuleError, UNITS
 from eador.encounters import ENCOUNTERS
 from eador.content import RELICS
 from eador.sight import line_of_sight
+from eador.battle_trace import BattleTrace, _Recorder
 
 
 @dataclass(frozen=True)
@@ -144,6 +146,26 @@ class Battle:
     outcome_reason: str | None = None
     sight_rules: str = 'terrain'
     smoke_clouds: list[SmokeCloud] = field(default_factory=list)
+    _observer: _Recorder | None = field(default=None, init=False, repr=False, compare=False)
+
+    def trace(self, command: Callable[[], None]) -> BattleTrace:
+        """Resolve an ordinary command once, returning immutable visual events outside the save.
+
+        Exceptions keep their identity and always release observation. Commands
+        retain their ordinary mutation/validation contract; tracing is no rollback.
+        """
+        if self._observer is not None:
+            raise ValueError('A battle command is already being observed.')
+        self._observer = recorder = _Recorder(self)
+        try:
+            command()
+            return recorder.finish(self)
+        finally:
+            self._observer = None
+
+    def _emit(self, kind, actor_id=None, target_id=None, *, text='', path=()):
+        if self._observer is not None:
+            self._observer.emit(self, kind, actor_id, target_id, text=text, path=path)
 
     @classmethod
     def create(cls, hero: Hero, enemies: list[str], terrain: str,
@@ -250,9 +272,11 @@ class Battle:
             return set()
         occupied = {other.pos for other in self.units if other.alive and other.id != unit.id}
         cells = self.grid.reachable(unit.pos, unit.effective_move_range, blocked=() if unit.can_fly else occupied,
-                                    cost=lambda pos: 2 if self.terrain[pos] in ('forest', 'marsh')
-                                    and not (unit.terrain_walk or unit.can_fly) else 1)
+                                    cost=lambda pos: self._move_cost(unit, pos))
         return set(cells) - occupied - {unit.pos}
+
+    def _move_cost(self, unit, pos):
+        return 2 if self.terrain[pos] in ('forest', 'marsh') and not (unit.terrain_walk or unit.can_fly) else 1
 
     def has_sight(self, source: Pos, target: Pos) -> bool:
         """Forest/cloud visibility shared by targeting, previews and route evaluation."""
@@ -276,8 +300,14 @@ class Battle:
     def _move(self, unit: BattleUnit, destination: Pos) -> None:
         if destination not in self.reachable(unit.id):
             raise RuleError('That hex is occupied, out of reach, or this unit already moved.')
+        path = ()
+        if self._observer is not None:
+            occupied = {other.pos for other in self.units if other.alive and other.id != unit.id}
+            path = self.grid.path(unit.pos, destination, blocked=() if unit.can_fly else occupied,
+                                  cost=lambda pos: self._move_cost(unit, pos))
         unit.pos = destination
         unit.moved = True
+        self._emit('move', unit.id, text=f'{unit.name} {"flies" if unit.can_fly else "moves"} to {destination}.', path=path)
 
     def attack(self, unit_id: int, target_id: int) -> None:
         self._attack(self._actor(unit_id), self.unit(target_id))
@@ -309,6 +339,7 @@ class Battle:
         unit.stance = 'brace' if unit.can_brace else 'guard'
         unit.moved = unit.acted = True
         self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
+        self._emit('guard', unit.id, text=self.log[-1])
 
     def repulse_targets(self, unit_id: int) -> list[BattleUnit]:
         unit = self.unit(unit_id)
@@ -337,6 +368,7 @@ class Battle:
         unit.spent_abilities += ('repulse',)
         unit.acted = unit.moved = True
         self.log.append(f'{unit.name} repulses {target.name} to {target.pos}.')
+        self._emit('repulse', unit.id, target.id, text=self.log[-1])
 
     def smoke_targets(self, unit_id: int) -> set[Pos]:
         unit = self.unit(unit_id)
@@ -359,6 +391,7 @@ class Battle:
         unit.spent_abilities += ('smoke',)
         unit.acted = unit.moved = True
         self.log.append(f'{unit.name} screens {pos} with smoke until its next turn.')
+        self._emit('smoke', unit.id, text=self.log[-1])
 
     def rally_targets(self, unit_id: int) -> list[BattleUnit]:
         """Living pinned adjacent allies; clearing Pin never refreshes their orders."""
@@ -383,6 +416,7 @@ class Battle:
         target.pinned = False
         unit.acted = unit.moved = True
         self.log.append(f'{unit.name} rallies {target.name}; Pin is cleared.')
+        self._emit('rally', unit.id, target.id, text=self.log[-1])
 
     def swap_targets(self, unit_id: int) -> list[BattleUnit]:
         """Adjacent living allies a ready Swap user may replace, including spent allies."""
@@ -402,6 +436,7 @@ class Battle:
         unit.pos, target.pos = target.pos, unit.pos
         unit.acted = unit.moved = target.moved = True
         self.log.append(f'{unit.name} swaps places with {target.name}.')
+        self._emit('swap', unit.id, target.id, text=self.log[-1])
 
     @property
     def evacuation_blocked_reason(self) -> str | None:
@@ -430,6 +465,7 @@ class Battle:
         hero.acted = hero.moved = True
         self.outcome, self.outcome_reason = 'player', 'escape'
         self.log.append('The hero escapes with the recovered cargo. Surviving defenders withdraw.')
+        self._emit('escape', hero.id, text=self.log[-1])
 
     def _damage(self, attacker: BattleUnit, target: BattleUnit, *, pin: bool = False) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
@@ -465,6 +501,7 @@ class Battle:
             target.stance = None
             target.retaliated = True
             self.log.append(f'{target.name} braces and strikes {unit.name} for {spear} before the attack.')
+            self._emit('brace', target.id, unit.id, text=self.log[-1])
         target.hp -= damage
         if pin:
             unit.pin_cooldown = 2
@@ -476,10 +513,12 @@ class Battle:
             unit.safe_attacks -= 1
         if unit.alive:
             self.log.append(f'{unit.name} {"pins" if pin else "hits"} {target.name} for {damage}.')
+            self._emit('pin' if pin else 'attack', unit.id, target.id, text=self.log[-1])
         if retaliation:
             unit.hp -= retaliation
             target.retaliated = True
             self.log.append(f'{target.name} retaliates for {retaliation}.')
+            self._emit('retaliation', target.id, unit.id, text=self.log[-1])
         self._check_outcome()
 
     def spell_cost(self, spell: str) -> int:
@@ -533,15 +572,19 @@ class Battle:
         else:
             target.hp += amount
             self.log.append(f'Heal restores {amount} health to {target.name}.')
+        self._emit(spell, caster.id, target.id, text=self.log[-1])
         self._check_outcome()
 
     def _check_outcome(self) -> None:
+        before = self.outcome
         if (self.hero_id is not None and not self.unit(self.hero_id).alive) or not any(u.alive and u.team == 'player' for u in self.units):
             self.outcome = 'enemy'
             self.outcome_reason = 'hero_death' if self.hero_id is not None else 'rout'
         elif not any(u.alive and u.team == 'enemy' for u in self.units):
             self.outcome = 'player'
             self.outcome_reason = 'rout'
+        if self.outcome != before:
+            self._emit('result', text='Victory.' if self.outcome == 'player' else 'Defeat.')
 
     def _objective_turn(self) -> None:
         objective = self.objective
@@ -830,12 +873,16 @@ class Battle:
                 unit.pin_cooldown = max(0, unit.pin_cooldown - 1)
                 unit.moved = unit.acted = False
                 unit.stance = None
+        self._emit('phase', text='Enemy turn. Expired effects are cleared.')
         self._play_team('enemy')
         for unit in self.units:
             if unit.team == 'enemy':
                 unit.pinned = False
         if not self.outcome:
             self._objective_turn()
+            self._emit('objective', text=(self.log[-1] if self.outcome else
+                       f'Seal held: {self.objective.progress}/{self.objective.required} turns.'
+                       if self.objective.kind == 'hold' else 'The escape clock advances.'))
         if not self.outcome:
             self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != 'player']
             self.round += 1
@@ -848,6 +895,7 @@ class Battle:
                 self.outcome = 'enemy'
                 self.outcome_reason = 'exhaustion'
                 self.log.append('The exhausted army must retreat.')
+        self._emit('phase', text='Your turn.' if not self.outcome else 'Battle resolved.')
 
     def auto_turn(self) -> None:
         if self.outcome:
