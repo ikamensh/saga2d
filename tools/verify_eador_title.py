@@ -37,6 +37,7 @@ def verify(output, *, backend='pyglet'):
     sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     native, matrix = backend == 'pyglet', []
+    about_views = []
     with TemporaryDirectory(prefix='shardbound-title-reading-') as directory:
         saves = Path(directory) / 'saves'
         game = create_game(backend=backend, visible=False, save_dir=saves)
@@ -99,6 +100,19 @@ def verify(output, *, backend='pyglet'):
                 game.tick(1 / 60)
                 for percent in (100, 125):
                     player.press('t'); player.press('left' if percent == 100 else 'right'); player.press('return')
+                    title = game.scene
+                    player.button('About this build')
+                    about = game.scene
+                    assert about.title == 'About Shardbound'
+                    for page in range(about.pages):
+                        assert about.page == page
+                        check_reading_layout(about)
+                        about_views.append(dict(window=window, percent=percent, page=page + 1))
+                        if window == (1280, 720):
+                            player.capture(f'about-{percent}-page-{page + 1}')
+                        player.press('pagedown')
+                    player.press('escape')
+                    assert game.scene is title and files(saves) == retained
                     for mode_index, (mode, rules) in enumerate(DIFFICULTIES.items(), 1):
                         player.press(str(mode_index)) if percent == 100 else player.button(rules.title)
                         for theme, world in THEMES.items():
@@ -167,7 +181,8 @@ def verify(output, *, backend='pyglet'):
         finally:
             game._teardown(); game.backend.quit()
     assert all(hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == sha for name, sha in hashes.items())
-    report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+    report = dict(about_views=about_views,
+                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, backend=backend, layouts=matrix, input_activations=len(events), inputs=events)
     (output / 'verification.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f'Title reading passed ({backend}): {len(matrix)} layouts / {len(events)} inputs')

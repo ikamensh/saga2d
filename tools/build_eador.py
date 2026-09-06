@@ -20,6 +20,9 @@ from tempfile import TemporaryDirectory
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from eador.release import VERSION
+
 TOOL_VERSIONS = {"pyinstaller": "6.22.2", "pyinstaller-hooks-contrib": "2026.7"}
 RUNTIME_PACKAGES = ("numpy", "Pillow", "pyglet")
 
@@ -118,7 +121,7 @@ def snapshot(source: Path) -> dict:
     source_hashes = {str(path.relative_to(source)): sha256(path)
                      for path in sorted(source.rglob("*")) if path.is_file()}
     info = {
-        "product": "Shardbound", "version": "0.1.0-development",
+        "product": "Shardbound", "version": VERSION,
         "release_ready": False,
         "built_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
