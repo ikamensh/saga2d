@@ -251,8 +251,7 @@ def advance(state: State, offer_id: str, troop_ids, relic_ids) -> None:
     campaign.stage += 1
     campaign.contract, campaign.phase, campaign.offers = offer.contract, 'playing', ()
     campaign.casualties = campaign.prior_attempt_turns = 0
-    candidate.gold = candidate.rules.starting_gold + min(40, state.gold)
-    candidate.crystals = candidate.rules.starting_crystals + min(2, state.crystals)
+    candidate.gold, candidate.crystals = state.expedition_funding()
     candidate.rival.gold = 80 if campaign.stage == 2 else 90
     if campaign.contract == 'foundries':
         candidate.provinces[FOUNDRIES[0]].name = 'North Foundry'
@@ -272,11 +271,12 @@ def recover(state: State, troop_ids, relic_ids) -> None:
     if state.campaign is None or state.campaign.phase != 'recovery' or state.battle or state.choice:
         raise RuleError('A recovery expedition is available only after the first lost shard.')
     troops, relics = _retinue(state, troop_ids, relic_ids)
+    gold, crystals = state.expedition_funding(recovery=True)
     data = json.loads(state.to_json())
     data.update(deepcopy(state.campaign.entry))
     data.update(campaign=None, battle=None, battle_kind=None, battle_province=None,
                 status='playing', choices=[], buildings=[], turn=1,
-                gold=state.rules.recovery_gold, crystals=state.rules.recovery_crystals)
+                gold=gold, crystals=crystals)
     data['hero']['pos'] = [-2, 0]
     data['actions_left'] = 3 if state.hero.hero_class == 'Scout' else 2
     candidate = State.from_json(json.dumps(data))
