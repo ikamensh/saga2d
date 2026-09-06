@@ -1,0 +1,2 @@
+AI games: 60 played, 0 failed, outcomes {'score': 45, 'domination': 15}
+monkey runs: 20 played, 0 failed
