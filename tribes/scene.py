@@ -11,8 +11,9 @@ from saga2d import (
     Anchor, Button, Camera, Column, Delay, InputEvent, KeyHints, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer,
     Row, Scene, Sequence, Sprite, Style,
 )
+from saga2d.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, Pulse, Toast, hop
 from tribes import ai, effects, mapgen
-from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, TilePulse, Toast, hop, play_sound
+from tribes.effects import play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, REWARDS, TECHS, UNITS, Reward, Tech, UnitType
 from tribes.style import ACTION_BUTTON, BAD, DANGER_BUTTON, GHOST_BUTTON, GOLD, GOOD, OVERLAY_STYLE, PANEL_STYLE, SEMIBOLD
@@ -253,7 +254,7 @@ class MapScene(Scene):
         self.selected_unit = None
         self._refresh_selection()
         if changed and city is not None:
-            self.effects.add(TilePulse(tile_center(city.pos), rgba(self.tribe.color, 160), radius=(10, 40), rings=1, duration=0.5))
+            self.effects.add(Pulse(tile_center(city.pos), rgba(self.tribe.color, 160), radius=(10, 40), rings=1, duration=0.5))
             self.sfx("select")
 
     def cancel(self) -> None:
@@ -354,7 +355,7 @@ class MapScene(Scene):
         for finding in self.world.take_findings():
             center = tile_center(finding.pos)
             self.effects.add(Burst(center, GOLD, 22, rng=self.rng))
-            self.effects.add(TilePulse(center, GOLD, radius=(10, TILE), rings=2, duration=0.9))
+            self.effects.add(Pulse(center, GOLD, radius=(10, TILE), rings=2, duration=0.9))
             self.effects.add(FloatingText(finding.text, (center[0], center[1] - TILE * 0.7), GOLD, font_size=20, rise=36, duration=1.8))
             self.say(f"Ruins explored: {finding.text}")
             self.sfx("level_up")
@@ -450,7 +451,7 @@ class MapScene(Scene):
         color = rgba(self.tribe.color)
         center = tile_center(city.pos)
         self.effects.add(Burst(center, color, 24, rng=self.rng))
-        self.effects.add(TilePulse(center, color, radius=(12, TILE * 1.2), rings=3, duration=1.1))
+        self.effects.add(Pulse(center, color, radius=(12, TILE * 1.2), rings=3, duration=1.1))
         self.effects.add(FloatingText(city.name, (center[0], center[1] - TILE * 0.8), GOLD, font_size=22, rise=36, duration=1.4))
         self.camera.shake(3, 0.25)
         self.say(f"{city.name} is yours")
@@ -482,7 +483,7 @@ class MapScene(Scene):
         self.sfx("train")
         self._refresh_selection()
         hop(self.view.unit_sprite(unit.id), tile_center(unit.pos), height=14, speed=320)
-        self.effects.add(TilePulse(tile_center(city.pos), rgba(self.tribe.color, 150), radius=(8, 34), rings=1, duration=0.45))
+        self.effects.add(Pulse(tile_center(city.pos), rgba(self.tribe.color, 150), radius=(8, 34), rings=1, duration=0.45))
 
     def harvest(self, pos: Pos) -> None:
         tile = self.world.tile(pos)
@@ -505,7 +506,7 @@ class MapScene(Scene):
     def _celebrate_level(self, city: City) -> None:
         center = tile_center(city.pos)
         color = rgba(self.tribe.color)
-        self.effects.add(TilePulse(center, color, radius=(14, TILE * 1.4), rings=3, duration=1.2, delay=0.35))
+        self.effects.add(Pulse(center, color, radius=(14, TILE * 1.4), rings=3, duration=1.2, delay=0.35))
         self.effects.add(FloatingText(f"Level {city.level}!", (center[0], center[1] - TILE * 0.8), GOLD, font_size=24, rise=40, duration=1.6, delay=0.4))
         self.effects.add(Burst(center, color, 26, rng=self.rng, delay=0.4))
         self.after(0.4, lambda: self.sfx("level_up"))
@@ -1135,7 +1136,7 @@ class RewardScene(_Overlay):
         scene = self.map_scene
         scene.world.choose_reward(self.city, reward)
         center = tile_center(self.city.pos)
-        scene.effects.add(TilePulse(center, rgba(scene.tribe.color), radius=(12, TILE * 1.3), rings=3, duration=1.0))
+        scene.effects.add(Pulse(center, rgba(scene.tribe.color), radius=(12, TILE * 1.3), rings=3, duration=1.0))
         scene.say(f"{self.city.name}: {REWARDS[reward].name}")
         scene.sfx("research")
         scene.sync()

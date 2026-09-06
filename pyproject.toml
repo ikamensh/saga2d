@@ -25,5 +25,8 @@ ai-verify = ["anthropic>=0.39.0"]
 [tool.setuptools.packages.find]
 include = ["saga2d*"]
 
+[tool.setuptools.package-data]
+saga2d = ["assets/fonts/*.ttf", "assets/fonts/OFL.txt"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

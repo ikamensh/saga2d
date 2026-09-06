@@ -9,11 +9,11 @@ from __future__ import annotations
 
 import argparse
 
-from saga2d import Game
+from saga2d import Game, fonts
 from tribes import effects
 from tribes.scene import DEFAULT_SETTINGS, new_game
 from tribes.sound import SoundBank
-from tribes.style import build_theme, load_fonts
+from tribes.style import build_theme
 from tribes.title import TitleScene
 
 
@@ -25,7 +25,7 @@ def main() -> None:
     parser.add_argument("--fullscreen", action="store_true")
     args = parser.parse_args()
     game = Game("Tribes", resolution=None, fullscreen=args.fullscreen, theme=build_theme())
-    load_fonts(game)
+    fonts.load(game)
     bank = SoundBank(game)
     effects.sound_hook = bank.play
     effects.volume_hook = bank.set_volume

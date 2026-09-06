@@ -174,6 +174,12 @@ def rotate_z(mesh: Mesh, degrees: float, about: tuple[float, float] = (0.0, 0.0)
     return [Face(tuple(rot(p) for p in f.points), f.color) for f in mesh]
 
 
+def scale(mesh: Mesh, factor: float, about: Vec3 = (0.0, 0.0, 0.0)) -> Mesh:
+    """Scale a mesh uniformly about *about*."""
+    ax, ay, az = about
+    return [Face(tuple((ax + (x - ax) * factor, ay + (y - ay) * factor, az + (z - az) * factor) for x, y, z in f.points), f.color) for f in mesh]
+
+
 def _ring(cx: float, cy: float, z: float, radius: float, sides: int, rotation: float) -> list[Vec3]:
     return [
         (cx + radius * math.cos(rotation + 2 * math.pi * i / sides), cy + radius * math.sin(rotation + 2 * math.pi * i / sides), z)
