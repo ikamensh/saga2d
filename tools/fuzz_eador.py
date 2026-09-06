@@ -40,6 +40,7 @@ from eador.encounter_scene import EncounterScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
 from eador.worldgen import THEMES
 from eador.rival_scene import RivalScene  # noqa: E402
+from eador.replacement_scene import ReplacementScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
 from eador.scene import (BattleScene, CatalogScene, ChoiceScene, HelpScene, HeroScene,
                          ResultScene, SaveScene, ShardScene, TitleScene)  # noqa: E402
@@ -644,8 +645,63 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         metrics['equip_inputs'] += 1
                     else:
                         press(rng.choice(('left', 'right', 'u', 'i', 't', 'c', 'escape', 'escape')))
+                elif isinstance(scene, ReplacementScene):
+                    before = root().state.to_json()
+                    if rng.random() < .15:
+                        press('f5')
+                        press('f9')
+                        assert isinstance(game.scene, ShardScene) and root().state.to_json() == before
+                        metrics['replacement_applied_save_load' if scene.applied else 'replacement_draft_save_load'] += 1
+                    elif scene.kind is None:
+                        key = rng.choice((*map(str, range(1, len(scene.visible_troops) + 1)),
+                                          'left', 'right', 'escape', 't', 'c', 'f6'))
+                        outgoing_id = scene.visible_troops[int(key) - 1] if key.isdigit() else None
+                        press(key)
+                        assert root().state.to_json() == before, 'Choosing a veteran spent resources'
+                        if outgoing_id is not None:
+                            assert isinstance(game.scene, CatalogScene) and game.scene.outgoing_id == outgoing_id
+                            metrics['replacement_veteran_selections'] += 1
+                    elif scene.applied:
+                        key = rng.choice(('1', '2', 'return', 'escape', 't', 'c', 'f6'))
+                        press(key)
+                        assert root().state.to_json() == before, 'Applied review repeated a replacement'
+                        if key in ('return', 'escape'):
+                            assert isinstance(game.scene, ShardScene) and len(game.scenes) == 1
+                        metrics['replacement_applied_inputs'] += 1
+                    else:
+                        quote = root().state.replacement_preview(scene.outgoing_id, scene.kind)
+                        assert scene.quote == quote, 'Displayed replacement quote became stale'
+                        key = rng.choice(('return', 'return', 'escape', 't', 'c', 'f6'))
+                        if key == 'return' and quote.blocked_reason is None:
+                            expected = State.from_json(before)
+                            expected.replace_troop(scene.outgoing_id, scene.kind)
+                            press(key)
+                            assert scene.applied and root().state.to_json() == expected.to_json()
+                            metrics['replacement_confirmations'] += 1
+                            metrics['replacement_retired_veterans'] += int(quote.outgoing.level > 1)
+                        else:
+                            press(key)
+                            assert root().state.to_json() == before, 'A refused or canceled replacement changed the campaign'
+                            if key == 'escape':
+                                assert isinstance(game.scene, CatalogScene) and game.scene.outgoing_id == scene.outgoing_id
+                                metrics['replacement_cancellations'] += 1
+                            elif key == 'return':
+                                assert not scene.applied
+                                metrics['replacement_blocked_inputs'] += 1
                 elif isinstance(scene, CatalogScene):
-                    press(rng.choice(('1', '2', '3', '4', '5', 'left', 'right', 'escape', 'escape')))
+                    before = root().state.to_json()
+                    old_size = len(root().state.hero.army)
+                    key = rng.choice((*map(str, range(1, len(scene.visible_items) + 1)),
+                                      'left', 'right', 'escape', 'escape',
+                                      *(('m', 'm') if scene.kind == 'recruit' else ())))
+                    press(key)
+                    if scene.outgoing_id is not None or key == 'm':
+                        assert root().state.to_json() == before, 'Browsing replacements changed the campaign'
+                        if key.isdigit():
+                            assert isinstance(game.scene, ReplacementScene) and game.scene.quote is not None
+                            metrics['replacement_reviews'] += 1
+                    elif scene.kind == 'recruit' and len(root().state.hero.army) > old_size:
+                        metrics['ordinary_recruit_inputs'] += 1
                 elif rng.random() < .15:
                     roll = rng.random()
                     if roll < .4:
@@ -687,7 +743,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         metrics['replays'] += 1
                         break
                 elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene,
-                                        SettingsScene, EncounterScene, CampaignPlanScene)):
+                                        SettingsScene, EncounterScene, CampaignPlanScene, ReplacementScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
                     press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))
