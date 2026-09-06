@@ -127,3 +127,16 @@ ENCOUNTERS['explorer_north'] = EncounterSpec(
 )
 ENCOUNTERS['explorer_south'] = replace(ENCOUNTERS['explorer_north'],
     player_positions=((3, -1), (-2, 3), (-1, 3), (-2, 2), (-2, 1), (2, -1), (-3, 3)))
+
+
+_SCREEN_FOREST = {(-1, -1), (0, 1), (1, -2)}
+_SCREEN_HILLS = {(1, 0), (2, -1)}
+ENCOUNTERS['screen_western'] = EncounterSpec(
+    'Smuggler Screen',
+    tuple(((q, r), 'forest' if (q, r) in _SCREEN_FOREST else 'hills' if (q, r) in _SCREEN_HILLS else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-3, 0), (-2, 0), (-3, 1), (-2, -1), (-3, 2), (-2, 1), (-3, 3)),
+    ((1, 0), (2, -1), (1, -1), (2, 0), (1, 1), (2, -2), (3, -1)),
+)
+ENCOUNTERS['screen_northern'] = replace(ENCOUNTERS['screen_western'],
+    player_positions=((-3, 0), (-2, -1), (-2, 0), (-1, -2), (-3, 1), (0, -3), (-3, 2)))
