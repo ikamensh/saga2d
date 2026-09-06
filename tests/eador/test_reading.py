@@ -33,6 +33,7 @@ def test_long_prose_pages_preserve_every_character_and_fit_actual_scene_measurem
                 return scene.measure(Label(text, width=240, wrap=True, font_size=font_size))[1]
             pages = reading_text_pages(text, 120, measure=measure)
             assert len(pages) > 2 and ''.join(pages) == text
+            assert pages[0].startswith('Cannot read file\n\n/ordinary-directory')
             assert all(page and measure(page) <= 120 for page in pages)
         assert reading_text_pages('', 120, measure=measure) == ('',)
         with pytest.raises(ValueError, match='character'):
