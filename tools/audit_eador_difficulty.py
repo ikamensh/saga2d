@@ -30,7 +30,7 @@ ROUTES = {'direct': None, 'north': NORTH_ROAD, 'south': SOUTH_ROAD}
 
 class DifficultyTrial(Trial):
     def __init__(self, seed, hero, theme, plan, mode, route, *, rules_id=None,
-                 mana_reserve=None, adaptive_interception=False):
+                 mana_reserve=None, adaptive_interception=False, budget=None):
         state = State.new(seed, hero, theme=theme, difficulty=mode)
         if rules_id:
             # A deliberately configured fresh experiment, never a migrated live
@@ -38,7 +38,7 @@ class DifficultyTrial(Trial):
             data = json.loads(state.to_json())
             data['rules_id'] = rules_id
             state = State.from_json(json.dumps(data))
-        super().__init__(seed, hero, theme, plan, state=state, route=ROUTES[route])
+        super().__init__(seed, hero, theme, plan, state=state, route=ROUTES[route], budget=budget)
         self.mode, self.route_name = mode, route
         self.mana_reserve, self.adaptive_interception = mana_reserve, adaptive_interception
         self.events = Counter()

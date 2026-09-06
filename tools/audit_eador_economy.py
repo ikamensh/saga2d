@@ -27,8 +27,9 @@ PLANS = {
 
 class Trial:
     """A measured player policy; every mutation calls the shipped State/Battle interface."""
-    def __init__(self, seed, hero_class, theme, plan, *, state=None, route=None):
+    def __init__(self, seed, hero_class, theme, plan, *, state=None, route=None, budget=None):
         self.state = State.new(seed, hero_class, theme=theme) if state is None else state
+        self.budget = budget
         self.route = route
         self.seed, self.hero_class, self.theme, self.plan = seed, hero_class, theme, plan
         self.metrics = CampaignMetrics()
@@ -39,6 +40,8 @@ class Trial:
         self.building_crystals = self.upkeep_gold = self.retreat_gold = self.deserters = 0
 
     def buy(self, action, kind):
+        if self.budget:
+            self.budget.checkpoint()
         state = self.state
         gold, crystals = state.gold, state.crystals
         getattr(state, action)(kind)
@@ -81,10 +84,12 @@ class Trial:
 
     def battle(self):
         before = self.state.gold
-        finish_battle(self.state, self.metrics)
+        finish_battle(self.state, self.metrics, budget=self.budget)
         self.retreat_gold += max(0, before - self.state.gold)
 
     def rest(self, defend=True):
+        if self.budget:
+            self.budget.checkpoint()
         state = self.state
         if defend:
             self.intercept()
@@ -116,6 +121,8 @@ class Trial:
     def march(self, destination):
         state = self.state
         for _ in range(24):
+            if self.budget:
+                self.budget.checkpoint()
             if state.hero.pos == destination or state.status != 'playing' or state.turn >= 60 or self.stop_reason:
                 return
             if not state.actions_left:
