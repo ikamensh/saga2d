@@ -142,10 +142,10 @@ with the old three-shard totals. At matched turn 46 on the first shard, the old
 policy had won and current Control was still playing.
 
 These results distinguish a correct local survival improvement from an effective
-whole-campaign policy. A complete manually directed Control journey should
-examine actual Tower infusion, specialist purchases, protection and the cost of
-waiting while the rival recruits. That journey remains unfinished; additional
-automated completions or favorable isolated orders would not replace it.
+whole-campaign policy. The completed directed Control continuation below examines
+actual Tower infusion, specialist purchases, protection and rival timing. It
+does not make these automatic policies effective or establish comparative
+balance across the three builds.
 
 ## Directed Control first shard
 
@@ -156,10 +156,58 @@ two Tower infusions, three recovery turns and three battles. Repulse, flight,
 shared-mana healing and attack order all entered the decisions. One rank-3
 Militia died after an agent underestimated overlapping Guard attacks; that error
 and the actual wounds remain recorded. The opening before this journal used
-autoplay, and the remaining linked shards have yet to be directed.
+autoplay. This retained first-shard receipt is superseded in scope by the
+completed continuation below; its original evidence remains unchanged.
 
 All 184 commands replay through real native controls and exact F5/F9 continuation:
 794 input events, 66.37 seconds, averaging 25.44% of one CPU core. The final
 departure holds 140 gold, nine crystals and the four living specialists. This
 provides one paid, directed first-shard itinerary; comparisons across builds and
 counter-scenarios remain necessary for G04.
+
+## Completed directed Control continuation
+
+[The complete retained journey](evidence/directed-control-complete-718afc9/README.md)
+continues that same historical turn-6 opening through Foundries and Throne:
+**556 explicit commands, 15 battle victories and two battle casualties**. There
+are no player autoplay commands after the earned anchor. The agent had source,
+reachability and forecast access; this is not an independent human playtest.
+
+| Directed segment | Capital victory turn | Wins / casualties | Gold / crystals paid | Campaign rests |
+|---|---:|---:|---:|---:|
+| Westwatch, beginning T6 | 9 | 3 / 1 | 150 / 11 | 3 |
+| Foundries | 4 | 7 / 0 | 305 / 6 | 3 |
+| Throne | 3 | 5 / 1 | 305 / 3 | 2 |
+
+These expenses include buildings and infusions as well as recruitment, unlike
+the recruitment-only columns in the autoplay tables. Recruitment and replacement
+alone cost 360 gold and seven crystals within the continuation. Two paid
+retirements are separate from its two battle casualties. The historical opening's
+earlier costs and battles are outside these totals; the capital-turn sum of 16
+includes its elapsed turns.
+
+The earned Adept and Skyrider travel between shards, while new Acolytes, Sappers
+and buildings use actual expedition funds. Foundries claims both required
+provinces and defeats the finite rival expedition before its capital assault.
+Throne instead takes the southern plains route and attacks the adjacent capital
+while the real expedition is away at Frostmere. Capturing that capital ends the
+campaign without fighting its remaining five expedition troops.
+
+Both casualties expose mistakes in the agent's tactics: overlapping Guard attacks
+kill Westwatch's Militia; moving the Throne Sapper out of cover allows two Guards
+and a Wolf to kill it. Both outcomes remain recorded. The final army retains
+Adept, Skyrider, Militia and Acolyte, with 61 gold, three crystals and six mana.
+Channeling 2 and Restoration 1 were earned; Channeling 3 was never offered. No
+retreat, recovery expedition, alternate simulation or rewind was used.
+
+After `Game.close()`, source **75c2b60** exactly replays every original command,
+forecast, currency delta and saved state into a separately attributed derived
+journal. Its native continuation passes **2,403 inputs and 556 actual F5/F9
+joins**, averaging **25.24% of one CPU core** over 193.74 seconds. The historical
+opening is loaded, not replayed through native controls. The later **325c5c5** map
+UI change has separate verification and is not the source of this full replay.
+
+This supplies the previously missing complete directed Control continuation.
+Other directed builds, counter-scenarios, independent player understanding,
+capital recovery and optimal or comparative balance remain unproven.
+**G04 and all G01–G19 remain incomplete.**

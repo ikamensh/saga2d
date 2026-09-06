@@ -1,0 +1,8 @@
+{
+  "integrated_commit": "325c5c57ad1400c2bb947cb7ef816e06122e824b",
+  "isolated_commit": "a3bd4512222eba47458bbd2b8f61b113a77ad802",
+  "native_report_head_before_commit": "5ec7e56b8edce2fc717c2d4ce403a9b062c8d5fa",
+  "all_recorded_source_hashes_match_integrated_commit": true,
+  "source_files": 72,
+  "scope": "Byte identity for the completed native check, not another run."
+}
