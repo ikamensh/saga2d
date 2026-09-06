@@ -102,7 +102,8 @@ then rewards and defenders, followed by the entry message and controls. The
 window height follows measured content, up to 780 on the 800-pixel logical canvas.
 The map uses its original 21-pixel hexes in a reserved layout component; no
 terrain, deployment, objective or fee rule is reconstructed by layout code.
-Each defender type has its own line so its count cannot wrap away from its name.
+Each defender type has its own measured Label. Larger lists use two columns,
+keeping each name/count together and the wounded-health summary below them.
 Approach selection survives Settings and Codex overlays. Canceling the briefing
 spends nothing; only its original entry command spends the selected fee/action.
 
@@ -140,3 +141,14 @@ fee and the linked final Gate. Another six records cover the Guide/Observatory
 tracer. Native extraction, rout, hold, blocked-fee and final-Gate frames were
 inspected. These are content-snapshot counts; new authored sites need their own
 public preparation in the matrix.
+
+
+After integrating Explorer model `e041337`, the guidance matrix covers all 13
+current encounter definitions: 132 approach views plus six Guide/Observatory
+tracer records. The actual paid Ranger, Acolyte and smaller Scout parties appear
+in both Explorer approaches at 100/125 in all three native windows. The briefing
+names the isolated troop from the current army and selected deployment, using
+“army slot 5” rather than implying a tactical troop ID; the smaller party says
+the hero starts alone. No saved troop capabilities or entry commands change.
+The wider defender column keeps all four Explorer names and wounded HP distinct
+at 125%, without reducing font size or changing the deployment geometry.

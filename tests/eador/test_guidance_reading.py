@@ -1,5 +1,8 @@
 """Reading size extends to complete guidance without changing campaign commands."""
 
+import pytest
+from saga2d import Label
+
 from eador.app import create_game
 from eador.model import State
 from eador.scene import HelpScene, ShardScene
@@ -97,5 +100,32 @@ def test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committin
         rows = verify_briefing_matrix(game)
         assert any(row['blocked'] for row in rows)
         assert {row['percent'] for row in rows} == {100, 125}
+    finally:
+        game._teardown()
+
+
+@pytest.mark.parametrize('hero,support,isolated', [('Commander', 'ranger', 'Ranger (army slot 5)'),
+                                                  ('Warrior', 'healer', 'Acolyte (army slot 5)'),
+                                                  ('Scout', None, 'Hero starts alone east')])
+def test_explorer_names_the_actual_isolated_party_in_both_approaches(tmp_path, hero, support, isolated):
+    """A real purchased party is named from deployment, including a lone hero, without changing its orders."""
+    from tools.eador_explorer_campaign import prepare_explorer
+    from eador.encounter_scene import EncounterScene
+
+    (tmp_path / 'settings.json').write_text('{"codex_text_scale": 125}')
+    state = prepare_explorer(hero, support=support)
+    before = state.to_json()
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    player = PlayerInput(game)
+    try:
+        game.push(ShardScene(state))
+        player.press('x')
+        assert isinstance(game.scene, EncounterScene)
+        for key in ('1', '2'):
+            player.press(key)
+            text = '\n'.join(label.text for label in game.scene.ui.find_all(lambda item: isinstance(item, Label)))
+            assert isolated in text
+            check_reading_layout(game.scene)
+            assert state.to_json() == before
     finally:
         game._teardown()
