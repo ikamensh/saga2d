@@ -3,16 +3,28 @@
 from collections import Counter
 from dataclasses import dataclass
 
+from saga2d import Anchor, Column, Label
+
 from eador.battle import Battle, SPELLS
 from eador.content import RELICS, SITES, SKILLS
 from eador.encounters import ENCOUNTERS
+from eador.preferences import codex_text_scale
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
 
 
 CATEGORIES = ("Troops", "Abilities", "Buildings", "Skills", "Sites", "Relics")
-PAGE_SIZE = 3
+
+
+INTRODUCTIONS = (
+    "Each troop offers different orders. See Abilities for timing and limits. Base stats exclude veteran and hero bonuses.",
+    "Hero and Acolytes share mana. Spell values include skills and relics; counts use this battle's saved capabilities.",
+    "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
+    "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
+    "Explore an owned, uncleared site using one action. Approach choices follow their site; the active choice shows its saved reward.",
+    "Equip one relic between battles. Replacing Moonstone or Ember Lens removes its spell unless learned elsewhere. Sources belong to this saved shard.",
+)
 
 
 @dataclass(frozen=True)
@@ -26,7 +38,8 @@ class CodexScene(Screen):
     """Inspect rules without changing the root campaign or writing save files.
 
     Number keys select a category; Tab/Shift+Tab cycle categories. Left/Right
-    or Page Up/Page Down turn pages. Escape closes this overlay.
+    or Page Up/Page Down turn measured whole-entry pages. T opens the scoped
+    reading-size setting. Escape closes this overlay.
     """
 
     transparent = True
@@ -40,27 +53,91 @@ class CodexScene(Screen):
         self.root = root
         self.category = 0
         self.page = 0
+        self._page_indices = [[]]
+        self._laid_out_category = None
 
     @property
     def pages(self):
-        return max(1, (len(self.entries) + PAGE_SIZE - 1) // PAGE_SIZE)
+        return len(self._page_indices)
+
+    @property
+    def visible_entries(self):
+        """The whole entries on the current measured page, in reading order."""
+        return tuple(self.entries[index] for index in self._page_indices[self.page])
+
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        if self._display != (self.game.window_size, codex_text_scale(self.game)):
+            self.refresh()
 
     def refresh(self):
+        anchor = (self._page_indices[self.page][0] if self._laid_out_category == self.category
+                  and self._page_indices[self.page] else 0)
         super().refresh()
         self.entries = self.read_entries()
-        self.page = min(self.page, self.pages - 1)
         self.x, self.y = self.game.width / 2 - 520, self.game.height / 2 - 350
+        self._display = self.game.window_size, codex_text_scale(self.game)
+        scale = self._display[1] / 100
+        intro = Label(INTRODUCTIONS[self.category], width=992, wrap=True, font="Verdana",
+                      font_size=round(13 * scale), text_color=MUTED)
+        self._blocks = [Column(
+            Label(entry.title, width=992, wrap=True, font="Verdana", font_size=round(19 * scale), text_color=TEAL),
+            Label(entry.facts, width=992, wrap=True, font="Verdana", font_size=round(12 * scale), text_color=GOLD),
+            Label(entry.description, width=992, wrap=True, font="Verdana", font_size=round(13 * scale), text_color=TEXT),
+            spacing=6,
+        ) for entry in self.entries]
+        # Attachment supplies the actual backend/font before public preferred-size
+        # queries. Column owns all line and row positions; the game owns paging.
+        self.ui.add(Column(intro, *self._blocks, spacing=20, anchor=Anchor.TOP_LEFT,
+                           margin=(round(self.x + 24), round(self.y + 163))))
+        available = 451 - intro.get_preferred_size()[1] - 20
+        heights = [block.get_preferred_size()[1] for block in self._blocks]
+
+        def pack(start, stop):
+            pages, current, height = [], [], 0
+            for index in range(start, stop):
+                size = heights[index]
+                if size > available:
+                    raise ValueError(f"Codex entry does not fit at {scale:.0%}: {self.entries[index].title}")
+                if current and height + 20 + size > available:
+                    pages.append(current)
+                    current, height = [], 0
+                height += (20 if current else 0) + size
+                current.append(index)
+            return pages + ([current] if current else [])
+
+        # Reflow around the old first entry, so changing reading size cannot move
+        # the reader to a different rule or quietly hide part of that entry.
+        anchor = min(anchor, max(0, len(self.entries) - 1))
+        prefix = pack(0, anchor)
+        self._page_indices = prefix + pack(anchor, len(self.entries)) or [[]]
+        self.page = len(prefix)
+        self._laid_out_category = self.category
         for i, category in enumerate(CATEGORIES):
             self.button(category, self.x + 24 + i * 167, self.y + 104, 157,
                         lambda i=i: self.select_category(i), shortcut=str(i + 1), primary=i == self.category)
-        self.button("Previous", self.x + 24, self.y + 634, 150, self.previous_page,
-                    hotkey="←", enabled=self.page > 0)
-        self.button("Next", self.x + 184, self.y + 634, 150, self.next_page,
-                    hotkey="→", enabled=self.page + 1 < self.pages)
+        self.button("Text size", self.x + 830, self.y + 41, 186, self.open_text_settings, shortcut="T")
+        self._previous = self.button("Previous", self.x + 24, self.y + 634, 150, self.previous_page, hotkey="←")
+        self._next = self.button("Next", self.x + 184, self.y + 634, 150, self.next_page, hotkey="→")
         self.button("Close codex", self.x + 830, self.y + 634, 186, self.game.pop, shortcut="Esc")
+        self._show_page()
+
+    def _show_page(self):
+        visible = self._page_indices[self.page]
+        for index, block in enumerate(self._blocks):
+            block.visible = index in visible
+        self._previous.enabled = self.page > 0
+        self._next.enabled = self.page + 1 < self.pages
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus="codex_text_scale"))
 
     def select_category(self, index):
         self.category, self.page = index, 0
+        self._laid_out_category = None
         self.refresh()
 
     def next_category(self):
@@ -71,19 +148,19 @@ class CodexScene(Screen):
 
     def previous_page(self):
         self.page = max(0, self.page - 1)
-        self.refresh()
+        self._show_page()
 
     def next_page(self):
         self.page = min(self.pages - 1, self.page + 1)
-        self.refresh()
+        self._show_page()
 
     def first_page(self):
         self.page = 0
-        self.refresh()
+        self._show_page()
 
     def last_page(self):
         self.page = self.pages - 1
-        self.refresh()
+        self._show_page()
 
     def read_entries(self):
         state = self.root.state
@@ -291,22 +368,8 @@ class CodexScene(Screen):
         self.text("Know your forces", x + 24, y + 41, size=30, serif=True)
         self.text(f"{state.hero.hero_class} · {HERO_CLASSES[state.hero.hero_class].description}",
                   x + 24, y + 81, size=12, color=MUTED)
-        introductions = (
-            "Each troop offers different orders. See Abilities for timing and limits. Base stats exclude veteran and hero bonuses.",
-            "Hero and Acolytes share mana. Spell values include skills and relics; counts use this battle's saved capabilities.",
-            "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
-            "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
-            "Explore an owned, uncleared site using one action. Approach choices follow their site; the active choice shows its saved reward.",
-            "Equip one relic between battles. Replacing Moonstone or Ember Lens removes its spell unless learned elsewhere. Sources belong to this saved shard.",
-        )
-        self.paragraph(introductions[self.category], x + 24, y + 163, width=992, size=13)
-        start = self.page * PAGE_SIZE
-        for i, entry in enumerate(self.entries[start:start + PAGE_SIZE]):
-            top = y + 223 + i * 134
-            self.rule(x + 24, top - 13, 992)
-            top += self.paragraph(entry.title, x + 24, top, width=992, size=19, color=TEAL) + 7
-            top += self.paragraph(entry.facts, x + 24, top, width=992, size=12, color=GOLD) + 9
-            self.paragraph(entry.description, x + 24, top, width=992, size=13, color=TEXT)
+        self.rule(x + 24, y + 148, 992)
+        self.rule(x + 24, y + 620, 992)
         self.text(f"{CATEGORIES[self.category]} · Page {self.page + 1} of {self.pages} · {len(self.entries)} entries",
                   x + 354, y + 640, size=13, color=MUTED)
         self.text("1–6 tabs  /  Tab, Shift+Tab cycle  /  ← → pages", x + 354, y + 664,

@@ -442,3 +442,26 @@ Windows runtime, human playtests and listening review remain open.
 G01–G19 remain incomplete. Broken Observatory, scoped larger Codex text and
 difficulty design continue independently; global text scaling, content depth,
 economy/pacing, platform, candidate stress and human feedback remain open.
+
+## Observatory choices and larger reference text — 2026-09-06
+
+- Broken Observatory is the seventh authored family, using the existing hold
+  objective, finite guards and saved approach data. Native purchased Sapper and
+  paired Rune armies pass 610 inputs and 26 exact reloads at `46a5aa8`, with all
+  allies alive. The same Rune orders show the two-crystal lane saves six wounds,
+  with no phase saved. [Reports and inspected images](eador-observatory.md)
+  preserve that limited comparison alongside finite retry and old-save evidence.
+- Codex reading size now offers 100/125%, with measured whole-entry pages and
+  persistent Apply/Cancel/restart/recovery. It explicitly affects reference
+  content only. A native resize regression found and fixed cached text metrics
+  being reused at the wrong scale; the framework caches physical glyph metrics
+  and converts them at the current viewport scale, without a new public method.
+  [Reading-size verification](eador-reading-size.md) includes old and current
+  saved rules. Root inspected larger entries, Settings and the paid Observatory.
+- Combined integration passes 924 tests, the independent native resize metrics,
+  pixels and clicks in both directions, Tribes' 60-game/20-scene fuzz and
+  Shardbound's 12-campaign/12-scene linked fuzz. These are development checkpoints.
+
+G01–G19 remain incomplete. Three-mode difficulty is under model review and
+matched evaluation; its UI is next. Global text scaling, remaining authored
+patterns, campaign economy/pacing, platform checks and human feedback remain open.

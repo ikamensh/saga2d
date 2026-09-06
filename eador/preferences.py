@@ -8,7 +8,7 @@ from saga2d import Game, Settings
 
 WINDOW_SIZES = ((960, 600), (1280, 720), (1280, 800), (1600, 900), (1920, 1080))
 DEFAULTS = {"master": .8, "music": .5, "sfx": .8, "muted": False,
-            "window_size": [1280, 800], "fullscreen": False, "reduced_motion": False}
+            "window_size": [1280, 800], "fullscreen": False, "reduced_motion": False, "codex_text_scale": 100}
 
 
 def validate_preferences(values: Mapping[str, Any]) -> None:
@@ -19,6 +19,8 @@ def validate_preferences(values: Mapping[str, Any]) -> None:
     for key in ("muted", "fullscreen", "reduced_motion"):
         if type(values[key]) is not bool:
             raise ValueError(f"{key.replace('_', ' ').title()} must be true or false")
+    if type(values["codex_text_scale"]) is not int or values["codex_text_scale"] not in (100, 125):
+        raise ValueError("Codex reading size must be 100 or 125 percent")
     size = values["window_size"]
     if (type(size) is not list or len(size) != 2
             or any(type(value) is not int or not 1 <= value <= 16384 for value in size)):
@@ -26,17 +28,23 @@ def validate_preferences(values: Mapping[str, Any]) -> None:
 
 
 def apply_preferences(game: Game, values: Mapping[str, Any]) -> None:
-    """Apply live audio/motion values; display changes are explicit and separate."""
+    """Apply live audio/motion/reading values; display changes are explicit and separate."""
     validate_preferences(values)
     for channel in ("master", "music", "sfx"):
         game.audio.set_volume(channel, values[channel])
     game.audio.muted = values["muted"]
     game._shardbound_reduced_motion = values["reduced_motion"]
+    game._shardbound_codex_text_scale = values["codex_text_scale"]
 
 
 def reduced_motion(game: Game) -> bool:
     """Whether game-owned action feedback should stay still, including live previews."""
     return getattr(game, "_shardbound_reduced_motion", DEFAULTS["reduced_motion"])
+
+
+def codex_text_scale(game: Game) -> int:
+    """Percent size of Codex reading content; other game text is unchanged."""
+    return getattr(game, "_shardbound_codex_text_scale", DEFAULTS["codex_text_scale"])
 
 
 def apply_display_preferences(game: Game, values: Mapping[str, Any]) -> None:
@@ -49,7 +57,7 @@ def apply_display_preferences(game: Game, values: Mapping[str, Any]) -> None:
 
 
 def load_preferences(game: Game) -> Settings:
-    """Apply sound/motion only; check the returned ``error`` to offer recovery.
+    """Apply sound/motion/reading only; check the returned ``error`` to offer recovery.
 
     ``create_game`` applies saved display once. Scene entries may call this helper
     without undoing a player's later native window resize or fullscreen change.

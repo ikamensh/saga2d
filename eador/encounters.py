@@ -97,3 +97,19 @@ ENCOUNTERS['hunt_compact'] = EncounterSpec(
 )
 ENCOUNTERS['hunt_lured'] = replace(ENCOUNTERS['hunt_compact'],
     player_positions=((0, -2), (-1, -2), (1, -3), (0, -3), (1, -2), (3, -3), (-2, -1)))
+
+
+_OBSERVATORY_FOREST = {(-1, 0), (0, -1), (0, 1), (1, -2), (1, 1), (-2, 1)}
+_OBSERVATORY_HILLS = {(0, 0), (1, 0), (1, -3), (3, -1), (0, 3)}
+ENCOUNTERS['observatory_covered'] = EncounterSpec(
+    'Broken Observatory',
+    tuple(((q, r), 'forest' if (q, r) in _OBSERVATORY_FOREST else 'hills' if (q, r) in _OBSERVATORY_HILLS else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-3, 0), (-2, 0), (-3, 1), (-2, -1), (-2, 1), (-3, 2), (-2, 2)),
+    ((1, 0), (3, -1), (1, -3), (0, 3), (2, 0), (2, 1), (3, -3)),
+    (0, 0),
+    objective='hold',
+)
+ENCOUNTERS['observatory_clear'] = replace(ENCOUNTERS['observatory_covered'],
+    terrain=tuple((pos, 'plains' if pos == (-1, 0) else terrain)
+                  for pos, terrain in ENCOUNTERS['observatory_covered'].terrain))

@@ -16,7 +16,7 @@ def create_game(title='Shardbound', **options):
     Tests and packaging may override normal Game options such as backend,
     visibility and save_dir. Explicit resolution/fullscreen, hidden windows, or
     SAGA2D_HEADLESS keep their launch display instead of restoring saved display.
-    Sound and motion preferences still load. Asset paths never depend on cwd.
+    Sound, motion and Codex reading preferences still load. Asset paths never depend on cwd.
     """
     defaults = dict(resolution=(1280, 800), theme=build_theme(), asset_path=ASSETS,
                     save_dir=Path.home() / '.shardbound' / 'saves')

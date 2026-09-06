@@ -3,10 +3,10 @@
 import os
 from copy import deepcopy
 
-from saga2d import Settings, SettingsError
+from saga2d import Anchor, Label, Settings, SettingsError
 
 from eador.preferences import (DEFAULTS, WINDOW_SIZES, apply_display_preferences,
-                               apply_preferences, reduced_motion, validate_preferences)
+                               apply_preferences, codex_text_scale, reduced_motion, validate_preferences)
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, RED, TEAL
 
@@ -17,7 +17,8 @@ SOUND_ROWS = (("master", "Master volume", "Overall level for all sound."),
               ("muted", "Mute all audio", "Silence sound without changing your levels."))
 DISPLAY_ROWS = (("window_size", "Window size", "Resize the window; the game canvas stays fixed."),
                 ("fullscreen", "Fullscreen", "Use the desktop's current resolution."),
-                ("reduced_motion", "Reduced motion", "Keep damage numbers still."))
+                ("reduced_motion", "Reduced motion", "Keep damage numbers still."),
+                ("codex_text_scale", "Codex reading size", "Read the Codex at this size."))
 
 
 class SettingsScene(Screen):
@@ -25,10 +26,15 @@ class SettingsScene(Screen):
     controls = {"up": "previous_row", "down": "next_row", "left": "decrease", "right": "increase",
                 "tab": "next_page"}
 
-    def __init__(self):
+    def __init__(self, *, focus=None):
         super().__init__()
-        self.page = "sound"
-        self.selected = 0
+        self.page, self.selected = "sound", 0
+        if focus is not None:
+            matches = [(page, index) for page, rows in (("sound", SOUND_ROWS), ("display", DISPLAY_ROWS))
+                       for index, row in enumerate(rows) if row[0] == focus]
+            if not matches:
+                raise ValueError(f"Unknown settings row: {focus}")
+            self.page, self.selected = matches[0]
         self.committed = False
         self.recover = False
         self.last_error = None
@@ -43,10 +49,11 @@ class SettingsScene(Screen):
         self.entry = deepcopy(DEFAULTS)
         self.entry.update({channel: self.game.audio.get_volume(channel) for channel in ("master", "music", "sfx")})
         self.entry.update(muted=self.game.audio.muted, reduced_motion=reduced_motion(self.game),
+                          codex_text_scale=codex_text_scale(self.game),
                           window_size=list(self.game.windowed_size), fullscreen=self.game.fullscreen)
         self.draft = {key: deepcopy(self.preferences[key]) for key in DEFAULTS}
         # The native window may have been resized or launched with an explicit override.
-        for key in ("window_size", "fullscreen", "reduced_motion"):
+        for key in ("window_size", "fullscreen", "reduced_motion", "codex_text_scale"):
             self.draft[key] = self.entry[key]
         self.load_error = self.preferences.error
         self.message = self.load_error.replace(str(self.preferences.path), "settings.json") if self.load_error else ""
@@ -105,6 +112,8 @@ class SettingsScene(Screen):
             else:
                 self.game.set_fullscreen(not self.game.fullscreen)
                 self.draft[key] = self.game.fullscreen
+        elif key == "codex_text_scale":
+            self.draft[key] = 125 if direction > 0 else 100
         elif type(self.draft[key]) is bool:
             self.draft[key] = not self.draft[key]
         else:
@@ -151,7 +160,7 @@ class SettingsScene(Screen):
 
     @property
     def panel(self):
-        return ((self.game.width - 840) / 2, (self.game.height - 660) / 2, 840, 660)
+        return ((self.game.width - 840) / 2, (self.game.height - 700) / 2, 840, 700)
 
     def refresh(self):
         super().refresh()
@@ -162,19 +171,24 @@ class SettingsScene(Screen):
                     shortcut="D", enabled=self.page != "display")
         toggles = {"muted": ("Unmute", "Mute"), "fullscreen": ("Go windowed", "Go fullscreen"),
                    "reduced_motion": ("Full motion", "Reduce motion")}
-        for index, (key, label, _) in enumerate(self.rows):
+        for index, (key, label, hint) in enumerate(self.rows):
             ry = y + 154 + index * 72
             if key in toggles:
                 on, off = toggles[key]
                 self.button(on if self.draft[key] else off, x + 628, ry, 152,
                             lambda index=index: self.adjust(index, 1))
             else:
-                lower = self.next_size(-1) != self.game.windowed_size if key == "window_size" else self.draft[key] > 0
-                higher = self.next_size(1) != self.game.windowed_size if key == "window_size" else self.draft[key] < 1
+                if key == "codex_text_scale":
+                    lower, higher = self.draft[key] > 100, self.draft[key] < 125
+                    self.ui.add(Label(hint, width=360, wrap=True, font="Verdana", font_size=round(13 * self.draft[key] / 100),
+                                      text_color=MUTED, anchor=Anchor.TOP_LEFT, margin=(round(x + 52), round(ry + 27))))
+                else:
+                    lower = self.next_size(-1) != self.game.windowed_size if key == "window_size" else self.draft[key] > 0
+                    higher = self.next_size(1) != self.game.windowed_size if key == "window_size" else self.draft[key] < 1
                 self.button("−", x + 628, ry, 60, lambda index=index: self.adjust(index, -1), enabled=lower)
                 self.button("+", x + 720, ry, 60, lambda index=index: self.adjust(index, 1), enabled=higher)
         if self.load_error:
-            self.button("Preserve damaged file & use defaults", x + 36, y + 505, 490,
+            self.button("Preserve damaged file & use defaults", x + 36, y + 538, 490,
                         self.restore_defaults, shortcut="R", enabled=not self.recover)
         self.button("Cancel", x + 466, y + h - 62, 144, self.cancel, shortcut="Esc")
         self.button("Apply", x + 628, y + h - 62, 152, self.apply, shortcut="Enter", primary=True)
@@ -193,9 +207,12 @@ class SettingsScene(Screen):
                 self.draw_rect(x + 20, ry - 8, w - 40, 63, (37, 60, 65, 220), border_color=TEAL, border_width=1, radius=4)
                 self.text("›", x + 26, ry + 7, size=22, color=GOLD)
             self.text(label, x + 52, ry + 1, size=17)
-            self.text(hint, x + 52, ry + 27, size=11, color=MUTED)
+            if key != "codex_text_scale":
+                self.text(hint, x + 52, ry + 27, size=11, color=MUTED)
             if key == "window_size":
                 value = " × ".join(map(str, self.game.windowed_size))
+            elif key == "codex_text_scale":
+                value = f'{self.draft[key]}%'
             elif type(self.draft[key]) is bool:
                 value = "On" if self.draft[key] else "Off"
             else:
@@ -205,12 +222,14 @@ class SettingsScene(Screen):
             actual = " × ".join(map(str, self.game.window_size))
             canvas = " × ".join(map(str, self.game.resolution))
             mode = "fullscreen" if self.game.fullscreen else "windowed"
-            self.text(f"Now {actual} {mode} · Game canvas {canvas} (fixed).", x + 52, y + 396, size=12, color=MUTED)
-        self.rule(x + 36, y + 445, w - 72)
+            self.text(f"Now {actual} {mode} · Game canvas {canvas} (fixed).", x + 52, y + 446, size=12, color=MUTED)
+        self.rule(x + 36, y + 477, w - 72)
         notice = "A saved settings file could not be read. It is still intact." if self.load_error else "Tab switches pages · Up/Down selects a row · Left/Right changes its value."
-        self.paragraph(notice, x + 36, y + 462, width=w - 72, size=12, color=RED if self.load_error else MUTED)
+        if self.page == "display" and not self.load_error:
+            notice = "Codex reading size changes reference content only. Other screens keep their sizes.\nTab: page · Up/Down: row · Left/Right: value."
+        self.paragraph(notice, x + 36, y + 494, width=w - 72, size=12, color=RED if self.load_error else MUTED)
         if self.message:
-            self.paragraph(self.message, x + 36, y + 553, width=w - 72, size=11,
+            self.paragraph(self.message, x + 36, y + 586, width=w - 72, size=11,
                            color=TEAL if self.recover and not self.message.startswith("Could not") else RED)
         else:
-            self.text("Settings apply to every shard and stay separate from your progress.", x + 36, y + 563, size=11, color=MUTED)
+            self.text("Settings apply to every shard and stay separate from your progress.", x + 36, y + 596, size=11, color=MUTED)
