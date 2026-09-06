@@ -22,6 +22,7 @@ class ReplacementScene(Screen):
         self.description = description
         self.applied = False
         self.quote = None
+        self._shown_diagnostic = None
         self.page = 0
         self._page_troops = [tuple(troop.id for troop in root.state.hero.army)]
 
@@ -52,6 +53,11 @@ class ReplacementScene(Screen):
         from eador.settings_scene import SettingsScene
         self.game.push(SettingsScene(focus='codex_text_scale'))
 
+    def read_error(self):
+        from eador.diagnostics import DiagnosticScene
+        self._shown_diagnostic = self.message
+        self.game.push(DiagnosticScene(self.message, return_label="Return to replacement"))
+
     def select(self, outgoing_id):
         self.game.replace(CatalogScene(self.root, 'recruit', outgoing_id=outgoing_id))
 
@@ -60,10 +66,19 @@ class ReplacementScene(Screen):
         self._display = self.game.window_size, reading_scale(self.game)
         scale = self._display[1] / 100
         state = self.root.state
+        diagnostic = False
+        maximum = self.game.height - 40 - 194
+        if not self.message:
+            self._shown_diagnostic = None
 
         def label(text, size=13, *, width=1064, color=MUTED):
             return Label(text, width=width, wrap=True, font='Verdana',
                          font_size=round(size * scale), text_color=color)
+
+        def error_link():
+            return Row(label('Save/load failed. Read the complete error, then return here to retry.',
+                             12, width=824, color=GOLD),
+                       Button('Read error', width=216, height=40, shortcut='D', on_click=self.read_error), spacing=24)
 
         if self.kind is None:
             self.title = 'Choose a veteran to retire'
@@ -72,14 +87,16 @@ class ReplacementScene(Screen):
                                f'Rank {troop.level} · {troop.xp} XP · {troop.hp}/{troop.max_hp} HP', width=800, color=TEXT)
                          for index, troop in enumerate(state.hero.army, 1)]
             footer = [label(self.message, 12, color=GOLD)] if self.message else []
-            self.ui.add(Column(introduction, *summaries, *footer))
+            heights = [max(40, self.measure(item)[1]) for item in summaries]
             ids = [troop.id for troop in state.hero.army]
             anchor = ids.index(self.visible_troops[0]) if self.visible_troops else 0
-            available = self.game.height - 40 - 194 - introduction.get_preferred_size()[1] - 18
+            available = maximum - self.measure(introduction)[1] - 18
             if footer:
-                available -= footer[0].get_preferred_size()[1] + 18
-            pages, self.page = reading_pages([max(40, item.get_preferred_size()[1]) for item in summaries],
-                                             available, anchor=anchor, spacing=18, max_items=9)
+                diagnostic = self.measure(footer[0])[1] + 18 + max(heights) > available
+                if diagnostic:
+                    footer = [error_link()]
+                available -= self.measure(footer[0])[1] + 18
+            pages, self.page = reading_pages(heights, available, anchor=anchor, spacing=18, max_items=9)
             self._page_troops = [tuple(ids[index] for index in page) for page in pages]
             rows = []
             for number, ident in enumerate(self.visible_troops, 1):
@@ -104,12 +121,14 @@ class ReplacementScene(Screen):
                              label(('Paid: ' if self.applied else 'Cost: ') + price, 15, color=GOLD),
                              label(f'Army upkeep: {quote.upkeep_before} → {quote.upkeep_after} gold per turn.\n'
                                    f'Available: {state.gold} gold · {state.crystals} crystals · {state.actions_left} actions.'),
-                             *([label(quote.blocked_reason, 12, color=RED)] if not self.applied and quote.blocked_reason else []),
-                             *([label(self.message, 12, color=GOLD)] if self.message else []), spacing=16)
+                             *([label(quote.blocked_reason, 12, color=RED)] if not self.applied and quote.blocked_reason else []), spacing=16)
+            if self.message:
+                footer = label(self.message, 12, color=GOLD)
+                diagnostic = self.measure(content)[1] + 16 + self.measure(footer)[1] > maximum
+                content.add(error_link() if diagnostic else footer)
             if not self.applied and not self.message and not quote.blocked_reason:
                 content.add(label('Keeping your veteran and resting remains available. Replacing spends an action even with an empty army slot.', 12))
-        self.ui.add(content)
-        self.panel_height = content.get_preferred_size()[1] + 194
+        self.panel_height = self.measure(content)[1] + 194
         if self.panel_height > self.game.height - 40:
             raise ValueError(f'Replacement does not fit at {scale:.0%}')
         self.x, self.y = self.game.width / 2 - 560, (self.game.height - self.panel_height) / 2
@@ -130,6 +149,9 @@ class ReplacementScene(Screen):
                 self.button('Replace veteran', self.x + 792, bottom, 300, self.replace_troop,
                             shortcut='Enter', danger=True, enabled=self.quote.blocked_reason is None)
 
+        if diagnostic and self.message != self._shown_diagnostic and self.game.scene is self:
+            self.read_error()
+
     def replace_troop(self):
         if self.applied:
             return
@@ -149,11 +171,13 @@ class ReplacementScene(Screen):
         self.game.clear_and_push(ShardScene(self.root.state))
 
     def save_game(self):
+        self._shown_diagnostic = None
         self.root.save_game()
         self.message = self.root.message
         self.refresh()
 
     def load_game(self, slot=1, *, backup=False):
+        self._shown_diagnostic = None
         loaded = super().load_game(slot, backup=backup)
         if not loaded:
             self.refresh()

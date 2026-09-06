@@ -34,3 +34,7 @@ reachable once and every file stays byte-identical through layout changes.
 Hidden-number activation is checked when native measurements produce more than
 one page. A fresh Game verifies 125% persistence. Screenshots still require
 inspection; these checks do not establish Windows or complete G10/G12.
+
+For unusually long filesystem errors, the [complete diagnostic view](eador-diagnostics.md)
+now preserves all text in measured pages while leaving the selected slot and its
+explicit recovery controls available on return. Short errors remain inline.
