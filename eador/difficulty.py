@@ -32,11 +32,15 @@ RULESETS = MappingProxyType({
     'challenge-1': DifficultySpec('challenge-1', 'Challenge',
         '90 starting gold, 80% realm gold income, slower mana recovery and shorter rival preparation.',
         90, 2, 80, 6, 3, 2, 2, 3, 60, 2),
+    # Mana recovery revised after matched route/purchase and saved-policy checks.
+    'challenge-2': DifficultySpec('challenge-2', 'Challenge',
+        '90 starting gold, 80% realm gold income, normal mana recovery and shorter rival preparation.',
+        90, 2, 80, 6, 4, 2, 2, 3, 60, 2),
 })
 DIFFICULTIES = MappingProxyType({
     'accessible': RULESETS['accessible-1'],
     'standard': RULESETS['standard-1'],
-    'challenge': RULESETS['challenge-1'],
+    'challenge': RULESETS['challenge-2'],
 })
 
 
