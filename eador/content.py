@@ -27,6 +27,7 @@ class RelicSpec:
     name: str
     description: str
     value: int
+    battle_ability: str | None = None
 
 
 RELICS = {
@@ -36,8 +37,9 @@ RELICS = {
     'moonstone': RelicSpec('Moonstone', 'Learn Heal while equipped; it restores 6 extra health.', 45),
     'iron_crown': RelicSpec('Iron Crown', 'Your first hero attack each battle avoids retaliation.', 40),
     'merchant_seal': RelicSpec('Merchant Seal', 'Recruitment costs 25% less while equipped.', 50),
-    'watch_bell': RelicSpec('Watch Bell', 'Your hero can Brace: the first adjacent melee attacker takes a pre-emptive hit. Ranged attacks counter it.', 45),
-    'storm_quiver': RelicSpec('Storm Quiver', 'Your hero can Pin within 3 hexes: half damage and -2 movement for the target’s next turn; skip one turn before reuse.', 45),
+    'watch_bell': RelicSpec('Watch Bell', 'Your hero can Brace: the first adjacent melee attacker takes a pre-emptive hit. Ranged attacks counter it.', 45, 'brace'),
+    'storm_quiver': RelicSpec('Storm Quiver', 'Your hero can Pin within 3 hexes: half damage and -2 movement for the target’s next turn; skip one turn before reuse.', 45, 'pin'),
+    'veil_censer': RelicSpec('Veil Censer', 'Your hero gains one Smoke charge each battle. Spend its order to screen a visible hex within 3; both teams’ ranged shots and spells are blocked until your next turn.', 45, 'smoke'),
 }
 
 
@@ -76,7 +78,7 @@ SITES = {
                             ('pikeman', 'archer', 'brigand'), 50, 2, 'watch_bell', 'border_watch'),
     'explorer_camp': SiteSpec('Explorer’s Camp', 'A goblin and its hound guard a pair of trail-worn boots.', ('goblin', 'wolf'), 40, 1, 'wayfarer_boots'),
     'courier_crossing': SiteSpec('Courier’s Crossing', 'Carry recovered dispatches to either exit by round 8, or rout the roadblock.',
-        ('pikeman', 'archer', 'brigand'), 50, 2, 'merchant_seal', 'courier_direct', (
+        ('pikeman', 'archer', 'brigand'), 50, 2, 'veil_censer', 'courier_direct', (
             AdventureApproach('direct', 'Take the open road', 'Free. Cross the exposed western approach; keep the full reward.', 'courier_direct'),
             AdventureApproach('guided', 'Hire a guide', 'Pay 20 gold for covered southern deployment. The fee is lost if you retreat.', 'courier_guided', gold_cost=20),
         )),

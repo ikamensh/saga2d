@@ -8,6 +8,7 @@ from saga2d import HexGrid
 
 from eador.model import Hero, Pos, RuleError, UNITS
 from eador.encounters import ENCOUNTERS
+from eador.content import RELICS
 from eador.sight import line_of_sight
 
 
@@ -166,7 +167,8 @@ class Battle:
         if len(health) != len(enemies):
             raise ValueError('Enemy health must match the enemy army.')
         units += cls._deploy(list(zip(enemies, health)), enemy_positions, 'enemy', max(u.id for u in units) + 1000)
-        units[0].abilities = ('pin',) if hero.relic == 'storm_quiver' else ('brace',) if hero.relic == 'watch_bell' else ()
+        ability = RELICS[hero.relic].battle_ability if hero.relic else None
+        units[0].abilities = (ability,) if ability else ()
         units[0].cargo_penalty = cargo_penalty
         ranks = hero.skill_ranks
         units[0].safe_attacks = ranks.get('duelist', 0) + (hero.relic == 'iron_crown')
