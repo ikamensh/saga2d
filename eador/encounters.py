@@ -66,3 +66,16 @@ ENCOUNTERS['supply_cache'] = EncounterSpec(
     ((-3, 0), (3, -3), (3, 0), (0, 3), (2, 1), (-3, 3), (1, 2)),
     exits=((-3, 1), (2, -3)),
 )
+
+
+_VAULT_MARSH = {(-1, 1), (-1, 2), (0, 1)}
+_VAULT_HILLS = {(-1, -1), (0, -1), (1, -1), (1, -3), (2, -1), (2, 1)}
+ENCOUNTERS['vault_crossfire'] = EncounterSpec(
+    'Sealed Vault',
+    tuple(((q, r), 'marsh' if (q, r) in _VAULT_MARSH else 'hills' if (q, r) in _VAULT_HILLS else 'plains')
+          for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3),
+    ((-2, 0), (-2, -1), (-3, 1), (-1, -1), (-2, 1), (-3, 0), (-3, 2)),
+    ((2, -1), (-3, 3), (2, 1), (0, -1), (3, -3), (2, 0), (3, -1)),
+    exits=((3, -1),),
+)
+ENCOUNTERS['vault_unsealed'] = replace(ENCOUNTERS['vault_crossfire'], exits=((3, -1), (-1, 3)))
