@@ -6,6 +6,7 @@ from functools import cache
 import json
 import os
 from pathlib import Path
+import re
 import sys
 from tempfile import TemporaryDirectory
 
@@ -106,8 +107,9 @@ def check_transition(scene):
                 assert RELICS[item].description in texts
     elif scene.step == 'ending' and scene.prose_pages == 1:
         for record in state.campaign.completed:
-            assert any(f'{record.turns} turns · Hero level {record.hero_level}' in text and
-                       f'{record.casualties} troops lost · {len(record.garrison)} left as garrison' in text for text in texts)
+            assert any(re.fullmatch(rf'{record.turns} turns · Hero level {record.hero_level} · '
+                                    rf'{record.casualties} troops? lost · {len(record.garrison)} left as garrison', text)
+                       for text in texts)
         for ident, rank in state.hero.skill_ranks.items():
             assert any(f'{SKILLS[ident].name} {rank}' in text for text in texts)
     # Button text is a single line: verify the full scaled label, not just its hit rectangle.

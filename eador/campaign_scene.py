@@ -299,7 +299,8 @@ class CampaignScene(Screen):
                            'The rival holds Westwatch. This journey ends here; your manual saves remain available.'), 14)
             records = [Column(label(f'{record.stage}. {CONTRACTS[record.contract].title} · {THEMES[record.theme].name}',
                                     22, serif=True, scaled=False, color=TEAL),
-                              label(f'{record.turns} turns · Hero level {record.hero_level} · {record.casualties} troops lost · '
+                              label(f'{record.turns} turns · Hero level {record.hero_level} · '
+                                    f'{record.casualties} {"troop" if record.casualties == 1 else "troops"} lost · '
                                     f'{len(record.garrison)} left as garrison'), spacing=10) for record in campaign.completed]
             build = ', '.join(f'{SKILLS[ident].name} {rank}' for ident, rank in state.hero.skill_ranks.items()) or 'No disciplines learned'
             sections = [intro, *records,

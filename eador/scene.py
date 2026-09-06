@@ -440,7 +440,8 @@ class ShardScene(Screen):
         y = self._summary_bottom + 12
         if s.campaign:
             self.button('Campaign', 644, y, 210, self.campaign_plan, shortcut='J')
-            y = column([label(f'Stage {s.campaign.stage} of 3', 210, size=11, color=MUTED)],
+            y = column([label(f'Stage {s.campaign.stage} of 3', 210, size=11, color=MUTED),
+                        label(s.campaign.objective, 210, size=12, color=GOLD)],
                        210, 644, y + 48) + 12
         else:
             y = column([label('Capture Duskspire', 210, size=14, color=GOLD, serif=True),
