@@ -256,7 +256,7 @@ class CodexScene(Screen):
                                  if definition.objective == 'extract' else
                                  f'Hold the seal for {definition.hold_turns} turns by round {definition.deadline}, or rout all defenders.'
                                  if definition.objective == 'hold' else
-                                 'Rout every defender. No round limit.')
+                                 'Rout every defender before exhaustion after 80 rounds.')
                     description = option.description + ' ' + objective
                     if option.gold_cost or option.crystals_cost:
                         description += " The fee is not refunded after retreat or defeat."

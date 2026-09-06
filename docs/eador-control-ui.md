@@ -97,3 +97,21 @@ changing state, then loads the actual v10 Pinned Crossing fixture. Its legal sho
 through terrain matches the public damage forecast and survives quicksave/load.
 The corrected native journey used 76 inputs and one exact reload. The full suite
 passed 847 tests; the final shorter copy passed all eight roster UI tests.
+
+## Combined native checkpoint — f24586d
+
+After integrating the validated automatic control policy, all eleven native
+scenarios passed: Smoke, actual Pin/Rally, Repulse, paid full-army Watch, saved
+sight rules, both Crossing approaches, both Cache loads and both Vault exits.
+Together they used **1,065 inputs and 40 exact save/reloads**. All recorded
+production hashes still matched after completion. Reports retain full input
+orders and the shared source fingerprint in
+[evidence/shardbound-combined-control-2026-09-06/journeys.json](evidence/shardbound-combined-control-2026-09-06/journeys.json).
+
+The local Mac development app built from that same source passed extracted-
+archive startup, native input, save/load, Codex, settings/restart and audio
+checks. Its manifest is retained beside the journey report. This checkpoint
+still showed 'No round limit' for routs; subsequent review corrected the copy
+to disclose the existing exhaustion retreat after 80 rounds. No combat rule
+changed. The corrected briefing, battle banner and Codex passed 24 focused
+tests and a repeated 22-input/two-reload native briefing check.

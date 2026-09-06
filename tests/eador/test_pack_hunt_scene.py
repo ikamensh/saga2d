@@ -10,8 +10,8 @@ from tools.eador_ui import PlayerInput
 
 
 @pytest.mark.parametrize('number', ['1', '2'])
-def test_pack_approach_briefing_and_codex_describe_rout_without_a_seal_or_deadline(tmp_path, number):
-    """Review/cancel is free; accepting records the visible fee and an untimed rout."""
+def test_pack_approach_briefing_and_codex_describe_rout_and_global_exhaustion(tmp_path, number):
+    """No mission deadline or seal applies; the battle's global exhaustion limit still does."""
     state = prepare_adventure(theme='elderwild')
     march_to(state, (-1, 1))
     if not state.actions_left:
@@ -25,7 +25,7 @@ def test_pack_approach_briefing_and_codex_describe_rout_without_a_seal_or_deadli
         player.press('x'); player.press(number)
         assert isinstance(game.scene, EncounterScene)
         text = ' '.join(item['text'] for item in game.backend.texts)
-        assert 'Rout the defenders' in text and 'No round limit' in text
+        assert 'Rout the defenders' in text and '80 rounds' in text
         assert 'Secure the seal' not in text and '◎ Seal' not in text
         approach = game.scene.approach
         assert state.to_json() == before
@@ -43,6 +43,6 @@ def test_pack_approach_briefing_and_codex_describe_rout_without_a_seal_or_deadli
         while not any('Current attempt' in item['text'] for item in game.backend.texts):
             player.button('Next')
         text = ' '.join(item['text'] for item in game.backend.texts)
-        assert 'No round limit' in text and 'Evacuate' not in text
+        assert '80 rounds' in text and 'Evacuate' not in text
     finally:
         game._teardown()
