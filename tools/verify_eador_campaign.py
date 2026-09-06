@@ -11,28 +11,38 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ['SAGA2D_SILENT'] = '1'
 
 from eador.app import create_game
-from eador.campaign_scene import CampaignScene
+from eador.campaign_scene import CampaignPlanScene, CampaignScene
+from eador.content import RELICS
+from eador.model import State
 from eador.scene import ShardScene, TitleScene
-from tools.eador_campaign import finish_battle
-from tools.eador_linked_campaign import play_stage, travel_selection
+from tools.eador_campaign import play_campaign
+from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
 from tools.eador_ui import PlayerInput
 
 
-def lose_shard(state):
-    """Leave the capital exposed and decline its defenses through ordinary commands."""
-    if state.hero.pos == (-2, 0):
-        if not state.actions_left:
-            state.end_turn()
-        state.travel((-2, 1))
-        if state.battle:
-            finish_battle(state)
-    for _ in range(120):
-        if state.status == 'defeat':
-            return
-        state.end_turn()
-        if state.battle:
-            state.retreat()
-    raise AssertionError('Neglect did not lose the capital')
+def verify_inventory(output, *, backend='pyglet'):
+    """An explicitly prepared, publicly earned eight-relic save tests the mouse page boundary."""
+    state = State.new_campaign(0)
+    route = [state.hero.pos] + [p for p in sorted(state.provinces) if p not in (state.hero.pos, (2, 0))] + [(2, 0)]
+    state = play_campaign(state, route)
+    with TemporaryDirectory(prefix='shardbound-retinue-') as directory:
+        game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
+        player = PlayerInput(game, native=backend == 'pyglet', output=output)
+        try:
+            game.push(ShardScene(state))
+            game.tick(1 / 60)
+            player.button('Choose challenge')
+            player.capture('retinue-page-1')
+            player.button('Next')
+            relic = state.inventory[-1]
+            player.button('Leave · ' + RELICS[relic].name)
+            player.capture('retinue-page-2')
+            player.button('Previous')
+            player.button('Depart for the next shard')
+            assert state.inventory == [relic] and isinstance(game.scene, ShardScene)
+            print(f'Eight earned relics, mouse paging and last-item carryover passed ({backend})', flush=True)
+        finally:
+            game._teardown()
 
 
 def choose_retinue(player):
@@ -62,6 +72,13 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
             player.press('l')
             assert player.state.campaign.stage == 1
             for stage, destination in ((1, middle), (2, finale), (3, None)):
+                before = player.state.to_json()
+                player.press('j')
+                assert isinstance(game.scene, CampaignPlanScene)
+                player.capture(f'stage-{stage}-plan')
+                player.press('1')
+                assert player.state.to_json() == before
+                player.capture(f'stage-{stage}-objectives')
                 if recovery and stage == 2:
                     lose_shard(player.state)
                     assert isinstance(game.scene, CampaignScene) and game.scene.phase == 'recovery'
@@ -101,7 +118,9 @@ def verify(output, *, backend='pyglet', middle='rootward', finale='gate', recove
                 assert set(selected['relic_ids']) == set(player.state.inventory)
                 player.capture(f'stage-{stage + 1}-arrival')
                 player.reload(player.state.to_json())
-            report = dict(backend=backend, middle=middle, finale=finale, recovery=recovery,
+            if finale == 'gate':
+                assert 'The Last Gate' in player.briefings, 'The final ritual was not briefed before committing'
+            report = dict(backend=backend, middle=middle, finale=finale, recovery=recovery, briefings=player.briefings,
                           elapsed_seconds=perf_counter() - started, input_activations=len(player.events),
                           exact_save_reloads=player.reloads, records=records, inputs=player.events)
             (output / 'journey.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -118,5 +137,9 @@ if __name__ == '__main__':
     parser.add_argument('--middle', choices=('rootward', 'foundries'), default='rootward')
     parser.add_argument('--finale', choices=('throne', 'gate'), default='gate')
     parser.add_argument('--recovery', action='store_true')
+    parser.add_argument('--inventory', action='store_true', help='verify mouse pagination using a prepared full-inventory save')
     args = parser.parse_args()
-    verify(args.output, middle=args.middle, finale=args.finale, recovery=args.recovery)
+    if args.inventory:
+        verify_inventory(args.output)
+    else:
+        verify(args.output, middle=args.middle, finale=args.finale, recovery=args.recovery)

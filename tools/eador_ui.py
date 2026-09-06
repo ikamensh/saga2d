@@ -6,12 +6,14 @@ come from the current saved game; every changing command goes through its UI.
 from eador.model import BUILDINGS, RECRUITABLE
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HeroScene, ResultScene, ShardScene
 from eador.encounter_scene import EncounterScene
+from saga2d import Button
 
 
 class PlayerInput:
     def __init__(self, game, *, native=False, output=None):
         self.game, self.native, self.output = game, native, output
         self.events = []
+        self.briefings = []
         self.reloads = 0
         self.state = PlayerState(self)
 
@@ -52,6 +54,12 @@ class PlayerInput:
         if self.native and self.output is not None:
             self.output.mkdir(parents=True, exist_ok=True)
             self.game.backend.capture_frame().save(self.output / f'{name}.png')
+
+    def button(self, label):
+        control = self.game.scene.ui.find(lambda control: isinstance(control, Button) and control.text == label)
+        assert control is not None and control.enabled, f'{type(self.game.scene).__name__} has no enabled {label}'
+        x, y, width, height = control.bounds
+        self.click(x + width / 2, y + height / 2)
 
     def reload(self, expected):
         self.press('f5')
@@ -98,6 +106,7 @@ class PlayerState:
 
     def enter_briefing(self, shortcut):
         if isinstance(self.player.game.scene, EncounterScene):
+            self.player.briefings.append(self.player.game.scene.definition.name)
             before = self.to_json()
             self.player.capture('briefing-' + self.player.game.scene.definition.name.lower().replace(' ', '-'))
             self.player.press('escape')

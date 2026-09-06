@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from saga2d import Button# noqa: E402
 
 from eador.app import create_game# noqa: E402
-from eador.campaign_scene import CampaignScene  # noqa: E402
+from eador.campaign_scene import CampaignPlanScene, CampaignScene  # noqa: E402
 from eador.codex import CodexScene  # noqa: E402
 from eador.encounter_scene import EncounterScene  # noqa: E402
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, RuleError, State  # noqa: E402
@@ -375,6 +375,8 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         press(rng.choice(('left', 'right', 'up', 'down', 'space', 'return', 'escape', 'q', 'f6')))
                     else:
                         press(rng.choice(('return', 'f5', 'f9', 'f6')))
+                elif isinstance(scene, CampaignPlanScene):
+                    press(rng.choice(('1', '2', '3', 'h', 'escape')))
                 elif isinstance(scene, HelpScene):
                     button(rng.choice(('Save & title', 'Codex', 'Settings', 'Return to game', 'Return to game')))
                 elif isinstance(scene, SettingsScene):
@@ -455,7 +457,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(*scene.grid.center(destination))
                         press('return')
                     else:
-                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6', 'c', 'v')))
+                        press(rng.choice(('x', 'e', 'e', 'b', 'r', 'f1', 'h', 'f6', 'c', 'v', 'j')))
 
             random_phase = False
             # Complete a real losing campaign, then use the replay control.
@@ -478,7 +480,8 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         assert isinstance(game.scene, ShardScene) and game.scene.state.turn == 1
                         metrics['replays'] += 1
                         break
-                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene, SettingsScene, EncounterScene)):
+                elif isinstance(scene, (CatalogScene, HelpScene, SaveScene, HeroScene, CodexScene, RivalScene,
+                                        SettingsScene, EncounterScene, CampaignPlanScene)):
                     press('escape')
                 elif isinstance(scene, ChoiceScene):
                     press(str(rng.randrange(len(scene.root.state.choice.options)) + 1))

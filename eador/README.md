@@ -12,6 +12,7 @@ uv sync --extra dev
 uv run python -m eador                       # title and hero selection
 uv run python -m eador --seed 7              # start immediately as Commander
 uv run python -m eador --seed 7 --hero Wizard --theme elderwild
+uv run python -m eador --campaign --seed 7 --hero Commander
 uv run python -m pytest tests/eador -q
 ```
 
@@ -24,6 +25,11 @@ challenge comparison. Learned skills persist, traveling health and mana
 recover, and local holdings and buildings stay behind. A first lost capital
 offers one recovery expedition; another loss ends the run. See the
 [linked campaign guide](../docs/eador-linked-ui.md) for carryover and saves.
+**J** opens your current contract, numbered map objectives, rank limits and
+recovery status. Its numbered **Locate** controls select a required province
+without spending an action. The final ritual's briefing shows the deployment,
+seal, defending army and deadline before you commit the assault. Retinue
+pages also have mouse-accessible **Previous / Next** controls.
 
 `--hero` accepts `Commander`, `Warrior`, `Scout` or `Wizard`; `--theme` accepts
 `frontier`, `elderwild` or `ruins`. With `--seed` they start that world directly;

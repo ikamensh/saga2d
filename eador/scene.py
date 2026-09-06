@@ -39,7 +39,7 @@ class Screen(Scene):
 
     def checkpoint(self, state):
         try:
-            self.saves.autosave(state)
+            self.saves.checkpoint(state)
         except SaveError as error:
             self.message = f"Autosave failed: {error}"
             return False
@@ -253,10 +253,11 @@ class ShardScene(Screen):
         here = self.selected == self.state.hero.pos
         adjacent = self.selected in self.grid.neighbors(self.state.hero.pos)
         can_act = playing and self.state.actions_left > 0
+        blocked = self.selected == (2, 0) and self.state.assault_blocked_reason
         expedition_here = self.state.rival.army and self.selected == self.state.rival.pos
         self.button("Hero is here" if here else "Intercept expedition" if expedition_here else
                     "Travel here" if province.owner == "player" else "Invade province",
-                    x, 423, 300, self.travel, hotkey="Enter", primary=True, enabled=can_act and adjacent)
+                    x, 423, 300, self.travel, hotkey="Enter", primary=True, enabled=can_act and adjacent and not blocked)
         current = self.state.provinces[self.state.hero.pos]
         self.button("Explore current province", x, 473, 300, self.explore, hotkey="X",
                     enabled=can_act and current.owner == "player" and current.site is not None and not current.explored)
@@ -269,6 +270,8 @@ class ShardScene(Screen):
         self.button("Save", self.edge - 177, 30, 72, lambda: self.browse_saves("save"))
         self.button("Load", self.edge - 97, 30, 72, self.browse_saves)
         self.button("Rival plan", self.edge - 185, 180, 160, self.rival_details, shortcut="V")
+        if self.state.campaign:
+            self.button("Campaign", self.edge - 185, 118, 160, self.campaign_plan, shortcut="J")
 
     def get_save_state(self):
         return {"campaign": self.state.to_json()}
@@ -295,6 +298,10 @@ class ShardScene(Screen):
         from eador.rival_scene import RivalScene
         self.game.push(RivalScene(self))
 
+    def campaign_plan(self):
+        from eador.campaign_scene import CampaignPlanScene
+        self.game.push(CampaignPlanScene(self))
+
     def act(self, callback, *, cue="confirm"):
         before = self.state.status
         if self.command(callback, cue=cue):
@@ -304,11 +311,17 @@ class ShardScene(Screen):
             self.follow_state()
 
     def travel(self):
-        self.act(lambda: self.state.travel(self.selected), cue="move")
+        if (self.state.actions_left and self.selected in self.state.grid.neighbors(self.state.hero.pos)
+                and not (self.selected == (2, 0) and self.state.assault_blocked_reason)
+                and self.state.encounter_at(self.selected)):
+            from eador.encounter_scene import EncounterScene
+            self.game.push(EncounterScene(self, self.selected, kind="conquest"))
+        else:
+            self.act(lambda: self.state.travel(self.selected), cue="move")
 
     def explore(self):
         province = self.state.provinces[self.state.hero.pos]
-        if (province.site_kind and SITES[province.site_kind].encounter and not province.explored
+        if (self.state.encounter_at(province.pos, kind="site") and not province.explored
                 and province.owner == "player"):
             from eador.encounter_scene import EncounterScene
             self.game.push(EncounterScene(self))
@@ -399,6 +412,8 @@ class ShardScene(Screen):
             hint = "No hero actions left. End the turn to continue."
         elif self.selected != s.hero.pos and self.selected not in self.grid.neighbors(s.hero.pos):
             hint = "This province is not adjacent to your hero."
+        elif self.selected == (2, 0) and s.assault_blocked_reason:
+            hint = "Assault locked. J shows the required objectives."
         self.text(hint, x, 395, size=11, color=MUTED)
         self.text("YOUR STRONGHOLD", x, 531, size=10, color=MUTED)
         self.text(f"{len(s.buildings)}/{len(BUILDINGS)} buildings  ·  {len(s.hero.army)}/{s.hero.max_army} troops", x, 662, size=11, color=MUTED)
@@ -414,8 +429,17 @@ class ShardScene(Screen):
         if s.rival.army:
             art.expedition(self, self.grid, s.rival.pos, len(s.rival.army))
         art.compass(self, 75, 162)
-        self.text("Capture Duskspire", self.edge - 185, 122, size=13, color=GOLD, serif=True)
-        self.text("Protect Westwatch", self.edge - 185, 146, size=11, color=MUTED)
+        if s.campaign:
+            from eador.campaign_scene import campaign_targets
+            self.text(f'Stage {s.campaign.stage} of 3', self.edge - 185, 161, size=9, color=MUTED)
+            for index, (pos, _, complete) in enumerate(campaign_targets(s)):
+                cx, cy = self.grid.center(pos)
+                cx, cy = cx + self.grid.size * .50, cy + self.grid.size * .05
+                self.draw_circle(cx, cy, 10, INK)
+                self.text(str(index + 1), cx, cy - 8, size=11, color=TEAL if complete else GOLD, center=True)
+        else:
+            self.text("Capture Duskspire", self.edge - 185, 122, size=13, color=GOLD, serif=True)
+            self.text("Protect Westwatch", self.edge - 185, 146, size=11, color=MUTED)
         self.paragraph(rival_order(s), self.edge - 185, 232, width=160, size=11, color=RED)
         self.text("YOUR ARMY", 28, h - 112, size=10, color=MUTED)
         for i, troop in enumerate(s.hero.army):
@@ -523,7 +547,8 @@ class HelpScene(Screen):
             yy = y + 119 + i * 84
             self.text(title, x + 28, yy, size=17, serif=True, color=TEAL)
             self.paragraph(body, x + 28, yy + 28, width=624, size=12)
-        self.text("F5 quicksave  /  F9 quickload  /  F6 save slots  /  Capture Duskspire to win", x + 28, y + 459, size=11, color=GOLD)
+        objective = "J campaign objectives" if self.root.state.campaign else "Capture Duskspire to win"
+        self.text("F5 quicksave  /  F9 quickload  /  F6 save slots  /  " + objective, x + 28, y + 459, size=11, color=GOLD)
 
 
 class BattleScene(Screen):
@@ -1062,7 +1087,9 @@ class HeroScene(Screen):
             top = y + 260 + i * 75
             self.text(RELICS[relic].name, x + 28, top, size=15, color=TEAL if hero.relic == relic else TEXT)
             self.paragraph(RELICS[relic].description, x + 28, top + 25, width=586, size=11)
-        self.paragraph(self.message or "Find relics in adventure sites. Change equipment between battles.",
+        self.paragraph(self.message or (f'Rank limits: hero {s.hero_level_cap}, troops {s.troop_level_cap}. XP pauses at the limit. '
+                                       'Change equipment between battles.' if s.campaign else
+                                       "Find relics in adventure sites. Change equipment between battles."),
                        x + 28, y + 557, width=744, size=10, color=GOLD if self.message else MUTED)
         self.text(f"{self.page + 1} / {self.pages}", x + 332, y + 602, size=12, color=MUTED)
 
@@ -1113,8 +1140,9 @@ class ResultScene(Screen):
             standing = sum(u.hp > 0 for u in b.units if u.team == "player")
             lost = sum(u.hp == 0 for u in b.units if u.team == "player" and u.id != 0)
             detail = f"{standing} standing  ·  {lost} troops lost  ·  {b.round} battle rounds"
-            subtitle = ("Surviving defenders withdraw. Claim the site's reward." if b.outcome_reason == "hold" else
-                        "The seal was not secured. Withdraw without a site reward." if b.outcome_reason == "deadline" else
+            subtitle = (("Surviving defenders withdraw. Claim the site's reward." if s.battle_kind == "site" else
+                         "The defenders withdraw. Duskspire and its seal are yours.") if b.outcome_reason == "hold" else
+                        "The seal was not secured. The defenders retain their ground." if b.outcome_reason == "deadline" else
                         "Survivors carry their wounds and experience home.")
         else:
             title = "The shard is yours" if s.status == "victory" else "Westwatch has fallen"
