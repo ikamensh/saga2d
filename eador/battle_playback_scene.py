@@ -1,0 +1,181 @@
+"""Bounded, skippable viewing of a turn whose authoritative rules already resolved."""
+from dataclasses import asdict, replace
+import math
+
+from saga2d import Column, Label
+
+from eador.battle import Battle, SmokeCloud
+from eador.preferences import reading_scale, reduced_motion
+from eador.scene import BattleScene, Screen
+from eador.style import BLUE, GOLD, MUTED, TEAL, TEXT
+
+
+class BattlePlayback:
+    """An isolated visual battle plus a clock; never writes to its source battle."""
+    MAX_SECONDS = 8.0
+
+    def __init__(self, battle, trace):
+        self.trace = trace
+        self.view = Battle.from_dict(battle.to_dict())
+        self.view.log = []
+        self.index = 0
+        self.elapsed = 0.0
+        self.duration = min(.8, self.MAX_SECONDS / len(trace.events))
+        self._apply(trace.before)
+
+    @property
+    def done(self):
+        return self.index >= len(self.trace.events)
+
+    @property
+    def event(self):
+        return self.trace.events[min(self.index, len(self.trace.events) - 1)]
+
+    @property
+    def fraction(self):
+        return min(1.0, self.elapsed / self.duration)
+
+    @property
+    def applied(self):
+        return self.fraction >= .5
+
+    def _apply(self, frame):
+        self.view.units = [replace(self.view.unit(unit.id), **asdict(unit)) for unit in frame.units]
+        self.view.mana, self.view.round = frame.mana, frame.round
+        self.view.objective.progress = frame.progress
+        self.view.outcome, self.view.outcome_reason = frame.outcome, frame.outcome_reason
+        self.view.smoke_clouds = [SmokeCloud(*cloud) for cloud in frame.smoke]
+
+    def advance(self, dt):
+        self.elapsed += dt
+        while not self.done and self.elapsed >= self.duration:
+            self.elapsed -= self.duration
+            self.index += 1
+        self._apply(self.trace.after if self.done else self.event.after if self.applied else self.event.before)
+        completed = len(self.trace.events) if self.done else self.index + self.applied
+        self.view.log = [event.text for event in self.trace.events[:completed]]
+
+    def position(self, unit, grid, *, still=False):
+        event = self.event
+        moved = event.before.unit(unit.id).pos != event.after.unit(unit.id).pos
+        if still or self.done or not moved:
+            return grid.center(unit.pos)
+        path = event.path if event.kind == 'move' and unit.id == event.actor_id else (
+            event.before.unit(unit.id).pos, event.after.unit(unit.id).pos)
+        progress = self.fraction * (len(path) - 1)
+        segment = min(int(progress), len(path) - 2)
+        amount = progress - segment
+        a, b = grid.center(path[segment]), grid.center(path[segment + 1])
+        x, y = a[0] + (b[0] - a[0]) * amount, a[1] + (b[1] - a[1]) * amount
+        if unit.can_fly:
+            y -= math.sin(self.fraction * math.pi) * 10
+        return x, y
+
+
+class BattlePlaybackScene(BattleScene):
+    """Reuse the battle HUD in a modal scene that owns all playback input."""
+    controls = {'space': 'finish', 'return': 'finish', 'escape': 'finish',
+                'f5': 'save_game', 'f9': 'load_game', 'f6': 'browse_saves',
+                'f1': 'help', 'f2': 'open_text_settings'}
+    accepts_orders = False
+
+    def __init__(self, parent, trace):
+        self.parent = parent
+        self.playback = BattlePlayback(parent.battle, trace)
+        self.finished = False
+        super().__init__(parent.root)
+        self.selected = parent.selected
+        self.message = parent.message
+        self._shown = None
+
+    @property
+    def battle(self):
+        return self.playback.view
+
+    def on_enter(self):
+        Screen.on_enter(self)
+        self._announce()
+
+    def _phase_button(self, x, y):
+        self.button('Finish playback', x, y, 300, self.finish, hotkey='Space', primary=True)
+
+    def _command_content(self):
+        scale = reading_scale(self.game) / 100
+        def label(text, size=12, color=MUTED):
+            return Label(text, width=300, wrap=True, font='Verdana', font_size=round(size * scale), text_color=color)
+        event = self.playback.event
+        lines = [label(f'Action {self.playback.index + 1} of {len(self.playback.trace.events)}', color=GOLD),
+                 label(event.text, 15, TEXT)]
+        if event.actor_id is not None:
+            unit = self.battle.unit(event.actor_id)
+            lines.append(label(f'{unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL))
+        lines.extend([label('Watch each move, ability and reaction in order.'),
+                      label('Space, Enter or Esc finishes playback. Battle orders resume afterward.'),
+                      label('Saves record the resolved turn. Loading resumes after these actions.', 11)])
+        return Column(*lines, spacing=18)
+
+    def order_hint(self):
+        return 'Watching resolved actions. Space finishes playback; L opens the complete battle log.'
+
+    def action_targets(self):
+        return []
+
+    def act(self, callback, **options):
+        """The modal owns input; no battle command is accepted during playback."""
+        return None
+
+    def handle_input(self, event):
+        return False
+
+    def read_log(self):
+        self.parent.read_log()
+
+    def _unit_center(self, unit):
+        return self.playback.position(unit, self.grid, still=reduced_motion(self.game))
+
+    def _announce(self):
+        shown = self.playback.index, self.playback.applied
+        if shown == self._shown:
+            return
+        event = self.playback.event
+        if self._shown is None or self._shown[0] != shown[0]:
+            cue = {'move': 'move', 'attack': 'attack_hit', 'pin': 'attack_hit',
+                   'brace': 'guard', 'retaliation': 'attack_hit', 'guard': 'guard',
+                   'bolt': 'bolt', 'heal': 'heal', 'rally': 'confirm', 'swap': 'move',
+                   'smoke': 'confirm', 'repulse': 'move'}.get(event.kind)
+            if cue:
+                self.game.audio.play_sound(cue)
+        self.floats = []
+        if self.playback.applied:
+            for unit in event.after.units:
+                amount = unit.hp - event.before.unit(unit.id).hp
+                if amount:
+                    self.floats.append((self.clock, unit.pos, amount))
+        self._shown = shown
+        self.refresh()
+
+    def update(self, dt):
+        self.clock += dt
+        self.playback.advance(dt)
+        if self.playback.done:
+            self.finish()
+            return
+        self._announce()
+        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def draw(self):
+        super().draw()
+        event = self.playback.event
+        for ident, color in ((event.actor_id, GOLD), (event.target_id, BLUE)):
+            if ident is not None:
+                unit = self.battle.unit(ident)
+                x, y = self._unit_center(unit)
+                self.draw_circle(x, y + 8, self.grid.size * .7, (*color[:3], 45))
+                self.draw_circle(x, y + 8, 5, color)
+
+    def finish(self):
+        if not self.finished:
+            self.finished = True
+            self.game.pop()
+            self.parent.finish_phase()

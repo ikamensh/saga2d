@@ -850,6 +850,7 @@ class HelpScene(Screen):
 
 
 class BattleScene(Screen):
+    accepts_orders = True
     unit_orders = {
         'pin': ('Pin', 'P', 'attack_hit', 'Choose an unpinned enemy in sight within 3 hexes.'),
         'swap': ('Swap ally', 'S', 'move', 'Choose an adjacent ally. Both moves are spent; its unspent action remains.'),
@@ -914,8 +915,7 @@ class BattleScene(Screen):
         origin = (self.edge / 2 - (left + right) / 2 * size,
                   (board_top + board_bottom) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
-        self.button("End battle round", x, h - 46, 300, self.end_turn,
-                    hotkey="E", primary=True, enabled=b.outcome is None)
+        self._phase_button(x, h - 46)
         self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
         self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
@@ -998,9 +998,9 @@ class BattleScene(Screen):
         if overflow:
             hint = label('A complete battle message is available below.', width=width - 396, color=GOLD)
         controls = Row(Button('Auto-play one round', width=270, height=40, shortcut='A', on_click=self.auto_round,
-                              enabled=self.battle.outcome is None),
+                              enabled=self.battle.outcome is None and self.accepts_orders),
                        Button('Retreat', width=150, height=40, shortcut='T', style=DANGER,
-                              on_click=self.retreat, enabled=self.battle.outcome is None),
+                              on_click=self.retreat, enabled=self.battle.outcome is None and self.accepts_orders),
                        Button('Battle log', width=170, height=40, shortcut='L', on_click=self.read_log), spacing=12)
         if overflow:
             controls.add(Button('Read message', width=242, height=40, shortcut='M', on_click=self.read_message))
@@ -1038,7 +1038,7 @@ class BattleScene(Screen):
                           color=GOLD, width=width - 336)
             heading = Row(title, Button('Locate exit', width=156, height=40, shortcut='O', on_click=self.locate_objective),
                           Button('Evacuate', width=156, height=40, shortcut='V', on_click=self.evacuate,
-                                 style=PRIMARY, enabled=b.evacuation_blocked_reason is None), spacing=12)
+                                 style=PRIMARY, enabled=b.evacuation_blocked_reason is None and self.accepts_orders), spacing=12)
             detail = 'Hero on an exit, no adjacent foes, unspent hero order; rout also wins.'
         else:
             heading = label('ROUT THE DEFENDERS', size=12, color=GOLD)
@@ -1076,11 +1076,33 @@ class BattleScene(Screen):
                 self.game.audio.play_sound("victory" if self.battle.outcome == "player" else "defeat")
                 self.game.push(ResultScene(self.root, battle=True))
 
+    def _phase_button(self, x, y):
+        self.button("End battle round", x, y, 300, self.end_turn,
+                    hotkey="E", primary=True, enabled=self.battle.outcome is None)
+
+    def play_phase(self, command):
+        from eador.battle_playback_scene import BattlePlaybackScene
+        recorded = []
+        if self.command(lambda: recorded.append(self.battle.trace(command)), cue='end_turn'):
+            self.targeting = None
+            self.checkpoint(self.root.state)
+            self.refresh()
+            if recorded[0].events:
+                self.game.push(BattlePlaybackScene(self, recorded[0]))
+            else:
+                self.finish_phase()
+
+    def finish_phase(self):
+        if self.battle.outcome:
+            set_music(self.game, None)
+            self.game.audio.play_sound('victory' if self.battle.outcome == 'player' else 'defeat')
+            self.game.push(ResultScene(self.root, battle=True))
+
     def end_turn(self):
-        self.act(self.battle.end_turn, checkpoint=True, cue="end_turn")
+        self.play_phase(self.battle.end_turn)
 
     def auto_round(self):
-        self.act(self.battle.auto_turn, checkpoint=True, cue="end_turn")
+        self.play_phase(self.battle.auto_turn)
 
     def guard(self):
         self.act(lambda: self.battle.guard(self.selected), cue="guard")
@@ -1317,6 +1339,9 @@ class BattleScene(Screen):
         if self.battle is not None:
             self.refresh()
 
+    def _unit_center(self, unit):
+        return self.grid.center(unit.pos)
+
     def draw(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
@@ -1331,7 +1356,7 @@ class BattleScene(Screen):
         self.text("COMMAND", x, 30, size=10, color=GOLD)
         selected = b.unit(self.selected) if self.selected is not None else None
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
-        reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting else set()
+        reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting and self.accepts_orders else set()
         targets = {u.id for u in self.action_targets()} if b.outcome is None else set()
         rally_reachable = b.rally_preview(selected.id, hovered.id).reachable if (
             self.targeting == 'rally' and hovered and hovered.id in targets) else set()
@@ -1376,7 +1401,7 @@ class BattleScene(Screen):
             if pos == self.hover:
                 art.outline(self, points, GOLD, 2)
         for u in sorted((u for u in b.units if u.hp > 0), key=lambda u: self.grid.center(u.pos)[1]):
-            cx, cy = self.grid.center(u.pos)
+            cx, cy = self._unit_center(u)
             if u.id in targets:
                 self.draw_circle(cx, cy + 7, 25, TEAL if self.targeting in ('heal', 'swap', 'rally') else RED)
             art.piece(self, cx, cy - 1, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, self.grid.size / 43),
