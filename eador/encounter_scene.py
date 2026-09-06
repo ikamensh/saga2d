@@ -153,7 +153,8 @@ class EncounterScene(Screen):
             if 'militia' in self.guards:
                 advice.append("Militia clears adjacent allies' Pin.")
             if 'skyrider' in self.guards:
-                advice.append('Skyrider crosses occupied cells; deny its landing or remove support.')
+                advice.append('Skyrider crosses occupied cells; deny its landing' +
+                              (' or remove support.' if 'militia' in self.guards else '.'))
             hold_advice = ' '.join(advice) or 'The surviving defenders shown keep their wounds in either approach.'
         carrier = 'Your hero carries the cargo. Reach an exit with an unspent hero action, then choose Evacuate.'
         if self.province.site_kind == 'stranded_explorer':
