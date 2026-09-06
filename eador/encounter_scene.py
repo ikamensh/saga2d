@@ -158,10 +158,8 @@ class EncounterScene(Screen):
             hold_advice = ' '.join(advice) or 'The surviving defenders shown keep their wounds in either approach.'
         carrier = 'Your hero carries the cargo. Reach an exit with an unspent hero action, then choose Evacuate.'
         extraction_advice = 'A Warden can deliver an unspent hero. Attacking, casting or Guarding prevents evacuation this turn.'
-        if self.province.site_kind == 'runebound_causeway':
-            extraction_advice += (' Rune Adept has one Repulse charge: finish it, Guard/Brace, or fill its push landing.'
-                                  if 'adept' in self.guards else
-                                  ' The dead caster stays absent; the surviving guards keep their wounds.')
+        if self.province.site_kind == 'runebound_causeway' and 'adept' in self.guards:
+            extraction_advice += ' Rune Adept has one Repulse charge: finish it, Guard/Brace, or fill its push landing.'
         if self.province.site_kind == 'stranded_explorer':
             isolated = [f'{UNITS[troop.kind].name} (army slot {index})'
                         for index, (troop, pos) in enumerate(zip(self.root.state.hero.army, definition.player_positions[1:]), 1)
