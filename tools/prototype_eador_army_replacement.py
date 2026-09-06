@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import BUILDINGS, RECRUITABLE, RuleError, State, UNITS
 from tools.audit_eador_difficulty import DifficultyTrial
+from tools.cpu_budget import CpuBudget
 
 
 def prototype_replace(state, outgoing_id, kind):
@@ -74,7 +75,8 @@ def snapshot(state):
                 rival=asdict(state.rival))
 
 
-def exercise(payload, kind=None, *, rest=False, pursuit=False, reload_rounds=True):
+def exercise(payload, kind=None, *, rest=False, pursuit=False, reload_rounds=True, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     state = State.from_json(json.dumps(payload))
     operations = [dict(command='load retained paid state', state=snapshot(state))]
     replacement = None
@@ -83,10 +85,12 @@ def exercise(payload, kind=None, *, rest=False, pursuit=False, reload_rounds=Tru
         state = State.from_json(state.to_json())
         operations.append(dict(command='PROTOTYPE replace', quote=replacement, state=snapshot(state)))
     if rest or not state.actions_left:
+        budget.checkpoint()
         state.end_turn()
         assert state.battle is None, 'The disclosed local waiting branch changed.'
         operations.append(dict(command='end_turn', state=snapshot(state)))
     target = state.rival.pos if pursuit else (2, 0)
+    budget.checkpoint()
     state.travel(target)
     assert state.battle is not None
     operations.append(dict(command='travel', target=target, state=snapshot(state)))
@@ -95,6 +99,7 @@ def exercise(payload, kind=None, *, rest=False, pursuit=False, reload_rounds=Tru
     initial_ids = {troop.id for troop in state.hero.army}
     rounds = []
     for _ in range(80):
+        budget.checkpoint()
         battle = state.battle
         if battle.outcome:
             break
@@ -113,10 +118,12 @@ def exercise(payload, kind=None, *, rest=False, pursuit=False, reload_rounds=Tru
                 if unit.team == 'player' and unit.id != 0 and unit.hp == 0]
     state.resolve_battle()
     while state.choice:
+        budget.checkpoint()
         state.choose(state.choice.options[0].id)
     assert initial_ids - {troop.id for troop in state.hero.army} == set(dead_ids)
     encoded = state.to_json()
     assert State.from_json(encoded).to_json() == encoded
+    budget.checkpoint()
     return dict(replacement=replacement, rest_requested=rest,
                 operations=operations, battle_kind=battle_kind,
                 initial_battle=initial_battle, rounds=rounds, final_battle=final_battle,
@@ -154,7 +161,8 @@ class GoldLedger(State):
         return self.record('choice.' + self.choice.kind, super().choose, option)
 
 
-def investment_observation(payload):
+def investment_observation(payload, *, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     full = State.from_json(json.dumps(payload))
     before = full.to_json()
     try:
@@ -166,6 +174,7 @@ def investment_observation(payload):
     assert full.to_json() == before
     missing = []
     for kind in BUILDINGS:
+        budget.checkpoint()
         if kind not in full.buildings:
             missing.append(dict(kind=kind, gold=BUILDINGS[kind].cost, crystals=BUILDINGS[kind].crystals))
             full.build(kind)
@@ -175,15 +184,16 @@ def investment_observation(payload):
     full.end_turn()
     after_waiting = snapshot(full)
     case = (0, 'Commander', 'frontier', 'economy', 'standard', 'direct')
-    trial = DifficultyTrial(*case)
+    trial = DifficultyTrial(*case, budget=budget)
     trial.state = GoldLedger.from_json(trial.state.to_json())
     start_gold = trial.state.gold
     result = trial.run()
-    assert result == DifficultyTrial(*case).run(), 'Observing gold changed the paid policy.'
+    assert result == DifficultyTrial(*case, budget=budget).run(), 'Observing gold changed the paid policy.'
     totals = Counter()
     for event in trial.state.ledger:
         totals[event['command'].split('.')[0]] += event['delta']
     assert start_gold + sum(totals.values()) == trial.state.gold
+    budget.checkpoint()
     return dict(full_army_rejection=rejection, missing_buildings_bought=missing,
                 after_buildings=after_building, after_one_wait=after_waiting, role_quotes=quotes,
                 ledger_case=case, ledger_start_gold=start_gold, ledger=trial.state.ledger,
@@ -194,15 +204,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--examples', type=Path, default=ROOT / 'docs/evidence/crystal-service-comparison.examples.json')
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/army-replacement-prototype.json.gz')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     args = parser.parse_args()
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     examples = json.loads(args.examples.read_text())
     complete_camp = State.from_json(json.dumps(examples['late_full_roster']['state']))
     for building in ('archery', 'mage_tower'):
+        budget.checkpoint()
         complete_camp.build(building)
     examples['late_all_buildings'] = dict(state=json.loads(complete_camp.to_json()))
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__),
                       *[ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                                                         'stress_eador_control.py', 'eador_campaign.py')]])
+                                                         'stress_eador_control.py', 'eador_campaign.py', 'cpu_budget.py')]])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     runs = {}
     for name, variants in {
@@ -215,7 +232,7 @@ def main():
     }.items():
         runs[name] = []
         for kind, rest in variants:
-            options = dict(rest=rest, pursuit=name == 'pursuit_last_action')
+            options = dict(rest=rest, pursuit=name == 'pursuit_last_action', budget=budget)
             run = exercise(examples[name]['state'], kind, **options)
             # Real saves after every tactical round continue exactly like no reloads.
             assert run == exercise(examples[name]['state'], kind, reload_rounds=False, **options)
@@ -236,17 +253,19 @@ def main():
                                       for unit in data['units'] if unit['team'] == 'enemy']
                 assert enemy(actual) == enemy(baseline)
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+                  cpu_percent=budget.percent,
                   source_sha256=hashes, examples_sha256=hashlib.sha256(args.examples.read_bytes()).hexdigest(),
                   policy='NON-PRODUCTION normal-price, one-action replacement of troop 1 in its original formation slot; '
                          'fresh rank/XP/ID, no refund or reserve. Subsequent real orders and explicit auto battle. '
                          'Every-round saved continuation compared exactly to an uninterrupted duplicate.',
                   derived_input=dict(source='late_full_roster', commands=[['build', 'archery'], ['build', 'mage_tower']],
                                      state=examples['late_all_buildings']['state']),
-                  investment=investment_observation(examples['late_full_roster']['state']), runs=runs)
+                  investment=investment_observation(examples['late_full_roster']['state'], budget=budget), runs=runs)
     assert all(hashlib.sha256(p.read_bytes()).hexdigest() == hashes[str(p.relative_to(ROOT))] for p in sources)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     encoded = (json.dumps(report, indent=2, sort_keys=True) + '\n').encode()
     args.report.write_bytes(gzip.compress(encoded, mtime=0) if args.report.suffix == '.gz' else encoded)
+    budget.checkpoint()
 
 
 if __name__ == '__main__':

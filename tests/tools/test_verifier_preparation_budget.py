@@ -2,6 +2,7 @@
 
 import gzip
 import json
+from pathlib import Path
 
 import pytest
 
@@ -140,3 +141,25 @@ def test_verifier_closes_both_actual_mock_backends_after_its_input_journey(name,
     verify(tmp_path, backend='mock')
     assert len(backends) == 2
     assert all(not backend.is_running for backend in backends)
+
+
+def test_replacement_prototype_battle_and_investment_each_yield_without_changing_results(clock):
+    """One retained battle and the bounded paid ledger comparison preserve outcomes while yielding independently."""
+    from tools.prototype_eador_army_replacement import exercise, investment_observation
+
+    examples = Path(__file__).resolve().parents[2] / 'docs/evidence/crystal-service-comparison.examples.json'
+    payload = json.loads(examples.read_text())['late_full_roster']['state']
+    before = json.dumps(payload, sort_keys=True)
+    expected = exercise(payload, budget=CpuBudget(100))
+    assert not clock['sleeps']
+    actual = exercise(payload)
+    assert clock['sleeps'], 'The prototype battle loop itself must yield'
+    assert actual == expected and actual['rounds']
+
+    clock['sleeps'].clear()
+    expected = investment_observation(payload, budget=CpuBudget(100))
+    assert not clock['sleeps']
+    actual = investment_observation(payload)
+    assert clock['sleeps'], 'The paid observed/baseline campaign comparison must yield'
+    assert actual == expected and actual['ledger']
+    assert json.dumps(payload, sort_keys=True) == before
