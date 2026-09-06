@@ -814,7 +814,7 @@ class HelpScene(Screen):
         sections = (
             ("01   Establish your foothold", "Build a barracks or marketplace. Recruit in your territory. Troops cost upkeep; provinces provide income."),
             ("02   March and explore", "Select a neighboring province, then Invade. Travel and exploration spend hero actions. Explore owned provinces for treasure and experience."),
-            ("03   Command the battle", "Select, move, then attack. G Guards; Pikemen Brace. Terrain grants cover. Spells spend shared mana and the caster's order."),
+            ("03   Command the battle", "Select a unit, move, then attack. A surviving adjacent defender can retaliate once a round. Read Deal / Take; Tab selects units. G Guards; Pikemen Brace. Spells use shared mana and the caster's order."),
             ("04   Grow and counterattack", "Win battles for skills; H equips relics. A Mage Tower unlocks H → I: spend crystals and an action for mana. V shows rival orders; strike while it rebuilds."),
         )
         blocks = [Column(
@@ -1289,6 +1289,15 @@ class BattleScene(Screen):
             labels.append(Label(text, width=300, wrap=True, font='Verdana',
                                 font_size=round(size * scale), text_color=color))
 
+        def casualties(attacker, target, damage, reaction):
+            if reaction >= attacker.hp:
+                loss = ' Battle lost.' if attacker.id == b.hero_id else ''
+                another = any(u.alive and u.team == attacker.team and u.id != attacker.id and not u.acted for u in b.units)
+                hint = 'Tab selects another unit.' if another else 'Choose another order.'
+                line(f'{attacker.name} falls.{loss} {hint}', size=11, color=RED)
+            if damage >= target.hp:
+                line(f'{target.name} defeated.', size=11, color=TEAL)
+
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)
         if self.targeting == 'smoke':
             legal = self.hover in b.smoke_targets(self.selected)
@@ -1297,11 +1306,14 @@ class BattleScene(Screen):
         elif hovered:
             line(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", size=13, color=GOLD)
             pin_target = selected and self.targeting == "pin" and hovered in b.pin_targets(selected.id)
+            pin_survives = False
             caster = b.unit(self.heal_caster if self.targeting == 'heal' else 0) if self.targeting in ('bolt', 'heal') else selected
             sight_blocked = caster and (self.targeting in ('bolt', 'heal', 'pin') or caster.attack_range > 1) and not b.has_sight(caster.pos, hovered.pos)
             if pin_target:
                 damage, retaliation = b.pin_preview(selected.id, hovered.id)
                 line(f"Pin {damage}  /  Take {retaliation}", size=12, color=RED)
+                casualties(selected, hovered, damage, retaliation)
+                pin_survives = damage < hovered.hp
             elif self.targeting in ('bolt', 'heal') and hovered in self.action_targets():
                 amount = b.spell_preview(self.targeting, hovered.id, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
                 line(f'Restore {amount} HP' if self.targeting == 'heal' else f'Deal {amount} HP damage', size=12, color=TEAL if self.targeting == 'heal' else RED)
@@ -1316,6 +1328,7 @@ class BattleScene(Screen):
             elif selected and not self.targeting and hovered in b.targets(selected.id):
                 damage, retaliation = b.preview(selected.id, hovered.id)
                 line(f"Deal {damage}  /  Take {retaliation}", size=12, color=RED)
+                casualties(selected, hovered, damage, retaliation)
             elif sight_blocked:
                 line('Sight blocked', size=12, color=GOLD)
             else:
@@ -1325,7 +1338,7 @@ class BattleScene(Screen):
                       'One charge; target keeps its orders.' if self.targeting == 'repulse' else
                       'Forest and smoke block ranged orders.' if sight_blocked else
                       f'{b.spell_cost(self.targeting)} shared mana · caster spends its order.' if self.targeting in ('bolt', 'heal') else
-                      f"Next turn: Move {max(1, hovered.move_range - 2 - hovered.cargo_penalty)} · may still attack." if pin_target else
+                      f"Next turn: Move {max(1, hovered.move_range - 2 - hovered.cargo_penalty)} · may still attack." if pin_survives else
                       f"Pinned: Move {hovered.effective_move_range} · may still attack." if hovered.pinned else
                       "Brace strikes first against melee." if hovered.stance == "brace" else
                       'Smoke clears before its team’s next turn.' if hovered.pos in {cloud.pos for cloud in b.smoke_clouds} else
