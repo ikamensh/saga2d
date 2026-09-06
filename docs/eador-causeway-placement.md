@@ -166,5 +166,11 @@ the authored pattern count alone will not close G05 or the release criteria.
 
 Run `uv run python tools/audit_eador_causeway_placement.py` to reproduce the
 1,000-seed source audit and sixteen actual-arrival tactical comparisons. The
-default compressed report is `/tmp/causeway-placement.json.gz`; its retained
-source attribution is recorded with the final evidence commit.
+default compressed report is `/tmp/causeway-placement.json.gz`. The
+[retained report](evidence/causeway-placement-2026-09-06.json.gz) records source
+`2749a725b2f6f64e47d5f5de4c1339e0fc165996`, 45 hashes matched to that Git
+revision, 1,000 witnesses, 82 public travel-command/reloads and 650 tactical
+order/reloads across sixteen comparisons. The gzip is 186,009 bytes, SHA-256
+`0111c8a68ce1d80fe517c6a119bffe01dbaa0d55ac5594b6b485d61baa84c442`.
+The audit, original prototype regressions and 78 existing public
+Guard/control/extraction tests pass. No game source changed during measurement.
