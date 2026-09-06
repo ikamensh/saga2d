@@ -41,3 +41,7 @@ then compares full state JSON after keyboard/mouse Locate actions. It also
 checks Settings Cancel/Apply/restart and an exact save/load after closing.
 This verifies the rival reading slice toward G10; map and tactical HUD text
 are outside it. These checks do not establish AI strength or campaign balance.
+
+[Retained evidence](evidence/shardbound-rival-reading-2026-09-06/README.md) contains
+the source-attributed matrix, six inspected native frames and exact full-suite,
+fuzz and integrated rival-journey results.
