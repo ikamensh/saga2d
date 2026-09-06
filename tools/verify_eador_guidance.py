@@ -45,8 +45,9 @@ def prepared_briefings():
     from tools.eador_vault_campaign import prepare_vault
     from tools.eador_screen_campaign import prepare_screen
     from tools.eador_aerie_campaign import prepare_aerie, aerie_failed_sortie
+    from tools.eador_relief_campaign import prepare_relief
 
-    cases = [('crossing', prepare_adventure(), None),
+    cases = [('relief', prepare_relief(), None), ('crossing', prepare_adventure(), None),
              ('cache', prepare_adventure(theme='elderwild'), None),
              ('vault', prepare_vault(), None), ('hunt', prepare_pack_hunt(), None),
              ('observatory', prepare_observatory(), None),

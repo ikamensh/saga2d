@@ -1,0 +1,7 @@
+Relief forward/standard passed (pyglet): 158 inputs, 8 reloads
+Relief western/standard passed (pyglet): 222 inputs, 13 reloads
+Relief scout/standard passed (pyglet): 134 inputs, 8 reloads
+Relief passive/standard passed (pyglet): 153 inputs, 8 reloads
+Relief failed-retry/standard passed (pyglet): 236 inputs, 18 reloads
+Relief forward/accessible passed (pyglet): 150 inputs, 8 reloads
+Relief forward/challenge passed (pyglet): 149 inputs, 8 reloads

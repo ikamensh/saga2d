@@ -21,3 +21,15 @@ def expected_rootward_arrival(recorded):
     expected['provinces'] = provinces
     expected['campaign']['entry']['provinces'] = deepcopy(provinces)
     return expected
+
+
+def expected_fresh_replay(recorded):
+    """Replay starts a newly generated shard but retains its recorded difficulty parameters."""
+    assert recorded['turn'] == 1 and recorded['theme'] == 'frontier'
+    expected = deepcopy(recorded)
+    provinces = json.loads(json.dumps([asdict(p) for p in generate(recorded['seed'], recorded['theme']).values()]))
+    expected['provinces'] = provinces
+    if expected['campaign'] is not None:
+        assert expected['campaign']['stage'] == 1 and expected['campaign']['phase'] == 'playing'
+        expected['campaign']['entry']['provinces'] = deepcopy(provinces)
+    return expected

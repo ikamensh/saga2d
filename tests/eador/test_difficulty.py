@@ -7,7 +7,7 @@ import pytest
 from eador.model import State
 from tools.eador_campaign import finish_battle
 from tools.eador_linked_campaign import travel_selection
-from tools.eador_save_expectations import expected_rootward_arrival
+from tools.eador_save_expectations import expected_rootward_arrival, expected_fresh_replay
 
 
 def without_difficulty_metadata(state):
@@ -123,6 +123,8 @@ def test_actual_challenge1_saves_keep_exact_rest_replay_arrival_and_recovery(nam
     else:
         state.end_turn()
     expected_after = expected_rootward_arrival(case['after']) if name == 'advance' else case['after']
+    if name.endswith('replay'):
+        expected_after = expected_fresh_replay(expected_after)
     assert json.loads(state.to_json()) == expected_after
 
 

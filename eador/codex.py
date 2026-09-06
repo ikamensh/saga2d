@@ -299,10 +299,25 @@ class CodexScene(Screen):
                           f"Your rank: {state.hero.skill_ranks.get(kind, 0)}", spec.description)
                     for kind, spec in SKILLS.items()]
         if category == "Sites":
+            def reward_text(gold, crystals, relic):
+                return f"{gold} gold / {crystals} crystal{'s' if crystals != 1 else ''}" + (f" / {RELICS[relic].name}" if relic else "")
+
             entries = []
             for kind, spec in SITES.items():
-                entries.append(_Entry(spec.name, f"Base reward: {spec.gold} gold · {spec.crystals} "
-                                      f"{'crystal' if spec.crystals == 1 else 'crystals'} · {RELICS[spec.relic].name}",
+                variable = kind == 'relief_column'
+                base = (spec.gold, spec.crystals, spec.relic)
+                if variable:
+                    recorded = next((p for p in state.provinces.values() if p.site_kind == kind), None)
+                    if recorded:
+                        base = (recorded.site_gold, recorded.site_crystals, recorded.site_relic)
+                        base_facts = 'Recorded reward: ' + reward_text(*base)
+                    else:
+                        base_facts = 'Reward varies by shard; no Relief source is recorded here.'
+                else:
+                    base_facts = (f"Base reward: {spec.gold} gold · {spec.crystals} "
+                                  f"{'crystal' if spec.crystals == 1 else 'crystals'}" +
+                                  (f" · {RELICS[spec.relic].name}" if spec.relic else ''))
+                entries.append(_Entry(spec.name, base_facts,
                                       f"{spec.description} Base guardians: " + ", ".join(
                                           f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items()) + "."))
                 for option in spec.approaches:
@@ -310,10 +325,11 @@ class CodexScene(Screen):
                     current = (attempt is not None and state.provinces[state.battle_province].site_kind == kind
                                and attempt.approach == option.id)
                     gold, crystals, relic = ((attempt.gold, attempt.crystals, attempt.relic) if current
-                                             else (spec.gold + option.bonus_gold, spec.crystals, spec.relic))
+                                             else (base[0] + option.bonus_gold, base[1], base[2]))
                     fee = f"{option.gold_cost} gold" + (f" / {option.crystals_cost} crystals" if option.crystals_cost else "")
-                    reward = f"{gold} gold / {crystals} crystal{'s' if crystals != 1 else ''}" + (f" / {RELICS[relic].name}" if relic else "")
+                    reward = reward_text(gold, crystals, relic)
                     facts = ((f"Current attempt · Paid at entry: {fee} · Saved reward: {reward}") if current
+                             else f"Entry fee: {fee} · {base_facts}" if variable
                              else f"Entry fee: {fee} · Base reward: {reward}")
                     definition = ENCOUNTERS[option.encounter]
                     objective = (f'Evacuate by round {definition.deadline}, or rout all defenders.'
