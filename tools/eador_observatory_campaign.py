@@ -4,13 +4,13 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders
 
 
-def prepare_observatory(state=None):
+def prepare_observatory(state=None, *, support="sapper"):
     state = State.new(7, 'Commander', theme='ruins') if state is None else state
     state.build('barracks'); state.recruit('warden')
     state.explore(); finish_battle(state)
     for destination in ((-1, -1), (-1, 0)):
         march_to(state, destination); rest(state)
-    for kind in ('sapper', 'healer'):
+    for kind in (support, 'healer'):
         spec = UNITS[kind]
         for _ in range(48):
             assert state.status == 'playing'
@@ -68,5 +68,43 @@ def observatory_route(state, approach, *, orders_type=AdventureOrders):
     # Once Pin expires, a body closes the northern bowman's longer route.
     play.do('move', 5, (1, 0))
     play.do('cast', 'heal', 1); play.do('cast', 'heal', 3, caster_id=6)
+    play.guard_remaining(); play.do('end_turn')
+    return play
+
+
+def observatory_rune_route(state, approach='covered', *, orders_type=AdventureOrders):
+    """The paid Rune retinue stages behind cover, then pushes the final contester away."""
+    state.explore(approach=approach)
+    play = orders_type(state)
+    defenders = {u.pos: u.id for u in play.battle.units if u.team == 'enemy'}
+    guard, east, north, south = (defenders[pos] for pos in ((1, 0), (3, -1), (1, -3), (0, 3)))
+    for uid, pos in ((1, (0, -1)), (0, (-1, 0)), (3, (-1, -1)), (4, (-1, 1)),
+                     (2, (-2, 1)), (5, (-2, 0)), (6, (-1, 2))):
+        play.do('move', uid, pos)
+    play.do('pin', 3, north)
+    play.guard_remaining(); play.do('end_turn')
+    # Clear the occupied hill and the northern marksman before advancing.
+    for uid, pos in ((6, (-2, 2)), (4, (0, 2)), (2, (-1, 1))):
+        play.do('move', uid, pos)
+    for uid in (0, 1, 2):
+        play.do('attack', uid, east)
+    play.do('attack', 3, north); play.do('cast', 'heal', 6, caster_id=6)
+    play.guard_remaining(); play.do('end_turn')
+    # Concentrate on the armoured anchor; the southern bowman remains alive.
+    for uid, pos in ((1, (2, -1)), (2, (1, -1)), (0, (0, 0)), (3, (0, -1)),
+                     (4, (1, 1)), (5, (-1, 0))):
+        play.do('move', uid, pos)
+    for uid in (0, 1, 2, 3, 4, 5):
+        play.do('attack', uid, guard)
+    play.do('move', 6, (-1, 1)); play.do('cast', 'heal', 3, caster_id=6)
+    play.guard_remaining(); play.do('end_turn')
+    play.do('attack', 0, guard)
+    # Free the push destination, then occupy the bowman's direct return paths.
+    for uid, pos in ((4, (2, 0)), (6, (-1, 2)), (5, (-1, 1))):
+        play.do('move', uid, pos)
+    play.do('repulse', 5, south)
+    play.do('move', 2, (0, 1)); play.do('move', 1, (1, 0))
+    play.guard_remaining(); play.do('end_turn')
+    play.do('cast', 'heal', 0)
     play.guard_remaining(); play.do('end_turn')
     return play
