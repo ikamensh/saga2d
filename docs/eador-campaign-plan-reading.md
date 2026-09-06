@@ -37,3 +37,7 @@ uv run python -m pytest tests/eador/test_campaign_plan_reading.py tests/eador/te
 This is a complete current-plan reading slice toward G10, not a claim that
 all campaign screens or the map/battle HUD scale. The matrix verifies layout,
 input and saved progress; it does not assess campaign balance.
+
+[Retained native evidence](evidence/shardbound-campaign-plan-reading-2026-09-06/README.md)
+contains the source-attributed matrix, six inspected screenshots and exact
+full-suite/fuzz outcomes.

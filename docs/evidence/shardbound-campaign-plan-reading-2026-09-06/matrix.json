@@ -1,0 +1,2066 @@
+[
+  {
+    "case": "opening-accessible",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "opening-standard",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "opening-challenge",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "rootward-arrival",
+    "contract": "rootward",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "rootward-watch-cleared",
+    "contract": "rootward",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "gate-arrival",
+    "contract": "gate",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-arrival",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-held-1",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-held-2",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "throne-arrival",
+    "contract": "throne",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-recovery-spent",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "opening-accessible",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "opening-standard",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "opening-challenge",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "rootward-arrival",
+    "contract": "rootward",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "rootward-watch-cleared",
+    "contract": "rootward",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "gate-arrival",
+    "contract": "gate",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-arrival",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-held-1",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-held-2",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "throne-arrival",
+    "contract": "throne",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "foundries-recovery-spent",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      720
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1440
+    ]
+  },
+  {
+    "case": "opening-accessible",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "opening-standard",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "opening-challenge",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "rootward-arrival",
+    "contract": "rootward",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "rootward-watch-cleared",
+    "contract": "rootward",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "gate-arrival",
+    "contract": "gate",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-arrival",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-held-1",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-held-2",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "throne-arrival",
+    "contract": "throne",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-recovery-spent",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "opening-accessible",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "opening-standard",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "opening-challenge",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "rootward-arrival",
+    "contract": "rootward",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "rootward-watch-cleared",
+    "contract": "rootward",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "gate-arrival",
+    "contract": "gate",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-arrival",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-held-1",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-held-2",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "throne-arrival",
+    "contract": "throne",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "foundries-recovery-spent",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1280,
+      800
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      2560,
+      1600
+    ]
+  },
+  {
+    "case": "opening-accessible",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "opening-standard",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "opening-challenge",
+    "contract": "westwatch",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "rootward-arrival",
+    "contract": "rootward",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "rootward-watch-cleared",
+    "contract": "rootward",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "gate-arrival",
+    "contract": "gate",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-arrival",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-held-1",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-held-2",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "throne-arrival",
+    "contract": "throne",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-recovery-spent",
+    "contract": "foundries",
+    "percent": 100,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "opening-accessible",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "opening-standard",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "opening-challenge",
+    "contract": "westwatch",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "rootward-arrival",
+    "contract": "rootward",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "rootward-watch-cleared",
+    "contract": "rootward",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -2
+        ],
+        "Border Watch at Raven Hill",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 14,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "gate-arrival",
+    "contract": "gate",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-arrival",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-held-1",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-held-2",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        true
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        true
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "throne-arrival",
+    "contract": "throne",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 12,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  },
+  {
+    "case": "foundries-recovery-spent",
+    "contract": "foundries",
+    "percent": 125,
+    "window": [
+      1920,
+      1080
+    ],
+    "targets": [
+      [
+        [
+          0,
+          -1
+        ],
+        "North Foundry",
+        false
+      ],
+      [
+        [
+          0,
+          1
+        ],
+        "South Foundry",
+        false
+      ],
+      [
+        [
+          2,
+          0
+        ],
+        "Duskspire",
+        false
+      ]
+    ],
+    "labels": 16,
+    "framebuffer": [
+      3840,
+      2160
+    ]
+  }
+]
