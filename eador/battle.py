@@ -57,6 +57,14 @@ class BattleUnit:
         return 'pin' in self.abilities
 
     @property
+    def can_swap(self) -> bool:
+        return 'swap' in self.abilities
+
+    @property
+    def can_heal(self) -> bool:
+        return 'heal' in self.abilities
+
+    @property
     def can_brace(self) -> bool:
         return self.kind == 'pikeman' or 'brace' in self.abilities
 
@@ -119,7 +127,7 @@ class Battle:
             units.append(BattleUnit(troop.id, 'player', troop.kind, pos, troop.hp,
                                     troop.max_hp, spec.attack + troop.level - 1 + (hero.hero_class == 'Commander'),
                                     spec.defense + (troop.level - 1) // 2,
-                                    spec.move_range, spec.attack_range, level=troop.level, abilities=('pin',) if troop.kind == 'archer' else ()))
+                                    spec.move_range, spec.attack_range, level=troop.level, abilities=spec.abilities, skirmisher=spec.skirmisher))
         health = enemy_hp if enemy_hp is not None else [UNITS[kind].hp for kind in enemies]
         if len(health) != len(enemies):
             raise ValueError('Enemy health must match the enemy army.')
@@ -158,7 +166,7 @@ class Battle:
             if not 0 < hp <= spec.hp:
                 raise ValueError('A combatant must have positive health within its maximum.')
             units.append(BattleUnit(i, team, kind, pos, hp, spec.hp, spec.attack,
-                                    spec.defense, spec.move_range, spec.attack_range, abilities=('pin',) if kind == 'archer' else ()))
+                                    spec.defense, spec.move_range, spec.attack_range, abilities=spec.abilities, skirmisher=spec.skirmisher))
         return units
 
     @classmethod
@@ -247,6 +255,25 @@ class Battle:
         unit.moved = unit.acted = True
         self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
 
+    def swap_targets(self, unit_id: int) -> list[BattleUnit]:
+        """Adjacent living allies a ready Warden may replace, including spent allies."""
+        unit = self.unit(unit_id)
+        if not unit.alive or not unit.can_swap or unit.acted or self.outcome:
+            return []
+        return [other for other in self.units if other.alive and other.team == unit.team
+                and self.grid.distance(unit.pos, other.pos) == 1]
+
+    def swap(self, unit_id: int, target_id: int) -> None:
+        """Exchange places, spending the Warden's order and the ally's remaining move."""
+        self._swap(self._actor(unit_id), self.unit(target_id))
+
+    def _swap(self, unit: BattleUnit, target: BattleUnit) -> None:
+        if target not in self.swap_targets(unit.id):
+            raise RuleError('A ready Warden can swap with an adjacent living ally.')
+        unit.pos, target.pos = target.pos, unit.pos
+        unit.acted = unit.moved = target.moved = True
+        self.log.append(f'{unit.name} swaps places with {target.name}.')
+
     def _damage(self, attacker: BattleUnit, target: BattleUnit, *, pin: bool = False) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
         damage = max(1, attacker.attack - target.effective_defense - cover)
@@ -303,33 +330,51 @@ class Battle:
             raise RuleError('Unknown spell.')
         return self.spell_costs[spell]
 
-    def cast(self, spell: str, target_id: int) -> None:
+    def _caster(self, spell: str, caster_id: int | None) -> BattleUnit:
         if self.hero_id is None:
-            raise RuleError('This army has no spellcasting hero.')
-        hero = self._actor(self.hero_id)
-        if spell not in self.spells or spell not in SPELLS:
-            raise RuleError('That spell has not been learned.')
-        if hero.acted:
-            raise RuleError('Your hero has already acted.')
+            raise RuleError('This army has no spellcasting hero or shared mana.')
+        caster = self._actor(self.hero_id if caster_id is None else caster_id)
+        learned = spell in self.spells if caster.id == self.hero_id else spell == 'heal' and caster.can_heal
+        if spell not in SPELLS or not learned:
+            raise RuleError('That spell has not been learned by this unit.')
+        if caster.acted:
+            raise RuleError('That unit has already acted.')
         if self.mana < self.spell_cost(spell):
             raise RuleError('Not enough mana.')
+        return caster
+
+    def spell_targets(self, spell: str, *, caster_id: int | None = None) -> list[BattleUnit]:
+        """Legal targets for this ready caster, using the army's shared mana pool."""
+        try:
+            caster = self._caster(spell, caster_id)
+        except RuleError:
+            return []
+        return [target for target in self.units if target.alive
+                and HexGrid.distance(caster.pos, target.pos) <= 4
+                and (target.team != caster.team if spell == 'bolt'
+                     else target.team == caster.team and target.hp < target.max_hp)]
+
+    def spell_preview(self, spell: str, target_id: int, *, caster_id: int | None = None) -> int:
+        """Actual health restored or removed by a legal spell, without spending it."""
+        self._caster(spell, caster_id)
         target = self.unit(target_id)
-        if not target.alive or HexGrid.distance(hero.pos, target.pos) > 4:
-            raise RuleError('Choose a living target within 4 hexes.')
-        if spell == 'bolt' and target.team != 'enemy':
-            raise RuleError('Arcane Bolt targets enemies.')
-        if spell == 'heal' and (target.team != 'player' or target.hp == target.max_hp):
-            raise RuleError('Heal targets a wounded ally.')
+        if target not in self.spell_targets(spell, caster_id=caster_id):
+            raise RuleError('Choose a wounded ally for Heal or an enemy for Bolt within 4 hexes.')
+        return min(self.spell_power[spell], target.max_hp - target.hp if spell == 'heal' else target.hp)
+
+    def cast(self, spell: str, target_id: int, *, caster_id: int | None = None) -> None:
+        """Cast with the hero, or let a capable Acolyte spend the same mana on Heal."""
+        caster = self._caster(spell, caster_id)
+        amount = self.spell_preview(spell, target_id, caster_id=caster.id)
+        target = self.unit(target_id)
         self.mana -= self.spell_cost(spell)
-        hero.acted = hero.moved = True
+        caster.acted = caster.moved = True
         if spell == 'bolt':
-            damage = min(target.hp, self.spell_power['bolt'])
-            target.hp -= damage
-            self.log.append(f'Arcane Bolt strikes {target.name} for {damage}.')
+            target.hp -= amount
+            self.log.append(f'Arcane Bolt strikes {target.name} for {amount}.')
         else:
-            healed = min(self.spell_power['heal'], target.max_hp - target.hp)
-            target.hp += healed
-            self.log.append(f'Heal restores {healed} health to {target.name}.')
+            target.hp += amount
+            self.log.append(f'Heal restores {amount} health to {target.name}.')
         self._check_outcome()
 
     def _check_outcome(self) -> None:
@@ -369,6 +414,22 @@ class Battle:
         if destination != unit.pos:
             self._move(unit, destination)
 
+    def _withdraw(self, unit: BattleUnit) -> None:
+        """Mobile ranged troops spend their unused move to reduce immediate exposure."""
+        if self.objective.kind == 'hold' and (unit.team == 'enemy' or unit.pos == self.objective.target):
+            return
+        reachable = self.reachable(unit.id)
+        enemies = [other for other in self.units if other.alive and other.team != unit.team]
+        if not reachable or not enemies:
+            return
+        def exposure(pos):
+            distances = [(other, self.grid.distance(pos, other.pos)) for other in enemies]
+            return (sum(distance <= other.attack_range + other.effective_move_range for other, distance in distances),
+                    -min(distance for _, distance in distances), self.terrain[pos] not in ('forest', 'hills'), pos)
+        destination = min(reachable | {unit.pos}, key=exposure)
+        if destination != unit.pos:
+            self._move(unit, destination)
+
     def _play_team(self, team: str) -> None:
         for unit in self.units:
             if self.outcome:
@@ -384,6 +445,23 @@ class Battle:
                 enemies = [u for u in self.units if u.alive and u.team != team and HexGrid.distance(unit.pos, u.pos) <= 4]
                 if 'bolt' in self.spells and self.mana >= self.spell_cost('bolt') and enemies:
                     self.cast('bolt', min(enemies, key=lambda u: u.hp).id)
+                    continue
+            if unit.can_swap:
+                enemies = [other for other in self.units if other.alive and other.team != team]
+                endangered = [ally for ally in self.swap_targets(unit.id)
+                              if ally.hp * 2 <= ally.max_hp and ally.hp < unit.hp
+                              and any(self.grid.distance(ally.pos, enemy.pos) < self.grid.distance(unit.pos, enemy.pos)
+                                      and self.grid.distance(ally.pos, enemy.pos) <= enemy.attack_range + enemy.effective_move_range
+                                      for enemy in enemies)]
+                if endangered:
+                    self._swap(unit, min(endangered, key=lambda ally: (ally.hp / ally.max_hp, ally.id)))
+                    continue
+            if unit.can_heal:
+                injured = [target for target in self.spell_targets('heal', caster_id=unit.id)
+                           if target.max_hp - target.hp >= 8]
+                if injured:
+                    self.cast('heal', min(injured, key=lambda target: (target.hp / target.max_hp, target.id)).id,
+                              caster_id=unit.id)
                     continue
             defending_seal = team == 'enemy' and self.objective.kind == 'hold'
             if defending_seal:
@@ -420,7 +498,7 @@ class Battle:
                                if ally.alive and ally.team == team)
                 slow_stops_approach = (target.attack_range + max(1, target.move_range - 2) < distance
                                        <= target.attack_range + target.move_range)
-                use_pin = (target in self.pin_targets(unit.id) and slow_stops_approach
+                use_pin = (target in self.pin_targets(unit.id) and (slow_stops_approach or target.kind == 'ranger' and distance > 1)
                            and self.preview(unit.id, target.id)[0] < target.hp
                            and not (defending_seal and target.pos == self.objective.target))
                 if use_pin:
@@ -432,6 +510,8 @@ class Battle:
                     self.attack(unit.id, target.id)
                 else:
                     self._attack(unit, target)
+                if unit.kind == 'ranger':
+                    self._withdraw(unit)
             elif unit.kind == 'pikeman':
                 self._guard(unit)
 
