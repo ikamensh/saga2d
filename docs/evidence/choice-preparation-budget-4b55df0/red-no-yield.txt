@@ -1,0 +1,21 @@
+Retained verbatim output from the pre-fix focused pytest tool call:
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_choice_preparation_yields_and_preserves_every_earned_reward _______
+
+clock = {'cpu': 0.0, 'sleeps': [], 'wall': 0.0}
+
+    def test_choice_preparation_yields_and_preserves_every_earned_reward(clock):
+        """All real hero/theme campaigns earn identical reloadable decisions with the default allowance."""
+        from tools.verify_eador_choices import prepared_choices
+    
+        actual = prepared_choices()
+>       assert clock['sleeps'], 'The default reward preparation must yield'
+E       AssertionError: The default reward preparation must yield
+E       assert []
+
+tests/tools/test_verifier_preparation_budget.py:71: AssertionError
+=========================== short test summary info ============================
+FAILED tests/tools/test_verifier_preparation_budget.py::test_choice_preparation_yields_and_preserves_every_earned_reward
+1 failed in 0.83s
