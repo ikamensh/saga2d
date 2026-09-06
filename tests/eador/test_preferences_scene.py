@@ -256,3 +256,215 @@ def test_title_and_guide_settings_preserve_campaign_and_survive_quickload(tmp_pa
         assert Settings(tmp_path / "settings.json", DEFAULTS)["muted"]
     finally:
         game._teardown()
+
+
+def test_saved_display_applies_once_at_startup_and_scene_load_keeps_os_resize(tmp_path):
+    """Restart restores display preferences without later scene entry undoing an OS resize."""
+    from eador.preferences import reduced_motion, validate_preferences
+
+    prefs = Settings(tmp_path / "settings.json", DEFAULTS, validator=validate_preferences)
+    prefs.update(window_size=[1280, 720], fullscreen=True, reduced_motion=True)
+    prefs.save()
+    game = create_game("Display restart", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        assert game.fullscreen and game.windowed_size == (1280, 720)
+        assert game.resolution == (1280, 800) and reduced_motion(game)
+        game.set_fullscreen(False)
+        game.backend.inject_resize(940, 720)
+        game.tick(1 / 60)
+        load_preferences(game)
+        assert not game.fullscreen and game.window_size == (940, 720)
+        assert reduced_motion(game)
+    finally:
+        game._teardown()
+
+
+@pytest.mark.parametrize("options", [{"visible": False}, {"resolution": (1280, 720)}, {"fullscreen": False}])
+def test_explicit_launch_display_does_not_inherit_saved_fullscreen(tmp_path, options):
+    """Hidden verification windows and explicit launch displays retain their requested mode."""
+    prefs = Settings(tmp_path / "settings.json", DEFAULTS)
+    prefs.update(window_size=[960, 600], fullscreen=True, reduced_motion=True)
+    prefs.save()
+    game = create_game("Controlled display", backend="mock", save_dir=tmp_path / "saves", **options)
+    try:
+        assert not game.fullscreen
+        assert game.window_size == options.get("resolution", (1280, 800))
+        load_preferences(game)
+        assert not game.fullscreen
+        assert prefs["fullscreen"] is True
+    finally:
+        game._teardown()
+
+
+@pytest.mark.parametrize("raw", ['{"window_size": [true, 720]}', '{"window_size": [1280.0, 720]}',
+                                 '{"window_size": [0, 720]}', '{"window_size": [999999999, 720]}',
+                                 '{"window_size": [1280]}', '{"fullscreen": 1}', '{"reduced_motion": 1}'])
+def test_invalid_display_file_stays_intact_and_uses_windowed_defaults(tmp_path, raw):
+    """Malformed display data cannot send invalid native requests or silently overwrite evidence."""
+    path = tmp_path / "settings.json"
+    path.write_text(raw)
+    game = create_game("Invalid display", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        assert load_preferences(game).error
+        assert game.window_size == (1280, 800) and not game.fullscreen
+        assert path.read_text() == raw
+    finally:
+        game._teardown()
+
+
+def test_display_keyboard_preview_cancel_from_fullscreen_restores_os_size(tmp_path):
+    """Tabs share one draft; cancelling fullscreen previews restores the real entry display."""
+    from eador.preferences import reduced_motion
+
+    game = create_game("Display preview", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        game.backend.inject_resize(940, 720)
+        game.tick(1 / 60)
+        game.set_fullscreen(True)
+        underlying = Scene()
+        game.push(underlying)
+        game.push(SettingsScene())
+        press(game, "d")
+        press(game, "right")
+        assert not game.fullscreen and game.windowed_size != (940, 720)
+        press(game, "down")
+        press(game, "right")
+        assert game.fullscreen
+        press(game, "down")
+        press(game, "right")
+        assert reduced_motion(game)
+        press(game, "s")
+        press(game, "left")
+        assert game.audio.get_volume("master") == .7
+        press(game, "escape")
+        assert game.scene is underlying
+        assert game.fullscreen and game.windowed_size == (940, 720)
+        assert not reduced_motion(game) and game.audio.get_volume("master") == .8
+        game.set_fullscreen(False)
+        assert game.window_size == (940, 720) and game.resolution == (1280, 800)
+        assert not (tmp_path / "settings.json").exists()
+    finally:
+        game._teardown()
+
+
+@pytest.mark.parametrize("input_mode", ["keyboard", "mouse"])
+def test_display_apply_and_restart_match_for_mouse_and_keyboard(tmp_path, input_mode):
+    """Both input paths persist the same presentation without changing the logical canvas."""
+    from eador.preferences import reduced_motion
+
+    game = create_game("Display apply", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        underlying = Scene()
+        game.push(underlying)
+        game.push(SettingsScene())
+        game.tick(1 / 60)
+        if input_mode == "keyboard":
+            for key in ("tab", "left", "down", "right", "down", "right", "tab", "left", "return"):
+                press(game, key)
+        else:
+            for label in ("Display", "−", "Go fullscreen", "Reduce motion", "Sound", "−", "Apply"):
+                click_button(game, label)
+        assert game.scene is underlying
+        assert game.fullscreen and game.windowed_size == (1280, 720)
+        assert reduced_motion(game) and game.audio.get_volume("master") == .7
+    finally:
+        game._teardown()
+    restarted = create_game("Display apply", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        assert restarted.fullscreen and restarted.windowed_size == (1280, 720)
+        assert restarted.resolution == (1280, 800)
+        assert reduced_motion(restarted) and restarted.audio.get_volume("master") == .7
+    finally:
+        restarted._teardown()
+
+
+def test_failed_display_apply_keeps_preview_open_then_cancel_restores_entry(tmp_path):
+    """Failed disk writes cannot close Settings or commit fullscreen/motion changes."""
+    from eador.preferences import reduced_motion
+
+    game = create_game("Display failure", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        prefs = load_preferences(game)
+        prefs.save()
+        before = prefs.path.read_bytes()
+        prefs.path.with_suffix(".backup.json").mkdir()
+        game.backend.inject_resize(940, 720)
+        game.tick(1 / 60)
+        game.push(Scene())
+        game.push(SettingsScene())
+        for key in ("d", "right", "down", "right", "down", "right", "return"):
+            press(game, key)
+        assert isinstance(game.scene, SettingsScene) and game.fullscreen and reduced_motion(game)
+        assert "Could not apply" in game.scene.message and prefs.path.read_bytes() == before
+        press(game, "escape")
+        assert not game.fullscreen and game.window_size == (940, 720) and not reduced_motion(game)
+        assert prefs.path.read_bytes() == before
+    finally:
+        game._teardown()
+
+
+def test_display_recovery_retains_corruption_and_cancels_fullscreen_preview(tmp_path):
+    """Damaged display data needs explicit recovery; Cancel restores the entry mode and bytes."""
+    damaged = b'{"fullscreen": "yes"}'
+    path = tmp_path / "settings.json"
+    path.write_bytes(damaged)
+    game = create_game("Display recovery", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        game.backend.inject_resize(940, 720)
+        game.tick(1 / 60)
+        game.set_fullscreen(True)
+        game.push(Scene())
+        for ending in ("escape", "return"):
+            game.push(SettingsScene())
+            press(game, "d")
+            press(game, "r")
+            assert not game.fullscreen and game.window_size == (1280, 800)
+            press(game, ending)
+            if ending == "escape":
+                assert game.fullscreen and game.windowed_size == (940, 720)
+                assert path.read_bytes() == damaged and not list(tmp_path.glob("settings.recovery-*.json"))
+        assert not game.fullscreen and game.window_size == (1280, 800)
+        assert [p.read_bytes() for p in tmp_path.glob("settings.recovery-*.json")] == [damaged]
+        assert dict(Settings(path, DEFAULTS)) == DEFAULTS
+    finally:
+        game._teardown()
+
+
+def test_headless_launch_and_settings_cannot_inherit_or_request_fullscreen(tmp_path, monkeypatch):
+    """The process-wide hidden-window policy survives saved fullscreen and keyboard attempts."""
+    prefs = Settings(tmp_path / "settings.json", DEFAULTS)
+    prefs.update(window_size=[960, 600], fullscreen=True)
+    prefs.save()
+    before = prefs.path.read_bytes()
+    monkeypatch.setenv("SAGA2D_HEADLESS", "1")
+    game = create_game("Headless display", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        assert not game.fullscreen and game.window_size == (1280, 800)
+        game.push(Scene())
+        game.push(SettingsScene())
+        for key in ("d", "down", "right"):
+            press(game, key)
+        assert not game.fullscreen and "SAGA2D_HEADLESS" in game.scene.message
+        press(game, "escape")
+        assert prefs.path.read_bytes() == before
+    finally:
+        game._teardown()
+
+
+def test_size_controls_follow_os_resize_while_settings_is_open(tmp_path):
+    """A native resize updates the value and the next size choice, rather than stale draft data."""
+    game = create_game("Live OS resize", backend="mock", save_dir=tmp_path / "saves")
+    try:
+        game.push(Scene())
+        game.push(SettingsScene())
+        press(game, "d")
+        game.backend.inject_resize(1280, 720)
+        game.tick(1 / 60)
+        press(game, "right")
+        assert game.window_size == (1280, 800)
+        game.backend.inject_resize(940, 720)
+        game.tick(1 / 60)
+        press(game, "return")
+        assert Settings(tmp_path / "settings.json", DEFAULTS)["window_size"] == [940, 720]
+    finally:
+        game._teardown()

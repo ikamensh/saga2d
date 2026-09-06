@@ -208,3 +208,67 @@ def test_current_relic_sources_and_equipped_pin_capability_are_visible_with_mous
         assert state.to_json() == before
     finally:
         game._teardown()
+
+
+def test_paid_watch_army_can_read_its_role_orders_and_costs_without_spending_them(tmp_path):
+    """A real support army sees mobility, extraction costs and its shared healing budget."""
+    from eador.codex import CodexScene
+    from tools.eador_roles_campaign import prepare_support_watch
+
+    state = prepare_support_watch()
+    game = create_game('Support role reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        game.tick(1 / 60)
+        click_button(game, 'Abilities')
+        click_button(game, 'Next')
+        text = rendered_text(game)
+        assert 'Ranger: shoot then move' in text and 'Moving first gives no second move' in text
+        assert 'No Pin' in text and 'terrain costs' in text
+        assert 'Swap' in text and "Warden's action and both units' remaining movement" in text
+        assert "The ally's action stays as it was" in text and 'Guard/Brace and Pin stay unchanged' in text
+        assert 'Acolyte Heal' in text and 'Current battle: 1 of 1 Acolytes have Heal' in text
+        assert f"{state.battle.spell_cost('heal')} mana / up to {state.battle.spell_power['heal']} healing" in text
+        assert f'Shared mana: {state.battle.mana}' in text
+        assert "The hero's action is untouched" in text and 'need not know Heal' in text
+        click_button(game, 'Troops')
+        troop_text = rendered_text(game)
+        while game.scene.ui.find(lambda control: isinstance(control, Button) and control.text == 'Next').enabled:
+            click_button(game, 'Next')
+            troop_text += ' ' + rendered_text(game)
+        assert 'Ranger' in troop_text and 'Shoot before moving to reposition' in troop_text
+        assert 'Warden' in troop_text and 'Swap into an adjacent ally’s place' in troop_text
+        click_button(game, 'Close codex')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
+
+
+def test_older_saved_acolyte_reference_never_advertises_an_unavailable_order(tmp_path):
+    """The recorded v8 troop stays noncasting in both troop and ability references."""
+    from pathlib import Path
+    from eador.codex import CodexScene
+
+    state = State.from_json((Path(__file__).parent / 'fixtures/v8_acolyte_battle.json').read_text())
+    game = create_game('Saved support reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        press(game, 'right')
+        text = rendered_text(game)
+        assert 'Acolyte' in text and '2 army recovery' in text
+        assert 'shared mana' in text and 'This older battle retains its noncasting Acolytes' in text
+        press(game, '2')
+        press(game, 'right')
+        text = rendered_text(game)
+        assert 'Current battle: 0 of 1 Acolytes have Heal' in text
+        assert 'This older battle retains its noncasting Acolytes' in text
+        press(game, 'escape')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
+    finally:
+        game._teardown()
