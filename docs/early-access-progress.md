@@ -70,6 +70,17 @@ change is newer than the preserved Mac archive above. A fresh independent
 walkthrough timed out before any UI observation; G09 still has no credit from
 that attempt. All release gates remain incomplete.
 
+The CPU follow-up in **c759e6c / b621acf** adds a 30 FPS helper to seven older
+native verifiers and forwards the 25% allowance through Extraction, Causeway and
+Hero equipment preparation. It also closes native windows left open by Guard
+and Hero checks. [Bounded measurements and verification](evidence/development-cpu-b621acf.json)
+record 76 passing integration tests, exact paced/unpaced campaign outcomes,
+three passing standalone checks, and inspected native frames. A 110-frame battle
+settling loop takes 3.91 seconds at 28.12 FPS and 22.63% of one core, preserving
+State and closing its window. The Causeway CLI averages about 27% including
+startup. These are development-tool changes; the game and framework are unchanged.
+All jobs ran serially and ended; cancelled long campaigns and the soak remain stopped.
+
 ## Earlier playable checkpoint — 2026-09-06
 
 **Later source changes:** [frame pacing and test CPU budgets](evidence/frame-pacing-069f79c/README.md)

@@ -1,0 +1,56 @@
+{
+  "source_commit": "b621acfb4c2f3a339fbee6966a36a91b36fa1226",
+  "tests": {
+    "passed": 76,
+    "seconds": 12.89
+  },
+  "native_frames": {
+    "source_commit": "c759e6c",
+    "frames": 110,
+    "seconds": 3.911913707968779,
+    "fps": 28.11922966908091,
+    "cpu_percent": 22.63495736616762,
+    "state_unchanged": true,
+    "closed": true
+  },
+  "native_guard": {
+    "input_and_save_checks": true,
+    "window_closed_on_return": true,
+    "regression": "Before the cleanup fix, the completed verifier returned with its native window open."
+  },
+  "native_text": {
+    "resize_pixel_equality": true,
+    "clicks": true,
+    "screenshots_inspected": true
+  },
+  "cli_checks": [
+    {
+      "tool": "extraction",
+      "cpu_percent": 25,
+      "source_hashes_verified": 71,
+      "escapes": 18,
+      "wall_seconds": 0.75,
+      "cpu_seconds": 0.26
+    },
+    {
+      "tool": "causeway",
+      "cpu_percent": 25,
+      "source_hashes_verified": 86,
+      "plans": 12,
+      "worlds": 1000,
+      "wall_seconds": 6.13,
+      "cpu_seconds": 1.63
+    },
+    {
+      "tool": "hero",
+      "cpu_percent": 25,
+      "source_hashes_verified": 72,
+      "backend": "mock",
+      "pages": 120,
+      "inputs": 550,
+      "wall_seconds": 3.91,
+      "cpu_seconds": 2.18
+    }
+  ],
+  "scope": "Serial bounded development checks. CPU percentage is relative to one core; cooperative allowances can overrun within atomic commands. Hero mock UI frames are unpaced. No battery-life, sustained-performance or release-gate claim."
+}
