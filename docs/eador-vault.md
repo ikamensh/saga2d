@@ -16,8 +16,10 @@ flanks, while the eastern Warden can rescue its wounded Guard. Ordinary
 extraction rules apply: an unspent hero order, no adjacent living enemy, and
 explicit Evacuate by round eight. Rout remains an alternative.
 
-The default saved reward is 60 gold, one crystal and Iron Crown. The paid route
-spends its two crystals regardless of the outcome; retreat retains surviving
+Current new worlds offer 60 gold, one crystal and **Mirror Badge** by default.
+The original checkpoint measured below offered Iron Crown; its retained reports
+and older saved rewards remain historical. The paid route spends its two crystals
+regardless of the outcome; retreat retains surviving
 defender kinds and wounds. Choosing the free approach on a later attempt
 neither restores its fallen Archer nor refunds the earlier fee. Victory pays
 once and closes the site even when enemy survivors remain.
@@ -53,9 +55,15 @@ the army clears the exit before allied Warden delivery. The paid route uses
 Ranger fire followed by movement, eliminates the rear Archer, and Pins the
 eastern one. Its genuinely Pinned hero walks one hex before the Warden swaps
 it onto the southern exit. The delivery preserves the hero's action, allowing
-explicit evacuation that turn. The second door saves time and wounds in this
-pair; the free door preserves scarce crystals for other purchases. This is a
+explicit evacuation that turn. The second door saves tactical rounds and wounds
+in this pair; the free door keeps two crystals. This tactical comparison alone
+does not establish that the fee prevents another desired purchase. It is a
 reproducible plan comparison, not an optimal-play or universal safety claim.
+
+The [later campaign continuation](eador-vault-continuation.md) starts both routes
+with the same earned 131 gold and 17 crystals. Paid captures a production province
+two turns earlier and preserves a veteran in the ensuing interception; the
+report separates those consequences from recovery waits and earned progression.
 
 The same paid manual route also succeeds with Warrior, Scout and Wizard on
 seed seven. Their army composition matches, but their preparation costs,
@@ -86,8 +94,8 @@ exercises 100 seeds per theme, including 16 free and 13 paid Vault entries,
 47,858 state checks and 12,816 rejected commands that leave state unchanged.
 Six victories and 294 defeats describe this random policy, not a balance claim.
 The same checkpoint passed **831 full tests**; three subsequent focused
-regressions retain the other heroes' paid manual routes. No production code
-changed after these runs.
+regressions retain the other heroes' paid manual routes. These counts describe
+that historical checkpoint, rather than the current game and reward catalogue.
 
 Run from a checkout with its Python dependencies installed:
 
