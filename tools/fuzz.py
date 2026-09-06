@@ -95,7 +95,7 @@ def monkey_runs(seeds: range, steps: int = 600, *, budget: CpuBudget | None = No
         rng = random.Random(seed)
         random.seed(seed)  # Title/NewGameScene use the global RNG; only this development tool seeds it.
         with tempfile.TemporaryDirectory() as save_dir:
-            game = Game("Monkey", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=save_dir)
+            game = Game("Monkey", backend="mock", resolution=(1280, 800), theme=build_theme(), save_dir=Path(save_dir) / "saves")
             try:
                 game.push(TitleScene(size=rng.choice((11, 14)), tribes=rng.choice((2, 3, 4))))
                 game.tick(1 / 60)

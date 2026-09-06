@@ -1,0 +1,16 @@
+Command: uv run python tools/verify_tribes_scores.py
+Completed native journey output:
+victory
+leaderboard
+empty-board
+title
+victory-960
+leaderboard-960
+defeat
+unsaved-result
+storage-error
+PASS: native keyboard, mouse, AI surrender, persistence, restart and error reporting
+
+The full-frame PNGs were opened and visually inspected. Early iterations caught
+and corrected title/menu overlap, excessive results height, and text showing
+through the result panels. The final screenshots include four tribes at 960×600.
