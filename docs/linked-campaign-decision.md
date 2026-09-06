@@ -1,9 +1,10 @@
 # Decision proposal: three linked shards
 
-Status: preferred design for implementation review, **not implemented**. Builds on
-G01/G03/G12/G13 in `early-access-criteria.md`, the v6 themed worlds, and research's
-pending v7 Pin/relic increment. Reserve **v8** for this work after v7 is stable.
-The existing standalone shard remains unchanged.
+Status: accepted and implemented as the **v8 model checkpoint**; see
+[evidence and current limits](eador-campaign.md). G01 acceptance still requires
+native journeys and human pacing/decision review. This decision builds on
+G01/G03/G12/G13 in `early-access-criteria.md`, themed worlds and v7 Pin/relics.
+The existing standalone mode remains available.
 
 ## The run
 
