@@ -86,8 +86,8 @@ class Trial:
 
     def rest(self, defend=True):
         state = self.state
-        if defend and state.rival.army and state.grid.distance(state.rival.pos, (-2, 0)) <= 2:
-            self.march(state.rival.pos)
+        if defend:
+            self.intercept()
         if state.status != 'playing' or state.turn >= 60 or self.stop_reason:
             return
         before = {t.id: t.hp for t in state.hero.army}
@@ -102,6 +102,16 @@ class Trial:
         self.metrics.mana_recovered += state.hero.mana - mana
         if state.battle:
             self.battle()
+
+    def intercept(self):
+        state = self.state
+        if state.rival.army and state.grid.distance(state.rival.pos, (-2, 0)) <= 2:
+            self.march(state.rival.pos)
+
+    def ready_for_final(self):
+        state = self.state
+        missing = max([state.hero.max_hp - state.hero.hp] + [t.max_hp - t.hp for t in state.hero.army])
+        return missing <= 6 and state.hero.mana >= state.hero.max_mana - 4 and state.actions_left > 0
 
     def march(self, destination):
         state = self.state
@@ -146,8 +156,7 @@ class Trial:
             if state.status != 'playing' or state.turn >= 60 or self.stop_reason:
                 break
             self.invest()
-            missing = max([state.hero.max_hp - state.hero.hp] + [t.max_hp - t.hp for t in state.hero.army])
-            if missing > 6 or state.hero.mana < state.hero.max_mana - 4 or not state.actions_left:
+            if not self.ready_for_final():
                 self.metrics.recovery_turns += 1
                 self.rest()
                 continue

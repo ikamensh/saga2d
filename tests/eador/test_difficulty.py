@@ -81,6 +81,29 @@ def test_challenge_changes_affordable_orders_and_income_without_altering_the_wor
     assert forecast.army_hp == normal.recovery_preview().army_hp
 
 
+def test_unselected_mana_candidate_keeps_existing_challenge_saves_and_new_games_exact():
+    """A separately saved candidate can be measured without changing the shipped selector."""
+    from eador.difficulty import DIFFICULTIES
+    original = State.new(7, 'Wizard', difficulty='challenge')
+    original.explore(); finish_battle(original)
+    saved = original.to_json()
+    data = json.loads(saved)
+    data['rules_id'] = 'challenge-2'
+    candidate = State.from_json(json.dumps(data))
+    assert DIFFICULTIES['challenge'].id == original.rules_id == 'challenge-1'
+    assert candidate.recovery_preview().mana == 4
+    assert original.recovery_preview().mana == 3
+    before_mana = original.hero.mana
+    original.end_turn(); candidate.end_turn()
+    assert original.hero.mana == before_mana + 3
+    assert candidate.hero.mana == before_mana + 4
+    assert State.from_json(candidate.to_json()).to_json() == candidate.to_json()
+    resumed = State.from_json(saved)
+    resumed.end_turn()
+    assert resumed.to_json() == original.to_json()
+    assert candidate.replay().rules_id == 'challenge-2'
+
+
 @pytest.mark.parametrize('mode', ['accessible', 'standard', 'challenge'])
 def test_linked_arrival_and_recovery_keep_the_saved_policy_and_separate_grants(mode):
     """A completed shard carries bounded funds; defeat restores its recorded finite world."""
