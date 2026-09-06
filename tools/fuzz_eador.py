@@ -34,6 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from saga2d import Button# noqa: E402
 
 from eador.app import create_game# noqa: E402
+from eador.battle_playback_scene import BattlePlaybackScene
 from eador.diagnostics import DiagnosticScene
 from eador.campaign_scene import CampaignPlanScene, CampaignScene  # noqa: E402
 from eador.codex import CodexScene  # noqa: E402
@@ -301,9 +302,15 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
                 # Continue both copies through the same real AI, including flags
                 # for movement, retaliation and spell actions saved mid-battle.
                 restored = State.from_json(state.to_json())
-                state.battle.auto_turn()
+                trace = state.battle.trace(state.battle.auto_turn)
                 restored.battle.auto_turn()
-                assert state.to_json() == restored.to_json(), 'save changed battle continuation'
+                assert state.to_json() == restored.to_json(), 'trace/save changed battle continuation'
+                frame = trace.before
+                for event in trace.events:
+                    assert event.before == frame
+                    frame = event.after
+                assert frame == trace.after
+                metrics['trace_events'] += len(trace.events)
                 metrics['battle_rounds'] += 1
             continue
         command = rng.choice(('build', 'recruit', 'replace_troop', 'travel', 'travel', 'explore', 'end_turn', 'equip', 'infuse'))
@@ -424,7 +431,9 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
         def tick():
             game.tick(1 / 60)
             metrics['input_ticks'] += 1
-            assert game.scene is not None and len(game.scenes) <= 4
+            playback = [s for s in game.scenes if isinstance(s, BattlePlaybackScene)]
+            assert game.scene is not None and len(game.scenes) <= (5 if playback else 4)
+            assert len(playback) <= 1
             shard = root()
             if shard:
                 check_state(shard.state)
@@ -439,7 +448,8 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                     else:
                         assert len(results) == 1 and not results[0].is_battle, 'campaign ended without its result screen'
                 elif shard.state.battle and shard.state.battle.outcome:
-                    assert len(results) == 1 and results[0].is_battle, 'battle ended without its result screen'
+                    assert (len(results) == 1 and results[0].is_battle) or playback, 'battle ended without feedback or its result screen'
+                    assert not (results and playback), 'result opened before feedback finished'
                 if shard.state.choice is not None:
                     assert any(isinstance(s, ChoiceScene) for s in game.scenes), 'saved choice has no decision screen'
             metrics['screen_' + type(game.scene).__name__] += 1
@@ -716,6 +726,12 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         hover(rng.randrange(game.width), rng.randrange(game.height))
                     else:
                         press(rng.choice(('f1', 'f5', 'f9', 'f6', 'tab', 'escape', 'home', 'c')))
+                elif isinstance(scene, BattlePlaybackScene):
+                    before = root().state.to_json()
+                    key = rng.choice(('e', 'a', 't', 'g', '1', '2', 'space', 'return', 'escape', 'f2', 'l', 'f5', 'f6'))
+                    press(key)
+                    assert root().state.to_json() == before, 'playback input mutated the resolved command'
+                    metrics['playback_readonly_inputs'] += 1
                 elif isinstance(scene, BattleScene):
                     battle_input()
                 else:
@@ -762,6 +778,8 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         assert isinstance(game.scene, ShardScene) and game.scene.state.turn == 1
                         metrics['replays'] += 1
                         break
+                elif isinstance(scene, BattlePlaybackScene):
+                    button('Finish playback')
                 elif isinstance(scene, BattleScene):
                     if scene.battle.outcome:
                         press('e')

@@ -9,8 +9,9 @@ from saga2d import Button
 
 
 class PlayerInput:
-    def __init__(self, game, *, native=False, output=None):
+    def __init__(self, game, *, native=False, output=None, finish_actions=True):
         self.game, self.native, self.output = game, native, output
+        self.finish_actions = finish_actions
         self.events = []
         self.briefings = []
         self.reloads = 0
@@ -31,6 +32,8 @@ class PlayerInput:
             self.game.backend.inject_key(name)
             self.game.backend.inject_key(name, type='key_release')
         self.game.tick(1 / 60)
+        if self.finish_actions:
+            self.finish_playback()
 
     def click(self, x, y):
         self.events.append((type(self.game.scene).__name__, 'click', (round(x), round(y))))
@@ -46,6 +49,16 @@ class PlayerInput:
             self.game.backend.inject_click(round(x), round(y))
             self.game.backend.inject_release(round(x), round(y))
         self.game.tick(1 / 60)
+        if self.finish_actions:
+            self.finish_playback()
+
+    def finish_playback(self):
+        """Use the visible completion order; never advance presentation or rules internally."""
+        from eador.battle_playback_scene import BattlePlaybackScene
+        if isinstance(self.game.scene, BattlePlaybackScene):
+            finish = self.game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Finish playback')
+            assert finish is not None and finish.enabled
+            self.press('space')
 
     def capture(self, name, *, settle=True):
         for _ in range(110 if settle and isinstance(self.game.scene, BattleScene) else 1):

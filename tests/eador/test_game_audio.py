@@ -8,9 +8,8 @@ from saga2d import Settings
 
 
 def press(game, name):
-    game.backend.inject_key(name)
-    game.backend.inject_key(name, type='key_release')
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).press(name)
 
 
 def cues(game):

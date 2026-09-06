@@ -7,16 +7,13 @@ from eador.scene import BattleScene, ShardScene, TitleScene
 
 
 def press(game, key):
-    game.backend.inject_key(key)
-    game.backend.inject_key(key, type='key_release')
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).press(key)
 
 
 def click_hex(game, pos):
-    x, y = game.scene.grid.center(pos)
-    game.backend.inject_click(round(x), round(y))
-    game.backend.inject_release(round(x), round(y))
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).click(*game.scene.grid.center(pos))
 
 
 def test_pin_targeting_save_and_cooldown_are_playable_without_private_commands(tmp_path):

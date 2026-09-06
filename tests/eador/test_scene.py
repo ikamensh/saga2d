@@ -8,13 +8,13 @@ from eador.app import create_game
 
 
 def press(game, key):
-    game.backend.inject_key(key)
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).press(key)
 
 
 def click(game, x, y):
-    game.backend.inject_click(round(x), round(y))
-    game.tick(1 / 60)
+    from tools.eador_ui import PlayerInput
+    PlayerInput(game).click(x, y)
 
 
 def button(game, label):

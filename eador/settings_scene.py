@@ -17,7 +17,7 @@ SOUND_ROWS = (("master", "Master volume", "Overall level for all sound."),
               ("muted", "Mute all audio", "Silence sound without changing your levels."))
 DISPLAY_ROWS = (("window_size", "Window size", "Resize the window; the game canvas stays fixed."),
                 ("fullscreen", "Fullscreen", "Use the desktop's current resolution."),
-                ("reduced_motion", "Reduced motion", "Keep damage numbers still."),
+                ("reduced_motion", "Reduced motion", "Keep units and damage numbers still."),
                 ("codex_text_scale", "Reading size", "Read guidance at this size."))
 
 
