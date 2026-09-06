@@ -147,7 +147,11 @@ independent counterplay review and native forecast/retry journeys remain gates.
 
 ## Reproduce and review
 
-Run `uv run python tools/prototype_eador_causeway.py` from the checkout. The
+This is archived prototype evidence, superseded by the
+[production Causeway](eador-causeway.md). Its temporary registry/tool was absorbed
+into the ordinary content and public route helper, then deleted. To reproduce
+this historical report, use a detached checkout of the source below and run
+`uv run python tools/prototype_eador_causeway.py`. The
 default report is `/tmp/causeway-prototype.json.gz`; `--step` shows unit state,
 resources, forecasts and each next order, advancing with Enter or quitting with
 `q`. The [retained report](evidence/causeway-prototype-2026-09-06.json.gz) was

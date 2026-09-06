@@ -1,5 +1,10 @@
 # Causeway: actual Ruins arrival and production proposal
 
+This is the retained pre-production audit. The [production record](eador-causeway.md)
+adds real entry/retry, native input and the existing Tower infusion alternative.
+The recovery checkpoints below follow the audit's rest policy; they are not the
+earliest possible entry when crystals and a spare hero action fund infusion.
+
 This follow-up supersedes the original proposal's unreviewed emphasis on
 anchoring. Independent review found a valid **caster-priority** route: Archer,
 hero and Acolyte (or Warden) finish the Rune Adept before it acts. It is retained
@@ -98,12 +103,12 @@ fixture with mana edited upward.
 
 ## Fair manual comparison
 
-Every row has an actual earliest affordable checkpoint and is also replayed
+Every row has an actual first affordable recovery-policy checkpoint and is also replayed
 from that party's same fully recovered snapshot. All orders save/reload the
 whole State exactly; attack/spell HP changes match public forecasts. All
 surviving source rewards settle once. No allied unit dies in these lines.
 
-| Commander plan | Earliest campaign turn | Battle result | Missing HP | Mana spent |
+| Commander plan | Recovery-policy campaign turn | Battle result | Missing HP | Mana spent |
 |---|---:|---:|---:|---:|
 | Caster focus | 9 | Escape R4 | 37 | 4 |
 | Caster focus + Heal | 9 | Escape R4 | 15 | 8 |
@@ -123,7 +128,10 @@ The fair Guard healing line sends Militia 2 from `(2,-3)` to `(2,-1)` in round
 four to finish the Ranger's last four HP, freeing Acolyte to Heal the hero. It
 ends hero 38/44, Militia 26/32. Caster-focus + Heal ends hero 35/44 and the same
 26/32 Militia: **Guard buys three fewer wounds for four more mana and, on the
-actual low-mana arrival, one additional recovery turn**. Occupied landing caps
+actual low-mana arrival under this rest policy, one additional recovery turn**.
+The later production audit also proves that ordinary Tower infusion instead
+spends three crystals and one hero action at turn nine, leaving an action to
+enter immediately with enough mana for either healed line. Occupied landing caps
 Heal at the hero's fourteen missing HP and leaves the other Militia wounded;
 it is a legal but comparatively expensive alternative in this measured party.
 No claim of universally better recovery or optimal play follows from these
@@ -164,7 +172,8 @@ briefing/Codex and native command/forecast journeys; independent review and
 full/fuzz checks. The bounded earned comparison supports implementation, but
 the authored pattern count alone will not close G05 or the release criteria.
 
-Run `uv run python tools/audit_eador_causeway_placement.py` to reproduce the
+Use a detached checkout of source `2749a725b2f6f64e47d5f5de4c1339e0fc165996`
+and run `uv run python tools/audit_eador_causeway_placement.py` to reproduce the
 1,000-seed source audit and sixteen actual-arrival tactical comparisons. The
 default compressed report is `/tmp/causeway-placement.json.gz`. The
 [retained report](evidence/causeway-placement-2026-09-06.json.gz) records source
@@ -172,5 +181,7 @@ default compressed report is `/tmp/causeway-placement.json.gz`. The
 revision, 1,000 witnesses, 82 public travel-command/reloads and 650 tactical
 order/reloads across sixteen comparisons. The gzip is 186,009 bytes, SHA-256
 `0111c8a68ce1d80fe517c6a119bffe01dbaa0d55ac5594b6b485d61baa84c442`.
-The audit, original prototype regressions and 78 existing public
+The old proposal tool was absorbed into `tools/audit_eador_causeway.py` and
+deleted after production acceptance; its temporary content must not be run
+against newly generated production worlds. The audit, original prototype regressions and 78 existing public
 Guard/control/extraction tests pass. No game source changed during measurement.
