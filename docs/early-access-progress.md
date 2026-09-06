@@ -9,72 +9,63 @@ the named source snapshot, and later entries supersede earlier feature gaps.
 
 ## Current playable checkpoint — 2026-09-06
 
-Current source adds [Runebound Causeway](eador-causeway.md), bringing authored
-pattern coverage to **12/12**. Final source `1a20e54` passes **1,188 tests**;
-seven native plans pass 1,645 inputs and 93 exact reloads, including actual
-Tower infusion, a deadline loss and manual wounded retry. Independent review
-compares 3,000 complete worlds and reproduces 806 exact command/save reloads.
-The site and shared placement/reward handling stay game-owned. Its retained
-source-specific checks include 300 random campaigns, 10,009 random scene
-inputs, Tribes fuzz and the complete briefing matrix. Counts do not close G05
-or prove balance, enjoyment or first-time comprehension. Ordered battle
-playback is still undergoing final isolated checks. The archive below predates
-Causeway and contains eleven patterns.
+The preserved Mac development build is clean source **219bcf9**, with twelve
+authored encounter patterns and ordered battle playback. It includes three
+linked shards, three difficulties, ten recruitable roles, twelve relics,
+paid troop replacement, Tower infusion, complete tactical forecasts/history,
+measured campaign/battle HUDs and 100/125 reading settings.
+[Archive, source identity and verification](evidence/shardbound-package-219bcf9/README.md)
+identify the exact playable checkpoint. **All G01–G19 gates remain incomplete.**
 
-The preserved Mac development build is clean source **c8ec2e2**. It includes
-three linked shards, three difficulty modes, eleven authored adventure patterns,
-ten recruitable roles, twelve relics, paid troop replacement, Tower infusion,
-measured campaign/battle HUDs, complete tactical forecasts/objectives/history,
-long save diagnostics and shared 100/125 reading for the supported screens.
-[Exact artifact and verification](evidence/shardbound-package-c8ec2e2/README.md)
-identify what is playable. **All G01–G19 release gates remain incomplete.**
+The combined source suite passes **1,207 tests**. The extracted frozen app
+completes direct and lost-capital recovery campaigns across nine processes:
+**984 native inputs, 17 UI save/reloads and seven exact process joins**. Both
+routes reload their completed ending and return to title at 125% reading size.
+The policies use automatic rounds and visible Finish playback, so they verify
+campaign/save behavior without claiming manual tactics or human playtime.
+Installed assets/audio, LaunchServices and the local ad-hoc signature pass.
+Six actual package screenshots were inspected; independent package review found
+no issue with the archive, source mappings, import closure or journey receipts.
 
-The full source suite passes **1,171 tests**. The extracted frozen app completes
-a direct linked campaign and a lost-capital recovery campaign across nine
-separate app processes: **802 native inputs, 17 UI save/reloads and seven exact
-process-to-process State restorations**. Each route reloads its completed ending
-and returns to title; the recovery route also restarts at the recovery decision.
-These policies use the visible automatic-round control, so this is campaign/save
-verification, not a manual-tactics or human playtest result. Settings persist at
-125% reading size. The quick installed-asset/audio smoke, LaunchServices app
-launch and local ad-hoc signature checks pass. Twelve package images were inspected.
+[Runebound Causeway](eador-causeway.md) brings authored pattern coverage to
+**12/12**. Its seven paid native plans pass 1,645 inputs and 93 exact reloads,
+including Tower infusion, a deadline loss and finite wounded manual retry.
+An unchanged ordinary site retains the same reward. Independent review compares
+3,000 complete worlds and reproduces 806 exact command/save reloads. Its named
+source passes 300 random campaigns, 10,009 random scene inputs, Tribes fuzz and
+the complete briefing matrix. Counts alone do not close G05 or prove enjoyment.
 
-[Relief Column](eador-relief.md) is the eleventh authored pattern. Its two free
-assemblies use existing hold, Rally, flight, Pin and Repulse rules, and an unchanged
-ordinary site offers the same reward. Sixty paid manual plans across three modes
-and five seeds preserve all arriving units, with 1,740 exact full-State order
-reloads. Seven native journeys pass 1,202 inputs and 71 reloads, including veteran
-loss, a fresh paid recruit and finite wounded retry. Its named source also passes
-300 model campaigns, 10,009 random scene inputs, 60 linked model runs and Tribes'
-fuzz checks. A later earned retry test fixes advice that mentioned already-dead
-support. These source reports retain their exact revisions; they are not relabeled
-as packaged full-content or release-scale stress. Content coverage is **11/12**.
+[Ordered battle playback](eador-battle-feedback.md) shows movement, abilities
+and reactions in sequence. Space/Finish skips it; reduced motion keeps pieces
+still. Rules resolve once, saves record that completed turn, and modal input
+cannot issue another battle order. Three clean-source native journeys retain
+393 inputs, seven reloads and 637 watched frames. Independent lifecycle review
+passes 25 tests. Its named 300-campaign/20-scene stress run checks 47,716 trace
+events and 10,004 random inputs. The [combined Causeway journeys](eador-causeway-feedback-integration.md)
+add 610 native inputs and 34 reloads; both final saves are byte-exact with the
+pre-playback runs. These reports keep their own source revisions.
 
-The source-attributed [campaign HUD](eador-shard-reading.md),
-[battle HUD/history](eador-battle-hud-reading.md), [objectives](eador-battle-objective-reading.md),
-[forecasts](eador-forecast-reading.md) and [save diagnostics](eador-diagnostics.md)
-retain their full layout/input matrices separately from the bounded packaged
-journeys. Saga2D's small `Scene.measure` primitive measures unattached UI using
-the eventual font/theme context; an independent example verifies its rendering
-and input ownership. Campaign, encounter, pagination and economy rules stay in
-Shardbound. This packaging increment adds no framework API.
+The combined checkpoint also passes 12 linked model campaigns, 12 scene runs,
+3,004 random inputs and 327 inputs verified inert during playback, plus Tribes'
+60 AI games and 20 random-input runs. The [90-second native playback probe](evidence/shardbound-playback-soak-449e40e/README.md)
+verifies the adapted paced driver on an earlier source. It is not the two-hour
+candidate soak or evidence of no memory growth.
 
-The [resource attribution study](eador-resource-breakpoints.md) reconciles 27
-unchanged campaigns and 10,762 real detached quotes. Earlier investments compete
-for money, but the tested later policies stop buying while income continues.
-No unproven tax or currency sink was added. Causeway's earned arrival also
-demonstrates a local crystals-versus-time infusion choice; recurring late-game
-economic depth remains open. Ordered enemy-action feedback is isolated work
-in progress, outside this archive.
-Meaningful recurring economic choices, human/listening feedback, clean-account
-and Windows execution, the remaining complete display/content acceptance and
-candidate-specific sustained stress remain open.
+Causeway, its shared duplicate-source/reward handling, battle traces and playback
+stay in Shardbound. Saga2D's existing scenes, layers, input ownership and measured
+UI primitives suffice. The [Scene.measure example](framework-ui-measurement.md)
+remains independent of this game; this increment adds no framework API or schema.
 
-The [three-minute native run](evidence/shardbound-reading-soak-a431f47/README.md)
-retains 54 repeated journeys, 10,246 frames and bounded timing/RSS measurements
-on an earlier source. It is not the two-hour candidate soak or evidence of no
-memory leak. The previous [56f1ffb archive](evidence/shardbound-package-56f1ffb/README.md)
-remains preserved rather than being overwritten or assigned newer verification.
+The [resource attribution study](eador-resource-breakpoints.md) still identifies
+later policies that stop buying while income continues. Causeway demonstrates a
+local crystals-versus-time choice without establishing recurring economic depth.
+Human/listening feedback, clean-account and Windows execution, remaining balance,
+complete display/content acceptance and sustained candidate stress remain open.
+The UI-only blind opening attempt observed no game: CUA reported a locked Mac
+on both attempts. It supplies no walkthrough or human-playtest credit.
+
+Earlier [c8ec2e2](evidence/shardbound-package-c8ec2e2/README.md) and
+[56f1ffb](evidence/shardbound-package-56f1ffb/README.md) archives remain preserved.
 
 ## Baseline audit — 2026-09-05
 

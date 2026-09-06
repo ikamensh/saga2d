@@ -1,0 +1,941 @@
+{
+  "source": "219bcf94136db9cd0fe2ac81f7e8a636be657e60",
+  "archive": {
+    "bytes": 32788690,
+    "file": "Shardbound-macos-arm64.zip",
+    "sha256": "2781921fcd858577159c7222e915e479b7af88345b6cf3bfe0144641cd4b7bd8"
+  },
+  "git_matched_inputs": 95,
+  "generated_inputs": 26,
+  "source_inputs": 121,
+  "bundle_entries": 128,
+  "project_imports": 68,
+  "project_import_closure": [
+    [
+      "campaign_check",
+      "campaign_check.py"
+    ],
+    [
+      "eador",
+      "eador/__init__.py"
+    ],
+    [
+      "eador.__main__",
+      "eador/__main__.py"
+    ],
+    [
+      "eador.app",
+      "eador/app.py"
+    ],
+    [
+      "eador.art",
+      "eador/art.py"
+    ],
+    [
+      "eador.battle",
+      "eador/battle.py"
+    ],
+    [
+      "eador.battle_playback_scene",
+      "eador/battle_playback_scene.py"
+    ],
+    [
+      "eador.battle_trace",
+      "eador/battle_trace.py"
+    ],
+    [
+      "eador.campaign",
+      "eador/campaign.py"
+    ],
+    [
+      "eador.campaign_scene",
+      "eador/campaign_scene.py"
+    ],
+    [
+      "eador.codex",
+      "eador/codex.py"
+    ],
+    [
+      "eador.content",
+      "eador/content.py"
+    ],
+    [
+      "eador.diagnostics",
+      "eador/diagnostics.py"
+    ],
+    [
+      "eador.difficulty",
+      "eador/difficulty.py"
+    ],
+    [
+      "eador.encounter_scene",
+      "eador/encounter_scene.py"
+    ],
+    [
+      "eador.encounters",
+      "eador/encounters.py"
+    ],
+    [
+      "eador.model",
+      "eador/model.py"
+    ],
+    [
+      "eador.persistence",
+      "eador/persistence.py"
+    ],
+    [
+      "eador.preferences",
+      "eador/preferences.py"
+    ],
+    [
+      "eador.reading",
+      "eador/reading.py"
+    ],
+    [
+      "eador.replacement_scene",
+      "eador/replacement_scene.py"
+    ],
+    [
+      "eador.rival",
+      "eador/rival.py"
+    ],
+    [
+      "eador.rival_scene",
+      "eador/rival_scene.py"
+    ],
+    [
+      "eador.scene",
+      "eador/scene.py"
+    ],
+    [
+      "eador.settings_scene",
+      "eador/settings_scene.py"
+    ],
+    [
+      "eador.sight",
+      "eador/sight.py"
+    ],
+    [
+      "eador.sound",
+      "eador/sound.py"
+    ],
+    [
+      "eador.style",
+      "eador/style.py"
+    ],
+    [
+      "eador.worldgen",
+      "eador/worldgen.py"
+    ],
+    [
+      "saga2d",
+      "saga2d/__init__.py"
+    ],
+    [
+      "saga2d._fileio",
+      "saga2d/_fileio.py"
+    ],
+    [
+      "saga2d._scene_stack",
+      "saga2d/_scene_stack.py"
+    ],
+    [
+      "saga2d.actions",
+      "saga2d/actions.py"
+    ],
+    [
+      "saga2d.animation",
+      "saga2d/animation.py"
+    ],
+    [
+      "saga2d.assets",
+      "saga2d/assets.py"
+    ],
+    [
+      "saga2d.audio",
+      "saga2d/audio.py"
+    ],
+    [
+      "saga2d.backends",
+      "saga2d/backends/__init__.py"
+    ],
+    [
+      "saga2d.backends.base",
+      "saga2d/backends/base.py"
+    ],
+    [
+      "saga2d.backends.mock_backend",
+      "saga2d/backends/mock_backend.py"
+    ],
+    [
+      "saga2d.backends.pyglet_backend",
+      "saga2d/backends/pyglet_backend.py"
+    ],
+    [
+      "saga2d.game",
+      "saga2d/game.py"
+    ],
+    [
+      "saga2d.hexgrid",
+      "saga2d/hexgrid.py"
+    ],
+    [
+      "saga2d.input",
+      "saga2d/input.py"
+    ],
+    [
+      "saga2d.rendering",
+      "saga2d/rendering/__init__.py"
+    ],
+    [
+      "saga2d.rendering._text",
+      "saga2d/rendering/_text.py"
+    ],
+    [
+      "saga2d.rendering.camera",
+      "saga2d/rendering/camera.py"
+    ],
+    [
+      "saga2d.rendering.layers",
+      "saga2d/rendering/layers.py"
+    ],
+    [
+      "saga2d.rendering.particles",
+      "saga2d/rendering/particles.py"
+    ],
+    [
+      "saga2d.rendering.shapes",
+      "saga2d/rendering/shapes.py"
+    ],
+    [
+      "saga2d.rendering.sprite",
+      "saga2d/rendering/sprite.py"
+    ],
+    [
+      "saga2d.save",
+      "saga2d/save.py"
+    ],
+    [
+      "saga2d.scene",
+      "saga2d/scene.py"
+    ],
+    [
+      "saga2d.settings",
+      "saga2d/settings.py"
+    ],
+    [
+      "saga2d.synth",
+      "saga2d/synth.py"
+    ],
+    [
+      "saga2d.ui",
+      "saga2d/ui/__init__.py"
+    ],
+    [
+      "saga2d.ui.base",
+      "saga2d/ui/base.py"
+    ],
+    [
+      "saga2d.ui.components",
+      "saga2d/ui/components.py"
+    ],
+    [
+      "saga2d.ui.layout",
+      "saga2d/ui/layout.py"
+    ],
+    [
+      "saga2d.ui.theme",
+      "saga2d/ui/theme.py"
+    ],
+    [
+      "saga2d.util",
+      "saga2d/util/__init__.py"
+    ],
+    [
+      "saga2d.util.collision",
+      "saga2d/util/collision.py"
+    ],
+    [
+      "saga2d.util.reactive",
+      "saga2d/util/reactive.py"
+    ],
+    [
+      "saga2d.util.timer",
+      "saga2d/util/timer.py"
+    ],
+    [
+      "saga2d.util.tween",
+      "saga2d/util/tween.py"
+    ],
+    [
+      "tools",
+      "tools/__init__.py"
+    ],
+    [
+      "tools.eador_campaign",
+      "tools/eador_campaign.py"
+    ],
+    [
+      "tools.eador_linked_campaign",
+      "tools/eador_linked_campaign.py"
+    ],
+    [
+      "tools.eador_ui",
+      "tools/eador_ui.py"
+    ]
+  ],
+  "git_mapping": [
+    {
+      "snapshot": "campaign_check.py",
+      "git": "packaging/campaign_check.py",
+      "sha256": "72bd626d0ea354c209b0832c32b4f795395edddd93f9e901fdc145d6f2a20400"
+    },
+    {
+      "snapshot": "eador/README.md",
+      "git": "eador/README.md",
+      "sha256": "508ac56d63137d2e36a9b20ff775176b40a43e3c31cafd07d4425d4d8fe02044"
+    },
+    {
+      "snapshot": "eador/__init__.py",
+      "git": "eador/__init__.py",
+      "sha256": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245"
+    },
+    {
+      "snapshot": "eador/__main__.py",
+      "git": "eador/__main__.py",
+      "sha256": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7"
+    },
+    {
+      "snapshot": "eador/app.py",
+      "git": "eador/app.py",
+      "sha256": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55"
+    },
+    {
+      "snapshot": "eador/art.py",
+      "git": "eador/art.py",
+      "sha256": "46e1d88a47249f76640a9ee15bb69f42457ad6621369b5a4679c8d9686cb866d"
+    },
+    {
+      "snapshot": "eador/assets/AUDIO-PROVENANCE.md",
+      "git": "eador/assets/AUDIO-PROVENANCE.md",
+      "sha256": "26e4bc2b663502d7c9aa6ac8f8aff38313aaa6961c877e90bd4138e4235f15aa"
+    },
+    {
+      "snapshot": "eador/assets/audio-manifest.json",
+      "git": "eador/assets/audio-manifest.json",
+      "sha256": "af5037fe003b0df4c6b4cd5f2533cabb242c71eb80a9b07b180d14a7d2fcf6a5"
+    },
+    {
+      "snapshot": "eador/assets/music/battle.wav",
+      "git": "eador/assets/music/battle.wav",
+      "sha256": "c772edbc9be0ed4adf001508668848501349cb7671623b32c69b9fc630c814d2"
+    },
+    {
+      "snapshot": "eador/assets/music/campaign.wav",
+      "git": "eador/assets/music/campaign.wav",
+      "sha256": "b542e73cb716c45fe4f8bd70818a6f189532f42ec5aceb2695d9464603a5252a"
+    },
+    {
+      "snapshot": "eador/assets/sounds/attack_hit.wav",
+      "git": "eador/assets/sounds/attack_hit.wav",
+      "sha256": "0064e0921969a6b09f6529db6aebff334ff42ae397b199349750720bbbec4f7d"
+    },
+    {
+      "snapshot": "eador/assets/sounds/bolt.wav",
+      "git": "eador/assets/sounds/bolt.wav",
+      "sha256": "6dac81d3118b2d6b4045949d02db97a319a45d1110083b3cde69cf8462a146df"
+    },
+    {
+      "snapshot": "eador/assets/sounds/confirm.wav",
+      "git": "eador/assets/sounds/confirm.wav",
+      "sha256": "521921fa8a109c3885aaf268654586d8a316dba3a4cad65840df94d4cde7da8d"
+    },
+    {
+      "snapshot": "eador/assets/sounds/defeat.wav",
+      "git": "eador/assets/sounds/defeat.wav",
+      "sha256": "cf165d770785fae4c729846ab5a1c83965a9ab1834063f51a1851f89199c4dbf"
+    },
+    {
+      "snapshot": "eador/assets/sounds/end_turn.wav",
+      "git": "eador/assets/sounds/end_turn.wav",
+      "sha256": "1a62cf8b5a0a3e85adbeb83046daf1b7097c2094e7f0aa10d1e5475286021552"
+    },
+    {
+      "snapshot": "eador/assets/sounds/guard.wav",
+      "git": "eador/assets/sounds/guard.wav",
+      "sha256": "28b67b8d81ebfc9c74628c00453c19888fa4e4767c297b2931c7adcabba5f945"
+    },
+    {
+      "snapshot": "eador/assets/sounds/heal.wav",
+      "git": "eador/assets/sounds/heal.wav",
+      "sha256": "d80a62979e69fd41f1cf24bff3cd94ce25d8d6e51134543f2b56be10d77e048c"
+    },
+    {
+      "snapshot": "eador/assets/sounds/level_up.wav",
+      "git": "eador/assets/sounds/level_up.wav",
+      "sha256": "a0af701db72c4547a907145e1ed07447d631b216f7dcbd82c293ae9f2225b968"
+    },
+    {
+      "snapshot": "eador/assets/sounds/move.wav",
+      "git": "eador/assets/sounds/move.wav",
+      "sha256": "735ba39d212c4d8099e263e3eef90f8049170c22267f5e6731a92ca8f4df677f"
+    },
+    {
+      "snapshot": "eador/assets/sounds/refuse.wav",
+      "git": "eador/assets/sounds/refuse.wav",
+      "sha256": "46334fd6d7cbd137ee5afcd2455c6740ea43b6ebf3190e59eb4be7ac6c68a0d6"
+    },
+    {
+      "snapshot": "eador/assets/sounds/reward.wav",
+      "git": "eador/assets/sounds/reward.wav",
+      "sha256": "f4bcb57b437d0b6b12c859f61acd308a762eca146b377e4607ea919693f5b700"
+    },
+    {
+      "snapshot": "eador/assets/sounds/victory.wav",
+      "git": "eador/assets/sounds/victory.wav",
+      "sha256": "f99c1376802048f2b56f6181b5e0c29530219bbee04885cc3114b8240da4d274"
+    },
+    {
+      "snapshot": "eador/battle.py",
+      "git": "eador/battle.py",
+      "sha256": "ba19db6ded9a9844b852cc73bdfc33c14d7a9ba6d981e6b85a36fe0f16bc519c"
+    },
+    {
+      "snapshot": "eador/battle_playback_scene.py",
+      "git": "eador/battle_playback_scene.py",
+      "sha256": "5399c1dff3d26e06259ac06169ef24ecc65feb5343e7d56d00537d543fcc27a2"
+    },
+    {
+      "snapshot": "eador/battle_trace.py",
+      "git": "eador/battle_trace.py",
+      "sha256": "57e1736fcb430a66c800d4268d1c1fe63c38ad19cbbb85b648ea53a1006f051c"
+    },
+    {
+      "snapshot": "eador/campaign.py",
+      "git": "eador/campaign.py",
+      "sha256": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27"
+    },
+    {
+      "snapshot": "eador/campaign_scene.py",
+      "git": "eador/campaign_scene.py",
+      "sha256": "6ad5769c6d1ce1f8eb9db56d84cc5e65a972a778d24053129d92bbc3af5442a0"
+    },
+    {
+      "snapshot": "eador/codex.py",
+      "git": "eador/codex.py",
+      "sha256": "db7c5b451767786490a926483183979a16285b4d67f2d22d158c269a9816dee0"
+    },
+    {
+      "snapshot": "eador/content.py",
+      "git": "eador/content.py",
+      "sha256": "6dbac37f87693364516ea10c3c19e96b67892df4d74d224c15f824dc900128db"
+    },
+    {
+      "snapshot": "eador/diagnostics.py",
+      "git": "eador/diagnostics.py",
+      "sha256": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c"
+    },
+    {
+      "snapshot": "eador/difficulty.py",
+      "git": "eador/difficulty.py",
+      "sha256": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00"
+    },
+    {
+      "snapshot": "eador/encounter_scene.py",
+      "git": "eador/encounter_scene.py",
+      "sha256": "c567a3c4bbec55de4950681f3b7b5a6a5e7c04c545498f5aa6ce0ed2faad7d76"
+    },
+    {
+      "snapshot": "eador/encounters.py",
+      "git": "eador/encounters.py",
+      "sha256": "66878812c1406fbbc1dc3d1d3d98cf9d067e3f01d6f9cfccb1e8649719c0737d"
+    },
+    {
+      "snapshot": "eador/model.py",
+      "git": "eador/model.py",
+      "sha256": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717"
+    },
+    {
+      "snapshot": "eador/persistence.py",
+      "git": "eador/persistence.py",
+      "sha256": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172"
+    },
+    {
+      "snapshot": "eador/preferences.py",
+      "git": "eador/preferences.py",
+      "sha256": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8"
+    },
+    {
+      "snapshot": "eador/reading.py",
+      "git": "eador/reading.py",
+      "sha256": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c"
+    },
+    {
+      "snapshot": "eador/replacement_scene.py",
+      "git": "eador/replacement_scene.py",
+      "sha256": "84a98abcae1255ffb4fc351f4c209e61dfa6c70f3d69f6f85fa7a19991b8568c"
+    },
+    {
+      "snapshot": "eador/rival.py",
+      "git": "eador/rival.py",
+      "sha256": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e"
+    },
+    {
+      "snapshot": "eador/rival_scene.py",
+      "git": "eador/rival_scene.py",
+      "sha256": "4a3a15bb4a36fc6d10c7d5ebdd07a37faba0def606ce1e3ff8af35170d48a21b"
+    },
+    {
+      "snapshot": "eador/scene.py",
+      "git": "eador/scene.py",
+      "sha256": "d228966bc9ad3603f2ee57bcaccee73b71e77f05a7789f5f8145fc0f0da39764"
+    },
+    {
+      "snapshot": "eador/settings_scene.py",
+      "git": "eador/settings_scene.py",
+      "sha256": "cf16efa9d04153ea94c4ac50862c871fae6d04feb4b02d48aea13dd07a53f9ca"
+    },
+    {
+      "snapshot": "eador/sight.py",
+      "git": "eador/sight.py",
+      "sha256": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796"
+    },
+    {
+      "snapshot": "eador/sound.py",
+      "git": "eador/sound.py",
+      "sha256": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951"
+    },
+    {
+      "snapshot": "eador/style.py",
+      "git": "eador/style.py",
+      "sha256": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532"
+    },
+    {
+      "snapshot": "eador/worldgen.py",
+      "git": "eador/worldgen.py",
+      "sha256": "0c89b6d52208f9cc929e67caae09790f4b1407903806fe87f0f01d0320ac79a3"
+    },
+    {
+      "snapshot": "entry.py",
+      "git": "packaging/entry.py",
+      "sha256": "e234075a79a2b6ef0b526c5ce3bceee164c57cfb6a3daf617970c1b0ff3c6365"
+    },
+    {
+      "snapshot": "release/LICENSE",
+      "git": "LICENSE",
+      "sha256": "2dd9083999dd489890c90f0397cd2ef0ae4183e2b5b3cfd6482fcf670461adf1"
+    },
+    {
+      "snapshot": "release/build-tools.txt",
+      "git": "packaging/requirements.txt",
+      "sha256": "8a1534a4a5ab1e8e7b9f388e8f18155e728db5437393b5460a9154616b1e7245"
+    },
+    {
+      "snapshot": "release/credits.md",
+      "git": "packaging/credits.md",
+      "sha256": "26fb0274d426e9f9f17e2373a47d2e1015538c062b5a162cb71a4b4073600ebb"
+    },
+    {
+      "snapshot": "release/player-guide.md",
+      "git": "eador/README.md",
+      "sha256": "508ac56d63137d2e36a9b20ff775176b40a43e3c31cafd07d4425d4d8fe02044"
+    },
+    {
+      "snapshot": "release/runtime-uv.lock",
+      "git": "uv.lock",
+      "sha256": "28fcee73a09809b13722b01c282c6ae2ac8dd263a3c388cae8a84205b24c354c"
+    },
+    {
+      "snapshot": "saga2d/__init__.py",
+      "git": "saga2d/__init__.py",
+      "sha256": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b"
+    },
+    {
+      "snapshot": "saga2d/_fileio.py",
+      "git": "saga2d/_fileio.py",
+      "sha256": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e"
+    },
+    {
+      "snapshot": "saga2d/_scene_stack.py",
+      "git": "saga2d/_scene_stack.py",
+      "sha256": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a"
+    },
+    {
+      "snapshot": "saga2d/actions.py",
+      "git": "saga2d/actions.py",
+      "sha256": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229"
+    },
+    {
+      "snapshot": "saga2d/animation.py",
+      "git": "saga2d/animation.py",
+      "sha256": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815"
+    },
+    {
+      "snapshot": "saga2d/assets.py",
+      "git": "saga2d/assets.py",
+      "sha256": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4"
+    },
+    {
+      "snapshot": "saga2d/audio.py",
+      "git": "saga2d/audio.py",
+      "sha256": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e"
+    },
+    {
+      "snapshot": "saga2d/backends/__init__.py",
+      "git": "saga2d/backends/__init__.py",
+      "sha256": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416"
+    },
+    {
+      "snapshot": "saga2d/backends/base.py",
+      "git": "saga2d/backends/base.py",
+      "sha256": "d2e10d6e84ee0bcadde245f873bce1c216ec7505eed3b56b87a3648404112185"
+    },
+    {
+      "snapshot": "saga2d/backends/mock_backend.py",
+      "git": "saga2d/backends/mock_backend.py",
+      "sha256": "18ac93641c51e9e4df9796a35bb7afbdf3c9431c73a3fcc338457ef45faf7f1e"
+    },
+    {
+      "snapshot": "saga2d/backends/pyglet_backend.py",
+      "git": "saga2d/backends/pyglet_backend.py",
+      "sha256": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8"
+    },
+    {
+      "snapshot": "saga2d/game.py",
+      "git": "saga2d/game.py",
+      "sha256": "21f03dac8c2a2d450bc3dd32554d31a6b2dd4c882c41f8f8d7a64b4ff58bef2d"
+    },
+    {
+      "snapshot": "saga2d/hexgrid.py",
+      "git": "saga2d/hexgrid.py",
+      "sha256": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0"
+    },
+    {
+      "snapshot": "saga2d/input.py",
+      "git": "saga2d/input.py",
+      "sha256": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29"
+    },
+    {
+      "snapshot": "saga2d/render3d.py",
+      "git": "saga2d/render3d.py",
+      "sha256": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b"
+    },
+    {
+      "snapshot": "saga2d/rendering/__init__.py",
+      "git": "saga2d/rendering/__init__.py",
+      "sha256": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a"
+    },
+    {
+      "snapshot": "saga2d/rendering/_text.py",
+      "git": "saga2d/rendering/_text.py",
+      "sha256": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1"
+    },
+    {
+      "snapshot": "saga2d/rendering/camera.py",
+      "git": "saga2d/rendering/camera.py",
+      "sha256": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0"
+    },
+    {
+      "snapshot": "saga2d/rendering/layers.py",
+      "git": "saga2d/rendering/layers.py",
+      "sha256": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996"
+    },
+    {
+      "snapshot": "saga2d/rendering/particles.py",
+      "git": "saga2d/rendering/particles.py",
+      "sha256": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0"
+    },
+    {
+      "snapshot": "saga2d/rendering/shapes.py",
+      "git": "saga2d/rendering/shapes.py",
+      "sha256": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f"
+    },
+    {
+      "snapshot": "saga2d/rendering/sprite.py",
+      "git": "saga2d/rendering/sprite.py",
+      "sha256": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8"
+    },
+    {
+      "snapshot": "saga2d/save.py",
+      "git": "saga2d/save.py",
+      "sha256": "e1002496a7fc01f2dbebb2831aba001ea3d1b725800a06911160a58ea0597c01"
+    },
+    {
+      "snapshot": "saga2d/scene.py",
+      "git": "saga2d/scene.py",
+      "sha256": "ae417745d4aa23e6cc470ef0fddb2fd762b1606423c1e3c5cbe51396ac3fd477"
+    },
+    {
+      "snapshot": "saga2d/settings.py",
+      "git": "saga2d/settings.py",
+      "sha256": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446"
+    },
+    {
+      "snapshot": "saga2d/synth.py",
+      "git": "saga2d/synth.py",
+      "sha256": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730"
+    },
+    {
+      "snapshot": "saga2d/testing.py",
+      "git": "saga2d/testing.py",
+      "sha256": "e73a33918038b50384ee380adf2473dde0e1c6bc8d6222d1a7264dcea63fc0f4"
+    },
+    {
+      "snapshot": "saga2d/ui/__init__.py",
+      "git": "saga2d/ui/__init__.py",
+      "sha256": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933"
+    },
+    {
+      "snapshot": "saga2d/ui/base.py",
+      "git": "saga2d/ui/base.py",
+      "sha256": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa"
+    },
+    {
+      "snapshot": "saga2d/ui/components.py",
+      "git": "saga2d/ui/components.py",
+      "sha256": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16"
+    },
+    {
+      "snapshot": "saga2d/ui/layout.py",
+      "git": "saga2d/ui/layout.py",
+      "sha256": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f"
+    },
+    {
+      "snapshot": "saga2d/ui/theme.py",
+      "git": "saga2d/ui/theme.py",
+      "sha256": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d"
+    },
+    {
+      "snapshot": "saga2d/util/__init__.py",
+      "git": "saga2d/util/__init__.py",
+      "sha256": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e"
+    },
+    {
+      "snapshot": "saga2d/util/collision.py",
+      "git": "saga2d/util/collision.py",
+      "sha256": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e"
+    },
+    {
+      "snapshot": "saga2d/util/reactive.py",
+      "git": "saga2d/util/reactive.py",
+      "sha256": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30"
+    },
+    {
+      "snapshot": "saga2d/util/timer.py",
+      "git": "saga2d/util/timer.py",
+      "sha256": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b"
+    },
+    {
+      "snapshot": "saga2d/util/tween.py",
+      "git": "saga2d/util/tween.py",
+      "sha256": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061"
+    },
+    {
+      "snapshot": "shardbound.spec",
+      "git": "packaging/shardbound.spec",
+      "sha256": "0ee3aa7dc6a15d4762825e0172ec7816166f6282029b11db45161a82af8ae947"
+    },
+    {
+      "snapshot": "tools/build_eador.py",
+      "git": "tools/build_eador.py",
+      "sha256": "2de9f180e0a4fc185e2f8dc3168768f280ead7299b36abea2352780fa0be41aa"
+    },
+    {
+      "snapshot": "tools/build_eador_audio.py",
+      "git": "tools/build_eador_audio.py",
+      "sha256": "452ba80db8687fe243482093c19a1acbeaa83f38b29f0fc84e2276ee8a5720e7"
+    },
+    {
+      "snapshot": "tools/eador_campaign.py",
+      "git": "tools/eador_campaign.py",
+      "sha256": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387"
+    },
+    {
+      "snapshot": "tools/eador_linked_campaign.py",
+      "git": "tools/eador_linked_campaign.py",
+      "sha256": "6888ff9dce8bd5e812e19b61ff8b9c55687e5efb964f17748547fde81b4e4e45"
+    },
+    {
+      "snapshot": "tools/eador_ui.py",
+      "git": "tools/eador_ui.py",
+      "sha256": "09fefd32651b749aba51ff80e1e2da76f055cffe25cbb62e622e6f05b2d6eb61"
+    }
+  ],
+  "process_ids": [
+    53139,
+    53225,
+    53317,
+    53388,
+    53393,
+    53463,
+    53503,
+    53584,
+    53619
+  ],
+  "inputs": 984,
+  "exact_ui_reloads": 17,
+  "exact_process_joins": 7,
+  "visible_playback_finishes": 182,
+  "journeys": {
+    "direct": {
+      "phases": [
+        {
+          "phase": 1,
+          "campaign_phase": "departure",
+          "checkpoint": "c82efe6b6c1bd0b21765560401684c6659f1a1ffb1a8d351752eb82d78f55277",
+          "inputs": 143,
+          "reloads": 2,
+          "playback_finishes": 28
+        },
+        {
+          "phase": 2,
+          "campaign_phase": "departure",
+          "checkpoint": "28588c7f14ecd9761ec6c1462bf9c56f89a019e8962d1fb342141b609ee788ba",
+          "inputs": 165,
+          "reloads": 3,
+          "playback_finishes": 32
+        },
+        {
+          "phase": 3,
+          "campaign_phase": "completed",
+          "checkpoint": "9965177840f61662b2fb5796968652e50138f53343c3ae97bed3aa9303c946c1",
+          "inputs": 160,
+          "reloads": 3,
+          "playback_finishes": 30
+        },
+        {
+          "phase": 4,
+          "campaign_phase": "completed",
+          "checkpoint": "9965177840f61662b2fb5796968652e50138f53343c3ae97bed3aa9303c946c1",
+          "inputs": 3,
+          "reloads": 0,
+          "playback_finishes": 0
+        }
+      ],
+      "records": [
+        {
+          "casualties": 2,
+          "contract": "westwatch",
+          "garrison": [
+            "archer",
+            "swordsman",
+            "swordsman",
+            "swordsman"
+          ],
+          "hero_level": 3,
+          "stage": 1,
+          "theme": "frontier",
+          "turns": 12
+        },
+        {
+          "casualties": 1,
+          "contract": "rootward",
+          "garrison": [
+            "swordsman",
+            "swordsman",
+            "swordsman",
+            "swordsman"
+          ],
+          "hero_level": 4,
+          "stage": 2,
+          "theme": "elderwild",
+          "turns": 13
+        },
+        {
+          "casualties": 0,
+          "contract": "gate",
+          "garrison": [],
+          "hero_level": 5,
+          "stage": 3,
+          "theme": "ruins",
+          "turns": 11
+        }
+      ]
+    },
+    "recovery": {
+      "phases": [
+        {
+          "phase": 1,
+          "campaign_phase": "departure",
+          "checkpoint": "c82efe6b6c1bd0b21765560401684c6659f1a1ffb1a8d351752eb82d78f55277",
+          "inputs": 143,
+          "reloads": 2,
+          "playback_finishes": 28
+        },
+        {
+          "phase": 2,
+          "campaign_phase": "recovery",
+          "checkpoint": "f054a683a0b0dc09f1032d22bee0ea6e754d29b754a7bede32b4d762d4bbcdc4",
+          "inputs": 49,
+          "reloads": 1,
+          "playback_finishes": 2
+        },
+        {
+          "phase": 3,
+          "campaign_phase": "departure",
+          "checkpoint": "7388750cb38a4573f6b8f380fd6fd9a910e91a1ac03f1f4ef86dab36a496c22f",
+          "inputs": 158,
+          "reloads": 3,
+          "playback_finishes": 32
+        },
+        {
+          "phase": 4,
+          "campaign_phase": "completed",
+          "checkpoint": "4c746c502936be8325a897dc84d017200df572ea739ebb92776c41c6d4b7a872",
+          "inputs": 160,
+          "reloads": 3,
+          "playback_finishes": 30
+        },
+        {
+          "phase": 5,
+          "campaign_phase": "completed",
+          "checkpoint": "4c746c502936be8325a897dc84d017200df572ea739ebb92776c41c6d4b7a872",
+          "inputs": 3,
+          "reloads": 0,
+          "playback_finishes": 0
+        }
+      ],
+      "records": [
+        {
+          "casualties": 2,
+          "contract": "westwatch",
+          "garrison": [
+            "archer",
+            "swordsman",
+            "swordsman",
+            "swordsman"
+          ],
+          "hero_level": 3,
+          "stage": 1,
+          "theme": "frontier",
+          "turns": 12
+        },
+        {
+          "casualties": 1,
+          "contract": "rootward",
+          "garrison": [
+            "swordsman",
+            "swordsman",
+            "swordsman",
+            "swordsman"
+          ],
+          "hero_level": 4,
+          "stage": 2,
+          "theme": "elderwild",
+          "turns": 33
+        },
+        {
+          "casualties": 0,
+          "contract": "gate",
+          "garrison": [],
+          "hero_level": 5,
+          "stage": 3,
+          "theme": "ruins",
+          "turns": 11
+        }
+      ]
+    }
+  },
+  "limitation": "Read-only audit of retained build and native receipts; no new launch/full-suite/code-signing/human test.",
+  "entry_analysis_matches_snapshot": true
+}
