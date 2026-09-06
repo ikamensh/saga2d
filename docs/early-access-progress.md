@@ -76,6 +76,17 @@ gameplay commands. Forty-five focused integration tests pass in 18.20 seconds.
 All jobs ran serially and ended; no large matrix, soak or packaged refresh was
 run. **All G01–G19 remain incomplete.**
 
+[The directed Foundries continuation](evidence/directed-foundries-03ded5e/README.md)
+extends the same journal to 428 commands and second-shard departure at turn 4.
+Seven victories retain all five troops, with actual paid support recruitment,
+three ordinary rests and earned Channeling II. The shared mana pool is exhausted
+in the eight-round capital battle; the departure retains 158 gold and 17 crystals.
+All commands resume from exact serialized results. The additional second-shard
+commands still need native replay, and the finale remains in progress at this
+checkpoint. A fresh UI-only attempt stopped at the locked Mac before observing
+the game; its own process was closed. No human-playtest, full-campaign or release
+gate credit is claimed. Game and framework source hashes remain unchanged.
+
 [Paid Vault continuation](eador-vault-continuation.md) now follows an earned
 two-crystal unseal through production and veteran replacement. In this seed-7
 example it captures production two turns earlier and retains the original

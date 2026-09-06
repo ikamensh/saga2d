@@ -1,0 +1,24 @@
+{
+  "root_source_commit": "03ded5e",
+  "package_source_commit": "32f354ce6233d8f159acf6692548e854acc322cc",
+  "package_path": "/tmp/shardbound-playtest-32f354c/Shardbound.app",
+  "isolated_profile": "/tmp/shardbound-independent-ui-03ded5e",
+  "agent": "blind_first_run_awake",
+  "method": "Fresh agent without conversation history or code access; one native CUA attachment to the already launched app, with display kept awake.",
+  "attachment": "cua.getApp('/tmp/shardbound-playtest-32f354c/Shardbound.app')",
+  "result": "blocked before observing UI",
+  "error": "The Mac is locked and automatic unlock could not unlock it. Ask the user to unlock the Mac manually before continuing.",
+  "screenshots": 0,
+  "gameplay_inputs": 0,
+  "independent_walkthrough_completed": false,
+  "human_playtest": false,
+  "cleanup": {
+    "owned_pid": 92177,
+    "command_verified_before_signal": true,
+    "signal": "SIGTERM",
+    "session": 98584,
+    "session_terminal": true,
+    "pid_absent_after_signal": true
+  },
+  "scope": "No usability or G09 completion credit. The package predates current autoplay changes. Other work continues; no further attachment attempt until the Mac is unlocked."
+}
