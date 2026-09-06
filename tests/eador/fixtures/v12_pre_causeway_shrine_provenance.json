@@ -1,0 +1,11 @@
+{
+  "source_revision": "c1797d11bd85ca055c74bdc9b40fb0af2d7f3edc",
+  "source_sha256": {
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/worldgen.py": "aedc6cc6c6401b762ca35e0243a0821e2c0550284e5c2400791288122f299e4b",
+    "eador/content.py": "9cb9dd550be6c456358b7d34b300607d7b7b9fa3f20e937d0b164206dd270554",
+    "tools/audit_eador_causeway_placement.py": "90f63030396857818ebeadb12929710cda9766e7403ab73cd0967b0e76b8d865"
+  },
+  "scope": "Actual Standard seed7 Commander Ruins arrival from travel(): healthy turn9 L3 mana10. Explore existing ordinary Shrine at(0,1), then public finish_battle with reward choices. Saved before Causeway registry/world changes."
+}
