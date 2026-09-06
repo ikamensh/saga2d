@@ -51,6 +51,15 @@ timed out before observing any game, and its launched app was closed. All jobs
 ended; no cancelled large matrix or soak was restarted. The Mac archive above
 predates this battle-policy change. **All G01–G19 remain incomplete.**
 
+[Verification preparation and cleanup in 9bcca4b](evidence/verification-helper-cpu-9bcca4b/README.md)
+extend the 25% cooperative allowance to save/result preparation and the older
+Relief prototype's searches. Both verifiers close their initial and restarted
+rendering backends. Nine focused integration checks pass; one tiny real prototype
+run completes in 1.11 seconds at about 42% of one core including startup and
+report writing. This is not a strict CPU quota or battery-life measurement. No
+native window or large stress job was launched, and all jobs ended. This changes
+development tools only; game/framework bytes remain those of d643410.
+
 [Paid Vault continuation](eador-vault-continuation.md) now follows an earned
 two-crystal unseal through production and veteran replacement. In this seed-7
 example it captures production two turns earlier and retains the original

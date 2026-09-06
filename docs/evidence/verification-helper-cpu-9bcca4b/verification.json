@@ -1,0 +1,39 @@
+{
+  "commit": "9bcca4b4a57255c6d911f313fface4c2fce5ad50",
+  "tests": {
+    "command": "uv run python -m pytest tests/tools/test_verifier_preparation_budget.py tests/tools/test_native_frames.py -q",
+    "passed": 9,
+    "seconds": 5.24
+  },
+  "real_cli": {
+    "cpu_percent": 25,
+    "exit_code": 0,
+    "wall_seconds": 1.11,
+    "user_cpu_seconds": 0.43,
+    "system_cpu_seconds": 0.04,
+    "observed_cpu_percent_including_startup": 42.34234234234234,
+    "source_revision_at_run": "16a52f908b95378b183dfb82ba1e2653e6155dfa",
+    "source_hashes_verified_against_commit": 86,
+    "source_files_changed_during_run": [],
+    "authored_detached_plans": 14,
+    "automatic_detached_branches": 4,
+    "search_groups": 12,
+    "search_trials": 48,
+    "world_seeds_per_theme": 2,
+    "reproduce_command": "uv run python tools/prototype_eador_relief.py --trials 4 --world-seeds 2 --output /tmp/shardbound-final-helper-cpu-prototype.json.gz"
+  },
+  "verified_source_sha256": {
+    "tools/eador_control_campaign.py": "9c8287d2a66003cc43ee15271d68b5b41d6bfef0dd06a9b1a2c83591cbc35d0d",
+    "tools/eador_observatory_campaign.py": "edabc205108c74db2fdf02be9d33c460c54a82d4b730107387f9066958368aa3",
+    "tools/prototype_eador_relief.py": "a435e44b8312a40dfbdb0c1765c68381252a6c8e4372021ff3932bcab6bcb808",
+    "tools/verify_eador_results.py": "4d742f9064937f3afa9978efabefd29ed7d06eb6d39a189bf06a1805cb362fdd",
+    "tools/verify_eador_saves.py": "f9c7336a0da14d594fa6599cebd951c25fe83b50dd8dd5e9d1913f6a18f99f7b",
+    "tests/tools/test_verifier_preparation_budget.py": "35859c1a2a581b3ba6e56301737566857a84db89bc2877173c2ee2feaea201dd"
+  },
+  "limits": [
+    "The short end-to-end CPU ratio includes interpreter/import/CLI overhead and report serialization.",
+    "The cooperative allowance is not an OS quota; atomic operations may exceed it.",
+    "No native window, full matrix, full-suite repeat, soak, battery-life measurement or release acceptance was performed for this tool-only increment."
+  ],
+  "all_owned_jobs_ended": true
+}

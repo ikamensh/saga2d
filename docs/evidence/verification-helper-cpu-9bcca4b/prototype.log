@@ -1,0 +1,28 @@
+forward hold 2 wounds 50 mana 4 dead []
+forward-heal hold 2 wounds 28 mana 8 dead []
+western hold 4 wounds 50 mana 8 dead []
+western-heal hold 4 wounds 28 mana 12 dead []
+scout hold 2 wounds 44 mana 0 dead []
+seven-body-passive-counterexample hold 2 wounds 40 mana 0 dead []
+four-body-commander-old-enclosure hero_death 4 wounds 40 mana 0 dead [0]
+four-body-warrior-old-enclosure deadline 4 wounds 42 mana 0 dead []
+four-body-scout-old-enclosure hero_death 4 wounds 40 mana 0 dead [0]
+four-body-wizard-old-enclosure hero_death 4 wounds 40 mana 0 dead [0]
+missed-support-first-phase None 2 wounds 28 mana 4 dead []
+missed-support-then-guard deadline 4 wounds 61 mana 4 dead [4]
+wrong-archer-allocation None 2 wounds 29 mana 0 dead []
+western-repulse-omitted deadline 4 wounds 52 mana 8 dead []
+passive search four-body-commander-forward {'deadline': 4}
+passive search four-body-commander-western {'deadline': 4}
+passive search four-body-warrior-forward {'deadline': 4}
+passive search four-body-warrior-western {'deadline': 4}
+passive search four-body-scout-forward {'deadline': 4}
+passive search four-body-scout-western {'deadline': 4}
+passive search four-body-wizard-forward {'deadline': 4}
+passive search four-body-wizard-western {'deadline': 4}
+passive search scout-forward {'deadline': 4}
+passive search scout-western {'deadline': 4}
+passive search commander-forward {'deadline': 4}
+passive search commander-western {'deadline': 4}
+placement {'(1, -2)': 2}
+/tmp/shardbound-final-helper-cpu-prototype.json.gz
