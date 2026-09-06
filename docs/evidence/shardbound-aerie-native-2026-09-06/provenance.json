@@ -1,0 +1,75 @@
+{
+  "source_revision": "3ba80da54c4de436f8123d4c74c896949e2316ae",
+  "source_hashes_verified_against_git_and_worktree": true,
+  "source_files_per_report": 83,
+  "source_changed_during_runs": false,
+  "all_runs_started_clean": true,
+  "python": "3.13.2",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "backend": "pyglet",
+  "logical_resolution": [
+    1280,
+    800
+  ],
+  "framebuffer_size": [
+    2560,
+    1600
+  ],
+  "reading_scale": 125,
+  "native_input_activations": 1430,
+  "exact_save_reloads": 101,
+  "manual_orders_including_failed_attempt": 362,
+  "full_test_suite": {
+    "passed": 1128,
+    "seconds": 110.1
+  },
+  "inspected_images": {
+    "western-briefing-125.png": "western/briefing-western-125.png",
+    "western-deployment.png": "western/aerie-deployment.png",
+    "northern-deployment.png": "northern/aerie-deployment.png",
+    "western-repulse.png": "western/round-2-repulse-forecast.png",
+    "western-brace.png": "western/round-2-braced-reserve.png",
+    "western-flight.png": "western/round-2-flight-landed.png",
+    "western-final-attack.png": "western/round-4-attack-0-forecast.png",
+    "northern-first-bolt.png": "northern/round-1-bolt-forecast.png",
+    "northern-flight.png": "northern/round-2-flight-landed.png",
+    "scout-swap.png": "scout/round-3-swap-forecast.png",
+    "scout-heal.png": "scout/round-4-heal-forecast.png",
+    "failed-result.png": "failed-retry/failure/hero-defeat.png",
+    "paid-replacement.png": "failed-retry/failure/paid-new-skyrider.png",
+    "retry-briefing-125.png": "failed-retry/retry/briefing-northern-125.png",
+    "retry-bolt.png": "failed-retry/retry/round-1-bolt-forecast.png",
+    "retry-victory.png": "failed-retry/retry/aerie-rout-victory.png",
+    "retry-reward-sidebar-clip.png": "failed-retry/retry/aerie-reward-kept-once.png"
+  },
+  "known_visual_issue": "Exhausted hero-action guidance clips at right edge in retry-reward-sidebar-clip.png; reported to root for shared ShardScene follow-up.",
+  "limits": [
+    "Scripted native input, not independent human playtesting.",
+    "The round-56 failure deliberately refuses to advance; it is finite-persistence evidence, not typical pacing.",
+    "Evidence proves this revision and these Standard seed-seven purchased plans, not release readiness or all army policies."
+  ],
+  "artifact_sha256": {
+    "failed-result.png": "d56bdf5722c1aad3c7e371199034d63277fb2f7d11192f99ff9e1e0229f4f2b4",
+    "failed-retry.json": "b97f1272c0e3939a30bfc5fb39c3a05dc9a8520a171304300290c2277b0bcb0c",
+    "northern-deployment.png": "3f7b9b74c05566928e76b6ba1c94c6f45abea8887f0fa4a6e849bc0037eac88b",
+    "northern-first-bolt.png": "a324867a99d9003dad7c34d97f2ead79875e25defa162257a0fb8faab8ff7d1b",
+    "northern-flight.png": "a6428bfc229f3408aa7f3771443def52f7883627b54bf29a3228b9954d7fb9be",
+    "northern.json": "7093d22d2c5a23675f1e214dad9ff58db2a2f65e610708c0931b126847591462",
+    "paid-replacement.png": "3e9fea86f06dc6984fc5095a650148d343a8b5a525decc8dd3ca3bc24bee0100",
+    "retry-bolt.png": "11a1dbf5d18b249488df4ae16a79e61f07ec797d53d295bd5e6a61df36dccff6",
+    "retry-briefing-125.png": "a7a7718a2105d0e283164b46c9294ab5b2e992a98cf8033724c42ed6fc350573",
+    "retry-reward-sidebar-clip.png": "dd92316e349128428b842501d9b1e6f8059f33c2555ac13d3cbb13b37b218ebd",
+    "retry-victory.png": "ce4cbe4d25255b2fc2914ee76f68ea2d18d2b4747106ce702d7aca1387a924d8",
+    "scout-heal.png": "1511509baa6d2e26f2400b2c490f0bb5be8886ef025e9daa429fd170889be466",
+    "scout-swap.png": "53ba6394d8cb5f40650325e897e7abcdb4e1e03df8016a0b819814ae22244467",
+    "scout.json": "5e07fa3dbbc5760ecf987a32a6ff2ff6a71474b65debf05969ec17685d2c8f59",
+    "western-brace.png": "e603d9bac8076d3599b303313455798a74715fa18b0ab52e44e778d1dca775e4",
+    "western-briefing-125.png": "d0c77740b82d6c3d596f7c53334f32c8bcee1710c0a06c12c91f58ae8bb5b3f6",
+    "western-deployment.png": "9d451101153366140fa80c35429e6504e1cd120185f56d8ed5501f296c49c484",
+    "western-final-attack.png": "a4f01261313154a700634285474109ee262b826693140d080c0ffa38bf4cc425",
+    "western-flight.png": "1e8d3533454ee98f2beff82e7cf1f21a7729e67ddff77c8a8323845f9963a57e",
+    "western-heal.json": "a1066282946046fdc43d5d3852f39bc63ac0ed7445bdf1e66947b81de62745ab",
+    "western-repulse.png": "ff2a8726fb704c022c45848cc5708c33fa3814d474ed7ecf1157c379196a76b9",
+    "western.json": "9d3294229d8825e772c2de78e496eb95e6626f2d4fc9f5269b3461820aa74603"
+  }
+}

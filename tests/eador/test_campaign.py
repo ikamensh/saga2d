@@ -214,6 +214,17 @@ def final_battle(finale='gate', hero_class='Commander', seed=7, *, ranged=False)
         if not state.actions_left:
             rest(state, defend=False)
             continue
+        if ranged and hero_class in ('Warrior', 'Scout') and state.hero.army[1].kind != 'healer':
+            # Aerie attrition can leave a fresh seal Archer. Buy a second Heal
+            # by permanently retiring the rear veteran; no free levels or HP.
+            outgoing = state.hero.army[1]
+            quote = state.replacement_preview(outgoing.id, 'healer')
+            gold, actions = state.gold, state.actions_left
+            state.replace_troop(outgoing.id, 'healer')
+            assert state.gold == gold - quote.gold and state.actions_left == actions - 1
+            if not state.actions_left:
+                rest(state, defend=False)
+                continue
         state.travel((2, 0))
         if state.battle_kind == 'conquest':
             return state
@@ -293,6 +304,9 @@ def test_six_body_armies_hold_the_final_seal_with_pin_rotation_and_healing(hero_
         defender = next(u for u in battle.units if u.team == 'enemy' and u.pos == flank)
         battle.pin(by_pos[archer_start], defender.id)
     battle.cast('heal', by_pos[(-3, 2)])
+    rear = battle.unit(by_pos[(-3, 1)])
+    if rear.can_heal:
+        battle.cast('heal', by_pos[(-2, 1)], caster_id=rear.id)
     for unit in battle.units:
         if unit.team == 'player' and not unit.acted:
             battle.guard(unit.id)

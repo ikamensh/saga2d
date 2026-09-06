@@ -116,6 +116,11 @@ SITES = {
             AdventureApproach('western', 'Form the western column', 'Free. Assemble west of the forest. The southern Guard can press a screened front line.', 'screen_western'),
             AdventureApproach('northern', 'Assemble to the north', 'Free. Challenge the northern bowmen earlier, with less distance between your support and their crossfire.', 'screen_northern'),
         )),
+    'aerie_raid': SiteSpec('Aerie Raid', 'Rout the airborne raiders. Their Skyriders cross marsh and occupied ground, but must land before striking.',
+        ('skyrider', 'skyrider', 'archer', 'pikeman'), 60, 2, 'watch_bell', 'aerie_western', (
+            AdventureApproach('western', 'Form the western reserve', 'Free. Hold the dry western ground; flyers can cross the marsh to attack your rear.', 'aerie_western'),
+            AdventureApproach('northern', 'Challenge the northern perch', 'Free. Assemble closer to the northern raider and the eastern firing lane.', 'aerie_northern'),
+        )),
     'stranded_explorer': SiteSpec('Stranded Explorer', 'Recover a trail kit beyond the marsh, then regroup at the western exit by round 6, or rout the patrol.',
         ('pikeman', 'archer', 'guard', 'warden'), 55, 1, 'wayfarer_boots', 'explorer_north', (
             AdventureApproach('north', 'Assemble to the north', 'Free. The main force begins north of the return exit. Your hero and fifth troop, if present, start isolated east of the marsh.', 'explorer_north'),
