@@ -197,7 +197,7 @@ class CampaignScene(Screen):
             return
         self.game.audio.play_sound('confirm')
         if not self.checkpoint(state):
-            self.root.message = self.message + ' Your pre-departure snapshot remains available in Saves.'
+            self.root.message = 'Arrived. Pre-departure save is intact; autosave failed. F5 or F6 saves this new shard.'
         self.game.pop()
 
     def abandon(self):
