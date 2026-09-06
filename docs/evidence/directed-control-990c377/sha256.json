@@ -1,0 +1,18 @@
+{
+  "README.md": "f7ad7a2170d73db49d737bc2e42642c0b99eec9b16ea62e984c404779f7257ea",
+  "director.py": "00620080b05b5116178668440d48cf1606e08a27fcfad95d5f6abf2640ccfd7f",
+  "journal.json.gz": "a786afe7b8a2732e6a60bc0bdcd5ce3fef37b7125ab21dc9b82379f298c5641e",
+  "native/015-battle-end_turn.png": "c63cb101ce4d1168ff3fe55cb193acbb985ae32dc50b422752112096b34d4f20",
+  "native/022-battle-cast.png": "6cbca73c44293e64f2a5198ae79399915f3ff16bdb6878d710d2772cec09bf87",
+  "native/033-resolve_battle.png": "a1bbbc31fdeba0020d682568fb32728307ef6f42cbbc55cdef1d00bdae0ed169",
+  "native/068-battle-repulse.png": "1567fc3e22a409d3ca899476fbb1db79537bd02409e0754a58f67da5cf381a51",
+  "native/final-state.png": "bbad74944a0b43c96eb78de19226ef2e5bf537b02815efd1671f0b8c992da289",
+  "native/replacement-1-adept-applied.png": "f83b0bea5cf6570ee00564bf5da67dbcbe0c7ad80cd68d1324f748ef8db97486",
+  "native/replacement-1-adept-review.png": "08bff74150cfacae114a193c78e3515db1de56dd5784459bd7927c1fad6a9678",
+  "native/replacement-3-skyrider-applied.png": "f9d36ee8d93d850d6672246c812ed3c0c156ff0272d23b31fdba59a468540a8b",
+  "native/replacement-3-skyrider-review.png": "c7a9b8e77c868b0ce4edf4a5929933b84b04a23697fafd30ae5601ccea2ff259",
+  "native/verification.json": "e65948b1c1fb1cd8095ef7b20d0284bcaaed679059fb82b4fe0621d409507cde",
+  "native.log": "0906c02caa349018c2039ca9f89e04be15e4a33bd32ac935240c75a131e16702",
+  "summary.json": "c994febfcc26f93ca4fd784aa2a6e7c33caf22d6df761624be451f2c6ccf4a26",
+  "tests.log": "75995adef2e2e31fddfdb821fdab91f597bc06ac32621e48a41c061b711e61f6"
+}

@@ -60,6 +60,22 @@ report writing. This is not a strict CPU quota or battery-life measurement. No
 native window or large stress job was launched, and all jobs ended. This changes
 development tools only; game/framework bytes remain those of d643410.
 
+[Directed Control and pacing in f78359d / 990c377](evidence/directed-control-990c377/README.md)
+add 184 explicit commands from the historical earned turn-6 opening to first-shard
+victory at turn 9. The paid Adept/Skyrider purchases, two infusions, three battles
+and one actual Militia casualty are retained with agent rationales and mistakes.
+The opening used autoplay; the next two linked shards remain unplayed in this
+continuation. Native input matches all 184 command/save/reload joins across 794
+events, with three screenshots inspected. The run averages 25.44% of one core
+over 66.37 seconds at the default CPU allowance and 30 FPS native cap.
+
+The retained replacement prototype now shares that CPU allowance through its
+battle and investment loops. Save verification also requires an actual written
+slot and a replaced live State after F9, and rejects read-only queries counted as
+gameplay commands. Forty-five focused integration tests pass in 18.20 seconds.
+All jobs ran serially and ended; no large matrix, soak or packaged refresh was
+run. **All G01–G19 remain incomplete.**
+
 [Paid Vault continuation](eador-vault-continuation.md) now follows an earned
 two-crystal unseal through production and veteran replacement. In this seed-7
 example it captures production two turns earlier and retains the original

@@ -144,5 +144,22 @@ policy had won and current Control was still playing.
 These results distinguish a correct local survival improvement from an effective
 whole-campaign policy. A complete manually directed Control journey should
 examine actual Tower infusion, specialist purchases, protection and the cost of
-waiting while the rival recruits. That journey remains unexecuted; additional
+waiting while the rival recruits. That journey remains unfinished; additional
 automated completions or favorable isolated orders would not replace it.
+
+## Directed Control first shard
+
+[The directed continuation on unchanged game source](evidence/directed-control-990c377/README.md)
+now follows the historical earned turn-6 opening through first-shard victory at
+turn 9. Its 184 explicit commands include two paid specialist replacements,
+two Tower infusions, three recovery turns and three battles. Repulse, flight,
+shared-mana healing and attack order all entered the decisions. One rank-3
+Militia died after an agent underestimated overlapping Guard attacks; that error
+and the actual wounds remain recorded. The opening before this journal used
+autoplay, and the remaining linked shards have yet to be directed.
+
+All 184 commands replay through real native controls and exact F5/F9 continuation:
+794 input events, 66.37 seconds, averaging 25.44% of one CPU core. The final
+departure holds 140 gold, nine crystals and the four living specialists. This
+provides one paid, directed first-shard itinerary; comparisons across builds and
+counter-scenarios remain necessary for G04.
