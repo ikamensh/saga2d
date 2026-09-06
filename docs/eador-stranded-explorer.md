@@ -95,3 +95,18 @@ To replay through a model or input adapter, use `prepare_explorer(...)` and
 `support=None` for the smaller Scout party. `collect_boots=True` also plays the
 Camp first, reaching the actual duplicate reward choice. Each route accepts
 `orders_type`; production helpers do not import tests.
+
+## Integrated native acceptance
+
+Source `0e27175` completes all four purchased manual plans through the shipped
+controls: 559 input activations and 28 exact save/reloads, with every ally alive.
+Commander north/south and Warrior/Acolyte escape in round three; the smaller
+Scout party escapes in round two. Fees, once-only rewards and refusal to repeat
+a cleared site are checked through the same input path.
+
+The [retained native reports and inspected frames](evidence/shardbound-integrated-0e27175/README.md)
+include Swap, Heal and evacuation forecasts. The complete guidance matrix also
+covers both deployments and all three actual isolated-party compositions at
+100/125 and three native window sizes. Counts and persistent defender HP no
+longer collide with the footer. This completes the eighth authored family's
+current development tranche; the twelve-family floor and wider G05 remain open.

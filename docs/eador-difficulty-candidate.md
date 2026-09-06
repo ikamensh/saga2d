@@ -124,6 +124,14 @@ replay, next-shard advance and defeat recovery. The old mana-3 rules remain in
 those outputs; new Challenge starts and their replay use mana 4. The combined
 mode/campaign/pressure/rival/UI integration suite passes 152 tests after selection.
 
+At integrated source `0e27175`, native current-mode openings and three actual
+pre-switch UI continuations also pass. The separate UI fixture records source
+`2ce3040` and preserves that UI's roster-order retinue selection; it does not
+sort away differences from the earlier model-command fixture. New Challenge
+completes the linked campaign after losing and recovering a realm, with 396
+inputs and 13 exact reloads. [Retained native evidence](evidence/shardbound-integrated-0e27175/README.md)
+shows both the original +3 and current +4 mana forecasts and actual completion.
+
 Reproduce the full candidate and one-factor policy comparisons:
 
 ```sh

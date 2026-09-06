@@ -186,6 +186,18 @@ The dirty flag reflects unrelated `.gitignore` work; snapshotted source hashes
 are recorded. Windows, a clean account and a full packaged campaign remain
 unverified. See [the playtest log](eador-playtests.md) for feedback status.
 
+## Integrated playable checkpoint — 2026-09-06
+
+The latest preserved Mac checkpoint is source `0e271756d35d` at
+`dist/shardbound-checkpoints/0e271756d35d/Shardbound-macos-arm64.zip`:
+**32,693,078 bytes**, SHA-256
+`c182ef2e1daf00633e0381441dfc02eeb4f95d6193fbdc2ef52dc05a6577a21c`.
+It includes Challenge-2, the eighth authored adventure and larger guidance
+text, with an updated player guide. [Manifest, launch report and inspected frames](evidence/shardbound-integrated-0e27175/README.md)
+retain the extracted frozen and LaunchServices checks. The earlier playtest
+archive is unchanged. This remains local development evidence; the native
+source campaign matrix is not a full packaged campaign test.
+
 ## Windows x64 plan — untested
 
 Build on a Windows x64 host using x64 CPython 3.13.2. Run the same uv build
