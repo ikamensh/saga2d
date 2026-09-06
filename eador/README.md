@@ -13,6 +13,7 @@ uv run python -m eador                       # title and hero selection
 uv run python -m eador --seed 7              # start immediately as Commander
 uv run python -m eador --seed 7 --hero Wizard --theme elderwild
 uv run python -m eador --campaign --seed 7 --hero Commander
+uv run python -m eador --campaign --seed 7 --difficulty accessible
 uv run python -m pytest tests/eador -q
 ```
 
@@ -45,9 +46,20 @@ retains its previous version, opened explicitly with **Backup** or
 reported without replacing live play; recover a backup and save to another
 manual slot. **Save & title** asks for a slot and leaves only after writing it.
 
+Choose **Accessible / Standard / Challenge** on the title with **1 / 2 / 3**,
+or use `--difficulty accessible|standard|challenge`. Accessible starts with
+130 gold and more generous recovery; Standard starts with 100 gold; Challenge
+starts with 90 gold, earns 80% of base realm gold production and has shorter
+rival preparation windows. The choice is fixed for a run. Loading preserves
+that save's exact rules, including earlier Challenge recovery rates. **H**
+shows the actual next-turn recovery; campaign briefings show actual arrival
+and recovery funds.
+
 **O** opens settings from the title or field guide. **S / D** selects Sound
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
-fullscreen and reduced motion; **Enter** applies, **Esc** cancels the preview.
+fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
+Reading size offers 100/125% for the Codex, Field Guide and expedition briefings.
+**T** opens it directly from a briefing; other screens currently keep their sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
@@ -58,7 +70,7 @@ and mix review remain part of release preparation.
 
 ## Your first turns
 
-1. Start with Commander. You have 100 gold, two militia, an archer and your
+1. Start with Commander on Standard. You have 100 gold, two militia, an archer and your
    hero. Press **B**, then **1** to build Barracks for 45 gold. Close with
    **Esc**, press **R**, then **2** to recruit a Swordsman for 45 gold.
 2. Close recruitment and press **X** to explore Westwatch's guarded site.
@@ -105,6 +117,8 @@ adds mana to support the two spells already learned.
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
 | Title | Left / Right / click world | Choose Frontier, Elderwild or Ruins |
+| Title | 1 / 2 / 3 | Choose Accessible, Standard or Challenge |
+| Title | L | Start a linked campaign |
 | Title | Enter / Space | Start the selected shard |
 | Title | N | Choose a new shard seed |
 | Title / guide | O | Open sound and display settings |
@@ -120,6 +134,7 @@ adds mana to support the two spells already learned.
 | Shard | X | Explore the hero's current province; preview authored expeditions |
 | Expedition briefing | Enter / Esc | Enter for one action / return without spending |
 | Adventure briefing | 1 / 2 | Compare deployment, fee or reward choices |
+| Expedition briefing | T | Adjust reading size with live preview and Apply/Cancel |
 | Shard | B / R | Open construction / recruitment |
 | Shard / decision | H | Inspect skills and equip relics |
 | Shard, battle, guide, hero or decision | C | Open the rules codex |
@@ -167,7 +182,8 @@ eastern approach has four, and Duskspire has seven. Travel and site
 exploration spend campaign actions: two per turn, or three for Scout.
 Construction and recruitment spend resources without consuming actions;
 recruitment is available in any province you control. There is one guarded
-site per eligible province, resolved in a single expedition.
+site per eligible province. Each can be cleared once; failed attempts leave
+surviving defenders wounded for a later retry.
 
 | Class | Difference |
 |---|---|
@@ -219,15 +235,17 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Twelve sites have different defending parties and gold/crystal rewards:
-Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove, Border Watch, Explorer's Camp, Courier's Crossing, Supply Cache,
-Sealed Vault and Pack Hunt.
+Sites have different defending parties, rewards and objectives. Ordinary
+guarded ruins sit alongside authored adventures such as Border Watch,
+Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory
+and Stranded Explorer. The Codex describes the current catalogue and its
+saved rewards.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
-defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of eight
+defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of twelve
 relics to gain healing or damage spells, avoid retaliation, cross difficult
-terrain, improve army recovery or reduce recruitment costs. Duplicate
+terrain, improve army recovery, reduce recruitment costs, or give the hero
+Smoke, Repulse, Swap or Rally. One relic is equipped at a time. Duplicate
 relics can instead be distilled into four crystals. These choices belong
 to this adaptation; they do not reproduce the commercial game's catalogue.
 
@@ -250,6 +268,13 @@ The same finite pack and reward remain. Defeat every defender while keeping
 your hero alive; there is no seal or exit objective. Ordinary rout battles
 force a retreat through exhaustion after 80 rounds.
 
+Broken Observatory asks you to hold a central hill. Spend two crystals to
+clear a forest lane for both armies, or retain its cover for free. Stranded
+Explorer separates the hero and one escort, when present, from the main
+party across a marsh. Choose the northern or southern assembly for free,
+then return the hero to the western exit by round six or rout the patrol.
+The briefing identifies the actual isolated party before entry.
+
 | Building | Cost | Benefit |
 |---|---|---|
 | Barracks | 45 gold | Recruit Swordsmen, Pikemen and Wardens |
@@ -267,7 +292,8 @@ Unpaid troops leave, preserving higher levels and experience first; among
 equal veterans, more expensive/newer recruits leave first. Outlying owned
 provinces still produce income.
 
-Ending the turn restores health on friendly land and 4 mana, unless the
+Ending the turn restores health on friendly land and mana according to the
+saved mode, unless the
 hero is inside encircled Westwatch. Before skill and relic modifiers,
 Arcane Bolt deals 14 damage; Heal restores up to 16 health
 to a living ally. Both cost 4 mana, have a range of four hexes and use the
@@ -292,9 +318,10 @@ Capture Duskspire to win; taking every province is unnecessary. If the
 rival reaches a province containing your hero, you fight a defensive
 battle. Other guarded provinces fight its expedition using the same
 tactical rules, with lasting losses on both sides. Losing
-Westwatch ends the campaign. Retreating or losing an ordinary battle keeps
+Westwatch loses the shard; a linked campaign may still have its one recovery.
+Retreating or losing an ordinary battle keeps
 survivors' wounds and costs up to 20 gold; defending territory is lost on
-retreat. New shard becomes available after victory or defeat.
+retreat. Return to the title to begin another run after victory or defeat.
 
 This slice has no astral metacampaign, diplomatic simulation, karma,
 rebellions, multiclassing, multiplayer, fog of war or
