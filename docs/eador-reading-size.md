@@ -77,3 +77,10 @@ passed 919 tests. The extended native matrix passed 108 category traversals,
 fee/reward and hold rules were inspected at 100/125; its 25-entry Sites catalog
 remains complete. These counts describe that content snapshot, not a fixed
 pagination contract.
+
+A compact [retained evidence set](evidence/shardbound-reading-2026-09-06/README.md)
+contains the final matrix JSON, exact source/artifact provenance and six inspected
+frames. The [100%](evidence/shardbound-reading-2026-09-06/troops-100.png) and
+[restarted 125%](evidence/shardbound-reading-2026-09-06/troops-125-restarted.png)
+frames show the reading change; the paid Observatory and earned Smoke frames
+preserve the long saved-value cases.
