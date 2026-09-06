@@ -1,5 +1,7 @@
 """Encirclement has observable costs, deterministic upkeep, and a playable breakout."""
 from eador.model import BUILDINGS, State
+from eador.difficulty import DIFFICULTIES
+import pytest
 
 
 def resolve(state):
@@ -11,9 +13,9 @@ def resolve(state):
     return result
 
 
-def surrounded_capital(*, market=False, veterans=False, outpost=False):
+def surrounded_capital(*, market=False, veterans=False, outpost=False, difficulty='standard'):
     """A real fortified defense lets the rival take the surrounding countryside."""
-    state = State.new(7)
+    state = State.new(7, difficulty=difficulty)
     state.build('barracks')
     state.recruit('swordsman')
     if veterans:
@@ -31,8 +33,12 @@ def surrounded_capital(*, market=False, veterans=False, outpost=False):
             return state
         if 'temple' not in state.buildings and state.gold >= BUILDINGS['temple'].cost:
             state.build('temple')
-        while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
-            state.recruit('swordsman')
+        if market and difficulty == 'challenge' and 'market' not in state.buildings:
+            if state.gold >= BUILDINGS['market'].cost:
+                state.build('market')
+        else:
+            while state.gold >= state.recruit_cost('swordsman') and len(state.hero.army) < state.hero.max_army:
+                state.recruit('swordsman')
         if market and 'market' not in state.buildings and state.gold >= BUILDINGS['market'].cost:
             state.build('market')
         state.end_turn()
@@ -41,8 +47,9 @@ def surrounded_capital(*, market=False, veterans=False, outpost=False):
     raise AssertionError('The rival never encircled the capital.')
 
 
-def test_encirclement_blocks_capital_and_market_production_with_a_persistent_warning():
-    state = surrounded_capital(market=True)
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_encirclement_blocks_capital_and_market_production_with_a_persistent_warning(difficulty):
+    state = surrounded_capital(market=True, difficulty=difficulty)
     assert 'market' in state.buildings
     assert state.encircled
     assert state.income == state.crystal_income == 0
@@ -63,6 +70,14 @@ def wound_the_army(state):
     """Command the hero into a guarded site, spend Heal, then withdraw injured."""
     state.explore()
     battle = state.battle
+    # Move the paid formation to the rear so it cannot trap the deliberately
+    # exposed hero behind occupied cells in a different seeded battlefield.
+    enemies = [unit for unit in battle.units if unit.team == 'enemy']
+    for unit in battle.units:
+        if unit.team == 'player' and unit.id != 0 and battle.reachable(unit.id):
+            destination = max(battle.reachable(unit.id), key=lambda pos: (
+                min(battle.grid.distance(pos, enemy.pos) for enemy in enemies), -pos[0], pos[1]))
+            battle.move(unit.id, destination)
     for _ in range(12):
         hero = battle.unit(0)
         wounded = [unit for unit in battle.units if unit.team == 'player' and unit.alive
@@ -89,10 +104,17 @@ def wound_the_army(state):
         state.retreat()
 
 
-def test_rest_is_blocked_inside_encircled_westwatch_and_a_real_breakout_restores_it():
-    state = surrounded_capital()
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_rest_is_blocked_inside_encircled_westwatch_and_a_real_breakout_restores_it(difficulty):
+    # Challenge's funded breakout needs the requested Market before filling the
+    # last troop slots; the military-only camp exhausts its payroll on retreat.
+    state = surrounded_capital(difficulty=difficulty, market=difficulty == 'challenge')
     wound_the_army(state)
     health = (state.hero.hp, state.hero.mana, {troop.id: troop.hp for troop in state.hero.army})
+    forecast = state.recovery_preview()
+    assert (forecast.hero_hp, forecast.army_hp, forecast.mana) == (0, 0, 0)
+    assert forecast.blocked_reason is not None
+    assert not state.upkeep_shortfall
     state.end_turn()
     assert (state.hero.hp, state.hero.mana, {troop.id: troop.hp for troop in state.hero.army}) == health
     destination = min((pos for pos in state.grid.neighbors(state.hero.pos) if pos != state.rival.pos),
@@ -138,8 +160,9 @@ def test_upkeep_shortfall_warns_before_deterministic_desertion_and_preserves_vet
     assert state.to_json() == restored.to_json()
 
 
-def test_permanent_marketplace_camping_eventually_loses_instead_of_farming_income():
-    state = surrounded_capital(market=True)
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_permanent_marketplace_camping_eventually_loses_instead_of_farming_income(difficulty):
+    state = surrounded_capital(market=True, difficulty=difficulty)
     start_turn = state.turn
     for _ in range(100):
         if state.status != 'playing':
