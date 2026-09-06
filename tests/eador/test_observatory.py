@@ -154,6 +154,7 @@ def test_new_ruins_get_exactly_one_observatory_and_keep_crown_and_required_sourc
         assert state.provinces[(-1, 1)].site_kind == 'sealed_vault'
         assert state.provinces[(-1, 1)].site_relic == 'mirror_badge'
         assert sum(p.site_kind == 'border_watch' for p in state.provinces.values()) == 1
-        assert state.provinces[(0, 0)].site_relic == state.provinces[(1, 0)].site_relic == 'iron_crown'
+        assert state.provinces[(1, 0)].site_relic == 'iron_crown'
+        assert state.provinces[(0, 0)].site_relic == 'watch_bell'
     for theme in ('frontier', 'elderwild'):
         assert not any(p.site_kind == 'broken_observatory' for p in State.new(7, theme=theme).provinces.values())

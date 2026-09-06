@@ -39,7 +39,8 @@ def test_ruins_trade_a_valuable_pike_checkpoint_for_a_weaker_flank():
     state = State.new(7, theme='ruins')
     checkpoint = state.provinces[(0, 0)]
     assert {'pikeman', 'archer'} <= set(checkpoint.guards)
-    assert checkpoint.site_kind == 'barrow'
+    assert checkpoint.site_kind == 'aerie_raid'
+    assert state.provinces[(1, 0)].site_kind == 'barrow'
     flanks = [[state.provinces[pos] for pos in road[1:-1]] for road in (NORTH_ROAD, SOUTH_ROAD)]
     weaker = min(flanks, key=lambda provinces: sum(sum(p.guard_hp) for p in provinces))
     assert sum(sum(p.guard_hp) for p in weaker) < sum(sum(p.guard_hp) for p in max(flanks, key=lambda ps: sum(sum(p.guard_hp) for p in ps)))

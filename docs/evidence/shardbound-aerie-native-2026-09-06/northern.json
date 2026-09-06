@@ -1,0 +1,1380 @@
+{
+  "plan": "northern",
+  "hero": "Commander",
+  "backend": "pyglet",
+  "logical_resolution": [
+    1280,
+    800
+  ],
+  "window_size": [
+    1280,
+    800
+  ],
+  "framebuffer_size": [
+    2560,
+    1600
+  ],
+  "purchases": [
+    {
+      "command": "build",
+      "kind": "market",
+      "gold": 60,
+      "crystals": 0
+    },
+    {
+      "command": "build",
+      "kind": "barracks",
+      "gold": 45,
+      "crystals": 0
+    },
+    {
+      "command": "recruit",
+      "kind": "pikeman",
+      "gold": 34,
+      "crystals": 0
+    },
+    {
+      "command": "build",
+      "kind": "mage_tower",
+      "gold": 75,
+      "crystals": 2
+    },
+    {
+      "command": "recruit",
+      "kind": "adept",
+      "gold": 56,
+      "crystals": 2
+    },
+    {
+      "command": "build",
+      "kind": "temple",
+      "gold": 65,
+      "crystals": 0
+    },
+    {
+      "command": "recruit",
+      "kind": "skyrider",
+      "gold": 60,
+      "crystals": 3
+    }
+  ],
+  "failed_attempt": null,
+  "reading_scale": 125,
+  "campaign_turn": 8,
+  "battle_rounds": 3,
+  "outcome_reason": "rout",
+  "fee_gold": 0,
+  "fee_crystals": 0,
+  "reward_gold": 60,
+  "reward_crystals": 2,
+  "reward_relic": "watch_bell",
+  "mana_spent": 8,
+  "survivors": [
+    {
+      "id": 0,
+      "kind": "hero",
+      "hp": 44,
+      "max_hp": 44
+    },
+    {
+      "id": 1,
+      "kind": "militia",
+      "hp": 26,
+      "max_hp": 32
+    },
+    {
+      "id": 2,
+      "kind": "militia",
+      "hp": 25,
+      "max_hp": 32
+    },
+    {
+      "id": 3,
+      "kind": "archer",
+      "hp": 20,
+      "max_hp": 28
+    },
+    {
+      "id": 4,
+      "kind": "pikeman",
+      "hp": 32,
+      "max_hp": 32
+    },
+    {
+      "id": 5,
+      "kind": "adept",
+      "hp": 32,
+      "max_hp": 32
+    },
+    {
+      "id": 6,
+      "kind": "skyrider",
+      "hp": 15,
+      "max_hp": 28
+    }
+  ],
+  "troops_lost": 0,
+  "hp_deficit": 34,
+  "flight_only_landings": [
+    {
+      "unit": 6,
+      "source": [
+        -3,
+        0
+      ],
+      "destination": [
+        1,
+        -1
+      ]
+    }
+  ],
+  "input_activations": 174,
+  "exact_save_reloads": 7,
+  "orders": [
+    [
+      "attack",
+      [
+        4,
+        1006
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        3,
+        1006
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        5,
+        1006
+      ],
+      {}
+    ],
+    [
+      "cast",
+      [
+        "bolt",
+        1006
+      ],
+      {}
+    ],
+    [
+      "guard",
+      [
+        1
+      ],
+      {}
+    ],
+    [
+      "guard",
+      [
+        2
+      ],
+      {}
+    ],
+    [
+      "guard",
+      [
+        6
+      ],
+      {}
+    ],
+    [
+      "end_turn",
+      [],
+      {}
+    ],
+    [
+      "move",
+      [
+        2,
+        [
+          -3,
+          1
+        ]
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        2,
+        1007
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        3,
+        1007
+      ],
+      {}
+    ],
+    [
+      "move",
+      [
+        6,
+        [
+          1,
+          -1
+        ]
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        6,
+        1008
+      ],
+      {}
+    ],
+    [
+      "move",
+      [
+        0,
+        [
+          -3,
+          0
+        ]
+      ],
+      {}
+    ],
+    [
+      "cast",
+      [
+        "heal",
+        4
+      ],
+      {}
+    ],
+    [
+      "move",
+      [
+        5,
+        [
+          -2,
+          0
+        ]
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        5,
+        1007
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        1,
+        1009
+      ],
+      {}
+    ],
+    [
+      "guard",
+      [
+        4
+      ],
+      {}
+    ],
+    [
+      "end_turn",
+      [],
+      {}
+    ],
+    [
+      "attack",
+      [
+        6,
+        1008
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        3,
+        1009
+      ],
+      {}
+    ],
+    [
+      "attack",
+      [
+        5,
+        1009
+      ],
+      {}
+    ]
+  ],
+  "inputs": [
+    [
+      "TitleScene",
+      "key",
+      "return"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "x"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ChoiceScene",
+      "key",
+      "1"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "h"
+    ],
+    [
+      "HeroScene",
+      "key",
+      "1"
+    ],
+    [
+      "HeroScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "b"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "right"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "1"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        288,
+        281
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ChoiceScene",
+      "key",
+      "1"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        348,
+        385
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "b"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "1"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "r"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "5"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "b"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "4"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "r"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "right"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "4"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "b"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "3"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        408,
+        281
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        408,
+        281
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ChoiceScene",
+      "key",
+      "1"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "r"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "right"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "right"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "1"
+    ],
+    [
+      "CatalogScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "click",
+      [
+        468,
+        385
+      ]
+    ],
+    [
+      "ShardScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "a"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "e"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "x"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "t"
+    ],
+    [
+      "SettingsScene",
+      "key",
+      "right"
+    ],
+    [
+      "SettingsScene",
+      "click",
+      [
+        924,
+        708
+      ]
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "1"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "2"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "c"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "1"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "right"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "right"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "right"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "right"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "right"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "right"
+    ],
+    [
+      "CodexScene",
+      "key",
+      "escape"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f5"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f9"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "x"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "2"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "escape"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "x"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "2"
+    ],
+    [
+      "EncounterScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "v"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f5"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f9"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        396,
+        276
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        359,
+        464
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        276
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        287,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "1"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        359,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "g"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "g"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        251,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "g"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "e"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f5"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f9"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        287,
+        464
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        287,
+        464
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        359,
+        464
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        251,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        251,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        504,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f5"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f9"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        504,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        287,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        251,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        251,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "2"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        276
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        359,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        396,
+        276
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "g"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "e"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f5"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f9"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        504,
+        338
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        359,
+        464
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "BattleScene",
+      "click",
+      [
+        323,
+        401
+      ]
+    ],
+    [
+      "BattleScene",
+      "key",
+      "f"
+    ],
+    [
+      "BattleScene",
+      "key",
+      "return"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "f5"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "f9"
+    ],
+    [
+      "ResultScene",
+      "key",
+      "e"
+    ],
+    [
+      "ChoiceScene",
+      "key",
+      "1"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "x"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f5"
+    ],
+    [
+      "ShardScene",
+      "key",
+      "f9"
+    ]
+  ],
+  "source_revision": "3ba80da54c4de436f8123d4c74c896949e2316ae",
+  "dirty_at_start": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "1890ee60548d27d73acda78a20b651aa50087b9b2c791af378daefacecec1ae4",
+    "eador/codex.py": "dbb12fff9abdc2c386963474a5c89996541c03ba1e6718f03e071dc4e62a84c1",
+    "eador/content.py": "b7e768ccd01e20d20f46ef5a63971f16c0d383f9cda20ccfd6a2acf87ff1f915",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "054a4742ff038dc763a567c02cb7f2b7e51e59f328002fe538dac100767df8dc",
+    "eador/encounters.py": "697a9b60d571f93894c75d7b247732ad76e2431075d65dc9500acafed08d789b",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "b62f11321cb583759700c0ec43c7f1ed6ff5c916601f6f32cb2a0cc6ab06aa49",
+    "eador/replacement_scene.py": "95ca38ee23c7a7dbd792ce283616978aaba738a12b2988d6f3ef12054b4b1057",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "e0c9b83a85c6afac837d80e6733b72e87df6330e377c3a18e767e9f6cf602d41",
+    "eador/scene.py": "05c0a40cf06712a9b74a873e5e7974704987a1a5f5b4168b3fc53c0e8823bc92",
+    "eador/settings_scene.py": "8e7931908dc0bc0817e2887486e66cc45ccba393fc9673baca469fffa5bc30d5",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "2531d3e02902000dd7cab6c31b460eabd0b39fdd35c4a49ef7e0cfd6e64b1de8",
+    "saga2d/__init__.py": "4bb7b2e62fb032c7dff6e26a9aff18b0c6535e846ebf289cbb82b6ba67d9ad3b",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/_scene_stack.py": "f89137b92d1316d327cbe8f8de9eb31e4064a74cba7c4d044cced8f0ae56bb6a",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "9d0a7806e2c98f1bb19da8f921c2824f5a7c7eb236989caa83a73b4bacff98c4",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "d2e10d6e84ee0bcadde245f873bce1c216ec7505eed3b56b87a3648404112185",
+    "saga2d/backends/mock_backend.py": "18ac93641c51e9e4df9796a35bb7afbdf3c9431c73a3fcc338457ef45faf7f1e",
+    "saga2d/backends/pyglet_backend.py": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8",
+    "saga2d/game.py": "21f03dac8c2a2d450bc3dd32554d31a6b2dd4c882c41f8f8d7a64b4ff58bef2d",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/input.py": "5f99aa5acbc3e879b217eb57223d4cade5bf94d5d4d8c62e2b8a9869c1e56c29",
+    "saga2d/render3d.py": "19572c76aa2079c53ba86e7d5ee67d8cdddc2322dd2a402070125d7031287e4b",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "589d41232db2c018d05e72f2430037b99b0a7f683b0dd5773a257752cebd2996",
+    "saga2d/rendering/particles.py": "68234d63d1691f6edc51a273deac31bf91cbae967cc8bb6ead09aac6555ae7a0",
+    "saga2d/rendering/shapes.py": "dac346a6577cbca28405b7cf132cd3f4cac85d44627a642cf27a85818428d73f",
+    "saga2d/rendering/sprite.py": "cee4ee9db783e49cd3058e95ec2d4dd6ad770ab5e60ea476574ba85b9a8f11a8",
+    "saga2d/save.py": "e1002496a7fc01f2dbebb2831aba001ea3d1b725800a06911160a58ea0597c01",
+    "saga2d/scene.py": "e7be356a3922cfdb3fd17c6a1500474266513e25ef4a34aebbed61fad59480d6",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/testing.py": "e73a33918038b50384ee380adf2473dde0e1c6bc8d6222d1a7264dcea63fc0f4",
+    "saga2d/ui/__init__.py": "3b8d6af70392e9d2cc3ccdd347dd0a2f01574d86879db37feb22f8b652ce2933",
+    "saga2d/ui/base.py": "621042fc4e5f341b44fd0e0d097d635a69fe207b5ecb132409bb14d754ed73aa",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/theme.py": "4ae358b45bba65430c1f2020b0e6daef4c4f7aed9be19e2bd49d026b939dcb3d",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "tools/audit_eador_aerie.py": "39ee7838d9dd746e52fa4cdd51124e3b366b33b42a05649917a88395a8a25264",
+    "tools/audit_eador_extraction.py": "50332c13d4343789278abfe02f278e7bdddeee36bff9fa8f6381eed35ab1fe82",
+    "tools/eador_aerie_campaign.py": "21b28ffb602903accb9bda76818c2e922a189ce6f110aaacdc778f9e3668b375",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/eador_control_campaign.py": "4eb25a987106af9a63c111f829107f7c8068f33a0d4b02974bfb44e47316c0ec",
+    "tools/eador_explorer_campaign.py": "1b7f773b9c247323e82cc57aa15399294deadd99d4b38f146d866b6fdd668bd4",
+    "tools/eador_extraction_campaign.py": "a73348493275070164bc4319ebbdb479888a327793968fd1075775fcdab250ea",
+    "tools/eador_hunt_campaign.py": "9206ba4e585548b2e62f4fccae70322162dea196ac77961ad3d7eaa189b9a915",
+    "tools/eador_linked_campaign.py": "6888ff9dce8bd5e812e19b61ff8b9c55687e5efb964f17748547fde81b4e4e45",
+    "tools/eador_observatory_campaign.py": "2ef2ddee692424c70aa47ee763e0ebd07848318653c92e842b0a98035539d077",
+    "tools/eador_relic_campaign.py": "619384a5888a9f53d65ed82bc398578de4fbf684ab85917c3f5e52781ff2e3d6",
+    "tools/eador_roles_campaign.py": "c795ba1213dedbd1135daa5e132718611ec69092e8ed580c65437db0b88fbc75",
+    "tools/eador_save_expectations.py": "f85a4637ac3eff3648ad48cfa07204c68064e0ee752f87c735913aa769dd94c4",
+    "tools/eador_screen_campaign.py": "f419fc13a8db7a0b5b53e120cc4f433c0d9ad230c19573761580cd9e4f75fd08",
+    "tools/eador_ui.py": "9a3d99b3a287203b88d6eb3ce9f782011df5ae4dc9827aa383053e528708446b",
+    "tools/eador_vault_campaign.py": "c8fdaccca0129cef3199131af4348d20f0a3455933045e2bbab822723949a5fe",
+    "tools/verify_eador_aerie.py": "50ccc878ace96f5406ed73b91c6793987cb248f9006edd47c8d1dd4a0fa3cf9c",
+    "tools/verify_eador_control.py": "3818a91e64adf3b231fb96a18cc36895aaaaaee8352c70d5e1c2240d13994fea",
+    "tools/verify_eador_extraction.py": "893afc0d825538899e62311460bf2c2b88df67571529d074ad438941563047fe",
+    "tools/verify_eador_guidance.py": "ffa2b26a428f8108f50845a7a3d85d4fe05f8291c9d7929d666e3ae8da60b3fd",
+    "tools/verify_eador_reading.py": "7542297c008ca47646c68b767266fa14e289351416242cac0fe4bd94b13ce6b2"
+  },
+  "source_files_changed": [],
+  "elapsed_seconds": 18.899095957982354,
+  "python": "3.13.2",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O"
+}

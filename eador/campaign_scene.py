@@ -1,7 +1,5 @@
 """Choose the next challenge and traveling retinue, or review a completed journey."""
 
-import textwrap
-
 from eador.campaign import CONTRACTS, FOUNDRIES
 from eador.content import RELICS, SKILLS
 from eador.model import RuleError, UNITS
@@ -109,6 +107,8 @@ class CampaignPlanScene(Screen):
 
 
 class CampaignScene(Screen):
+    """Review a saved transition; reading and retinue selection never spend campaign state."""
+
     transparent = True
     controls = {'f5': 'save_game', 'f9': 'load_game', 'f6': 'browse_saves',
                 'left': 'left', 'right': 'right', 'up': 'up', 'down': 'down', 'space': 'toggle_focused'}
@@ -121,44 +121,244 @@ class CampaignScene(Screen):
         self.offer_id = None
         self.troop_ids, self.relic_ids = set(), set()
         self.column, self.cursors = 0, [0, 0]
+        self.visible_items = [(), ()]
+        self._item_pages = [[()], [()]]
+        self.pages = [0, 0]
+        self._prose_anchor = self.prose_page = 0
+        self.prose_pages = 1
+        self._prose_indices = ((),)
+        self._reading_error = False
+        self._dismissed_error = None
+        self._error_page = 0
+        self._error_pages = ()
 
     @property
     def campaign(self):
         return self.root.state.campaign
 
-    def refresh(self):
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
+    def refresh(self, *, follow_cursor=False):
+        from dataclasses import replace
+        from saga2d import Anchor, Button, Column, Label, Row, Style
+        from eador.preferences import reading_scale
+        from eador.reading import reading_pages, reading_text_pages
+        from eador.style import PRIMARY
+
         super().refresh()
-        self.x, self.y = (self.game.width - 1080) / 2, (self.game.height - 700) / 2
-        x, y = self.x, self.y
-        self.button('Saves', x + 896, y + 22, 156, self.browse_saves, hotkey='F6')
+        state, campaign = self.root.state, self.campaign
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+        self.x, self.y = (self.game.width - 1120) / 2, (self.game.height - 760) / 2
+        x, y = self.x + 28, self.y + 24
+        bottom = self.y + 696
+
+        def label(text, size=12, *, width=1064, color=MUTED, serif=False, scaled=True):
+            return Label(text, width=width, wrap=True, font='Georgia' if serif else 'Verdana',
+                         font_size=round(size * scale) if scaled else size, text_color=color)
+
+        def place(block, left, top):
+            self.ui.add(Column(block, anchor=Anchor.TOP_LEFT, margin=(round(left), round(top))))
+
+        title = ('Choose the next challenge' if self.step == 'offers' else
+                 'Choose your recovery expedition' if self.step == 'retinue' and self.phase == 'recovery' else
+                 'Choose who travels with you' if self.step == 'retinue' else
+                 'The three shards are free' if self.phase == 'completed' else 'The expedition has ended')
+        if self._reading_error:
+            title = 'Complete save/load diagnostic'
+        heading = Column(label(f'LINKED CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}',
+                               10, width=700, color=GOLD),
+                         label(title, 29, width=700, serif=True, scaled=False, color=TEXT), spacing=12)
+        body_y = y + self.measure(heading)[1] + 20
+        place(heading, x, y)
+        self.button('Text size', self.x + 754, y, 170, self.open_text_settings, shortcut='T')
+        self.button('Saves', self.x + 942, y, 150, self.browse_saves, hotkey='F6')
+        if self._reading_error:
+            self._error_pages = reading_text_pages(self.message, bottom - body_y - 24,
+                                                  measure=lambda text: self.measure(label(text, color=RED))[1])
+            self._error_page = min(self._error_page, len(self._error_pages) - 1)
+            place(label(self._error_pages[self._error_page], color=RED), x, body_y)
+            self.button('Previous', x, bottom, 160, lambda: self.turn_error(-1), shortcut='PageUp', enabled=self._error_page > 0)
+            self.button('Next', x + 176, bottom, 160, lambda: self.turn_error(1), shortcut='PageDown',
+                        enabled=self._error_page + 1 < len(self._error_pages))
+            place(label(f'Page {self._error_page + 1} / {len(self._error_pages)}', 10, width=140), x + 354, bottom + 12)
+            self.button('Return to review', self.x + 686, bottom, 406, self.close_error, shortcut=('Enter', 'Esc'))
+            return
+        shortened_error = self.message and self._dismissed_error == self.message
+        error = label('The last save/load attempt failed. Read the complete diagnostic before retrying.'
+                      if shortened_error else self.message, 12, color=RED) if self.message else None
+        content_bottom = bottom - 18
+        if error:
+            content_bottom -= self.measure(error)[1] + 16
+        blocks = []
         if self.step == 'offers':
-            for index, offer in enumerate(self.campaign.offers):
-                self.button('Choose challenge', x + 36 + index * 522, y + 347, 486,
-                            lambda ident=offer.id: self.choose_offer(ident), shortcut=str(index + 1), primary=True)
+            intro = label(f'{campaign.title} is liberated. Your learned skills and selected veterans can cross to the next world.')
+            cards = []
+            for index, offer in enumerate(campaign.offers):
+                cards.append(Column(label(offer.title, 23, width=520, color=TEAL, serif=True, scaled=False),
+                                    label(f'{THEMES[offer.theme].name} · Shard {offer.seed}', 11, width=520, color=GOLD),
+                                    label(offer.description, 13, width=520, color=TEXT),
+                                    Button('Choose challenge', width=520, height=40, style=PRIMARY,
+                                           on_click=lambda ident=offer.id: self.choose_offer(ident), shortcut=str(index + 1)), spacing=16))
+            height = max(self.measure(card)[1] for card in cards)
+            offers = Row(*(Column(card, height=height) for card in cards), spacing=24)
+            next_stage = campaign.stage + 1
+            army = 'four Dread Guards and two Archers' if next_stage == 3 else 'the usual six-soldier expedition'
+            arrival = label(f'The next rival begins with {army}, {90 if next_stage == 3 else 80} gold, '
+                            f'and its first operation in {state.rules.arrival_delay} turns. '
+                            'It still pays for healing and replacements. Inspect its plan after arrival.', 14)
+            carryover = label('Next, choose up to two veterans and two relics. Bring your hero’s skills; build a new local realm. '
+                              'Your unselected army stays behind as the liberated shard’s garrison.', 14)
+            sections = [intro, offers, arrival, carryover,
+                        label('Choose a visible challenge with 1 / 2. You can return to compare before departing.', 12)]
         elif self.step == 'retinue':
+            intro = label('Keep up to two veterans and two relics. Unfilled starting troop places become fresh Militia. '
+                          'Left/Right changes column; Up/Down browses; Space toggles the focused choice.')
+            row_y = body_y + self.measure(intro)[1] + 16
+            items = self.items(self.column)
+            detail = None
+            if items:
+                item = items[self.cursors[self.column]]
+                detail = label((f'{UNITS[item.kind].name}: level {item.level}, {item.xp} XP. Returns at full health; '
+                                f'{UNITS[item.kind].upkeep} gold upkeep per turn.' if self.column == 0 else RELICS[item].description),
+                               color=TEAL)
+            recovery = self.phase == 'recovery'
+            gold, crystals = state.expedition_funding(recovery=recovery)
+            offer = next((offer for offer in campaign.offers if offer.id == self.offer_id), None)
+            destination = campaign.title if recovery else offer.title
+            funding = label(f'{destination} · {gold} gold · {crystals} crystals · '
+                            f'{len(self.troop_ids)} veterans + {3 - len(self.troop_ids)} new Militia', 13, color=GOLD)
+            rules = label(('One recovery for the whole campaign. Same initial world; buildings and holdings reset. '
+                           'Another capital loss ends the run. ' if recovery else 'Buildings, holdings and remaining wealth stay here. ') +
+                          'Hero skills survive; traveling health and mana are restored.', 11)
+            footer = Column(*([detail] if detail else []), funding, rules, spacing=12)
+            footer_y = content_bottom - self.measure(footer)[1]
+            blocks.extend(((intro, x, body_y), (footer, x, footer_y)))
             for column in (0, 1):
                 items = self.items(column)
-                start = self.cursors[column] // 6 * 6
-                for index in range(start, min(len(items), start + 6)):
-                    item = items[index]
-                    selected = item.id in self.troop_ids if column == 0 else item in self.relic_ids
-                    name = f'{UNITS[item.kind].name} · Lv{item.level} · {item.hp}/{item.max_hp} HP' if column == 0 else RELICS[item].name
-                    self.button(('Keep · ' if selected else 'Leave · ') + name,
-                                x + 36 + column * 522, y + 172 + (index - start) * 50, 486,
-                                lambda column=column, index=index: self.toggle(column, index), primary=selected)
-                if len(items) > 6:
-                    self.button('Previous', x + 258 + column * 522, y + 465, 142,
-                                lambda column=column: self.page(column, -1), enabled=start > 0)
-                    self.button('Next', x + 411 + column * 522, y + 465, 111,
-                                lambda column=column: self.page(column, 1), enabled=start + 6 < len(items))
-            if self.phase == 'departure':
-                self.button('Other challenge', x + 36, y + 634, 236, self.back, shortcut='Esc')
-            else:
-                self.button('End this campaign', x + 36, y + 634, 282, self.abandon, shortcut='Q', danger=True)
-            self.button('Launch recovery' if self.phase == 'recovery' else 'Depart for the next shard',
-                        x + 638, y + 634, 406, self.depart, shortcut='Enter', primary=True)
+                selected = self.troop_ids if column == 0 else self.relic_ids
+                ids = [item.id for item in items] if column == 0 else list(items)
+                heading_text = ('VETERANS' if column == 0 else 'RELICS') + f' · {len(selected)}/2 KEPT'
+                column_heading = label(('› ' if column == self.column else '') + heading_text, 11, width=520, color=GOLD)
+                rows = []
+                for index, item in enumerate(items):
+                    name = (f'{UNITS[item.kind].name} · Lv{item.level} · {item.hp}/{item.max_hp} HP'
+                            if column == 0 else RELICS[item].name)
+                    style = replace(PRIMARY if ids[index] in selected else Style(), font_size=round(13 * scale))
+                    if column == self.column and index == self.cursors[column]:
+                        style = replace(style, border_color=GOLD, border_width=2)
+                    rows.append(Button(('Keep · ' if ids[index] in selected else 'Leave · ') + name,
+                                       width=520, style=style,
+                                       on_click=lambda column=column, index=index: self.toggle(column, index)))
+                available = footer_y - row_y - self.measure(column_heading)[1] - 12 - 56
+                anchor = ids.index(self.visible_items[column][0]) if self.visible_items[column] else 0
+                heights = [self.measure(row)[1] for row in rows]
+                if error and (available <= 0 or any(height > available for height in heights)):
+                    self.open_error()
+                    return
+                packed, current = reading_pages(heights, available,
+                                                anchor=anchor, spacing=10)
+                self._item_pages[column] = [tuple(ids[index] for index in page) for page in packed]
+                self.pages[column] = current
+                visible = packed[current]
+                self.visible_items[column] = self._item_pages[column][current]
+                if items and self.cursors[column] not in visible:
+                    # A larger font or complete error may shorten the anchored page.
+                    # Keep Space on a visible row, then measure its actual detail.
+                    if follow_cursor and column == self.column:
+                        self.visible_items[column] = (ids[self.cursors[column]],)
+                    else:
+                        self.cursors[column] = visible[0]
+                    self.refresh()
+                    return
+                column_rows = ([rows[index] for index in visible] if items else
+                               [label('No survivors available.' if column == 0 else 'No relics owned.', width=520)])
+                list_block = Column(column_heading, *column_rows, spacing=10)
+                blocks.append((list_block, x + column * 544, row_y))
+                if len(packed) > 1:
+                    navigation = Row(label(f'Page {current + 1} / {len(packed)}', 10, width=174),
+                                     Button('Previous', width=166, height=40, enabled=current > 0,
+                                            on_click=lambda column=column: self.page(column, -1)),
+                                     Button('Next', width=156, height=40, enabled=current + 1 < len(packed),
+                                            on_click=lambda column=column: self.page(column, 1)), spacing=12)
+                    blocks.append((navigation, x + column * 544, footer_y - 56))
+            sections = None
         else:
-            self.button('Return to title', x + 638, y + 634, 406, self.to_title, shortcut='Enter', primary=True)
+            intro = label((('You rebuilt after a lost realm and returned to liberate the worlds.' if campaign.recovery_used else
+                            'Your expedition held together from Westwatch to the final stronghold.') if self.phase == 'completed' else
+                           'The rival holds Westwatch. This journey ends here; your manual saves remain available.'), 14)
+            records = [Column(label(f'{record.stage}. {CONTRACTS[record.contract].title} · {THEMES[record.theme].name}',
+                                    22, serif=True, scaled=False, color=TEAL),
+                              label(f'{record.turns} turns · Hero level {record.hero_level} · {record.casualties} troops lost · '
+                                    f'{len(record.garrison)} left as garrison'), spacing=10) for record in campaign.completed]
+            build = ', '.join(f'{SKILLS[ident].name} {rank}' for ident, rank in state.hero.skill_ranks.items()) or 'No disciplines learned'
+            sections = [intro, *records,
+                        label(f'Level {state.hero.level} {state.hero.hero_class} · {build}', 14),
+                        label('Recovery used' if campaign.recovery_used else 'Recovery declined' if self.phase == 'lost'
+                                   else 'No recovery needed', color=GOLD)]
+        if sections is not None:
+            heights = [self.measure(section)[1] for section in sections]
+            if error and any(height > content_bottom - body_y for height in heights):
+                self.open_error()
+                return
+            self._prose_indices, self.prose_page = reading_pages(
+                heights, content_bottom - body_y,
+                anchor=self._prose_anchor, spacing=24)
+            self.prose_pages = len(self._prose_indices)
+            self._prose_anchor = self._prose_indices[self.prose_page][0]
+            blocks.append((Column(*(sections[index] for index in self._prose_indices[self.prose_page]), spacing=24), x, body_y))
+        for block, left, top in blocks:
+            place(block, left, top)
+        if error:
+            place(error, x, content_bottom + 16)
+        if shortened_error:
+            self.button('Read error', self.x + 540, bottom, 130, self.open_error, shortcut='D')
+        if self.step != 'retinue' and self.prose_pages > 1:
+            self.button('Previous', x, bottom, 160, lambda: self.turn_prose(-1), shortcut='PageUp', enabled=self.prose_page > 0)
+            self.button('Next', x + 176, bottom, 160, lambda: self.turn_prose(1), shortcut='PageDown',
+                        enabled=self.prose_page + 1 < self.prose_pages)
+            place(label(f'Page {self.prose_page + 1} / {self.prose_pages}', 10, width=140), x + 354, bottom + 12)
+        if self.step == 'retinue':
+            if self.phase == 'departure':
+                self.button('Other challenge', x, bottom, 236, self.back, shortcut='Esc')
+            else:
+                self.button('End this campaign', x, bottom, 282, self.abandon, shortcut='Q', danger=True)
+            self.button('Launch recovery' if self.phase == 'recovery' else 'Depart for the next shard',
+                        self.x + 686, bottom, 406, self.depart, shortcut='Enter', primary=True)
+        elif self.step == 'ending':
+            self.button('Return to title', self.x + 686, bottom, 406, self.to_title, shortcut='Enter', primary=True)
+
+    def open_error(self):
+        self._reading_error = True
+        self._error_page = 0
+        self.refresh()
+
+    def turn_error(self, direction):
+        page = self._error_page + direction
+        if 0 <= page < len(self._error_pages):
+            self._error_page = page
+            self.refresh()
+
+    def close_error(self):
+        self._reading_error = False
+        self._dismissed_error = self.message
+        self.refresh()
+
+    def turn_prose(self, direction):
+        page = self.prose_page + direction
+        if 0 <= page < self.prose_pages:
+            self._prose_anchor = self._prose_indices[page][0]
+            self.refresh()
 
     def choose_offer(self, ident):
         self.offer_id, self.step = ident, 'retinue'
@@ -167,24 +367,35 @@ class CampaignScene(Screen):
 
     def back(self):
         self.step = 'offers'
+        self._prose_anchor = 0
         self.refresh()
 
     def items(self, column):
         return self.root.state.hero.army if column == 0 else self.root.state.inventory
 
     def left(self):
+        if self._reading_error:
+            self.turn_error(-1)
+            return
         self.column = 0
         self.refresh()
 
     def right(self):
+        if self._reading_error:
+            self.turn_error(1)
+            return
         self.column = 1
         self.refresh()
 
     def shift(self, direction):
         items = self.items(self.column)
-        if self.step == 'retinue' and items:
+        if self.step == 'retinue' and not self._reading_error and items:
             self.cursors[self.column] = (self.cursors[self.column] + direction) % len(items)
-            self.refresh()
+            item = items[self.cursors[self.column]]
+            ident = item.id if self.column == 0 else item
+            if ident not in self.visible_items[self.column]:
+                self.visible_items[self.column] = (ident,)
+            self.refresh(follow_cursor=True)
 
     def up(self):
         self.shift(-1)
@@ -193,13 +404,17 @@ class CampaignScene(Screen):
         self.shift(1)
 
     def toggle_focused(self):
-        if self.step == 'retinue' and self.items(self.column):
+        if self.step == 'retinue' and not self._reading_error and self.items(self.column):
             self.toggle(self.column, self.cursors[self.column])
 
     def page(self, column, direction):
-        self.column = column
-        self.cursors[column] = min(len(self.items(column)) - 1, max(0, self.cursors[column] + direction * 6))
-        self.refresh()
+        page = self.pages[column] + direction
+        if 0 <= page < len(self._item_pages[column]):
+            self.column = column
+            self.visible_items[column] = self._item_pages[column][page]
+            ids = [item.id for item in self.items(column)] if column == 0 else self.items(column)
+            self.cursors[column] = ids.index(self.visible_items[column][0])
+            self.refresh()
 
     def toggle(self, column, index):
         self.column, self.cursors[column] = column, index
@@ -212,13 +427,15 @@ class CampaignScene(Screen):
         else:
             self.message = 'Choose at most two veterans and two relics. Remove one before selecting another.'
             self.game.audio.play_sound('refuse')
+            self.refresh()
             return
         self.message = ''
-        self.refresh()
+        self.refresh(follow_cursor=True)
 
     def depart(self):
         state = self.root.state
         if not self.checkpoint(state):
+            self.refresh()
             return
         # Preserve roster/inventory order so equipment fallback and saved travel are deterministic.
         selection = dict(troop_ids=tuple(t.id for t in state.hero.army if t.id in self.troop_ids),
@@ -231,6 +448,7 @@ class CampaignScene(Screen):
         except RuleError as error:
             self.message = str(error)
             self.game.audio.play_sound('refuse')
+            self.refresh()
             return
         self.game.audio.play_sound('confirm')
         if not self.checkpoint(state):
@@ -243,11 +461,18 @@ class CampaignScene(Screen):
             self.checkpoint(self.root.state)
             self.phase, self.step = 'lost', 'ending'
             self.game.audio.play_sound('defeat')
-            self.refresh()
+        self.refresh()
 
     def save_game(self):
         self.root.save_game()
         self.message = self.root.message
+        self.refresh()
+
+    def load_game(self, slot=1, *, backup=False):
+        if super().load_game(slot, backup=backup):
+            return True
+        self.refresh()
+        return False
 
     def browse_saves(self):
         self.root.browse_saves()
@@ -258,80 +483,5 @@ class CampaignScene(Screen):
                                            difficulty=state.difficulty))
 
     def draw(self):
-        x, y, state, campaign = self.x, self.y, self.root.state, self.campaign
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 232))
-        self.box(x, y, 1080, 700)
-        self.text(f'LINKED CAMPAIGN · STAGE {campaign.stage} OF 3 · {state.rules.title.upper()}',
-                  x + 36, y + 25, size=11, color=GOLD)
-        title = ('Choose the next challenge' if self.step == 'offers' else
-                 'Choose your recovery expedition' if self.phase == 'recovery' else
-                 'Choose who travels with you' if self.step == 'retinue' else
-                 'The three shards are free' if self.phase == 'completed' else 'The expedition has ended')
-        self.text(title, x + 36, y + 54, size=29, serif=True)
-        if self.step == 'offers':
-            self.paragraph(f'{campaign.title} is liberated. Your learned skills and selected veterans can cross to the next world.',
-                           x + 36, y + 105, width=1008, size=12)
-            for index, offer in enumerate(campaign.offers):
-                left = x + 36 + index * 522
-                self.box(left, y + 150, 486, 182)
-                self.text(offer.title, left + 20, y + 168, size=23, serif=True, color=TEAL)
-                self.text(f'{THEMES[offer.theme].name} · Shard {offer.seed}', left + 20, y + 204, size=11, color=GOLD)
-                self.paragraph(offer.description, left + 20, y + 233, width=446, size=13, color=TEXT)
-            next_stage = campaign.stage + 1
-            army = 'four Dread Guards and two Archers' if next_stage == 3 else 'the usual six-soldier expedition'
-            self.paragraph(f'The next rival begins with {army}, {90 if next_stage == 3 else 80} gold, '
-                           f'and its first operation in {state.rules.arrival_delay} turns. '
-                           'It still pays for healing and replacements. Inspect its plan after arrival.',
-                           x + 36, y + 421, width=1008, size=14)
-            self.paragraph('Next, choose up to two veterans and two relics. Bring your hero’s skills; build a new local realm. '
-                           'Your unselected army stays behind as the liberated shard’s garrison.',
-                           x + 36, y + 510, width=1008, size=14)
-            self.text('1 / 2 chooses a challenge. You can return to compare before departing.', x + 36, y + 641, size=12, color=MUTED)
-        elif self.step == 'retinue':
-            self.paragraph('Keep up to two veterans and two relics. Unfilled starting troop places become fresh Militia. '
-                           'Left/Right changes column; Up/Down browses; Space toggles the focused choice.',
-                           x + 36, y + 101, width=1008, size=12)
-            for column, label in ((0, f'VETERANS · {len(self.troop_ids)}/2 KEPT'), (1, f'RELICS · {len(self.relic_ids)}/2 KEPT')):
-                left = x + 36 + column * 522
-                self.text(label, left, y + 145, size=11, color=GOLD)
-                items = self.items(column)
-                if not items:
-                    self.text('No survivors available.' if column == 0 else 'No relics owned.', left + 16, y + 190, color=MUTED)
-                if column == self.column and items:
-                    self.text('›', left - 21, y + 175 + (self.cursors[column] % 6) * 50, size=21, color=GOLD)
-                if len(items) > 6:
-                    self.text(f'Page {self.cursors[column] // 6 + 1} / {(len(items) + 5) // 6}',
-                              left, y + 479, size=10, color=MUTED)
-            items = self.items(self.column)
-            if items:
-                item = items[self.cursors[self.column]]
-                detail = (f'{UNITS[item.kind].name}: level {item.level}, {item.xp} XP. Returns at full health; '
-                          f'{UNITS[item.kind].upkeep} gold upkeep per turn.' if self.column == 0 else RELICS[item].description)
-                self.paragraph(detail, x + 36, y + 516, width=1008, size=12, color=TEAL)
-            recovery = self.phase == 'recovery'
-            gold, crystals = state.expedition_funding(recovery=recovery)
-            offer = next((offer for offer in campaign.offers if offer.id == self.offer_id), None)
-            destination = campaign.title if recovery else offer.title
-            self.text(f'{destination} · {gold} gold · {crystals} crystals · {len(self.troop_ids)} veterans + {3 - len(self.troop_ids)} new Militia',
-                      x + 36, y + 553, size=13, color=GOLD)
-            self.paragraph(('One recovery for the whole campaign. Same initial world; buildings and holdings reset. Another capital loss ends the run. '
-                            if recovery else 'Buildings, holdings and remaining wealth stay here. ') +
-                           'Hero skills survive; traveling health and mana are restored.',
-                           x + 36, y + 581, width=1008, size=11)
-        else:
-            self.paragraph(('You rebuilt after a lost realm and returned to liberate the worlds.' if campaign.recovery_used else
-                            'Your expedition held together from Westwatch to the final stronghold.') if self.phase == 'completed' else
-                           'The rival holds Westwatch. This journey ends here; your manual saves remain available.',
-                           x + 36, y + 111, width=1008, size=14)
-            for index, record in enumerate(campaign.completed):
-                top = y + 196 + index * 94
-                self.text(f'{record.stage}. {CONTRACTS[record.contract].title} · {THEMES[record.theme].name}', x + 36, top, size=22, serif=True, color=TEAL)
-                self.text(f'{record.turns} turns · Hero level {record.hero_level} · {record.casualties} troops lost · {len(record.garrison)} left as garrison',
-                          x + 36, top + 37, size=12, color=MUTED)
-            build = ', '.join(f'{SKILLS[ident].name} {rank}' for ident, rank in state.hero.skill_ranks.items()) or 'No disciplines learned'
-            self.paragraph(f'Level {state.hero.level} {state.hero.hero_class} · {build}', x + 36, y + 500, width=1008, size=14)
-            self.text('Recovery used' if campaign.recovery_used else 'Recovery declined' if self.phase == 'lost' else 'No recovery needed',
-                      x + 36, y + 550, size=12, color=GOLD)
-        if self.message:
-            self.text(textwrap.shorten(self.message, width=133, placeholder='…'),
-                      x + 36, y + 611, size=10, color=RED)
+        self.box(self.x, self.y, 1120, 760)
