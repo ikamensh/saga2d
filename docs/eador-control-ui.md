@@ -82,3 +82,18 @@ campaign fixtures retain their recorded capability tuples and open-sight mode.
 Ability-aware automatic play and broader v11 balance evidence are a separate
 model tranche; historical v9 economy and older package/soak reports are not
 current-candidate acceptance.
+
+## Sight guidance review — 2026-09-06
+
+Independent native review found a misleading range-only refusal for a forest-
+blocked shot and terrain-sight instructions shown in a saved v10 open-sight
+battle. Attack/Pin refusals now mention clear sight, and the idle tactical hint
+uses the battle's saved sight rule. The hint was shortened after native inspection
+caught it touching End Round. No targeting or compatibility rules changed.
+
+`tools/verify_eador_control.py --scenario sight` prepares the paid Watch army,
+moves an unspent Archer into range behind forest, rejects the blocked shot without
+changing state, then loads the actual v10 Pinned Crossing fixture. Its legal shot
+through terrain matches the public damage forecast and survives quicksave/load.
+The corrected native journey used 76 inputs and one exact reload. The full suite
+passed 847 tests; the final shorter copy passed all eight roster UI tests.

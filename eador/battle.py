@@ -442,9 +442,9 @@ class Battle:
     def _attack_effects(self, unit: BattleUnit, target: BattleUnit, *, pin: bool = False) -> tuple[int, int, int]:
         """Resolve the ordered damage once for both forecasts and attacks."""
         if pin and target not in self.pin_targets(unit.id):
-            raise RuleError('Pin needs a ready ability and an unpinned enemy within 3 hexes.')
+            raise RuleError('Pin needs a ready ability, clear sight and an unpinned enemy within 3 hexes.')
         if not pin and target not in self.targets(unit.id):
-            raise RuleError('Choose an enemy within attack range; each unit attacks once.')
+            raise RuleError('Choose an enemy in range; ranged shots need clear sight. Attack once per turn.')
         adjacent = HexGrid.distance(unit.pos, target.pos) == 1
         braces = target.stance == 'brace' and adjacent and unit.attack_range == 1 and not pin
         spear = self._damage(target, unit) if braces else 0

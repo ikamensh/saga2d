@@ -965,7 +965,9 @@ class BattleScene(Screen):
                       f"Terrain: {b.terrain[hovered.pos].title()}" + (" · Guard +2 defense" if hovered.stance == "guard" else ""))
             self.text(detail, x, 679, size=11, color=MUTED)
         else:
-            self.paragraph('F aims at targets. Enter commits; Esc cancels. C opens the Codex. Forest and smoke block ranged orders.',
+            sight_hint = ('Forest and smoke block ranged orders.' if b.sight_rules == 'terrain' else
+                          'Saved rules allow ranged orders through terrain.')
+            self.paragraph('F targets. Enter acts. Esc cancels. C opens the Codex. ' + sight_hint,
                            x, 630, size=11)
         self.text("Arrows aim · Enter act · F target · Tab unit", x, h - 37, size=10, color=MUTED)
         reachable = b.reachable(self.selected) if selected and b.outcome is None and not self.targeting else set()
