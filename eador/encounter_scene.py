@@ -152,6 +152,14 @@ class EncounterScene(Screen):
             split = ('Isolated east: hero and ' + ', '.join(isolated) + '.' if isolated
                      else 'Hero starts alone east.')
             carrier = split + ' ' + carrier
+        rout_advice = 'Protect your rear and rotate wounded allies. Forest blocks distant shots but provides cover at its edge.'
+        if self.province.site_kind == 'smuggler_screen':
+            advice = []
+            if 'sapper' in self.guards:
+                advice.append('Sapper: one Smoke charge per battle blocks both sides’ shots and spells.')
+            if 'warden' in self.guards:
+                advice.append('Warden swaps wounded allies to safety.')
+            rout_advice = ' '.join(advice + ['Defeated guards stay defeated. Codex explains these orders.'])
         return (
             carrier,
             f'Clear adjacent foes. Escape or rout all defenders by round {definition.deadline}. Hero death loses immediately.',
@@ -164,7 +172,7 @@ class EncounterScene(Screen):
         ) if definition.objective == 'hold' else (
             'Defeat every defender to claim the reward. Exhaustion forces retreat after 80 rounds.',
             'Keep your hero alive. Hero death ends the expedition immediately.',
-            'Protect your rear and rotate wounded allies. Forest blocks distant shots but provides cover at its edge.',
+            rout_advice,
         )
 
     def enter(self):
