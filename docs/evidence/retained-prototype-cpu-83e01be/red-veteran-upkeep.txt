@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_veteran_recovery_preparation_and_waiting_each_yield_without_changing_results _
+
+clock = {'cpu': 0.06, 'sleeps': [], 'wall': 0.06}
+
+    def test_veteran_recovery_preparation_and_waiting_each_yield_without_changing_results(clock):
+        """A paid departure, actual loss and recovery retain their saves and later wage costs."""
+        from tools.prototype_eador_veteran_upkeep import SalaryOne, recovery_input, recovery_probe
+    
+>       expected = recovery_input('standard', budget=CpuBudget(100))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: recovery_input() got an unexpected keyword argument 'budget'
+
+tests/tools/test_retained_prototype_budget.py:45: TypeError
+=========================== short test summary info ============================
+FAILED tests/tools/test_retained_prototype_budget.py::test_veteran_recovery_preparation_and_waiting_each_yield_without_changing_results
+1 failed in 0.03s

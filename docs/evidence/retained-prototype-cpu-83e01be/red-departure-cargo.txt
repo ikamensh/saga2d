@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_cargo_earned_preparation_and_one_paid_continuation_each_yield ______
+
+clock = {'cpu': 0.06, 'sleeps': [], 'wall': 0.06}
+
+    def test_cargo_earned_preparation_and_one_paid_continuation_each_yield(clock):
+        """One departure choice keeps exact paid battles and funding independently of preparation pacing."""
+        from tools.prototype_eador_departure_cargo import earned_departures, run_case
+    
+>       expected = earned_departures(budget=CpuBudget(100))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: earned_departures() got an unexpected keyword argument 'budget'
+
+tests/tools/test_retained_prototype_budget.py:65: TypeError
+=========================== short test summary info ============================
+FAILED tests/tools/test_retained_prototype_budget.py::test_cargo_earned_preparation_and_one_paid_continuation_each_yield
+1 failed in 0.02s

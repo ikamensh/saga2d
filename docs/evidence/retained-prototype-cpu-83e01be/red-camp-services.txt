@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_camp_service_and_actual_battle_yield_without_changing_paid_outcome ____
+
+clock = {'cpu': 0.06, 'sleeps': [], 'wall': 0.06}
+
+    def test_camp_service_and_actual_battle_yield_without_changing_paid_outcome(clock):
+        """A retained paid camp keeps its service cost, battle and original save when yielding."""
+        from tools.prototype_eador_camp_services import exercise
+    
+        path = Path(__file__).resolve().parents[2] / 'docs/evidence/crystal-service-comparison.examples.json'
+        payload = json.loads(path.read_text())['pre_assault_mana']['state']
+        before = json.dumps(payload, sort_keys=True)
+>       expected = exercise(payload, 'infusion', budget=CpuBudget(100))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: exercise() got an unexpected keyword argument 'budget'
+
+tests/tools/test_retained_prototype_budget.py:91: TypeError
+=========================== short test summary info ============================
+FAILED tests/tools/test_retained_prototype_budget.py::test_camp_service_and_actual_battle_yield_without_changing_paid_outcome
+1 failed in 0.02s

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import asdict
+from functools import partial
 import hashlib
 import json
 from pathlib import Path
@@ -19,8 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import BUILDINGS, RuleError, State
 from tools.audit_eador_economy import Trial
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import finish_battle
 from tools.eador_control_campaign import prepare_control_watch, watch_control_route
+from tools.eador_extraction_campaign import AdventureOrders
 from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
 
 PRICE = GRANT = 100
@@ -66,13 +69,14 @@ def depart(state, offer_id, *, troop_ids=(), relic_ids=(), chest=False):
 
 class CargoTrial(Trial):
     """Two disclosed investment policies; all following orders are public game calls."""
-    def __init__(self, state, policy):
+    def __init__(self, state, policy, *, budget=None):
+        budget = CpuBudget(25) if budget is None else budget
         watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
         route = (((-2, 0), (-1, 0), (0, 0), watch, (1, 0), (2, 0))
                  if state.campaign.contract == 'rootward' else
                  ((-2, 0), (-1, 0), (0, -1), (0, 1), (1, 0), (2, 0)))
         super().__init__(state.seed, state.hero.hero_class, state.theme,
-                         'economy' if policy == 'economy' else 'spells', state=state, route=route)
+                         'economy' if policy == 'economy' else 'spells', state=state, route=route, budget=budget)
         self.policy = policy
         self.fights = []
         # Magic develops one Adept, a Swordsman and Temple, then normal Swordsmen.
@@ -109,7 +113,7 @@ class CargoTrial(Trial):
     def battle(self):
         state = self.state
         clone = State.from_json(state.to_json())
-        finish_battle(clone)
+        finish_battle(clone, budget=self.budget)
         battle = state.battle
         record = dict(turn=state.turn, kind=state.battle_kind, province=state.battle_province,
                       encounter=state.battle_encounter, mana_before=battle.mana,
@@ -123,39 +127,45 @@ class CargoTrial(Trial):
         self.fights.append(record)
 
 
-def earned_departures():
-    ordinary = play_stage(State.new_campaign(7, 'Commander'))
-    specialists = prepare_control_watch(State.new_campaign(0, 'Commander'))
+def earned_departures(*, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
+    ordinary = play_stage(State.new_campaign(7, 'Commander'), budget=budget)
+    specialists = prepare_control_watch(State.new_campaign(0, 'Commander'), budget=budget)
     purchased_watch = json.loads(specialists.to_json())
-    watch_control_route(specialists)
-    finish_battle(specialists)
-    specialists = play_stage(specialists)
+    watch_control_route(specialists, orders_type=partial(AdventureOrders, budget=budget))
+    finish_battle(specialists, budget=budget)
+    specialists = play_stage(specialists, budget=budget)
     assert ordinary.campaign.phase == specialists.campaign.phase == 'departure'
     assert all(next(t for t in ordinary.hero.army if t.id == uid).kind == 'swordsman' for uid in (5, 4))
     adept = next(t for t in specialists.hero.army if t.id == 5)
     assert adept.kind == 'adept' and adept.level == 3
+    budget.checkpoint()
     return dict(swords=dict(state=json.loads(ordinary.to_json()), offer='rootward', troops=(5, 4)),
                 specialist=dict(state=json.loads(specialists.to_json()), offer='foundries', troops=(1, 5))), purchased_watch
 
 
-def run_case(case, branch, policy, *, keep_id=None):
+def run_case(case, branch, policy, *, keep_id=None, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     state = State.from_json(json.dumps(case['state']))
     ids = case['troops'] if branch == 'two_veterans' else (case['troops'][0] if keep_id is None else keep_id,)
     arrival, quote = depart(state, case['offer'], troop_ids=ids,
                             relic_ids=travel_selection(state)['relic_ids'], chest=branch == 'chest')
     saved = arrival.to_json()
-    trial = CargoTrial(State.from_json(saved), policy)
+    trial = CargoTrial(State.from_json(saved), policy, budget=budget)
     result = trial.run()
+    budget.checkpoint()
     return dict(branch=branch, policy=policy, keep_id=keep_id, quote=quote, arrival=json.loads(saved),
                 result=result, fights=trial.fights, final=json.loads(trial.state.to_json()))
 
 
-def boundaries(case):
+def boundaries(case, *, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     state = State.from_json(json.dumps(case['state']))
     relics = travel_selection(state)['relic_ids']
     failures = []
 
     def refuse(source, **options):
+        budget.checkpoint()
         encoded = source.to_json()
         try:
             depart(source, options.pop('offer_id', case['offer']), relic_ids=relics, **options)
@@ -182,7 +192,7 @@ def boundaries(case):
     arrival, quote = depart(state, case['offer'], troop_ids=case['troops'][:1], relic_ids=relics, chest=True)
     before_loss = arrival.to_json()
     refuse(arrival, troop_ids=(), chest=True)
-    lose_shard(arrival)
+    lose_shard(arrival, budget=budget)
     assert arrival.campaign.phase == 'recovery'
     refuse(arrival, troop_ids=(), chest=True)
     lost = arrival.to_json()
@@ -196,6 +206,7 @@ def boundaries(case):
     direct = State.from_json(state.to_json())
     direct.advance(case['offer'], troop_ids=case['troops'], relic_ids=relics)
     assert ordinary.to_json() == direct.to_json()
+    budget.checkpoint()
     return dict(rejected=failures, empty_slot_quote=empty_quote, exact_price_quote=exact_quote,
                 funded_arrival=json.loads(before_loss), actual_loss=json.loads(lost),
                 recovery=json.loads(arrival.to_json()), recovery_funding=expected_funding,
@@ -207,19 +218,25 @@ def boundaries(case):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/departure-cargo-prototype.json')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     args = parser.parse_args()
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve(),
                *(ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_linked_campaign.py',
-                 'eador_control_campaign.py', 'eador_extraction_campaign.py', 'audit_eador_economy.py'))]
+                 'eador_control_campaign.py', 'eador_extraction_campaign.py', 'audit_eador_economy.py', 'cpu_budget.py'))]
     fingerprints = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     before = fingerprints()
-    cases, watch = earned_departures()
+    cases, watch = earned_departures(budget=budget)
     rows = []
     for name, case in cases.items():
         for policy in ('economy', 'magic'):
             for branch in ('two_veterans', 'one_veteran', 'chest'):
-                row = run_case(case, branch, policy)
-                assert row == run_case(case, branch, policy)
+                row = run_case(case, branch, policy, budget=budget)
+                assert row == run_case(case, branch, policy, budget=budget)
                 row['case'] = name
                 rows.append(row)
                 result = row['result']
@@ -230,15 +247,15 @@ def main():
     # The original two-veteran baseline keeps its original roster order (1, 5).
     for policy in ('economy', 'magic'):
         for branch in ('one_veteran', 'chest'):
-            row = run_case(cases['specialist'], branch, policy, keep_id=5)
-            assert row == run_case(cases['specialist'], branch, policy, keep_id=5)
+            row = run_case(cases['specialist'], branch, policy, keep_id=5, budget=budget)
+            assert row == run_case(cases['specialist'], branch, policy, keep_id=5, budget=budget)
             row['case'] = 'specialist_keep_adept'
             rows.append(row)
             print(row['case'], policy, branch, row['result']['turns'], row['result']['metrics']['lost_troops'])
-    checks = boundaries(cases['swords'])
+    checks = boundaries(cases['swords'], budget=budget)
     assert before == fingerprints(), 'Source changed during the measurement'
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                  source_sha256=before, source_files_changed_during_run=[],
+                  cpu_percent=budget.percent, source_sha256=before, source_files_changed_during_run=[],
                   scope='NON-PRODUCTION. Two actual earned departures, three retinue choices, two disclosed '
                         'subsequent investment policies, plus keeping the expensive specialist instead. '
                         'Explicit automatic tactics; each fight paired with '
@@ -249,6 +266,7 @@ def main():
     args.report.parent.mkdir(parents=True, exist_ok=True)
     # Compact records keep complete snapshots inspectable without tens of thousands of lines.
     args.report.write_text(json.dumps(report, separators=(',', ':')) + '\n')
+    budget.checkpoint()
     print(args.report)
 
 

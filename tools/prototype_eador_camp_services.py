@@ -18,6 +18,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import RuleError, State
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import CampaignMetrics, finish_battle
 
 
@@ -70,7 +71,8 @@ def snapshot(state):
                 rival_intent=state.rival.intent, rival_countdown=state.rival.turns_until_action)
 
 
-def exercise(payload, variant, *, pursuit=False):
+def exercise(payload, variant, *, pursuit=False, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     state = State.from_json(json.dumps(payload))
     before = snapshot(state)
     operations, service = [], None
@@ -84,24 +86,28 @@ def exercise(payload, variant, *, pursuit=False):
     after_preparation = snapshot(state)
     if 'rest_reserve' in variant:
         while state.hero.mana < state.hero.max_mana - 4:
+            budget.checkpoint()
             state.end_turn()
             operations.append(dict(command='end_turn'))
             assert not state.battle, 'Concrete rest example unexpectedly entered defense'
     elif 'rest_once' in variant or not state.actions_left:
+        budget.checkpoint()
         state.end_turn()
         operations.append(dict(command='end_turn'))
         assert not state.battle, 'Concrete rest example unexpectedly entered defense'
     before_battle = snapshot(state)
     target = state.rival.pos if pursuit else (2, 0)
+    budget.checkpoint()
     state.travel(target)
     operations.append(dict(command='travel', target=target, battle_kind=state.battle_kind))
     assert state.battle is not None
     battle_kind = state.battle_kind
     metrics = CampaignMetrics()
-    finish_battle(state, metrics)
+    finish_battle(state, metrics, budget=budget)
     operations.append(dict(command='explicit automatic battle and reward resolution'))
     after = snapshot(state)
     assert State.from_json(state.to_json()).to_json() == state.to_json()
+    budget.checkpoint()
     return dict(variant=variant, rules_id=state.rules_id, before=before,
                 after_preparation=after_preparation, before_battle=before_battle,
                 after=after, operations=operations, metrics=asdict(metrics),
@@ -112,9 +118,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--examples', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     args = parser.parse_args()
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     examples = json.loads(args.examples.read_text())
-    sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__), ROOT / 'tools/eador_campaign.py'])
+    sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__),
+                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     runs = {}
     variants = {'pre_assault_mana': ('assault_now', 'rest_once', 'rest_reserve', 'infusion', 'treatment'),
@@ -123,8 +136,8 @@ def main():
     for name, choices in variants.items():
         runs[name] = []
         for variant in choices:
-            result = exercise(examples[name]['state'], variant, pursuit=name == 'pursuit_last_action')
-            assert result == exercise(examples[name]['state'], variant, pursuit=name == 'pursuit_last_action')
+            result = exercise(examples[name]['state'], variant, pursuit=name == 'pursuit_last_action', budget=budget)
+            assert result == exercise(examples[name]['state'], variant, pursuit=name == 'pursuit_last_action', budget=budget)
             runs[name].append(result)
     # Confirm the quoted scarcity example through a public rejected purchase.
     full = State.from_json(json.dumps(examples['late_full_roster']['state']))
@@ -137,7 +150,7 @@ def main():
         raise AssertionError('The retained full army unexpectedly accepted a recruit')
     assert full.to_json() == before
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                  source_sha256=hashes, examples_file=args.examples.name,
+                  cpu_percent=budget.percent, source_sha256=hashes, examples_file=args.examples.name,
                   examples_sha256=hashlib.sha256(args.examples.read_bytes()).hexdigest(),
                   policy='NON-PRODUCTION saved-payload services; one action; subsequent real commands and explicit auto combat. '
                          'Fixed local branches, not a tuned campaign policy or new service API.',
@@ -147,6 +160,7 @@ def main():
     assert not report['source_files_changed']
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+    budget.checkpoint()
 
 
 if __name__ == '__main__':

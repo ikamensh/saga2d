@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import State, UNITS
 from tools.audit_eador_difficulty import DifficultyTrial
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import finish_battle
 
 
@@ -76,21 +77,25 @@ def snapshot(state):
                 rival=asdict(state.rival), heartwood=asdict(state.provinces[(0, 0)]))
 
 
-def paid_plan(case, cls):
-    trial = DifficultyTrial(*case)
+def paid_plan(case, cls, *, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
+    trial = DifficultyTrial(*case, budget=budget)
     trial.state = cls.from_json(trial.state.to_json())
     result = trial.run()
+    budget.checkpoint()
     return dict(case=case, experiment='ordinary' if cls is MeasuredState else 'remittance-r1',
                 result=result, cash_flow=trial.state.cash_flow)
 
 
-def late_quote(payload, cls):
+def late_quote(payload, cls, *, budget=None):
     """Future cash flow only: never claw back wealth earned in the original save."""
+    budget = CpuBudget(25) if budget is None else budget
     original = State.from_json(json.dumps(payload))
     before = original.to_json()
     state = cls.from_json(before)
     operations = []
     for kind in ('archery', 'mage_tower'):
+        budget.checkpoint()
         state.build(kind)
         operations.append(dict(command='build', kind=kind, after=snapshot(state)))
     quote = state.replacement_preview(state.hero.army[0].id, 'warden')
@@ -104,6 +109,7 @@ def late_quote(payload, cls):
     state.end_turn()
     operations.append(dict(command='end_turn', after=snapshot(state)))
     assert original.to_json() == before
+    budget.checkpoint()
     return operations
 
 
@@ -136,7 +142,8 @@ def buy_outpost(state, kinds):
                         added_upkeep=sum(UNITS[k].upkeep for k in kinds))
 
 
-def pursuit(payload, policy, *, reload_turns=True):
+def pursuit(payload, policy, *, reload_turns=True, budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     state = State.from_json(json.dumps(payload))
     original = state.to_json()
     initial_ids = {t.id for t in state.hero.army}
@@ -153,10 +160,12 @@ def pursuit(payload, policy, *, reload_turns=True):
         state, quote = buy_outpost(state, kinds)
         operations.append(dict(command='PROTOTYPE dispatch outpost', quote=quote, state=snapshot(state)))
     if policy == 'intercept':
+        budget.checkpoint()
         state.travel(state.rival.pos)
-        finish_battle(state)
+        finish_battle(state, budget=budget)
         operations.append(dict(command='intercept with explicit auto combat', state=snapshot(state)))
     else:
+        budget.checkpoint()
         state.end_turn()
         assert state.battle is None
         operations.append(dict(command='end_turn: actual rival operation', state=snapshot(state)))
@@ -164,10 +173,11 @@ def pursuit(payload, policy, *, reload_turns=True):
             state = type(state).from_json(state.to_json())
         # Recapture the province / finish the wounded expedition through public orders.
         state.travel(state.rival.pos)
-        finish_battle(state)
+        finish_battle(state, budget=budget)
         operations.append(dict(command='intercept after waiting with explicit auto combat', state=snapshot(state)))
     assert State.from_json(original).to_json() == original
     assert State.from_json(state.to_json()).to_json() == state.to_json()
+    budget.checkpoint()
     return dict(policy=policy, quote=quote, operations=operations,
                 lost_hero_troops=sorted(initial_ids - {t.id for t in state.hero.army}),
                 final=snapshot(state), final_save_sha256=hashlib.sha256(state.to_json().encode()).hexdigest())
@@ -176,12 +186,18 @@ def pursuit(payload, policy, *, reload_turns=True):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/late-realm-prototype.json')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     args = parser.parse_args()
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     example_path = ROOT / 'docs/evidence/crystal-service-comparison.examples.json'
     examples = json.loads(example_path.read_text())
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__).resolve(),
                       *(ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                                                         'stress_eador_control.py', 'eador_campaign.py'))])
+                                                         'stress_eador_control.py', 'eador_campaign.py', 'cpu_budget.py'))])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     plans = []
     for seed, hero, theme, mode in ((0, 'Commander', 'frontier', 'standard'),
@@ -190,20 +206,21 @@ def main():
         for plan in ('economy', 'sustain', 'spells'):
             case = (seed, hero, theme, plan, mode, 'direct')
             for cls in (MeasuredState, LimitedRemittance):
-                row = paid_plan(case, cls)
-                assert row == paid_plan(case, cls)
+                row = paid_plan(case, cls, budget=budget)
+                assert row == paid_plan(case, cls, budget=budget)
                 plans.append(row)
                 print(case, row['experiment'], row['result']['status'], row['result']['turns'], row['result']['gold_left'])
-    late = {name: late_quote(examples['late_full_roster']['state'], cls)
+    late = {name: late_quote(examples['late_full_roster']['state'], cls, budget=budget)
             for name, cls in (('ordinary', MeasuredState), ('remittance-r1', LimitedRemittance))}
     outposts = []
     for policy in ('intercept', 'rest', 'tower_infuse', 'outpost_pikes', 'outpost_bow'):
-        row = pursuit(examples['pursuit_last_action']['state'], policy)
-        assert row == pursuit(examples['pursuit_last_action']['state'], policy, reload_turns=False)
+        row = pursuit(examples['pursuit_last_action']['state'], policy, budget=budget)
+        assert row == pursuit(examples['pursuit_last_action']['state'], policy, reload_turns=False, budget=budget)
         outposts.append(row)
         print(policy, row['final']['gold'], row['final']['mana'], row['lost_hero_troops'])
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                  source_sha256=hashes, examples_sha256=hashlib.sha256(example_path.read_bytes()).hexdigest(),
+                  cpu_percent=budget.percent, source_sha256=hashes,
+                  examples_sha256=hashlib.sha256(example_path.read_bytes()).hexdigest(),
                   caveat='NON-PRODUCTION runtime experiments, not a supported new saved rules profile. '
                          'No production registry, frozen ID, model command, tactical formula or schema changed. '
                          'Nine selected paid plan pairs, not a balance matrix. Outpost bankruptcy and combined '
@@ -217,6 +234,7 @@ def main():
     assert not report['source_files_changed_during_run']
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+    budget.checkpoint()
     print(args.report)
 
 
