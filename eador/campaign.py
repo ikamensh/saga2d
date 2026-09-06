@@ -183,7 +183,9 @@ def validate_campaign(data: dict) -> None:
     checkpoint.update(campaign=None, battle=None, battle_kind=None, battle_province=None,
                       choices=[], status='playing', turn=1, provinces=entry['provinces'], rival=entry['rival'])
     checkpoint['hero']['pos'] = [-2, 0]
-    _validate_save(checkpoint, 8)
+    if data['schema_version'] >= 10:
+        checkpoint['battle_adventure'] = None
+    _validate_save(checkpoint, data['schema_version'])
     if contract == 'rootward':
         for provinces in (data['provinces'], entry['provinces']):
             require(sum(p['site_kind'] == 'border_watch' for p in provinces) == 1,

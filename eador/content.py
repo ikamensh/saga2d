@@ -79,3 +79,14 @@ class Choice:
     options: tuple[ChoiceOption, ...]
     kind: str
     context: str
+
+
+@dataclass(frozen=True)
+class AdventureAttempt:
+    """An entered approach keeps its actual reward and burden across later saves."""
+    approach: str
+    encounter: str
+    gold: int
+    crystals: int
+    relic: str | None
+    cargo_penalty: int = 0

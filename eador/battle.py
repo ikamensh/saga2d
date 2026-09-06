@@ -51,6 +51,7 @@ class BattleUnit:
     abilities: tuple[str, ...] = ()
     pinned: bool = False
     pin_cooldown: int = 0
+    cargo_penalty: int = 0
 
     @property
     def can_pin(self) -> bool:
@@ -70,7 +71,7 @@ class BattleUnit:
 
     @property
     def effective_move_range(self) -> int:
-        return max(1, self.move_range - (2 if self.pinned else 0))
+        return max(1, self.move_range - (2 if self.pinned else 0) - self.cargo_penalty)
 
     @property
     def alive(self) -> bool:
@@ -93,6 +94,7 @@ class BattleObjective:
     progress: int = 0
     required: int = 0
     deadline: int | None = None
+    exits: tuple[Pos, ...] = ()
 
 
 @dataclass
@@ -274,6 +276,34 @@ class Battle:
         unit.acted = unit.moved = target.moved = True
         self.log.append(f'{unit.name} swaps places with {target.name}.')
 
+    @property
+    def evacuation_blocked_reason(self) -> str | None:
+        if self.outcome is not None:
+            return 'The battle is over.'
+        if self.objective.kind != 'extract' or self.hero_id is None:
+            return 'This battle has no cargo to evacuate.'
+        hero = self.unit(self.hero_id)
+        if not hero.alive:
+            return 'The carrier has fallen.'
+        if hero.acted:
+            return 'The hero has already acted; evacuation needs an unspent action.'
+        if hero.pos not in self.objective.exits:
+            return 'Bring the hero to a marked exit.'
+        if any(other.alive and other.team != hero.team and self.grid.distance(hero.pos, other.pos) == 1
+               for other in self.units):
+            return 'Clear adjacent enemies before evacuating.'
+        return None
+
+    def evacuate(self) -> None:
+        """Spend the carrier's action at an uncontested exit; arrival alone never wins."""
+        reason = self.evacuation_blocked_reason
+        if reason is not None:
+            raise RuleError(reason)
+        hero = self.unit(self.hero_id)
+        hero.acted = hero.moved = True
+        self.outcome, self.outcome_reason = 'player', 'escape'
+        self.log.append('The hero escapes with the recovered cargo. Surviving defenders withdraw.')
+
     def _damage(self, attacker: BattleUnit, target: BattleUnit, *, pin: bool = False) -> int:
         cover = 2 if self.terrain[target.pos] in ('forest', 'hills') else 0
         damage = max(1, attacker.attack - target.effective_defense - cover)
@@ -387,6 +417,11 @@ class Battle:
 
     def _objective_turn(self) -> None:
         objective = self.objective
+        if objective.kind == 'extract':
+            if self.round >= objective.deadline:
+                self.outcome, self.outcome_reason = 'enemy', 'deadline'
+                self.log.append('Time ran out before the cargo could be evacuated.')
+            return
         if objective.kind != 'hold':
             return
         holding = any(unit.alive and unit.team == 'player' and unit.pos == objective.target for unit in self.units)
@@ -566,5 +601,6 @@ class Battle:
                    mana=data['mana'], spells=set(data['spells']), round=data['round'],
                    outcome=data['outcome'], log=list(data['log']),
                    spell_costs=dict(data['spell_costs']), spell_power=dict(data['spell_power']), hero_id=data['hero_id'],
-                   objective=BattleObjective(**{**data['objective'], 'target': tuple(data['objective']['target']) if data['objective']['target'] is not None else None}),
+                   objective=BattleObjective(**{**data['objective'], 'target': tuple(data['objective']['target']) if data['objective']['target'] is not None else None,
+                                                'exits': tuple(tuple(pos) for pos in data['objective']['exits'])}),
                    outcome_reason=data['outcome_reason'])

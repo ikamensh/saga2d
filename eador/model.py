@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from saga2d import HexGrid
 
-from eador.content import Choice, ChoiceOption, RELICS, SITES, SKILLS
+from eador.content import AdventureAttempt, Choice, ChoiceOption, RELICS, SITES, SKILLS
 from eador.campaign import Campaign
 from eador.rival import INTENTS, STRONGHOLD, RivalState, RivalTroop
 
@@ -169,6 +169,7 @@ class State:
     rival: RivalState = field(default_factory=RivalState)
     theme: str = 'frontier'
     campaign: Campaign | None = None
+    battle_adventure: AdventureAttempt | None = None
 
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier') -> State:
@@ -648,7 +649,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 9
+        data['schema_version'] = 10
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -667,8 +668,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8 and 9.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10.')
         _validate_save(data, version)
         if version >= 8:
             from eador.campaign import validate_campaign
@@ -729,6 +730,14 @@ class State:
         if version < 7 and data['battle'] is not None:
             for unit in data['battle']['units']:
                 unit.update(abilities=(), pinned=False, pin_cooldown=0)
+        if version < 10:
+            data['battle_adventure'] = None
+            if data['battle'] is not None:
+                data['battle']['objective']['exits'] = ()
+                for unit in data['battle']['units']:
+                    unit['cargo_penalty'] = 0
+        if data['battle_adventure'] is not None:
+            data['battle_adventure'] = AdventureAttempt(**data['battle_adventure'])
         data['rival']['pos'] = tuple(data['rival']['pos'])
         if data['rival']['target'] is not None:
             data['rival']['target'] = tuple(data['rival']['target'])
@@ -786,7 +795,7 @@ def _validate_save(data: dict, version: int) -> None:
     def text_fields(value, names, label):
         require(all(isinstance(value[name], str) for name in names), f'{label} contains invalid text.')
 
-    new_state = {'inventory', '_choices', 'rival', 'theme', 'campaign'}
+    new_state = {'inventory', '_choices', 'rival', 'theme', 'campaign', 'battle_adventure'}
     state_keys = {f.name for f in fields(State)} - new_state
     if version >= 2:
         state_keys |= {'inventory', 'choices', 'schema_version'}
@@ -796,6 +805,8 @@ def _validate_save(data: dict, version: int) -> None:
         state_keys.add('theme')
     if version >= 8:
         state_keys.add('campaign')
+    if version >= 10:
+        state_keys.add('battle_adventure')
     object_fields(data, state_keys, 'Campaign', optional={'schema_version'} if version == 1 else ())
     if version >= 6:
         from eador.worldgen import THEMES
@@ -936,6 +947,17 @@ def _validate_save(data: dict, version: int) -> None:
             rival_by_id[troop['id']] = troop
 
     battle = data['battle']
+    if version >= 10:
+        attempt = data['battle_adventure']
+        if attempt is not None:
+            require(battle is not None and data['battle_kind'] == 'site', 'Adventure approach has no site battle.')
+            object_fields(attempt, {f.name for f in fields(AdventureAttempt)}, 'Adventure approach')
+            text_fields(attempt, ('approach', 'encounter'), 'Adventure approach')
+            integer(attempt['gold'], 'Adventure gold reward')
+            integer(attempt['crystals'], 'Adventure crystal reward')
+            integer(attempt['cargo_penalty'], 'Adventure cargo penalty', maximum=1)
+            require(attempt['relic'] is None or isinstance(attempt['relic'], str) and attempt['relic'] in RELICS,
+                    'Adventure names an unknown relic.')
     if battle is None:
         require(data['battle_kind'] is None and data['battle_province'] is None, 'Battle context has no battle.')
         return
@@ -969,8 +991,10 @@ def _validate_save(data: dict, version: int) -> None:
     require(len(cells) == 37, 'A battlefield must contain 37 hexes.')
     objective = battle['objective'] if version >= 5 else asdict(BattleObjective())
     if version >= 5:
-        object_fields(objective, {f.name for f in fields(BattleObjective)}, 'Objective')
+        object_fields(objective, {f.name for f in fields(BattleObjective)} - ({'exits'} if version < 10 else set()), 'Objective')
         require(objective['kind'] in ('rout', 'hold'), 'Unknown battle objective.')
+        if version >= 10:
+            require(objective['exits'] == [], 'Only extraction objectives have exits.')
         integer(objective['required'], 'Objective required turns', maximum=80)
         integer(objective['progress'], 'Objective progress', maximum=objective['required'])
         if objective['kind'] == 'rout':
@@ -993,7 +1017,7 @@ def _validate_save(data: dict, version: int) -> None:
     ids, occupied, player_ids, enemies = set(), set(), set(), []
     expedition_ids = set()
     for unit in battle['units']:
-        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set())
+        unit_keys = {f.name for f in fields(BattleUnit)} - ({'safe_attacks', 'terrain_walk', 'skirmisher'} if version == 1 else set()) - ({'source_id'} if version < 3 else set()) - ({'stance'} if version < 4 else set()) - ({'abilities', 'pinned', 'pin_cooldown'} if version < 7 else set()) - ({'cargo_penalty'} if version < 10 else set())
         object_fields(unit, unit_keys, 'Battle unit')
         integer(unit['id'], 'Battle unit ID')
         require(unit['id'] not in ids, 'Duplicate battle unit ID.')
@@ -1007,6 +1031,10 @@ def _validate_save(data: dict, version: int) -> None:
         integer(unit['defense'], 'Battle unit defense')
         for name in ('moved', 'acted', 'retaliated'):
             require(type(unit[name]) is bool, 'Invalid battle action flags.')
+        if version >= 10:
+            integer(unit['cargo_penalty'], 'Carried cargo penalty', maximum=1)
+            require(unit['cargo_penalty'] == 0 or unit['id'] == 0 and data['battle_adventure'] is not None,
+                    'Only an adventure hero carries cargo.')
         if version >= 7:
             strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
             require('swap' not in unit['abilities'] or unit['kind'] == 'warden', 'Only Wardens can swap allies.')

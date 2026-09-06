@@ -321,6 +321,7 @@ def test_an_actual_v7_standalone_battle_continues_exactly_after_the_v8_migration
         state.choose(state.choice.options[0].id)
     actual = json.loads(state.to_json())
     actual.pop('campaign')
+    assert actual.pop('battle_adventure') is None
     actual['schema_version'] = 7
     assert actual == json.loads((fixtures / 'v7_campaign_battle_result.json').read_text())
 
