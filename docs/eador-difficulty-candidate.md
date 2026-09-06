@@ -3,9 +3,9 @@
 The proposed new-game profile is **challenge-2**, with 4 mana recovered per turn.
 It preserves Challenge-1's 90 gold / 2 crystal grant, 80% gold income, HP recovery,
 finite rival funds and forces, announced operation delays, and linked funding.
-**The catalog still selects challenge-1.** Existing saves retain their recorded
-profile. This is a recommendation for review, not a declaration that difficulty
-or the economy is complete.
+**Following review, the new-game catalog selects challenge-2.** Existing saves
+retain their recorded profile. The measurements below preceded that switch;
+they do not declare difficulty or the economy complete.
 
 The original [32,400-run report](eador-difficulty-model.md) remains unchanged.
 All candidate experiments below used clean source **445b069**, with hashes checked
@@ -102,7 +102,7 @@ inside this recovery experiment.
 
 ## Recommendation and verification
 
-Prefer **challenge-2 for future new games**, subject to the root's review. Keep
+The accepted decision is **challenge-2 for future new games**, keeping
 challenge-1 loadable with mana 3. Challenge should get its tension from constrained
 funding, expansion, reinforcement choices and readable rival pressure; a near-full
 mana waiting cycle adds little useful pressure. Teach the existing alternative of
@@ -116,6 +116,13 @@ frozen-ID/replay behavior and candidate recovery. Standard regression fuzz passe
 12 campaigns and 12 scene runs; the unrelated Tribes fuzzer passed 60 AI games and
 20 random-input runs. The large candidate matrix provides the new profile's public
 campaign coverage; Standard scene fuzz is not claimed as random candidate coverage.
+
+The separate selector change captures five actual pre-switch Challenge-1 saves
+in `tests/eador/fixtures/v12_challenge1_cases.json`, with their source revision.
+Public tests preserve every recorded field through rest, standalone and linked
+replay, next-shard advance and defeat recovery. The old mana-3 rules remain in
+those outputs; new Challenge starts and their replay use mana 4. The combined
+mode/campaign/pressure/rival/UI integration suite passes 152 tests after selection.
 
 Reproduce the full candidate and one-factor policy comparisons:
 

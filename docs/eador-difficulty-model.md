@@ -3,8 +3,10 @@
 Three game-owned policies are implemented in schema v12. Standard retains the
 original realm rules. This report covers the first Accessible/Challenge values
 in [the proposal](eador-difficulty-proposal.md), **not tuned-mode acceptance**.
-Challenge's measured recovery tail is unsatisfactory and is being compared with
-a separate mana-four candidate. The original `challenge-1` remains meaningful.
+Challenge's measured recovery tail prompted the separate
+[mana-four comparison](eador-difficulty-candidate.md). New Challenge games now
+select `challenge-2`; the original `challenge-1` remains meaningful and the
+historical results below have not been rewritten.
 
 ## Public rules and protected progress
 
@@ -101,8 +103,9 @@ an unwinnable map, but does not excuse the policy's 30 recovery turns.
 
 Native selection/readout verification belongs to root's UI checkpoint. This
 model evidence does not relabel mock commands as native input or complete
-G02/G07. The next comparison isolates mana-four `challenge-2` while retaining
-`challenge-1` saves and keeping the three-mode new-game catalog unchanged.
+G02/G07. The [follow-up comparison](eador-difficulty-candidate.md) isolates
+mana-four `challenge-2`, with exact Challenge-1 save-continuation fixtures before
+the subsequent new-game selection change.
 
 Reproduce the original audit with the recorded source revision:
 

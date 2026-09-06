@@ -79,27 +79,48 @@ def test_challenge_changes_affordable_orders_and_income_without_altering_the_wor
     assert forecast.army_hp == normal.recovery_preview().army_hp
 
 
-def test_unselected_mana_candidate_keeps_existing_challenge_saves_and_new_games_exact():
-    """A separately saved candidate can be measured without changing the shipped selector."""
-    from eador.difficulty import DIFFICULTIES
-    original = State.new(7, 'Wizard', difficulty='challenge')
-    original.explore(); finish_battle(original)
+def test_new_challenge_recovers_mana_faster_without_rewriting_a_recorded_profile():
+    """The new-game selector changes; a real previously saved Challenge still rests by its old rules."""
+    cases = json.loads((Path(__file__).parent / 'fixtures/v12_challenge1_cases.json').read_text())['cases']
+    original = State.from_json(json.dumps(next(c['before'] for c in cases if c['name'] == 'rest')))
     saved = original.to_json()
-    data = json.loads(saved)
-    data['rules_id'] = 'challenge-2'
-    candidate = State.from_json(json.dumps(data))
-    assert DIFFICULTIES['challenge'].id == original.rules_id == 'challenge-1'
+    candidate = State.new(7, 'Wizard', difficulty='challenge')
+    candidate.explore(); finish_battle(candidate)
+    assert candidate.rules_id == 'challenge-2' and original.rules_id == 'challenge-1'
     assert candidate.recovery_preview().mana == 4
     assert original.recovery_preview().mana == 3
-    before_mana = original.hero.mana
+    before_mana, candidate_mana = original.hero.mana, candidate.hero.mana
     original.end_turn(); candidate.end_turn()
     assert original.hero.mana == before_mana + 3
-    assert candidate.hero.mana == before_mana + 4
+    assert candidate.hero.mana == candidate_mana + 4
     assert State.from_json(candidate.to_json()).to_json() == candidate.to_json()
     resumed = State.from_json(saved)
     resumed.end_turn()
     assert resumed.to_json() == original.to_json()
     assert candidate.replay().rules_id == 'challenge-2'
+
+
+@pytest.mark.parametrize('name', ['rest', 'standalone_replay', 'advance', 'linked_replay', 'recover'])
+def test_actual_challenge1_saves_keep_exact_rest_replay_arrival_and_recovery(name):
+    """Changing the new-game alias never changes recorded grants, orders, world or mana rules."""
+    fixture = json.loads((Path(__file__).parent / 'fixtures/v12_challenge1_cases.json').read_text())
+    case = next(c for c in fixture['cases'] if c['name'] == name)
+    state = State.from_json(json.dumps(case['before']))
+    assert json.loads(state.to_json()) == case['before']
+    assert state.rules_id == fixture['rules_id'] == 'challenge-1'
+    assert state.difficulty == 'challenge' and state.rules.mana_recovery == 3
+    if name.endswith('replay'):
+        before = state.to_json()
+        result = state.replay()
+        assert state.to_json() == before
+        state = result
+    elif name == 'advance':
+        state.advance('rootward', **travel_selection(state))
+    elif name == 'recover':
+        state.recover(**travel_selection(state))
+    else:
+        state.end_turn()
+    assert json.loads(state.to_json()) == case['after']
 
 
 @pytest.mark.parametrize('mode', ['accessible', 'standard', 'challenge'])
