@@ -155,6 +155,18 @@ class CodexScene(Screen):
             acolytes = [unit for unit in battle.units if unit.team == 'player' and unit.alive and unit.kind == 'healer']
             healers = sum(unit.can_heal for unit in acolytes)
             context = "Current battle" if state.battle else "Next battle"
+            def orders(ability):
+                capable = [unit for unit in battle.units if unit.alive and unit.team == 'player'
+                           and ability in unit.abilities]
+                unspent = sum(not unit.acted for unit in capable)
+                facts = f"{context} · {ability.title()}: {len(capable)} capable / {unspent} unspent order{'s' if unspent != 1 else ''}"
+                if ability in ('smoke', 'repulse'):
+                    charges = sum(ability not in unit.spent_abilities for unit in capable)
+                    facts += f" · {charges} charge{'s' if charges != 1 else ''} left"
+                if hero.alive and ability in hero.abilities:
+                    facts += " · Hero included"
+                return facts + " · No mana"
+
             entries += [
                 _Entry("Pin", f"Range 3 · No mana · Army: {len(capable)} capable / {ready} ready · {cooling} cooling · {pin_hero}",
                        "Half damage after defense/cover (round up); forecast includes reactions. "
@@ -163,9 +175,9 @@ class CodexScene(Screen):
                 _Entry("Ranger: shoot then move", "Ordinary attack · No mana · No Pin",
                        "Shoot before moving to keep the Ranger's unused movement. Moving first gives no second move. "
                        "Pin still slows the escape; occupied hexes and normal terrain costs still apply."),
-                _Entry("Swap", "Warden · Adjacent living ally · No mana",
-                       "Exchange places, spending the Warden's action and both units' remaining movement. "
-                       "The ally's action stays as it was, even if already spent. May move then Swap. "
+                _Entry("Swap", orders('swap'),
+                       "Warden or Mirror Badge hero: swap with an adjacent ally. Spend your action and both remaining moves; "
+                       "preserve the ally's action, spent or unspent. May move then Swap. "
                        "Guard/Brace and Pin stay unchanged."),
                 _Entry("Acolyte Heal",
                        f"{context}: {healers} of {len(acolytes)} Acolytes have Heal · "
@@ -178,28 +190,18 @@ class CodexScene(Screen):
                        "Guard spends the order. The first adjacent melee attacker takes a normal hit before striking; lethal damage cancels its attack. "
                        "One reaction, expiring next own turn. Ranged fire avoids it. Other units gain +2 defense."),
             ]
-            def orders(ability):
-                capable = [unit for unit in battle.units if unit.alive and unit.team == 'player'
-                           and ability in unit.abilities]
-                unspent = sum(not unit.acted for unit in capable)
-                facts = f"{context} · {ability.title()}: {len(capable)} capable / {unspent} unspent order{'s' if unspent != 1 else ''}"
-                if ability in ('smoke', 'repulse'):
-                    charges = sum(ability not in unit.spent_abilities for unit in capable)
-                    facts += f" · {charges} charge{'s' if charges != 1 else ''} left"
-                return facts + " · No mana"
-
             flying = sum(unit.alive and unit.team == 'player' and unit.can_fly for unit in battle.units)
             sight = (f"{context}: terrain sight · Smoke clouds: {len(battle.smoke_clouds)}" if battle.sight_rules == 'terrain'
                      else "This older battle uses open sight · New battles use terrain sight")
             entries += [
                 _Entry("Rally", orders('rally'),
-                       "Militia clears Pin from an adjacent living ally. Spends the Militia's action and move; "
+                       "Militia or Vanguard Drum hero clears an adjacent ally's Pin. Spends the acting unit's action and move; "
                        "never refreshes the ally's orders or clears cargo. Can be used each turn; not a battle charge."),
                 _Entry("Smoke", orders('smoke'),
-                       "One charge per battle; spends action and move. Place within 3 and in sight. "
-                       "Blocks both sides' fire and magic, endpoints too; self-targeting works. Ends before your next team turn, even if the Sapper dies."),
+                       "Sapper or Veil Censer hero: once per battle; spends action and move. Range 3 in sight; self-targeting works. "
+                       "Blocks both sides' fire and magic, endpoints too, until your next turn even if the caster dies."),
                 _Entry("Repulse", orders('repulse'),
-                       "One charge per battle; spends action and move. Push an adjacent foe one hex directly away without damage or retaliation. "
+                       "Adept or Porter’s Rune hero: one charge per battle. Spends action and move. Push an adjacent foe one hex directly away without damage or retaliation. "
                        "Guard/Brace anchors it; landing must be empty and on the board."),
                 _Entry("After a Repulse", "Position changes · No replacement orders · No immediate objective progress",
                        "Target orders, retaliation and Pin stay unchanged. Seal progress waits for its normal checkpoint. "
@@ -220,7 +222,7 @@ class CodexScene(Screen):
             entries += [
                 _Entry("Evacuate", escape_status,
                        "Arrival alone never wins. Hero on exit, unspent action, no adjacent living enemy: Evacuate spends action and movement. "
-                       "Warden Swap preserves the hero's action; its attack, spell or Guard spends it."),
+                       "An ally's Swap preserves the hero's action; the hero's active orders spend it."),
                 _Entry("Cargo and the escape clock", deadline + " · " + movement,
                        "Pin and cargo reduce movement (minimum 1), but cannot block Evacuate. Escape before the last enemy phase ends, "
                        "or rout every defender for the same reward. Hero death loses; all other survivors escape."),
@@ -265,10 +267,15 @@ class CodexScene(Screen):
                                   "A retry spends one campaign action and its chosen fee; surviving defenders keep their wounds. "
                                   "Failure gives no reward or victory XP and loses up to 20 more gold. Success pays the chosen reward once and closes the site."))
             return entries
-        return [_Entry(spec.name, f"Sell when found: {spec.value} gold · "
-                      f"{'Equipped' if state.hero.relic == kind else 'Owned' if kind in state.inventory else 'Not owned'}",
-                      spec.description + " " + self.relic_sources(kind))
-                for kind, spec in RELICS.items()]
+        entries = []
+        for kind, spec in RELICS.items():
+            equipped = state.hero.relic == kind
+            facts = f"Sell when found: {spec.value} gold · " + ("Equipped" if equipped else "Owned" if kind in state.inventory else "Not owned")
+            if equipped and spec.battle_ability and state.battle:
+                recorded = spec.battle_ability in state.battle.unit(0).abilities
+                facts += f" · Saved hero: {spec.battle_ability.title()} {'recorded' if recorded else 'not recorded'}"
+            entries.append(_Entry(spec.name, facts, spec.description + " " + self.relic_sources(kind)))
+        return entries
 
     def relic_sources(self, kind):
         sources = sorted({province.site for province in self.root.state.provinces.values()
@@ -290,7 +297,7 @@ class CodexScene(Screen):
             "Stronghold buildings are permanent. Each can be constructed once, even while your hero is away.",
             "Each earned hero level offers a discipline. Deepen one path or develop both; skills belong to a hero class.",
             "Explore an owned, uncleared site using one action. Approach choices follow their site; the active choice shows its saved reward.",
-            "Equip one relic between battles. Recorded sources belong to this saved shard; cleared sites cannot award their reward again.",
+            "Equip one relic between battles. Replacing Moonstone or Ember Lens removes its spell unless learned elsewhere. Sources belong to this saved shard.",
         )
         self.paragraph(introductions[self.category], x + 24, y + 163, width=992, size=13)
         start = self.page * PAGE_SIZE

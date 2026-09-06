@@ -29,3 +29,19 @@ fixtures here; this verification makes no difficulty or route-quality claim.
 at commit 99b56c5: `State.new_campaign(0)` followed by `play_campaign` with home,
 every sorted non-capital province, then Duskspire. It preserves the earlier eight
 relics and their recorded sources; no inventory or reward was injected.
+
+The Abilities reference names the four relic alternatives beside their troop
+sources: Censer/Smoke, Rune/Repulse, Badge/Swap and Drum/Rally. It counts the living
+hero only when the active battle actually contains that capability, and keeps
+used charges separate from unspent orders. The Relics reference identifies the
+equipped hero's recorded battle capability and keeps source names from the saved
+shard. Replacing a spell-granting relic and spending the hero's own active order
+before Evacuate are explicit tradeoffs.
+
+`python tools/verify_eador_relic_codex.py` earns the Censer, enters Watch, spends
+hero Smoke through the visible button/hex controls, saves/reloads, and browses
+all Abilities/Relics pages. The same pages are checked against an older active
+v10 save. Opening, paging and closing the Codex change neither state nor save
+files. Native screenshots for the long descriptions, saved charge count and
+old capability counts were inspected; the fixed three-entry layout required
+concise Swap, Smoke and Evacuate wording.

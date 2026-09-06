@@ -238,8 +238,8 @@ def test_paid_watch_army_can_read_its_role_orders_and_costs_without_spending_the
         text = rendered_text(game)
         assert 'Ranger: shoot then move' in text and 'Moving first gives no second move' in text
         assert 'No Pin' in text and 'terrain costs' in text
-        assert 'Swap' in text and "Warden's action and both units' remaining movement" in text
-        assert "The ally's action stays as it was" in text and 'Guard/Brace and Pin stay unchanged' in text
+        assert 'Swap' in text and "Spend your action and both remaining moves" in text
+        assert "preserve the ally's action, spent or unspent" in text and 'Guard/Brace and Pin stay unchanged' in text
         assert 'Acolyte Heal' in text and 'Current battle: 1 of 1 Acolytes have Heal' in text
         assert f"{state.battle.spell_cost('heal')} mana / up to {state.battle.spell_power['heal']} healing" in text
         assert f'Shared mana: {state.battle.mana}' in text
@@ -501,5 +501,44 @@ def test_paid_saved_sapper_reference_keeps_used_charge_after_the_cloud_expires(t
             if not expired:
                 state.battle.end_turn()
                 assert state.battle.unit(sapper.id).alive
+    finally:
+        game._teardown()
+
+
+def test_earned_censer_reference_uses_saved_hero_order_and_charge_without_writing(tmp_path):
+    """A recovered, equipped Censer grants the hero Smoke; reloading keeps its spent charge.
+
+    Catalog and ability pages must identify the acting hero and cannot resurrect
+    that charge or imply that equipping multiple relics combines their powers.
+    """
+    from eador.codex import CodexScene
+    from tools.eador_relic_campaign import prepare_censer_watch
+
+    state = prepare_censer_watch()
+    state.battle.smoke(0, state.battle.unit(0).pos)
+    state = State.from_json(state.to_json())
+    game = create_game('Earned relic reference', backend='mock', save_dir=tmp_path)
+    try:
+        root = ShardScene(state)
+        game.push(root)
+        before = state.to_json()
+        game.push(CodexScene(root))
+        press(game, '2')
+        while 'Smoke: 1 capable' not in rendered_text(game):
+            assert game.scene.page + 1 < game.scene.pages
+            press(game, 'right')
+        text = rendered_text(game)
+        assert 'Smoke: 1 capable / 0 unspent orders · 0 charges left' in text
+        assert 'Hero included' in text and 'Veil Censer' in text
+        assert 'even if the caster dies' in text
+        press(game, '6')
+        assert 'Replacing Moonstone or Ember Lens removes its spell unless learned elsewhere' in rendered_text(game)
+        while 'Veil Censer' not in rendered_text(game):
+            assert game.scene.page + 1 < game.scene.pages
+            press(game, 'right')
+        assert 'Saved hero: Smoke recorded' in rendered_text(game)
+        assert 'Recorded sources: Courier’s Crossing' in rendered_text(game)
+        press(game, 'escape')
+        assert state.to_json() == before and not list(tmp_path.iterdir())
     finally:
         game._teardown()
