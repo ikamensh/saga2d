@@ -571,3 +571,26 @@ the dedicated successful paid journeys.
 G01–G19 remain incomplete. Campaign transitions/retinue and tactical/HUD
 reading, the tenth and remaining authored patterns, meaningful economy,
 candidate-specific stress, platforms and human feedback remain active work.
+
+## Ten authored families and complete campaign reading — 2026-09-06
+
+Aerie Raid is integrated, using existing flight, Brace, Swap and Repulse on a
+marsh-divided battlefield. Two free deployment approaches and a cheaper Scout
+army have paid public-command and native-input victories. The finite failed
+sortie/retry retains wounds and pays its reward once. Aerie brings the current
+authored family count to ten; G05's twelve-family floor is still open.
+
+The title and campaign transitions now use the shared 100/125 reading setting.
+Selected new-run settings, retinue IDs and visible keyboard focus survive
+settings changes and resize. Valid unusually long save paths no longer turn a
+failed title or departure load into a layout crash: complete diagnostics page
+without losing characters. Independent review reproduced the transition bug
+before the fix. The shard's exhausted-action hint also fits its actual native
+sidebar. [Integrated verification](evidence/shardbound-integrated-56f1ffb/README.md)
+records 1,142 passing tests, both bounded fuzz checks and the native retries.
+
+G01–G19 remain incomplete. Tactical/HUD reading, the remaining two authored
+families, meaningful economy and pacing, oversized errors in remaining review
+screens, candidate stress, platform verification and human feedback remain active.
+A fresh Mac development package is being checked; previous artifacts retain
+their original source attribution and do not prove the current build.

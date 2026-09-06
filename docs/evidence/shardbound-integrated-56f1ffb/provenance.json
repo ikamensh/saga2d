@@ -1,0 +1,25 @@
+{
+  "implementation_revision": "56f1ffb1036b0a1e1a74bbc20d6ee0812e38c7e6",
+  "recorded_report_heads_preserved": true,
+  "all_recorded_source_hashes_match_implementation": true,
+  "full_tests": {
+    "passed": 1142,
+    "seconds": 116.04
+  },
+  "tribes": {
+    "ai_games": 60,
+    "scene_runs": 20,
+    "failures": 0
+  },
+  "inspected_images": [
+    "complete-map-hint.png",
+    "reading-scope.png"
+  ],
+  "artifact_sha256": {
+    "linked.json": "dd4650370d54bedd807fa68868744a43bb19e319a8f54bcf6e1b808b38f25939",
+    "aerie-retry.json": "f5f409c4c1722b12bf22ea07c87285a08ba1009df9f421a4c6e3ee6feccd3690",
+    "complete-map-hint.png": "4c5e50fe917f2b9c064e42c3bab419ee5b8ec937f4ff207c287086c6ea3af24e",
+    "reading-scope.png": "02b9722bc1c3aed68a53d9a866ff38e50559fb8d722f9e22fca2742e8c5a42e2",
+    "title.json": "aec39c85cce54f19d1daeb0ac1a9430da53310eaf2bda54e4236caad395d3c25"
+  }
+}
