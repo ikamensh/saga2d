@@ -1269,6 +1269,8 @@ class SaveScene(Screen):
         self.return_to_title = return_to_title
         self.page = 0
         self.entries = []
+        self._shown_diagnostic = None
+        self._next_anchor = None
         self._page_indices = [()]
 
     @property
@@ -1300,12 +1302,19 @@ class SaveScene(Screen):
         from eador.settings_scene import SettingsScene
         self.game.push(SettingsScene(focus='codex_text_scale'))
 
+    def read_error(self):
+        from eador.diagnostics import DiagnosticScene
+        self._shown_diagnostic = self.message
+        self.game.push(DiagnosticScene(self.message, return_label="Return to saves"))
+
     def refresh(self):
         from saga2d import Column, Label, Row
         from eador.preferences import reading_scale
         from eador.reading import reading_pages
 
         anchor = self.entries.index(self.visible_entries[0]) if self.visible_entries else 0
+        if self._next_anchor is not None:
+            anchor, self._next_anchor = self._next_anchor, None
         super().refresh()
         self._display = self.game.window_size, reading_scale(self.game)
         scale = self._display[1] / 100
@@ -1336,9 +1345,16 @@ class SaveScene(Screen):
                 'Shown slot numbers select a save. Shift + number opens its previous version. Left/Right changes page. Loading never overwrites a file.')
         footer = label(self.message or hint, 11, color=GOLD if self.message else MUTED)
         body_y = 99 + self.measure(introduction)[1] + 18
+        heights = [max(40, self.measure(block)[1]) for block in blocks]
+        diagnostic = bool(self.message) and self.measure(footer)[1] + max(heights) + 18 > 670 - body_y
+        if diagnostic:
+            footer = Row(label('Save/load failed. Read the complete error, then choose another slot or an available backup.',
+                               11, width=824, color=GOLD),
+                         Button('Read error', width=216, height=40, shortcut='D', on_click=self.read_error), spacing=24)
+        elif not self.message:
+            self._shown_diagnostic = None
         footer_y = 670 - self.measure(footer)[1]
-        self._page_indices, self.page = reading_pages([max(40, self.measure(block)[1]) for block in blocks],
-                                                      footer_y - 18 - body_y, anchor=anchor, spacing=20)
+        self._page_indices, self.page = reading_pages(heights, footer_y - 18 - body_y, anchor=anchor, spacing=20)
         self.ui.clear()
         self.ui.add(Column(introduction, anchor=Anchor.TOP_LEFT, margin=(round(x + 28), round(y + 99))))
         rows = []
@@ -1360,7 +1376,11 @@ class SaveScene(Screen):
         self.button('Text size', x + 886, y + 32, 206, self.open_text_settings, shortcut='T')
         self.button("Close", x + 892, y + 692, 200, self.game.pop, shortcut="Esc")
 
+        if diagnostic and self.message != self._shown_diagnostic and self.game.scene is self:
+            self.read_error()
+
     def load_game(self, slot=1, *, backup=False):
+        self._shown_diagnostic = None
         loaded = super().load_game(slot, backup=backup)
         if not loaded:
             self.refresh()
@@ -1375,10 +1395,13 @@ class SaveScene(Screen):
 
     def recover(self, index):
         if self.mode == "load" and self.entries[index].backup_available:
+            self._next_anchor = index
             self.load_game(self.entries[index].slot, backup=True)
 
     def activate(self, index):
         entry = self.entries[index]
+        self._shown_diagnostic = None
+        self._next_anchor = index
         if self.mode == "load":
             self.load_game(entry.slot)
         elif entry.slot in MANUAL_SLOTS:
