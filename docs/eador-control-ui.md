@@ -57,6 +57,16 @@ model and twelve scene journeys (2,227 inputs, 1,852 randomized). The verifier
 records source hashes, revision, dirty paths, runtime/platform and exact inputs,
 and refuses to report success if source changes during its run.
 
+All four native journeys were rerun at clean production source `2f90bc5`
+(only an unrelated `.gitignore` edit was present). Retained reports and
+inspected PNGs are in [the evidence directory](evidence/shardbound-control-ui-2026-09-06/):
+[Smoke](evidence/shardbound-control-ui-2026-09-06/smoke/journey.json),
+[Rally](evidence/shardbound-control-ui-2026-09-06/rally/journey.json),
+[Repulse](evidence/shardbound-control-ui-2026-09-06/repulse/journey.json), and
+[combined Watch](evidence/shardbound-control-ui-2026-09-06/watch/journey.json).
+The repeated runs produced the same input/reload counts. This source includes
+the saved-control/terrain-sight Codex increment `4114510`.
+
 ```sh
 uv run python tools/verify_eador_control.py --scenario smoke --output /tmp/control-smoke
 uv run python tools/verify_eador_control.py --scenario rally --output /tmp/control-rally
