@@ -1,0 +1,9 @@
+{
+  "source": "2a7e4b4",
+  "seed": 7,
+  "hero": "Commander",
+  "theme": "frontier",
+  "difficulty": "standard-1",
+  "commands": "build barracks; recruit swordsman; explore shrine; finish_battle; for (-1,0),(0,0): march_to,rest; explore Grove; snapshot; finish_battle; result",
+  "scope": "Actual old selected source and exact loaded battle/reward continuation. Fresh maps may add Relief."
+}
