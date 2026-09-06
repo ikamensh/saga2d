@@ -59,9 +59,8 @@ and recovery funds.
 or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
 Reading size offers 100/125% for the title, Codex, Field Guide, expedition briefings,
-Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival and campaign
-plans. Press **T** in these screens to open that setting directly.
-Other screens, including the tactical HUD and campaign departures, keep their existing sizes.
+Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival plans and campaign transitions/plans. Press **T** in these screens to open that setting directly.
+The shard and tactical HUDs keep their existing sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive
@@ -242,8 +241,8 @@ cheaper Heal. **H** shows learned effects.
 
 Sites have different defending parties, rewards and objectives. Ordinary
 guarded ruins sit alongside authored adventures such as Border Watch,
-Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory
-Stranded Explorer and Smuggler Screen. The Codex describes the current catalogue and its
+Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory,
+Stranded Explorer, Smuggler Screen and Aerie Raid. The Codex describes the current catalogue and its
 saved rewards.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
@@ -286,6 +285,12 @@ spells too; Rally clears Pin without restoring spent actions. Choose a route
 around the screen, rescue exposed troops or stop the Sapper before it acts.
 Both formations face the same finite defenders and offer 60 gold, two crystals
 and a Veil Censer. A failed attempt preserves killed guards and wounded survivors.
+
+Aerie Raid offers western and northern deployments against two Skyriders, an
+Archer and a Pikeman. Flight crosses the marsh and occupied hexes, but still
+needs an empty landing. Block useful landings, Brace the next melee approach,
+or reposition with Swap and Repulse. Both formations offer 60 gold, two
+crystals and a Watch Bell; wounded survivors persist after a failed attempt.
 
 | Building | Cost | Benefit |
 |---|---|---|

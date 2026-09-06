@@ -1,7 +1,7 @@
 # Reading size
 
 The title, Field Codex, expedition briefings, Build/Recruit catalogs, troop replacement,
-Hero, reward choices, results, Saves, rival and campaign plans offer **Text size** (`T`), opening Settings directly on
+Hero, reward choices, results, Saves, rival plans and campaign transitions/plans offer **Text size** (`T`), opening Settings directly on
 **Display → Reading size**. Choose **100%** or **125%** with Left/Right
 or the visible minus/plus buttons. The sample previews the selected size.
 Apply saves it and returns to the same first visible entry; Cancel restores the
@@ -24,10 +24,11 @@ cards; campaign plans enlarge objectives, live progress and saved rules. Rival
 plans enlarge the full order, location, finite army, upkeep/refit prices and
 interception or breakout advice. Troop
 replacement enlarges the outgoing roster, lost rank/XP, incoming role and exact
-cost/upkeep review. Navigation and
+cost/upkeep review. Campaign transitions enlarge offer details, retinue rows,
+focused descriptions, funding, recovery rules and ending records. Navigation and
 purchase buttons, large screen titles and page count keep their normal size.
-Other screens—including tactical forecasts, HUD and campaign departures
-and retinue selection—keep their existing text sizes.
+Other screens—including tactical forecasts and the shard HUD—keep their
+existing text sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
 

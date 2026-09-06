@@ -336,6 +336,16 @@ class ShardScene(Screen):
         can_act = playing and self.state.actions_left > 0
         blocked = self.selected == (2, 0) and self.state.assault_blocked_reason
         expedition_here = self.state.rival.army and self.selected == self.state.rival.pos
+        from saga2d import Label
+        hint = 'Select a neighboring province.'
+        if not self.state.actions_left:
+            hint = 'No actions left. End the turn.'
+        elif not here and not adjacent:
+            hint = 'Choose a province beside your hero.'
+        elif blocked:
+            hint = 'Assault locked. J lists objectives.'
+        self.ui.add(Label(hint, width=300, wrap=True, font='Verdana', font_size=11,
+                          text_color=MUTED, anchor=Anchor.TOP_LEFT, margin=(x, 395)))
         self.button("Hero is here" if here else "Intercept expedition" if expedition_here else
                     "Travel here" if province.owner == "player" else "Invade province",
                     x, 423, 300, self.travel, hotkey="Enter", primary=True, enabled=can_act and adjacent and not blocked)
@@ -490,14 +500,6 @@ class ShardScene(Screen):
             self.text(textwrap.shorten(guards, width=40, placeholder="…"), x, 369, size=11, color=RED)
         else:
             self.text("Ruins cleared" if p.explored else p.site or "No ruins in this province", x, 369, size=12, color=GOLD)
-        hint = "Select a neighboring province to travel."
-        if not s.actions_left:
-            hint = "No hero actions left. End the turn to continue."
-        elif self.selected != s.hero.pos and self.selected not in self.grid.neighbors(s.hero.pos):
-            hint = "This province is not adjacent to your hero."
-        elif self.selected == (2, 0) and s.assault_blocked_reason:
-            hint = "Assault locked. J shows the required objectives."
-        self.text(hint, x, 395, size=11, color=MUTED)
         self.text("YOUR STRONGHOLD", x, 531, size=10, color=MUTED)
         self.text(f"{len(s.buildings)}/{len(BUILDINGS)} buildings  ·  {len(s.hero.army)}/{s.hero.max_army} troops", x, 662, size=11, color=MUTED)
         if s.upkeep_shortfall:
