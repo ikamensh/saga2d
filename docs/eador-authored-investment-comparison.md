@@ -47,7 +47,11 @@ attractive.
 The Sapper and T8 retained-party control both enter fully healed, spend four mana,
 finish R4 and lose nobody. The Sapper purchases ten fewer wounds for 42 gold, one
 crystal, one soldier retirement and one campaign action. Keeping the army can
-instead complete a full campaign turn earlier with more wounds. The pair saves a
+instead complete a full campaign turn earlier with more wounds. These are different
+maximum-health armies: the Sapper line has 246/258 living HP, compared with
+244/266 for the retained Swordsman line. Ten fewer wounds means only two more
+remaining HP, and the replacement also trades attack and defense for Smoke.
+The direct Smoke/Guard comparison below holds composition fixed. The pair saves a
 battle round at T8 but costs 121 additional gold/four crystals over Sapper and ends
 with 34 more wounds. Neither faster battle completion nor lower treasury alone
 makes it the better investment.
@@ -90,8 +94,9 @@ explicitly excluded instead of resetting the site.
 The larger three-seed/four-class/three-theme/three-mode run was **interrupted with
 exit 143** after the user reported CPU and battery pressure. Its aggregate was not
 written, so its partial console lines are not counted as completed comparison
-cases. Further heavy work is paused while root fixes frame pacing and test
-concurrency. The wider class/theme/difficulty comparison remains required before
+cases. The tool now defaults to one Commander/Ruins/Standard seed-zero window and
+a cooperative 25% allowance of one CPU core. Larger selections must be explicit,
+and heavy jobs run serially. The wider class/theme/difficulty comparison remains required before
 any general economy recommendation.
 
 The pilot was invoked before committing the tool; its recorded source hashes
@@ -111,7 +116,7 @@ uv run python tools/prototype_eador_early_conversion.py --authored --seeds 0 --h
 uv run python tools/prototype_eador_early_conversion.py --tactical-control-from /tmp/earned-investment.json.gz --report /tmp/earned-smoke-control.json.gz
 ```
 
-The new packaged control command completed its public continuations in the pilot,
+The new source/model control command completed its public continuations in the pilot,
 then hit a tuple/list comparison in its final assertion. That comparison is fixed
 by comparing the serialized battle form; a read-only comparison of the previously
 written results confirms exact equality. A fresh invocation of that command is

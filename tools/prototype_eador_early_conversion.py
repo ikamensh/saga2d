@@ -19,6 +19,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import BUILDINGS, RuleError, State, UNITS
+from tools.cpu_budget import CpuBudget
 
 ROLES = ((4, 'sapper'), (5, 'adept'), (6, 'skyrider'))
 
@@ -41,12 +42,15 @@ def snapshot(state):
 
 
 class Orders:
-    def __init__(self, state):
+    def __init__(self, state, *, budget=None):
         self.state = state
+        self.budget = budget
         self.events, self.retired, self.fights = [], [], []
         self.gold_spent = self.crystals_spent = self.replacement_actions = 0
 
     def do(self, command, *args, **kwargs):
+        if self.budget:
+            self.budget.checkpoint()
         before = self.state.to_json()
         gold, crystals = self.state.gold, self.state.crystals
         quote = (self.state.replacement_preview(*args) if command == 'replace_troop' else None)
@@ -79,9 +83,9 @@ class Orders:
         assert self.do('replace_troop', uid, kind)
 
 
-def prepare(plan):
+def prepare(plan, *, budget=None):
     state, _ = input_state()
-    play = Orders(state)
+    play = Orders(state, budget=budget)
     single_role = plan.removesuffix('_militia')
     if plan.startswith('tower') or single_role == 'adept':
         play.tower()
@@ -160,6 +164,8 @@ def fight(play, tactics):
     kind = state.battle_kind
     orders = []
     for _ in range(80):
+        if play.budget:
+            play.budget.checkpoint()
         if state.battle.outcome:
             break
         before = state.to_json()
@@ -188,8 +194,8 @@ def fight(play, tactics):
     return battle.outcome
 
 
-def run(plan, tactics='auto', *, wait_after_intercept=False):
-    play = prepare(plan)
+def run(plan, tactics='auto', *, wait_after_intercept=False, budget=None):
+    play = prepare(plan, budget=budget)
     ready = snapshot(play.state)
     for _ in range(4):
         if play.state.status != 'playing':
@@ -221,13 +227,13 @@ def run(plan, tactics='auto', *, wait_after_intercept=False):
                 result='victory' if json.loads(ending)['status'] == 'victory' else 'failed_assault')
 
 
-def paid_retry(payload):
+def paid_retry(payload, *, budget=None):
     """One bounded conventional recovery from the staged conversion's real loss.
 
     Buy affordable Swordsmen, rest to the existing six-HP/four-mana reserve, and
     retry the adjacent capital. No site rewards, injected funds or free troops.
     """
-    play = Orders(State.from_json(json.dumps(payload)))
+    play = Orders(State.from_json(json.dumps(payload)), budget=budget)
     start = play.state.turn
     for _ in range(32):
         state = play.state
@@ -318,15 +324,16 @@ def role_cost(state, roles):
             sum(BUILDINGS[kind].crystals for kind in buildings) + sum(state.recruit_crystal_cost(kind) for kind in roles))
 
 
-def authored_branch(encoded, plan, *, target_kind, wait_until=None):
+def authored_branch(encoded, plan, *, target_kind, wait_until=None, budget=None):
     """Compare actual preparations before the same named encounter and finite rival.
 
     The disclosed retirement policy preserves a ranged/core troop where possible,
     then releases the lowest-rank/XP melee duplicate. It never edits resources or
-    troops. Funding is capped at twelve actual turns; a killed outgoing veteran
+    troops. New funding attempts stop after twelve elapsed turns; a defensive
+    detour may itself advance several turns. A killed outgoing veteran
     is a combat loss and may leave a normal recruitment slot instead.
     """
-    play = InvestmentOrders(State.from_json(encoded))
+    play = InvestmentOrders(State.from_json(encoded), budget=budget)
     state = play.state
     start_turn = state.turn
     roles = {'keep': (), 'sapper': ('sapper',), 'adept': ('adept',),
@@ -378,13 +385,21 @@ def authored_branch(encoded, plan, *, target_kind, wait_until=None):
     target = next(pos for pos, province in play.state.provinces.items() if province.site_kind == target_kind)
     target_fight = None
     if not stopped and play.state.status == 'playing':
-        play.march(target)
-        if play.state.status == 'playing' and play.state.hero.pos == target:
+        for _ in range(24):
+            play.march(target)
+            if play.state.status != 'playing' or play.state.hero.pos != target:
+                break
             if not play.state.actions_left:
                 play.rest()
-            if play.state.status == 'playing' and play.do('explore'):
+                continue  # Defensive recovery can move the hero away from this site.
+            if play.do('explore'):
+                assert play.state.battle_province == target
+                assert play.state.provinces[play.state.battle_province].site_kind == target_kind
                 target_fight = len(play.fights)
                 fight(play, 'auto')
+            break
+        else:
+            stopped = 'objective_preparation_bound'
     endpoint = play.state.to_json()
     # Observe two ordinary post-objective turns too. Their actual defensive
     # battles, ownership changes and income are distinct from the objective cost.
@@ -399,7 +414,7 @@ def authored_branch(encoded, plan, *, target_kind, wait_until=None):
                 aftermath=json.loads(play.state.to_json()))
 
 
-def authored_comparison(args):
+def authored_comparison(args, *, budget=None):
     """Broaden the earlier experiment with existing authored targets and paid openings."""
     from tools.audit_eador_difficulty import DifficultyTrial
     from eador.model import HERO_CLASSES
@@ -408,7 +423,7 @@ def authored_comparison(args):
     target_by_theme = {'frontier': 'relief_column', 'elderwild': 'supply_cache', 'ruins': 'runebound_causeway'}
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve(),
                *(ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                 'audit_eador_resource_breakpoints.py', 'stress_eador_control.py', 'eador_campaign.py'))]
+                 'audit_eador_resource_breakpoints.py', 'stress_eador_control.py', 'eador_campaign.py', 'cpu_budget.py'))]
     fingerprints = lambda: {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     before = fingerprints()
     rows, skipped = [], []
@@ -417,11 +432,11 @@ def authored_comparison(args):
             for theme in args.themes or THEMES:
                 for mode in args.modes or DIFFICULTIES:
                     case = (seed, hero, theme, 'economy', mode, 'direct')
-                    trial = DifficultyTrial(*case)
+                    trial = DifficultyTrial(*case, budget=budget)
                     window = EarnedWindow(trial.state)
                     trial.state = window
                     observed = trial.run()
-                    assert observed == DifficultyTrial(*case).run(), 'Capturing a camp changed its original paid policy'
+                    assert observed == DifficultyTrial(*case, budget=budget).run(), 'Capturing a camp changed its original paid policy'
                     if window.saved is None:
                         skipped.append(dict(case=case, reason='No full affordable Sapper camp on turns 5–7', baseline=observed))
                         continue
@@ -431,22 +446,23 @@ def authored_comparison(args):
                     if target.explored:
                         skipped.append(dict(case=case, reason='The target is already explored at the earned window', baseline=observed))
                         continue
-                    branches = [authored_branch(window.saved, plan, target_kind=target_kind)
+                    branches = [authored_branch(window.saved, plan, target_kind=target_kind, budget=budget)
                                 for plan in ('keep', 'sapper', 'adept', 'skyrider', 'pair', 'staged', 'fund_first')]
                     # Same-clock no-purchase controls include recovery and the real
                     # rival operation. They do not backdate a changed battlefield.
                     dates = sorted({branch['ready']['turn'] for branch in branches} - {state.turn})
-                    branches += [authored_branch(window.saved, 'keep', target_kind=target_kind, wait_until=date) for date in dates]
+                    branches += [authored_branch(window.saved, 'keep', target_kind=target_kind, wait_until=date, budget=budget) for date in dates]
                     if args.repeat:
                         for branch in branches:
                             assert branch == authored_branch(window.saved, branch['plan'], target_kind=target_kind,
-                                                             wait_until=branch['wait_until'])
+                                                             wait_until=branch['wait_until'], budget=budget)
                     rows.append(dict(case=case, baseline=observed, input=json.loads(window.saved), branches=branches))
                     print(case, 'start', state.turn, state.gold, 'branches', len(branches), flush=True)
     assert before == fingerprints(), 'Sources changed during the authored comparison'
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=before, source_files_changed_during_run=[], repeated=args.repeat,
                   target=args.target, seeds=args.seeds, rows=rows, skipped=skipped,
+                  cpu_percent=budget.percent if budget else None,
                   scope='Unchanged Economy/direct earned openings; first affordable full camp at turns 5–7. '
                         'Actual purchases, retirements, waits, optional objective and two aftermath turns. '
                         'Explicit automatic tactics, not manual mastery or a full balance acceptance. '
@@ -458,7 +474,7 @@ def authored_comparison(args):
 
 
 
-def tactical_control(args):
+def tactical_control(args, *, budget=None):
     """A paid Smoke versus Guard choice, followed by the same automatic policy."""
     original = json.loads(gzip.decompress(args.tactical_control_from.read_bytes()))
     row = next(row for row in original['rows']
@@ -468,6 +484,8 @@ def tactical_control(args):
     state = State.from_json(json.dumps(encounter['initial']))
     prefix = []
     for _ in range(80):
+        if budget:
+            budget.checkpoint()
         before = state.to_json()
         battle = state.battle
         trace = battle.trace(battle.auto_turn)
@@ -485,7 +503,7 @@ def tactical_control(args):
         raise AssertionError('The earned Smoke decision exceeded the battle bound')
     branches = []
     for command in ('smoke', 'guard'):
-        play = Orders(State.from_json(before))
+        play = Orders(State.from_json(before), budget=budget)
         args_order = (smoke.actor_id, position) if command == 'smoke' else (smoke.actor_id,)
         getattr(play.state.battle, command)(*args_order)
         saved = play.state.to_json()
@@ -493,7 +511,7 @@ def tactical_control(args):
         fight(play, 'auto')
         # A second complete public continuation establishes repeatability of the
         # explicit first order too, in addition to fight's per-phase saved replay.
-        repeat = Orders(State.from_json(before))
+        repeat = Orders(State.from_json(before), budget=budget)
         getattr(repeat.state.battle, command)(*args_order)
         fight(repeat, 'auto')
         assert play.fights == repeat.fights and play.state.to_json() == repeat.state.to_json()
@@ -502,6 +520,7 @@ def tactical_control(args):
     assert json.loads(json.dumps(branches[0]['fight']['result'])) == encounter['result'], 'Manual Smoke did not reproduce the original paid result'
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   input_report_sha256=hashlib.sha256(args.tactical_control_from.read_bytes()).hexdigest(),
+                  cpu_percent=budget.percent if budget else None,
                   paid_case=row['case'], campaign_input=row['input'], investment_branch=branch,
                   public_prefix=prefix, before=json.loads(before), branches=branches,
                   original_phase_trace=[asdict(event) for event in trace.events],
@@ -516,19 +535,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/early-conversion-prototype.json.gz')
     parser.add_argument('--authored', action='store_true', help='Compare actual affordable turn-five/seven camps across existing authored objectives.')
-    parser.add_argument('--seeds', type=int, nargs='+', default=[0, 7, 19])
-    parser.add_argument('--heroes', nargs='+', choices=('Commander', 'Scout', 'Warrior', 'Wizard'))
-    parser.add_argument('--themes', nargs='+', choices=('frontier', 'elderwild', 'ruins'))
-    parser.add_argument('--modes', nargs='+', choices=('accessible', 'standard', 'challenge'))
+    parser.add_argument('--seeds', type=int, nargs='+', default=[0])
+    parser.add_argument('--heroes', nargs='+', default=['Commander'], choices=('Commander', 'Scout', 'Warrior', 'Wizard'))
+    parser.add_argument('--themes', nargs='+', default=['ruins'], choices=('frontier', 'elderwild', 'ruins'))
+    parser.add_argument('--modes', nargs='+', default=['standard'], choices=('accessible', 'standard', 'challenge'))
     parser.add_argument('--target', choices=('authored', 'watch'), default='authored')
     parser.add_argument('--repeat', action='store_true', help='Repeat every complete branch as well as every saved tactical phase.')
     parser.add_argument('--tactical-control-from', type=Path, help='Replay the earned Causeway Sapper Smoke/Guard decision from an authored report.')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Cooperative allowance as a percent of one CPU core (default 25).')
     args = parser.parse_args()
+    budget = CpuBudget(args.cpu_percent)
     if args.tactical_control_from:
-        tactical_control(args)
+        tactical_control(args, budget=budget)
         return
     if args.authored:
-        authored_comparison(args)
+        authored_comparison(args, budget=budget)
         return
     state, input_path = input_state()
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve()]
@@ -542,18 +564,19 @@ def main():
     cases += [(plan, 'heal_first', False) for plan in ('keep_rest1', 'adept', 'full_staged', 'tower_rest3')]
     rows = []
     for plan, tactics, delayed in cases:
-        row = run(plan, tactics, wait_after_intercept=delayed)
-        assert row == run(plan, tactics, wait_after_intercept=delayed)
+        row = run(plan, tactics, wait_after_intercept=delayed, budget=budget)
+        assert row == run(plan, tactics, wait_after_intercept=delayed, budget=budget)
         rows.append(row)
         print(plan, tactics, delayed, 'ready', row['ready']['turn'], 'result', row['result'],
               row['ending']['turn'], 'deaths', len(row['combat_deaths']), flush=True)
     staged = next(row for row in rows if row['plan'] == 'full_staged' and row['tactics'] == 'auto')
-    retry = paid_retry(staged['ending'])
-    assert retry == paid_retry(staged['ending'])
+    retry = paid_retry(staged['ending'], budget=budget)
+    assert retry == paid_retry(staged['ending'], budget=budget)
     print('staged paid retry', retry['final']['status'], retry['final']['turn'], retry['additional_gold_spent'])
     assert before == fingerprints()
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=before, source_files_changed_during_run=[],
+                  cpu_percent=budget.percent,
                   input_sha256=hashlib.sha256(input_path.read_bytes()).hexdigest(), input=json.loads(state.to_json()),
                   scope='No production rules changed. All ordinary commands from an actual paid turn-six save. '
                         'Same capital objective and initial finite rival. Waiting changes rival and the seeded '
