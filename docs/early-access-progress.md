@@ -261,3 +261,51 @@ complete linked UI, broader content/build/economy choices, settings and
 presentation, then a new packaged candidate and candidate-specific stress.
 The shipping logical canvas uses letterboxing for smaller windows; arbitrary
 logical resizing and text scaling are not established by that evidence.
+
+## Linked progression, display and economy baseline — 2026-09-06
+
+- `00df6c4` makes the three-shard campaign playable through the title, challenge
+  comparison, explicit veteran/relic selection, recovery and ending screens.
+  `14dcd39` adds the J contract panel, numbered map targets, final ritual
+  pre-entry briefing and mouse controls for larger retinues. Complete native
+  Rootward/Gate and Foundries/Throne journeys, including recovery, used 356
+  and 377 input activations with 11 and 13 exact manual save/reloads. Captured
+  screens were inspected and clipped captions corrected. These are automated
+  journey counts; their short runtime is not a measure of human pacing.
+  See [eador-linked-ui.md](eador-linked-ui.md).
+- V8 rule evidence includes 880 complete linked routes across heroes and
+  challenge choices, plus 300 randomized runs entering all three stages.
+  Every hero has a manual final-seal victory with defenders still alive.
+  See [eador-campaign.md](eador-campaign.md) for source-specific reports,
+  policy limits and replay commands.
+- An unreadable set of rolling autosaves no longer traps a ready departure
+  or recovery. An exact current manual checkpoint can protect the transition;
+  stale snapshots cannot. Damaged files remain intact. Native journeys
+  exercise refusal, a fresh manual save, departure and exact reloading of the
+  pre-departure state. Save-browser labels identify stage, contract and
+  departure/recovery/completed/lost phase (`645b545`).
+- Native window sizing, fullscreen and restoration are reusable Saga2D
+  operations, with a separate game-owned preference screen. Apply/Cancel,
+  startup overrides, Retina sizing and a resized-window/fullscreen roundtrip
+  were exercised through native input and screenshots. See
+  [framework-display.md](framework-display.md) and
+  [eador-display-settings.md](eador-display-settings.md). Text scaling is still
+  absent; the motion preference's combat presentation is a later increment.
+- The historical `31a2c88` two-hour native soak completed: 429,506 frames,
+  577 journeys, p95 11.988 ms and bounded RSS plateaus. The retained
+  [soak report](soak.md) names the machine, source snapshot, timing samples
+  and memory limits. It predates current campaign, role, audio and display
+  changes and does not pass the current candidate's G15 requirement.
+- The read-only v9 [economy audit](eador-economy-v9.md) (`5c13b5e`, measured
+  source `cfaf982`) completed 3,600 matched victories: 100 seeds, three worlds,
+  four heroes and three fixed build policies. Marketplace-first was faster;
+  Mage-Tower-first suffered fewer retreats. All plans eventually share a
+  military/healing core, and crystals were spent only 0 / 0 / 2 on average.
+  This is route robustness and evidence of an open economy gap, not difficulty
+  balance or completion of G07. No opportunistic balance changes were made.
+
+G01–G19 remain incomplete. Support-role rules, distinct artwork and current/
+older-save Codex explanations are integrated, while their full control and
+feedback increment is being verified separately. Extraction adventures and
+further tactical roles are underway. A new frozen artifact, candidate-specific
+stress, Windows runtime, human playtests and listening review remain required.
