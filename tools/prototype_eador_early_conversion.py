@@ -249,10 +249,228 @@ def paid_retry(payload):
                 events=play.events, fights=play.fights, final=json.loads(play.state.to_json()))
 
 
+
+class EarnedWindow:
+    """Observe an unchanged paid policy, retaining the first useful turn-five/seven camp."""
+    def __init__(self, state):
+        self.state, self.saved = state, None
+
+    def __getattr__(self, name):
+        from tools.audit_eador_resource_breakpoints import COMMANDS
+        target = getattr(self.state, name)
+        if name not in COMMANDS:
+            return target
+        def observed(*args, **kwargs):
+            result = target(*args, **kwargs)
+            state = self.state
+            if (self.saved is None and 5 <= state.turn <= 7 and state.status == 'playing'
+                    and not state.battle and not state.choice and state.actions_left
+                    and state.provinces[state.hero.pos].owner == 'player'
+                    and len(state.hero.army) == state.hero.max_army
+                    and state.gold >= state.recruit_cost('sapper')
+                    and state.crystals >= state.recruit_crystal_cost('sapper')):
+                self.saved = state.to_json()
+            return result
+        return observed
+
+
+class InvestmentOrders(Orders):
+    """Existing public replay/quote recorder, with real defense during funding waits."""
+    def rest(self, *, defend=True):
+        # Match the established policy's defense responsibility, but recheck the
+        # actual expedition position instead of marching to a stale destination.
+        if defend:
+            for _ in range(24):
+                state = self.state
+                if (state.status != 'playing' or not state.rival.army
+                        or state.grid.distance(state.rival.pos, (-2, 0)) > 2):
+                    break
+                if not state.actions_left:
+                    self.rest(defend=False)
+                    continue
+                assert self.do('travel', state.grid.path(state.hero.pos, state.rival.pos)[1])
+                if self.state.battle and fight(self, 'auto') == 'enemy':
+                    break
+            else:
+                raise AssertionError('Public live-position interception exceeded its bound')
+        if self.state.status == 'playing':
+            assert self.do('end_turn')
+            if self.state.battle:
+                fight(self, 'auto')
+
+    def march(self, destination):
+        for _ in range(24):
+            state = self.state
+            if state.status != 'playing' or state.hero.pos == destination:
+                return
+            if not state.actions_left:
+                self.rest(defend=False)
+                continue
+            assert self.do('travel', state.grid.path(state.hero.pos, destination)[1])
+            if self.state.battle and fight(self, 'auto') == 'enemy':
+                return
+        raise AssertionError('Authored investment route exceeded its public movement bound')
+
+
+def role_cost(state, roles):
+    buildings = {UNITS[kind].building for kind in roles} - state.buildings
+    return (sum(BUILDINGS[kind].cost for kind in buildings) + sum(state.recruit_cost(kind) for kind in roles),
+            sum(BUILDINGS[kind].crystals for kind in buildings) + sum(state.recruit_crystal_cost(kind) for kind in roles))
+
+
+def authored_branch(encoded, plan, *, target_kind, wait_until=None):
+    """Compare actual preparations before the same named encounter and finite rival.
+
+    The disclosed retirement policy preserves a ranged/core troop where possible,
+    then releases the lowest-rank/XP melee duplicate. It never edits resources or
+    troops. Funding is capped at twelve actual turns; a killed outgoing veteran
+    is a combat loss and may leave a normal recruitment slot instead.
+    """
+    play = InvestmentOrders(State.from_json(encoded))
+    state = play.state
+    start_turn = state.turn
+    roles = {'keep': (), 'sapper': ('sapper',), 'adept': ('adept',),
+             'skyrider': ('skyrider',), 'pair': ('sapper', 'adept'),
+             'staged': ('sapper', 'adept', 'skyrider'),
+             'fund_first': ('sapper', 'adept', 'skyrider')}[plan]
+    initial_quote = dict(zip(('gold', 'crystals'), role_cost(state, roles)))
+    bound = start_turn + 12
+    stopped = None
+    if plan == 'fund_first':
+        while play.state.status == 'playing' and play.state.turn <= bound:
+            gold, crystals = role_cost(play.state, roles)
+            if play.state.gold >= gold and play.state.crystals >= crystals:
+                break
+            play.rest()
+    purchased_ids = set()
+    for kind in roles:
+        while play.state.status == 'playing' and play.state.turn <= bound:
+            state = play.state
+            building = UNITS[kind].building
+            if building not in state.buildings:
+                spec = BUILDINGS[building]
+                if state.gold >= spec.cost and state.crystals >= spec.crystals:
+                    assert play.do('build', building)
+            state = play.state
+            candidates = [troop for troop in state.hero.army if troop.id not in purchased_ids]
+            if len(state.hero.army) < state.hero.max_army:
+                command, args = 'recruit', (kind,)
+            elif candidates:
+                outgoing = min(candidates, key=lambda troop: (troop.kind not in ('militia', 'swordsman'),
+                                                               troop.level, troop.xp, troop.id))
+                command, args = 'replace_troop', (outgoing.id, kind)
+            else:
+                stopped = 'No original troop remains to retire.'
+                break
+            incoming = state.next_troop_id
+            if play.do(command, *args):
+                purchased_ids.add(incoming)
+                break
+            play.rest()
+        else:
+            stopped = 'funding_bound' if play.state.status == 'playing' else play.state.status
+        if stopped:
+            break
+    while (wait_until is not None and play.state.status == 'playing'
+           and play.state.turn < wait_until):
+        play.rest()
+    ready = snapshot(play.state)
+    target = next(pos for pos, province in play.state.provinces.items() if province.site_kind == target_kind)
+    target_fight = None
+    if not stopped and play.state.status == 'playing':
+        play.march(target)
+        if play.state.status == 'playing' and play.state.hero.pos == target:
+            if not play.state.actions_left:
+                play.rest()
+            if play.state.status == 'playing' and play.do('explore'):
+                target_fight = len(play.fights)
+                fight(play, 'auto')
+    endpoint = play.state.to_json()
+    # Observe two ordinary post-objective turns too. Their actual defensive
+    # battles, ownership changes and income are distinct from the objective cost.
+    for _ in range(2):
+        if play.state.status == 'playing':
+            play.rest()
+    return dict(plan=plan, wait_until=wait_until, initial_quote=initial_quote, ready=ready,
+                stopped=stopped, target=target, target_kind=target_kind, target_fight=target_fight,
+                gold_spent=play.gold_spent, crystals_spent=play.crystals_spent,
+                replacement_actions=play.replacement_actions, retired=play.retired,
+                events=play.events, fights=play.fights, endpoint=json.loads(endpoint),
+                aftermath=json.loads(play.state.to_json()))
+
+
+def authored_comparison(args):
+    """Broaden the earlier experiment with existing authored targets and paid openings."""
+    from tools.audit_eador_difficulty import DifficultyTrial
+    from eador.model import HERO_CLASSES
+    from eador.worldgen import THEMES
+    from eador.difficulty import DIFFICULTIES
+    target_by_theme = {'frontier': 'relief_column', 'elderwild': 'supply_cache', 'ruins': 'runebound_causeway'}
+    sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve(),
+               *(ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
+                 'audit_eador_resource_breakpoints.py', 'stress_eador_control.py', 'eador_campaign.py'))]
+    fingerprints = lambda: {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    before = fingerprints()
+    rows, skipped = [], []
+    for seed in args.seeds:
+        for hero in args.heroes or HERO_CLASSES:
+            for theme in args.themes or THEMES:
+                for mode in args.modes or DIFFICULTIES:
+                    case = (seed, hero, theme, 'economy', mode, 'direct')
+                    trial = DifficultyTrial(*case)
+                    window = EarnedWindow(trial.state)
+                    trial.state = window
+                    observed = trial.run()
+                    assert observed == DifficultyTrial(*case).run(), 'Capturing a camp changed its original paid policy'
+                    if window.saved is None:
+                        skipped.append(dict(case=case, reason='No full affordable Sapper camp on turns 5–7', baseline=observed))
+                        continue
+                    state = State.from_json(window.saved)
+                    target_kind = 'border_watch' if args.target == 'watch' else target_by_theme[theme]
+                    target = next(p for p in state.provinces.values() if p.site_kind == target_kind)
+                    if target.explored:
+                        skipped.append(dict(case=case, reason='The target is already explored at the earned window', baseline=observed))
+                        continue
+                    branches = [authored_branch(window.saved, plan, target_kind=target_kind)
+                                for plan in ('keep', 'sapper', 'adept', 'skyrider', 'pair', 'staged', 'fund_first')]
+                    # Same-clock no-purchase controls include recovery and the real
+                    # rival operation. They do not backdate a changed battlefield.
+                    dates = sorted({branch['ready']['turn'] for branch in branches} - {state.turn})
+                    branches += [authored_branch(window.saved, 'keep', target_kind=target_kind, wait_until=date) for date in dates]
+                    if args.repeat:
+                        for branch in branches:
+                            assert branch == authored_branch(window.saved, branch['plan'], target_kind=target_kind,
+                                                             wait_until=branch['wait_until'])
+                    rows.append(dict(case=case, baseline=observed, input=json.loads(window.saved), branches=branches))
+                    print(case, 'start', state.turn, state.gold, 'branches', len(branches), flush=True)
+    assert before == fingerprints(), 'Sources changed during the authored comparison'
+    report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+                  source_sha256=before, source_files_changed_during_run=[], repeated=args.repeat,
+                  target=args.target, seeds=args.seeds, rows=rows, skipped=skipped,
+                  scope='Unchanged Economy/direct earned openings; first affordable full camp at turns 5–7. '
+                        'Actual purchases, retirements, waits, optional objective and two aftermath turns. '
+                        'Explicit automatic tactics, not manual mastery or a full balance acceptance. '
+                        'Every tactical phase replays its public orders from an exact save. '
+                        'Same-clock kept-veteran controls; no rules or resources are replaced.')
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    args.report.write_bytes(gzip.compress(json.dumps(report, separators=(',', ':')).encode(), mtime=0))
+    print(f'{len(rows)} earned windows; {len(skipped)} excluded; {sum(len(row["branches"]) for row in rows)} branches')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/evidence/early-conversion-prototype.json.gz')
+    parser.add_argument('--authored', action='store_true', help='Compare actual affordable turn-five/seven camps across existing authored objectives.')
+    parser.add_argument('--seeds', type=int, nargs='+', default=[0, 7, 19])
+    parser.add_argument('--heroes', nargs='+', choices=('Commander', 'Scout', 'Warrior', 'Wizard'))
+    parser.add_argument('--themes', nargs='+', choices=('frontier', 'elderwild', 'ruins'))
+    parser.add_argument('--modes', nargs='+', choices=('accessible', 'standard', 'challenge'))
+    parser.add_argument('--target', choices=('authored', 'watch'), default='authored')
+    parser.add_argument('--repeat', action='store_true', help='Repeat every complete branch as well as every saved tactical phase.')
     args = parser.parse_args()
+    if args.authored:
+        authored_comparison(args)
+        return
     state, input_path = input_state()
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve()]
     fingerprints = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
