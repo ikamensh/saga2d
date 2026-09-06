@@ -1257,7 +1257,7 @@ class SaveScene(Screen):
 
 
 class ChoiceScene(Screen):
-    """A saved decision must be resolved before continuing campaign actions."""
+    """Both earned options stay complete at the shared reading size."""
 
     transparent = True
     controls = {"h": "hero_details", "f5": "save_game", "f9": "load_game", "f6": "browse_saves"}
@@ -1266,17 +1266,68 @@ class ChoiceScene(Screen):
         super().__init__()
         self.root = root
 
+    def on_reveal(self):
+        self.refresh()
+
+    def update(self, dt):
+        from eador.preferences import reading_scale
+        if self._display != (self.game.window_size, reading_scale(self.game)):
+            self.refresh()
+
+    def open_text_settings(self):
+        from eador.settings_scene import SettingsScene
+        self.game.push(SettingsScene(focus='codex_text_scale'))
+
     def refresh(self):
+        from saga2d import Column, Component, Label, Row, Style
+        from eador.preferences import reading_scale
+
         super().refresh()
-        self.x, self.y = self.game.width / 2 - 400, self.game.height / 2 - 275
-        for i, option in enumerate(self.root.state.choice.options):
-            self.button("Choose this path" if self.root.state.choice.kind == "skill" else "Choose reward",
-                        self.x + 28 + i * 382, self.y + 390, 362,
-                        lambda option=option: self.choose(option.id), shortcut=str(i + 1), primary=True)
-        self.button("Hero & relics", self.x + 28, self.y + 485, 174,
-                    self.hero_details, hotkey="H")
-        self.button("Saves", self.x + 612, self.y + 485, 160, self.browse_saves, hotkey="F6")
-        self.button("Codex", self.x + 216, self.y + 485, 154, self.root.codex, shortcut="C")
+        self._display = self.game.window_size, reading_scale(self.game)
+        scale = self._display[1] / 100
+        choice = self.root.state.choice
+
+        def label(text, size, *, width=1064, color=MUTED):
+            return Label(text, width=width, wrap=True, font='Verdana',
+                         font_size=round(size * scale), text_color=color)
+
+        title = Label(choice.title, width=988 if choice.kind == 'relic' else 1064,
+                      wrap=True, font='Georgia', font_size=30, text_color=GOLD)
+        self._relic_space = Component(width=64, height=64) if choice.kind == 'relic' else None
+        heading = Row(self._relic_space, title, spacing=12) if self._relic_space else title
+        introduction = Column(heading, label(choice.description, 12), spacing=12)
+        blocks = [Column(label(option.name, 17, width=484, color=TEXT),
+                         label(option.description, 12, width=484), spacing=12)
+                  for option in choice.options]
+        footer = label(self.message or
+                       'Choose before taking your next campaign action. Your decision is saved automatically.',
+                       11, color=GOLD if self.message else MUTED)
+        # Measure complete option prose together, then give both cards equal space
+        # so their numbered actions remain aligned without shortening either option.
+        self.ui.add(Column(introduction, *blocks, footer))
+        option_height = max(block.get_preferred_size()[1] for block in blocks)
+        cards = []
+        for index, (option, block) in enumerate(zip(choice.options, blocks)):
+            control = Button('Choose this path' if choice.kind == 'skill' else 'Choose reward',
+                             on_click=lambda option=option: self.choose(option.id),
+                             shortcut=str(index + 1), width=484, height=40, style=PRIMARY)
+            cards.append(Column(Column(block, height=option_height), control, spacing=24,
+                                style=Style(background_color=PANEL, border_color=LINE, border_width=1,
+                                            padding=18, radius=5)))
+        content = Column(introduction, Row(*cards, spacing=24), footer, spacing=24)
+        self.ui.add(content)
+        height = content.get_preferred_size()[1]
+        self.panel_height = height + 150
+        if self.panel_height > self.game.height - 40:
+            raise ValueError(f'Choice {choice.title!r} does not fit at {scale:.0%}')
+        self.x, self.y = self.game.width / 2 - 560, (self.game.height - self.panel_height) / 2
+        self.ui.clear()
+        self.ui.add(Column(content, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 48))))
+        bottom = self.y + self.panel_height - 68
+        self.button('Hero & relics', self.x + 28, bottom, 200, self.hero_details, hotkey='H')
+        self.button('Codex', self.x + 248, bottom, 170, self.root.codex, shortcut='C')
+        self.button('Text size', self.x + 438, bottom, 200, self.open_text_settings, shortcut='T')
+        self.button('Saves', self.x + 892, bottom, 200, self.browse_saves, hotkey='F6')
 
     def choose(self, option_id):
         kind = self.root.state.choice.kind
@@ -1285,6 +1336,7 @@ class ChoiceScene(Screen):
         except RuleError as error:
             self.message = str(error)
             self.game.audio.play_sound("refuse")
+            self.refresh()
             return
         self.message = ""
         self.game.audio.play_sound("level_up" if kind == "skill" else "reward")
@@ -1298,6 +1350,13 @@ class ChoiceScene(Screen):
     def save_game(self):
         self.root.save_game()
         self.message = self.root.message
+        self.refresh()
+
+    def load_game(self, slot=1, *, backup=False):
+        loaded = super().load_game(slot, backup=backup)
+        if not loaded:
+            self.refresh()
+        return loaded
 
     def browse_saves(self):
         self.game.push(SaveScene(self.root))
@@ -1308,19 +1367,11 @@ class ChoiceScene(Screen):
     def draw(self):
         x, y, choice = self.x, self.y, self.root.state.choice
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 205))
-        self.box(x, y, 800, 550)
-        self.text("A TURN IN YOUR STORY", x + 28, y + 24, size=10, color=MUTED)
-        if choice.kind == 'relic':
-            art.relic(self, x + 56, y + 75, choice.context)
-        self.text(choice.title, x + (98 if choice.kind == 'relic' else 28), y + 51, size=30, serif=True, color=GOLD)
-        self.paragraph(choice.description, x + 28, y + 104, width=744, size=12)
-        for i, option in enumerate(choice.options):
-            left = x + 28 + i * 382
-            self.box(left, y + 157, 362, 277)
-            self.paragraph(option.name, left + 18, y + 177, width=326, size=17, color=TEXT)
-            self.paragraph(option.description, left + 18, y + 229, width=326, size=12)
-        self.paragraph(self.message or "Choose before taking your next campaign action. Your decision is saved automatically.",
-                       x + 28, y + 450, width=744, size=10, color=GOLD if self.message else MUTED)
+        self.box(x, y, 1120, self.panel_height)
+        self.text('A TURN IN YOUR STORY', x + 28, y + 22, size=10, color=MUTED)
+        if self._relic_space:
+            rx, ry, rw, rh = self._relic_space.bounds
+            art.relic(self, rx + rw / 2, ry + rh / 2, choice.context)
 
 
 class HeroScene(Screen):
