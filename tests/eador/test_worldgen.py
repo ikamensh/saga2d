@@ -57,7 +57,7 @@ def test_theme_identity_and_active_hold_survive_save_migration_without_world_gen
     state = State.from_json(legacy)
     assert state.theme == 'frontier'
     current = json.loads(state.to_json())
-    assert current['schema_version'] == 11
+    assert current['schema_version'] == 12
     assert current['provinces'] == before['provinces']
     for unit in before['battle']['units']:
         unit.update(abilities=[], pinned=False, pin_cooldown=0, cargo_penalty=0, spent_abilities=[])
