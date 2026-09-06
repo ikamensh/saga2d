@@ -371,7 +371,7 @@ class Battle:
     def rally_preview(self, unit_id: int, target_id: int) -> RallyPreview:
         target = self.unit(target_id)
         if target not in self.rally_targets(unit_id):
-            raise RuleError('Rally needs a ready militia and an adjacent pinned ally.')
+            raise RuleError('Rally needs a ready capable unit and an adjacent pinned ally.')
         released = replace(target, pinned=False)
         return RallyPreview(released.effective_move_range, frozenset(self._reachable(released)))
 
@@ -385,7 +385,7 @@ class Battle:
         self.log.append(f'{unit.name} rallies {target.name}; Pin is cleared.')
 
     def swap_targets(self, unit_id: int) -> list[BattleUnit]:
-        """Adjacent living allies a ready Warden may replace, including spent allies."""
+        """Adjacent living allies a ready Swap user may replace, including spent allies."""
         unit = self.unit(unit_id)
         if not unit.alive or not unit.can_swap or unit.acted or self.outcome:
             return []
@@ -393,12 +393,12 @@ class Battle:
                 and self.grid.distance(unit.pos, other.pos) == 1]
 
     def swap(self, unit_id: int, target_id: int) -> None:
-        """Exchange places, spending the Warden's order and the ally's remaining move."""
+        """Exchange places, spending the actor's order and the ally's remaining move."""
         self._swap(self._actor(unit_id), self.unit(target_id))
 
     def _swap(self, unit: BattleUnit, target: BattleUnit) -> None:
         if target not in self.swap_targets(unit.id):
-            raise RuleError('A ready Warden can swap with an adjacent living ally.')
+            raise RuleError('A ready Swap user can exchange places with an adjacent living ally.')
         unit.pos, target.pos = target.pos, unit.pos
         unit.acted = unit.moved = target.moved = True
         self.log.append(f'{unit.name} swaps places with {target.name}.')

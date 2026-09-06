@@ -85,6 +85,7 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _ruins(provinces, seed)
     if theme == 'frontier':
         _site(provinces[(0, 2)], 'courier_crossing')
+        _site(provinces[(-1, 1)], 'muster_yard')
     elif theme == 'elderwild':
         _site(provinces[(-1, -1)], 'supply_cache')
         _site(provinces[(-1, 1)], 'pack_hunt')
@@ -92,6 +93,11 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _site(provinces[(-1, 1)], 'sealed_vault')
     _site(provinces[(-2, 2)], 'den')
     _site(provinces[(-1, 2)], 'explorer_camp')
+    # Preserve the former duplicate reward's discoverability without rerolling the map.
+    # (-2, 1) is a procedural western site, clear of every fixed authored source.
+    fallback = 'caravan' if theme == 'frontier' else 'grove' if theme == 'elderwild' else None
+    if fallback and not any(province.site_relic == SITES[fallback].relic for province in provinces.values()):
+        _site(provinces[(-2, 1)], fallback)
     for province in provinces.values():
         province.guard_hp = [UNITS[kind].hp for kind in province.guards]
         province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]

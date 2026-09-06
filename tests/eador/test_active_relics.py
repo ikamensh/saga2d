@@ -52,3 +52,56 @@ def test_censer_uses_one_equipped_slot_and_cannot_change_power_during_combat():
         with pytest.raises(SaveFormatError):
             State.from_json(json.dumps(data))
     assert state.to_json() == before
+
+
+def test_new_relic_sources_and_old_equipment_remain_discoverable_across_themes():
+    from eador.content import RELICS
+    assert len(RELICS) == 12
+    for seed in range(100):
+        for theme, sources, old_relic in (
+            ('frontier', {(0, 2): ('courier_crossing', 'veil_censer'), (-1, 1): ('muster_yard', 'vanguard_drum')}, 'merchant_seal'),
+            ('elderwild', {(-1, -1): ('supply_cache', 'porter_rune')}, 'oak_standard'),
+            ('ruins', {(-1, 1): ('sealed_vault', 'mirror_badge')}, 'iron_crown'),
+        ):
+            state = State.new(seed, theme=theme)
+            for pos, identity in sources.items():
+                site = state.provinces[pos]
+                assert (site.site_kind, site.site_relic) == identity
+            assert any(site.site_relic == old_relic for site in state.provinces.values())
+            assert state.provinces[(-2, 0)].site_kind == 'shrine'
+            assert state.provinces[(-2, 2)].site_kind == 'den'
+            assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
+            assert any(site.site_kind == 'border_watch' for site in state.provinces.values())
+            assert State.from_json(state.to_json()).to_json() == state.to_json()
+
+
+def test_earned_censer_screen_and_guard_both_hold_with_defenders_alive():
+    from tools.eador_extraction_campaign import AdventureOrders
+    from tools.eador_relic_campaign import censer_watch_route
+
+    class SavedOrders(AdventureOrders):
+        def do(self, command, *args, **kwargs):
+            if command == 'smoke':
+                # The same earned hero can choose a bad screen that blocks its Acolyte.
+                before = self.state.to_json()
+                bad = State.from_json(before)
+                assert bad.battle.unit(1) in bad.battle.spell_targets('heal', caster_id=5)
+                bad.battle.smoke(0, (0, 0))
+                assert bad.battle.unit(1) not in bad.battle.spell_targets('heal', caster_id=5)
+                assert State.from_json(bad.to_json()).to_json() == bad.to_json()
+                assert self.state.to_json() == before
+            super().do(command, *args, **kwargs)
+            saved = self.state.to_json()
+            self.state = State.from_json(saved)
+            assert self.state.to_json() == saved
+
+    baseline = prepare_censer_watch(ranger=True).to_json()
+    screened = censer_watch_route(State.from_json(baseline), orders_type=SavedOrders)
+    guarded = censer_watch_route(State.from_json(baseline), smoke=False, orders_type=SavedOrders)
+    assert screened.after_screen_hp > guarded.after_screen_hp
+    for play in (screened, guarded):
+        assert play.battle.outcome_reason == 'hold' and play.battle.round == 3
+        assert all(u.alive for u in play.battle.units if u.team == 'player')
+        assert any(u.alive for u in play.battle.units if u.team == 'enemy')
+        play.state.resolve_battle()
+        assert play.state.provinces[(0, -2)].explored

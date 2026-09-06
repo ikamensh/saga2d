@@ -40,6 +40,9 @@ RELICS = {
     'watch_bell': RelicSpec('Watch Bell', 'Your hero can Brace: the first adjacent melee attacker takes a pre-emptive hit. Ranged attacks counter it.', 45, 'brace'),
     'storm_quiver': RelicSpec('Storm Quiver', 'Your hero can Pin within 3 hexes: half damage and -2 movement for the target’s next turn; skip one turn before reuse.', 45, 'pin'),
     'veil_censer': RelicSpec('Veil Censer', 'Your hero gains one Smoke charge each battle. Spend its order to screen a visible hex within 3; both teams’ ranged shots and spells are blocked until your next turn.', 45, 'smoke'),
+    'porter_rune': RelicSpec('Porter’s Rune', 'Your hero gains one Repulse charge each battle. Spend its order to push an adjacent unanchored enemy into an empty hex; Guard and Brace resist it.', 45, 'repulse'),
+    'mirror_badge': RelicSpec('Mirror Badge', 'Your hero can Swap with an adjacent ally: spend your order and both moves, preserving the ally’s unspent action. You take the exposed position.', 45, 'swap'),
+    'vanguard_drum': RelicSpec('Vanguard Drum', 'Your hero can Rally an adjacent pinned ally. Spend your order to clear Pin, without restoring movement or an action already spent.', 45, 'rally'),
 }
 
 
@@ -83,17 +86,19 @@ SITES = {
             AdventureApproach('guided', 'Hire a guide', 'Pay 20 gold for covered southern deployment. The fee is lost if you retreat.', 'courier_guided', gold_cost=20),
         )),
     'supply_cache': SiteSpec('Supply Cache', 'Break out of the surrounding pack with recovered supplies by round 8, or rout the guardians.',
-        ('wolf', 'wolf', 'wolf', 'goblin'), 40, 2, 'oak_standard', 'supply_cache', (
+        ('wolf', 'wolf', 'wolf', 'goblin'), 40, 2, 'porter_rune', 'supply_cache', (
             AdventureApproach('light', 'Travel light', 'Carry the normal supplies at full movement speed.', 'supply_cache'),
             AdventureApproach('full', 'Carry the full cache', 'Gain 40 extra gold on success; your hero has 1 less movement this battle, minimum 1.',
                               'supply_cache', cargo_penalty=1, bonus_gold=40),
         )),
     'sealed_vault': SiteSpec('Sealed Vault', 'Extract the regalia through the eastern crossfire by round 8, or rout its watchful guards.',
-        ('warden', 'archer', 'archer', 'guard'), 60, 1, 'iron_crown', 'vault_crossfire', (
+        ('warden', 'archer', 'archer', 'guard'), 60, 1, 'mirror_badge', 'vault_crossfire', (
             AdventureApproach('crossfire', 'Face the crossfire', 'Keep your crystals. Only the guarded eastern exit is open.', 'vault_crossfire'),
             AdventureApproach('unseal', 'Unseal the floodgate', 'Spend 2 crystals to open a second, southern exit. The cost is lost on retreat.',
                               'vault_unsealed', crystals_cost=2),
         )),
+    'muster_yard': SiteSpec('Muster Yard', 'An outlaw bowman and two deserters hold a drum that steadies wavering troops.',
+        ('archer', 'brigand', 'brigand'), 50, 1, 'vanguard_drum'),
     'pack_hunt': SiteSpec('Pack Hunt', 'Rout the wolves closing from both sides of the wooded divide.',
         ('wolf',) * 6, 55, 1, 'storm_quiver', 'hunt_compact', (
             AdventureApproach('compact', 'Stand together', 'Free. Keep the compact central formation against pressure from both flanks.', 'hunt_compact'),
