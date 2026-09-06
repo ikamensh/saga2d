@@ -1,0 +1,382 @@
+{
+  "canvas": [
+    320,
+    352
+  ],
+  "center": [
+    160,
+    160
+  ],
+  "files": {
+    "images/terrain/ground-forest-0.png": {
+      "bytes": 81933,
+      "mode": "ground",
+      "sha256": "4e071802000c410d8da2184646423384aad0ce04d0cfcb9fb7c7b89cc8a1b5b5",
+      "terrain": "forest",
+      "variant": 0
+    },
+    "images/terrain/ground-forest-1.png": {
+      "bytes": 81672,
+      "mode": "ground",
+      "sha256": "79d5dc463703dc1743d8ba2a2b4ac4873d48c8fd895bc4c0bca0ab3e243d408d",
+      "terrain": "forest",
+      "variant": 1
+    },
+    "images/terrain/ground-forest-2.png": {
+      "bytes": 82042,
+      "mode": "ground",
+      "sha256": "ee4687e1e3469c291bfe4025cef95a13ab55cdba683f7f1e4033eeba2faa7c3d",
+      "terrain": "forest",
+      "variant": 2
+    },
+    "images/terrain/ground-forest-3.png": {
+      "bytes": 81939,
+      "mode": "ground",
+      "sha256": "b8b4158be5a384f8256114ddaea54a324c68f883001bd555d7cceab32c076d4b",
+      "terrain": "forest",
+      "variant": 3
+    },
+    "images/terrain/ground-hills-0.png": {
+      "bytes": 83272,
+      "mode": "ground",
+      "sha256": "3bdb00b391fd64836809742ef2558f5878ab57005af8da7abae716c4a91958aa",
+      "terrain": "hills",
+      "variant": 0
+    },
+    "images/terrain/ground-hills-1.png": {
+      "bytes": 83252,
+      "mode": "ground",
+      "sha256": "c8853417c0d5e1e683033bd7988702342f6b07b23ae7251686e9001091bfc4e4",
+      "terrain": "hills",
+      "variant": 1
+    },
+    "images/terrain/ground-hills-2.png": {
+      "bytes": 82922,
+      "mode": "ground",
+      "sha256": "79ed3cbad13ee1b1e6898904626f4d220479cce54c996db5fd048f0e46fb0cc3",
+      "terrain": "hills",
+      "variant": 2
+    },
+    "images/terrain/ground-hills-3.png": {
+      "bytes": 82575,
+      "mode": "ground",
+      "sha256": "f97afa533ab1e370865cfd1b0e1f018c1c0b28345c543815175de46035c1c73c",
+      "terrain": "hills",
+      "variant": 3
+    },
+    "images/terrain/ground-marsh-0.png": {
+      "bytes": 81082,
+      "mode": "ground",
+      "sha256": "f39ba61f98dc560a23939e9073c1485fb9cdc554f995e6886365a30fe266b16b",
+      "terrain": "marsh",
+      "variant": 0
+    },
+    "images/terrain/ground-marsh-1.png": {
+      "bytes": 81152,
+      "mode": "ground",
+      "sha256": "554f7547af6bc98dc05406ef0b5628d438da5074b55f25990401fb8aeba2e69d",
+      "terrain": "marsh",
+      "variant": 1
+    },
+    "images/terrain/ground-marsh-2.png": {
+      "bytes": 81215,
+      "mode": "ground",
+      "sha256": "9fac2ad5ab40be7e309f236de20fa5454dbc9e08ffdd1a7fbf674f7bb1e468d1",
+      "terrain": "marsh",
+      "variant": 2
+    },
+    "images/terrain/ground-marsh-3.png": {
+      "bytes": 81327,
+      "mode": "ground",
+      "sha256": "4901435fb449d83ad0fda51089e02a6b030e61c1590b30e47cc32ea3dc16eb5b",
+      "terrain": "marsh",
+      "variant": 3
+    },
+    "images/terrain/ground-mountains-0.png": {
+      "bytes": 79706,
+      "mode": "ground",
+      "sha256": "d7233a50dd2bb892a591c950016a11f1698a8d94227c20d37a680d9936ba98c6",
+      "terrain": "mountains",
+      "variant": 0
+    },
+    "images/terrain/ground-mountains-1.png": {
+      "bytes": 79186,
+      "mode": "ground",
+      "sha256": "296f3f15575b9db6e562c897d34c27bb6ccb4e5a113d9988a37b9743cb99d35b",
+      "terrain": "mountains",
+      "variant": 1
+    },
+    "images/terrain/ground-mountains-2.png": {
+      "bytes": 80459,
+      "mode": "ground",
+      "sha256": "e5a6a3397acf762828d01f97053367da5c20afc9c47c5fa49d30f774f016981a",
+      "terrain": "mountains",
+      "variant": 2
+    },
+    "images/terrain/ground-mountains-3.png": {
+      "bytes": 79653,
+      "mode": "ground",
+      "sha256": "5948db855528eff1e3b8848331ce542fbf79acdff595af7d4c1aa535d9eb4e7b",
+      "terrain": "mountains",
+      "variant": 3
+    },
+    "images/terrain/ground-plains-0.png": {
+      "bytes": 79315,
+      "mode": "ground",
+      "sha256": "7a08ecc6f875b197a468d706489cc7c8d1191d179789583ee13a057ba920ec91",
+      "terrain": "plains",
+      "variant": 0
+    },
+    "images/terrain/ground-plains-1.png": {
+      "bytes": 79617,
+      "mode": "ground",
+      "sha256": "b2de826aff19e613ffb8be5ed344ed84e92b18826e2ce6fc52540a187f556e46",
+      "terrain": "plains",
+      "variant": 1
+    },
+    "images/terrain/ground-plains-2.png": {
+      "bytes": 78981,
+      "mode": "ground",
+      "sha256": "c2b5b4369ec8c44bb2070d6f5ce1df8938f5e6f90c580af0ff51dcbe1325633c",
+      "terrain": "plains",
+      "variant": 2
+    },
+    "images/terrain/ground-plains-3.png": {
+      "bytes": 79364,
+      "mode": "ground",
+      "sha256": "721593155da2a83cf2ed15e465946cc3602e4d3803748f709d20c8b640c07fdf",
+      "terrain": "plains",
+      "variant": 3
+    },
+    "images/terrain/ground-water-0.png": {
+      "bytes": 75123,
+      "mode": "ground",
+      "sha256": "193d7e8dfd34eb0fb9ee0c0530363698d3937d9a42755ddf90ed7c4af1081237",
+      "terrain": "water",
+      "variant": 0
+    },
+    "images/terrain/ground-water-1.png": {
+      "bytes": 75336,
+      "mode": "ground",
+      "sha256": "81e296f162e8d356d3857ed0d42f5df5dcee4bd8b9e7468bf867778f0dd7ae68",
+      "terrain": "water",
+      "variant": 1
+    },
+    "images/terrain/ground-water-2.png": {
+      "bytes": 75094,
+      "mode": "ground",
+      "sha256": "a7230a9cbcd52eec18c24ce7ec9d576f1ac1cf9308c2e0f89a375203c321cbc3",
+      "terrain": "water",
+      "variant": 2
+    },
+    "images/terrain/ground-water-3.png": {
+      "bytes": 75098,
+      "mode": "ground",
+      "sha256": "230f512e0734893e4f1dfa9874ec59e1772b7ad7e8eb1c7c28ce8bb9596b3cad",
+      "terrain": "water",
+      "variant": 3
+    },
+    "images/terrain/province-forest-0.png": {
+      "bytes": 89969,
+      "mode": "province",
+      "sha256": "f60ab785b2db063e1842e201f7fdff2694e4df6ccc52840ebcdfd7c756419930",
+      "terrain": "forest",
+      "variant": 0
+    },
+    "images/terrain/province-forest-1.png": {
+      "bytes": 90766,
+      "mode": "province",
+      "sha256": "850ae9cc39f2030fa5dfe6914724107ddcd8a6e3322dc2e2f4f42adbd54212d4",
+      "terrain": "forest",
+      "variant": 1
+    },
+    "images/terrain/province-forest-2.png": {
+      "bytes": 90350,
+      "mode": "province",
+      "sha256": "020bac21dab93472b7942ad7af6c33197509c88b301050e4b8fb4b9272bd200e",
+      "terrain": "forest",
+      "variant": 2
+    },
+    "images/terrain/province-forest-3.png": {
+      "bytes": 90710,
+      "mode": "province",
+      "sha256": "35ef80e8e815e3551d46cb9a6a7142de5db9479c12a62a8917132759b57a4b5f",
+      "terrain": "forest",
+      "variant": 3
+    },
+    "images/terrain/province-hills-0.png": {
+      "bytes": 84998,
+      "mode": "province",
+      "sha256": "61b2c5503d0391913e754b585baf16189c60816add8ffa4adfe7a422d06c1425",
+      "terrain": "hills",
+      "variant": 0
+    },
+    "images/terrain/province-hills-1.png": {
+      "bytes": 85409,
+      "mode": "province",
+      "sha256": "4e860120bfbdd0c77a0c50327d7660dc147656cd37d5c983fd22976b78b79d25",
+      "terrain": "hills",
+      "variant": 1
+    },
+    "images/terrain/province-hills-2.png": {
+      "bytes": 86540,
+      "mode": "province",
+      "sha256": "d133f5cf72cec8ff6860189404a2f3d5d20b56195acfa370ac4f88ad8eaf6a54",
+      "terrain": "hills",
+      "variant": 2
+    },
+    "images/terrain/province-hills-3.png": {
+      "bytes": 85647,
+      "mode": "province",
+      "sha256": "8fc624d8a9696ef558a3ceec7fe09000124c12f5ae3dfef1ee54c64f44630c1f",
+      "terrain": "hills",
+      "variant": 3
+    },
+    "images/terrain/province-marsh-0.png": {
+      "bytes": 84249,
+      "mode": "province",
+      "sha256": "8e22d06f2f8d8d422876e963cb1e37fa4660af9cd8750f861d3ffc95a02f8bde",
+      "terrain": "marsh",
+      "variant": 0
+    },
+    "images/terrain/province-marsh-1.png": {
+      "bytes": 83992,
+      "mode": "province",
+      "sha256": "4fd3a94330053fff9c5fd78633f35cf8241e5124c12ae0ebe5abd6ee1cc536cc",
+      "terrain": "marsh",
+      "variant": 1
+    },
+    "images/terrain/province-marsh-2.png": {
+      "bytes": 82550,
+      "mode": "province",
+      "sha256": "0ba256efd429bd9d582e187c52b9bb3c24dbf5cf08561d19d47bed55da4b5a7b",
+      "terrain": "marsh",
+      "variant": 2
+    },
+    "images/terrain/province-marsh-3.png": {
+      "bytes": 84415,
+      "mode": "province",
+      "sha256": "54ef736ea5e68147c8b001ef896426511bae9ce829dc269048724245176e62ea",
+      "terrain": "marsh",
+      "variant": 3
+    },
+    "images/terrain/province-mountains-0.png": {
+      "bytes": 77882,
+      "mode": "province",
+      "sha256": "28cbde1a675534c3def2f75f28ac97bc15696d17b31feeb1fe2c66f15a6d58b3",
+      "terrain": "mountains",
+      "variant": 0
+    },
+    "images/terrain/province-mountains-1.png": {
+      "bytes": 79331,
+      "mode": "province",
+      "sha256": "63e4fb81f4d2448981c76ac52a4b32a839cd9cc0afe24a72ea0831f415e0dcaf",
+      "terrain": "mountains",
+      "variant": 1
+    },
+    "images/terrain/province-mountains-2.png": {
+      "bytes": 78907,
+      "mode": "province",
+      "sha256": "a2536649188d507754e5772995986ec66e87398014082319a9da36d23dd8de16",
+      "terrain": "mountains",
+      "variant": 2
+    },
+    "images/terrain/province-mountains-3.png": {
+      "bytes": 77481,
+      "mode": "province",
+      "sha256": "6fd7a017a5f0c798ea09e2c78108051fc72c6f7738247274599af3822d655939",
+      "terrain": "mountains",
+      "variant": 3
+    },
+    "images/terrain/province-plains-0.png": {
+      "bytes": 91077,
+      "mode": "province",
+      "sha256": "b1562ec703a35454812726a48ccfb64e5a2cbfdeaf31ba6957567e0e1b1eca26",
+      "terrain": "plains",
+      "variant": 0
+    },
+    "images/terrain/province-plains-1.png": {
+      "bytes": 90540,
+      "mode": "province",
+      "sha256": "94dd6db1e5cd271e3af9127f8a8c94499624631a2d2e342e16d98a801a1a73bb",
+      "terrain": "plains",
+      "variant": 1
+    },
+    "images/terrain/province-plains-2.png": {
+      "bytes": 91041,
+      "mode": "province",
+      "sha256": "85d04d14fd3839fcbd030c65692895c01aed6ce12b6260dd7062baeb67c46d39",
+      "terrain": "plains",
+      "variant": 2
+    },
+    "images/terrain/province-plains-3.png": {
+      "bytes": 91275,
+      "mode": "province",
+      "sha256": "975012e7b5768601257db828864c9b3a055fc5a6109fced773a5699944115a4f",
+      "terrain": "plains",
+      "variant": 3
+    },
+    "images/terrain/province-water-0.png": {
+      "bytes": 81471,
+      "mode": "province",
+      "sha256": "1be815f40ed90397e1dde16ff1577df9a63c7ffc653ea72adeec9004c30af22f",
+      "terrain": "water",
+      "variant": 0
+    },
+    "images/terrain/province-water-1.png": {
+      "bytes": 81013,
+      "mode": "province",
+      "sha256": "fc27c4d5a0cbdb77b08d232a6cb732fd2065974880c067de79b61cff33639c15",
+      "terrain": "water",
+      "variant": 1
+    },
+    "images/terrain/province-water-2.png": {
+      "bytes": 81368,
+      "mode": "province",
+      "sha256": "6d0fb6809b2d79f830a8b4ce846d3789c75596657bffe23c69c3bb29f81a4d92",
+      "terrain": "water",
+      "variant": 2
+    },
+    "images/terrain/province-water-3.png": {
+      "bytes": 81639,
+      "mode": "province",
+      "sha256": "1c4629580c064e5c29bee871030208009efd49768eee6448ba55d7e4bc1ab036",
+      "terrain": "water",
+      "variant": 3
+    }
+  },
+  "generator_dependencies": {
+    "numpy": "2.4.2",
+    "pillow": "12.1.1"
+  },
+  "generator_version": 1,
+  "license": "Repository MIT license; see LICENSE.",
+  "modes": [
+    "province",
+    "ground"
+  ],
+  "product": "Shardbound",
+  "provenance": "Original project-owned procedural illustration: seeded pigment, hand-authored terrain forms and lighting. No external art, photographs, or Eador assets.",
+  "radius": 150,
+  "relief": 20,
+  "runtime": "Prebuilt PNGs only. The game does not execute the composition module.",
+  "source_sha256": {
+    "eador/landscape.py": "9170235c688bebffcc4cea06b7fda4bc5bc09b9a6f9f35649e30b635be8d420b",
+    "tools/build_eador_art.py": "8e755c27202217300995f3dacff9193a270a74e28476dd87b7a8e66828ff481d",
+    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"
+  },
+  "terrains": [
+    "plains",
+    "forest",
+    "hills",
+    "marsh",
+    "water",
+    "mountains"
+  ],
+  "variants": [
+    0,
+    1,
+    2,
+    3
+  ]
+}

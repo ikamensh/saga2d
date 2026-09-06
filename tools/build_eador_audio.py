@@ -1,4 +1,4 @@
-"""Build Shardbound's original shipping WAVs, provenance and a short cue sampler.
+"""Build Shardbound's original shipping WAVs, provenance and a cue/music sampler.
 
     uv run python tools/build_eador_audio.py
     uv run python tools/build_eador_audio.py --verify-native
@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT))
 
 from eador.sound import CUES, GENERATOR_VERSION, TRACKS  # noqa: E402
 from saga2d.synth import SAMPLE_RATE, mix, write_wav  # noqa: E402
+from tools.cpu_budget import CpuBudget  # noqa: E402
 
 
 def digest(path):
@@ -40,13 +41,15 @@ def describe(path):
             'seam_step': round(float(np.max(np.abs(pcm[0] - pcm[-1]))), 8)}
 
 
-def build_assets(directory: Path, *, sampler: Path) -> dict:
+def build_assets(directory: Path, *, sampler: Path, budget: CpuBudget | None = None) -> dict:
     """Generate deterministic shipping audio and its exact-file manifest."""
+    budget = budget or CpuBudget()
     files, placements, order = {}, [], {}
+    music_excerpts = {}
     cursor = .25
     for folder, catalogue in (('sounds', CUES), ('music', TRACKS)):
         for name, compose in catalogue.items():
-            samples = compose()
+            samples = compose(budget=budget) if folder == 'music' else compose()
             relative = f'{folder}/{name}.wav'
             target = directory / relative
             write_wav(target, samples)
@@ -55,9 +58,20 @@ def build_assets(directory: Path, *, sampler: Path) -> dict:
                 placements.append((cursor, samples))
                 order[name] = round(cursor, 6)
                 cursor += len(samples) / SAMPLE_RATE + .35
+            else:
+                excerpt = samples[:16 * SAMPLE_RATE].copy()
+                fade = np.linspace(0, 1, SAMPLE_RATE // 4)[:, None]
+                excerpt[:len(fade)] *= fade
+                excerpt[-len(fade):] *= fade[::-1]
+                placements.append((cursor, excerpt))
+                music_excerpts[name] = {'sampler_start': round(cursor, 6),
+                                        'source_start': 0, 'seconds': 16}
+                cursor += 16.75
+            budget.checkpoint()
     write_wav(sampler, mix(*placements, (cursor, np.zeros(round(.25 * SAMPLE_RATE)))))
     manifest = {
         'product': 'Shardbound', 'generator_version': GENERATOR_VERSION,
+        'cpu_percent': budget.percent,
         'sample_rate': SAMPLE_RATE, 'encoding': '16-bit PCM WAV',
         'composition': 'Original E-minor shard motif, explicit game-owned voicings and rhythms; deterministic seeded noise.',
         'provenance': 'Generated solely from project source. No recordings, sampled instruments, Eador assets, or externally sourced melodies were used.',
@@ -65,11 +79,12 @@ def build_assets(directory: Path, *, sampler: Path) -> dict:
         'review_status': 'Technical verification only; listening and artistic approval remain required.',
         'runtime': {'python': '.'.join(map(str, sys.version_info[:3])), 'numpy': np.__version__},
         'source_sha256': {name: digest(ROOT / name) for name in
-                          ('eador/sound.py', 'saga2d/synth.py', 'tools/build_eador_audio.py')},
+                          ('eador/sound.py', 'saga2d/synth.py', 'tools/build_eador_audio.py', 'tools/cpu_budget.py')},
         'files': files,
-        'sampler': {**describe(sampler), 'order': order},
+        'sampler': {**describe(sampler), 'order': order, 'music_excerpts': music_excerpts},
     }
     (directory / 'audio-manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+    budget.checkpoint()
     return manifest
 
 
@@ -147,8 +162,10 @@ def main():
     parser.add_argument('--out', type=Path, default=ROOT / 'eador' / 'assets')
     parser.add_argument('--sampler', type=Path, default=ROOT / 'docs' / 'evidence' / 'shardbound-cue-sampler.wav')
     parser.add_argument('--verify-native', action='store_true')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Cooperative build allowance as a percentage of one core (default: 25; 100 disables pacing)')
     args = parser.parse_args()
-    manifest = build_assets(args.out, sampler=args.sampler)
+    manifest = build_assets(args.out, sampler=args.sampler, budget=CpuBudget(args.cpu_percent))
     print(f'Built {len(manifest["files"])} shipping WAVs in {args.out}; sampler {args.sampler}', flush=True)
     if args.verify_native:
         verify_native(args.out, manifest)

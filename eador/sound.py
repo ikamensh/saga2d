@@ -1,110 +1,181 @@
 """Original Shardbound compositions; generation is an explicit build step.
 
-The game owns the E-minor motif, voicings, rhythms and cue meanings. Saga2D
-supplies tone/noise/envelope/sample helpers. Runtime uses ordinary WAV assets
-through game.audio; importing this module generates nothing and opens no files.
+The game owns instruments, the E-minor motif, voicings, rhythms and cue meanings.
+Saga2D supplies sample primitives. Runtime uses ordinary WAV assets through
+Game.audio; importing this module generates nothing and opens no files.
 """
 
 import numpy as np
 
-from saga2d.synth import BELL, DARK, GLASS, SOFT, SAMPLE_RATE, level, mix, noise, pan, thump, tone
+from saga2d.synth import SAMPLE_RATE, envelope, hz, level, mix, noise, pan, seconds, thump, tone
 
-GENERATOR_VERSION = '1'
+GENERATOR_VERSION = '2'
+
+
+def _plucked(note, length, *, seed=0):
+    """Damped lute strings, a wooden body and a brief pick scrape."""
+    string = tone(note, length, attack=.004, tau=length * .27,
+                  partials=((1, 1), (2.002, .64), (3.008, .38), (4.016, .22), (5.025, .1), (6.036, .05)))
+    return mix(string, noise(.035, 1500, 6500, attack=.003, tau=.008, seed=seed) * .11,
+               tone(285, min(length, .15), attack=.005, tau=.035, partials=((1, .6), (1.71, .25), (2.32, .15))) * .12)
+
+
+def _bowed(note, length, *, attack=.7, seed=0):
+    """Two gently detuned bowed voices, slow vibrato and restrained bow friction."""
+    t, freq = seconds(length), hz(note)
+    out = np.zeros_like(t)
+    for detune, phase in ((.9991, .2), (1.0009, 1.4)):
+        vibrato = freq * .0016 / 4.7 * np.sin(2 * np.pi * 4.7 * t + phase)
+        for harmonic, weight in ((1, 1), (2, .48), (3, .24), (4, .13), (5, .065), (6, .025)):
+            out += weight * np.sin(2 * np.pi * freq * detune * harmonic * t + harmonic * vibrato)
+    out *= envelope(length, attack, length * .43) / 3.88
+    return out + noise(length, 900, 3800, attack=attack, tau=length * .3, seed=seed) * .025
+
+
+def _flute(note, length, *, seed=0):
+    """A breathed wooden flute with a soft attack and moving upper harmonics."""
+    t, freq = seconds(length), hz(note)
+    phase = 2 * np.pi * freq * t + freq * .0018 / 5.1 * np.sin(2 * np.pi * 5.1 * t)
+    voice = np.sin(phase) + .22 * np.sin(2 * phase) + .09 * np.sin(3 * phase)
+    return voice * envelope(length, .055, length * .4) / 1.31 + noise(
+        length, 1400, 4800, attack=.07, tau=length * .25, seed=seed) * .045
+
+
+def _skin(length=.48, *, seed=0):
+    """Low skin drum: falling pitch, inharmonic membrane modes and a fingertip."""
+    return mix(thump(118, 48, length, attack=.005, tau=.11),
+               tone(143, length, attack=.006, tau=.065, partials=((1, .5), (1.59, .3), (2.14, .2))) * .4,
+               noise(.075, 250, 2800, attack=.004, tau=.016, seed=seed) * .32)
+
+
+def _metal(freq, length):
+    return tone(freq, length, attack=.005, tau=length * .24,
+                partials=((1, 1), (2.756, .53), (5.404, .3), (8.933, .12)))
+
+
+def _room(clip, position):
+    """Three quiet stereo reflections give the chamber depth, without a dry echo."""
+    return mix(pan(clip, position), (.071, pan(clip * .16, -position)),
+               (.137, pan(clip * .09, position * .35)), (.223, pan(clip * .045, -position * .6)))
 
 
 def confirm():
-    """A small E–B answering chime: clear, brief and affirmative."""
-    return level(mix(tone('E5', .14, attack=.006, tau=.055, partials=GLASS),
-                     (.075, tone('B5', .19, attack=.006, tau=.07, partials=GLASS) * .7)), .42)
+    """Two small wooden E–B plucks, with a delicate metallic overtone."""
+    return level(mix(_plucked('E5', .17, seed=500),
+                     (.075, _plucked('B5', .22, seed=501) * .7),
+                     _metal(1318, .20) * .09), .42)
 
 
 def refuse():
-    """A dry descending semitone, without an alarming buzzer."""
-    return level(mix(tone('G3', .13, attack=.012, tau=.055, partials=DARK),
-                     (.105, tone('F#3', .19, attack=.012, tau=.08, partials=DARK))), .38)
+    """Two muted descending wood knocks; dry and distinct from a reward."""
+    return level(mix(_plucked('G3', .14, seed=502),
+                     (.105, _plucked('F#3', .20, seed=503) * .85)), .38)
 
 
 def move():
-    """Two weighted bootfalls with distinct gravel grains."""
-    return level(mix(noise(.11, 160, 1700, attack=.008, tau=.026, seed=510),
-                     thump(105, 54, .13, attack=.008, tau=.035) * .45,
-                     (.18, noise(.12, 220, 2000, attack=.009, tau=.03, seed=511) * .8),
-                     (.18, thump(95, 49, .14, attack=.008, tau=.038) * .35)), .43)
+    """Two weighted bootfalls with leather creak and distinct gravel grains."""
+    return level(mix(noise(.13, 160, 2300, attack=.007, tau=.033, seed=510),
+                     _skin(.16, seed=512) * .4,
+                     (.18, noise(.14, 220, 2600, attack=.009, tau=.035, seed=511) * .8),
+                     (.18, _skin(.17, seed=513) * .32)), .43)
 
 
 def attack_hit():
-    """A quick edged impact above a short low body, not a musical reward."""
-    return level(mix(thump(240, 58, .25, attack=.004, tau=.07),
-                     noise(.085, 1800, 5500, attack=.004, tau=.017, seed=520) * .7,
-                     (.014, tone('E3', .15, attack=.004, tau=.045, partials=DARK) * .4)), .62)
+    """An edged strike: short metal scrape, a wooden crack and low contact."""
+    return level(mix(thump(220, 58, .27, attack=.004, tau=.065),
+                     noise(.12, 1600, 7500, attack=.004, tau=.023, seed=520) * .85,
+                     _metal(710, .31) * .32,
+                     (.012, tone(310, .19, attack=.004, tau=.055,
+                                 partials=((1, .6), (1.73, .25), (2.41, .15))) * .5)), .62)
+
+
+def attack_arrow():
+    """Bowstring snap and feathered flight; contact has its own timed impact cue."""
+    return level(mix(tone(172, .22, attack=.004, tau=.035,
+                           partials=((1, 1), (2.01, .65), (3.03, .4), (4.06, .2))),
+                     noise(.055, 1800, 7400, attack=.004, tau=.01, seed=521) * .45,
+                     (.025, noise(.28, 1300, 4600, attack=.045, tau=.055, seed=522) * .5)), .48)
+
+
+def attack_heavy():
+    """A weighty shield or polearm impact with a deep body and loose armour rattle."""
+    return level(mix(_skin(.44, seed=523),
+                     thump(76, 31, .47, attack=.006, tau=.13) * .65,
+                     noise(.17, 350, 4700, attack=.005, tau=.04, seed=524) * .65,
+                     (.022, _metal(386, .48) * .4),
+                     (.067, noise(.16, 2000, 6500, attack=.009, tau=.045, seed=525) * .22)), .64)
 
 
 def guard():
-    """A hollow shield knock followed by a muted metallic ring."""
-    return level(mix(thump(115, 76, .17, attack=.006, tau=.05),
-                     noise(.09, 350, 1800, attack=.006, tau=.025, seed=530) * .35,
-                     (.014, tone('B3', .46, attack=.006, tau=.14, partials=BELL) * .55)), .5)
+    """A hollow shield knock followed by damped, inharmonic iron resonance."""
+    return level(mix(_skin(.22, seed=530), _metal(438, .47) * .55,
+                     noise(.11, 420, 2400, attack=.006, tau=.025, seed=531) * .3), .5)
 
 
 def bolt():
-    """A rising electric streak releases into a high, short spark."""
-    return level(mix(thump(380, 1100, .26, attack=.018, tau=.11) * .7,
-                     noise(.30, 1200, 6200, attack=.025, tau=.075, seed=540) * .6,
-                     (.19, tone('B6', .22, attack=.004, tau=.055, partials=BELL) * .4)), .58)
+    """A tearing air streak releases into branching sparks and a resonant crack."""
+    return level(mix(noise(.32, 600, 7000, attack=.022, tau=.09, seed=540),
+                     thump(280, 1500, .23, attack=.02, tau=.09) * .3,
+                     (.16, noise(.17, 2400, 9000, attack=.004, tau=.023, seed=541) * .85),
+                     (.18, _metal(1480, .31) * .23),
+                     (.2, thump(170, 53, .23, attack=.004, tau=.055) * .6)), .58)
 
 
 def heal():
-    """A soft opening minor triad, with a quiet breath rather than an impact."""
-    return level(mix(tone('E4', .68, attack=.045, tau=.27, partials=SOFT),
-                     (.08, tone('G4', .65, attack=.045, tau=.26, partials=SOFT) * .75),
-                     (.19, tone('B4', .61, attack=.045, tau=.25, partials=SOFT) * .55),
-                     noise(.76, 2200, 5200, attack=.12, tau=.19, seed=550) * .09), .47)
+    """A breathed opening minor triad over gently resonating strings."""
+    return level(mix(_flute('E4', .72, seed=550),
+                     (.085, _flute('G4', .69, seed=551) * .7),
+                     (.19, _plucked('B4', .66, seed=552) * .65),
+                     (.23, _metal(988, .49) * .1)), .47)
 
 
 def reward():
-    """Three lightly struck upper notes: a small material reward."""
-    return level(mix(tone('E5', .36, attack=.005, tau=.12, partials=GLASS),
-                     (.105, tone('G5', .38, attack=.005, tau=.13, partials=GLASS) * .85),
-                     (.24, tone('B5', .43, attack=.005, tau=.15, partials=GLASS) * .7)), .49)
+    """Three bright hammered strings, with a small coin-like shimmer."""
+    return level(mix(_plucked('E5', .38, seed=553),
+                     (.105, _plucked('G5', .40, seed=554) * .85),
+                     (.24, _plucked('B5', .45, seed=555) * .7),
+                     (.25, _metal(1520, .34) * .15)), .49)
 
 
 def level_up():
-    """A wider, longer ascent than reward, resolving a second into the high tonic."""
+    """A rising lute figure opens into a short breathed high tonic."""
     phrases = [('E4', 0), ('B4', .12), ('F#5', .28), ('G5', .43), ('E6', .66)]
-    return level(mix(*[(at, tone(note, .55, attack=.009, tau=.21, partials=BELL) * (.95 - i * .08))
-                       for i, (note, at) in enumerate(phrases)]), .56)
+    return level(mix(*[(at, _plucked(note, .60, seed=560 + i) * (.95 - i * .08))
+                       for i, (note, at) in enumerate(phrases)],
+                     (.65, _flute('E5', .63, seed=565) * .55)), .56)
 
 
 def victory():
-    """The E–F#–B–G shard motif settles into an open minor-add-nine chord."""
-    layers = [(at, tone(note, .45, attack=.012, tau=.19, partials=GLASS))
-              for note, at in [('E4', 0), ('F#4', .18), ('B4', .38), ('G4', .58)]]
-    layers += [(.82, tone(note, 1.35, attack=.025, tau=.47, partials=SOFT) * gain)
-               for note, gain in [('E3', .6), ('B3', .6), ('E4', .7), ('G4', .55), ('F#5', .25)]]
-    return level(mix(*layers), .6)
+    """The shard motif resolves into an open minor-add-nine bowed chord and low drum."""
+    layers = [(at, _plucked(note, .5, seed=570 + i))
+              for i, (note, at) in enumerate([('E4', 0), ('F#4', .18), ('B4', .38), ('G4', .58)])]
+    layers += [(.82, _bowed(note, 1.45, attack=.09, seed=580 + i) * gain)
+               for i, (note, gain) in enumerate([('E3', .6), ('B3', .6), ('E4', .7), ('G4', .55), ('F#5', .25)])]
+    return level(mix(*layers, (.81, _skin(seed=585) * .35)), .6)
 
 
 def defeat():
-    """An unhurried descent to B, leaving the tonic unresolved."""
-    return level(mix(*[(at, tone(note, .85, attack=.025, tau=.31, partials=DARK) * gain)
-                       for note, at, gain in [('E3', 0, 1), ('D3', .25, .9), ('C3', .54, .85), ('B2', .87, .8)]],
-                     noise(1.6, 80, 360, attack=.25, tau=.45, seed=560) * .1), .46)
+    """A bowed descent to unresolved B, with a low wind tail."""
+    return level(mix(*[(at, _bowed(note, .95, attack=.065, seed=590 + i) * gain)
+                       for i, (note, at, gain) in enumerate([('E3', 0, 1), ('D3', .25, .9), ('C3', .54, .85), ('B2', .87, .8)])],
+                     noise(1.8, 80, 650, attack=.25, tau=.55, seed=595) * .16), .46)
 
 
 def end_turn():
-    """A wooden tick and an answering downward fifth close the command phase."""
-    return level(mix(noise(.055, 750, 2500, attack=.004, tau=.014, seed=570) * .35,
-                     tone('B4', .25, attack=.012, tau=.11, partials=DARK),
-                     (.23, tone('E4', .37, attack=.017, tau=.15, partials=DARK))), .4)
+    """A woodblock tick and two muted lute notes close the command phase."""
+    return level(mix(noise(.065, 750, 3000, attack=.004, tau=.015, seed=600) * .35,
+                     _plucked('B4', .28, seed=601),
+                     (.23, _plucked('E4', .39, seed=602) * .8)), .4)
 
 
 CUES = {'confirm': confirm, 'refuse': refuse, 'move': move, 'attack_hit': attack_hit,
+        'attack_arrow': attack_arrow, 'attack_heavy': attack_heavy,
         'guard': guard, 'bolt': bolt, 'heal': heal, 'reward': reward, 'level_up': level_up,
         'victory': victory, 'defeat': defeat, 'end_turn': end_turn}
 
 
-# E–F#–B–G is the shared shard motif. Sparse answers vary across six eight-second
-# harmonic fields; these voicings/timings are game compositions, not synth API.
+# E–F#–B–G is the shared shard motif. Timings and instrument choices belong here,
+# not in the framework. Six fields give the campaign a complete 48-second form.
 _CAMPAIGN_VOICINGS = (
     ('E2', 'B2', 'E3', 'G3', 'F#4'), ('C3', 'G3', 'B3', 'E4'),
     ('G2', 'D3', 'A3', 'B3'), ('D3', 'A3', 'E4', 'F#4'),
@@ -125,27 +196,36 @@ def _wrap(out, clip, start):
     out[:len(clip) - first] += clip[first:]
 
 
-def campaign():
-    """48 seconds: twelve slow 4/4 bars, overlapping low reeds and sparse glass answers."""
+def campaign(*, budget=None):
+    """48 seconds: bowed harmonic fields, wooden lute figures, flute answers and a soft hand drum."""
     out = np.zeros((48 * SAMPLE_RATE, 2))
     for phrase, (chord, answer) in enumerate(zip(_CAMPAIGN_VOICINGS, _CAMPAIGN_ANSWERS)):
         start = phrase * 8
         for voice, note in enumerate(chord):
-            weight = .55 if voice == 0 else .35
-            pad = tone(note, 10.8, attack=1.3, tau=3.6, partials=DARK if voice < 2 else SOFT)
-            _wrap(out, pan(pad * weight, -.55 + voice * .24), start - .9)
-        for note, offset, position in zip(answer, (1.15, 2.55, 4.4, 6.25), (-.4, .2, .45, -.15)):
+            pad = _bowed(note, 10.8, attack=1.25, seed=700 + phrase * 10 + voice)
+            _wrap(out, _room(pad * (.29 if voice == 0 else .17), -.65 + voice * .29), start - .9)
+            if budget:
+                budget.checkpoint()
+        for index, (note, offset) in enumerate(zip(answer, (1.0, 2.5, 4.25, 6.25))):
             if note is not None:
-                _wrap(out, pan(tone(note, 2.1, attack=.012, tau=.65, partials=GLASS) * .105,
-                               position), start + offset)
-        # A very quiet, seeded air wash is a texture within each phrase.
-        wash = noise(9.5, 180, 1200, attack=1.8, tau=2.6, seed=700 + phrase)
-        _wrap(out, pan(wash * .035, .35 if phrase % 2 else -.35), start - .6)
+                _wrap(out, _room(_flute(note, 1.9, seed=770 + phrase * 4 + index) * .16,
+                                 -.25 if phrase % 2 else .3), start + offset)
+        # Lute arpeggios change register and spacing, leaving the flute room to breathe.
+        for step, offset in enumerate((.25, 1.75, 3.0, 4.75, 5.5, 7.25)):
+            note = chord[1 + (step + phrase) % (len(chord) - 1)]
+            _wrap(out, _room(_plucked(note, 1.5, seed=810 + phrase * 6 + step) * (.16 if step % 3 else .21),
+                             -.45 if step % 2 else .45), start + offset)
+        for beat in (0, 4):
+            _wrap(out, _room(_skin(seed=860 + phrase + beat) * (.12 if beat else .17), -.08), start + beat)
+        wash = noise(9.5, 180, 1600, attack=1.8, tau=2.6, seed=900 + phrase)
+        _wrap(out, pan(wash * .045, .45 if phrase % 2 else -.45), start - .6)
+        if budget:
+            budget.checkpoint()
     return level(out, .16)
 
 
-def battle():
-    """32 seconds: sixteen 4/4 bars at 120 BPM, felt in half-time with sparse toms."""
+def battle(*, budget=None):
+    """32 seconds: bowed low ostinato, skin drums, dry rattles and alternating flute/lute answers."""
     out = np.zeros((32 * SAMPLE_RATE, 2))
     fields = (('E2', 'B2', 'G3'), ('A2', 'E3', 'C4'),
               ('C3', 'G3', 'E4'), ('B2', 'F#3', 'E4'))
@@ -154,19 +234,31 @@ def battle():
     for section, (chord, answer) in enumerate(zip(fields, answers)):
         start = section * 8
         for voice, note in enumerate(chord):
-            bed = tone(note, 10, attack=.8, tau=3.2, partials=DARK)
-            _wrap(out, pan(bed * (.5 if voice == 0 else .27), (voice - 1) * .4), start - .5)
+            bed = _bowed(note, 10, attack=.8, seed=1000 + section * 3 + voice)
+            _wrap(out, _room(bed * (.23 if voice == 0 else .14), (voice - 1) * .5), start - .5)
+            if budget:
+                budget.checkpoint()
         for cell in range(2):
             at = start + cell * 4
-            for index, (offset, weight) in enumerate(((0, .5), (1.5, .32), (2, .42), (3.25, .24))):
-                drum = mix(thump(92, 43, .29, attack=.008, tau=.075),
-                           noise(.11, 130, 920, attack=.006, tau=.027, seed=800 + section * 20 + cell * 4 + index) * .23)
-                _wrap(out, pan(drum * weight, -.12 if index % 2 else .12), at + offset)
+            for index, (offset, weight) in enumerate(((0, .45), (1.5, .23), (2, .36), (3.25, .19))):
+                _wrap(out, _room(_skin(seed=1100 + section * 20 + cell * 4 + index) * weight,
+                                 -.18 if index % 2 else .12), at + offset)
+            for beat in range(8):
+                # Repeated lower strings carry urgency without turning the melody into an alarm.
+                note = chord[beat % 2]
+                bow = _bowed(note, .43, attack=.025, seed=1200 + section * 16 + cell * 8 + beat)
+                _wrap(out, _room(bow * (.16 if beat % 3 else .22), -.3), at + beat * .5 + .015)
+                rattle = noise(.10, 2800, 7600, attack=.006, tau=.022, seed=1300 + section * 16 + cell * 8 + beat)
+                _wrap(out, pan(rattle * (.065 if beat % 2 else .04), .45), at + beat * .5 + .25)
             for index, note in enumerate(answer):
-                # Half the statements answer low rather than doubling a lead melody.
                 offset = (.5, 1.25, 2.75, 3.5)[index]
-                phrase = tone(note, .8, attack=.018, tau=.24, partials=GLASS)
-                _wrap(out, pan(phrase * (.12 if cell else .09), (-.35, .2, .35, -.1)[index]), at + offset)
+                line = (_flute(note, .88, seed=1400 + index) if cell and section % 2
+                        else _plucked(note, .85, seed=1410 + index))
+                _wrap(out, _room(line * (.18 if cell else .13), .35), at + offset)
+            if cell:
+                _wrap(out, _room(_metal(530, 1.4) * .035, -.35), at + 3.5)
+            if budget:
+                budget.checkpoint()
     return level(out, .18)
 
 
