@@ -19,6 +19,7 @@ from __future__ import annotations
 import collections
 import statistics
 import time
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable
 
 from saga2d.game import Game
@@ -105,3 +106,86 @@ class FrameTimer:
             calls = self.calls[label]
             lines.append(f"  {label:20s} {seconds * 1000:8.0f} ms  {100 * seconds / total if total else 0:5.1f}%  {calls} calls, {seconds * 1000 / max(1, calls):.2f} ms each")
         return "\n".join(lines)
+
+
+@dataclass(frozen=True)
+class TextBox:
+    """Where one drawn text lands, in logical pixels of its space."""
+
+    text: str
+    left: float
+    top: float
+    width: float
+    height: float
+    space: str
+    order: int
+
+    @property
+    def right(self) -> float:
+        return self.left + self.width
+
+    @property
+    def bottom(self) -> float:
+        return self.top + self.height
+
+    def __str__(self) -> str:
+        return f"{self.text!r} at ({self.left:.0f}, {self.top:.0f})–({self.right:.0f}, {self.bottom:.0f})"
+
+
+_ANCHOR_X = {"left": 0.0, "center": 0.5, "right": 1.0}
+_ANCHOR_Y = {"top": 0.0, "center": 0.5, "baseline": 0.8, "bottom": 1.0}
+
+
+def text_boxes(backend: Any) -> list[TextBox]:
+    """The boxes of every text the mock backend drew in its last frame.
+
+    Sizes come from the backend's own ``measure_text``, the same numbers the
+    UI layout used, so this sees the layout the way the layout sees itself.
+    """
+    boxes = []
+    for t in backend.texts:
+        if not str(t["text"]).strip():
+            continue
+        width, height = backend.measure_text(t["text"], t["font_size"], t["font"])
+        left = t["x"] - width * _ANCHOR_X[t["anchor_x"]]
+        top = t["y"] - height * _ANCHOR_Y[t["anchor_y"]]
+        boxes.append(TextBox(str(t["text"]), left, top, width, height, t["space"], t["order"]))
+    return boxes
+
+
+def overlapping_texts(target: Any, *, spaces: tuple[str, ...] = ("screen",), slack: float = 2.0,
+                      top_scene_only: bool = False) -> list[tuple[TextBox, TextBox]]:
+    """Pairs of texts drawn over each other in the last frame of a mock-backed game.
+
+    *target* is a :class:`Game` or its mock backend.  Only texts in the same
+    space are compared, screen space by default (world text such as damage
+    numbers may pile up on purpose).  A second pass of the same text within
+    four pixels is a shadow or outline, not an overlap.  *slack* forgives
+    boxes that merely touch.  With *top_scene_only* (a :class:`Game` target),
+    texts of the scenes beneath an overlay are ignored: an overlay's panel
+    covers them on purpose.
+    """
+    backend = target.backend if hasattr(target, "backend") else target
+    boxes = [b for b in text_boxes(backend) if b.space in spaces]
+    if top_scene_only:
+        from saga2d.scene import UI_ORDER_BASE, UI_ORDER_STRIDE
+
+        floor = UI_ORDER_BASE + (len(target.scenes) - 1) * UI_ORDER_STRIDE
+        boxes = [b for b in boxes if b.space != "screen" or b.order >= floor]
+    pairs = []
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            if a.space != b.space:
+                continue
+            if a.text == b.text and abs(a.left - b.left) <= 4 and abs(a.top - b.top) <= 4:
+                continue
+            if min(a.right, b.right) - max(a.left, b.left) > slack and min(a.bottom, b.bottom) - max(a.top, b.top) > slack:
+                pairs.append((a, b))
+    return pairs
+
+
+def assert_no_text_overlap(target: Any, *, spaces: tuple[str, ...] = ("screen",), slack: float = 2.0, top_scene_only: bool = False) -> None:
+    """Fail with every offending pair when texts overlap; see :func:`overlapping_texts`."""
+    pairs = overlapping_texts(target, spaces=spaces, slack=slack, top_scene_only=top_scene_only)
+    if pairs:
+        raise AssertionError("text drawn over text:\n" + "\n".join(f"  {a}  over  {b}" for a, b in pairs))

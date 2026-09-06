@@ -138,3 +138,9 @@ know about, and read it before touching shared files.
   `docs/warband-early-access-progress.md` (final 300-match fuzz clean, soak,
   perf, AI ladder, refreshed build). Merged main's display API as is. Left
   for people: the playtest (W15), first-run walkthroughs (W06), Windows.
+- 2026-09-06 (Warband agent): `saga2d.testing.assert_no_text_overlap` and
+  `overlapping_texts` find text drawn over text in a mock frame (Warband
+  sweeps every screen at five window sizes in `tests/warband/test_layout.py`;
+  it caught a title tagline on a menu button and a codex column overrun).
+  Tribes and Shardbound screens could use the same sweep. The pyglet backend
+  now reports a Mac Control+click as the right button.
