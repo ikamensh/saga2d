@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from eador.battle import Battle
 from eador.model import HERO_CLASSES, RECRUITABLE, Hero, Troop, UNITS
+from tools.cpu_budget import CpuBudget
 
 
 def fixture(seed, metrics):
@@ -50,11 +51,13 @@ def issue(battle, command, unit_id, target):
         battle.cast(command, target, caster_id=unit_id)
 
 
-def exercise(seed, metrics):
+def exercise(seed, metrics, *, budget=None):
     rng = random.Random(seed)
     battle = fixture(seed, metrics)
     while battle.outcome is None:
         for _ in range(7):
+            if budget:
+                budget.checkpoint()
             if battle.outcome:
                 break
             unit = rng.choice([u for u in battle.units if u.team == 'player' and u.alive])
@@ -93,6 +96,8 @@ def exercise(seed, metrics):
             metrics['orders.' + command] += 1
             metrics['forecast_checks'] += forecast is not None
         if battle.outcome is None:
+            if budget:
+                budget.checkpoint()
             battle.auto_turn()
             metrics['automatic_rounds'] += 1
         saved = battle.to_dict()
@@ -111,21 +116,28 @@ def main():
     parser.add_argument('--cases', type=int, default=500)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='cooperative CPU allowance (default: 25; 100 disables yielding)')
     args = parser.parse_args()
     if args.cases < 1:
         parser.error('--cases must be positive')
-    sources = [*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'), Path(__file__).resolve()]
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    sources = [*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
+               Path(__file__).resolve(), ROOT / 'tools/cpu_budget.py']
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(sources)}
     report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'python': platform.python_version(), 'platform': platform.platform(), 'seed': args.seed,
-              'cases': args.cases, 'source_sha256': hashes}
+              'cases': args.cases, 'source_sha256': hashes, 'cpu_percent': budget.percent}
     started = time.perf_counter()
     metrics = Counter()
     for seed in range(args.seed, args.seed + args.cases):
         if (seed - args.seed) % 50 == 0:
             print(f'Battle fixture {seed - args.seed + 1}/{args.cases}', flush=True)
-        exercise(seed, metrics)
+        exercise(seed, metrics, budget=budget)
     report.update(elapsed_seconds=time.perf_counter() - started, metrics=dict(metrics),
                   source_files_changed=[str(p.relative_to(ROOT)) for p in sorted(sources)
                                         if hashlib.sha256(p.read_bytes()).hexdigest() != hashes[str(p.relative_to(ROOT))]])

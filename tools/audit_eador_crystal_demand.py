@@ -23,13 +23,14 @@ from eador.difficulty import DIFFICULTIES
 from eador.model import HERO_CLASSES
 from eador.worldgen import THEMES
 from tools.audit_eador_difficulty import DifficultyTrial, ROUTES
+from tools.cpu_budget import CpuBudget
 
 PLANS = ('economy', 'sustain', 'spells', 'control', 'flight')
 
 
 class DemandTrial(DifficultyTrial):
-    def __init__(self, *args, examples=None):
-        super().__init__(*args)
+    def __init__(self, *args, examples=None, budget=None):
+        super().__init__(*args, budget=budget)
         self.first_quote = None
         self.demand = Counter()
         self.first_service_points = {}
@@ -133,28 +134,37 @@ class DemandTrial(DifficultyTrial):
         return result
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seeds', type=int, default=10)
+    parser.add_argument('--heroes', nargs='+', choices=HERO_CLASSES, default=list(HERO_CLASSES))
+    parser.add_argument('--themes', nargs='+', choices=THEMES, default=list(THEMES))
+    parser.add_argument('--routes', nargs='+', choices=ROUTES, default=list(ROUTES))
+    parser.add_argument('--modes', nargs='+', choices=DIFFICULTIES, default=list(DIFFICULTIES))
+    parser.add_argument('--plans', nargs='+', choices=PLANS, default=list(PLANS))
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Cooperative allowance for one CPU core; 100 disables sleeping.')
     parser.add_argument('--report', type=Path, required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if args.seeds < 1:
         parser.error('--seeds must be positive')
+    budget = CpuBudget(args.cpu_percent)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__),
                       ROOT / 'tools/audit_eador_difficulty.py', ROOT / 'tools/audit_eador_economy.py',
-                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/stress_eador_control.py'])
+                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/stress_eador_control.py',
+                      ROOT / 'tools/cpu_budget.py'])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     started, rows, examples = time.perf_counter(), [], {}
     for seed in range(args.seeds):
-        for theme in THEMES:
-            for hero in HERO_CLASSES:
-                for route in ROUTES:
-                    for plan in PLANS:
-                        for mode in DIFFICULTIES:
-                            trial = DemandTrial(seed, hero, theme, plan, mode, route, examples=examples)
+        for theme in args.themes:
+            for hero in args.heroes:
+                for route in args.routes:
+                    for plan in args.plans:
+                        for mode in args.modes:
+                            trial = DemandTrial(seed, hero, theme, plan, mode, route, examples=examples, budget=budget)
                             result = trial.run()
                             if seed == 0 and route == 'direct':
-                                baseline = DifficultyTrial(seed, hero, theme, plan, mode, route).run()
+                                baseline = DifficultyTrial(seed, hero, theme, plan, mode, route, budget=budget).run()
                                 assert all(result[key] == value for key, value in baseline.items()), 'Observation changed baseline orders'
                             rows.append(result)
         print(f'{seed + 1}/{args.seeds} seeds; {len(rows)} observed campaigns', flush=True)
@@ -192,7 +202,8 @@ def main():
                 party_free_rest_covers=sum(p['party_covered_by_free_rest'] for p in party),
                 infusion_free_rest_covers=sum(p['infusion'] and p['infusion_covered_by_free_rest'] for p in points))
     report = dict(revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                  source_sha256=hashes, seeds=args.seeds, plans=PLANS, modes=list(DIFFICULTIES),
+                  source_sha256=hashes, seeds=args.seeds, plans=args.plans, modes=args.modes,
+                  heroes=args.heroes, themes=args.themes, routes=args.routes, cpu_percent=args.cpu_percent,
                   policy='Read-only service quotes during unchanged final recovery and post-battle decisions; no services execute; '
                          '8mana/3crystals/Tower,12HP-per-unit/2crystals/Temple, party24HP total max12each/4crystals/Temple; '
                          'first affordable quote per phase/campaign avoids counting repeat waits as independent purchases; remaining actions expose cost0vs1.',

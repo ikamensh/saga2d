@@ -10,6 +10,15 @@ uv run python -m pytest tests -q        # headless suite (mock backend)
 uv run python -m tribes --seed 7        # play
 ```
 
+## CPU and battery during development
+
+Run at most one expensive local test, simulation or native verification job at
+a time, including work delegated to agents. Long audit/fuzz/stress CLIs default
+to `--cpu-percent 25`; retain that allowance for ordinary development. Explicit
+stress runs may use 100. Select small cases while iterating; do not automatically
+restart a cancelled large matrix or soak. Native `PlayerInput` already caps at
+30 FPS; direct `tick(dt)` calls remain unpaced and require their caller's clock.
+
 ## Visual changes must be looked at
 
 Mock tests prove logic, not pixels.  After any change to rendering, the

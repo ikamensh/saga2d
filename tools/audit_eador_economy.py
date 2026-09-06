@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 from eador.model import BUILDINGS, HERO_CLASSES, State
 from eador.worldgen import THEMES
 from tools.eador_campaign import CampaignMetrics, finish_battle
+from tools.cpu_budget import CpuBudget
 
 PLANS = {
     'economy': (('build', 'market'), ('build', 'barracks'), ('recruit', 'swordsman'), ('build', 'temple')),
@@ -208,14 +209,21 @@ def aggregate(runs):
     return summary
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seeds', type=int, default=100)
+    parser.add_argument('--heroes', nargs='+', choices=HERO_CLASSES, default=list(HERO_CLASSES))
+    parser.add_argument('--themes', nargs='+', choices=THEMES, default=list(THEMES))
+    parser.add_argument('--plans', nargs='+', choices=PLANS, default=list(PLANS))
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Cooperative allowance for one CPU core; 100 disables sleeping.')
     parser.add_argument('--output', type=Path, required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if args.seeds < 1:
         parser.error('--seeds must be positive')
-    sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__), ROOT / 'tools/eador_campaign.py']
+    budget = CpuBudget(args.cpu_percent)
+    sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__),
+               ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py']
     fingerprints = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     before = fingerprints()
     runs = []
@@ -223,12 +231,12 @@ def main():
     for seed in range(args.seeds):
         if seed % 10 == 0:
             print(f'Economy seed {seed}/{args.seeds}', flush=True)
-        for theme in THEMES:
-            for hero in HERO_CLASSES:
-                for plan in PLANS:
-                    row = Trial(seed, hero, theme, plan).run()
+        for theme in args.themes:
+            for hero in args.heroes:
+                for plan in args.plans:
+                    row = Trial(seed, hero, theme, plan, budget=budget).run()
                     if seed == 0:
-                        assert Trial(seed, hero, theme, plan).run() == row, 'repeated public policy differed'
+                        assert Trial(seed, hero, theme, plan, budget=budget).run() == row, 'repeated public policy differed'
                     runs.append(row)
     after = fingerprints()
     assert before == after, 'source changed during measurement'
@@ -237,7 +245,8 @@ def main():
                   policy='Matched direct site itinerary; explicit auto tactics; first reward choices; ordered investment plans then refill Swordsmen. '
                          'Sustain retains one paid Acolyte; all use recovered Merchant Seal discounts and restore combat relic. '
                          'Rest when needed; intercept a visible expedition near home. No rule or route tuning by seed. 60-turn/40-assault-step bound.',
-                  seeds=args.seeds, campaigns=len(runs), summary=aggregate(runs), runs=runs)
+                  seeds=args.seeds, heroes=args.heroes, themes=args.themes, plans=args.plans,
+                  cpu_percent=args.cpu_percent, campaigns=len(runs), summary=aggregate(runs), runs=runs)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     # One complete trial per line keeps a large audit inspectable without a huge
     # pretty-printed tree. Metadata and grouped comparisons remain indented.

@@ -22,6 +22,7 @@ os.environ.setdefault('SAGA2D_SILENT', '1')
 
 from eador.content import SKILLS
 from eador.model import State
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import CampaignMetrics
 from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
 
@@ -56,7 +57,7 @@ class DisciplinePath:
                                    selected=option_id, before=before, after=after))
 
 
-def journey(skill, *, seed=7, recovery=False, player=None):
+def journey(skill, *, seed=7, recovery=False, player=None, budget=None):
     """Earn ranks through ordinary paid battles, then preserve them through actual transitions."""
     decisions, checkpoints = [], []
     metrics = CampaignMetrics()
@@ -86,7 +87,7 @@ def journey(skill, *, seed=7, recovery=False, player=None):
     for stage, destination in ((1, 'foundries'), (2, 'throne'), (3, None)):
         if stage == 2 and recovery:
             ranks = dict(state.hero.skill_ranks)
-            lose_shard(state)
+            lose_shard(state, budget=budget)
             assert state.campaign.phase == 'recovery'
             assert state.hero.skill_ranks == ranks
             checkpoint('capital-lost')
@@ -97,7 +98,7 @@ def journey(skill, *, seed=7, recovery=False, player=None):
                 player.press('return')
             assert state.campaign.recovery_used and state.hero.skill_ranks == ranks
             checkpoint('recovered')
-        state = play_stage(state, metrics=metrics, reload_state=reload_state)
+        state = play_stage(state, metrics=metrics, reload_state=reload_state, budget=budget)
         checkpoint(f'stage-{stage}-{state.campaign.phase}')
         if state.status != 'victory':
             break
@@ -117,16 +118,17 @@ def journey(skill, *, seed=7, recovery=False, player=None):
                 exact_ui_reloads=player.reloads if player is not None else 0)
 
 
-def verify(output, *, skills=tuple(SKILLS), backend='model', recovery=False, seed=7):
+def verify(output, *, skills=tuple(SKILLS), backend='model', recovery=False, seed=7, budget=None):
     output.mkdir(parents=True, exist_ok=True)
     paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
              ROOT / 'tools/audit_eador_disciplines.py', ROOT / 'tools/eador_campaign.py',
-             ROOT / 'tools/eador_linked_campaign.py', ROOT / 'tools/eador_ui.py']
+             ROOT / 'tools/eador_linked_campaign.py', ROOT / 'tools/eador_ui.py',
+             ROOT / 'tools/cpu_budget.py']
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     results = []
     for skill in skills:
         if backend == 'model':
-            result = journey(skill, seed=seed, recovery=recovery)
+            result = journey(skill, seed=seed, recovery=recovery, budget=budget)
         else:
             from eador.app import create_game
             from tools.eador_ui import PlayerInput
@@ -134,7 +136,7 @@ def verify(output, *, skills=tuple(SKILLS), backend='model', recovery=False, see
                 game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
                 try:
                     player = PlayerInput(game, native=backend == 'pyglet', output=output / skill)
-                    result = journey(skill, seed=seed, recovery=recovery, player=player)
+                    result = journey(skill, seed=seed, recovery=recovery, player=player, budget=budget)
                 finally:
                     game._teardown()
         results.append(result)
@@ -143,6 +145,7 @@ def verify(output, *, skills=tuple(SKILLS), backend='model', recovery=False, see
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == checksum for path, checksum in hashes.items())
     report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, source_unchanged=True, backend=backend,
+                  cpu_percent=budget.percent if budget else None,
                   policy='Paid standard seed itinerary, Foundries then Throne, tactical autoplay, preferred discipline until capped.',
                   recovery=recovery, results=results)
     with gzip.open(output / 'journeys.json.gz', 'wt') as stream:
@@ -157,5 +160,11 @@ if __name__ == '__main__':
     parser.add_argument('--skills', nargs='+', choices=SKILLS, default=list(SKILLS))
     parser.add_argument('--seed', type=int, default=7)
     parser.add_argument('--recovery', action='store_true')
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     args = parser.parse_args()
-    verify(args.output, skills=args.skills, backend=args.backend, recovery=args.recovery, seed=args.seed)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.output, skills=args.skills, backend=args.backend, recovery=args.recovery, seed=args.seed, budget=budget)

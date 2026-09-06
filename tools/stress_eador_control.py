@@ -23,6 +23,7 @@ from eador.battle import Battle
 from eador.model import BUILDINGS, HERO_CLASSES, Hero, State, Troop, UNITS
 from eador.worldgen import THEMES
 from tools.audit_eador_economy import Trial
+from tools.cpu_budget import CpuBudget
 
 PLANS = {
     'control': (('build', 'market'), ('recruit', 'sapper'), ('build', 'mage_tower'),
@@ -94,7 +95,7 @@ def issue(battle, command, uid, target):
         getattr(battle, command)(uid, target)
 
 
-def exercise(seed, metrics, *, battle=None, checkpoint=None):
+def exercise(seed, metrics, *, battle=None, checkpoint=None, budget=None):
     rng = random.Random(seed)
     battle = fixture(seed) if battle is None else battle
     metrics['fixture.' + battle.objective.kind] += 1
@@ -103,6 +104,8 @@ def exercise(seed, metrics, *, battle=None, checkpoint=None):
         if battle.outcome:
             break
         for _ in range(9):
+            if budget:
+                budget.checkpoint()
             if battle.outcome:
                 break
             unit = rng.choice([u for u in battle.units if u.alive and u.team == 'player'])
@@ -152,6 +155,8 @@ def exercise(seed, metrics, *, battle=None, checkpoint=None):
             if checkpoint is not None:
                 checkpoint()
         if not battle.outcome:
+            if budget:
+                budget.checkpoint()
             restored = Battle.from_dict(battle.to_dict())
             battle.auto_turn(); restored.auto_turn()
             assert battle.to_dict() == restored.to_dict(), 'Automatic policy changed after reload'
@@ -177,24 +182,31 @@ def main():
     parser.add_argument('--campaign-seeds', type=int, default=5)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='cooperative CPU allowance (default: 25; 100 disables yielding)')
     args = parser.parse_args()
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
-                      Path(__file__).resolve(), ROOT / 'tools/audit_eador_economy.py', ROOT / 'tools/eador_campaign.py'])
+                      Path(__file__).resolve(), ROOT / 'tools/audit_eador_economy.py',
+                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'source_sha256': hashes, 'plans': PLANS, 'seed': args.seed, 'battles': args.battles,
-              'campaign_seeds': args.campaign_seeds}
+              'campaign_seeds': args.campaign_seeds, 'cpu_percent': budget.percent}
     started, metrics, campaigns = time.perf_counter(), Counter(), []
     for seed in range(args.seed, args.seed + args.battles):
-        exercise(seed, metrics)
+        exercise(seed, metrics, budget=budget)
         if (seed - args.seed + 1) % 100 == 0:
             print(f'{seed - args.seed + 1} battle fixtures passed', flush=True)
     for seed in range(args.seed, args.seed + args.campaign_seeds):
         for theme in THEMES:
             for hero_class in HERO_CLASSES:
                 for plan in PLANS:
-                    campaigns.append(ControlTrial(seed, hero_class, theme, plan).run())
+                    campaigns.append(ControlTrial(seed, hero_class, theme, plan, budget=budget).run())
         print(f'{len(campaigns)} campaigns exercised', flush=True)
     report.update(metrics=dict(metrics), campaigns=campaigns, elapsed_seconds=time.perf_counter() - started,
                   source_files_changed=[str(p.relative_to(ROOT)) for p in sources

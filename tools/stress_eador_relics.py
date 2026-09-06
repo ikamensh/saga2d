@@ -24,11 +24,18 @@ from tools.eador_extraction_campaign import AdventureOrders
 from tools.eador_relic_campaign import (drum_watch_route, prepare_censer_watch,
                                         prepare_relic_gate)
 from tools.stress_eador_control import exercise
+from tools.cpu_budget import CpuBudget
 
 
-def earned_checkpoints():
+def earned_checkpoints(*, budget=None):
     """The Drum starts just before its actual enemy Pin can be answered."""
-    class PinOrders(AdventureOrders):
+    class BudgetedOrders(AdventureOrders):
+        def do(self, command, *args, **kwargs):
+            if budget:
+                budget.checkpoint()
+            return super().do(command, *args, **kwargs)
+
+    class PinOrders(BudgetedOrders):
         pinned_save = None
 
         def do(self, command, *args, **kwargs):
@@ -36,13 +43,13 @@ def earned_checkpoints():
                 self.pinned_save = self.state.to_json()
             return super().do(command, *args, **kwargs)
 
-    drum = drum_watch_route(orders_type=PinOrders)
+    drum = drum_watch_route(orders_type=PinOrders, budget=budget)
     assert drum.pinned_save is not None
     return {
-        'veil_censer': prepare_censer_watch(ranger=True).to_json(),
+        'veil_censer': prepare_censer_watch(ranger=True, orders_type=BudgetedOrders, budget=budget).to_json(),
         'vanguard_drum': drum.pinned_save,
-        'porter_rune': prepare_relic_gate('porter_rune').to_json(),
-        'mirror_badge': prepare_relic_gate('mirror_badge').to_json(),
+        'porter_rune': prepare_relic_gate('porter_rune', budget=budget).to_json(),
+        'mirror_badge': prepare_relic_gate('mirror_badge', budget=budget).to_json(),
     }
 
 
@@ -50,17 +57,20 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--policies', type=int, default=50, help='policies per earned checkpoint')
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Cooperative allowance for one CPU core; 100 disables sleeping.')
     args = parser.parse_args()
+    budget = CpuBudget(args.cpu_percent)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *ROOT.joinpath('tools').glob('eador*campaign.py'), Path(__file__).resolve(),
-                      ROOT / 'tools/stress_eador_control.py'])
+                      ROOT / 'tools/stress_eador_control.py', ROOT / 'tools/cpu_budget.py'])
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'source_sha256': hashes, 'policies_per_checkpoint': args.policies,
-              'checkpoint_world_seed': 7}
+              'checkpoint_world_seed': 7, 'cpu_percent': args.cpu_percent}
     started, results = time.perf_counter(), {}
-    for relic, saved in earned_checkpoints().items():
+    for relic, saved in earned_checkpoints(budget=budget).items():
         metrics = Counter()
         for seed in range(args.policies):
             state = State.from_json(saved)
@@ -70,9 +80,9 @@ def main():
                 assert State.from_json(current).to_json() == current
                 metrics['campaign_save_checks'] += 1
 
-            exercise(seed, metrics, battle=state.battle, checkpoint=checkpoint)
+            exercise(seed, metrics, battle=state.battle, checkpoint=checkpoint, budget=budget)
             restored = State.from_json(state.to_json())
-            finish_battle(state); finish_battle(restored)
+            finish_battle(state, budget=budget); finish_battle(restored, budget=budget)
             assert state.to_json() == restored.to_json(), 'Saved relic battle resolution changed the campaign'
             metrics['resolution_checks'] += 1
         results[relic] = dict(metrics)

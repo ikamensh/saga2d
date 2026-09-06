@@ -15,17 +15,18 @@ sys.path.insert(0, str(ROOT))
 
 from eador.model import HERO_CLASSES, State
 from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
+from tools.cpu_budget import CpuBudget
 from tools.eador_campaign import CampaignMetrics, play_campaign
 
 
-def audit(seed_count: int) -> dict:
+def audit(seed_count: int, *, budget=None) -> dict:
     rows = []
     for theme in THEMES:
         for seed in range(seed_count):
             for hero_class in HERO_CLASSES:
                 for route_name, route in (('direct', None), ('north', NORTH_ROAD), ('south', SOUTH_ROAD)):
                     metrics = CampaignMetrics()
-                    state = play_campaign(State.new(seed, hero_class, theme=theme), route, metrics)
+                    state = play_campaign(State.new(seed, hero_class, theme=theme), route, metrics, budget=budget)
                     rows.append(dict(theme=theme, seed=seed, hero_class=hero_class, route=route_name,
                                      outcome=state.status, turn=state.turn, gold=state.gold,
                                      army_size=len(state.hero.army), relics=state.inventory,
@@ -38,8 +39,9 @@ def audit(seed_count: int) -> dict:
                     victories=sum(row['outcome'] == 'victory' for row in group),
                     **{column: round(mean(row[column] for row in group), 2) for column in columns})
                for (theme, route), group in groups.items()]
-    sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__), ROOT / 'tools/eador_campaign.py']
-    return dict(seed_count=seed_count, campaigns=len(rows),
+    sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__),
+               ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py']
+    return dict(seed_count=seed_count, campaigns=len(rows), cpu_percent=budget.percent if budget else None,
                 source_sha256={str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
                                for path in sources},
                 policy='Explore itinerary sites; buy Barracks/Swordsman, then Temple (Wizard tower first); '
@@ -55,11 +57,17 @@ def audit(seed_count: int) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seeds', type=int, default=10)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if args.seeds < 1:
         parser.error('--seeds must be positive')
-    report = audit(args.seeds)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    report = audit(args.seeds, budget=budget)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(dict(campaigns=report['campaigns'], summary=report['summary']), indent=2))

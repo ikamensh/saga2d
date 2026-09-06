@@ -24,6 +24,7 @@ from eador.model import HERO_CLASSES, State
 from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
 from tools.audit_eador_economy import PLANS, Trial
 from tools.stress_eador_control import PLANS as SPECIALIST_PLANS, ControlTrial
+from tools.cpu_budget import CpuBudget
 
 ROUTES = {'direct': None, 'north': NORTH_ROAD, 'south': SOUTH_ROAD}
 
@@ -82,6 +83,8 @@ class DifficultyTrial(Trial):
         # Recheck the announced live position after every turn instead of walking
         # to a stale target. Do not pursue an expedition that is no longer near home.
         for _ in range(24):
+            if self.budget:
+                self.budget.checkpoint()
             if (state.status != 'playing' or state.turn >= 60 or self.stop_reason or
                     not state.rival.army or state.grid.distance(state.rival.pos, (-2, 0)) > 2):
                 return
@@ -132,9 +135,13 @@ def summarize(rows):
     return results
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seeds', type=int, default=100)
+    parser.add_argument('--heroes', nargs='+', choices=HERO_CLASSES, default=list(HERO_CLASSES))
+    parser.add_argument('--themes', nargs='+', choices=THEMES, default=list(THEMES))
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='Cooperative allowance for one CPU core; 100 disables sleeping.')
     parser.add_argument('--routes', nargs='+', choices=ROUTES, default=list(ROUTES))
     parser.add_argument('--modes', nargs='+', choices=DIFFICULTIES, default=list(DIFFICULTIES))
     parser.add_argument('--plans', nargs='+', choices=tuple(PLANS) + tuple(SPECIALIST_PLANS), default=list(PLANS))
@@ -143,31 +150,33 @@ def main():
     parser.add_argument('--adaptive-interception', action='store_true', help='Recheck the expedition position after every turn of a defensive detour.')
     parser.add_argument('--worst-from', type=Path, help='Replay only unfinished/defeated matching cases in a retained .rows.json.gz report.')
     parser.add_argument('--report', type=Path, required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if args.seeds < 1:
         parser.error('--seeds must be positive')
     if args.rules_id and args.modes != [args.rules_id.rsplit('-', 1)[0]]:
         parser.error('--rules-id requires the single matching --modes entry')
     if args.mana_reserve is not None and args.mana_reserve < 0:
         parser.error('--mana-reserve must be nonnegative')
+    budget = CpuBudget(args.cpu_percent)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__).resolve(),
                       ROOT / 'tools/audit_eador_economy.py', ROOT / 'tools/stress_eador_control.py',
-                      ROOT / 'tools/eador_campaign.py'])
+                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     started, rows = time.perf_counter(), []
     cases = [(seed, hero, theme, plan, mode, route) for seed in range(args.seeds)
-             for theme in THEMES for hero in HERO_CLASSES for route in args.routes
+             for theme in args.themes for hero in args.heroes for route in args.routes
              for plan in args.plans for mode in args.modes]
     if args.worst_from:
         original = json.loads(gzip.decompress(args.worst_from.read_bytes()))
         cases = [(r['seed'], r['hero'], r['theme'], r['plan'], r['mode'], r['route']) for r in original
                  if r['status'] != 'victory' and r['mode'] in args.modes and
-                 r['plan'] in args.plans and r['route'] in args.routes]
+                 r['plan'] in args.plans and r['route'] in args.routes and
+                 r['hero'] in args.heroes and r['theme'] in args.themes]
         if not cases:
             parser.error('--worst-from has no matching unfinished or defeated cases')
     for index, case in enumerate(cases):
         options = dict(rules_id=args.rules_id, mana_reserve=args.mana_reserve,
-                       adaptive_interception=args.adaptive_interception)
+                       adaptive_interception=args.adaptive_interception, budget=budget)
         row = DifficultyTrial(*case, **options).run()
         if case[0] == 0:
             assert row == DifficultyTrial(*case, **options).run()
@@ -178,6 +187,7 @@ def main():
         'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'dirty': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
         'seeds': args.seeds, 'routes': args.routes, 'modes': args.modes, 'plans': args.plans,
+        'heroes': args.heroes, 'themes': args.themes, 'cpu_percent': args.cpu_percent,
         'rules_id_override': args.rules_id, 'mana_reserve': args.mana_reserve,
         'adaptive_interception': args.adaptive_interception,
         'worst_from': str(args.worst_from) if args.worst_from else None,

@@ -40,13 +40,13 @@ def prepared_crossing(state=None):
     return state
 
 
-def prepare_adventure(hero_class='Commander', theme='frontier', *, support='healer', state=None):
+def prepare_adventure(hero_class='Commander', theme='frontier', *, support='healer', state=None, budget=None):
     """Pay for a Warden and support through western conquest, then recover at the site."""
     state = State.new(7, hero_class, theme=theme) if state is None else state
     state.build('barracks'); state.recruit('warden')
-    state.explore(); finish_battle(state)
+    state.explore(); finish_battle(state, budget=budget)
     for pos in ((-1, -1), (-1, 0)):
-        march_to(state, pos); rest(state)
+        march_to(state, pos, budget=budget); rest(state, budget=budget)
     building = 'temple' if support == 'healer' else 'archery'
     for _ in range(48):
         assert state.status == 'playing'
@@ -55,15 +55,15 @@ def prepare_adventure(hero_class='Commander', theme='frontier', *, support='heal
         if building in state.buildings and state.gold >= state.recruit_cost(support):
             state.recruit(support)
             break
-        rest(state)
+        rest(state, budget=budget)
     else:
         raise AssertionError('Could not fund support')
     destination = (0, 2) if theme == 'frontier' else (-1, -1)
     for _ in range(48):
-        march_to(state, destination)
+        march_to(state, destination, budget=budget)
         if state.actions_left and all(t.hp == t.max_hp for t in state.hero.army) and state.hero.hp == state.hero.max_hp:
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the adventure recovered')
 
 
