@@ -138,3 +138,43 @@ def test_boots_earned_at_camp_make_the_later_explorer_reward_an_explicit_saved_d
         with pytest.raises(RuleError):
             branch.explore()
         assert branch.to_json() == before
+
+
+def test_missed_deadline_keeps_real_losses_and_allows_a_paid_replacement_expedition():
+    from tools.eador_campaign import finish_battle, march_to, rest
+
+    state = prepare_explorer()
+    state.explore(approach='north')
+    gold, xp = state.gold, state.hero.xp
+    while state.battle.outcome is None:
+        state.battle.end_turn()
+        state = State.from_json(state.to_json())
+    assert state.battle.outcome == 'enemy' and state.battle.outcome_reason == 'deadline'
+    assert state.battle.round == 6
+    fallen = {u.id for u in state.battle.units if u.team == 'player' and not u.alive}
+    patrol = [(u.kind, u.hp) for u in state.battle.units if u.team == 'enemy' and u.alive]
+    assert fallen and len(patrol) < 4
+    state.resolve_battle()
+    assert (state.gold, state.hero.xp) == (gold - 20, xp)
+    assert fallen.isdisjoint(t.id for t in state.hero.army)
+    assert not state.provinces[(0, -1)].explored
+    state = State.from_json(state.to_json())
+    before_recruits = state.gold
+    while len(state.hero.army) < state.hero.max_army:
+        state.recruit('swordsman')
+    assert state.gold < before_recruits
+    for _ in range(16):
+        if state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
+            break
+        rest(state)
+    march_to(state, (0, -1))
+    if not state.actions_left:
+        rest(state); march_to(state, (0, -1))
+    state.explore(approach='south')
+    assert [(u.kind, u.hp) for u in state.battle.units if u.team == 'enemy'] == patrol
+    state = State.from_json(state.to_json())
+    gold, crystals, reward = state.gold, state.crystals, state.battle_adventure
+    finish_battle(state)
+    assert state.provinces[(0, -1)].explored
+    assert (state.gold, state.crystals) == (gold + reward.gold, crystals + reward.crystals)
+    assert fallen.isdisjoint(t.id for t in state.hero.army)
