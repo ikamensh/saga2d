@@ -180,13 +180,18 @@ class State:
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier',
             difficulty: str = 'standard') -> State:
+        if not isinstance(difficulty, str) or difficulty not in DIFFICULTIES:
+            raise RuleError('Choose Accessible, Standard or Challenge.')
+        return cls._new(seed, hero_class, theme, DIFFICULTIES[difficulty].id)
+
+    @classmethod
+    def _new(cls, seed: int, hero_class: str, theme: str, rules_id: str) -> State:
+        """Create from an exact saved policy, independent of new-game catalog aliases."""
         if type(seed) is not int:
             raise RuleError('The shard seed must be an integer.')
         if not isinstance(hero_class, str) or hero_class not in HERO_CLASSES:
             raise RuleError('Choose Commander, Warrior, Scout or Wizard.')
-        if not isinstance(difficulty, str) or difficulty not in DIFFICULTIES:
-            raise RuleError('Choose an available difficulty.')
-        rules = DIFFICULTIES[difficulty]
+        rules = RULESETS[rules_id]
         from eador.worldgen import generate
         provinces = generate(seed, theme)
         home = provinces[(-2, 0)]
@@ -209,6 +214,16 @@ class State:
         state = cls.new(seed, hero_class, difficulty=difficulty)
         state.campaign = Campaign(seed)
         state.campaign.checkpoint(state)
+        return state
+
+    def replay(self) -> State:
+        """Return a fresh run with its original seed and exact saved realm policy."""
+        seed = self.campaign.seed if self.campaign else self.seed
+        state = type(self)._new(seed, self.hero.hero_class,
+                               'frontier' if self.campaign else self.theme, self.rules_id)
+        if self.campaign:
+            state.campaign = Campaign(seed)
+            state.campaign.checkpoint(state)
         return state
 
     def advance(self, offer_id: str, *, troop_ids=(), relic_ids=()) -> None:
@@ -305,8 +320,9 @@ class State:
     def income(self) -> int:
         blocked = self.encircled
         income = sum(p.income for p in self.provinces.values() if p.owner == 'player')
-        return income - (self.provinces[(-2, 0)].income if blocked else 0) + (
+        production = income - (self.provinces[(-2, 0)].income if blocked else 0) + (
             8 if 'market' in self.buildings and not blocked else 0)
+        return production * self.rules.gold_percent // 100
 
     @property
     def crystal_income(self) -> int:
