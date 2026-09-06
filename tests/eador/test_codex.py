@@ -213,7 +213,7 @@ def test_current_relic_sources_and_equipped_pin_capability_are_visible_with_mous
 def test_paid_watch_army_can_read_its_role_orders_and_costs_without_spending_them(tmp_path):
     """A real support army sees mobility, extraction costs and its shared healing budget."""
     from eador.codex import CodexScene
-    from tests.eador.test_roles import prepare_support_watch
+    from tools.eador_roles_campaign import prepare_support_watch
 
     state = prepare_support_watch()
     game = create_game('Support role reference', backend='mock', save_dir=tmp_path)
