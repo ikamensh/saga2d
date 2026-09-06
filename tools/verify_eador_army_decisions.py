@@ -118,20 +118,8 @@ def verify(input_report, output, *, backend='pyglet'):
                 player.press('escape')
                 for entry in source[branch]['commands']:
                     assert player.state.to_json() == entry['before']
-                    command, args, kwargs = entry['command'], entry['args'], entry['kwargs']
-                    if command == 'battle.auto_turn':
-                        player.press('a')
-                    elif command == 'battle.attack':
-                        aim(player, *args); player.press('return')
-                    elif command in ('battle.move', 'battle.guard'):
-                        player.click(*game.scene.grid.center(player.state.battle.unit(args[0]).pos))
-                        if command == 'battle.move':
-                            player.click(*game.scene.grid.center(tuple(args[1])))
-                        else:
-                            player.press('g')
-                    else:
-                        getattr(player.state, command)(*args, **kwargs)
-                    assert player.state.to_json() == entry['after'], command
+                    player.order(entry['command'], *entry['args'], **entry['kwargs'])
+                    assert player.state.to_json() == entry['after'], entry['command']
                     player.reload(entry['after'])
                 assert player.state.to_json() == source[branch]['replenished']
                 player.capture('paid-aftermath', settle=False)

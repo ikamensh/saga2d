@@ -7,7 +7,15 @@ import time
 
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HeroScene, ResultScene, ShardScene
 from eador.encounter_scene import EncounterScene
+from eador.persistence import CampaignSaves
 from saga2d import Button
+
+PLAYER_COMMANDS = frozenset((
+    'travel', 'explore', 'end_turn', 'build', 'recruit', 'replace_troop', 'choose',
+    'equip', 'infuse', 'resolve_battle', 'retreat', 'advance',
+    *('battle.' + action for action in ('auto_turn', 'end_turn', 'move', 'attack', 'guard',
+                                        'cast', 'pin', 'swap', 'repulse', 'rally', 'smoke', 'evacuate')),
+))
 
 
 class PlayerInput:
@@ -86,11 +94,48 @@ class PlayerInput:
         self.click(x + width / 2, y + height / 2)
 
     def reload(self, expected):
+        before = self.root.state
         self.press('f5')
+        saved = CampaignSaves(self.game.save_manager).load()
+        assert saved is not None and saved.to_json() == expected, 'UI quicksave did not persist the expected campaign'
         self.press('f9')
+        assert self.root.state is not before, 'UI reload did not replace the live campaign'
         assert self.root.state.to_json() == expected, 'UI quicksave/load changed the campaign'
         self.reloads += 1
         return self.state
+
+    def order(self, command, *args, **kwargs):
+        """Apply one recorded public command through the same controls a player uses."""
+        assert command in PLAYER_COMMANDS, f'No input adapter for {command!r}'
+        if not command.startswith('battle.'):
+            return getattr(self.state, command)(*args, **kwargs)
+        assert isinstance(self.game.scene, BattleScene)
+        action = command.removeprefix('battle.')
+        if action in ('auto_turn', 'end_turn'):
+            self.press('a' if action == 'auto_turn' else 'e')
+            return
+        if action == 'cast':
+            actor = kwargs.get('caster_id') or 0
+        else:
+            actor = 0 if action == 'evacuate' else args[0]
+        self.click(*self.game.scene.grid.center(self.state.battle.unit(actor).pos))
+        assert self.game.scene.selected == actor
+        if action in ('guard', 'evacuate'):
+            self.press('g' if action == 'guard' else 'v')
+            return
+        destination = tuple(args[1]) if action in ('move', 'smoke') else self.state.battle.unit(args[1]).pos
+        if action in ('move', 'attack'):
+            self.click(*self.game.scene.grid.center(destination))
+            return
+        shortcut = {'bolt': '1', 'heal': '2'}[args[0]] if action == 'cast' else {
+            'pin': 'p', 'swap': 's', 'repulse': 'r', 'rally': 'q', 'smoke': 'd'}[action]
+        self.press(shortcut)
+        for _ in self.state.battle.terrain:
+            if self.game.scene.cursor == destination:
+                self.press('return')
+                return
+            self.press('f')
+        raise AssertionError(f'The requested target is not selectable for {command}')
 
     def choose_retinue(self, selection):
         from eador.campaign_scene import CampaignScene
