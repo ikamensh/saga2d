@@ -91,6 +91,27 @@ class CampaignSaves:
                                          error=str(error), backup_available=backup, backup_error=backup_error))
         return entries
 
+    def checkpoint(self, state: State) -> int:
+        """Return the slot preserving this exact state before a campaign transition.
+
+        Prefer a new rolling autosave. If that fails, an already saved, current
+        manual slot may satisfy the checkpoint instead. Only a validated full
+        state match counts; stale, unrelated or backup snapshots never do.
+        Failed reads stay untouched and cannot hide the original autosave error.
+        """
+        try:
+            return self.autosave(state)
+        except SaveError:
+            expected = state.to_json()
+            for slot in MANUAL_SLOTS:
+                try:
+                    saved = self.load(slot)
+                except SaveError:
+                    continue
+                if saved is not None and saved.to_json() == expected:
+                    return slot
+            raise
+
     def autosave(self, state: State) -> int:
         """Rotate only autosave slots; manual or damaged files stay untouched."""
         entries = [entry for entry in self.entries(autosaves_only=True) if not entry.error]
