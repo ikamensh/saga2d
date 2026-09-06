@@ -330,8 +330,30 @@ logical resizing and text scaling are not established by that evidence.
   This is route robustness and evidence of an open economy gap, not difficulty
   balance or completion of G07. No opportunistic balance changes were made.
 
-G01–G19 remain incomplete. Support-role rules, distinct artwork and current/
-older-save Codex explanations are integrated, while their full control and
-feedback increment is being verified separately. Extraction adventures and
-further tactical roles are underway. A new frozen artifact, candidate-specific
-stress, Windows runtime, human playtests and listening review remain required.
+## Control retinue and Ruins extraction — 2026-09-06
+
+- The integrated roster has ten recruits and eight distinct combat abilities.
+  `c8f9fa4` provides saved finite Smoke/Repulse, Militia Rally, Skyrider flight
+  and terrain sight. UI controls show exact Rally reach, Repulse landings,
+  cloud duration/charges and crystal recruitment costs. The paid combined
+  Watch route (`7d42eba`) passes through native input with 158 activations and
+  eight exact reloads; all seven allies survive a hold victory. Separate
+  native Smoke, Rally and Repulse journeys pass. See
+  [control UI evidence](eador-control-ui.md).
+- Troop silhouettes (`3fd1212`) distinguish the canister-bearing Sapper,
+  tablet-bearing Adept and mounted Skyrider. Native review caught wings and
+  spears obscuring adjacent health labels; existing screen layers now place
+  statuses/HP above pieces and feedback above those labels.
+- `69174ca` completes the [Sealed Vault tranche](eador-vault.md): the same
+  purchased army escapes the free route in round four or spends two crystals
+  for round two, with real differences in mana and wounds. Both native routes,
+  finite retries, exact old-save continuation and 300 randomized campaigns
+  pass. This brings authored battlefield families to five, not twelve.
+- Combined source passes **843 tests**. Ordinary Tribes and linked Shardbound
+  fuzz runs also pass after the control changes. Source/UI evidence does not
+  update the historical frozen artifact or satisfy candidate-specific stress.
+
+G01–G19 remain incomplete. Twelve relics, more meaningful authored patterns,
+whole-campaign build/difficulty comparisons and ability-aware automatic play
+are continuing. A new frozen artifact, candidate-specific stress, Windows
+runtime, text scaling, human playtests and listening review remain required.
