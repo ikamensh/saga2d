@@ -3,6 +3,7 @@ import pytest
 
 from eador.battle import Battle
 from eador.model import Hero, RuleError, Troop, UNITS
+from tools.eador_roles_campaign import prepare_support_watch
 
 
 def test_acolyte_spends_shared_mana_to_heal_without_spending_the_heros_order():
@@ -190,32 +191,6 @@ def test_new_recruits_require_their_building_and_preserve_paid_rosters_on_reload
     assert restored.to_json() == state.to_json()
     troop = next(u for u in restored.battle.units if u.kind == kind)
     assert troop.skirmisher if kind == 'ranger' else troop.can_swap
-
-
-def prepare_support_watch():
-    """A paid opening buys all three roles and reaches the existing authored Watch."""
-    from eador.model import BUILDINGS, State
-    from tools.eador_campaign import finish_battle, march_to, rest
-    state = State.new(7)
-    state.build('barracks'); state.recruit('warden')
-    state.explore(); finish_battle(state)
-    for destination in ((-1, -1), (0, -2)):
-        march_to(state, destination); rest(state)
-    for building, kind in (('temple', 'healer'), ('archery', 'ranger')):
-        while state.gold < BUILDINGS[building].cost:
-            rest(state)
-        state.build(building)
-        while state.gold < state.recruit_cost(kind):
-            rest(state)
-        state.recruit(kind)
-    while max([state.hero.max_hp - state.hero.hp] + [t.max_hp - t.hp for t in state.hero.army]):
-        rest(state)
-    march_to(state, (0, -2))
-    if not state.actions_left:
-        rest(state, defend=False)
-    state.explore()
-    assert state.battle_encounter == 'border_watch'
-    return state
 
 
 def test_a_paid_support_army_rotates_after_shooting_and_extracts_its_seal_holder():
