@@ -364,7 +364,7 @@ runtime, text scaling, human playtests and listening review remain required.
   validation; its source-specific evidence and attrition debt are in
   [eador-control-model.md](eador-control-model.md).
 - Pack Hunt's initial model tracer now uses an explicit game-owned encounter
-  objective. Its briefing and Codex correctly describe an untimed rout, show
+  objective. Its briefing and Codex describe the rout objective, show
   each deployment and fee, and preserve cancellation and saved entry decisions.
   Tactical rout battles now state their objective above the board. All site
   briefings show their remaining finite defender HP.
@@ -376,3 +376,47 @@ runtime, text scaling, human playtests and listening review remain required.
   (2,227 inputs). Both Pack Hunt entry choices were captured and inspected
   natively: 22 inputs, two exact quicksave/reloads, free cancellation, correct
   rout briefing/board/Codex. Final reward/guardian copy passed 11 focused tests.
+
+## Twelve relics, completed Pack Hunt and reusable text flow — 2026-09-06
+
+- `3923255` completes Pack Hunt's sixth authored family with three paid-army
+  manual plans and finite failed-attempt/retry evidence. The free Commander
+  plan takes three rounds; its 20-gold northern approach takes two and saves
+  four HP. A cheaper Warrior/Pikeman formation also wins, with greater wounds.
+  The rout has no separate mission deadline, but the global 80-round exhaustion
+  still applies; current briefing/board/Codex disclose this. See
+  [Pack Hunt evidence](eador-pack-hunt.md). Twelve authored families remain
+  required; ordinary source sites such as Muster Yard do not count as authored
+  battlefield families merely because they have a new reward.
+- `9d52700` integrates twelve discoverable relics, including the hero's
+  Smoke, Repulse, Swap and Rally alternatives. New reward sources preserve old
+  equipment availability across 100 seeds per theme. Saved existing sites and
+  battle capabilities retain their prior identities. All four rewards were
+  earned, reloaded, kept and equipped through native input; original icons and
+  long descriptions were inspected. [Relic presentation](eador-relic-art.md)
+  records the game-owned art and truthful capability/charge guidance.
+- `d1c9fea` adds a native earned Censer journey: fund the army, escape with the
+  reward, equip it, and hold a later Watch with every ally alive. The journey
+  uses 251 input activations and 12 exact reloads; forecast/result screenshots
+  were inspected. Paired model routes measure only one HP saved in the first
+  enemy phase, and a poor screen blocks friendly healing. This is a modest
+  tactical option, not proof of equipment balance. Earned-use journeys for the
+  remaining three relics are still being integrated.
+- Saga2D now provides `Label(text, width=300, wrap=True)`. Measured wrapping,
+  reactive font/text changes and the next control's hit bounds reflow together,
+  including beneath paused overlays. This shares the existing paragraph
+  algorithm and preserves its native pixels; no game rules entered the
+  framework. The [independent example and retained evidence](framework-wrapped-label.md)
+  cover native input, text bounds, fonts and resizing. This primitive alone does
+  not provide Shardbound text scaling.
+- Combined main passes **896 tests**, with source-specific Tribes and Shardbound
+  fuzz evidence retained for the integrated control, content and layout work.
+- A preserved Mac development artifact at source `f63aa6f2806c` was offered for
+  an opening playtest. It predates final Pack Hunt tuning and the four new
+  relics. [The playtest log](eador-playtests.md) records the exact artifact and
+  pending feedback; no human playtest is counted yet.
+
+G01–G19 remain incomplete. The next increments address earned relic use, the
+seventh authored encounter and larger reference text. Difficulty selection,
+whole-campaign balance/pacing, complete text scaling, candidate-specific stress,
+Windows runtime, human playtests and listening review remain open.

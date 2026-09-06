@@ -166,6 +166,26 @@ above. Updating the recipe or passing a source-mode smoke does not update that
 artifact or its evidence. Build and inspect a new frozen candidate only after
 the intended game and audio integration commits are assembled.
 
+## First-playtest checkpoint — 2026-09-06
+
+The preserved local archive at
+`dist/shardbound-checkpoints/f63aa6f2806c/Shardbound-macos-arm64.zip`
+contains source `f63aa6f2806cfa47395b27cd89d531dce67ec7bf`. It is
+**32,670,210 bytes**, SHA-256
+`f7a94054783ae42d5cbed66232512cb663c233eba9b1201e3509c8490def6b96`.
+The [retained manifest](evidence/shardbound-playtest-f63aa6f-build.json)
+records the exact inputs and extracted frozen application checks: native
+input, campaign/battle/Guard saves, settings Apply/Cancel/restart, Codex/rival
+rendering, and all fourteen installed audio assets with live mix/cleanup.
+
+This archive includes the control/flight roster, audio/display settings and
+initial Pack Hunt. It predates the final Pack Hunt deployment tuning, the
+four new active relics, and wrapped Labels. It remains a development build
+(`release_ready: false`), preserved separately from subsequent build output.
+The dirty flag reflects unrelated `.gitignore` work; snapshotted source hashes
+are recorded. Windows, a clean account and a full packaged campaign remain
+unverified. See [the playtest log](eador-playtests.md) for feedback status.
+
 ## Windows x64 plan — untested
 
 Build on a Windows x64 host using x64 CPython 3.13.2. Run the same uv build
