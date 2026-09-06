@@ -1,4 +1,6 @@
 """A crystal-funded exit changes a real Ruins adventure without replacing its guards."""
+import pytest
+
 from eador.model import State
 from tools.eador_vault_campaign import prepare_vault as prepared_vault, vault_route
 
@@ -41,7 +43,6 @@ def test_crystals_buy_a_shorter_route_while_the_free_route_breaks_a_rescuing_war
 
 def test_a_failed_paid_attempt_keeps_its_crystal_cost_and_finite_wounded_guard_roster():
     """Changing the next approach cannot resurrect the fallen rear Archer or refund its key."""
-    import pytest
     from eador.model import RuleError
     state = prepared_vault()
     crystals = state.crystals
@@ -74,6 +75,18 @@ def test_a_failed_paid_attempt_keeps_its_crystal_cost_and_finite_wounded_guard_r
     with pytest.raises(RuleError, match='crystals'):
         state.explore(approach='unseal')
     assert state.to_json() == before
+
+
+@pytest.mark.parametrize('hero', ['Warrior', 'Scout', 'Wizard'])
+def test_the_other_heroes_can_buy_a_support_army_and_manually_use_the_second_exit(hero):
+    from tests.eador.test_extraction_journeys import Journey, assert_one_reward
+
+    state = prepared_vault(hero)
+    crystals = state.crystals
+    play = vault_route(state, 'unseal', orders_type=Journey)
+    assert play.state.crystals == crystals - 2 and play.battle.round == 2
+    assert all(unit.alive for unit in play.battle.units if unit.team == 'player')
+    assert_one_reward(play)
 
 
 def test_an_existing_v10_ruins_battle_and_site_array_keep_their_actual_continuation():
