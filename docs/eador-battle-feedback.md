@@ -73,3 +73,13 @@ active-battle fixtures also continue through the same complete outcomes with or
 without observation. Terminal hold, queued input, save/reload, settings/history
 pause, real file errors and ordinary controls after Finish have public scene
 regressions. Final same-source validation and native evidence are recorded below.
+
+Frozen source **a27c473** passed **1,189 full tests**, including the fresh-process
+packaged campaign checks; **300 model / 20 scene stress runs**, with 47,716
+continuous trace events and 10,004 random inputs; and **60 Tribes AI / 20 monkey
+runs**. Three native paid journeys used 393 inputs and seven exact reloads,
+watching 637 frames through normal, reduced-motion and terminal-hold feedback.
+The [retained evidence](evidence/battle-feedback-a27c473/README.md) includes the
+independent review, complete source hashes, full-test log, actual input/timing
+records, selected unaltered PNGs and a short native frame sequence. All source
+stayed unchanged during final verification.

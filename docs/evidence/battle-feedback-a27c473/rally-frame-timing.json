@@ -1,0 +1,797 @@
+[
+  {
+    "tick": 0,
+    "seconds": 0.0,
+    "file": "frame-000.png"
+  },
+  {
+    "tick": 3,
+    "seconds": 0.05,
+    "file": "frame-003.png"
+  },
+  {
+    "tick": 6,
+    "seconds": 0.1,
+    "file": "frame-006.png"
+  },
+  {
+    "tick": 9,
+    "seconds": 0.15,
+    "file": "frame-009.png"
+  },
+  {
+    "tick": 12,
+    "seconds": 0.2,
+    "file": "frame-012.png"
+  },
+  {
+    "tick": 15,
+    "seconds": 0.25,
+    "file": "frame-015.png"
+  },
+  {
+    "tick": 18,
+    "seconds": 0.3,
+    "file": "frame-018.png"
+  },
+  {
+    "tick": 21,
+    "seconds": 0.35,
+    "file": "frame-021.png"
+  },
+  {
+    "tick": 24,
+    "seconds": 0.4,
+    "file": "frame-024.png"
+  },
+  {
+    "tick": 27,
+    "seconds": 0.45,
+    "file": "frame-027.png"
+  },
+  {
+    "tick": 30,
+    "seconds": 0.5,
+    "file": "frame-030.png"
+  },
+  {
+    "tick": 33,
+    "seconds": 0.55,
+    "file": "frame-033.png"
+  },
+  {
+    "tick": 36,
+    "seconds": 0.6,
+    "file": "frame-036.png"
+  },
+  {
+    "tick": 39,
+    "seconds": 0.65,
+    "file": "frame-039.png"
+  },
+  {
+    "tick": 42,
+    "seconds": 0.7,
+    "file": "frame-042.png"
+  },
+  {
+    "tick": 45,
+    "seconds": 0.75,
+    "file": "frame-045.png"
+  },
+  {
+    "tick": 48,
+    "seconds": 0.8,
+    "file": "frame-048.png"
+  },
+  {
+    "tick": 51,
+    "seconds": 0.85,
+    "file": "frame-051.png"
+  },
+  {
+    "tick": 54,
+    "seconds": 0.9,
+    "file": "frame-054.png"
+  },
+  {
+    "tick": 57,
+    "seconds": 0.95,
+    "file": "frame-057.png"
+  },
+  {
+    "tick": 60,
+    "seconds": 1.0,
+    "file": "frame-060.png"
+  },
+  {
+    "tick": 63,
+    "seconds": 1.05,
+    "file": "frame-063.png"
+  },
+  {
+    "tick": 66,
+    "seconds": 1.1,
+    "file": "frame-066.png"
+  },
+  {
+    "tick": 69,
+    "seconds": 1.15,
+    "file": "frame-069.png"
+  },
+  {
+    "tick": 72,
+    "seconds": 1.2,
+    "file": "frame-072.png"
+  },
+  {
+    "tick": 75,
+    "seconds": 1.25,
+    "file": "frame-075.png"
+  },
+  {
+    "tick": 78,
+    "seconds": 1.3,
+    "file": "frame-078.png"
+  },
+  {
+    "tick": 81,
+    "seconds": 1.35,
+    "file": "frame-081.png"
+  },
+  {
+    "tick": 84,
+    "seconds": 1.4,
+    "file": "frame-084.png"
+  },
+  {
+    "tick": 87,
+    "seconds": 1.45,
+    "file": "frame-087.png"
+  },
+  {
+    "tick": 90,
+    "seconds": 1.5,
+    "file": "frame-090.png"
+  },
+  {
+    "tick": 93,
+    "seconds": 1.55,
+    "file": "frame-093.png"
+  },
+  {
+    "tick": 96,
+    "seconds": 1.6,
+    "file": "frame-096.png"
+  },
+  {
+    "tick": 99,
+    "seconds": 1.65,
+    "file": "frame-099.png"
+  },
+  {
+    "tick": 102,
+    "seconds": 1.7,
+    "file": "frame-102.png"
+  },
+  {
+    "tick": 105,
+    "seconds": 1.75,
+    "file": "frame-105.png"
+  },
+  {
+    "tick": 108,
+    "seconds": 1.8,
+    "file": "frame-108.png"
+  },
+  {
+    "tick": 111,
+    "seconds": 1.85,
+    "file": "frame-111.png"
+  },
+  {
+    "tick": 114,
+    "seconds": 1.9,
+    "file": "frame-114.png"
+  },
+  {
+    "tick": 117,
+    "seconds": 1.95,
+    "file": "frame-117.png"
+  },
+  {
+    "tick": 120,
+    "seconds": 2.0,
+    "file": "frame-120.png"
+  },
+  {
+    "tick": 123,
+    "seconds": 2.05,
+    "file": "frame-123.png"
+  },
+  {
+    "tick": 126,
+    "seconds": 2.1,
+    "file": "frame-126.png"
+  },
+  {
+    "tick": 129,
+    "seconds": 2.15,
+    "file": "frame-129.png"
+  },
+  {
+    "tick": 132,
+    "seconds": 2.2,
+    "file": "frame-132.png"
+  },
+  {
+    "tick": 135,
+    "seconds": 2.25,
+    "file": "frame-135.png"
+  },
+  {
+    "tick": 138,
+    "seconds": 2.3,
+    "file": "frame-138.png"
+  },
+  {
+    "tick": 141,
+    "seconds": 2.35,
+    "file": "frame-141.png"
+  },
+  {
+    "tick": 144,
+    "seconds": 2.4,
+    "file": "frame-144.png"
+  },
+  {
+    "tick": 147,
+    "seconds": 2.45,
+    "file": "frame-147.png"
+  },
+  {
+    "tick": 150,
+    "seconds": 2.5,
+    "file": "frame-150.png"
+  },
+  {
+    "tick": 153,
+    "seconds": 2.55,
+    "file": "frame-153.png"
+  },
+  {
+    "tick": 156,
+    "seconds": 2.6,
+    "file": "frame-156.png"
+  },
+  {
+    "tick": 159,
+    "seconds": 2.65,
+    "file": "frame-159.png"
+  },
+  {
+    "tick": 162,
+    "seconds": 2.7,
+    "file": "frame-162.png"
+  },
+  {
+    "tick": 165,
+    "seconds": 2.75,
+    "file": "frame-165.png"
+  },
+  {
+    "tick": 168,
+    "seconds": 2.8,
+    "file": "frame-168.png"
+  },
+  {
+    "tick": 171,
+    "seconds": 2.85,
+    "file": "frame-171.png"
+  },
+  {
+    "tick": 174,
+    "seconds": 2.9,
+    "file": "frame-174.png"
+  },
+  {
+    "tick": 177,
+    "seconds": 2.95,
+    "file": "frame-177.png"
+  },
+  {
+    "tick": 180,
+    "seconds": 3.0,
+    "file": "frame-180.png"
+  },
+  {
+    "tick": 183,
+    "seconds": 3.05,
+    "file": "frame-183.png"
+  },
+  {
+    "tick": 186,
+    "seconds": 3.1,
+    "file": "frame-186.png"
+  },
+  {
+    "tick": 189,
+    "seconds": 3.15,
+    "file": "frame-189.png"
+  },
+  {
+    "tick": 192,
+    "seconds": 3.2,
+    "file": "frame-192.png"
+  },
+  {
+    "tick": 195,
+    "seconds": 3.25,
+    "file": "frame-195.png"
+  },
+  {
+    "tick": 198,
+    "seconds": 3.3,
+    "file": "frame-198.png"
+  },
+  {
+    "tick": 201,
+    "seconds": 3.35,
+    "file": "frame-201.png"
+  },
+  {
+    "tick": 204,
+    "seconds": 3.4,
+    "file": "frame-204.png"
+  },
+  {
+    "tick": 207,
+    "seconds": 3.45,
+    "file": "frame-207.png"
+  },
+  {
+    "tick": 210,
+    "seconds": 3.5,
+    "file": "frame-210.png"
+  },
+  {
+    "tick": 213,
+    "seconds": 3.55,
+    "file": "frame-213.png"
+  },
+  {
+    "tick": 216,
+    "seconds": 3.6,
+    "file": "frame-216.png"
+  },
+  {
+    "tick": 219,
+    "seconds": 3.65,
+    "file": "frame-219.png"
+  },
+  {
+    "tick": 222,
+    "seconds": 3.7,
+    "file": "frame-222.png"
+  },
+  {
+    "tick": 225,
+    "seconds": 3.75,
+    "file": "frame-225.png"
+  },
+  {
+    "tick": 228,
+    "seconds": 3.8,
+    "file": "frame-228.png"
+  },
+  {
+    "tick": 231,
+    "seconds": 3.85,
+    "file": "frame-231.png"
+  },
+  {
+    "tick": 234,
+    "seconds": 3.9,
+    "file": "frame-234.png"
+  },
+  {
+    "tick": 237,
+    "seconds": 3.95,
+    "file": "frame-237.png"
+  },
+  {
+    "tick": 240,
+    "seconds": 4.0,
+    "file": "frame-240.png"
+  },
+  {
+    "tick": 243,
+    "seconds": 4.05,
+    "file": "frame-243.png"
+  },
+  {
+    "tick": 246,
+    "seconds": 4.1,
+    "file": "frame-246.png"
+  },
+  {
+    "tick": 249,
+    "seconds": 4.15,
+    "file": "frame-249.png"
+  },
+  {
+    "tick": 252,
+    "seconds": 4.2,
+    "file": "frame-252.png"
+  },
+  {
+    "tick": 255,
+    "seconds": 4.25,
+    "file": "frame-255.png"
+  },
+  {
+    "tick": 258,
+    "seconds": 4.3,
+    "file": "frame-258.png"
+  },
+  {
+    "tick": 261,
+    "seconds": 4.35,
+    "file": "frame-261.png"
+  },
+  {
+    "tick": 264,
+    "seconds": 4.4,
+    "file": "frame-264.png"
+  },
+  {
+    "tick": 267,
+    "seconds": 4.45,
+    "file": "frame-267.png"
+  },
+  {
+    "tick": 270,
+    "seconds": 4.5,
+    "file": "frame-270.png"
+  },
+  {
+    "tick": 273,
+    "seconds": 4.55,
+    "file": "frame-273.png"
+  },
+  {
+    "tick": 276,
+    "seconds": 4.6,
+    "file": "frame-276.png"
+  },
+  {
+    "tick": 279,
+    "seconds": 4.65,
+    "file": "frame-279.png"
+  },
+  {
+    "tick": 282,
+    "seconds": 4.7,
+    "file": "frame-282.png"
+  },
+  {
+    "tick": 285,
+    "seconds": 4.75,
+    "file": "frame-285.png"
+  },
+  {
+    "tick": 288,
+    "seconds": 4.8,
+    "file": "frame-288.png"
+  },
+  {
+    "tick": 291,
+    "seconds": 4.85,
+    "file": "frame-291.png"
+  },
+  {
+    "tick": 294,
+    "seconds": 4.9,
+    "file": "frame-294.png"
+  },
+  {
+    "tick": 297,
+    "seconds": 4.95,
+    "file": "frame-297.png"
+  },
+  {
+    "tick": 300,
+    "seconds": 5.0,
+    "file": "frame-300.png"
+  },
+  {
+    "tick": 303,
+    "seconds": 5.05,
+    "file": "frame-303.png"
+  },
+  {
+    "tick": 306,
+    "seconds": 5.1,
+    "file": "frame-306.png"
+  },
+  {
+    "tick": 309,
+    "seconds": 5.15,
+    "file": "frame-309.png"
+  },
+  {
+    "tick": 312,
+    "seconds": 5.2,
+    "file": "frame-312.png"
+  },
+  {
+    "tick": 315,
+    "seconds": 5.25,
+    "file": "frame-315.png"
+  },
+  {
+    "tick": 318,
+    "seconds": 5.3,
+    "file": "frame-318.png"
+  },
+  {
+    "tick": 321,
+    "seconds": 5.35,
+    "file": "frame-321.png"
+  },
+  {
+    "tick": 324,
+    "seconds": 5.4,
+    "file": "frame-324.png"
+  },
+  {
+    "tick": 327,
+    "seconds": 5.45,
+    "file": "frame-327.png"
+  },
+  {
+    "tick": 330,
+    "seconds": 5.5,
+    "file": "frame-330.png"
+  },
+  {
+    "tick": 333,
+    "seconds": 5.55,
+    "file": "frame-333.png"
+  },
+  {
+    "tick": 336,
+    "seconds": 5.6,
+    "file": "frame-336.png"
+  },
+  {
+    "tick": 339,
+    "seconds": 5.65,
+    "file": "frame-339.png"
+  },
+  {
+    "tick": 342,
+    "seconds": 5.7,
+    "file": "frame-342.png"
+  },
+  {
+    "tick": 345,
+    "seconds": 5.75,
+    "file": "frame-345.png"
+  },
+  {
+    "tick": 348,
+    "seconds": 5.8,
+    "file": "frame-348.png"
+  },
+  {
+    "tick": 351,
+    "seconds": 5.85,
+    "file": "frame-351.png"
+  },
+  {
+    "tick": 354,
+    "seconds": 5.9,
+    "file": "frame-354.png"
+  },
+  {
+    "tick": 357,
+    "seconds": 5.95,
+    "file": "frame-357.png"
+  },
+  {
+    "tick": 360,
+    "seconds": 6.0,
+    "file": "frame-360.png"
+  },
+  {
+    "tick": 363,
+    "seconds": 6.05,
+    "file": "frame-363.png"
+  },
+  {
+    "tick": 366,
+    "seconds": 6.1,
+    "file": "frame-366.png"
+  },
+  {
+    "tick": 369,
+    "seconds": 6.15,
+    "file": "frame-369.png"
+  },
+  {
+    "tick": 372,
+    "seconds": 6.2,
+    "file": "frame-372.png"
+  },
+  {
+    "tick": 375,
+    "seconds": 6.25,
+    "file": "frame-375.png"
+  },
+  {
+    "tick": 378,
+    "seconds": 6.3,
+    "file": "frame-378.png"
+  },
+  {
+    "tick": 381,
+    "seconds": 6.35,
+    "file": "frame-381.png"
+  },
+  {
+    "tick": 384,
+    "seconds": 6.4,
+    "file": "frame-384.png"
+  },
+  {
+    "tick": 387,
+    "seconds": 6.45,
+    "file": "frame-387.png"
+  },
+  {
+    "tick": 390,
+    "seconds": 6.5,
+    "file": "frame-390.png"
+  },
+  {
+    "tick": 393,
+    "seconds": 6.55,
+    "file": "frame-393.png"
+  },
+  {
+    "tick": 396,
+    "seconds": 6.6,
+    "file": "frame-396.png"
+  },
+  {
+    "tick": 399,
+    "seconds": 6.65,
+    "file": "frame-399.png"
+  },
+  {
+    "tick": 402,
+    "seconds": 6.7,
+    "file": "frame-402.png"
+  },
+  {
+    "tick": 405,
+    "seconds": 6.75,
+    "file": "frame-405.png"
+  },
+  {
+    "tick": 408,
+    "seconds": 6.8,
+    "file": "frame-408.png"
+  },
+  {
+    "tick": 411,
+    "seconds": 6.85,
+    "file": "frame-411.png"
+  },
+  {
+    "tick": 414,
+    "seconds": 6.9,
+    "file": "frame-414.png"
+  },
+  {
+    "tick": 417,
+    "seconds": 6.95,
+    "file": "frame-417.png"
+  },
+  {
+    "tick": 420,
+    "seconds": 7.0,
+    "file": "frame-420.png"
+  },
+  {
+    "tick": 423,
+    "seconds": 7.05,
+    "file": "frame-423.png"
+  },
+  {
+    "tick": 426,
+    "seconds": 7.1,
+    "file": "frame-426.png"
+  },
+  {
+    "tick": 429,
+    "seconds": 7.15,
+    "file": "frame-429.png"
+  },
+  {
+    "tick": 432,
+    "seconds": 7.2,
+    "file": "frame-432.png"
+  },
+  {
+    "tick": 435,
+    "seconds": 7.25,
+    "file": "frame-435.png"
+  },
+  {
+    "tick": 438,
+    "seconds": 7.3,
+    "file": "frame-438.png"
+  },
+  {
+    "tick": 441,
+    "seconds": 7.35,
+    "file": "frame-441.png"
+  },
+  {
+    "tick": 444,
+    "seconds": 7.4,
+    "file": "frame-444.png"
+  },
+  {
+    "tick": 447,
+    "seconds": 7.45,
+    "file": "frame-447.png"
+  },
+  {
+    "tick": 450,
+    "seconds": 7.5,
+    "file": "frame-450.png"
+  },
+  {
+    "tick": 453,
+    "seconds": 7.55,
+    "file": "frame-453.png"
+  },
+  {
+    "tick": 456,
+    "seconds": 7.6,
+    "file": "frame-456.png"
+  },
+  {
+    "tick": 459,
+    "seconds": 7.65,
+    "file": "frame-459.png"
+  },
+  {
+    "tick": 462,
+    "seconds": 7.7,
+    "file": "frame-462.png"
+  },
+  {
+    "tick": 465,
+    "seconds": 7.75,
+    "file": "frame-465.png"
+  },
+  {
+    "tick": 468,
+    "seconds": 7.8,
+    "file": "frame-468.png"
+  },
+  {
+    "tick": 471,
+    "seconds": 7.85,
+    "file": "frame-471.png"
+  },
+  {
+    "tick": 474,
+    "seconds": 7.9,
+    "file": "frame-474.png"
+  }
+]

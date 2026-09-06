@@ -1,0 +1,143 @@
+{
+  "source_revision": "a27c4739c413b4c0b48c3a928ac739aea7b3f2b6",
+  "description": "33 original native frames sampled every six 60Hz game ticks, encoded as a 10fps GIF; no added graphics, crop or resize.",
+  "frame_size": [
+    2560,
+    1600
+  ],
+  "duration_seconds": 3.3,
+  "samples": [
+    {
+      "file": "frame-000.png",
+      "sha256": "45bd6aab7d596212e5a8dd0bf912e55bb6e135adae5394a99139306a8de1df32"
+    },
+    {
+      "file": "frame-006.png",
+      "sha256": "45bd6aab7d596212e5a8dd0bf912e55bb6e135adae5394a99139306a8de1df32"
+    },
+    {
+      "file": "frame-012.png",
+      "sha256": "45bd6aab7d596212e5a8dd0bf912e55bb6e135adae5394a99139306a8de1df32"
+    },
+    {
+      "file": "frame-018.png",
+      "sha256": "45bd6aab7d596212e5a8dd0bf912e55bb6e135adae5394a99139306a8de1df32"
+    },
+    {
+      "file": "frame-024.png",
+      "sha256": "3977f1f69c60a6253c91a960c5a7b8dbe9b23164a9bd4fa451b0ae02bbbbb690"
+    },
+    {
+      "file": "frame-030.png",
+      "sha256": "3977f1f69c60a6253c91a960c5a7b8dbe9b23164a9bd4fa451b0ae02bbbbb690"
+    },
+    {
+      "file": "frame-036.png",
+      "sha256": "3977f1f69c60a6253c91a960c5a7b8dbe9b23164a9bd4fa451b0ae02bbbbb690"
+    },
+    {
+      "file": "frame-042.png",
+      "sha256": "3977f1f69c60a6253c91a960c5a7b8dbe9b23164a9bd4fa451b0ae02bbbbb690"
+    },
+    {
+      "file": "frame-048.png",
+      "sha256": "f3067c2aa7f301e38386113fe5c12eb7cfa4f29093bab0545951c797fccfff5b"
+    },
+    {
+      "file": "frame-054.png",
+      "sha256": "2a5f2c040967ea2fd369864dad1cdb459a6117abeda469c5bf818130028aee38"
+    },
+    {
+      "file": "frame-060.png",
+      "sha256": "f8ceae0988f6eb29eb5ee7ce722e75c5adbda8a67ac05af6ca970528347982a4"
+    },
+    {
+      "file": "frame-066.png",
+      "sha256": "2f9ed99ab267005e98d6d4b31a70cc4104143b5ed89a1eef741503d516674d7a"
+    },
+    {
+      "file": "frame-072.png",
+      "sha256": "691b76239b1a17b0bfb7ecdbc8c7695bf71309f1b5a4943907b1795ef4c00b66"
+    },
+    {
+      "file": "frame-078.png",
+      "sha256": "8a3f7d0e94cbfde4b0799193bc1d7202ce09afa835627611352f699e0d62191c"
+    },
+    {
+      "file": "frame-084.png",
+      "sha256": "828d8faec25ce7d1ed5071d9c9b5f11d2d2f5664fecdef930977137e7d08b22d"
+    },
+    {
+      "file": "frame-090.png",
+      "sha256": "5a2b4396edbe0ad0df26d2b7c4ba131bcbb2e9c00eec20cd66830250a8809864"
+    },
+    {
+      "file": "frame-096.png",
+      "sha256": "6b19663d9bc0b8ccc840585fac2aede3e152f976e4d0841146bd38f2eb4767a5"
+    },
+    {
+      "file": "frame-102.png",
+      "sha256": "6b19663d9bc0b8ccc840585fac2aede3e152f976e4d0841146bd38f2eb4767a5"
+    },
+    {
+      "file": "frame-108.png",
+      "sha256": "6b19663d9bc0b8ccc840585fac2aede3e152f976e4d0841146bd38f2eb4767a5"
+    },
+    {
+      "file": "frame-114.png",
+      "sha256": "6b19663d9bc0b8ccc840585fac2aede3e152f976e4d0841146bd38f2eb4767a5"
+    },
+    {
+      "file": "frame-120.png",
+      "sha256": "fc93d7615fa3904949b2e85c39f4130f8d8ebf68f853ffb56eb804037757e765"
+    },
+    {
+      "file": "frame-126.png",
+      "sha256": "7d182dd87ec0f52d30ee085b8c69aee87470c147eae67955f18ec148df22ba79"
+    },
+    {
+      "file": "frame-132.png",
+      "sha256": "dee88484ac4f3a6a37bb17a9e224d282870cd015ef7615f914265261438068cc"
+    },
+    {
+      "file": "frame-138.png",
+      "sha256": "24f1769a1697e7b6c0a9f3f7554a19a9969fb78d796e1f6f08a5a98809496f22"
+    },
+    {
+      "file": "frame-144.png",
+      "sha256": "d5a091a3fe875b84336dcabe55497850b411e6b0d3b930389930f6da1adc39fa"
+    },
+    {
+      "file": "frame-150.png",
+      "sha256": "d5a091a3fe875b84336dcabe55497850b411e6b0d3b930389930f6da1adc39fa"
+    },
+    {
+      "file": "frame-156.png",
+      "sha256": "d5a091a3fe875b84336dcabe55497850b411e6b0d3b930389930f6da1adc39fa"
+    },
+    {
+      "file": "frame-162.png",
+      "sha256": "d5a091a3fe875b84336dcabe55497850b411e6b0d3b930389930f6da1adc39fa"
+    },
+    {
+      "file": "frame-168.png",
+      "sha256": "0e13f63014b7ea142f6ea3bbc69fc0a0d440c9796cbc93b7cfe7b23de27395d6"
+    },
+    {
+      "file": "frame-174.png",
+      "sha256": "5fe6f26ac5f4d44f2ce1692b9ad0b8ad01e1abd574c0d414c830702153e1eecc"
+    },
+    {
+      "file": "frame-180.png",
+      "sha256": "e641d010d21fd9858504f639f70be88413558ad3fea938558ecbedcf7f5dce8e"
+    },
+    {
+      "file": "frame-186.png",
+      "sha256": "909d8faf2d8d18d73933aa830cbbf6d4cb0f8b06e6aed5bddae1f0579bcb32a1"
+    },
+    {
+      "file": "frame-192.png",
+      "sha256": "a865bfb8712c348a75517e79c01fdfa1f28c3991c817a82f9f6be44a071de861"
+    }
+  ]
+}
