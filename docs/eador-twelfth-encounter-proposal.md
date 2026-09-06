@@ -1,5 +1,10 @@
 # Twelfth encounter candidate: Runebound Causeway
 
+**Follow-up:** [actual Ruins arrival and production proposal](eador-causeway-placement.md)
+retains independent review's caster-priority bypass, fair healing comparisons
+and the safe duplicate-source audit. That later evidence supersedes this
+initial probe's unreviewed emphasis on the Repulse counter.
+
 **Prototype, not production content or G05 completion.** The question is whether
 an enemy Rune Adept can turn extraction into a choice between anchoring the
 carrier, occupying the push landing, and approaching from a different angle.

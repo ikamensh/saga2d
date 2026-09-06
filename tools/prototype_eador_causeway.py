@@ -145,7 +145,7 @@ def opening(play, *, backstop, exposed=False):
     assert ('repulse' in play.battle.unit(play.enemy('adept')).spent_abilities) == exposed
 
 
-def commander_route(play, *, backstop):
+def commander_route(play, *, backstop, heal=False):
     opening(play, backstop=backstop)
     play.do('move', 0, (0, -1))
     play.do('cast', 'bolt', play.enemy('pikeman' if backstop else 'adept'))
@@ -166,13 +166,42 @@ def commander_route(play, *, backstop):
     play.end()
     play.do('attack', 3, play.enemy('ranger'))
     if not backstop:
-        play.do('attack', 5, play.enemy('ranger'))
+        if heal:
+            play.do('move', 2, (2, -1)); play.do('attack', 2, play.enemy('ranger'))
+        else:
+            play.do('attack', 5, play.enemy('ranger'))
+    if heal:
+        play.do('cast', 'heal', 0, caster_id=5)
     play.do('move', 4, (3, -3)); play.do('move', 0, (2, -2)); play.do('swap', 4, 0)
     assert not play.battle.unit(0).acted and play.battle.outcome is None
     play.do('evacuate')
 
 
-def scout_route(play):
+def focus_route(play, *, heal=False):
+    """Independent review's full-shot bypass; kill the Adept before it can act."""
+    for uid, pos in ((3, (-1, -1)), (4, (-1, 1)), (1, (-2, 2)),
+                     (0, (-1, 0)), (5, (-2, 1)), (2, (-1, -2))):
+        play.do('move', uid, pos)
+    for uid in (3, 0, 5):
+        play.do('attack', uid, play.enemy('adept'))
+    assert not play.battle.unit(play.enemy('adept')).alive
+    play.end()
+    for uid, pos in ((0, (0, -1)), (3, (0, -2)), (2, (0, -3)),
+                     (4, (0, 0)), (5, (0, 1)), (1, (-1, 0))):
+        play.do('move', uid, pos)
+    play.do('attack', 3, play.enemy('ranger')); play.end()
+    play.do('move', 0, (1, -2)); play.do('cast', 'bolt', play.enemy('pikeman'))
+    play.do('attack', 3, play.enemy('pikeman'))
+    play.do('move', 2, (2, -3)); play.do('attack', 2, play.enemy('pikeman'))
+    play.do('move', 5, (1, 0)); play.do('attack', 5, play.enemy('ranger'))
+    play.do('move', 4, (1, -1)); play.end()
+    if heal:
+        play.do('cast', 'heal', 0, caster_id=5)
+    play.do('move', 4, (3, -3)); play.do('move', 0, (2, -2))
+    play.do('swap', 4, 0); play.do('evacuate')
+
+
+def scout_route(play, *, heal=False):
     for uid, pos in ((3, (-1, -1)), (4, (-1, 1)), (1, (-2, 2)),
                      (0, (0, -1)), (2, (-1, -2))):
         play.do('move', uid, pos)
@@ -187,7 +216,15 @@ def scout_route(play):
     play.do('cast', 'bolt', play.enemy('pikeman'))
     play.do('move', 2, (2, -3)); play.do('attack', 2, play.enemy('pikeman'))
     play.do('move', 4, (1, -1)); play.end()
-    play.do('move', 0, (3, -3)); play.do('evacuate')
+    play.do('move', 0, (3, -3))
+    if heal:
+        play.do('cast', 'heal', 0)
+        play.end()
+        if play.battle.outcome is None:
+            play.do('attack', 3, play.enemy('guard'))
+        assert play.battle.outcome_reason == 'rout'
+    else:
+        play.do('evacuate')
 
 
 def settle_once(play):
