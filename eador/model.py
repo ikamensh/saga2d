@@ -46,7 +46,7 @@ class UnitSpec:
 
 
 UNITS = {
-    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127)),
+    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127), ('rally',)),
     'swordsman': UnitSpec('Swordsman', 34, 11, 4, 3, 1, 45, 2, 'barracks', (131, 177, 185)),
     'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112), ('pin',)),
     'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233), ('heal',)),
@@ -675,7 +675,7 @@ class State:
     def to_json(self) -> str:
         data = asdict(self)
         data['provinces'] = [asdict(p) for p in self.provinces.values()]
-        data['schema_version'] = 10
+        data['schema_version'] = 11
         data['choices'] = data.pop('_choices')
         data['buildings'] = sorted(self.buildings)
         data['battle'] = self.battle.to_dict() if self.battle else None
@@ -694,8 +694,8 @@ class State:
         if not isinstance(data, dict):
             raise SaveFormatError('The save must contain a campaign object.')
         version = data.get('schema_version', 1)
-        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
-            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10.')
+        if type(version) is not int or version not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
+            raise SaveFormatError(f'Unsupported save version {version}; this game reads versions 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 and 11.')
         _validate_save(data, version)
         if version >= 8:
             from eador.campaign import validate_campaign
@@ -1090,7 +1090,8 @@ def _validate_save(data: dict, version: int) -> None:
             expected_cargo = data['battle_adventure']['cargo_penalty'] if unit['id'] == 0 and data['battle_adventure'] else 0
             require(unit['cargo_penalty'] == expected_cargo, 'Carried cargo differs from the adventure approach.')
         if version >= 7:
-            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
+            strings(unit['abilities'], 'Battle abilities', ('pin', 'brace', 'heal', 'swap', 'rally') if version >= 11 else ('pin', 'brace', 'heal', 'swap') if version >= 9 else ('pin', 'brace'), unique=True)
+            require('rally' not in unit['abilities'] or unit['kind'] == 'militia', 'Only Militia can Rally.')
             require('swap' not in unit['abilities'] or unit['kind'] == 'warden', 'Only Wardens can swap allies.')
             require('heal' not in unit['abilities'] or unit['kind'] == 'healer', 'Only Acolytes gain troop Heal.')
             require('pin' not in unit['abilities'] or unit['kind'] == 'archer'

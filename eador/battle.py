@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 from saga2d import HexGrid
 
@@ -25,6 +25,12 @@ SPELLS = {
     'bolt': SpellSpec('Arcane Bolt', 4, 'Deal 14 damage to an enemy within 4 hexes.'),
     'heal': SpellSpec('Heal', 4, 'Restore 16 health to a living ally within 4 hexes.'),
 }
+
+
+@dataclass(frozen=True)
+class RallyPreview:
+    move_range: int
+    reachable: frozenset[Pos]
 
 
 @dataclass
@@ -52,6 +58,10 @@ class BattleUnit:
     pinned: bool = False
     pin_cooldown: int = 0
     cargo_penalty: int = 0
+
+    @property
+    def can_rally(self) -> bool:
+        return 'rally' in self.abilities
 
     @property
     def can_pin(self) -> bool:
@@ -205,10 +215,12 @@ class Battle:
         return unit
 
     def reachable(self, unit_id: int) -> set[Pos]:
-        unit = self.unit(unit_id)
+        return self._reachable(self.unit(unit_id))
+
+    def _reachable(self, unit: BattleUnit) -> set[Pos]:
         if not unit.alive or unit.moved or (unit.acted and not unit.skirmisher) or self.outcome:
             return set()
-        occupied = {other.pos for other in self.units if other.alive and other.id != unit_id}
+        occupied = {other.pos for other in self.units if other.alive and other.id != unit.id}
         cells = self.grid.reachable(unit.pos, unit.effective_move_range, blocked=occupied,
                                     cost=lambda pos: 2 if self.terrain[pos] in ('forest', 'marsh') and not unit.terrain_walk else 1)
         return set(cells) - {unit.pos}
@@ -259,6 +271,30 @@ class Battle:
         unit.stance = 'brace' if unit.can_brace else 'guard'
         unit.moved = unit.acted = True
         self.log.append(f'{unit.name} {"braces" if unit.stance == "brace" else "guards"} until its next turn.')
+
+    def rally_targets(self, unit_id: int) -> list[BattleUnit]:
+        """Living pinned adjacent allies; clearing Pin never refreshes their orders."""
+        unit = self.unit(unit_id)
+        if not unit.alive or not unit.can_rally or unit.acted or self.outcome:
+            return []
+        return [other for other in self.units if other.alive and other.team == unit.team
+                and other.pinned and self.grid.distance(unit.pos, other.pos) == 1]
+
+    def rally_preview(self, unit_id: int, target_id: int) -> RallyPreview:
+        target = self.unit(target_id)
+        if target not in self.rally_targets(unit_id):
+            raise RuleError('Rally needs a ready militia and an adjacent pinned ally.')
+        released = replace(target, pinned=False)
+        return RallyPreview(released.effective_move_range, frozenset(self._reachable(released)))
+
+    def rally(self, unit_id: int, target_id: int) -> None:
+        self._rally(self._actor(unit_id), self.unit(target_id))
+
+    def _rally(self, unit: BattleUnit, target: BattleUnit) -> None:
+        self.rally_preview(unit.id, target.id)
+        target.pinned = False
+        unit.acted = unit.moved = True
+        self.log.append(f'{unit.name} rallies {target.name}; Pin is cleared.')
 
     def swap_targets(self, unit_id: int) -> list[BattleUnit]:
         """Adjacent living allies a ready Warden may replace, including spent allies."""
