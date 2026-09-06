@@ -3,7 +3,6 @@
 The same driver works against mock input and native pyglet event dispatch. Reads
 come from the current saved game; every changing command goes through its UI.
 """
-from eador.model import BUILDINGS, RECRUITABLE
 from eador.scene import BattleScene, CatalogScene, ChoiceScene, HeroScene, ResultScene, ShardScene
 from eador.encounter_scene import EncounterScene
 from saga2d import Button
@@ -110,7 +109,7 @@ class PlayerState:
     def __getattr__(self, name):
         value = getattr(self.player.root.state, name)
         if callable(value) and name not in ('to_json', 'recruit_cost', 'recruit_crystal_cost', 'adventure_approaches',
-                                            'recovery_preview', 'expedition_funding'):
+                                            'recovery_preview', 'infusion_preview', 'expedition_funding'):
             raise AssertionError(f'No input adapter for campaign command {name!r}')
         return value
 
@@ -153,21 +152,23 @@ class PlayerState:
         self.player.press('e')
 
     def build(self, name):
-        self.catalog('b', list(BUILDINGS).index(name))
+        self.catalog('b', name)
         assert name in self.buildings
 
     def recruit(self, name):
         before = len(self.hero.army)
-        self.catalog('r', list(RECRUITABLE).index(name))
+        self.catalog('r', name)
         assert len(self.hero.army) == before + 1 and self.hero.army[-1].kind == name
 
-    def catalog(self, shortcut, index):
+    def catalog(self, shortcut, name):
         assert isinstance(self.player.game.scene, ShardScene)
         self.player.press(shortcut)
         assert isinstance(self.player.game.scene, CatalogScene)
-        for _ in range(index // 5):
+        scene = self.player.game.scene
+        while name not in scene.visible_items:
+            assert scene.page + 1 < scene.pages, f'Catalog has no item {name}'
             self.player.press('right')
-        self.player.press(str(index % 5 + 1))
+        self.player.press(str(scene.visible_items.index(name) + 1))
         self.player.press('escape')
 
     def choose(self, ident):
@@ -182,12 +183,25 @@ class PlayerState:
         if ident is None:
             self.player.press('u')
         else:
-            index = self.inventory.index(ident)
-            for _ in range(index // 4):
+            for _ in range(self.player.game.scene.pages):
+                if ident in self.player.game.scene.visible_relics:
+                    break
                 self.player.press('right')
-            self.player.press(str(index % 4 + 1))
+            else:
+                raise AssertionError(f'No visible equipment control for {ident!r}')
+            self.player.press(str(self.player.game.scene.visible_relics.index(ident) + 1))
         self.player.press('escape')
         assert self.hero.relic == ident
+
+    def infuse(self):
+        assert isinstance(self.player.game.scene, ShardScene)
+        quote = self.infusion_preview()
+        assert quote.blocked_reason is None, quote.blocked_reason
+        before = self.hero.mana
+        self.player.press('h')
+        self.player.press('i')
+        self.player.press('escape')
+        assert self.hero.mana == before + quote.mana
 
     def resolve_battle(self):
         assert isinstance(self.player.game.scene, ResultScene)
