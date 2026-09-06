@@ -3,13 +3,13 @@ from tools.eador_campaign import march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure
 
 
-def prepare_vault(hero_class='Commander', *, support='ranger', state=None):
-    state = prepare_adventure(hero_class, 'ruins', support=support, state=state)
+def prepare_vault(hero_class='Commander', *, support='ranger', state=None, budget=None):
+    state = prepare_adventure(hero_class, 'ruins', support=support, state=state, budget=budget)
     for _ in range(32):
-        march_to(state, (-1, 1))
+        march_to(state, (-1, 1), budget=budget)
         if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
             return state
-        rest(state)
+        rest(state, budget=budget)
     raise AssertionError('Could not reach the Vault with a recovered purchased army')
 
 
