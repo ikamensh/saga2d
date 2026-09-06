@@ -2,6 +2,7 @@
 import pytest
 
 from eador.model import HERO_CLASSES, State
+from eador.difficulty import DIFFICULTIES
 from tools.eador_linked_campaign import lose_shard
 
 
@@ -84,9 +85,9 @@ def test_damaged_linked_metadata_is_rejected_before_it_can_change_the_live_game(
     assert state.campaign.phase == 'playing' and state.campaign.stage == 1
 
 
-def second_shard(contract='rootward', hero_class='Commander', seed=7):
+def second_shard(contract='rootward', hero_class='Commander', seed=7, *, difficulty='standard'):
     from tools.eador_campaign import play_campaign
-    state = play_campaign(State.new_campaign(seed, hero_class))
+    state = play_campaign(State.new_campaign(seed, hero_class, difficulty=difficulty))
     state.advance(contract, troop_ids=tuple(t.id for t in state.hero.army[:2]), relic_ids=tuple(state.inventory[:2]))
     return state
 
@@ -329,10 +330,11 @@ def test_an_actual_v7_standalone_battle_continues_exactly_after_the_v8_migration
 
 @pytest.mark.parametrize('hero_class', HERO_CLASSES)
 @pytest.mark.parametrize('contract', ['rootward', 'foundries'])
-def test_a_recovery_expedition_can_complete_its_contract_and_the_final_shard(hero_class, contract):
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_a_recovery_expedition_can_complete_its_contract_and_the_final_shard(hero_class, contract, difficulty):
     """The smaller recovery treasury still permits a winning public strategy."""
     from tools.eador_linked_campaign import play_stage, travel_selection
-    state = second_shard(contract, hero_class)
+    state = second_shard(contract, hero_class, difficulty=difficulty)
     lose_shard(state)
     lost_turns, casualties = state.turn, state.campaign.casualties
     state.recover(**travel_selection(state))
@@ -348,10 +350,12 @@ def test_a_recovery_expedition_can_complete_its_contract_and_the_final_shard(her
 @pytest.mark.parametrize('hero_class', HERO_CLASSES)
 @pytest.mark.parametrize('middle', ['rootward', 'foundries'])
 @pytest.mark.parametrize('finale', ['throne', 'gate'])
-def test_each_hero_can_finish_each_linked_contract_path(hero_class, middle, finale):
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_each_hero_can_finish_each_linked_contract_path(hero_class, middle, finale, difficulty):
     """No class or offered path depends on the Commander-only manual seal formation."""
     from tools.eador_linked_campaign import play_linked
-    state = play_linked(17, hero_class, middle, finale)
+    state = play_linked(17, hero_class, middle, finale, difficulty=difficulty,
+                        secure_before_watch=difficulty != 'standard')
     assert state.campaign.phase == 'completed' and state.status == 'victory'
     assert state.hero.level <= 5 and all(t.level <= 3 for t in state.hero.army)
 

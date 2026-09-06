@@ -1,6 +1,8 @@
 """Finite rival forces use the same public battle and campaign rules as the player."""
 from eador.battle import Battle
 from eador.model import State, UNITS
+from eador.difficulty import DIFFICULTIES
+import pytest
 
 
 def resolve(state):
@@ -24,9 +26,10 @@ def test_armies_without_a_hero_use_tactical_rules_and_keep_their_survivors():
     assert Battle.from_dict(battle.to_dict()).to_dict() == battle.to_dict()
 
 
-def test_rival_conquest_uses_a_visible_finite_army_and_persists_its_losses():
+@pytest.mark.parametrize('difficulty', DIFFICULTIES)
+def test_rival_conquest_uses_a_visible_finite_army_and_persists_its_losses(difficulty):
     """The announced expedition moves to its target and pays the real cost of combat."""
-    state = State.new(7)
+    state = State.new(7, difficulty=difficulty)
     target = state.rival.target
     countdown = state.rival.turns_until_action
     starting_ids = {troop.id for troop in state.rival.army}
@@ -38,6 +41,7 @@ def test_rival_conquest_uses_a_visible_finite_army_and_persists_its_losses():
     assert {troop.id for troop in state.rival.army} <= starting_ids
     surviving_health = sum(troop.hp for troop in state.rival.army) + sum(state.provinces[target].guard_hp)
     assert surviving_health < starting_health
+    assert state.rival.intent != 'attack' or state.rival.turns_until_action == 2
     assert State.from_json(state.to_json()).to_json() == state.to_json()
 
 
