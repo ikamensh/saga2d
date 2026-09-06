@@ -1,0 +1,3213 @@
+{
+  "examples_file": "crystal-service-comparison.examples.json",
+  "examples_sha256": "709f1bd5636ad25a784f256530b87136d52c7b39b051372f061ca1a8c70b0f7b",
+  "full_army_purchase_rejection": "Your army is full.",
+  "policy": "NON-PRODUCTION saved-payload services; one action; subsequent real commands and explicit auto combat. Fixed local branches, not a tuned campaign policy or new service API.",
+  "revision": "9cfce52c642e6917468b219d12fb60bb81179b87",
+  "runs": {
+    "pre_assault_mana": [
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 17,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            }
+          ],
+          "capital_owner": "player",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 361,
+          "hero_hp": 34,
+          "hero_max_hp": 48,
+          "mana": 4,
+          "max_mana": 20,
+          "position": [
+            2,
+            0
+          ],
+          "rival_countdown": 0,
+          "rival_intent": "defeated",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": null,
+          "status": "victory",
+          "turn": 11
+        },
+        "after_preparation": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "battle_kind": "conquest",
+        "before": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "final_save_sha256": "e6c527d98c7e0d0f58c5d8f8dda65e49f8abb53951a3b74571305e1abde480c9",
+        "metrics": {
+          "battle_hp_attrition": 201,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 5,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "battle_kind": "conquest",
+            "command": "travel",
+            "target": [
+              2,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "standard-1",
+        "variant": "assault_now"
+      },
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 22,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 2,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 29,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 32,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "player",
+          "central_owner": "player",
+          "crystals": 38,
+          "gold": 394,
+          "hero_hp": 18,
+          "hero_max_hp": 48,
+          "mana": 4,
+          "max_mana": 20,
+          "position": [
+            2,
+            0
+          ],
+          "rival_countdown": 0,
+          "rival_intent": "defeated",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": null,
+          "status": "victory",
+          "turn": 12
+        },
+        "after_preparation": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "battle_kind": "conquest",
+        "before": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 38,
+          "gold": 369,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 10,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 2,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 12
+        },
+        "final_save_sha256": "2042ab6535bca36685c082dfa494070a9556b500b5aac2041a6deb7c70a01bcf",
+        "metrics": {
+          "battle_hp_attrition": 155,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 2,
+          "mana_recovered": 0,
+          "mana_spent": 8,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "command": "end_turn"
+          },
+          {
+            "battle_kind": "conquest",
+            "command": "travel",
+            "target": [
+              2,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "standard-1",
+        "variant": "rest_once"
+      },
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 2,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 27,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 14,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "player",
+          "central_owner": "player",
+          "crystals": 41,
+          "gold": 427,
+          "hero_hp": 48,
+          "hero_max_hp": 48,
+          "mana": 4,
+          "max_mana": 20,
+          "position": [
+            2,
+            0
+          ],
+          "rival_countdown": 0,
+          "rival_intent": "defeated",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": null,
+          "status": "victory",
+          "turn": 13
+        },
+        "after_preparation": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "battle_kind": "conquest",
+        "before": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 41,
+          "gold": 402,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 14,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 13
+        },
+        "final_save_sha256": "53a35851b9bf1acff1c7df84c9698552f8122deaa76f8112b19c5d1d660861d4",
+        "metrics": {
+          "battle_hp_attrition": 107,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 1,
+          "mana_recovered": 0,
+          "mana_spent": 12,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "command": "end_turn"
+          },
+          {
+            "command": "end_turn"
+          },
+          {
+            "battle_kind": "conquest",
+            "command": "travel",
+            "target": [
+              2,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "standard-1",
+        "variant": "rest_reserve"
+      },
+      {
+        "after": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 20,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 23,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 20,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "player",
+          "central_owner": "player",
+          "crystals": 32,
+          "gold": 361,
+          "hero_hp": 42,
+          "hero_max_hp": 48,
+          "mana": 4,
+          "max_mana": 20,
+          "position": [
+            2,
+            0
+          ],
+          "rival_countdown": 0,
+          "rival_intent": "defeated",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": null,
+          "status": "victory",
+          "turn": 11
+        },
+        "after_preparation": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 32,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 14,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "battle_kind": "conquest",
+        "before": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "before_battle": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 32,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 14,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "final_save_sha256": "7f1755716781dc2d2743f13d8b591716f54e2456a887942a9c6e6a99a53bf5bf",
+        "metrics": {
+          "battle_hp_attrition": 147,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 3,
+          "mana_recovered": 0,
+          "mana_spent": 12,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "actions": 1,
+            "command": "PROTOTYPE infusion",
+            "crystals": 3,
+            "gains": {
+              "mana": 8
+            },
+            "kind": "infusion"
+          },
+          {
+            "battle_kind": "conquest",
+            "command": "travel",
+            "target": [
+              2,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "standard-1",
+        "variant": "infusion"
+      },
+      {
+        "after": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 22,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 10,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "player",
+          "central_owner": "player",
+          "crystals": 31,
+          "gold": 361,
+          "hero_hp": 40,
+          "hero_max_hp": 48,
+          "mana": 4,
+          "max_mana": 20,
+          "position": [
+            2,
+            0
+          ],
+          "rival_countdown": 0,
+          "rival_intent": "defeated",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": null,
+          "status": "victory",
+          "turn": 11
+        },
+        "after_preparation": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 31,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "battle_kind": "conquest",
+        "before": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 35,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 35,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "before_battle": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 31,
+          "gold": 336,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 3,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 11
+        },
+        "final_save_sha256": "89518e85a0df55a330e4249d1295ca78d54d74b925153924db36f66237411c5b",
+        "metrics": {
+          "battle_hp_attrition": 186,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 4,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "actions": 1,
+            "command": "PROTOTYPE treatment",
+            "crystals": 4,
+            "gains": {
+              "1": 3,
+              "5": 3
+            },
+            "kind": "treatment"
+          },
+          {
+            "battle_kind": "conquest",
+            "command": "travel",
+            "target": [
+              2,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "standard-1",
+        "variant": "treatment"
+      }
+    ],
+    "pursuit_last_action": [
+      {
+        "after": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 20,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 34,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 36,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 197,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 2,
+          "max_mana": 14,
+          "position": [
+            1,
+            -1
+          ],
+          "rival_countdown": 5,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "after_preparation": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "battle_kind": "intercept",
+        "before": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "before_battle": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "final_save_sha256": "43d23f87f57c8d5420256813c0fbf5e94d258be880e061f70727ffaea51a918f",
+        "metrics": {
+          "battle_hp_attrition": 34,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 1,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "battle_kind": "intercept",
+            "command": "travel",
+            "target": [
+              1,
+              -1
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "accessible-1",
+        "variant": "intercept_now"
+      },
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 20,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 34,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 26,
+          "gold": 230,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 8,
+          "max_mana": 14,
+          "position": [
+            0,
+            0
+          ],
+          "rival_countdown": 5,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "after_preparation": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "battle_kind": "intercept",
+        "before": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 31,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 29,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 38,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "rival",
+          "crystals": 26,
+          "gold": 205,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 12,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 2,
+          "rival_intent": "attack",
+          "rival_position": [
+            0,
+            0
+          ],
+          "rival_target": [
+            -1,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "final_save_sha256": "dfbba78355b34b9de01d5dccee24178d2431890ac330d2d397bba107185a6092",
+        "metrics": {
+          "battle_hp_attrition": 15,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 0,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "command": "end_turn"
+          },
+          {
+            "battle_kind": "intercept",
+            "command": "travel",
+            "target": [
+              0,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "accessible-1",
+        "variant": "rest_once"
+      },
+      {
+        "after": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 12,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 34,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 36,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 21,
+          "gold": 122,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 2,
+          "max_mana": 18,
+          "position": [
+            1,
+            -1
+          ],
+          "rival_countdown": 5,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "after_preparation": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 21,
+          "gold": 97,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 10,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "battle_kind": "intercept",
+        "before": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "before_battle": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 21,
+          "gold": 97,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 10,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "final_save_sha256": "aecdfe7cce4f9efad255bc5832c791339acfbf9f183a64e4d040c4efaf8b0411",
+        "metrics": {
+          "battle_hp_attrition": 14,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 0,
+          "mana_recovered": 0,
+          "mana_spent": 8,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "command": "build",
+            "target": "mage_tower"
+          },
+          {
+            "battle_kind": "intercept",
+            "command": "travel",
+            "target": [
+              1,
+              -1
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "accessible-1",
+        "variant": "tower_intercept"
+      },
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 20,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 34,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 24,
+          "gold": 155,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 12,
+          "max_mana": 18,
+          "position": [
+            0,
+            0
+          ],
+          "rival_countdown": 5,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "after_preparation": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 21,
+          "gold": 97,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 10,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "battle_kind": "intercept",
+        "before": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 31,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 29,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 38,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "rival",
+          "crystals": 24,
+          "gold": 130,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 16,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 2,
+          "rival_intent": "attack",
+          "rival_position": [
+            0,
+            0
+          ],
+          "rival_target": [
+            -1,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "final_save_sha256": "abb2776ad4fcd4e5b0378e02ce92648a970d0b03acb8e365e7a3eab380212300",
+        "metrics": {
+          "battle_hp_attrition": 15,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 0,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "command": "build",
+            "target": "mage_tower"
+          },
+          {
+            "command": "end_turn"
+          },
+          {
+            "battle_kind": "intercept",
+            "command": "travel",
+            "target": [
+              0,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "accessible-1",
+        "variant": "tower_rest_once"
+      },
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 29,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 20,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 34,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 21,
+          "gold": 155,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 14,
+          "max_mana": 18,
+          "position": [
+            0,
+            0
+          ],
+          "rival_countdown": 5,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "after_preparation": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 18,
+          "gold": 97,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 18,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "battle_kind": "intercept",
+        "before": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 31,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 29,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 38,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "rival",
+          "crystals": 21,
+          "gold": 130,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 18,
+          "max_mana": 18,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 2,
+          "rival_intent": "attack",
+          "rival_position": [
+            0,
+            0
+          ],
+          "rival_target": [
+            -1,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "final_save_sha256": "88b5de0e05f09ee9bea75ef6c7c81335160a675ff0413b93ea51b6d2f33b66ae",
+        "metrics": {
+          "battle_hp_attrition": 15,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 0,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "command": "build",
+            "target": "mage_tower"
+          },
+          {
+            "actions": 1,
+            "command": "PROTOTYPE infusion",
+            "crystals": 3,
+            "gains": {
+              "mana": 8
+            },
+            "kind": "infusion"
+          },
+          {
+            "command": "end_turn"
+          },
+          {
+            "battle_kind": "intercept",
+            "command": "travel",
+            "target": [
+              0,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "accessible-1",
+        "variant": "tower_infusion"
+      },
+      {
+        "after": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 30,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 23,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 42,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 42
+            },
+            {
+              "hp": 34,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 22,
+          "gold": 230,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 8,
+          "max_mana": 14,
+          "position": [
+            0,
+            0
+          ],
+          "rival_countdown": 5,
+          "rival_intent": "recruit",
+          "rival_position": [
+            2,
+            0
+          ],
+          "rival_target": [
+            2,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "after_preparation": {
+          "actions": 0,
+          "army": [
+            {
+              "hp": 30,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 19,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "battle_kind": "intercept",
+        "before": {
+          "actions": 1,
+          "army": [
+            {
+              "hp": 18,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 16,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 36,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "player",
+          "crystals": 23,
+          "gold": 172,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 6,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 1,
+          "rival_intent": "attack",
+          "rival_position": [
+            1,
+            -1
+          ],
+          "rival_target": [
+            0,
+            0
+          ],
+          "status": "playing",
+          "turn": 6
+        },
+        "before_battle": {
+          "actions": 2,
+          "army": [
+            {
+              "hp": 32,
+              "id": 1,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 32,
+              "id": 2,
+              "kind": "militia",
+              "max_hp": 32
+            },
+            {
+              "hp": 28,
+              "id": 3,
+              "kind": "archer",
+              "max_hp": 28
+            },
+            {
+              "hp": 38,
+              "id": 4,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 5,
+              "kind": "swordsman",
+              "max_hp": 38
+            },
+            {
+              "hp": 38,
+              "id": 6,
+              "kind": "swordsman",
+              "max_hp": 38
+            }
+          ],
+          "capital_owner": "rival",
+          "central_owner": "rival",
+          "crystals": 22,
+          "gold": 205,
+          "hero_hp": 44,
+          "hero_max_hp": 44,
+          "mana": 12,
+          "max_mana": 14,
+          "position": [
+            1,
+            0
+          ],
+          "rival_countdown": 2,
+          "rival_intent": "attack",
+          "rival_position": [
+            0,
+            0
+          ],
+          "rival_target": [
+            -1,
+            0
+          ],
+          "status": "playing",
+          "turn": 7
+        },
+        "final_save_sha256": "d38ada2e6e1f0acfcdd5c9b9a3a21779694b55bcb99479ebb94aa6b948daa336",
+        "metrics": {
+          "battle_hp_attrition": 15,
+          "battles": 1,
+          "building_gold": 0,
+          "defeats": 0,
+          "end_turns": 0,
+          "hp_recovered": 0,
+          "lost_troops": 0,
+          "mana_recovered": 0,
+          "mana_spent": 4,
+          "recovery_turns": 0,
+          "recruitment_gold": 0
+        },
+        "operations": [
+          {
+            "actions": 1,
+            "command": "PROTOTYPE treatment",
+            "crystals": 4,
+            "gains": {
+              "1": 12,
+              "2": 12
+            },
+            "kind": "treatment"
+          },
+          {
+            "command": "end_turn"
+          },
+          {
+            "battle_kind": "intercept",
+            "command": "travel",
+            "target": [
+              0,
+              0
+            ]
+          },
+          {
+            "command": "explicit automatic battle and reward resolution"
+          }
+        ],
+        "rules_id": "accessible-1",
+        "variant": "treatment"
+      }
+    ]
+  },
+  "source_files_changed": [],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "106bcb19e9742c9d9b5790be76529b3da73dfe3339783687482fed0d894c25c7",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/battle.py": "d596a110ecaad8c679a353498899da7a931d2c983cfcb32571e5447e23f25eb6",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "c378c016f90c2f2c170ac4dcc0dc96e4031b85ecb94f5e432b17c7e802e5b17c",
+    "eador/codex.py": "383e43a066c0693e9630cf6c49d88b1477d3a6985b659203a43942dc663179d6",
+    "eador/content.py": "b9303f3aa2a4be98611f5032b3a141cff5c3a71881bc8a43c964b831c2385d03",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "23dbcada36bf49682bac596e1f67da5c8b9861257ae3b9e279d4f203d34ec444",
+    "eador/encounters.py": "dd79405285081d862d46b0290dda7e4a56bf832fe606b1a1b3904125271cfbc0",
+    "eador/model.py": "627051069c89277f7150f0a797277510139e2c2eb4d413530c93ae6b8a0e43a9",
+    "eador/persistence.py": "9661a716922e8397d1cc70cfb0e26d0f4c5461050d576a72d2c8fcf5a03cffcc",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "1982df3c6e980d4136b9aa7ab6c2bbd181dfd87a062c8f1d39e37b00d4697cad",
+    "eador/scene.py": "ce474ab1d2839db180a317195735d1631a6eb3255f70ac60bec5dd660d0f61e5",
+    "eador/settings_scene.py": "763e76feeb0cf3e448cfafedae7d37e817ea935335b4037e8ede4e2ac33e45ef",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "db6bb3a9e2c1e266c7dde426043e70340356b925a80844120c5c4f3090e3f951",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "bb137fb1f6d09ffda0b953b3cf4fee07d11870d86d68de16e8f441c27cc40929",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/prototype_eador_camp_services.py": "2be070b59d4d51e933bf53913286475d8974eeeb36117f19fabe9f2839f02674"
+  }
+}

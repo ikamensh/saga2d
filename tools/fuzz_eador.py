@@ -212,7 +212,7 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
                 assert state.to_json() == restored.to_json(), 'save changed battle continuation'
                 metrics['battle_rounds'] += 1
             continue
-        command = rng.choice(('build', 'recruit', 'travel', 'travel', 'explore', 'end_turn', 'equip'))
+        command = rng.choice(('build', 'recruit', 'travel', 'travel', 'explore', 'end_turn', 'equip', 'infuse'))
         before = state.to_json()
         try:
             if command == 'build':
@@ -229,10 +229,22 @@ def campaign_run(seed: int, steps: int, metrics: Counter, *, linked: bool = Fals
                     metrics['adventure_approach.' + state.battle_adventure.approach] += 1
             elif command == 'equip':
                 state.equip(rng.choice([None, *state.inventory]))
+            elif command == 'infuse':
+                quote = state.infusion_preview()
+                assert state.to_json() == before, 'infusion quote mutated state'
+                restored = State.from_json(before)
+                old = (state.hero.mana, state.crystals, state.actions_left)
+                state.infuse(); restored.infuse()
+                assert state.to_json() == restored.to_json(), 'save changed infusion consequences'
+                assert (state.hero.mana, state.crystals, state.actions_left) == (
+                    old[0] + quote.mana, old[1] - quote.crystals, old[2] - quote.actions)
             else:
                 state.end_turn()
-        except RuleError:
+        except RuleError as error:
             assert state.to_json() == before, f'rejected {command} mutated state'
+            if command == 'infuse':
+                assert str(error) == quote.blocked_reason
+                metrics['rejected_infusion_orders'] += 1
             metrics['rejected_commands'] += 1
         else:
             metrics[command] += 1
@@ -522,7 +534,7 @@ def scene_run(seed: int, steps: int, metrics: Counter, *, events: int | None = N
                         click(x + width / 2, y + height / 2)
                         metrics['equip_inputs'] += 1
                     else:
-                        press(rng.choice(('left', 'right', 'u', 'c', 'escape', 'escape')))
+                        press(rng.choice(('left', 'right', 'u', 'i', 't', 'c', 'escape', 'escape')))
                 elif isinstance(scene, CatalogScene):
                     press(rng.choice(('1', '2', '3', '4', '5', 'left', 'right', 'escape', 'escape')))
                 elif rng.random() < .15:

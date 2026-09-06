@@ -43,6 +43,27 @@ def verify(output, *, backend='pyglet'):
     with TemporaryDirectory(prefix='relic-art-') as directory:
         game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
         player = PlayerInput(game, native=backend == 'pyglet', output=output)
+
+        def capture_equipment(prefix):
+            scene = game.scene
+            assert isinstance(scene, HeroScene)
+            before, seen = scene.root.state.to_json(), []
+            for page in range(scene.pages):
+                seen.extend(scene.visible_relics)
+                player.capture(f'{prefix}-{page + 1}')
+                if page + 1 < scene.pages:
+                    player.button('Next')
+            assert seen == scene.root.state.inventory
+            assert scene.root.state.to_json() == before
+
+        def equipment_key(relic):
+            scene = game.scene
+            assert isinstance(scene, HeroScene)
+            while relic not in scene.visible_relics:
+                assert scene.page + 1 < scene.pages, f'No equipment control for {relic!r}'
+                player.press('right')
+            return str(scene.visible_relics.index(relic) + 1)
+
         try:
             game.push(RelicSheet())
             player.capture('twelve-relic-sheet')
@@ -54,19 +75,18 @@ def verify(output, *, backend='pyglet'):
             game.clear_and_push(root)
             game.push(HeroScene(root))
             before = state.to_json()
-            player.capture('v11-equipment-page-1')
-            player.button('Next')
-            player.capture('v11-equipment-page-2')
+            capture_equipment('v11-equipment-page')
             assert state.to_json() == before
             selected = state.inventory[-1]
-            player.press('4')
+            player.press(equipment_key(selected))
             assert state.hero.relic == selected
             before = state.to_json()
             saved = {path.name: path.read_bytes() for path in (Path(directory) / 'saves').iterdir()}
-            player.press('4')
+            player.press(equipment_key(selected))
             assert state.to_json() == before
             assert saved == {path.name: path.read_bytes() for path in (Path(directory) / 'saves').iterdir()}
-            player.button('Previous')
+            while game.scene.page:
+                player.button('Previous')
             player.capture('v11-equipment-after-selection')
 
             # Record actual pending choices along ordinary paid campaigns. These
@@ -93,10 +113,7 @@ def verify(output, *, backend='pyglet'):
                 root = ShardScene(State.from_json(result.to_json()))
                 game.clear_and_push(root)
                 game.push(HeroScene(root))
-                for page in range(game.scene.pages):
-                    player.capture(f'earned-{theme}-equipment-{page + 1}')
-                    if page + 1 < game.scene.pages:
-                        player.press('right')
+                capture_equipment(f'earned-{theme}-equipment')
 
             for relic in ('veil_censer', 'porter_rune', 'mirror_badge', 'vanguard_drum'):
                 state = State.from_json(choices['relic', relic])
@@ -110,10 +127,7 @@ def verify(output, *, backend='pyglet'):
                 assert relic in state.inventory
                 player.press('h')
                 assert isinstance(game.scene, HeroScene)
-                index = state.inventory.index(relic)
-                for _ in range(index // 4):
-                    player.press('right')
-                player.press(str(index % 4 + 1))
+                player.press(equipment_key(relic))
                 assert state.hero.relic == relic
                 player.capture(f'earned-{relic}-equipped')
 

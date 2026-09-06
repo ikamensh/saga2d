@@ -1,0 +1,4259 @@
+{
+  "late_full_roster": {
+    "hero": "Commander",
+    "mode": "standard",
+    "phase": "final_recovery",
+    "plan": "economy",
+    "quote": {
+      "actions": 2,
+      "army_size": 6,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "capacity": 6,
+      "capital_distance": 1,
+      "crystals": 37,
+      "equivalent_targeted_cost": 2,
+      "equivalent_targeted_orders": 1,
+      "full_targeted_bill": 2,
+      "gold": 421,
+      "infusion": false,
+      "infusion_covered_by_free_rest": false,
+      "mana_gain": 8,
+      "party_covered_by_free_rest": true,
+      "party_gains": {
+        "5": 3
+      },
+      "party_hp": 3,
+      "party_treatment": true,
+      "rival_adjacent": false,
+      "rival_countdown": 3,
+      "rival_intent": "recruit",
+      "single_treatment_best_gain": 3,
+      "turn": 11,
+      "upkeep_shortfall": 0
+    },
+    "route": "direct",
+    "seed": 0,
+    "state": {
+      "actions_left": 2,
+      "battle": null,
+      "battle_adventure": null,
+      "battle_kind": null,
+      "battle_province": null,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "campaign": null,
+      "choices": [],
+      "crystals": 37,
+      "gold": 421,
+      "hero": {
+        "army": [
+          {
+            "hp": 32,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 6
+          },
+          {
+            "hp": 32,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 6
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 6
+          },
+          {
+            "hp": 42,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 3
+          },
+          {
+            "hp": 35,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 9
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "hero_class": "Commander",
+        "hp": 44,
+        "level": 3,
+        "mana": 6,
+        "max_hp": 44,
+        "max_mana": 14,
+        "name": "Alden",
+        "pos": [
+          1,
+          0
+        ],
+        "relic": "moonstone",
+        "skill_ranks": {
+          "quartermaster": 2
+        },
+        "xp": 28
+      },
+      "inventory": [
+        "moonstone",
+        "ember_lens",
+        "iron_crown"
+      ],
+      "log": [
+        "Claim the shard: capture Duskspire before Westwatch falls.",
+        "Built Marketplace.",
+        "Battle at Buried Shrine.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Kept Moonstone. Equip it in the hero panel.",
+        "Equipped Moonstone.",
+        "Turn 2: +20 gold after upkeep; army rests.",
+        "Built Barracks.",
+        "Recruited Swordsman.",
+        "Battle at Silverford.",
+        "Alden reached level 2.",
+        "Claimed Silverford: +25 gold.",
+        "Learned Quartermaster 1.",
+        "Turn 3: +27 gold after upkeep; army rests.",
+        "Built Temple.",
+        "Equipped Moonstone.",
+        "Battle at Forgotten Tower.",
+        "Explored Forgotten Tower: +40 gold, +3 crystals.",
+        "Kept Ember Lens. Equip it in the hero panel.",
+        "Turn 4: +27 gold after upkeep; army rests.",
+        "The rival seized Frostmere with its surviving expedition.",
+        "Recruited Swordsman.",
+        "Equipped Moonstone.",
+        "Battle at Heartwood.",
+        "Claimed Heartwood: +25 gold.",
+        "Turn 5: +30 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Equipped Moonstone.",
+        "Battle at Buried Shrine.",
+        "Alden reached level 3.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Learned Quartermaster 2.",
+        "Distilled a duplicate relic into 4 crystals.",
+        "Turn 6: +28 gold after upkeep; army rests.",
+        "The rival seized Greenwater with its surviving expedition.",
+        "Equipped Moonstone.",
+        "Battle at Cinderwood.",
+        "Claimed Cinderwood: +25 gold.",
+        "Travelled to Heartwood.",
+        "Turn 7: +33 gold after upkeep; army rests.",
+        "Claimed unguarded Greenwater.",
+        "Turn 8: +41 gold after upkeep; army rests.",
+        "Equipped Moonstone.",
+        "Travelled to Heartwood.",
+        "Travelled to Cinderwood.",
+        "Turn 9: +41 gold after upkeep; army rests.",
+        "Battle at Old Barrow.",
+        "Explored Old Barrow: +55 gold, +1 crystals.",
+        "Kept Iron Crown. Equip it in the hero panel.",
+        "Turn 10: +41 gold after upkeep; army rests.",
+        "The rival paid 58 gold to heal its expedition at Duskspire.",
+        "Equipped Moonstone.",
+        "Equipped Moonstone.",
+        "Battle at Duskspire.",
+        "The rival expedition is broken: +25 gold. Duskspire still has a garrison.",
+        "Turn 11: +41 gold after upkeep; army rests.",
+        "Equipped Moonstone."
+      ],
+      "next_troop_id": 7,
+      "provinces": [
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 16,
+          "name": "Westwatch",
+          "owner": "player",
+          "pos": [
+            -2,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 7,
+          "name": "Amber Fields",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            1
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            17
+          ],
+          "guards": [
+            "wolf"
+          ],
+          "income": 6,
+          "name": "Old Hollow",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            2
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Briarwood",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 9,
+          "name": "Silverford",
+          "owner": "player",
+          "pos": [
+            -1,
+            0
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20
+          ],
+          "guards": [
+            "brigand"
+          ],
+          "income": 5,
+          "name": "Winding Vale",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            1
+          ],
+          "site": "Muster Yard",
+          "site_crystals": 1,
+          "site_gold": 50,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "archer",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "muster_yard",
+          "site_relic": "vanguard_drum",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 9,
+          "name": "Mossfell",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            2
+          ],
+          "site": "Explorer\u2019s Camp",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            17
+          ],
+          "site_guards": [
+            "goblin",
+            "wolf"
+          ],
+          "site_kind": "explorer_camp",
+          "site_relic": "wayfarer_boots",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 9,
+          "name": "Raven Hill",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -2
+          ],
+          "site": "Border Watch",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "border_watch",
+          "site_relic": "watch_bell",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [],
+          "guards": [],
+          "income": 8,
+          "name": "Greenwater",
+          "owner": "player",
+          "pos": [
+            0,
+            -1
+          ],
+          "site": "Stranded Explorer",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            28,
+            20,
+            42,
+            38
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "guard",
+            "warden"
+          ],
+          "site_kind": "stranded_explorer",
+          "site_relic": "wayfarer_boots",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 5,
+          "name": "Stonecross",
+          "owner": "neutral",
+          "pos": [
+            0,
+            1
+          ],
+          "site": "Lost Caravan",
+          "site_crystals": 0,
+          "site_gold": 65,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "brigand",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "caravan",
+          "site_relic": "merchant_seal",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 7,
+          "name": "Sunken Road",
+          "owner": "neutral",
+          "pos": [
+            0,
+            2
+          ],
+          "site": "Courier\u2019s Crossing",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "courier_crossing",
+          "site_relic": "veil_censer",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Ashen Marsh",
+          "owner": "neutral",
+          "pos": [
+            1,
+            -2
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            16,
+            42
+          ],
+          "site_guards": [
+            "goblin",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "plains"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            37
+          ],
+          "guards": [
+            "guard"
+          ],
+          "income": 5,
+          "name": "Frostmere",
+          "owner": "rival",
+          "pos": [
+            1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Cinderwood",
+          "owner": "player",
+          "pos": [
+            1,
+            0
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 9,
+          "name": "High Pass",
+          "owner": "neutral",
+          "pos": [
+            1,
+            1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 9,
+          "name": "Lost Reach",
+          "owner": "rival",
+          "pos": [
+            2,
+            -2
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 8,
+          "name": "Blackfen",
+          "owner": "rival",
+          "pos": [
+            2,
+            -1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "marsh"
+        },
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            42,
+            42,
+            42,
+            20,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "archer",
+            "archer"
+          ],
+          "income": 16,
+          "name": "Duskspire",
+          "owner": "rival",
+          "pos": [
+            2,
+            0
+          ],
+          "site": null,
+          "site_crystals": 0,
+          "site_gold": 0,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": null,
+          "site_relic": null,
+          "terrain": "forest"
+        }
+      ],
+      "rival": {
+        "army": [],
+        "defeats": 1,
+        "gold": 303,
+        "intent": "recruit",
+        "next_troop_id": 7,
+        "pos": [
+          2,
+          0
+        ],
+        "target": [
+          2,
+          0
+        ],
+        "turns_until_action": 3
+      },
+      "rules_id": "standard-1",
+      "schema_version": 12,
+      "seed": 0,
+      "status": "playing",
+      "theme": "frontier",
+      "turn": 11
+    },
+    "theme": "frontier"
+  },
+  "party_scattered": {
+    "hero": "Commander",
+    "mode": "accessible",
+    "phase": "after_battle",
+    "plan": "economy",
+    "quote": {
+      "actions": 1,
+      "army_size": 6,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "capacity": 6,
+      "capital_distance": 1,
+      "crystals": 27,
+      "equivalent_targeted_cost": 10,
+      "equivalent_targeted_orders": 5,
+      "full_targeted_bill": 10,
+      "gold": 260,
+      "infusion": false,
+      "infusion_covered_by_free_rest": true,
+      "mana_gain": 2,
+      "party_covered_by_free_rest": true,
+      "party_gains": {
+        "0": 6,
+        "1": 6,
+        "2": 3,
+        "5": 6,
+        "6": 3
+      },
+      "party_hp": 24,
+      "party_treatment": true,
+      "rival_adjacent": true,
+      "rival_countdown": 2,
+      "rival_intent": "attack",
+      "single_treatment_best_gain": 6,
+      "turn": 7,
+      "upkeep_shortfall": 0
+    },
+    "route": "direct",
+    "seed": 0,
+    "state": {
+      "actions_left": 1,
+      "battle": null,
+      "battle_adventure": null,
+      "battle_kind": null,
+      "battle_province": null,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "campaign": null,
+      "choices": [],
+      "crystals": 27,
+      "gold": 260,
+      "hero": {
+        "army": [
+          {
+            "hp": 26,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 29,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 3
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 42,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 32,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 35,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "hero_class": "Commander",
+        "hp": 38,
+        "level": 3,
+        "mana": 12,
+        "max_hp": 44,
+        "max_mana": 14,
+        "name": "Alden",
+        "pos": [
+          1,
+          0
+        ],
+        "relic": "moonstone",
+        "skill_ranks": {
+          "quartermaster": 2
+        },
+        "xp": 20
+      },
+      "inventory": [
+        "moonstone",
+        "ember_lens",
+        "iron_crown"
+      ],
+      "log": [
+        "Claim the shard: capture Duskspire before Westwatch falls.",
+        "Built Marketplace.",
+        "Built Barracks.",
+        "Battle at Buried Shrine.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Kept Moonstone. Equip it in the hero panel.",
+        "Equipped Moonstone.",
+        "Turn 2: +20 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Battle at Silverford.",
+        "Alden reached level 2.",
+        "Claimed Silverford: +25 gold.",
+        "Learned Quartermaster 1.",
+        "Turn 3: +27 gold after upkeep; army rests.",
+        "Built Temple.",
+        "Equipped Moonstone.",
+        "Battle at Forgotten Tower.",
+        "Explored Forgotten Tower: +40 gold, +3 crystals.",
+        "Kept Ember Lens. Equip it in the hero panel.",
+        "Turn 4: +27 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Recruited Swordsman.",
+        "Equipped Moonstone.",
+        "Battle at Heartwood.",
+        "Claimed Heartwood: +25 gold.",
+        "Turn 5: +28 gold after upkeep; army rests.",
+        "The rival seized Frostmere with its surviving expedition.",
+        "Equipped Moonstone.",
+        "Battle at Buried Shrine.",
+        "Alden reached level 3.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Learned Quartermaster 2.",
+        "Distilled a duplicate relic into 4 crystals.",
+        "Turn 6: +28 gold after upkeep; army rests.",
+        "Equipped Moonstone.",
+        "Battle at Cinderwood.",
+        "Claimed Cinderwood: +25 gold.",
+        "Turn 7: +33 gold after upkeep; army rests.",
+        "The rival seized Heartwood with its surviving expedition.",
+        "Equipped Moonstone.",
+        "Battle at Old Barrow.",
+        "Explored Old Barrow: +55 gold, +1 crystals.",
+        "Kept Iron Crown. Equip it in the hero panel."
+      ],
+      "next_troop_id": 7,
+      "provinces": [
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 16,
+          "name": "Westwatch",
+          "owner": "player",
+          "pos": [
+            -2,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 7,
+          "name": "Amber Fields",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            1
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            17
+          ],
+          "guards": [
+            "wolf"
+          ],
+          "income": 6,
+          "name": "Old Hollow",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            2
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Briarwood",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 9,
+          "name": "Silverford",
+          "owner": "player",
+          "pos": [
+            -1,
+            0
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20
+          ],
+          "guards": [
+            "brigand"
+          ],
+          "income": 5,
+          "name": "Winding Vale",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            1
+          ],
+          "site": "Muster Yard",
+          "site_crystals": 1,
+          "site_gold": 50,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "archer",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "muster_yard",
+          "site_relic": "vanguard_drum",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 9,
+          "name": "Mossfell",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            2
+          ],
+          "site": "Explorer\u2019s Camp",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            17
+          ],
+          "site_guards": [
+            "goblin",
+            "wolf"
+          ],
+          "site_kind": "explorer_camp",
+          "site_relic": "wayfarer_boots",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 9,
+          "name": "Raven Hill",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -2
+          ],
+          "site": "Border Watch",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "border_watch",
+          "site_relic": "watch_bell",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 8,
+          "name": "Greenwater",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -1
+          ],
+          "site": "Stranded Explorer",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            28,
+            20,
+            42,
+            38
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "guard",
+            "warden"
+          ],
+          "site_kind": "stranded_explorer",
+          "site_relic": "wayfarer_boots",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "rival",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 5,
+          "name": "Stonecross",
+          "owner": "neutral",
+          "pos": [
+            0,
+            1
+          ],
+          "site": "Lost Caravan",
+          "site_crystals": 0,
+          "site_gold": 65,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "brigand",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "caravan",
+          "site_relic": "merchant_seal",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 7,
+          "name": "Sunken Road",
+          "owner": "neutral",
+          "pos": [
+            0,
+            2
+          ],
+          "site": "Courier\u2019s Crossing",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "courier_crossing",
+          "site_relic": "veil_censer",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Ashen Marsh",
+          "owner": "neutral",
+          "pos": [
+            1,
+            -2
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            16,
+            42
+          ],
+          "site_guards": [
+            "goblin",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "plains"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Frostmere",
+          "owner": "rival",
+          "pos": [
+            1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Cinderwood",
+          "owner": "player",
+          "pos": [
+            1,
+            0
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 9,
+          "name": "High Pass",
+          "owner": "neutral",
+          "pos": [
+            1,
+            1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 9,
+          "name": "Lost Reach",
+          "owner": "rival",
+          "pos": [
+            2,
+            -2
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 8,
+          "name": "Blackfen",
+          "owner": "rival",
+          "pos": [
+            2,
+            -1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "marsh"
+        },
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            42,
+            42,
+            42,
+            20,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "archer",
+            "archer"
+          ],
+          "income": 16,
+          "name": "Duskspire",
+          "owner": "rival",
+          "pos": [
+            2,
+            0
+          ],
+          "site": null,
+          "site_crystals": 0,
+          "site_gold": 0,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": null,
+          "site_relic": null,
+          "terrain": "forest"
+        }
+      ],
+      "rival": {
+        "army": [
+          {
+            "hp": 16,
+            "id": 1,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 24,
+            "id": 5,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 20,
+            "id": 6,
+            "kind": "archer",
+            "max_hp": 20
+          }
+        ],
+        "defeats": 0,
+        "gold": 208,
+        "intent": "attack",
+        "next_troop_id": 7,
+        "pos": [
+          0,
+          0
+        ],
+        "target": [
+          -1,
+          0
+        ],
+        "turns_until_action": 2
+      },
+      "rules_id": "accessible-1",
+      "schema_version": 12,
+      "seed": 0,
+      "status": "playing",
+      "theme": "frontier",
+      "turn": 7
+    },
+    "theme": "frontier"
+  },
+  "party_single_wound": {
+    "hero": "Commander",
+    "mode": "accessible",
+    "phase": "after_battle",
+    "plan": "economy",
+    "quote": {
+      "actions": 1,
+      "army_size": 4,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "capacity": 6,
+      "capital_distance": 3,
+      "crystals": 12,
+      "equivalent_targeted_cost": 2,
+      "equivalent_targeted_orders": 1,
+      "full_targeted_bill": 2,
+      "gold": 72,
+      "infusion": false,
+      "infusion_covered_by_free_rest": true,
+      "mana_gain": 0,
+      "party_covered_by_free_rest": true,
+      "party_gains": {
+        "1": 8
+      },
+      "party_hp": 8,
+      "party_treatment": true,
+      "rival_adjacent": false,
+      "rival_countdown": 2,
+      "rival_intent": "attack",
+      "single_treatment_best_gain": 8,
+      "turn": 3,
+      "upkeep_shortfall": 0
+    },
+    "route": "direct",
+    "seed": 0,
+    "state": {
+      "actions_left": 1,
+      "battle": null,
+      "battle_adventure": null,
+      "battle_kind": null,
+      "battle_province": null,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "campaign": null,
+      "choices": [],
+      "crystals": 12,
+      "gold": 72,
+      "hero": {
+        "army": [
+          {
+            "hp": 20,
+            "id": 1,
+            "kind": "militia",
+            "level": 2,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 28,
+            "id": 2,
+            "kind": "militia",
+            "level": 2,
+            "max_hp": 28,
+            "xp": 3
+          },
+          {
+            "hp": 24,
+            "id": 3,
+            "kind": "archer",
+            "level": 2,
+            "max_hp": 24,
+            "xp": 3
+          },
+          {
+            "hp": 38,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 0
+          }
+        ],
+        "hero_class": "Commander",
+        "hp": 40,
+        "level": 2,
+        "mana": 12,
+        "max_hp": 40,
+        "max_mana": 12,
+        "name": "Alden",
+        "pos": [
+          -1,
+          0
+        ],
+        "relic": "moonstone",
+        "skill_ranks": {
+          "quartermaster": 1
+        },
+        "xp": 12
+      },
+      "inventory": [
+        "moonstone",
+        "ember_lens"
+      ],
+      "log": [
+        "Claim the shard: capture Duskspire before Westwatch falls.",
+        "Built Marketplace.",
+        "Built Barracks.",
+        "Battle at Buried Shrine.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Kept Moonstone. Equip it in the hero panel.",
+        "Equipped Moonstone.",
+        "Turn 2: +20 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Battle at Silverford.",
+        "Alden reached level 2.",
+        "Claimed Silverford: +25 gold.",
+        "Learned Quartermaster 1.",
+        "Turn 3: +27 gold after upkeep; army rests.",
+        "Built Temple.",
+        "Equipped Moonstone.",
+        "Battle at Forgotten Tower.",
+        "Explored Forgotten Tower: +40 gold, +3 crystals.",
+        "Kept Ember Lens. Equip it in the hero panel."
+      ],
+      "next_troop_id": 5,
+      "provinces": [
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 16,
+          "name": "Westwatch",
+          "owner": "player",
+          "pos": [
+            -2,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 7,
+          "name": "Amber Fields",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            1
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            17
+          ],
+          "guards": [
+            "wolf"
+          ],
+          "income": 6,
+          "name": "Old Hollow",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            2
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Briarwood",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 9,
+          "name": "Silverford",
+          "owner": "player",
+          "pos": [
+            -1,
+            0
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20
+          ],
+          "guards": [
+            "brigand"
+          ],
+          "income": 5,
+          "name": "Winding Vale",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            1
+          ],
+          "site": "Muster Yard",
+          "site_crystals": 1,
+          "site_gold": 50,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "archer",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "muster_yard",
+          "site_relic": "vanguard_drum",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 9,
+          "name": "Mossfell",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            2
+          ],
+          "site": "Explorer\u2019s Camp",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            17
+          ],
+          "site_guards": [
+            "goblin",
+            "wolf"
+          ],
+          "site_kind": "explorer_camp",
+          "site_relic": "wayfarer_boots",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 9,
+          "name": "Raven Hill",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -2
+          ],
+          "site": "Border Watch",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "border_watch",
+          "site_relic": "watch_bell",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 8,
+          "name": "Greenwater",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -1
+          ],
+          "site": "Stranded Explorer",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            28,
+            20,
+            42,
+            38
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "guard",
+            "warden"
+          ],
+          "site_kind": "stranded_explorer",
+          "site_relic": "wayfarer_boots",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "neutral",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 5,
+          "name": "Stonecross",
+          "owner": "neutral",
+          "pos": [
+            0,
+            1
+          ],
+          "site": "Lost Caravan",
+          "site_crystals": 0,
+          "site_gold": 65,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "brigand",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "caravan",
+          "site_relic": "merchant_seal",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 7,
+          "name": "Sunken Road",
+          "owner": "neutral",
+          "pos": [
+            0,
+            2
+          ],
+          "site": "Courier\u2019s Crossing",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "courier_crossing",
+          "site_relic": "veil_censer",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Ashen Marsh",
+          "owner": "neutral",
+          "pos": [
+            1,
+            -2
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            16,
+            42
+          ],
+          "site_guards": [
+            "goblin",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "plains"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 5,
+          "name": "Frostmere",
+          "owner": "neutral",
+          "pos": [
+            1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 5,
+          "name": "Cinderwood",
+          "owner": "neutral",
+          "pos": [
+            1,
+            0
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 9,
+          "name": "High Pass",
+          "owner": "neutral",
+          "pos": [
+            1,
+            1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 9,
+          "name": "Lost Reach",
+          "owner": "rival",
+          "pos": [
+            2,
+            -2
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 8,
+          "name": "Blackfen",
+          "owner": "rival",
+          "pos": [
+            2,
+            -1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "marsh"
+        },
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            42,
+            42,
+            42,
+            20,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "archer",
+            "archer"
+          ],
+          "income": 16,
+          "name": "Duskspire",
+          "owner": "rival",
+          "pos": [
+            2,
+            0
+          ],
+          "site": null,
+          "site_crystals": 0,
+          "site_gold": 0,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": null,
+          "site_relic": null,
+          "terrain": "forest"
+        }
+      ],
+      "rival": {
+        "army": [
+          {
+            "hp": 42,
+            "id": 1,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 42,
+            "id": 2,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 20,
+            "id": 3,
+            "kind": "archer",
+            "max_hp": 20
+          },
+          {
+            "hp": 20,
+            "id": 4,
+            "kind": "brigand",
+            "max_hp": 20
+          },
+          {
+            "hp": 42,
+            "id": 5,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 20,
+            "id": 6,
+            "kind": "archer",
+            "max_hp": 20
+          }
+        ],
+        "defeats": 0,
+        "gold": 102,
+        "intent": "attack",
+        "next_troop_id": 7,
+        "pos": [
+          2,
+          -1
+        ],
+        "target": [
+          1,
+          -1
+        ],
+        "turns_until_action": 2
+      },
+      "rules_id": "accessible-1",
+      "schema_version": 12,
+      "seed": 0,
+      "status": "playing",
+      "theme": "frontier",
+      "turn": 3
+    },
+    "theme": "frontier"
+  },
+  "pre_assault_mana": {
+    "hero": "Commander",
+    "mode": "standard",
+    "phase": "final_recovery",
+    "plan": "spells",
+    "quote": {
+      "actions": 2,
+      "army_size": 6,
+      "buildings": [
+        "barracks",
+        "mage_tower",
+        "temple"
+      ],
+      "capacity": 6,
+      "capital_distance": 1,
+      "crystals": 35,
+      "equivalent_targeted_cost": 4,
+      "equivalent_targeted_orders": 2,
+      "full_targeted_bill": 4,
+      "gold": 336,
+      "infusion": true,
+      "infusion_covered_by_free_rest": false,
+      "mana_gain": 8,
+      "party_covered_by_free_rest": true,
+      "party_gains": {
+        "1": 3,
+        "5": 3
+      },
+      "party_hp": 6,
+      "party_treatment": true,
+      "rival_adjacent": false,
+      "rival_countdown": 3,
+      "rival_intent": "recruit",
+      "single_treatment_best_gain": 3,
+      "turn": 11,
+      "upkeep_shortfall": 0
+    },
+    "route": "direct",
+    "seed": 0,
+    "state": {
+      "actions_left": 2,
+      "battle": null,
+      "battle_adventure": null,
+      "battle_kind": null,
+      "battle_province": null,
+      "buildings": [
+        "barracks",
+        "mage_tower",
+        "temple"
+      ],
+      "campaign": null,
+      "choices": [],
+      "crystals": 35,
+      "gold": 336,
+      "hero": {
+        "army": [
+          {
+            "hp": 29,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 6
+          },
+          {
+            "hp": 32,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 6
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 6
+          },
+          {
+            "hp": 42,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 3,
+            "max_hp": 42,
+            "xp": 0
+          },
+          {
+            "hp": 35,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 6
+          }
+        ],
+        "hero_class": "Commander",
+        "hp": 44,
+        "level": 3,
+        "mana": 6,
+        "max_hp": 44,
+        "max_mana": 18,
+        "name": "Alden",
+        "pos": [
+          1,
+          0
+        ],
+        "relic": "moonstone",
+        "skill_ranks": {
+          "quartermaster": 2
+        },
+        "xp": 28
+      },
+      "inventory": [
+        "moonstone",
+        "ember_lens",
+        "iron_crown"
+      ],
+      "log": [
+        "Claim the shard: capture Duskspire before Westwatch falls.",
+        "Built Mage Tower.",
+        "Battle at Buried Shrine.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Kept Moonstone. Equip it in the hero panel.",
+        "Equipped Moonstone.",
+        "Turn 2: +12 gold after upkeep; army rests.",
+        "Built Barracks.",
+        "Battle at Silverford.",
+        "Alden reached level 2.",
+        "Claimed Silverford: +25 gold.",
+        "Learned Quartermaster 1.",
+        "Turn 3: +21 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Battle at Forgotten Tower.",
+        "Explored Forgotten Tower: +40 gold, +3 crystals.",
+        "Kept Ember Lens. Equip it in the hero panel.",
+        "Turn 4: +19 gold after upkeep; army rests.",
+        "The rival seized Frostmere with its surviving expedition.",
+        "Built Temple.",
+        "Equipped Moonstone.",
+        "Battle at Heartwood.",
+        "Claimed Heartwood: +25 gold.",
+        "Turn 5: +24 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Recruited Swordsman.",
+        "Equipped Moonstone.",
+        "Battle at Buried Shrine.",
+        "Alden reached level 3.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Learned Quartermaster 2.",
+        "Distilled a duplicate relic into 4 crystals.",
+        "Turn 6: +20 gold after upkeep; army rests.",
+        "The rival seized Greenwater with its surviving expedition.",
+        "Equipped Moonstone.",
+        "Battle at Cinderwood.",
+        "Claimed Cinderwood: +25 gold.",
+        "Travelled to Heartwood.",
+        "Turn 7: +25 gold after upkeep; army rests.",
+        "Claimed unguarded Greenwater.",
+        "Turn 8: +33 gold after upkeep; army rests.",
+        "Equipped Moonstone.",
+        "Travelled to Heartwood.",
+        "Travelled to Cinderwood.",
+        "Turn 9: +33 gold after upkeep; army rests.",
+        "Battle at Old Barrow.",
+        "Explored Old Barrow: +55 gold, +1 crystals.",
+        "Kept Iron Crown. Equip it in the hero panel.",
+        "Turn 10: +33 gold after upkeep; army rests.",
+        "The rival paid 58 gold to heal its expedition at Duskspire.",
+        "Equipped Moonstone.",
+        "Equipped Moonstone.",
+        "Battle at Duskspire.",
+        "The rival expedition is broken: +25 gold. Duskspire still has a garrison.",
+        "Turn 11: +33 gold after upkeep; army rests.",
+        "Equipped Moonstone."
+      ],
+      "next_troop_id": 7,
+      "provinces": [
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 16,
+          "name": "Westwatch",
+          "owner": "player",
+          "pos": [
+            -2,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 7,
+          "name": "Amber Fields",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            1
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            17
+          ],
+          "guards": [
+            "wolf"
+          ],
+          "income": 6,
+          "name": "Old Hollow",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            2
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Briarwood",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 9,
+          "name": "Silverford",
+          "owner": "player",
+          "pos": [
+            -1,
+            0
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20
+          ],
+          "guards": [
+            "brigand"
+          ],
+          "income": 5,
+          "name": "Winding Vale",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            1
+          ],
+          "site": "Muster Yard",
+          "site_crystals": 1,
+          "site_gold": 50,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "archer",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "muster_yard",
+          "site_relic": "vanguard_drum",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 9,
+          "name": "Mossfell",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            2
+          ],
+          "site": "Explorer\u2019s Camp",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            17
+          ],
+          "site_guards": [
+            "goblin",
+            "wolf"
+          ],
+          "site_kind": "explorer_camp",
+          "site_relic": "wayfarer_boots",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 9,
+          "name": "Raven Hill",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -2
+          ],
+          "site": "Border Watch",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "border_watch",
+          "site_relic": "watch_bell",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [],
+          "guards": [],
+          "income": 8,
+          "name": "Greenwater",
+          "owner": "player",
+          "pos": [
+            0,
+            -1
+          ],
+          "site": "Stranded Explorer",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            28,
+            20,
+            42,
+            38
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "guard",
+            "warden"
+          ],
+          "site_kind": "stranded_explorer",
+          "site_relic": "wayfarer_boots",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 5,
+          "name": "Stonecross",
+          "owner": "neutral",
+          "pos": [
+            0,
+            1
+          ],
+          "site": "Lost Caravan",
+          "site_crystals": 0,
+          "site_gold": 65,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "brigand",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "caravan",
+          "site_relic": "merchant_seal",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 7,
+          "name": "Sunken Road",
+          "owner": "neutral",
+          "pos": [
+            0,
+            2
+          ],
+          "site": "Courier\u2019s Crossing",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "courier_crossing",
+          "site_relic": "veil_censer",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Ashen Marsh",
+          "owner": "neutral",
+          "pos": [
+            1,
+            -2
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            16,
+            42
+          ],
+          "site_guards": [
+            "goblin",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "plains"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            37
+          ],
+          "guards": [
+            "guard"
+          ],
+          "income": 5,
+          "name": "Frostmere",
+          "owner": "rival",
+          "pos": [
+            1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Cinderwood",
+          "owner": "player",
+          "pos": [
+            1,
+            0
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 9,
+          "name": "High Pass",
+          "owner": "neutral",
+          "pos": [
+            1,
+            1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 9,
+          "name": "Lost Reach",
+          "owner": "rival",
+          "pos": [
+            2,
+            -2
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 8,
+          "name": "Blackfen",
+          "owner": "rival",
+          "pos": [
+            2,
+            -1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "marsh"
+        },
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            42,
+            42,
+            42,
+            20,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "archer",
+            "archer"
+          ],
+          "income": 16,
+          "name": "Duskspire",
+          "owner": "rival",
+          "pos": [
+            2,
+            0
+          ],
+          "site": null,
+          "site_crystals": 0,
+          "site_gold": 0,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": null,
+          "site_relic": null,
+          "terrain": "forest"
+        }
+      ],
+      "rival": {
+        "army": [],
+        "defeats": 1,
+        "gold": 303,
+        "intent": "recruit",
+        "next_troop_id": 7,
+        "pos": [
+          2,
+          0
+        ],
+        "target": [
+          2,
+          0
+        ],
+        "turns_until_action": 3
+      },
+      "rules_id": "standard-1",
+      "schema_version": 12,
+      "seed": 0,
+      "status": "playing",
+      "theme": "frontier",
+      "turn": 11
+    },
+    "theme": "frontier"
+  },
+  "pursuit_last_action": {
+    "hero": "Commander",
+    "mode": "accessible",
+    "phase": "after_battle",
+    "plan": "economy",
+    "quote": {
+      "actions": 1,
+      "army_size": 6,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "capacity": 6,
+      "capital_distance": 1,
+      "crystals": 23,
+      "equivalent_targeted_cost": 4,
+      "equivalent_targeted_orders": 2,
+      "full_targeted_bill": 10,
+      "gold": 172,
+      "infusion": false,
+      "infusion_covered_by_free_rest": false,
+      "mana_gain": 8,
+      "party_covered_by_free_rest": true,
+      "party_gains": {
+        "1": 12,
+        "2": 12
+      },
+      "party_hp": 24,
+      "party_treatment": true,
+      "rival_adjacent": true,
+      "rival_countdown": 1,
+      "rival_intent": "attack",
+      "single_treatment_best_gain": 12,
+      "turn": 6,
+      "upkeep_shortfall": 0
+    },
+    "route": "direct",
+    "seed": 0,
+    "state": {
+      "actions_left": 1,
+      "battle": null,
+      "battle_adventure": null,
+      "battle_kind": null,
+      "battle_province": null,
+      "buildings": [
+        "barracks",
+        "market",
+        "temple"
+      ],
+      "campaign": null,
+      "choices": [],
+      "crystals": 23,
+      "gold": 172,
+      "hero": {
+        "army": [
+          {
+            "hp": 18,
+            "id": 1,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 0
+          },
+          {
+            "hp": 16,
+            "id": 2,
+            "kind": "militia",
+            "level": 3,
+            "max_hp": 32,
+            "xp": 0
+          },
+          {
+            "hp": 28,
+            "id": 3,
+            "kind": "archer",
+            "level": 3,
+            "max_hp": 28,
+            "xp": 0
+          },
+          {
+            "hp": 36,
+            "id": 4,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 9
+          },
+          {
+            "hp": 38,
+            "id": 5,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 3
+          },
+          {
+            "hp": 38,
+            "id": 6,
+            "kind": "swordsman",
+            "level": 2,
+            "max_hp": 38,
+            "xp": 3
+          }
+        ],
+        "hero_class": "Commander",
+        "hp": 44,
+        "level": 3,
+        "mana": 6,
+        "max_hp": 44,
+        "max_mana": 14,
+        "name": "Alden",
+        "pos": [
+          1,
+          0
+        ],
+        "relic": "moonstone",
+        "skill_ranks": {
+          "quartermaster": 2
+        },
+        "xp": 12
+      },
+      "inventory": [
+        "moonstone",
+        "ember_lens"
+      ],
+      "log": [
+        "Claim the shard: capture Duskspire before Westwatch falls.",
+        "Built Marketplace.",
+        "Built Barracks.",
+        "Battle at Buried Shrine.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Kept Moonstone. Equip it in the hero panel.",
+        "Equipped Moonstone.",
+        "Turn 2: +20 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Battle at Silverford.",
+        "Alden reached level 2.",
+        "Claimed Silverford: +25 gold.",
+        "Learned Quartermaster 1.",
+        "Turn 3: +27 gold after upkeep; army rests.",
+        "Built Temple.",
+        "Equipped Moonstone.",
+        "Battle at Forgotten Tower.",
+        "Explored Forgotten Tower: +40 gold, +3 crystals.",
+        "Kept Ember Lens. Equip it in the hero panel.",
+        "Turn 4: +27 gold after upkeep; army rests.",
+        "Recruited Swordsman.",
+        "Recruited Swordsman.",
+        "Equipped Moonstone.",
+        "Battle at Heartwood.",
+        "Claimed Heartwood: +25 gold.",
+        "Turn 5: +28 gold after upkeep; army rests.",
+        "The rival seized Frostmere with its surviving expedition.",
+        "Equipped Moonstone.",
+        "Battle at Buried Shrine.",
+        "Alden reached level 3.",
+        "Explored Buried Shrine: +45 gold, +2 crystals.",
+        "Learned Quartermaster 2.",
+        "Distilled a duplicate relic into 4 crystals.",
+        "Turn 6: +28 gold after upkeep; army rests.",
+        "Equipped Moonstone.",
+        "Battle at Cinderwood.",
+        "Claimed Cinderwood: +25 gold."
+      ],
+      "next_troop_id": 7,
+      "provinces": [
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 16,
+          "name": "Westwatch",
+          "owner": "player",
+          "pos": [
+            -2,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 7,
+          "name": "Amber Fields",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            1
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            17
+          ],
+          "guards": [
+            "wolf"
+          ],
+          "income": 6,
+          "name": "Old Hollow",
+          "owner": "neutral",
+          "pos": [
+            -2,
+            2
+          ],
+          "site": "Wolf Den",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            17,
+            17,
+            17
+          ],
+          "site_guards": [
+            "wolf",
+            "wolf",
+            "wolf"
+          ],
+          "site_kind": "den",
+          "site_relic": "storm_quiver",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Briarwood",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 9,
+          "name": "Silverford",
+          "owner": "player",
+          "pos": [
+            -1,
+            0
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20
+          ],
+          "guards": [
+            "brigand"
+          ],
+          "income": 5,
+          "name": "Winding Vale",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            1
+          ],
+          "site": "Muster Yard",
+          "site_crystals": 1,
+          "site_gold": 50,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "archer",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "muster_yard",
+          "site_relic": "vanguard_drum",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            16
+          ],
+          "guards": [
+            "goblin"
+          ],
+          "income": 9,
+          "name": "Mossfell",
+          "owner": "neutral",
+          "pos": [
+            -1,
+            2
+          ],
+          "site": "Explorer\u2019s Camp",
+          "site_crystals": 1,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            17
+          ],
+          "site_guards": [
+            "goblin",
+            "wolf"
+          ],
+          "site_kind": "explorer_camp",
+          "site_relic": "wayfarer_boots",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 9,
+          "name": "Raven Hill",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -2
+          ],
+          "site": "Border Watch",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "border_watch",
+          "site_relic": "watch_bell",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 8,
+          "name": "Greenwater",
+          "owner": "neutral",
+          "pos": [
+            0,
+            -1
+          ],
+          "site": "Stranded Explorer",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            28,
+            20,
+            42,
+            38
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "guard",
+            "warden"
+          ],
+          "site_kind": "stranded_explorer",
+          "site_relic": "wayfarer_boots",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": true,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Heartwood",
+          "owner": "player",
+          "pos": [
+            0,
+            0
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 5,
+          "name": "Stonecross",
+          "owner": "neutral",
+          "pos": [
+            0,
+            1
+          ],
+          "site": "Lost Caravan",
+          "site_crystals": 0,
+          "site_gold": 65,
+          "site_guard_hp": [
+            20,
+            20,
+            20
+          ],
+          "site_guards": [
+            "brigand",
+            "brigand",
+            "brigand"
+          ],
+          "site_kind": "caravan",
+          "site_relic": "merchant_seal",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            20,
+            16,
+            17
+          ],
+          "guards": [
+            "brigand",
+            "goblin",
+            "wolf"
+          ],
+          "income": 7,
+          "name": "Sunken Road",
+          "owner": "neutral",
+          "pos": [
+            0,
+            2
+          ],
+          "site": "Courier\u2019s Crossing",
+          "site_crystals": 2,
+          "site_gold": 50,
+          "site_guard_hp": [
+            28,
+            20,
+            20
+          ],
+          "site_guards": [
+            "pikeman",
+            "archer",
+            "brigand"
+          ],
+          "site_kind": "courier_crossing",
+          "site_relic": "veil_censer",
+          "terrain": "marsh"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 6,
+          "name": "Ashen Marsh",
+          "owner": "neutral",
+          "pos": [
+            1,
+            -2
+          ],
+          "site": "Forgotten Tower",
+          "site_crystals": 3,
+          "site_gold": 40,
+          "site_guard_hp": [
+            16,
+            16,
+            42
+          ],
+          "site_guards": [
+            "goblin",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "tower",
+          "site_relic": "ember_lens",
+          "terrain": "plains"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Frostmere",
+          "owner": "rival",
+          "pos": [
+            1,
+            -1
+          ],
+          "site": "Buried Shrine",
+          "site_crystals": 2,
+          "site_gold": 45,
+          "site_guard_hp": [
+            20,
+            16,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "goblin",
+            "guard"
+          ],
+          "site_kind": "shrine",
+          "site_relic": "moonstone",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [],
+          "guards": [],
+          "income": 5,
+          "name": "Cinderwood",
+          "owner": "player",
+          "pos": [
+            1,
+            0
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 1,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20,
+            16
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "brigand",
+            "goblin"
+          ],
+          "income": 9,
+          "name": "High Pass",
+          "owner": "neutral",
+          "pos": [
+            1,
+            1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "hills"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 9,
+          "name": "Lost Reach",
+          "owner": "rival",
+          "pos": [
+            2,
+            -2
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "forest"
+        },
+        {
+          "capital": false,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "archer"
+          ],
+          "income": 8,
+          "name": "Blackfen",
+          "owner": "rival",
+          "pos": [
+            2,
+            -1
+          ],
+          "site": "Old Barrow",
+          "site_crystals": 1,
+          "site_gold": 55,
+          "site_guard_hp": [
+            20,
+            17,
+            42
+          ],
+          "site_guards": [
+            "brigand",
+            "wolf",
+            "guard"
+          ],
+          "site_kind": "barrow",
+          "site_relic": "iron_crown",
+          "terrain": "marsh"
+        },
+        {
+          "capital": true,
+          "crystals": 0,
+          "explored": false,
+          "guard_hp": [
+            42,
+            42,
+            42,
+            42,
+            42,
+            20,
+            20
+          ],
+          "guards": [
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "guard",
+            "archer",
+            "archer"
+          ],
+          "income": 16,
+          "name": "Duskspire",
+          "owner": "rival",
+          "pos": [
+            2,
+            0
+          ],
+          "site": null,
+          "site_crystals": 0,
+          "site_gold": 0,
+          "site_guard_hp": [],
+          "site_guards": [],
+          "site_kind": null,
+          "site_relic": null,
+          "terrain": "forest"
+        }
+      ],
+      "rival": {
+        "army": [
+          {
+            "hp": 16,
+            "id": 1,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 24,
+            "id": 5,
+            "kind": "guard",
+            "max_hp": 42
+          },
+          {
+            "hp": 20,
+            "id": 6,
+            "kind": "archer",
+            "max_hp": 20
+          }
+        ],
+        "defeats": 0,
+        "gold": 176,
+        "intent": "attack",
+        "next_troop_id": 7,
+        "pos": [
+          1,
+          -1
+        ],
+        "target": [
+          0,
+          0
+        ],
+        "turns_until_action": 1
+      },
+      "rules_id": "accessible-1",
+      "schema_version": 12,
+      "seed": 0,
+      "status": "playing",
+      "theme": "frontier",
+      "turn": 6
+    },
+    "theme": "frontier"
+  }
+}

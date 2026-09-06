@@ -7,6 +7,29 @@ the current goal is substantially broader.
 Entries below are chronological checkpoints; their measurements apply to
 the named source snapshot, and later entries supersede earlier feature gaps.
 
+## Current playable checkpoint — 2026-09-06
+
+The preserved Mac development build is source **0e27175**. It includes the
+three-shard campaign, three saved difficulty modes, eight authored adventure
+families, ten recruitable roles, twelve relics, and 100/125 reading size for
+Codex, Guide and expedition briefings. [Exact artifact and native evidence](evidence/shardbound-integrated-0e27175/README.md)
+identify what is playable; all G01–G19 release gates remain incomplete.
+
+This source passes 1,041 tests and both games' bounded fuzz checks. Native
+mode/old-save, full Challenge recovery and four Explorer journeys pass 1,089
+inputs and 47 exact reloads. A separate 138-record guidance matrix covers every
+current approach at both reading sizes and all three supported window sizes.
+The extracted frozen app and macOS app-launch smoke pass with isolated saves,
+settings restart and all shipping audio assets. Screenshots were inspected.
+
+The next work concerns recurring economic choices, the ninth authored encounter
+and readable purchase catalogues. Resource surpluses, complete text scaling,
+human playtests, Windows/clean-account execution and candidate-specific stress
+remain open. The README's first framework example is now an asset-free runnable
+game; its mouse and keyboard controls were exercised with mock and native input.
+The changes above compose existing Saga2D primitives and add no strategy rules
+to the framework.
+
 ## Baseline audit — 2026-09-05
 
 - Authoritative baseline: `2d26787`; only unrelated `.gitignore` work was
