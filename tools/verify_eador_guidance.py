@@ -38,6 +38,7 @@ def prepared_briefings():
     from eador.model import State, UNITS
     from tools.eador_campaign import finish_battle, march_to, rest
     from tools.eador_extraction_campaign import prepare_adventure
+    from tools.eador_explorer_campaign import prepare_explorer
     from tools.eador_hunt_campaign import prepare_pack_hunt
     from tools.eador_observatory_campaign import prepare_observatory
     from tools.eador_relic_campaign import prepare_relic_gate
@@ -46,7 +47,10 @@ def prepared_briefings():
     cases = [('crossing', prepare_adventure(), None),
              ('cache', prepare_adventure(theme='elderwild'), None),
              ('vault', prepare_vault(), None), ('hunt', prepare_pack_hunt(), None),
-             ('observatory', prepare_observatory(), None)]
+             ('observatory', prepare_observatory(), None),
+             ('explorer-ranger', prepare_explorer(), None),
+             ('explorer-acolyte', prepare_explorer('Warrior', support='healer'), None),
+             ('explorer-alone', prepare_explorer('Scout', support=None), None)]
     watch = State.new(7)
     watch.build('barracks'); watch.recruit('pikeman'); watch.explore(); finish_battle(watch)
     for pos in ((-1, -1), (0, -2)):
@@ -108,8 +112,8 @@ def verify_briefing_matrix(game, *, native=False, output=None):
                         player.press('return')
                         assert game.scene is scene
                     assert state.to_json() == before
-                    if size == (1280, 720) and percent == 125:
-                        player.capture(f'{name}-{index + 1}-125')
+                    if size == (1280, 720) and (percent == 125 or name == 'explorer-ranger'):
+                        player.capture(f'{name}-{index + 1}-{percent}')
             player.press('escape')
             assert isinstance(game.scene, ShardScene) and state.to_json() == before
     from eador.encounters import ENCOUNTERS

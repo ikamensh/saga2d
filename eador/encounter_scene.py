@@ -84,29 +84,39 @@ class EncounterScene(Screen):
                              for index, approach in enumerate(self.approaches)), spacing=20))
             top.append(label(self.approach.description, color=GOLD))
 
+        left_width, right_width = 640, 392
         orders = Column(
             label('Escape with the cargo' if extraction else 'Secure the seal' if holding else 'Rout the defenders',
-                  22, width=696, color=TEAL, serif=True),
-            *(label(text, width=696) for text in self.instructions()), spacing=12)
-        self._preview = Component(width=336, height=231)
+                  22, width=left_width, color=TEAL, serif=True),
+            *(label(text, width=left_width) for text in self.instructions()), spacing=12)
+        self._preview = Component(width=right_width, height=231)
         legend = ('● Allies   ■ Foes   Numbered exits' if extraction else
                   '● Allies   ■ Defenders   ◎ Seal' if holding else '● Allies   ■ Defenders')
-        preview = Column(label('THE APPROACH', 10, width=336, color=GOLD), self._preview,
-                         label(legend, 10, width=336), spacing=8)
+        preview = Column(label('THE APPROACH', 10, width=right_width, color=GOLD), self._preview,
+                         label(legend, 10, width=right_width), spacing=8)
 
         bonus = self.approach.bonus_gold if self.approach else 0
         reward = (f"{p.site_gold + bonus} gold · {p.site_crystals} crystal{'s' if p.site_crystals != 1 else ''}" if self.kind == "site" else
                   "Liberate Duskspire and complete the three-shard campaign.")
         if self.kind == "site" and p.site_relic:
             reward += f" · {RELICS[p.site_relic].name}"
-        rewards = Column(label("REWARDS ON SUCCESS", 10, width=696, color=GOLD),
-                         label(reward, width=696, color=TEXT), spacing=6)
-        defenders = Column(*(label(f"{UNITS[kind].name} ×{count}", width=336, color=RED)
-                              for kind, count in Counter(self.guards).items()), spacing=4)
+        rewards = Column(label("REWARDS ON SUCCESS", 10, width=left_width, color=GOLD),
+                         label(reward, width=left_width, color=TEXT), spacing=6)
+        counts = [f"{UNITS[kind].name} ×{count}" for kind, count in Counter(self.guards).items()]
+        defenders = Column(spacing=4)
+        if len(counts) > 3:
+            for start in range(0, len(counts), 2):
+                pair = [label(text, width=(right_width - 16) // 2, color=RED) for text in counts[start:start + 2]]
+                if len(pair) == 1:
+                    pair.append(Component(width=(right_width - 16) // 2))
+                defenders.add(Row(*pair, spacing=16))
+        else:
+            for text in counts:
+                defenders.add(label(text, width=right_width, color=RED))
         if self.kind == 'site':
             health = p.site_guard_hp
             total = sum(UNITS[kind].hp for kind in self.guards)
-            defenders.add(label(f'Defenders: {sum(health)}/{total} HP; wounds persist.', 10, width=336))
+            defenders.add(label(f'Defenders: {sum(health)}/{total} HP; wounds persist.', 10, width=right_width))
 
         # Measure the paired columns while attached, then align their tops. This
         # keeps the real deployment at its original hex size while text reflows.
@@ -134,8 +144,16 @@ class EncounterScene(Screen):
 
     def instructions(self):
         definition = self.definition
+        carrier = 'Your hero carries the cargo. Reach an exit with an unspent hero action, then choose Evacuate.'
+        if self.province.site_kind == 'stranded_explorer':
+            isolated = [f'{UNITS[troop.kind].name} (army slot {index})'
+                        for index, (troop, pos) in enumerate(zip(self.root.state.hero.army, definition.player_positions[1:]), 1)
+                        if pos[0] > 0]
+            split = ('Isolated east: hero and ' + ', '.join(isolated) + '.' if isolated
+                     else 'Hero starts alone east.')
+            carrier = split + ' ' + carrier
         return (
-            'Your hero carries the cargo. Reach an exit with an unspent hero action, then choose Evacuate.',
+            carrier,
             f'Clear adjacent foes. Escape or rout all defenders by round {definition.deadline}. Hero death loses immediately.',
             'A Warden can deliver an unspent hero. Attacking, casting or Guarding prevents evacuation this turn.',
         ) if definition.objective == 'extract' else (
