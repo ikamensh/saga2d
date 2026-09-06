@@ -243,7 +243,7 @@ cheaper Heal. **H** shows learned effects.
 Sites have different defending parties, rewards and objectives. Ordinary
 guarded ruins sit alongside authored adventures such as Border Watch,
 Courier's Crossing, Supply Cache, Sealed Vault, Pack Hunt, Broken Observatory
-and Stranded Explorer. The Codex describes the current catalogue and its
+Stranded Explorer and Smuggler Screen. The Codex describes the current catalogue and its
 saved rewards.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
@@ -279,6 +279,13 @@ Explorer separates the hero and one escort, when present, from the main
 party across a marsh. Choose the northern or southern assembly for free,
 then return the hero to the western exit by round six or rout the patrol.
 The briefing identifies the actual isolated party before entry.
+
+Smuggler Screen offers western or northern formations against a Sapper, two
+Archers, a Warden and a Dread Guard. Smoke blocks friendly ranged orders and
+spells too; Rally clears Pin without restoring spent actions. Choose a route
+around the screen, rescue exposed troops or stop the Sapper before it acts.
+Both formations face the same finite defenders and offer 60 gold, two crystals
+and a Veil Censer. A failed attempt preserves killed guards and wounded survivors.
 
 | Building | Cost | Benefit |
 |---|---|---|

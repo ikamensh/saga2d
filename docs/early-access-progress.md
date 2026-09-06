@@ -514,3 +514,17 @@ patterns, campaign economy/pacing, platform checks and human feedback remain ope
 G01–G19 remain incomplete. Larger guidance text and the eighth authored encounter
 are separate increments. Content depth, economy/pacing, candidate-specific
 stress, platforms and human feedback remain open.
+
+## Readable decisions and the ninth encounter — 2026-09-06
+
+Smuggler Screen is integrated at `5941f60`. Its paid western, northern and
+smaller Scout plans exercise Smoke, Rally, flanking and finite failed-attempt
+recovery. All five native journeys pass with the new measured result panels:
+1,073 inputs and 58 exact reloads. The integrated suite passed 1,083 tests;
+both games' bounded fuzz checks passed. [Retained evidence](evidence/shardbound-results-screen-5941f60/README.md)
+separately attributes the eight-outcome result matrix and current Screen runs.
+The earlier `0e27175` Mac artifact predates these changes.
+
+G01–G19 remain incomplete. Reward reading, explicit paid troop replacement,
+remaining campaign layouts, economy/pacing, content depth, candidate stress,
+platform checks and human feedback remain active work.

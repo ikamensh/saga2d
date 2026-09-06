@@ -1,0 +1,52 @@
+{
+  "source_commit": "d14033f70a5a8b17e3174e37f732068709efc01d",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "command": "python tools/verify_eador_campaign_plan.py --output /tmp/shardbound-plan-reading-final",
+  "logical_canvas": [
+    1280,
+    800
+  ],
+  "native_states": 11,
+  "native_layouts": 66,
+  "native_inputs": 530,
+  "tests_passed": 1091,
+  "tests_seconds": 96.96,
+  "tribes_fuzz": {
+    "ai_games": 60,
+    "monkey_runs": 20,
+    "seed": 17,
+    "failures": 0
+  },
+  "linked_fuzz": {
+    "campaigns": 60,
+    "scene_runs": 20,
+    "input_events": 3724,
+    "seed": 17,
+    "failures": 0
+  },
+  "source_sha256": {
+    "eador/campaign_scene.py": "1890ee60548d27d73acda78a20b651aa50087b9b2c791af378daefacecec1ae4",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/model.py": "440b4c5ec6eccecccf38017b7602ab12a4b0582c1f9bd6113a5e513d28beea65",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/settings_scene.py": "4e476c62b6629d0c68a0ee573cc14371149fee1fb4e1aeff7b7dbaeb3e0b2519",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/backends/pyglet_backend.py": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8",
+    "tools/verify_eador_campaign_plan.py": "8c727fb7c6077332e16a3d103c630782dc11bd47aba70b2bec854ad6f0b50469",
+    "tools/eador_linked_campaign.py": "6888ff9dce8bd5e812e19b61ff8b9c55687e5efb964f17748547fde81b4e4e45",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/eador_ui.py": "c37b7c2832771adfaaa56a2e2b0533390dee152cecb7612e5d236007fd26e10c"
+  },
+  "artifact_sha256": {
+    "foundries-held-1-100.png": "c22ef127f84a82b923ccad1c25daec33082e86b621a31bca6a836b903da37b31",
+    "foundries-held-1-125.png": "5e23902a9f80768db024740b6e7bf109565ae8eb780c3dd20f54812e46f59772",
+    "foundries-recovery-spent-125.png": "45654a0745ba24bc944c7f1a50fecbdf1dc40537cd43e9b8e17f201009bab6c7",
+    "gate-arrival-125.png": "454719024cd53dceac318a89fec250a6ebcbfde96caf2302c62310921c8951b3",
+    "linked-fuzz.json": "bf736f9b82a6a5115f7de98ca8c6e3e55ec4a2f9eb05127196e479f8454b6090",
+    "matrix.json": "ddb310617ab67b637cec67850864247629b14ff64e4cbb93a22e257979fa3459",
+    "opening-challenge-125.png": "ecad07a2c40ebfd6053d209d97c97911f4e694ea0e4df56b5cb60cf4f8fe8213",
+    "rootward-watch-cleared-125.png": "e0156a0f9d2b286ed6d3e7b5126afae40ed8034df69a49775e563a59850ad4d2"
+  }
+}

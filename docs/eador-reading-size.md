@@ -247,3 +247,8 @@ combinations and drives an earned victory through Settings, Codex, Saves,
 exact reload, failed manual save/load and acceptance. A fresh Game restores
 the reading preference before returning from the ended shard to the title.
 The read-only matrix is separate from the actual-input preparation tracer.
+
+The [retained result and Screen integration evidence](evidence/shardbound-results-screen-5941f60/README.md)
+attributes the result matrix to `a58b0ce` and five subsequent native Screen
+journeys to `5941f60`. All six retained images were inspected. The integrated
+source passed 1,083 tests and both games' bounded stress checks.

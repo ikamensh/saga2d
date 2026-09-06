@@ -1,0 +1,41 @@
+{
+  "source_commit": "89782c220b99edf2ced068f86cf5a0abbd7ffb40",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "command": "python tools/verify_eador_choices.py --output /tmp/shardbound-choice-reading-final",
+  "logical_canvas": [
+    1280,
+    800
+  ],
+  "native_decisions": 42,
+  "native_layouts": 252,
+  "native_inputs": 925,
+  "tests_passed": 1077,
+  "extra_capture": "single-discipline-125.png: first earned Wizard one-option case from prepared_choices(), native1280x720, T/Right/Enter then2 leaves full State JSON unchanged. Same source revision.",
+  "fuzz_note": "Both fuzzers passed before the isolated parser diagnostic fix and Result merge; Choice production behavior was the same. See README for measured scope.",
+  "source_sha256": {
+    "eador/scene.py": "557e789f5fda71a4905c2e8b2931eafd13062e945c07518dccc068011254f7d7",
+    "eador/model.py": "440b4c5ec6eccecccf38017b7602ab12a4b0582c1f9bd6113a5e513d28beea65",
+    "eador/content.py": "b9303f3aa2a4be98611f5032b3a141cff5c3a71881bc8a43c964b831c2385d03",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/settings_scene.py": "4e476c62b6629d0c68a0ee573cc14371149fee1fb4e1aeff7b7dbaeb3e0b2519",
+    "eador/art.py": "10a7b1c39b1176de5548b8174f7aeb80ba81b1ce945b3252f41793bd0f7c36e2",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "saga2d/save.py": "e1002496a7fc01f2dbebb2831aba001ea3d1b725800a06911160a58ea0597c01",
+    "saga2d/scene.py": "e7be356a3922cfdb3fd17c6a1500474266513e25ef4a34aebbed61fad59480d6",
+    "saga2d/ui/components.py": "dadde7b944588d9e993ce0b8fd3bb41a870d25576c0e0423b99eb9fd5ee5ed16",
+    "saga2d/backends/pyglet_backend.py": "97191571776c9c15b195bf2f97b6df960ff46132694f2f3c7de25262ad3de7d8",
+    "tools/verify_eador_choices.py": "d67935b74cc400d4f8d40924b4491a335466f81d7f3b92fd21697221b6d9de45",
+    "tools/eador_campaign.py": "be39058ebcb16c13e7dc081a96c24be50694b5fac1b35bc995ef7f434539c387",
+    "tools/eador_ui.py": "c37b7c2832771adfaaa56a2e2b0533390dee152cecb7612e5d236007fd26e10c"
+  },
+  "artifact_sha256": {
+    "applied-save-error-125.png": "59f96ffa8b840b7a8420147b5294e0b9c3027c2449ea8e06806cd3f52c2b177d",
+    "censer-100.png": "972c0a271a72cab43b95f0ef82dd2419dd386da31adc86832c397b1cb1823b67",
+    "censer-125.png": "31d188bcbb358fba7ffcca46faebe6f00ec68a17a2a5803b88bc74354562ba64",
+    "duplicate-125.png": "8437e5145e5be867e342dbccf4afead06298fa5297f8eacec23b49174db2692f",
+    "linked-fuzz.json": "0f9598f3e3973f93ec0fcc95b610347e5f85056c659fd8a48af0db92a34076d4",
+    "matrix.json": "7ecf775b97b0298808b6c50046e2aacc30da8d5af92a47283a0ac399d8e5f7b2",
+    "single-discipline-125.png": "4b60fcc8b9a1ed33b99c8fd316c5012b687d8824ccd05ab7b5d85338e1d1bbac",
+    "wizard-disciplines-125.png": "416061c780795c54d6be20cd32a68b6aa08d2c9d7d97f4fef1348223cf8ceb9a"
+  }
+}
