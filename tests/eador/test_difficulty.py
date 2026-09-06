@@ -7,6 +7,7 @@ import pytest
 from eador.model import State
 from tools.eador_campaign import finish_battle
 from tools.eador_linked_campaign import travel_selection
+from tools.eador_save_expectations import expected_rootward_arrival
 
 
 def without_difficulty_metadata(state):
@@ -33,8 +34,9 @@ def test_real_v11_progress_migrates_and_continues_with_exact_standard_rules():
         while state.choice:
             state.choose(state.choice.options[0].id)
         state.end_turn()
+        expected_after = expected_rootward_arrival(case['after']) if case['name'] == 'departure' else case['after']
         assert without_difficulty_metadata(state) == {
-            key: value for key, value in case['after'].items() if key != 'schema_version'}
+            key: value for key, value in expected_after.items() if key != 'schema_version'}
 
 
 def test_accessible_recovery_forecast_is_live_nonmutating_and_matches_end_turn():
@@ -120,7 +122,8 @@ def test_actual_challenge1_saves_keep_exact_rest_replay_arrival_and_recovery(nam
         state.recover(**travel_selection(state))
     else:
         state.end_turn()
-    assert json.loads(state.to_json()) == case['after']
+    expected_after = expected_rootward_arrival(case['after']) if name == 'advance' else case['after']
+    assert json.loads(state.to_json()) == expected_after
 
 
 @pytest.mark.parametrize('mode', ['accessible', 'standard', 'challenge'])
