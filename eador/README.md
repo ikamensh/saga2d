@@ -60,8 +60,8 @@ or Display. Arrow keys or visible buttons adjust volume, mute, window size,
 fullscreen, reduced motion and reading size; **Enter** applies, **Esc** cancels the preview.
 Reading size offers 100/125% for the title, Codex, Field Guide, expedition briefings,
 Build, Recruit, troop replacement, Hero, reward choices, results, Saves, rival plans and campaign transitions/plans. Press **T** in these screens to open that setting directly.
-Battle forecasts use the same setting, opened with **F2** or **Text size** during battle.
-The shard and tactical HUD values and objective text keep their existing sizes.
+Battle objectives and forecasts use the same setting, opened with **F2** or **Text size** during battle.
+The shard and selected-unit HUD values, action guidance and battle log keep their existing sizes.
 Reduced motion keeps battle damage and healing numbers still. The logical
 canvas stays the same size and letterboxes to fit the window.
 Preferences live separately in `~/.shardbound/settings.json` and survive

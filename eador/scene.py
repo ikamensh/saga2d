@@ -832,14 +832,19 @@ class BattleScene(Screen):
         super().refresh()
         b = self.battle
         x, h = self.edge + 22, self.game.height
+        from saga2d import Column
+        objective = self._objective_content()
+        self.objective_bottom = 100 + self.measure(objective)[1] + 24
+        self.ui.add(Column(objective, anchor=Anchor.TOP_LEFT, margin=(38, 112)))
         # Fit any finite battle board; topology, picking and polygons share one grid.
         geometry = HexGrid(b.terrain)
         centers = [geometry.center(p) for p in b.terrain]
         left, right = min(p[0] for p in centers) - .866, max(p[0] for p in centers) + .866
         top, bottom = min(p[1] for p in centers) - 1, max(p[1] for p in centers) + 1
-        objective_space = 80 if b.objective.kind == 'extract' else 52
-        size = min((self.edge - 100) / (right - left), (h - 288 - objective_space) / (bottom - top))
-        origin = (self.edge / 2 - (left + right) / 2 * size, (h - 50 + objective_space) / 2 - (top + bottom) / 2 * size)
+        board_top, board_bottom = self.objective_bottom + 16, h - 146
+        size = min((self.edge - 100) / (right - left), (board_bottom - board_top) / (bottom - top))
+        origin = (self.edge / 2 - (left + right) / 2 * size,
+                  (board_top + board_bottom) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
         alive = [u for u in b.units if u.team == "player" and u.hp > 0]
         if self.selected is None or not any(u.id == self.selected for u in alive):
@@ -869,19 +874,44 @@ class BattleScene(Screen):
         self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
         self.button("Save", self.edge - 105, 29, 79, self.save_game)
         self.button('Text size', x + 126, 16, 174, self.open_text_settings, shortcut='F2')
-        from saga2d import Column
         from eador.preferences import reading_scale
         forecast = self._forecast()
         if self.measure(forecast)[1] > h - 58 - 575:
             raise ValueError('Tactical forecast exceeds the available reading space')
         self.ui.add(Column(forecast, anchor=Anchor.TOP_LEFT, margin=(x, 575)))
         self._reading_view = self.hover, self.game.window_size, reading_scale(self.game)
-        if b.objective.kind == "hold":
-            self.button("Locate seal", self.edge - 188, 109, 162, self.locate_objective, shortcut="O")
+
+    def _objective_content(self):
+        from saga2d import Column, Label, Row
+        from eador.preferences import reading_scale
+        b, width = self.battle, self.edge - 76
+        scale = reading_scale(self.game) / 100
+
+        def label(text, *, size=10, color=MUTED, width=width):
+            return Label(text, width=width, wrap=True, font='Verdana', font_size=round(size * scale), text_color=color)
+
+        if b.objective.kind == 'hold':
+            objective = b.objective
+            title = label(f'HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}',
+                          size=12, color=GOLD, width=width - 174)
+            heading = Row(title, Button('Locate seal', width=162, height=40, shortcut='O',
+                                        on_click=self.locate_objective), spacing=12)
+            detail = 'Keep an ally on the seal after consecutive enemy turns, with no adjacent foe. Losing control resets progress; rout also wins.'
         elif b.objective.kind == 'extract':
-            self.button('Locate exit', self.edge - 362, 109, 156, self.locate_objective, shortcut='O')
-            self.button('Evacuate', self.edge - 194, 109, 156, self.evacuate, shortcut='V',
-                        primary=True, enabled=b.evacuation_blocked_reason is None)
+            title = label(f'ESCAPE WITH CARGO · By round {b.objective.deadline}', size=12,
+                          color=GOLD, width=width - 336)
+            heading = Row(title, Button('Locate exit', width=156, height=40, shortcut='O', on_click=self.locate_objective),
+                          Button('Evacuate', width=156, height=40, shortcut='V', on_click=self.evacuate,
+                                 style=PRIMARY, enabled=b.evacuation_blocked_reason is None), spacing=12)
+            detail = 'Hero on an exit, no adjacent foes, unspent hero order; rout also wins.'
+        else:
+            heading = label('ROUT THE DEFENDERS', size=12, color=GOLD)
+            detail = 'Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.'
+        content = Column(heading, label(detail), spacing=8)
+        if b.objective.kind == 'extract':
+            content.add(label(b.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.',
+                              color=GOLD if b.evacuation_blocked_reason else TEAL))
+        return content
 
     def locate_objective(self):
         objective = self.battle.objective
@@ -1161,24 +1191,7 @@ class BattleScene(Screen):
                   size=25, serif=True, center=True)
         self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", header_center, 63, size=10, color=GOLD, center=True)
         self.rule(26, 90, self.edge - 52)
-        if b.objective.kind == "hold":
-            objective = b.objective
-            self.box(26, 100, self.edge - 52, 60)
-            self.text(f"HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}",
-                      38, 108, size=12, color=GOLD)
-            self.text("End enemy turns on the seal with no adjacent enemy; rout also wins.", 38, 137, size=10, color=MUTED)
-        elif b.objective.kind == 'extract':
-            self.box(26, 100, self.edge - 52, 88)
-            self.text(f'ESCAPE WITH CARGO · By round {b.objective.deadline}', 38, 111, size=12, color=GOLD)
-            self.text('Hero on an exit, no adjacent foes, unspent hero order; rout also wins.',
-                      38, 142, size=10, color=MUTED)
-            self.text(b.evacuation_blocked_reason or 'Ready: V evacuates your hero and surviving army.',
-                      38, 165, size=10, color=GOLD if b.evacuation_blocked_reason else TEAL)
-        else:
-            self.box(26, 100, self.edge - 52, 60)
-            self.text('ROUT THE DEFENDERS', 38, 108, size=12, color=GOLD)
-            self.text('Defeat every defender. Keep your hero alive. Exhaustion after 80 rounds.',
-                      38, 137, size=10, color=MUTED)
+        self.box(26, 100, self.edge - 52, self.objective_bottom - 100)
         self.text("COMMAND", x, 30, size=10, color=GOLD)
         allies = sum(u.hp > 0 and u.team == "player" for u in b.units)
         enemies = sum(u.hp > 0 and u.team != "player" for u in b.units)

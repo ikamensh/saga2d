@@ -30,8 +30,10 @@ purchase buttons, large screen titles and page count keep their normal size.
 Battle target forecasts also use this setting, opened with **F2** or **Text size**;
 **T** still retreats. Target health, damage/retaliation, healing, ability consequences,
 costs and sight guidance wrap completely within the tactical sidebar. Returning
-from Apply/Cancel preserves the selected unit and aimed command. The shard and
-tactical HUD values, objective text and battle log keep their existing text sizes.
+from Apply/Cancel preserves the selected unit and aimed command. Battle objectives
+enlarge complete rout/hold/extraction instructions, progress, deadlines and live
+evacuation reasons; the board fits beneath their measured height. The shard and
+selected-unit HUD values, action guidance and battle log keep their existing sizes.
 The Settings notice states this scope. This is a bounded reference-reading slice;
 it does not close G10's requirement for broader text scaling and readability.
 
