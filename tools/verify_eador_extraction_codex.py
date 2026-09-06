@@ -48,7 +48,7 @@ def verify(output):
                 game.tick(1 / 60)
                 player.press('2')
                 player.press('end')
-                assert game.scene.category == 1 and game.scene.page == 2
+                assert game.scene.category == 1 and game.scene.page == game.scene.pages - 1
                 player.capture(label + '-escape-orders')
                 if label in ('guided', 'full-cache'):
                     player.button('Sites')
