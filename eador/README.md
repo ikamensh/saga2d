@@ -119,6 +119,7 @@ adds mana to support the two spells already learned.
 | Shard | Enter / Space | Travel to or invade the selected adjacent province |
 | Shard | X | Explore the hero's current province; preview authored expeditions |
 | Expedition briefing | Enter / Esc | Enter for one action / return without spending |
+| Adventure briefing | 1 / 2 | Compare deployment, fee or reward choices |
 | Shard | B / R | Open construction / recruitment |
 | Shard / decision | H | Inspect skills and equip relics |
 | Shard, battle, guide, hero or decision | C | Open the rules codex |
@@ -134,10 +135,14 @@ adds mana to support the two spells already learned.
 | Battle | Click empty hex / enemy | Move / attack with selected unit |
 | Battle | Arrows / Page Up / Page Down | Aim at neighboring hexes (Page keys provide the other two diagonals) |
 | Battle | Enter / Space | Select, move, attack or cast at the aimed hex |
-| Battle | F | Cycle enemies, or legal targets for the aimed spell, Pin or Swap |
+| Battle | F | Cycle enemies, or legal targets for the selected order |
 | Battle | 1 / 2, then click target | Hero Bolt / Heal with the selected Acolyte, otherwise the hero |
 | Battle | S, then F / click target / Enter | Exchange a Warden with an adjacent ally |
-| Objective battle | O | Aim at the seal |
+| Battle | Q, then F / click target / Enter | Rally an adjacent Pinned ally with Militia |
+| Battle | D, then F / click hex / Enter | Place a Sapper's finite Smoke screen |
+| Battle | R, then F / click target / Enter | Preview and Repulse an enemy with a Rune Adept |
+| Objective battle | O | Aim at the seal or cycle exits |
+| Extraction battle | V | Evacuate with an unspent hero on an uncontested exit |
 | Battle | P, then F / click target / Enter | Aim Pin with an Archer or Storm Quiver hero |
 | Battle | G / Guard or Brace button | Spend the selected unit's order on its defensive stance |
 | Battle | E | End round, or accept a completed battle's result |
@@ -173,7 +178,7 @@ site per eligible province, resolved in a single expedition.
 
 Other classes have five troop slots. Troops are individual fighters, not
 stacks. Victories improve the hero and surviving veterans; dead troops are
-lost. Seven recruitable roles have different orders and costs. Militia fill
+lost. Ten recruitable roles have different orders and costs. Militia fill
 cheap front-line slots; Swordsmen provide stronger melee attacks; Archers
 offer ranged damage and Pin; Pikemen Brace against melee approaches.
 
@@ -191,6 +196,22 @@ their remaining movement; the Warden spends its action, while the ally keeps
 any unspent action. Guard, Brace and Pin remain unchanged. Ranger and Warden are
 on recruitment's second page; **Left/Right** or **Previous/Next** changes pages.
 
+Militia can **Rally** with **Q**, clearing an adjacent ally's Pin. The green
+forecast shows that ally's actual reachable hexes after Rally. The Militia
+spends its own action and movement; the ally keeps its existing spent orders.
+Sappers cost 60 gold and one crystal after Marketplace construction. **D**
+places one Smoke screen per battle within three visible hexes. It blocks
+both sides' ranged attacks, Pin and spells through that hex until the Sapper's
+next turn. The cloud badge and **Smoke · 0** persist across loading.
+
+Rune Adepts cost 65 gold and two crystals after Mage Tower construction.
+**R** uses one Repulse per battle to push an adjacent enemy one hex away,
+without damage or changing its spent orders. The landing is previewed and
+must be empty; Guard and Brace anchor enemies against displacement.
+Skyriders cost 85 gold and three crystals after Temple construction. Their
+four-hex flight crosses occupied or rough ground, with an empty landing.
+Pin still slows them and melee attacks still face Brace.
+
 Each level offers two class disciplines. Choose a new discipline or deepen
 one already learned, up to rank three. Commander balances recruitment and
 recovery against retaliation-free troop attacks; Warrior chooses safe,
@@ -198,9 +219,9 @@ stronger strikes or healing; Scout chooses terrain traversal or attacking
 before moving away; Wizard specializes in cheaper Bolt or stronger,
 cheaper Heal. **H** shows learned effects.
 
-Ten sites have different defending parties and gold/crystal rewards:
+Eleven sites have different defending parties and gold/crystal rewards:
 Buried Shrine, Forgotten Tower, Old Barrow, Wolf Den, Lost Caravan and Elder
-Grove, Border Watch, Explorer's Camp, Courier's Crossing and Supply Cache.
+Grove, Border Watch, Explorer's Camp, Courier's Crossing, Supply Cache and Sealed Vault.
 The Watch shows its layout and rewards before you commit
 an action. Hold its seal for two uncontested enemy turns by round eight, or
 defeat every defender. **O** locates the seal during its battle. Winning offers a relic or its gold value. Keep and equip one of eight
@@ -209,11 +230,12 @@ terrain, improve army recovery or reduce recruitment costs. Duplicate
 relics can instead be distilled into four crystals. These choices belong
 to this adaptation; they do not reproduce the commercial game's catalogue.
 
-Courier's Crossing and Supply Cache ask you to carry cargo out of a defended
+Courier's Crossing, Supply Cache and Sealed Vault ask you to carry cargo out of a defended
 battlefield. Their briefing compares two approaches with **1/2** and shows
 the actual deployment, exits, defenders and reward before **Enter** commits
 an action. **Esc** returns for free. At the Crossing, a guide costs 20 gold
 and changes your deployment; at the Cache, a larger reward slows your hero.
+The Ruins Vault offers a second escape door for two crystals.
 During battle, **O** cycles marked exits. Reach one with an unspent hero action
 and no adjacent enemy, then use **V** to Evacuate with all surviving troops.
 Moving or being delivered by a Warden keeps the hero's action; attacking,
@@ -225,9 +247,9 @@ success pays the chosen reward once. The Codex shows saved approach details.
 |---|---|---|
 | Barracks | 45 gold | Recruit Swordsmen, Pikemen and Wardens |
 | Archery Range | 55 gold | Recruit Archers and Rangers |
-| Temple | 65 gold | Recruit Acolytes, learn Heal, improve recovery |
-| Mage Tower | 75 gold + 2 crystals | Learn Arcane Bolt and gain 4 maximum mana |
-| Marketplace | 60 gold | Add 8 gold income each turn |
+| Temple | 65 gold | Recruit Acolytes and Skyriders, learn Heal, improve recovery |
+| Mage Tower | 75 gold + 2 crystals | Recruit Rune Adepts, learn Arcane Bolt and gain 4 maximum mana |
+| Marketplace | 60 gold | Recruit Sappers and add 8 gold income each turn |
 
 Owned provinces provide gold and hills provide crystals; army upkeep is
 deducted each campaign turn. If every province neighboring Westwatch is
@@ -246,7 +268,10 @@ hero's action. A move can precede an attack or spell; attacking or casting
 ends that unit's movement unless the Scout's Skirmisher discipline allows
 an attack followed by movement. Surviving adjacent targets can retaliate once
 per full round. Forest and marsh cost extra movement; forest and hills
-provide cover. Ranged attacks use distance without line-of-sight blocking.
+provide cover. Intervening forest blocks ranged attacks, Pin and spells;
+forest at a shooter or target provides cover without itself blocking the shot.
+Smoke also blocks shots into or out of its hex, while self-healing still works.
+Older saved active battles retain their original sight and capabilities.
 
 **G** spends a unit's remaining movement and action on **Guard**, adding two
 defense until its next turn. A Pikeman uses **Brace** instead: the first
@@ -270,7 +295,7 @@ the original games' large content catalogue. The rival has a finite
 expedition and treasury, with a fixed recruitment plan. Tactical morale,
 stamina and spell preparation are simplified
 away. Hero mana replaces Eador's prepared spells and gem costs; crystals
-here fund construction rather than individual casts.
+fund construction, specialist recruits and some expedition approaches.
 
 ## Game and framework
 
