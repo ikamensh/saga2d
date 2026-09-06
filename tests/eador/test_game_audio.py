@@ -88,7 +88,7 @@ def test_successful_move_hit_and_spells_have_their_own_cues(tmp_path):
         assert cues(game)[-1] == 'move'
         target = battle.targets(archer.id)[0]
         click(target.pos)
-        assert cues(game)[-1] == 'attack_hit'
+        assert cues(game)[-1] == 'attack_arrow'
         press(game, 'e')
         target = next(unit for unit in battle.units if unit.team == 'enemy' and unit.alive
                       and battle.grid.distance(battle.unit(0).pos, unit.pos) <= 4)

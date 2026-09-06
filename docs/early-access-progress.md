@@ -866,3 +866,28 @@ unchanged. The two sequential native runs average 25.38% and 25.30% of one core
 and close their games. [Retained journals and verification](evidence/scout-paths-78cb545/README.md)
 distinguish the original execution sources from the native verifier source.
 Twenty-four focused validator tests pass; G01–G19 remain incomplete.
+
+
+## Visuals and sound first — 2026-09-07
+
+The [presentation pass](eador-presentation.md) adds an original painted backdrop,
+48 offline terrain illustrations, shaded castles and miniatures, and brief
+command-driven projectiles, impacts and ability effects. Battlefield textures
+are quieter than province illustrations. Native review found and fixed ground
+rings crossing HP, repeated damage/Heal numbers overprinting, oversized labels
+merging with neighboring health, and contact sparks crossing damage numbers.
+Both health and damage now stay above effects, with compact labels inside their
+own hex. Normal orders and saves remain immediate; enemy playback remains read-only.
+
+Fourteen richer original cues and two revoiced music loops ship as prebuilt WAVs.
+The asset build stays near its 25% CPU allowance. Native silent playback of the
+complete catalogue, both full loops, live volume/mute and cleanup passes; audible
+artistic review is still open. Existing Saga2D images, layers, audio and synthesis
+primitives support the pass without a new framework interface.
+
+[Retained screenshots and receipts](evidence/presentation-pass/README.md) include
+nine final static frames, six native effect cases with 91 inputs and six exact
+reloads, focused integration tests, and both bounded fuzz checks. The existing
+60/15 FPS game caps remain. All owned expensive jobs ran serially and exited.
+The adventure-route branch remains separate; visuals and sound keep priority
+before additional mechanics. G01–G19 remain incomplete.

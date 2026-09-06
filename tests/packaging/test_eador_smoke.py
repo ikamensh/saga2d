@@ -9,6 +9,8 @@ import shutil
 
 import pytest
 
+from eador.sound import CUES, TRACKS
+
 
 ENTRY = Path(__file__).resolve().parents[2] / 'packaging/entry.py'
 
@@ -19,7 +21,7 @@ def test_smoke_decodes_a_relocated_shipping_catalogue_and_rejects_changed_bytes(
     assets = tmp_path / 'installed/eador/assets'
     shutil.copytree(ENTRY.parent.parent / 'eador/assets', assets)
     files = decode(assets)
-    assert len(files) == 14
+    assert set(files) == {f'sounds/{name}.wav' for name in CUES} | {f'music/{name}.wav' for name in TRACKS}
     assert {record['sample_rate'] for record in files.values()} == {44100}
     assert {record['channels'] for name, record in files.items() if name.startswith('sounds/')} == {1}
     assert {record['channels'] for name, record in files.items() if name.startswith('music/')} == {2}

@@ -30,10 +30,12 @@ def test_reduced_motion_keeps_damage_feedback_still_without_changing_combat(tmp_
         for key in ('1', 'f', 'return'):
             player.press(key)
         before = player.state.to_json()
-        numbers = [(text['text'], text['x'], text['y']) for text in game.backend.texts if text['font_size'] == 23]
+        numbers = [(text['text'], text['x'], text['y']) for text in game.backend.texts
+                   if text['text'].startswith(('+', '-')) and text['text'][1:].isdigit()]
         assert numbers
         game.tick(.25)
-        after = [(text['text'], text['x'], text['y']) for text in game.backend.texts if text['font_size'] == 23]
+        after = [(text['text'], text['x'], text['y']) for text in game.backend.texts
+                 if text['text'].startswith(('+', '-')) and text['text'][1:].isdigit()]
         assert (numbers == after) == reduce
         assert player.state.to_json() == before
     finally:

@@ -9,7 +9,7 @@ from eador.encounters import ENCOUNTERS
 from eador.model import UNITS
 from eador.preferences import reading_scale
 from eador.scene import Screen
-from eador.style import GOLD, INK, MUTED, PRIMARY, RED, TEAL, TEXT
+from eador.style import GOLD, MUTED, PRIMARY, RED, TEAL, TEXT
 
 
 class EncounterScene(Screen):
@@ -214,16 +214,16 @@ class EncounterScene(Screen):
         x, y, width, height = self._preview.bounds
         grid = HexGrid(dict(definition.terrain), size=21, origin=(x + width / 2, y + height / 2))
         for pos, terrain in definition.terrain:
-            self.draw_polygon(grid.corners(pos), art.TERRAINS[terrain])
-            art.outline(self, grid.corners(pos), INK)
-        for pos in definition.player_positions[:len(self.root.state.hero.army) + 1]:
-            cx, cy = grid.center(pos)
-            self.draw_circle(cx, cy, 5, TEAL)
-        for pos in definition.enemy_positions[:len(self.guards)]:
-            cx, cy = grid.center(pos)
-            self.draw_rect(cx - 4, cy - 4, 8, 8, RED)
-        if definition.objective == 'extract':
-            for number, pos in enumerate(definition.exits, 1):
-                art.exit_marker(self, grid, pos, number)
-        elif definition.objective == 'hold':
-            art.seal(self, grid, definition.seal)
+            art.terrain_tile(self, grid, pos, terrain)
+        with self.screen_layer(2):
+            for pos in definition.player_positions[:len(self.root.state.hero.army) + 1]:
+                cx, cy = grid.center(pos)
+                self.draw_circle(cx, cy, 5, TEAL)
+            for pos in definition.enemy_positions[:len(self.guards)]:
+                cx, cy = grid.center(pos)
+                self.draw_rect(cx - 4, cy - 4, 8, 8, RED)
+            if definition.objective == 'extract':
+                for number, pos in enumerate(definition.exits, 1):
+                    art.exit_marker(self, grid, pos, number)
+            elif definition.objective == 'hold':
+                art.seal(self, grid, definition.seal)

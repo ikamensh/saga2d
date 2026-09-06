@@ -1,0 +1,95 @@
+{
+  "scope": "Native visual input and exact saves; silent audio, no listening approval.",
+  "frames": [
+    {
+      "name": "title-frontier",
+      "scene": "TitleScene",
+      "reading_size": 100,
+      "six_frames_cpu_seconds": 0.128383
+    },
+    {
+      "name": "campaign-frontier",
+      "scene": "ShardScene",
+      "reading_size": 100,
+      "six_frames_cpu_seconds": 0.047374
+    },
+    {
+      "name": "title-elderwild",
+      "scene": "TitleScene",
+      "reading_size": 100,
+      "six_frames_cpu_seconds": 0.041097
+    },
+    {
+      "name": "campaign-elderwild",
+      "scene": "ShardScene",
+      "reading_size": 100,
+      "six_frames_cpu_seconds": 0.04655
+    },
+    {
+      "name": "title-ruins",
+      "scene": "TitleScene",
+      "reading_size": 100,
+      "six_frames_cpu_seconds": 0.03279
+    },
+    {
+      "name": "campaign-ruins",
+      "scene": "ShardScene",
+      "reading_size": 100,
+      "six_frames_cpu_seconds": 0.055149
+    },
+    {
+      "name": "title-reading-125",
+      "scene": "TitleScene",
+      "reading_size": 125,
+      "six_frames_cpu_seconds": 0.053264
+    },
+    {
+      "name": "campaign-reading-125",
+      "scene": "ShardScene",
+      "reading_size": 125,
+      "six_frames_cpu_seconds": 0.055957
+    },
+    {
+      "name": "battle-reading-125",
+      "scene": "BattleScene",
+      "reading_size": 125,
+      "six_frames_cpu_seconds": 0.052476
+    }
+  ],
+  "source_sha256": {
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "52578ae4ab65a0dfd8852f2eb49d128b5559e2953bcf90486f10f7c4a89cfd14",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "f084848e239acc2eca839b017f7c6e23883308906f570c724586727c6348a6d2",
+    "eador/battle.py": "4bf00295ff562299252a4ac6a4cc847055124fcf42c4a0532b09413c344c89f4",
+    "eador/battle_effects.py": "ab85dcf1fd712ddb03b93a4db74028b41f2e6a3e8c2b3a463b8739025775ed4d",
+    "eador/battle_playback_scene.py": "763be5074a24e5de2627a83ed2edb135e340b1ff6a78c100bae1a88c3bbbbe66",
+    "eador/battle_trace.py": "57e1736fcb430a66c800d4268d1c1fe63c38ad19cbbb85b648ea53a1006f051c",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "5cc53defc1e45160ebbf649407a993864aca5071542995d919a1bf0569e427dd",
+    "eador/codex.py": "db7c5b451767786490a926483183979a16285b4d67f2d22d158c269a9816dee0",
+    "eador/content.py": "6dbac37f87693364516ea10c3c19e96b67892df4d74d224c15f824dc900128db",
+    "eador/diagnostics.py": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/encounter_scene.py": "989312d689dcaed8a6e58eb394bd2f70cbd2c0c656c18c81b0ac35f7a898d29f",
+    "eador/encounters.py": "66878812c1406fbbc1dc3d1d3d98cf9d067e3f01d6f9cfccb1e8649719c0737d",
+    "eador/landscape.py": "9c3ae952cf0da62b110d8b2c85a77227f0a94ed09d122b164e7c6cfdaa0a3f72",
+    "eador/model.py": "8d7494397778acdbcd6c54efefb735d152e22a824be84dd5067cf6284c25c717",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/preferences.py": "07dc07e0a5dc1b70cdf24e8784e690f32d340b4bcf16e3252622bf11c9b833a8",
+    "eador/reading.py": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c",
+    "eador/release.py": "4bf603144c1bf6232feb366b004ac5dad60c32dbb0547d054a4033ef24be21c4",
+    "eador/replacement_scene.py": "84a98abcae1255ffb4fc351f4c209e61dfa6c70f3d69f6f85fa7a19991b8568c",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "4a3a15bb4a36fc6d10c7d5ebdd07a37faba0def606ce1e3ff8af35170d48a21b",
+    "eador/scene.py": "3de7235cd1cea8c1323f8fa5e285bff5b94784c0bc1959bc265d0e29d632f3fc",
+    "eador/settings_scene.py": "cf16efa9d04153ea94c4ac50862c871fae6d04feb4b02d48aea13dd07a53f9ca",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "c945aa5b9e5926a6ccdbd0843b36a70269014aad7f2ace49a8947c1e17011ff2",
+    "eador/style.py": "39ff765e44ad036cc375294935e0c72392cfbc204b7b1c1b75b5e8b17152c532",
+    "eador/worldgen.py": "0c89b6d52208f9cc929e67caae09790f4b1407903806fe87f0f01d0320ac79a3"
+  },
+  "native_inputs": 19,
+  "exact_reloads": 4,
+  "final_sha256": "3680f15293e566cdf41b1bcffcdcb65ddfd241903f2ea84bf3df0bb0976d4cd5"
+}

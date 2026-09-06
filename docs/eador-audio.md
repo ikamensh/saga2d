@@ -121,7 +121,12 @@ including exact paced/unpaced PCM and sampler comparisons. One real default
 build generated all sixteen shipping files in **9.46 seconds wall time and
 2.35 seconds of user + system CPU** (about 24.8% of one core). That measurement
 covers this build only; it is not a runtime game or battery measurement.
-No native or audible playback was performed for this composition check.
+The subsequent presentation pass played all fourteen cues to completion and
+both full loops with the native silent driver. Live volume/mute changes,
+continuous streaming and player cleanup passed in **93.85 seconds wall time,
+2.32 seconds CPU**. The retained receipt is
+[audio-native.txt](evidence/presentation-pass/audio-native.txt). This checks
+playback mechanics; audible artistic review remains outstanding.
 
 ## Historical generator 1 integration checkpoint — 2026-09-06
 

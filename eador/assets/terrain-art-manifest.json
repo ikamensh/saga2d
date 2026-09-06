@@ -9,170 +9,170 @@
   ],
   "files": {
     "images/terrain/ground-forest-0.png": {
-      "bytes": 81933,
+      "bytes": 72010,
       "mode": "ground",
-      "sha256": "4e071802000c410d8da2184646423384aad0ce04d0cfcb9fb7c7b89cc8a1b5b5",
+      "sha256": "7061ecd14a7aad299f1349a470ca1b97c74ebf8bef264fb0b45b468213ea8079",
       "terrain": "forest",
       "variant": 0
     },
     "images/terrain/ground-forest-1.png": {
-      "bytes": 81672,
+      "bytes": 71622,
       "mode": "ground",
-      "sha256": "79d5dc463703dc1743d8ba2a2b4ac4873d48c8fd895bc4c0bca0ab3e243d408d",
+      "sha256": "1cee1fbc954839be8d9a2fb0630a68bdd76fe585d835db88f8b24765e0971d0d",
       "terrain": "forest",
       "variant": 1
     },
     "images/terrain/ground-forest-2.png": {
-      "bytes": 82042,
+      "bytes": 71920,
       "mode": "ground",
-      "sha256": "ee4687e1e3469c291bfe4025cef95a13ab55cdba683f7f1e4033eeba2faa7c3d",
+      "sha256": "3b2e32eaec66ffcb93e9ba0dcbf9306540550bfeb4cadd0052e313f43256813b",
       "terrain": "forest",
       "variant": 2
     },
     "images/terrain/ground-forest-3.png": {
-      "bytes": 81939,
+      "bytes": 71906,
       "mode": "ground",
-      "sha256": "b8b4158be5a384f8256114ddaea54a324c68f883001bd555d7cceab32c076d4b",
+      "sha256": "4638bd01d89a04aac189469024cc11bc4f89047b561ff732725011ef2aab323e",
       "terrain": "forest",
       "variant": 3
     },
     "images/terrain/ground-hills-0.png": {
-      "bytes": 83272,
+      "bytes": 73486,
       "mode": "ground",
-      "sha256": "3bdb00b391fd64836809742ef2558f5878ab57005af8da7abae716c4a91958aa",
+      "sha256": "77ed3dd37766278b9dddb762268c24d6cf0bb69f9c789021a11be1dce06f106d",
       "terrain": "hills",
       "variant": 0
     },
     "images/terrain/ground-hills-1.png": {
-      "bytes": 83252,
+      "bytes": 73381,
       "mode": "ground",
-      "sha256": "c8853417c0d5e1e683033bd7988702342f6b07b23ae7251686e9001091bfc4e4",
+      "sha256": "31b5afdec074fd4a521d1febd051c5480bb0b1302d90c178dde148b819a8d1f0",
       "terrain": "hills",
       "variant": 1
     },
     "images/terrain/ground-hills-2.png": {
-      "bytes": 82922,
+      "bytes": 73019,
       "mode": "ground",
-      "sha256": "79ed3cbad13ee1b1e6898904626f4d220479cce54c996db5fd048f0e46fb0cc3",
+      "sha256": "0f2f7f1bd461e17b4bd6c3d2cfae4de98573360927fee3fbdfb86705631ad534",
       "terrain": "hills",
       "variant": 2
     },
     "images/terrain/ground-hills-3.png": {
-      "bytes": 82575,
+      "bytes": 72823,
       "mode": "ground",
-      "sha256": "f97afa533ab1e370865cfd1b0e1f018c1c0b28345c543815175de46035c1c73c",
+      "sha256": "2cb09971ad232d7e56dd54b0fb1b28421c17c0200edbeab47b36d12b490e57ce",
       "terrain": "hills",
       "variant": 3
     },
     "images/terrain/ground-marsh-0.png": {
-      "bytes": 81082,
+      "bytes": 70920,
       "mode": "ground",
-      "sha256": "f39ba61f98dc560a23939e9073c1485fb9cdc554f995e6886365a30fe266b16b",
+      "sha256": "5b6e0cab4264aa37d96b7f6ca91a31c3344ea1332f038f19963d4796a9b4d310",
       "terrain": "marsh",
       "variant": 0
     },
     "images/terrain/ground-marsh-1.png": {
-      "bytes": 81152,
+      "bytes": 70773,
       "mode": "ground",
-      "sha256": "554f7547af6bc98dc05406ef0b5628d438da5074b55f25990401fb8aeba2e69d",
+      "sha256": "b49001b64168fd8642d2b5c325aeb9e8efbd0b0b197669838034c3590e10abe7",
       "terrain": "marsh",
       "variant": 1
     },
     "images/terrain/ground-marsh-2.png": {
-      "bytes": 81215,
+      "bytes": 71042,
       "mode": "ground",
-      "sha256": "9fac2ad5ab40be7e309f236de20fa5454dbc9e08ffdd1a7fbf674f7bb1e468d1",
+      "sha256": "6725429e8505e1e2e42e5dc25b31485cc5b56b8f0f0cb9e72446755a1b59e859",
       "terrain": "marsh",
       "variant": 2
     },
     "images/terrain/ground-marsh-3.png": {
-      "bytes": 81327,
+      "bytes": 71035,
       "mode": "ground",
-      "sha256": "4901435fb449d83ad0fda51089e02a6b030e61c1590b30e47cc32ea3dc16eb5b",
+      "sha256": "71ff474cf61409ec0e8605d973d5d140aa69ea457b02165dcd15987e154019fc",
       "terrain": "marsh",
       "variant": 3
     },
     "images/terrain/ground-mountains-0.png": {
-      "bytes": 79706,
+      "bytes": 69564,
       "mode": "ground",
-      "sha256": "d7233a50dd2bb892a591c950016a11f1698a8d94227c20d37a680d9936ba98c6",
+      "sha256": "078c3267eb260ec53344563ebb40267cf9acbb8467ad2ec02b3653ef05295e90",
       "terrain": "mountains",
       "variant": 0
     },
     "images/terrain/ground-mountains-1.png": {
-      "bytes": 79186,
+      "bytes": 68774,
       "mode": "ground",
-      "sha256": "296f3f15575b9db6e562c897d34c27bb6ccb4e5a113d9988a37b9743cb99d35b",
+      "sha256": "fe96307731a250b86ee5d4b760f48badad507d5cda7fc75131a417c76e764825",
       "terrain": "mountains",
       "variant": 1
     },
     "images/terrain/ground-mountains-2.png": {
-      "bytes": 80459,
+      "bytes": 70034,
       "mode": "ground",
-      "sha256": "e5a6a3397acf762828d01f97053367da5c20afc9c47c5fa49d30f774f016981a",
+      "sha256": "581861f57791be76f48d1b9716c88840f83b23a4cc704558c5e669e09dcfb941",
       "terrain": "mountains",
       "variant": 2
     },
     "images/terrain/ground-mountains-3.png": {
-      "bytes": 79653,
+      "bytes": 69184,
       "mode": "ground",
-      "sha256": "5948db855528eff1e3b8848331ce542fbf79acdff595af7d4c1aa535d9eb4e7b",
+      "sha256": "dec31b395496eb924b39e754845cb08316725cd184dbaa9d18b761b5e241b7bb",
       "terrain": "mountains",
       "variant": 3
     },
     "images/terrain/ground-plains-0.png": {
-      "bytes": 79315,
+      "bytes": 68833,
       "mode": "ground",
-      "sha256": "7a08ecc6f875b197a468d706489cc7c8d1191d179789583ee13a057ba920ec91",
+      "sha256": "dbbf2c76690163da7ce27926ce3dac7eb1950e37475e05ab56baee6450208f12",
       "terrain": "plains",
       "variant": 0
     },
     "images/terrain/ground-plains-1.png": {
-      "bytes": 79617,
+      "bytes": 69368,
       "mode": "ground",
-      "sha256": "b2de826aff19e613ffb8be5ed344ed84e92b18826e2ce6fc52540a187f556e46",
+      "sha256": "2297a3f0ddb057f0e6edcc9d328ffe821ae6d87e9fbf2bc79f7b78635ba7311a",
       "terrain": "plains",
       "variant": 1
     },
     "images/terrain/ground-plains-2.png": {
-      "bytes": 78981,
+      "bytes": 68878,
       "mode": "ground",
-      "sha256": "c2b5b4369ec8c44bb2070d6f5ce1df8938f5e6f90c580af0ff51dcbe1325633c",
+      "sha256": "0f8b165a71c87e3f52f3ac572e4c9e020adefc2cfe4c180cdbb79e5686a7f9f1",
       "terrain": "plains",
       "variant": 2
     },
     "images/terrain/ground-plains-3.png": {
-      "bytes": 79364,
+      "bytes": 69072,
       "mode": "ground",
-      "sha256": "721593155da2a83cf2ed15e465946cc3602e4d3803748f709d20c8b640c07fdf",
+      "sha256": "5cdcc2d4d82db558fe52472e62b98c751cbe948c56d81891c95cd06f7a004ffc",
       "terrain": "plains",
       "variant": 3
     },
     "images/terrain/ground-water-0.png": {
-      "bytes": 75123,
+      "bytes": 64062,
       "mode": "ground",
-      "sha256": "193d7e8dfd34eb0fb9ee0c0530363698d3937d9a42755ddf90ed7c4af1081237",
+      "sha256": "c4a203c9183e3ca103ca1487870160f494470578a13bcea7429a3ebb4ca2a7d7",
       "terrain": "water",
       "variant": 0
     },
     "images/terrain/ground-water-1.png": {
-      "bytes": 75336,
+      "bytes": 64117,
       "mode": "ground",
-      "sha256": "81e296f162e8d356d3857ed0d42f5df5dcee4bd8b9e7468bf867778f0dd7ae68",
+      "sha256": "e61896d9d21aa564a40c94aef33c9b5e805a47b320d388257f1768499ead78da",
       "terrain": "water",
       "variant": 1
     },
     "images/terrain/ground-water-2.png": {
-      "bytes": 75094,
+      "bytes": 63997,
       "mode": "ground",
-      "sha256": "a7230a9cbcd52eec18c24ce7ec9d576f1ac1cf9308c2e0f89a375203c321cbc3",
+      "sha256": "cf000d221341adb3b20fb36548d9fbd610801175f2593dda4946738cbfe0d098",
       "terrain": "water",
       "variant": 2
     },
     "images/terrain/ground-water-3.png": {
-      "bytes": 75098,
+      "bytes": 63882,
       "mode": "ground",
-      "sha256": "230f512e0734893e4f1dfa9874ec59e1772b7ad7e8eb1c7c28ce8bb9596b3cad",
+      "sha256": "0541293455aa7711ea71785491cc995d722ca22feb6cea7512dfac4a3358bc2a",
       "terrain": "water",
       "variant": 3
     },
@@ -361,7 +361,7 @@
   "relief": 20,
   "runtime": "Prebuilt PNGs only. The game does not execute the composition module.",
   "source_sha256": {
-    "eador/landscape.py": "9170235c688bebffcc4cea06b7fda4bc5bc09b9a6f9f35649e30b635be8d420b",
+    "eador/landscape.py": "9c3ae952cf0da62b110d8b2c85a77227f0a94ed09d122b164e7c6cfdaa0a3f72",
     "tools/build_eador_art.py": "8e755c27202217300995f3dacff9193a270a74e28476dd87b7a8e66828ff481d",
     "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"
   },

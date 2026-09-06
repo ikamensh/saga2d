@@ -5,18 +5,12 @@ different reference game; all geometry uses Scene's drawing interface.
 """
 
 import math
-import random
+from pathlib import Path
 
 from eador.style import BLUE, GOLD, INK, LINE, MUTED, RED, TEAL, TEXT
 
-TERRAINS = {
-    "plains": (103, 121, 83, 255), "forest": (67, 102, 82, 255),
-    "hills": (134, 122, 87, 255), "swamp": (73, 100, 99, 255),
-    "marsh": (73, 100, 99, 255),
-    "mountain": (112, 125, 131, 255), "mountains": (112, 125, 131, 255),
-    "water": (58, 96, 120, 255),
-}
 OWNERS = {"player": TEAL, "rival": RED, "neutral": (160, 160, 126, 255)}
+IMAGES = Path(__file__).resolve().parent / 'assets' / 'images'
 
 
 def shade(color, amount):
@@ -184,80 +178,63 @@ def exit_marker(scene, grid, pos, number, *, label=True):
                    size=8 if size >= 30 else 7, color=TEAL, center=True)
 
 
-def backdrop(scene, width, height):
-    """Quiet star field and engraved orbit lines around the floating shard."""
-    rng = random.Random(918)
-    for _ in range(100):
-        x, y = rng.randrange(24, width - 24), rng.randrange(100, height - 50)
-        scene.draw_circle(x, y, rng.choice((0.7, 0.8, 1.2)), (85, 113, 119, rng.randrange(60, 150)))
-    cx, cy = width * .49, height * .49
-    for radius in (height * .35, height * .43):
-        points = [(cx + math.cos(i * math.tau / 96) * radius * 1.12,
-                   cy + math.sin(i * math.tau / 96) * radius) for i in range(96)]
-        outline(scene, points, (39, 56, 61, 255))
+def backdrop(scene, width, height, *, title=False):
+    """A shipped painting, cached by Assets; quiet enough for an atlas and its HUD."""
+    with scene.screen_layer(0):
+        scene.draw_image(str(IMAGES / 'shard-atmosphere.png'), 0, 0, width, height)
+    if not title:
+        with scene.screen_layer(1):
+            scene.draw_rect(0, 0, width, height, (12, 22, 27, 155))
 
 
-def tree(scene, x, y, scale=1):
-    scene.draw_line(x, y, x, y - 13 * scale, (68, 60, 41, 255), 3 * scale)
-    for dy, w in ((4, 12), (11, 10), (18, 7)):
-        scene.draw_polygon([(x - w * scale, y - dy * scale), (x, y - (dy + 17) * scale),
-                            (x + w * scale, y - dy * scale)], (34, 65 + dy, 56, 255))
-        scene.draw_polygon([(x, y - dy * scale), (x, y - (dy + 17) * scale),
-                            (x + w * scale, y - dy * scale)], (56, 88 + dy, 67, 255))
-
-
-def mountain(scene, x, y, scale=1):
-    scene.draw_polygon([(x - 23 * scale, y), (x - 3 * scale, y - 40 * scale),
-                        (x + 25 * scale, y)], (84, 92, 84, 255))
-    scene.draw_polygon([(x - 3 * scale, y - 40 * scale), (x + 6 * scale, y),
-                        (x + 25 * scale, y)], (164, 166, 139, 255))
-    scene.draw_polygon([(x - 10 * scale, y - 26 * scale), (x - 3 * scale, y - 40 * scale),
-                        (x + 7 * scale, y - 26 * scale), (x - 1 * scale, y - 29 * scale)], TEXT)
+def ellipse(scene, x, y, rx, ry, color):
+    """A shallow tabletop shadow or metal rim, using the ordinary shape renderer."""
+    scene.draw_polygon([(x + math.cos(i * math.tau / 24) * rx,
+                         y + math.sin(i * math.tau / 24) * ry) for i in range(24)], color)
 
 
 def castle(scene, x, y, color, scale=1):
-    scene.draw_circle(x, y + 5 * scale, 27 * scale, (22, 32, 29, 70))
+    ellipse(scene, x + 7 * scale, y + 8 * scale, 39 * scale, 13 * scale, (8, 18, 22, 130))
+    stone, shadow = (188, 177, 145, 255), (105, 121, 115, 255)
+    scene.draw_polygon([(x - 35 * scale, y + 6 * scale), (x - 26 * scale, y - 10 * scale),
+                        (x + 26 * scale, y - 10 * scale), (x + 36 * scale, y + 8 * scale),
+                        (x + 18 * scale, y + 14 * scale), (x - 23 * scale, y + 14 * scale)], shadow)
     for dx, rise in ((-20, 4), (0, -9), (20, 4)):
         xx, yy = x + dx * scale, y + rise * scale
-        scene.draw_rect(xx - 8 * scale, yy - 27 * scale, 16 * scale, 30 * scale, (185, 181, 151, 255))
-        scene.draw_rect(xx + 2 * scale, yy - 27 * scale, 6 * scale, 30 * scale, (118, 126, 117, 255))
+        scene.draw_rect(xx - 8 * scale, yy - 27 * scale, 16 * scale, 30 * scale, stone)
+        scene.draw_rect(xx + 2 * scale, yy - 27 * scale, 6 * scale, 30 * scale, shadow)
+        for dy in (-20, -11, -2):
+            scene.draw_line(xx - 8 * scale, yy + dy * scale, xx + 8 * scale, yy + dy * scale,
+                            (125, 128, 111, 255), .6 * scale)
+        scene.draw_line(xx - 8 * scale, yy - 26 * scale, xx - 8 * scale, yy + 2 * scale,
+                        (224, 205, 159, 255), scale)
         scene.draw_polygon([(xx - 12 * scale, yy - 27 * scale), (xx, yy - 43 * scale),
-                            (xx + 12 * scale, yy - 27 * scale)], color)
+                            (xx + 12 * scale, yy - 27 * scale)], shade(color, -40))
+        scene.draw_polygon([(xx - 12 * scale, yy - 27 * scale), (xx, yy - 43 * scale),
+                            (xx, yy - 27 * scale)], color)
         scene.draw_rect(xx - 2 * scale, yy - 19 * scale, 4 * scale, 9 * scale, INK)
+        scene.draw_rect(xx - scale, yy - 18 * scale, scale, 6 * scale, GOLD)
     scene.draw_rect(x - 20 * scale, y - 12 * scale, 40 * scale, 17 * scale, (165, 164, 134, 255))
-    scene.draw_rect(x - 5 * scale, y - 6 * scale, 10 * scale, 11 * scale, INK)
+    scene.draw_rect(x - 7 * scale, y - 8 * scale, 14 * scale, 13 * scale, shadow, radius=5 * scale)
+    scene.draw_rect(x - 5 * scale, y - 6 * scale, 10 * scale, 11 * scale, INK, radius=4 * scale)
+    for dx in (-18, -10, 6, 14):
+        scene.draw_rect(x + dx * scale, y - 15 * scale, 5 * scale, 6 * scale, stone)
+    scene.draw_polygon([(x - 5 * scale, y + 5 * scale), (x + 5 * scale, y + 5 * scale),
+                        (x + 10 * scale, y + 13 * scale), (x - 9 * scale, y + 13 * scale)], stone)
     scene.draw_line(x, y - 52 * scale, x, y - 74 * scale, GOLD, 1.5)
     scene.draw_polygon([(x, y - 74 * scale), (x + 20 * scale, y - 69 * scale),
                         (x, y - 63 * scale)], color)
 
 
-def village(scene, x, y, scale=1):
-    for dx, dy in ((-10, 2), (7, -5), (14, 8)):
-        xx, yy = x + dx * scale, y + dy * scale
-        scene.draw_rect(xx - 7 * scale, yy - 10 * scale, 14 * scale, 13 * scale, (199, 184, 135, 255))
-        scene.draw_polygon([(xx - 10 * scale, yy - 10 * scale), (xx, yy - 21 * scale),
-                            (xx + 10 * scale, yy - 10 * scale)], (104, 77, 55, 255))
-        scene.draw_rect(xx - 2 * scale, yy - 4 * scale, 4 * scale, 7 * scale, (57, 69, 56, 255))
-
-
-def terrain_detail(scene, terrain, x, y, seed, scale=1):
-    rng = random.Random(seed)
-    if terrain == "forest":
-        for dx, dy in ((-29, 0), (20, -8), (32, 7), (-15, 10), (2, 5)):
-            tree(scene, x + dx * scale, y + dy * scale, .75 * scale)
-    elif terrain in ("hills", "mountain", "mountains"):
-        mountain(scene, x - 15 * scale, y + 9 * scale, .8 * scale)
-        mountain(scene, x + 17 * scale, y + 13 * scale, .65 * scale)
-    elif terrain in ("swamp", "marsh", "water"):
-        for _ in range(7):
-            dx, dy = rng.randrange(-35, 26) * scale, rng.randrange(-17, 18) * scale
-            scene.draw_line(x + dx, y + dy, x + dx + 14 * scale, y + dy, (109, 152, 144, 255), 2)
-    else:
-        for _ in range(12):
-            dx, dy = rng.randrange(-40, 40) * scale, rng.randrange(-17, 23) * scale
-            scene.draw_line(x + dx, y + dy, x + dx + 3 * scale, y + dy - 5 * scale,
-                            (167, 169, 106, 255), 1)
-        village(scene, x, y + 6 * scale, .8 * scale)
+def terrain_tile(scene, grid, pos, terrain, *, mode='ground'):
+    """Paint one prebuilt diorama below interactive shapes; picking stays on HexGrid."""
+    terrain = {'swamp': 'marsh', 'mountain': 'mountains'}.get(terrain, terrain)
+    variant = (pos[0] * 7 + pos[1] * 11) % 4
+    x, y = grid.center(pos)
+    scale = grid.size * .95 / 150
+    with scene.screen_layer(1):
+        scene.draw_image(str(IMAGES / 'terrain' / f'{mode}-{terrain}-{variant}.png'),
+                         x - 160 * scale, y - 160 * scale, 320 * scale, 352 * scale)
 
 
 def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False, name_label=True):
@@ -265,21 +242,16 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
     x, y = grid.center(pos)
     s = grid.size / 78
     points = grid.corners(pos)
-    inner = [(x + (px - x) * .963, y + (py - y) * .963) for px, py in points]
-    base = TERRAINS[data.terrain]
-    under = [(px, py + 13 * s) for px, py in inner]
-    scene.draw_polygon(under, shade(base, -46))
-    scene.draw_polygon(inner, shade(base, 9 if hover else 0))
-    # Each cell has slight relief, engraved seams, and its own small landscape.
-    scene.draw_polygon([inner[0], inner[1], (x, y), inner[-1]], shade(base, 8))
-    outline(scene, inner, OWNERS[data.owner] if data.owner != "neutral" else shade(base, 24),
-            2 if data.owner != "neutral" else 1)
+    inner = [(x + (px - x) * .95, y + (py - y) * .95) for px, py in points]
+    terrain_tile(scene, grid, pos, data.terrain, mode='ground' if data.capital else 'province')
+    if hover:
+        scene.draw_polygon(inner, (238, 220, 165, 27))
+    if data.owner != 'neutral':
+        outline(scene, inner, OWNERS[data.owner], 2)
     if selected:
         outline(scene, [(x + (px - x) * .92, y + (py - y) * .92) for px, py in points], GOLD, 2.5)
     if data.capital:
         castle(scene, x, y + 4 * s, OWNERS[data.owner], .83 * s)
-    else:
-        terrain_detail(scene, data.terrain, x, y - 7 * s, pos[0] * 991 + pos[1] * 41, s)
     if data.site and not data.explored:
         scene.draw_circle(x + 39 * s, y - 24 * s, 9 * s, INK)
         scene.draw_text("?", x + 39 * s, y - 24 * s, color=GOLD, font_size=12,
@@ -314,9 +286,12 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
     color = TEAL if team == "player" else RED
     if spent:
         color = shade(color, -38)
-    scene.draw_circle(x, y + 14 * s, 22 * s, (11, 21, 25, 140))
-    scene.draw_circle(x, y + 10 * s, 21 * s, GOLD if selected else shade(color, -26))
-    scene.draw_circle(x, y + 7 * s, 18 * s, INK)
+    ellipse(scene, x + 5 * s, y + 15 * s, 27 * s, 11 * s, (6, 13, 18, 145))
+    ellipse(scene, x, y + 12 * s, 23 * s, 10 * s, (42, 43, 36, 255))
+    ellipse(scene, x, y + 8 * s, 23 * s, 10 * s, GOLD if selected else shade(color, -28))
+    ellipse(scene, x, y + 7 * s, 19 * s, 7 * s, (31, 42, 40, 255))
+    scene.draw_line(x - 15 * s, y + 13 * s, x + 4 * s, y + 15 * s,
+                    GOLD if selected else color, 1.5 * s)
     lower = kind.lower()
     if lower == "wolf":
         fur = (177, 184, 174, 255)
@@ -461,14 +436,26 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
         return
     if lower == "commander":
         scene.draw_polygon([(x - 11 * s, y - 21 * s), (x - 23 * s, y + 6 * s),
-                            (x + 19 * s, y + 7 * s), (x + 8 * s, y - 21 * s)], GOLD)
-    armor = (82, 77, 97, 255) if lower == "guard" else color
+                            (x + 19 * s, y + 7 * s), (x + 8 * s, y - 21 * s)], (151, 116, 59, 255))
+        scene.draw_polygon([(x - 11 * s, y - 21 * s), (x - 23 * s, y + 6 * s),
+                            (x - 10 * s, y + 3 * s), (x - 4 * s, y - 19 * s)], GOLD)
+    armor = (82, 77, 97, 255) if lower == "guard" else shade(color, -23)
     scene.draw_polygon([(x - 13 * s, y + 4 * s), (x - 7 * s, y - 20 * s),
                         (x + 7 * s, y - 20 * s), (x + 13 * s, y + 4 * s)], armor)
-    scene.draw_line(x - 5 * s, y + 3 * s, x - 7 * s, y + 12 * s, (209, 207, 174, 255), 4 * s)
-    scene.draw_line(x + 5 * s, y + 3 * s, x + 7 * s, y + 12 * s, (209, 207, 174, 255), 4 * s)
+    scene.draw_polygon([(x - 7 * s, y - 20 * s), (x, y - 18 * s),
+                        (x - 2 * s, y + 3 * s), (x - 13 * s, y + 4 * s)], color)
+    scene.draw_polygon([(x + 3 * s, y - 19 * s), (x + 7 * s, y - 20 * s),
+                        (x + 13 * s, y + 4 * s), (x + 7 * s, y + 1 * s)], shade(armor, -26))
+    scene.draw_line(x - 9 * s, y - 3 * s, x + 9 * s, y - 3 * s, (91, 71, 47, 255), 3 * s)
+    scene.draw_rect(x - 2 * s, y - 5 * s, 4 * s, 4 * s, GOLD)
+    for dx in (-1, 1):
+        scene.draw_line(x + dx * 5 * s, y + 3 * s, x + dx * 7 * s, y + 11 * s,
+                        (118, 123, 109, 255), 4 * s)
+        scene.draw_line(x + dx * 7 * s, y + 10 * s, x + dx * 10 * s, y + 12 * s,
+                        (66, 54, 39, 255), 4 * s)
     skin = (145, 176, 92, 255) if lower == "goblin" else (220, 199, 157, 255)
-    scene.draw_circle(x, y - 24 * s, 8 * s, skin)
+    scene.draw_circle(x, y - 24 * s, 8 * s, shade(skin, -34))
+    scene.draw_circle(x - 2 * s, y - 25 * s, 6 * s, skin)
     if lower == "goblin":
         scene.draw_polygon([(x - 7 * s, y - 29 * s), (x - 19 * s, y - 32 * s), (x - 7 * s, y - 21 * s)], skin)
         scene.draw_polygon([(x + 7 * s, y - 29 * s), (x + 19 * s, y - 32 * s), (x + 7 * s, y - 21 * s)], skin)

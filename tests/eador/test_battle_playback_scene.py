@@ -4,6 +4,215 @@ from eador.model import State
 from eador.scene import BattleScene, ShardScene
 from tools.eador_ui import PlayerInput
 from tests.eador.test_battle_trace import relief_before_rally
+import pytest
+
+
+def test_playback_hit_sound_matches_damage_and_does_not_repeat_on_refresh(tmp_path):
+    """A real ranged attack releases first; its one impact accompanies the visible HP change."""
+    from eador.battle_playback_scene import BattlePlaybackScene
+    from tests.eador.test_game_audio import cues
+    state = State.new(hero_class='Wizard')
+    state.explore()
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(ShardScene(state)); game.tick(1 / 60)
+        player = PlayerInput(game, finish_actions=False)
+        archer = next(unit for unit in state.battle.units if unit.team == 'player' and unit.can_pin)
+        player.order('battle.move', archer.id, (-1, 0))
+        target = state.battle.targets(archer.id)[0]
+        trace = state.battle.trace(lambda: state.battle.attack(archer.id, target.id))
+        resolved = state.to_json()
+        game.backend.sounds_played.clear()
+        view = BattlePlaybackScene(game.scene, trace)
+        game.push(view)
+        assert cues(game) == ['attack_arrow']
+        assert view.battle.unit(target.id).hp == trace.before.unit(target.id).hp
+        game.tick(view.playback.duration * .49)
+        assert 'attack_hit' not in cues(game)
+        game.tick(view.playback.duration * .02)
+        assert view.battle.unit(target.id).hp == trace.events[0].after.unit(target.id).hp
+        assert cues(game).count('attack_hit') == 1
+        view.refresh(); game.tick(0)
+        assert cues(game).count('attack_hit') == 1
+        assert state.to_json() == resolved
+    finally:
+        game.close()
+
+
+@pytest.mark.parametrize('still', [False, True])
+def test_direct_shot_has_bounded_feedback_and_keeps_orders_and_saves_live(tmp_path, still):
+    """An actual player shot is visible without delaying orders; reduced motion stays fixed."""
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        from eador.scene import TitleScene
+        game.push(TitleScene(hero_class='Wizard'))
+        player = PlayerInput(game, finish_actions=False)
+        if still:
+            for key in ('o', 'd', 'down', 'down', 'right', 'return'):
+                player.press(key)
+        player.press('return'); player.press('x')
+        battle = player.state.battle
+        archer = next(unit for unit in battle.units if unit.team == 'player' and unit.can_pin)
+        player.order('battle.move', archer.id, (-1, 0))
+        target = battle.targets(archer.id)[0]
+        expected = State.from_json(player.state.to_json())
+        expected.battle.attack(archer.id, target.id)
+        player.order('battle.attack', archer.id, target.id)
+        assert type(game.scene) is BattleScene
+        assert player.state.to_json() == expected.to_json()
+        early = list(game.backend.lines)
+        game.tick(.12)
+        assert (early == game.backend.lines) == still
+        game.tick(1.5)
+        assert early != game.backend.lines, 'The shot must have a visible transient effect'
+        assert player.state.to_json() == expected.to_json()
+        # A new ordinary command and save/load need no playback completion control.
+        player.order('battle.guard', 0)
+        expected.battle.guard(0)
+        assert type(game.scene) is BattleScene
+        player.reload(expected.to_json())
+    finally:
+        game.close()
+
+
+def test_shot_transients_leave_persistent_health_on_top(tmp_path):
+    """Actual shot effects stay below readable damage and health throughout contact and drift."""
+    from eador.style import GOLD, INK, RED
+    state = State.new(hero_class='Wizard'); state.explore()
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(ShardScene(state)); game.tick(1 / 60)
+        player = PlayerInput(game, finish_actions=False)
+        archer = next(unit for unit in state.battle.units if unit.team == 'player' and unit.can_pin)
+        player.order('battle.move', archer.id, (-1, 0))
+        target = state.battle.targets(archer.id)[0]
+        player.order('battle.attack', archer.id, target.id)
+        resolved = state.to_json()
+        cx, cy = game.scene.grid.center(archer.pos)
+        top = cy + game.scene.grid.size * .23
+        plaque = next(shape for shape in game.backend.polygons if shape['color'] == INK
+                      and abs(min(x for x, y in shape['points']) + max(x for x, y in shape['points']) - cx * 2) < .01
+                      and abs(min(y for x, y in shape['points']) - top) < .01)
+        hp = next(text for text in game.backend.texts if text['text'] == str(archer.hp)
+                  and abs(text['x'] - cx) < .01 and abs(text['y'] - top) < .01)
+        ring = [line for line in game.backend.lines if line['color'] == (*GOLD[:3], 180)]
+        assert ring, 'The successful shot must retain its ground focus marker'
+        assert all(line['order'] < plaque['order'] and line['order'] < hp['order'] for line in ring)
+        damage = next(text for text in game.backend.texts if text['text'].startswith('-') and text['text'][1:].isdigit())
+        neighbor = next(unit for unit in state.battle.units if unit.team == 'enemy' and unit.kind == 'brigand')
+        nx, ny = game.scene.grid.center(neighbor.pos)
+        neighbor_hp = next(text for text in game.backend.texts if text['text'] == str(neighbor.hp)
+                           and abs(text['x'] - nx) < .01 and abs(text['y'] - (ny + game.scene.grid.size * .23)) < .01)
+        assert damage['order'] < neighbor_hp['order']
+        game.tick(.33)  # The real shot has reached its target; its impact ring is now visible.
+        impact = [line for line in game.backend.lines
+                  if line['color'][:3] == RED[:3] and line['color'][3] < 255]
+        assert impact, 'The contact frame must retain a visible impact'
+        damage = next(text for text in game.backend.texts if text['text'].startswith('-') and text['text'][1:].isdigit())
+        tx, ty = game.scene.grid.center(target.pos)
+        target_hp = next(text for text in game.backend.texts if text['text'] == str(target.hp)
+                         and abs(text['x'] - tx) < .01 and abs(text['y'] - (ty + game.scene.grid.size * .23)) < .01)
+        assert all(line['order'] < damage['order'] < target_hp['order'] for line in impact)
+        def bounds(shape):
+            return (min(x for x, y in shape['points']), min(y for x, y in shape['points']),
+                    max(x for x, y in shape['points']), max(y for x, y in shape['points']))
+        neighbor_box = next(bounds(shape) for shape in game.backend.polygons if shape['color'] == INK
+                            and abs(bounds(shape)[0] + bounds(shape)[2] - nx * 2) < .01
+                            and abs(bounds(shape)[1] - (ny + game.scene.grid.size * .23)) < .01)
+        corners = game.scene.grid.corners(target.pos)
+        left, top, right = min(x for x, y in corners), min(y for x, y in corners), max(x for x, y in corners)
+        _, target_y = game.scene.grid.center(target.pos)
+        for dt in (0, .4, .5):
+            game.tick(dt)
+            damage = next(text for text in game.backend.texts if text['text'].startswith('-') and text['text'][1:].isdigit())
+            pill = next(bounds(shape) for shape in game.backend.polygons if shape['color'] == INK
+                        and bounds(shape)[0] < damage['x'] < bounds(shape)[2]
+                        and bounds(shape)[1] <= damage['y'] < bounds(shape)[3])
+            assert left <= pill[0] < pill[2] <= right and top <= pill[1] < pill[3] <= target_y
+            assert pill[2] - pill[0] < (right - left) * .75
+            assert pill[2] <= neighbor_box[0] or pill[0] >= neighbor_box[2] or pill[3] <= neighbor_box[1] or pill[1] >= neighbor_box[3]
+        assert state.to_json() == resolved
+    finally:
+        game.close()
+
+
+@pytest.mark.parametrize('ability', ['swap', 'smoke', 'heal'])
+def test_paid_ability_feedback_draws_from_the_resolved_trace(tmp_path, ability):
+    """Purchased roles show their distinct actual effects while save/load remains authoritative."""
+    from tools.eador_observatory_campaign import prepare_observatory
+    state = prepare_observatory()
+    state.explore(approach='clear' if ability == 'heal' else 'covered')
+    battle = state.battle
+    if ability == 'heal':
+        for ident, pos in ((1, (1, -1)), (0, (0, 0)), (3, (0, -1))):
+            battle.move(ident, pos)
+        guard = next(unit for unit in battle.units if unit.team == 'enemy' and unit.kind == 'guard')
+        battle.attack(0, guard.id)  # Earn the wound through the defender's real reaction.
+        for ident, pos in ((4, (-1, 0)), (5, (-1, 1)), (6, (-2, 1))):
+            battle.move(ident, pos)
+        command, args, options = 'cast', ('heal', 0), {'caster_id': 6}
+        assert 0 < battle.unit(0).hp < battle.unit(0).max_hp
+    elif ability == 'swap':
+        warden = next(unit for unit in battle.units if unit.team == 'player' and unit.can_swap)
+        command, args, options = 'swap', (warden.id, battle.swap_targets(warden.id)[0].id), {}
+    else:
+        sapper = next(unit for unit in battle.units if unit.team == 'player' and unit.can_smoke)
+        command, args, options = 'smoke', (sapper.id, min(battle.smoke_targets(sapper.id))), {}
+    expected = State.from_json(state.to_json())
+    getattr(expected.battle, command)(*args, **options)
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(ShardScene(state)); game.tick(1 / 60)
+        player = PlayerInput(game, finish_actions=False)
+        player.order('battle.' + command, *args, **options)
+        assert type(game.scene) is BattleScene and state.to_json() == expected.to_json()
+        early = list(game.backend.lines), list(game.backend.circles)
+        game.tick(.2)
+        assert early != (game.backend.lines, game.backend.circles)
+        game.tick(1.5)
+        assert early != (game.backend.lines, game.backend.circles)
+        assert state.to_json() == expected.to_json()
+        player.reload(expected.to_json())
+    finally:
+        game.close()
+
+
+def test_native_effects_capture_path_uses_real_orders_and_exact_saves(tmp_path):
+    """The native sampler's complete input route is executable against the shipped scene stack."""
+    from tools.verify_eador_effects import verify
+    report = verify(tmp_path, backend='mock')
+    assert [case['name'] for case in report['cases']] == ['arrow', 'bolt', 'melee', 'heal', 'swap', 'smoke']
+    assert report['exact_save_reloads'] == 6
+    assert all(len(case['captures']) == 3 and case['orders'] for case in report['cases'])
+    assert report['briefings'] and report['cpu_percent_requested'] == 25
+
+
+def test_quick_heal_replaces_the_previous_damage_number_at_its_hex(tmp_path):
+    """A fast legal Heal shows the new recovery amount without overprinting the earlier wound."""
+    from tools.eador_observatory_campaign import prepare_observatory
+    state = prepare_observatory(); state.explore(approach='clear')
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(ShardScene(state)); game.tick(1 / 60)
+        player = PlayerInput(game, finish_actions=False)
+        for ident, pos in ((1, (1, -1)), (0, (0, 0)), (3, (0, -1))):
+            player.order('battle.move', ident, pos)
+        guard = next(unit for unit in state.battle.units if unit.team == 'enemy' and unit.kind == 'guard')
+        player.order('battle.attack', 0, guard.id)
+        for ident, pos in ((4, (-1, 0)), (5, (-1, 1)), (6, (-2, 1))):
+            player.order('battle.move', ident, pos)
+        expected = State.from_json(state.to_json())
+        hp = expected.battle.unit(0).hp
+        expected.battle.cast('heal', 0, caster_id=6)
+        restored = expected.battle.unit(0).hp - hp
+        player.order('battle.cast', 'heal', 0, caster_id=6)
+        cx, _ = game.scene.grid.center(state.battle.unit(0).pos)
+        numbers = [text['text'] for text in game.backend.texts if text['text'].startswith(('+', '-'))
+                   and text['text'][1:].isdigit() and abs(text['x'] - cx) < .01]
+        assert numbers == [f'+{restored}']
+        assert state.to_json() == expected.to_json()
+    finally:
+        game.close()
 
 
 def test_enemy_playback_is_read_only_and_visible_finish_restores_ordinary_controls(tmp_path):

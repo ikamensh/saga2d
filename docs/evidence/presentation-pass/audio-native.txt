@@ -1,0 +1,20 @@
+Native silent: sounds/confirm, 0.30s
+Native silent: sounds/refuse, 0.30s
+Native silent: sounds/move, 0.35s
+Native silent: sounds/attack_hit, 0.31s
+Native silent: sounds/attack_arrow, 0.30s
+Native silent: sounds/attack_heavy, 0.50s
+Native silent: sounds/guard, 0.47s
+Native silent: sounds/bolt, 0.49s
+Native silent: sounds/heal, 0.85s
+Native silent: sounds/reward, 0.69s
+Native silent: sounds/level_up, 1.28s
+Native silent: sounds/victory, 2.27s
+Native silent: sounds/defeat, 1.82s
+Native silent: sounds/end_turn, 0.62s
+Native silent: music/campaign, 48.00s
+Native silent: music/battle, 32.00s
+Complete catalogue, loop continuity, live mute/mix and native lifetime checks passed.
+real 93.85
+user 1.60
+sys 0.72

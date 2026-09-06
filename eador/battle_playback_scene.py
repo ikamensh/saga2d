@@ -5,9 +5,10 @@ import math
 from saga2d import Column, Label
 
 from eador.battle import Battle, SmokeCloud
+from eador.battle_effects import draw_event
 from eador.preferences import reading_scale, reduced_motion
 from eador.scene import BattleScene, Screen
-from eador.style import BLUE, GOLD, MUTED, TEAL, TEXT
+from eador.style import GOLD, MUTED, TEAL, TEXT
 
 
 class BattlePlayback:
@@ -67,7 +68,12 @@ class BattlePlayback:
         amount = progress - segment
         a, b = grid.center(path[segment]), grid.center(path[segment + 1])
         x, y = a[0] + (b[0] - a[0]) * amount, a[1] + (b[1] - a[1]) * amount
-        if unit.can_fly:
+        if event.kind == 'swap':
+            length = math.hypot(b[0] - a[0], b[1] - a[1])
+            bend = math.sin(self.fraction * math.pi) * grid.size * .28
+            x -= (b[1] - a[1]) / length * bend
+            y += (b[0] - a[0]) / length * bend
+        elif unit.can_fly:
             y -= math.sin(self.fraction * math.pi) * 10
         return x, y
 
@@ -132,13 +138,22 @@ class BattlePlaybackScene(BattleScene):
         self.parent.read_log()
 
     def _unit_center(self, unit):
-        return self.playback.position(unit, self.grid, still=reduced_motion(self.game))
+        still = reduced_motion(self.game)
+        x, y = self.playback.position(unit, self.grid, still=still)
+        event = self.playback.event
+        if not still and event.kind in ('attack', 'brace', 'retaliation') and unit.id == event.actor_id and unit.attack_range == 1:
+            tx, ty = self.grid.center(event.before.unit(event.target_id).pos)
+            distance = math.hypot(tx - x, ty - y)
+            amount = math.sin(min(1, self.playback.fraction * 2) * math.pi) * self.grid.size * .18
+            x += (tx - x) / distance * amount
+            y += (ty - y) / distance * amount
+        return x, y
 
     def _unit_layer(self, unit):
         event = self.playback.event
         if not reduced_motion(self.game) and event.before.unit(unit.id).pos != event.after.unit(unit.id).pos:
-            return 2
-        return 0
+            return 5
+        return 3
 
     def _announce(self):
         shown = self.playback.index, self.playback.applied
@@ -146,14 +161,20 @@ class BattlePlaybackScene(BattleScene):
             return
         event = self.playback.event
         if self._shown is None or self._shown[0] != shown[0]:
-            cue = {'move': 'move', 'attack': 'attack_hit', 'pin': 'attack_hit',
-                   'brace': 'guard', 'retaliation': 'attack_hit', 'guard': 'guard',
-                   'bolt': 'bolt', 'heal': 'heal', 'rally': 'confirm', 'swap': 'move',
-                   'smoke': 'confirm', 'repulse': 'move'}.get(event.kind)
+            cue = 'move' if event.kind in ('move', 'swap', 'repulse') else None
+            if event.kind in ('attack', 'pin') and self.battle.unit(event.actor_id).attack_range > 1:
+                cue = 'attack_arrow'
             if cue:
                 self.game.audio.play_sound(cue)
         self.floats = []
         if self.playback.applied:
+            cue = {'attack': 'attack_hit', 'pin': 'attack_hit', 'brace': 'attack_hit',
+                   'retaliation': 'attack_hit', 'guard': 'guard', 'bolt': 'bolt',
+                   'heal': 'heal', 'rally': 'confirm', 'swap': 'confirm', 'smoke': 'confirm'}.get(event.kind)
+            if cue == 'attack_hit' and self.battle.unit(event.actor_id).kind in ('guard', 'warden', 'skyrider'):
+                cue = 'attack_heavy'
+            if cue:
+                self.game.audio.play_sound(cue)
             for unit in event.after.units:
                 amount = unit.hp - event.before.unit(unit.id).hp
                 if amount:
@@ -171,15 +192,8 @@ class BattlePlaybackScene(BattleScene):
         if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
             self.refresh()
 
-    def draw(self):
-        super().draw()
-        event = self.playback.event
-        for ident, color in ((event.actor_id, GOLD), (event.target_id, BLUE)):
-            if ident is not None:
-                unit = self.battle.unit(ident)
-                x, y = self._unit_center(unit)
-                self.draw_circle(x, y + 8, self.grid.size * .7, (*color[:3], 45))
-                self.draw_circle(x, y + 8, 5, color)
+    def draw_effects(self):
+        draw_event(self, self.playback.event, self.playback.fraction, still=reduced_motion(self.game))
 
     def finish(self):
         if not self.finished:

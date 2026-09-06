@@ -53,7 +53,7 @@ def _seed(terrain, variant, mode):
     ).digest()[:8], 'big')
 
 
-def _material(terrain, seed):
+def _material(terrain, seed, *, pigment_strength=1.0):
     """Layer broad pigment variation, diagonal brush grain, and fine paper tooth."""
     rng = np.random.default_rng(seed)
     width, height = SIZE[0] * SCALE, SIZE[1] * SCALE
@@ -65,6 +65,7 @@ def _material(terrain, seed):
     illumination = 10 - xx / width * 9 - yy / height * 8
     strokes = np.sin(xx * .20 + yy * .47 + broad * .07) * 1.25
     pigment = broad * .14 + grain * .035 + rng.normal(0, 1.6, (height, width)) + strokes
+    pigment *= pigment_strength
     pixels = np.empty((height, width, 3), dtype=np.uint8)
     for channel, base in enumerate(PALETTES[terrain]):
         light = illumination * (1.10, 1.0, .68)[channel]
@@ -293,7 +294,9 @@ def render_tile(terrain: str, variant: int, *, mode: str = 'province') -> Image.
     for i in range(3):
         relief.line([(HEX[4][0]+3,HEX[4][1]+5+i*4),(160,315+i*4),
                      (HEX[2][0]-2,HEX[2][1]+5+i*4)], (80,80,58,255),.8)
-    surface = _material(terrain,seed)
+    # Tactical ground keeps its material and lighting, with quieter pigment so
+    # small terrain landmarks and gameplay cues remain easy to read.
+    surface = _material(terrain,seed,pigment_strength=.5 if mode == 'ground' else 1.0)
     brush = Brush(surface)
     _paint_ground(brush,terrain,rng)
     if mode == 'province':
