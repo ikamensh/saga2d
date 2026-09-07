@@ -43,8 +43,12 @@ campaigns followed by a merge would lose or duplicate encounter consequences.
 `eador.economy.settle_realm` now owns upkeep and recovery for a supplied hero
 and treasury quote, independently of date advancement, rival AI and linked
 campaign bookkeeping. The existing solo `State.end_turn` applies that receipt
-then advances the world in its original order. `State.resolve_battle` subsequently needs an explicit split
-between army/progression results and claimed province/defender/site changes.
+then advances the world in its original order.
+`eador.battle_results.apply_army_result` now applies one completed PvE battle's
+wounds, casualties and advancement to a supplied hero, leaving the battle and
+world unchanged. `State.resolve_battle` retains province/defender/site changes,
+rewards, choices and encounter cleanup. The shared-world room still needs to
+coordinate those changes against its claims.
 Keep campaign PvP rules in `eador`; transport must not know heroes or battles.
 
 The existing socket interfaces already accept commands without a global
@@ -60,7 +64,8 @@ checkpoints must instead include both realms and active encounters.
 `RoomStore.save` now uses the catalog's explicit `checkpoint_match(game, match)`
 serializer, independently of player snapshots. Existing game formats, private
 resume tokens and room expiry behavior are preserved. The new room model must
-supply its own complete checkpoint representation when it is integrated. No public-server deployment is implied by source work.
+supply its own complete checkpoint representation when it is integrated.
+No public-server deployment is implied by source work.
 
 ## Acceptance criteria for the first playable increment
 

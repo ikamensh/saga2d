@@ -1149,3 +1149,14 @@ restart. Shardbound's restart journey now kills the server after a real battle
 order, rejoins both private seats and continues with an exact next battle order.
 No public deployment occurred. Player-view filtering and independent-realm
 campaign PvP remain unimplemented.
+
+## Army results independent of world rewards — 2026-09-07
+
+`apply_army_result` now applies a completed PvE battle's wounds, casualties,
+advancement and defeat recovery to its hero without changing the battle or
+world. Ordinary result acceptance retains claims, rewards and choices.
+[Verification](evidence/army-results/README.md) includes 94 passing checks,
+earned victory and defeat, exact saved continuation, a linked-shard advancement
+cap and bounded linked fuzzing. The same fuzz campaign/scene metrics match
+before and after extraction. This keeps the global campaign PvP work game-local;
+separate realms, claims and Ready coordination still need implementation.

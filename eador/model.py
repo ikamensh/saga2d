@@ -648,6 +648,7 @@ class State:
         self.log.append(f'Battle at {title}.')
 
     def resolve_battle(self) -> str:
+        from eador.battle_results import apply_army_result
         if self.battle is None or self.battle.outcome is None:
             raise RuleError('The battle is not finished.')
         battle = self.battle
@@ -672,40 +673,15 @@ class State:
             else:
                 province.guards = [unit.kind for unit in survivors]
                 province.guard_hp = [unit.hp for unit in survivors]
-        self.hero.hp = battle.unit(0).hp
-        self.hero.mana = battle.mana
-        casualties = []
-        survivors = []
-        for troop in self.hero.army:
-            troop.hp = battle.unit(troop.id).hp
-            if troop.hp <= 0:
-                casualties.append(UNITS[troop.kind].name)
-            else:
-                survivors.append(troop)
-        self.hero.army = survivors
+        army_result = apply_army_result(self.hero, battle, hero_level_cap=self.hero_level_cap,
+                                        troop_level_cap=self.troop_level_cap)
+        casualties = army_result.casualties
         if victory:
-            if self.hero_level_cap is None or self.hero.level < self.hero_level_cap:
-                self.hero.xp += 8
-            while self.hero.xp >= self.hero.level * 12 and (self.hero_level_cap is None or self.hero.level < self.hero_level_cap):
-                self.hero.xp -= self.hero.level * 12
-                self.hero.level += 1
-                self.hero.max_hp += 4
-                self.hero.hp += 4
-                self.hero.max_mana += 2
-                self.hero.mana += 2
-                self.log.append(f'{self.hero.name} reached level {self.hero.level}.')
+            for level in army_result.hero_levels:
+                self.log.append(f'{self.hero.name} reached level {level}.')
                 choice = self._skill_choice()
                 if choice:
                     self._choices.append(choice)
-            for troop in survivors:
-                if self.troop_level_cap is None or troop.level < self.troop_level_cap:
-                    troop.xp += 3
-                while troop.xp >= troop.level * 6 and (self.troop_level_cap is None or troop.level < self.troop_level_cap):
-                    troop.xp -= troop.level * 6
-                    troop.level += 1
-                    troop.max_hp += 4
-                    troop.hp += 4
-            self.hero.hp = min(self.hero.max_hp, self.hero.hp + 6 * self.hero.skill_ranks.get('vigor', 0))
             if self.battle_kind == 'site':
                 province.explored = True
                 reward = self.battle_adventure
@@ -728,7 +704,6 @@ class State:
                     self.status = 'victory'
                     message = 'Duskspire has fallen. The shard is yours!'
         else:
-            self.hero.hp = max(self.hero.hp, self.hero.max_hp // 3)
             lost_gold = min(max(0, self.gold), 20)
             self.gold -= lost_gold
             message = f'Retreated. Lost {lost_gold} gold; the survivors keep their wounds.'
