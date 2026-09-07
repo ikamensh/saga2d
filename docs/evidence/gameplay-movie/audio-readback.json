@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/Users/ikamen/.cache/uv/archive-v0/79fSdWJlvMXxQb0gmVVGu/lib/python3.13/site-packages/imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1",
+    "-hide_banner",
+    "-xerror",
+    "-err_detect",
+    "explode",
+    "-threads",
+    "1",
+    "-i",
+    "/tmp/shardbound-gameplay-393359f/gameplay.mp4",
+    "-vn",
+    "-c:a",
+    "pcm_s16le",
+    "/tmp/shardbound-gameplay-readback/decoded-audio.wav"
+  ],
+  "exit_code": 0,
+  "source_samples": 1715490,
+  "decoded_samples": 1716224,
+  "extra_aac_padding_samples": 734,
+  "same_position_correlation": 0.9998204234303597,
+  "peak": 0.61077880859375
+}

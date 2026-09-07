@@ -1,0 +1,2 @@
+Command: .venv/bin/python -m pytest tests/tools/test_gameplay_capture.py -q
+Result: 4 passed in 8.51s

@@ -1,0 +1,41 @@
+{
+  "command": [
+    "/Users/ikamen/.cache/uv/archive-v0/79fSdWJlvMXxQb0gmVVGu/lib/python3.13/site-packages/imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1",
+    "-hide_banner",
+    "-xerror",
+    "-err_detect",
+    "explode",
+    "-threads",
+    "1",
+    "-filter_threads",
+    "1",
+    "-i",
+    "/tmp/shardbound-gameplay-393359f/gameplay.mp4",
+    "-vf",
+    "select=eq(n\\,0)+eq(n\\,151)+eq(n\\,253)+eq(n\\,260)+eq(n\\,340)+eq(n\\,473)+eq(n\\,497)+eq(n\\,570)+eq(n\\,643)+eq(n\\,663)+eq(n\\,735)+eq(n\\,926)+eq(n\\,1166)",
+    "-fps_mode",
+    "vfr",
+    "-threads",
+    "1",
+    "/tmp/shardbound-gameplay-readback/%03d.png"
+  ],
+  "selected_frames": [
+    0,
+    151,
+    253,
+    260,
+    340,
+    473,
+    497,
+    570,
+    643,
+    663,
+    735,
+    926,
+    1166
+  ],
+  "exit_code": 0,
+  "wall_seconds": 2.7559995419578627,
+  "cpu_percent_requested": 25,
+  "frames_extracted": 13
+}
