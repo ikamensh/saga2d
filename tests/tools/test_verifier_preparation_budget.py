@@ -1,6 +1,5 @@
 """Legacy verification preparation and detached searches yield without changing their results."""
 
-import gzip
 import json
 from pathlib import Path
 
@@ -108,66 +107,6 @@ def test_choice_cli_paces_its_real_input_journey_and_closes_both_sessions(
     assert {row['cpu_percent'] for row in metrics} == {cpu_percent}
     assert len(backends) == 2
     assert all(not backend.is_running for backend in backends)
-
-
-def test_prototype_paid_preparation_and_saved_orders_share_the_allowance(clock):
-    """Paid troops and an explicit detached hold keep exact forecasts and snapshots when paced."""
-    from tools.prototype_eador_relief import Orders, create, forward, prepare
-
-    expected = prepare(budget=CpuBudget(100))
-    baseline = forward(Orders(create(expected, 'forward'), budget=CpuBudget(100))).report()
-    assert not clock['sleeps']
-    budget = CpuBudget(25)
-    actual = prepare(budget=budget)
-    assert clock['sleeps'], 'Prototype preparation bypassed its allowance'
-    assert actual.to_json() == expected.to_json()
-    assert actual.purchases == expected.purchases
-    clock['sleeps'].clear()
-    played = forward(Orders(create(actual, 'forward'), budget=budget)).report()
-    assert clock['sleeps'], 'Prototype orders bypassed the shared allowance'
-    assert played == baseline
-    assert played['outcome'] == 'hold'
-
-
-def test_bounded_prototype_cli_preserves_search_and_world_results_with_default_pacing(clock, tmp_path):
-    """Two trials per approach and two world seeds exercise real CLI forwarding without the full search."""
-    from tools.prototype_eador_relief import main
-
-    path = tmp_path / 'prototype.json.gz'
-    args = ['--output', str(path), '--trials', '2', '--world-seeds', '2']
-    main([*args, '--cpu-percent', '100'])
-    assert not clock['sleeps']
-    expected = json.loads(gzip.decompress(path.read_bytes()))
-    main(args)
-    assert clock['sleeps'], 'The prototype CLI bypassed its default allowance'
-    actual = json.loads(gzip.decompress(path.read_bytes()))
-    assert actual['cpu_percent'] == 25
-    assert 'tools/cpu_budget.py' in actual['source_sha256']
-    for field in ('parties', 'plans', 'automatic', 'passive_search', 'source_audit'):
-        assert actual[field] == expected[field]
-    for result in actual['passive_search'].values():
-        assert result['trials'] == sum(result['outcomes'].values()) == 2
-    assert actual['source_audit']['seeds_per_theme'] == 2
-
-
-def test_detached_search_and_world_audit_each_yield_without_changing_results(clock):
-    """Each formerly long loop must yield independently of preparation and explicit orders."""
-    from tools.prototype_eador_relief import passive_search, prepare, source_audit
-
-    party = prepare(budget=CpuBudget(100))
-    before = party.to_json()
-    expected = passive_search({'commander': party}, trials=2, budget=CpuBudget(100))
-    assert not clock['sleeps']
-    actual = passive_search({'commander': party}, trials=2, budget=CpuBudget(25))
-    assert clock['sleeps'], 'The detached search itself must yield'
-    assert actual == expected and party.to_json() == before
-
-    clock['sleeps'].clear()
-    expected = source_audit(seed_count=2, budget=CpuBudget(100))
-    assert not clock['sleeps']
-    actual = source_audit(seed_count=2, budget=CpuBudget(25))
-    assert clock['sleeps'], 'The world audit itself must yield'
-    assert actual == expected
 
 
 @pytest.mark.parametrize('name', ['saves', 'results'])

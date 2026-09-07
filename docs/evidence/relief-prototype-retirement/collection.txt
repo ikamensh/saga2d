@@ -1,0 +1,28 @@
+tests/tools/test_verifier_preparation_budget.py::test_saved_phase_preparation_yields_and_keeps_every_earned_snapshot
+tests/tools/test_verifier_preparation_budget.py::test_result_preparation_yields_and_keeps_real_battle_and_campaign_outcomes
+tests/tools/test_verifier_preparation_budget.py::test_choice_preparation_yields_and_preserves_every_earned_reward
+tests/tools/test_verifier_preparation_budget.py::test_choice_cli_paces_its_real_input_journey_and_closes_both_sessions[default]
+tests/tools/test_verifier_preparation_budget.py::test_choice_cli_paces_its_real_input_journey_and_closes_both_sessions[explicit-unpaced]
+tests/tools/test_verifier_preparation_budget.py::test_verifier_closes_both_actual_mock_backends_after_its_input_journey[saves]
+tests/tools/test_verifier_preparation_budget.py::test_verifier_closes_both_actual_mock_backends_after_its_input_journey[results]
+tests/tools/test_verifier_preparation_budget.py::test_replacement_prototype_battle_and_investment_each_yield_without_changing_results
+
+8 tests collected in 0.02s
+        0.16 real         0.10 user         0.01 sys
+            45383680  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                3056  page reclaims
+                  56  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 293  voluntary context switches
+                  59  involuntary context switches
+          1190755698  instructions retired
+           502884192  cycles elapsed
+            30048808  peak memory footprint

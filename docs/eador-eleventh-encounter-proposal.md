@@ -2,6 +2,12 @@
 
 This is the historical detached proposal. The accepted production integration
 and earned campaign evidence are recorded in [Relief Column](eador-relief.md).
+The superseded prototype runner and its three dedicated budget tests have been
+removed from current tooling. Its old displacement experiment assumes historical
+fixed site locations; it is not the current production placement audit. The
+[retirement record](evidence/relief-prototype-retirement/README.md) identifies the
+removed checks. Both original reports remain unchanged, including the source
+witnesses still used by production compatibility tests.
 
 The original corner proposal is **rejected**. Independent review found that
 four original units, after only the ordinary 60-gold Market preparation, won
@@ -170,20 +176,28 @@ extra eastern Guard. Existing loaded province arrays and reward values must
 remain exact. The briefing and Codex must describe the **saved variable reward**,
 not promise a fixed Drum from `SiteSpec`. The prototype installs no location.
 
-## Reproduction and remaining acceptance
+## Historical reproduction and acceptance at that snapshot
+
+Reproduce the original experiment only in its isolated historical checkout:
 
 ```sh
-PYTHONPATH=. python tools/prototype_eador_relief.py --output /tmp/relief-revised.json.gz
-PYTHONPATH=. python tools/prototype_eador_relief.py --interactive scout
+git worktree add --detach /tmp/shardbound-relief-4608d1e 4608d1e988bd630b0c302712160c97ad9a913584
+cd /tmp/shardbound-relief-4608d1e
+uv run --extra dev python tools/prototype_eador_relief.py --output /tmp/relief-revised.json.gz
+uv run --extra dev python tools/prototype_eador_relief.py --interactive scout
 ```
+
+This is an explicitly scheduled historical experiment, not a candidate test.
+The original runner predates its later CPU-budget change and includes the full
+12,000-trial search. It was not rerun when retiring the superseded tool.
 
 The report contains purchased campaign snapshots, orders and complete Battle
 reloads, immediate attack/Pin/spell/Repulse forecast checks, passive
-counterexamples and source-selection witnesses. The prototype needs independent
-review, then production finite retry/reward-once/old-save tests, actual paid
+counterexamples and source-selection witnesses. At this snapshot, remaining
+acceptance included independent review, production finite retry/reward-once/old-save tests, actual paid
 travel to the selected source, alternate seeds/modes and native pre-entry/input
-verification before it can become accepted content. None is replaced by the
-12,000 static-screen trials.
+verification. Their later production implementation is linked above; the
+12,000 static-screen trials did not substitute for those checks.
 
 The [revised retained report](evidence/relief-revised-prototype-2026-09-06.json.gz)
 was produced from clean source `4608d1e988bd630b0c302712160c97ad9a913584`. All
