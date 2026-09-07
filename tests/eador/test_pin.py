@@ -174,28 +174,30 @@ def test_real_adventures_award_equip_and_activate_both_relic_capabilities(theme)
     """All three sources are obtainable through battles, choices and travel in every theme."""
     from dataclasses import replace
     from eador.model import State
-    from tools.eador_campaign import finish_battle, provision_army, rest, march_to
+    from tools.cpu_budget import CpuBudget
+    from tools.eador_campaign import finish_battle, provision_army, rest, march_to, site_position
 
+    budget = CpuBudget(25)
     state = State.new(7, theme=theme)
     state.build('barracks')
     state.recruit('swordsman')
     state.explore()
-    finish_battle(state)
-    rest(state)
+    finish_battle(state, budget=budget)
+    rest(state, budget=budget)
     provision_army(state)
-    watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
-    for destination in ((-2, 2), (-1, 2), watch):
-        march_to(state, destination)
-        rest(state)
+    watch = site_position(state, 'border_watch')
+    for destination in (site_position(state, 'den'), site_position(state, 'explorer_camp'), watch):
+        march_to(state, destination, budget=budget)
+        rest(state, budget=budget)
         provision_army(state)
-        march_to(state, destination)
+        march_to(state, destination, budget=budget)
         if not state.actions_left:
-            rest(state)
-            march_to(state, destination)
+            rest(state, budget=budget)
+            march_to(state, destination, budget=budget)
         state.explore()
-        finish_battle(state)
+        finish_battle(state, budget=budget)
         if destination != watch:
-            rest(state)
+            rest(state, budget=budget)
             provision_army(state)
     assert {'storm_quiver', 'watch_bell', 'wayfarer_boots'} <= set(state.inventory)
     for relic in ('watch_bell', 'storm_quiver', 'wayfarer_boots'):
