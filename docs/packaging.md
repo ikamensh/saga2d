@@ -19,6 +19,10 @@ changing order uses native player input. Tactical battles use the visible
 automatic-round control; this is campaign/save verification, not manual tactics
 or a human playtest. The final process restores the completed chronicle and
 returns to title. Settings persist at 125% reading size throughout.
+The campaign policies share the existing 25% cooperative CPU allowance and
+native input is paced at 30 FPS. Phase receipts record both wall and CPU time;
+each invocation closes its Game. PyInstaller itself is not CPU-throttled, so
+the build remains the sole expensive local job.
 
 The check writes complete state checkpoints, event records and screenshots under
 `dist/shardbound/campaign-verification/`, isolated from player saves. Each fresh
@@ -81,10 +85,12 @@ All generated files stay under ignored `build/shardbound/` and
 The app includes a Python runtime and runtime libraries. The source snapshot's
 `package-data.json` freezes the exact ordered collection; the snapshotted spec
 consumes that list. Every collected file has a byte count and SHA-256 in the
-build manifest's `package_data` map. This includes all twelve effects, two music
-loops, `eador/assets/audio-manifest.json`, audio provenance, and other package
+build manifest's `package_data` map. This includes every shipping sound cue and
+music loop, `eador/assets/audio-manifest.json`, audio provenance, and other package
 data. The review-only cue sampler under `docs/evidence/` is not shipped.
-Current art is procedural. Bundled
+Current art includes the generated environment and hero portraits, offline
+terrain illustrations, original icons and procedural miniatures. Their exact
+assets and provenance are collected with the game. Bundled
 `Contents/Resources/release/` contains a player guide, credits, original license
 texts found in dependency distributions, the runtime lock and build metadata.
 No change to the Saga2D framework wheel is needed: the game is an application
@@ -98,7 +104,7 @@ expedition, invade a province, Guard, play an automatic battle round, restore
 the guarded battle and retreat. A fresh Game reloads the saved sound settings.
 The smoke renders title, settings, shard, codex, rival and battle screens.
 
-All fourteen shipping WAVs are decoded in full and checked against the audio
+All shipping WAVs are decoded in full and checked against the audio
 manifest. The native silent driver plays every effect to completion and briefly
 starts each looping track, checking live mute/channel gains and player cleanup.
 The builder compares the reported WAV hashes with the frozen input collection

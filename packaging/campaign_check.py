@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import platform
 import sys
-from time import perf_counter
+from time import perf_counter, process_time
 
 
 def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
@@ -19,6 +19,7 @@ def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
     from eador.campaign_scene import CampaignScene
     from eador.preferences import reading_scale
     from eador.scene import ShardScene, TitleScene
+    from tools.cpu_budget import CpuBudget
     from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
     from tools.eador_ui import PlayerInput
 
@@ -34,6 +35,8 @@ def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
         previous = json.loads((output / f'phase-{phase - 1}.json').read_text())
         assert previous['recovery'] == recovery and previous['phase'] == phase - 1
     started = perf_counter()
+    cpu_started = process_time()
+    budget = CpuBudget(25)
     game = create_game('Shardbound packaged campaign check', backend=backend,
                        visible=False, save_dir=output / 'saves')
     player = PlayerInput(game, native=backend == 'pyglet', output=output / f'phase-{phase}')
@@ -73,12 +76,12 @@ def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
             stage = player.state.campaign.stage
             player.press('j'); player.capture('contract-125'); player.press('escape')
             if recovery and phase == 2:
-                lose_shard(player.state)
+                lose_shard(player.state, budget=budget)
                 assert isinstance(game.scene, CampaignScene) and player.state.campaign.phase == 'recovery'
                 assert not player.state.campaign.recovery_used
                 player.capture('saved-capital-loss-125')
             else:
-                play_stage(player.state, reload_state=player.reload)
+                play_stage(player.state, reload_state=player.reload, budget=budget)
                 assert player.state.status == 'victory' and isinstance(game.scene, CampaignScene)
                 assert len(player.state.campaign.completed) == stage
                 if stage == 3:
@@ -100,6 +103,7 @@ def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
                       backend=backend, frozen=bool(getattr(sys, 'frozen', False)),
                       executable=sys.executable, process_id=os.getpid(), platform=platform.platform(),
                       asset_path=str(ASSETS), elapsed_seconds=perf_counter() - started,
+                      cpu_seconds=process_time() - cpu_started, cpu_percent=budget.percent,
                       input_activations=len(player.events), inputs=player.events,
                       exact_save_reloads=player.reloads, briefings=player.briefings,
                       loaded_checkpoint=loaded, checkpoint=checkpoint,
@@ -110,5 +114,4 @@ def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
         (output / f'phase-{phase}.json').write_text(json.dumps(report, indent=2) + '\n')
         return report
     finally:
-        game._teardown()
-        game.backend.quit()
+        game.close()
