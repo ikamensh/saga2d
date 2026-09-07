@@ -1,0 +1,19 @@
+{
+  "checked_process_ids": [
+    8531,
+    8646,
+    8880,
+    9116,
+    9119,
+    9254,
+    9398,
+    9574,
+    9765,
+    11721
+  ],
+  "all_checked_processes_gone": true,
+  "root_build_exit_code": 0,
+  "launchservices_smoke_launcher_exit_code": 0,
+  "normal_launch_launcher_exit_code": 0,
+  "scope": "Recorded nine frozen campaign processes and the one owned normal launch; root test/build/launch sessions were also awaited to completion."
+}

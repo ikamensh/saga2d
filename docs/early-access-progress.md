@@ -4,10 +4,47 @@ Criteria: [early-access-criteria.md](early-access-criteria.md).
 All release gates remain incomplete unless evidence below explicitly proves
 them. Last completed development milestone was a single-shard prototype;
 the current goal is substantially broader.
-Entries below are chronological checkpoints; their measurements apply to
-the named source snapshot, and later entries supersede earlier feature gaps.
+The current checkpoint comes first. Historical measurements and feature gaps
+apply to their named source snapshots, not to today's build.
 
-## Current playable checkpoint — 2026-09-06
+## Current playable checkpoint — 2026-09-07
+
+The latest preserved Mac development archive is clean source **7b5562d**:
+[runnable artifact, exact source and packaged frames](evidence/shardbound-package-7b5562d/README.md).
+It now includes the painted environment/portraits, illustrated terrain and role
+miniatures, icon toolbars and stats, richer sound, compact tactical controls,
+varied saved adventure locations and the existing shared-realm implementation.
+Ready evacuation guidance and singular foe text are corrected. No new game
+rules or framework API were needed for this refresh.
+
+[Ordinary validation](evidence/shardbound-candidate-validation/README.md) covers
+**1,542 current cases** across seven staged runs and the two display checks;
+all 110 game/framework/cross-game Python files match across those runs. Stale
+paid-route assertions were repaired, two superseded experiment runners and four
+dedicated tests were removed, and every initial failure is retained. **159
+expensive cases remain deferred**; two packaged-campaign mock cases passed
+separately. A small seed-0 Standard model audit completes **24/24** linked
+journeys, including eight recoveries, using the existing autoplay policy.
+
+The extracted frozen app passes installed assets/audio, settings and saved-input
+checks plus direct and actual lost-capital recovery campaigns across nine
+processes: **976 native inputs, 17 UI save/reloads and seven exact process joins**.
+Both endings restore at 125% and return to title. All 53 retained package frames
+were inspected, using exact-hash representatives for duplicates. A second
+extraction, local ad-hoc signature and LaunchServices smoke pass. The archive is
+49,259,991 bytes; its manifest and full hash are retained with the evidence.
+
+The campaign phase bodies average about 26.61% of one core at the requested 25%
+allowance and 30 FPS native cap; startup/cleanup and the uncapped sole build job
+are outside that timing. Expensive jobs ran serially and ended. The ordinary
+UI-only attempt encountered the locked Mac before any game observation, then
+closed its own process. Human playtests/listening, artifact co-op connectivity,
+clean-account/Windows and current sustained acceptance remain open. A manual-only
+Windows build workflow and concrete runtime handoff are prepared but unexecuted.
+No cancelled matrix/soak, remote dispatch or publication was performed.
+**All G01–G19 gates remain incomplete.**
+
+## Earlier playable checkpoint — 2026-09-06
 
 The latest preserved Mac development archive is clean source **32f354c**:
 [build identity, full tests and packaged frames](evidence/shardbound-package-32f354c/README.md).

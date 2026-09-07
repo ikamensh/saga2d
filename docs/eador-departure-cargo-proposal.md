@@ -152,8 +152,8 @@ uv run --extra dev python tools/prototype_eador_departure_cargo.py --report /tmp
 uv run pytest tests/eador/test_difficulty.py -q
 ```
 
-This is an explicitly scheduled historical experiment, not an ordinary candidate
-test: the original tool predates its later CPU-budget change. The separate
+This is a historical experiment outside ordinary candidate validation:
+the original tool predates its later CPU-budget change. The separate
 [CPU evidence](evidence/retained-prototype-cpu-83e01be/README.md) and its retained
 probe apply to their named historical revisions; that probe is no longer a live
 current-checkout command. Neither historical experiment was rerun for retirement.

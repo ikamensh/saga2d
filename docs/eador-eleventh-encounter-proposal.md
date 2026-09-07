@@ -187,7 +187,7 @@ uv run --extra dev python tools/prototype_eador_relief.py --output /tmp/relief-r
 uv run --extra dev python tools/prototype_eador_relief.py --interactive scout
 ```
 
-This is an explicitly scheduled historical experiment, not a candidate test.
+This is a historical experiment outside ordinary candidate validation.
 The original runner predates its later CPU-budget change and includes the full
 12,000-trial search. It was not rerun when retiring the superseded tool.
 

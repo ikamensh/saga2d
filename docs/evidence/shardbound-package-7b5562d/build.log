@@ -1,0 +1,110 @@
+   Building saga2d @ file:///private/tmp/saga2d-candidate-80a0769
+      Built saga2d @ file:///private/tmp/saga2d-candidate-80a0769
+Installed 5 packages in 36ms
+32 INFO: PyInstaller: 6.22.2, contrib hooks: 2026.7
+32 INFO: Python: 3.13.2
+37 INFO: Platform: macOS-26.6.2-arm64-arm-64bit-Mach-O
+37 INFO: Python environment: /Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e
+39 INFO: Removing temporary files and cleaning cache in /Users/ikamen/Library/Application Support/pyinstaller
+45 INFO: Module search paths (PYTHONPATH):
+['/private/tmp/saga2d-candidate-80a0769/build/shardbound/source',
+ '/Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/python313.zip',
+ '/Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/python3.13',
+ '/Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/python3.13/lib-dynload',
+ '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages',
+ '/Users/ikamen/.cache/uv/builds-v0/.tmpxLbf9F/lib/python3.13/site-packages',
+ '__editable__.saga2d-0.1.0.finder.__path_hook__',
+ '/private/tmp/saga2d-candidate-80a0769/build/shardbound/source']
+813 INFO: Appending 'datas' from .spec
+816 INFO: checking Analysis
+816 INFO: Building Analysis because Analysis-00.toc is non existent
+816 INFO: Looking for Python shared library...
+818 INFO: Using Python shared library: /Users/ikamen/.local/share/uv/python/cpython-3.13.2-macos-aarch64-none/lib/libpython3.13.dylib
+818 INFO: Running Analysis Analysis-00.toc
+818 INFO: Target bytecode optimization level: 0
+818 INFO: Initializing module dependency graph...
+818 INFO: Initializing module graph hook caches...
+824 INFO: Analyzing modules for base_library.zip ...
+1165 INFO: Processing standard module hook 'hook-encodings.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+1278 INFO: Processing standard module hook 'hook-math.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+1372 INFO: Processing standard module hook 'hook-heapq.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+1807 INFO: Processing standard module hook 'hook-pickle.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2401 INFO: Caching module dependency graph...
+2415 INFO: Analyzing /private/tmp/saga2d-candidate-80a0769/build/shardbound/source/entry.py
+2437 INFO: Processing standard module hook 'hook-platform.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2450 INFO: Processing standard module hook 'hook-xml.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+2458 INFO: Processing standard module hook 'hook-_ctypes.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3179 INFO: Processing standard module hook 'hook-PIL.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3226 INFO: Processing standard module hook 'hook-PIL.Image.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3309 INFO: Processing standard module hook 'hook-numpy.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3496 INFO: Processing standard module hook 'hook-difflib.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+3582 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+4096 INFO: Processing standard module hook 'hook-sysconfig.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+4102 INFO: Processing standard module hook 'hook-_osx_support.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+4378 INFO: Processing standard module hook 'hook-webbrowser.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+4656 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4656 INFO: SetuptoolsInfo: initializing cached setuptools info...
+5134 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+5221 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+5527 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/pre_safe_import_module'
+6247 INFO: Processing standard module hook 'hook-websockets.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+6866 INFO: Processing module hooks (post-graph stage)...
+7130 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks'
+7183 INFO: Performing binary vs. data reclassification (148 entries)
+7191 INFO: Looking for ctypes DLLs
+7242 WARNING: Library libc.so.6 required via ctypes not found
+7360 WARNING: Library winmm required via ctypes not found
+7385 INFO: Analyzing run-time hooks ...
+7387 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7389 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7390 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/hooks/rthooks'
+7397 INFO: Creating base_library.zip...
+7406 INFO: Looking for dynamic libraries
+7455 INFO: Warnings written to /private/tmp/saga2d-candidate-80a0769/build/shardbound/pyinstaller/shardbound/warn-shardbound.txt
+7471 INFO: Graph cross-reference written to /private/tmp/saga2d-candidate-80a0769/build/shardbound/pyinstaller/shardbound/xref-shardbound.html
+7496 INFO: checking PYZ
+7496 INFO: Building PYZ because PYZ-00.toc is non existent
+7496 INFO: Building PYZ (ZlibArchive) /private/tmp/saga2d-candidate-80a0769/build/shardbound/pyinstaller/shardbound/PYZ-00.pyz
+7935 INFO: Building PYZ (ZlibArchive) /private/tmp/saga2d-candidate-80a0769/build/shardbound/pyinstaller/shardbound/PYZ-00.pyz completed successfully.
+7940 INFO: EXE target arch: arm64
+7940 INFO: Code signing identity: None
+7941 INFO: checking PKG
+7941 INFO: Building PKG because PKG-00.toc is non existent
+7941 INFO: Building PKG (CArchive) Shardbound.pkg
+7955 INFO: Building PKG (CArchive) Shardbound.pkg completed successfully.
+7956 INFO: Bootloader /Users/ikamen/.cache/uv/archive-v0/doFjt-A7lDwf4jJZrpd1e/lib/python3.13/site-packages/PyInstaller/bootloader/Darwin-64bit/runw
+7956 INFO: checking EXE
+7956 INFO: Building EXE because EXE-00.toc is non existent
+7956 INFO: Building EXE from EXE-00.toc
+7956 INFO: Copying bootloader EXE to /private/tmp/saga2d-candidate-80a0769/build/shardbound/pyinstaller/shardbound/Shardbound
+7956 INFO: Converting EXE to target arch (arm64)
+7971 INFO: Removing signature(s) from EXE
+7987 INFO: Modifying Mach-O image UUID(s) in EXE
+7992 INFO: Appending PKG archive to EXE
+7995 INFO: Fixing EXE headers for code signing
+7999 INFO: Rewriting the executable's macOS SDK version (26.2.0) to match the SDK version of the Python library (14.2.0) in order to avoid inconsistent behavior and potential UI issues in the frozen application.
+7999 INFO: Re-signing the EXE
+8022 INFO: Building EXE from EXE-00.toc completed successfully.
+8023 INFO: checking COLLECT
+8023 INFO: Building COLLECT because COLLECT-00.toc is non existent
+8023 INFO: Building COLLECT COLLECT-00.toc
+9148 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+9151 INFO: checking BUNDLE
+9151 INFO: Building BUNDLE because BUNDLE-00.toc is non existent
+9151 INFO: Building BUNDLE BUNDLE-00.toc
+9238 INFO: Signing the BUNDLE...
+9368 INFO: Building BUNDLE BUNDLE-00.toc completed successfully.
+9370 INFO: Build complete! The results are available in: /private/tmp/saga2d-candidate-80a0769/dist/shardbound
+2026-09-07 12:50:25.223 Shardbound[8388:23352019] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:50:37.241 Shardbound[8531:23353385] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:50:57.166 Shardbound[8646:23354201] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:51:21.575 Shardbound[8880:23356068] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:51:44.179 Shardbound[9116:23357827] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:51:45.514 Shardbound[9119:23357863] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:52:06.729 Shardbound[9254:23359035] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:52:16.118 Shardbound[9398:23360211] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:52:41.251 Shardbound[9574:23361596] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+2026-09-07 12:53:06.335 Shardbound[9765:23363334] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.shardbound.savedState
+Built /private/tmp/saga2d-candidate-80a0769/dist/shardbound/Shardbound-macos-arm64.zip
+SHA256 4bf1e0e8ba8e77698e91621a4baee6931d1740263e1807b75836413f29ef559b
+Manifest /private/tmp/saga2d-candidate-80a0769/dist/shardbound/build-manifest.json

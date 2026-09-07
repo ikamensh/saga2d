@@ -4,6 +4,14 @@ This is the packaging foundation for G14/G18, not a release-readiness claim.
 The local macOS arm64 artifact starts without a repository, installed Python,
 uv or a terminal window. Windows remains an untested build target.
 
+The current preserved Mac development build is clean source **7b5562d**:
+[artifact identity, packaged campaigns and visual review](evidence/shardbound-package-7b5562d/README.md).
+It includes the current portraits, icons, terrain, sound and varied site placement.
+The extracted archive passes direct/recovery campaigns across nine app processes,
+LaunchServices smoke and local ad-hoc signature verification. Its ordinary UI-only
+check stopped at the locked Mac; this does not establish clean-account, Windows,
+human playtest/listening or co-op connectivity acceptance.
+
 ## Build locally
 
 From the repository root, with uv installed:

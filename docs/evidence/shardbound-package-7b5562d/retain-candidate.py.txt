@@ -1,0 +1,115 @@
+"""Retain and authenticate the already-built local development candidate."""
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+ROOT = Path('/tmp/saga2d-candidate-80a0769')
+MAIN = Path('/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d')
+BUILD = ROOT / 'dist/shardbound'
+SNAPSHOT = ROOT / 'build/shardbound/source'
+EXTRACTED = Path('/tmp/shardbound-candidate-7b5562d-extracted/Shardbound.app')
+EVIDENCE = ROOT / 'docs/evidence/shardbound-package-7b5562d'
+sys.path.insert(0, str(ROOT))
+from tools.build_eador import inventory, sha256
+
+manifest = json.loads((BUILD / 'build-manifest.json').read_text())
+assert manifest['source_commit'] == '7b5562d1b76b5d16863d121efc9fff5288942f2a'
+assert not manifest['working_tree_dirty'] and not manifest['release_ready']
+assert inventory(EXTRACTED) == manifest['files']
+checked_current = {}
+origins = {'entry.py': 'packaging/entry.py', 'campaign_check.py': 'packaging/campaign_check.py',
+           'shardbound.spec': 'packaging/shardbound.spec', 'release/LICENSE': 'LICENSE',
+           'release/player-guide.md': 'eador/README.md', 'release/credits.md': 'packaging/credits.md',
+           'release/build-tools.txt': 'packaging/requirements.txt', 'release/runtime-uv.lock': 'uv.lock'}
+for name, expected in manifest['source_sha256'].items():
+    assert sha256(SNAPSHOT / name) == expected, name
+    origin = origins.get(name)
+    if name.startswith(('eador/', 'saga2d/', 'tools/')) and name != 'tools/__init__.py':
+        origin = name
+    if origin is not None:
+        assert sha256(ROOT / origin) == expected, origin
+        checked_current[origin] = expected
+
+archive = BUILD / manifest['artifact']['file']
+assert sha256(archive) == manifest['artifact']['sha256']
+checkpoint = MAIN / 'dist/shardbound-checkpoints' / manifest['source_commit'][:12]
+assert not checkpoint.exists()
+checkpoint.mkdir(parents=True)
+shutil.copyfile(archive, checkpoint / archive.name)
+shutil.copyfile(BUILD / 'build-manifest.json', checkpoint / 'build-manifest.json')
+subprocess.run(['/usr/bin/ditto', str(EXTRACTED), str(checkpoint / 'Shardbound.app')], check=True)
+assert inventory(checkpoint / 'Shardbound.app') == manifest['files']
+subprocess.run(['/usr/bin/codesign', '--verify', '--deep', '--strict',
+                str(checkpoint / 'Shardbound.app')], check=True)
+assert sha256(checkpoint / archive.name) == manifest['artifact']['sha256']
+
+assert not EVIDENCE.exists()
+EVIDENCE.mkdir(parents=True)
+originals = []
+
+def retain(source, relative):
+    source = Path(source)
+    data = source.read_bytes()
+    target = EVIDENCE / relative
+    if source.suffix in ('.json', '.jsonl'):
+        target = target.with_name(target.name + '.gz')
+        stored = gzip.compress(data, mtime=0)
+        assert gzip.decompress(stored) == data
+    else:
+        stored = data
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(stored)
+    originals.append(dict(original=str(source), retained=target.relative_to(EVIDENCE).as_posix(),
+                          original_bytes=len(data), original_sha256=hashlib.sha256(data).hexdigest()))
+
+retain(BUILD / 'build-manifest.json', 'build-manifest.json')
+retain('/tmp/shardbound-candidate-build-7b5562d.log', 'build.log')
+for source in sorted(BUILD.glob('packaged-smoke*')):
+    retain(source, 'smoke/' + source.name)
+for source in sorted((BUILD / 'campaign-verification').rglob('*')):
+    if source.is_file():
+        retain(source, 'campaign/' + source.relative_to(BUILD / 'campaign-verification').as_posix())
+for source in sorted(Path('/tmp/shardbound-candidate-launch-7b5562d').iterdir()):
+    if source.is_file():
+        retain(source, 'launchservices/' + source.name)
+for source, name in [('/tmp/shardbound-candidate-extraction.json', 'second-extraction.json'),
+                     ('/tmp/shardbound-candidate-normal-launch.json', 'normal-launch.json'),
+                     ('/tmp/shardbound-candidate-normal-launch.log', 'normal-launch.log'),
+                     ('/tmp/shardbound-candidate-smoke-review.json', 'visual-review.json'),
+                     ('/tmp/shardbound-retain-candidate.py', 'retain-candidate.py.txt')]:
+    retain(source, name)
+
+phases = [json.loads(p.read_text()) for p in sorted((BUILD / 'campaign-verification').glob('*/phase-*.json'))]
+launch = json.loads(Path('/tmp/shardbound-candidate-launch-7b5562d/smoke.json').read_text())
+assert launch['frozen'] and launch['cwd'] == '/'
+assert launch['about_build_label'] == '0.1.0-development · 7b5562d1b76b'
+assert all(launch[k] for k in ('native_input_journey', 'save_load_roundtrip',
+                              'settings_apply_cancel_restart', 'audio_catalogue_decoded_and_played',
+                              'audio_live_mix_and_cleanup'))
+launch_images = []
+for source in sorted(Path('/tmp/shardbound-candidate-launch-7b5562d').glob('*.png')):
+    peer = BUILD / ('packaged-' + source.name)
+    same = sha256(source) == sha256(peer)
+    assert same or source.name == 'smoke-about-2.png'
+    launch_images.append(dict(file=source.name, identical_to_reviewed_smoke=same,
+                              observation='Identical to reviewed build frame.' if same else
+                              'Root viewed separately: different temporary data path, all text and controls fit.'))
+receipt = dict(source_commit=manifest['source_commit'], artifact=manifest['artifact'],
+               retained_checkpoint=str(checkpoint), verified_current_source_sha256=checked_current,
+               snapshot_files_verified=len(manifest['source_sha256']),
+               extracted_and_retained_inventory_matches=True, retained_adhoc_signature_passes=True,
+               native_campaigns=manifest['smoke']['linked_campaigns'],
+               phase_work_wall_seconds=sum(p['elapsed_seconds'] for p in phases),
+               phase_work_cpu_seconds=sum(p['cpu_seconds'] for p in phases),
+               phase_timing_scope='Phase body only; excludes imports/startup, report writing and cleanup. PyInstaller itself is uncapped.',
+               launchservices_images=launch_images,
+               scope='Local macOS arm64 development build. No clean-account, Windows, co-op connectivity, human playtest or listening claim.')
+(EVIDENCE / 'retention.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(EVIDENCE / 'originals.json').write_text(json.dumps(originals, indent=2) + '\n')
+print(json.dumps(dict(checkpoint=str(checkpoint), evidence=str(EVIDENCE), originals=len(originals),
+                     snapshot_files_verified=len(manifest['source_sha256']),
+                     current_sources_verified=len(checked_current), archive_sha256=manifest['artifact']['sha256']), indent=2))
