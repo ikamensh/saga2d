@@ -82,3 +82,35 @@ adventure approaches. Their actual outcomes must be assessed separately from
 the structural audit; preserving reward packages does not establish equal
 access cost or tactical difficulty. These local routes cannot establish three
 successful full-campaign strategies, general balance or release readiness.
+
+Both declared routes reached their endpoint: [seed 5](route-seed5-outcome.md)
+finished five battles on T3 with one action and 112g/10c; [seed 12](seed12-outcome.md)
+finished six battles on T3 with no actions and 121g/14c. All six troops survived
+in both, with 11/15 remaining wounds. The Seal saved 19g before the 20g guided
+fee; the Boots route paid full recruitment prices and gave up Heal for the
+free northern rescue. Both escaped in round 2 using Warden Swap. No elective
+recovery, retreat, defeat or rewind occurred. Each journal retains one rejected
+move with exact state unchanged.
+
+The final companion input selection passes 23 checks in 96.24 seconds, excluding
+one already-passed Relief retry. Bounded linked fuzzing on seeds 97–98 passes
+two model and two scene runs at 100 random steps, with 227 model and 305 scene
+state checks, 314 input activations and both actual model defeats retained.
+It completes in 12.8 seconds at the default CPU allowance. This small run is
+regression evidence, not the release soak or large acceptance matrix.
+
+## Actual route input and screenshots
+
+[Manual-input receipts](manual-input/README.md) retain both accepted command
+chains through fresh New Campaign input at 125% text size. Mock execution
+reproduces 219 commands and exact reload pairs with 901 inputs. Native execution
+reproduces the same 219 pairs with 903 inputs. All 18 native PNGs were inspected;
+the compact toolbar/stat icons, objectives, exit readiness and cleared sources
+remain readable. Both native receipts authenticate 82 unchanged source files.
+
+Seed 5 takes 44.899 seconds wall / 11.503 CPU; seed 12 takes 45.284 seconds wall /
+11.577 CPU. Native verification uses the existing 30 FPS pacing and cooperative
+25% CPU allowance, with only one expensive process running at a time. Games
+close after execution. These are agent-directed local routes and silent native
+input replays; human playtesting, audible review and release acceptance remain
+open.

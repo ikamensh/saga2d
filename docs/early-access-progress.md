@@ -950,3 +950,38 @@ Bounded Shardbound fuzzing passes, including actual error-reader input. The game
 frame caps remain 60/15 FPS, and expensive verification runs serially at the
 default 25% allowance. Human listening/playtest feedback and all release gates
 remain open. **G01–G19 remain incomplete.**
+
+## Varied adventure locations and informed routes — 2026-09-07
+
+New worlds now vary complete authored site packages within progression bands.
+Saved worlds keep their recorded maps. Selecting a province reveals its site
+before conquest; Sites and Relics in the Codex show actual source provinces and
+mark cleared sources. Existing Saga2D primitives support this game-specific
+generation and presentation change without a new framework API.
+
+[Retained evidence](evidence/adventure-variety/README.md) compares 300 worlds
+with the exact historical baseline, including 600 exact reloads, unchanged
+non-site facts and complete reward/guard packages. Five native discovery cases
+retain 186 inputs, five exact reload pairs and eight inspected frames. Focused
+earned-army regressions now reach the actual site and retain changed travel,
+experience, wounds, losses and paid retries. Large campaign matrices remain
+deferred.
+
+Two plans declared before their first battle complete fresh paid expeditions:
+the Seal/guided Courier route finishes five battles on turn 3 with one action,
+112 gold/10 crystals and 11 wounds; the Boots/northern Explorer route finishes
+six battles on turn 3 with no actions, 121 gold/14 crystals and 15 wounds. Both
+keep all six troops and use Warden Swap to evacuate in round 2. Neither uses
+autoplay, a rewind or elective recovery. Each retains one rejected move with
+unchanged state. These local routes demonstrate different actual access costs
+and equipment choices, not general balance or whole-campaign strategies.
+
+Both accepted journals reproduce through native New Campaign input at 125%
+text size: 219 exact commands and reload pairs, 903 inputs and 18 inspected
+screenshots. All 82 authenticated source files remain unchanged. The sequential
+native runs take 44.90/45.28 seconds wall and 11.50/11.58 seconds CPU; games close
+and verifier pacing remains 30 FPS with a cooperative 25% CPU allowance.
+Twenty-three companion input checks and bounded linked model/scene fuzzing
+also pass. This advances G02/G05 evidence without completing a gate. Human
+listening/playtests, packaged-platform validation and release acceptance remain
+open. **G01–G19 remain incomplete.**

@@ -48,8 +48,20 @@ Seed 5 prioritizes the nearby Caravan's Merchant Seal, buys its planned troops
 at the actual discount, and pays for the guided Courier approach. Seed 12
 prioritizes nearby Boots, gives up the Tower alternative and its spell/reward,
 then equips mobility instead of Moonstone healing for Stranded Explorer. The
-declared stops, recovery allowance, failure handling and nominal forecasts are
-retained before play. Actual results must be reported even when unfavorable.
+declared stops, recovery allowance, failure handling and nominal forecasts were
+retained before play. Both routes reached their declared reward endpoint.
+
+| Actual route | Investment and equipment | Endpoint |
+| --- | --- | --- |
+| [Seed 5: Caravan → Courier](evidence/adventure-variety/route-seed5-outcome.md) | Seal saves 19 gold on recruits; guided entry costs 20. Moonstone supplies Heal. | Five battles; T3 with one action, 112 gold/10 crystals, six troops alive and 11 wounds. |
+| [Seed 12: Camp → Explorer](evidence/adventure-variety/seed12-outcome.md) | Full-price recruits; Archer waits for Silverford's reward. Boots replace Heal for the free northern rescue. | Six battles; T3 with no actions, 121 gold/14 crystals, six troops alive and 15 wounds. |
+
+Both evacuations used Warden Swap and finished in round 2 with defenders still
+alive. Each route used two mandatory end-turns and no elective recovery,
+retreat, defeat, autoplay or rewind. One rejected move per route is retained
+with exact state unchanged. The 107/112 accepted commands preserve every paid
+step and saved continuation. Different seed economics, conquest XP and rewards
+also affect the comparison; it does not isolate a single equipment effect.
 
 These local adventure routes cannot establish three successful whole-campaign
 strategies, optimal play, general economic balance or an Early Access gate.
