@@ -1,6 +1,6 @@
 """Purchased Observatory formations and explicit orders, reusable by input adapters."""
 from eador.model import BUILDINGS, State, UNITS
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_extraction_campaign import AdventureOrders
 
 
@@ -23,9 +23,11 @@ def prepare_observatory(state=None, *, support="sapper", budget=None):
             rest(state, budget=budget)
         else:
             raise AssertionError(f'Could not fund {spec.name}')
+    destination = site_position(state, 'broken_observatory')
     for _ in range(48):
-        march_to(state, (-1, 0), budget=budget)
-        if state.actions_left and state.crystals >= 2 and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
+        march_to(state, destination, budget=budget)
+        if (state.hero.pos == destination and state.actions_left and state.crystals >= 2
+                and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army)):
             return state
         rest(state, budget=budget)
     raise AssertionError('Could not reach the Observatory recovered')

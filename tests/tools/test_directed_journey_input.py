@@ -43,6 +43,40 @@ def earned_report(anchor='control', *, skill='pathfinder'):
     )
 
 
+def fresh_report(seed=5):
+    """Record a paid opening from exactly the state produced by starting a new campaign."""
+    state = State.new_campaign(seed, 'Commander')
+    initial = state.to_json()
+    played = SavedCommands(state, CpuBudget(100))
+    for command, args in (('build', ('barracks',)), ('recruit', ('warden',)),
+                          ('explore', ()), ('battle.guard', (0,))):
+        played.order(command, *args)
+        played.commands[-1]['reason'] = 'Buy a starting formation and enter the actual home shrine.'
+    return dict(
+        source=dict(kind='new_campaign', seed=seed, hero_class='Commander', difficulty='standard',
+                    initial_sha256=hashlib.sha256(initial.encode()).hexdigest()),
+        execution_source='test working source',
+        source_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                       for p in [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py')]},
+        initial_state=initial, final_state=played.state.to_json(), commands=played.commands,
+    )
+
+
+def test_fresh_campaign_journal_starts_through_title_and_pays_for_its_army(tmp_path):
+    """A generated opening must be reproduced by New Campaign input, before any save is loaded."""
+    from tools.verify_eador_directed_journey import verify
+
+    source = fresh_report()
+    path = tmp_path / 'fresh.json.gz'
+    path.write_bytes(gzip.compress(json.dumps(source).encode()))
+    result = verify(path, tmp_path / 'verified', backend='mock')
+    assert result['inputs'][0] == ('TitleScene', 'key', 'l')
+    assert result['final_state'] == source['final_state']
+    assert result['reloads'] == result['exact_commands'] == 4
+    assert State.from_json(result['final_state']).gold == 0
+    assert 'fresh campaign' in result['scope'] and 'historical autoplay' not in result['scope']
+
+
 def test_directed_journal_replays_infusion_and_acolyte_cast_through_saved_input(tmp_path):
     """Campaign investment, the chosen caster, Guard and enemy response match after every F5/F9."""
     from tools.verify_eador_directed_journey import verify
@@ -55,6 +89,7 @@ def test_directed_journal_replays_infusion_and_acolyte_cast_through_saved_input(
     assert result['reloads'] == result['exact_commands'] == len(source['commands'])
     assert result['input_sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert result['source_unchanged']
+    assert 'historical autoplay opening' in result['scope']
 
 
 @pytest.mark.parametrize('skill', ['pathfinder', 'skirmisher'])

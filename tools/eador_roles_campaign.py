@@ -1,16 +1,17 @@
 """Public paid preparation for a sustain, mobile-fire and rescue formation."""
 from eador.model import BUILDINGS, State
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 
 
 def prepare_support_watch(state=None, *, budget=None):
     """Buy all three roles and reach the Watch; accepts a model or the real-input adapter."""
     state = State.new(7) if state is None else state
+    watch = site_position(state, 'border_watch')
     state.build('barracks')
     state.recruit('warden')
     state.explore()
     finish_battle(state, budget=budget)
-    for destination in ((-1, -1), (0, -2)):
+    for destination in ((-1, -1), watch):
         march_to(state, destination, budget=budget)
         rest(state, budget=budget)
     for building, kind in (('temple', 'healer'), ('archery', 'ranger')):
@@ -22,7 +23,7 @@ def prepare_support_watch(state=None, *, budget=None):
         state.recruit(kind)
     while max([state.hero.max_hp - state.hero.hp] + [t.max_hp - t.hp for t in state.hero.army]):
         rest(state, budget=budget)
-    march_to(state, (0, -2), budget=budget)
+    march_to(state, watch, budget=budget)
     if not state.actions_left:
         rest(state, defend=False, budget=budget)
     state.explore()

@@ -1,6 +1,6 @@
 """Purchased Smuggler Screen parties and manual orders for input adapters."""
 from eador.model import BUILDINGS, State
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_extraction_campaign import AdventureOrders
 
 
@@ -27,11 +27,13 @@ def prepare_screen(hero_class='Commander', *, state=None, budget=None):
         rest(state, budget=budget)
     else:
         raise AssertionError('Could not fund the Ranger')
-    for pos in ((-1, 1), (-1, 2), (0, -1)):
+    destination = site_position(state, 'smuggler_screen')
+    for pos in ((-1, 1), (-1, 2), destination):
         march_to(state, pos, budget=budget)
     for _ in range(48):
-        march_to(state, (0, -1), budget=budget)
-        if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
+        march_to(state, destination, budget=budget)
+        if (state.hero.pos == destination and state.actions_left and state.hero.hp == state.hero.max_hp
+                and all(t.hp == t.max_hp for t in state.hero.army)):
             return state
         rest(state, budget=budget)
     raise AssertionError('Could not reach the Screen with the purchased party recovered')
@@ -96,16 +98,26 @@ def screen_northern_route(state, *, orders_type=AdventureOrders):
     return p
 
 
-def screen_scout_route(state, *, orders_type=AdventureOrders):
-    """Five bodies concentrate ranged fire before Smoke, then rotate the Ranger back."""
-    state.explore(approach='northern')
-    p = orders_type(state)
-    sapper, warden, guard = (p.enemy(kind) for kind in ('sapper', 'warden', 'guard'))
-    north, middle = [u.id for u in p.battle.units if u.team == 'enemy' and u.kind == 'archer']
+def screen_scout_opening(p):
+    """Open the Scout's firing lane, kill the Sapper, and swap its wounded attacker back."""
+    sapper = p.enemy('sapper')
+    middle = next(u.id for u in p.battle.units if u.team == 'enemy' and u.pos == (1, -1))
     p.do('move', 2, (0, 0)); p.do('attack', 2, sapper)
     p.do('move', 5, (0, -1)); p.do('attack', 5, sapper)
-    p.do('attack', 3, sapper); p.do('move', 0, (-1, 0)); p.do('attack', 0, sapper)
-    p.do('move', 4, (1, -2)); p.do('attack', 4, middle)
+    p.do('move', 3, (-2, 0)); p.do('attack', 3, sapper)
+    p.do('move', 1, (1, -2))  # Clear the Scout's only remaining exit from the deployment.
+    p.do('move', 0, (-1, 0)); p.do('attack', 0, sapper)
+    p.do('attack', 1, middle)
+    p.do('move', 4, (-1, 1)); p.do('swap', 4, 2)
+
+
+def screen_scout_route(state, *, orders_type=AdventureOrders):
+    """Six bodies deny Smoke, swap into cover, then rotate the Ranger back."""
+    state.explore(approach='northern')
+    p = orders_type(state)
+    warden, guard = (p.enemy(kind) for kind in ('warden', 'guard'))
+    north, middle = [u.id for u in p.battle.units if u.team == 'enemy' and u.kind == 'archer']
+    screen_scout_opening(p)
     p.guard_remaining(); p.do('end_turn')
     p.do('move', 0, (-1, -1)); p.do('cast', 'heal', 2)
     p.do('attack', 5, middle); p.do('move', 5, (-2, 1))
@@ -117,11 +129,12 @@ def screen_scout_route(state, *, orders_type=AdventureOrders):
     p.guard_remaining(); p.do('end_turn')
     p.do('cast', 'heal', 2)
     p.do('attack', 4, warden); p.do('attack', 5, warden)
-    p.do('attack', 3, warden); p.do('attack', 2, warden)
+    p.do('attack', 3, warden)
+    p.do('move', 2, (0, 0)); p.do('attack', 2, warden)
     p.guard_remaining(); p.do('end_turn')
     p.do('move', 4, (1, 1)); p.do('attack', 4, guard)
     for uid in (0, 2, 3, 5):
         p.do('attack', uid, guard)
+    # The forward Warden survives the last strike and its retaliation finishes the rout.
     p.guard_remaining(); p.do('end_turn')
-    p.do('attack', 0, guard); p.do('attack', 3, guard)
     return p

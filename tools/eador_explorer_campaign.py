@@ -1,6 +1,6 @@
 """Purchased split-party preparations and public orders for native input adapters."""
 from eador.model import BUILDINGS, State, UNITS
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_extraction_campaign import AdventureOrders
 
 
@@ -30,16 +30,19 @@ def prepare_explorer(hero_class='Commander', *, support='ranger', collect_boots=
             rest(state, budget=budget)
         else:
             raise AssertionError('Could not fund the explorer escort')
-    # Develop the western road before crossing into the optional northern site.
-    for pos in ((-1, 1), (-1, 2), (0, -1)):
+    # Ruins callers reuse this economy before continuing to their own adventure.
+    destination = site_position(state, 'stranded_explorer') if state.theme == 'frontier' else (0, -1)
+    camp = site_position(state, 'explorer_camp') if collect_boots else (-1, 2)
+    for pos in ((-1, 1), camp, destination):
         march_to(state, pos, budget=budget)
-        if pos == (-1, 2) and collect_boots:
+        if pos == camp and collect_boots and not state.provinces[pos].explored:
             if not state.actions_left:
                 rest(state, budget=budget); march_to(state, pos, budget=budget)
             state.explore(); finish_battle(state, budget=budget)
     for _ in range(48):
-        march_to(state, (0, -1), budget=budget)
-        if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army) and (support != 'healer' or state.hero.mana >= 4):
+        march_to(state, destination, budget=budget)
+        if (state.hero.pos == destination and state.actions_left and state.hero.hp == state.hero.max_hp
+                and all(t.hp == t.max_hp for t in state.hero.army) and (support != 'healer' or state.hero.mana >= 4)):
             return state
         rest(state, budget=budget)
     raise AssertionError('Could not reach the Explorer with the purchased party recovered')

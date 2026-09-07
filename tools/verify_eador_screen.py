@@ -20,7 +20,7 @@ from eador.preferences import reading_scale
 from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
 from tools.audit_eador_extraction import PaidState
 from tools.eador_screen_campaign import (prepare_screen, screen_western_route,
-                                          screen_northern_route, screen_scout_route)
+                                          screen_northern_route, screen_scout_route, screen_scout_opening)
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_control import ControlOrders
 from tools.verify_eador_guidance import check_reading_layout
@@ -111,58 +111,61 @@ def failed_retry(state):
     from tools.eador_campaign import rest, march_to
 
     player = state.player
+    source = state.hero.pos
     output = player.output
     player.output = output / 'failed-attempt'
     state.explore(approach='northern')
     p = ScreenOrders(state)
-    sapper = p.enemy('sapper')
-    middle = next(u.id for u in p.battle.units if u.team == 'enemy' and u.pos == (1, -1))
-    for command, *args in [('move', 2, (0, 0)), ('attack', 2, sapper),
-                           ('move', 5, (0, -1)), ('attack', 5, sapper), ('attack', 3, sapper),
-                           ('move', 0, (-1, 0)), ('attack', 0, sapper),
-                           ('move', 4, (1, -2)), ('attack', 4, middle)]:
-        p.do(command, *args)
-    for _ in range(40):
+    screen_scout_opening(p)
+    for _ in range(80):
         if p.battle.outcome:
             break
         p.guard_remaining(); p.do('end_turn')
-    assert p.battle.outcome_reason == 'hero_death' and p.battle.round == 13
+    assert p.battle.outcome_reason == 'hero_death' and p.battle.round == 53
     player.capture('hero-defeat-and-casualties')
     dead = [u.id for u in p.battle.units if u.team == 'player' and not u.alive and u.id != 0]
-    assert dead == [2, 3, 5]
+    assert dead == [1, 2, 3, 4, 5]
+    failed_round = p.battle.round
     xp, gold, crystals, turn = state.hero.xp, state.gold, state.crystals, state.turn
     state.resolve_battle()
     assert state.hero.xp == xp and (state.gold, state.crystals) == (gold - 20, crystals)
-    assert state.choice is None and not state.provinces[(0, -1)].explored
-    assert state.provinces[(0, -1)].site_guards == ['archer']
-    assert state.provinces[(0, -1)].site_guard_hp == [20]
+    assert state.choice is None and not state.provinces[source].explored
+    assert state.provinces[source].site_guards == ['archer']
+    assert state.provinces[source].site_guard_hp == [20]
     player.reload(state.to_json())
     player.capture('saved-loss-before-replacements')
     paid_before = state.recruitment_gold
     for _ in range(32):
+        assert state.status == 'playing'
         if len(state.hero.army) < state.hero.max_army and state.gold >= state.recruit_cost('swordsman'):
             state.recruit('swordsman')
-        march_to(state, (0, -1))
-        if state.actions_left and len(state.hero.army) >= 4 and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
+        march_to(state, source)
+        if (state.hero.pos == source and state.actions_left and len(state.hero.army) >= 4
+                and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army)):
             break
         rest(state)
+    else:
+        raise AssertionError('Could not return to the Screen with the paid replacement party recovered')
     replacement_gold = state.recruitment_gold - paid_before
     assert replacement_gold == 180 and not set(dead).intersection(t.id for t in state.hero.army)
+    assert [troop.kind for troop in state.hero.army] == ['swordsman'] * 4
+    replacement_ids = [troop.id for troop in state.hero.army]
     player.output = output / 'retry'
     inspect_briefing(player)
     entry_gold, entry_crystals, entry_mana = state.gold, state.crystals, state.hero.mana
     state.explore(approach='western')
     p_retry = ScreenOrders(state)
     assert [(u.kind, u.hp) for u in p_retry.battle.units if u.team == 'enemy'] == [('archer', 20)]
-    p_retry.guard_remaining(); p_retry.do('end_turn')
     bowman = p_retry.enemy('archer')
-    p_retry.do('move', 4, (0, 0)); p_retry.do('attack', 4, bowman)
+    # The old Warden died. Advance the first purchased Swordsman, freeing
+    # the Scout's exit, then concentrate sword and bow on the saved survivor.
+    front = replacement_ids[0]
+    p_retry.do('move', front, (0, 0)); p_retry.do('attack', front, bowman)
     p_retry.do('move', 0, (-1, 0)); p_retry.do('attack', 0, bowman)
-    p_retry.guard_remaining(); p_retry.do('end_turn')
-    p_retry.do('attack', 0, bowman)
     assert p_retry.battle.outcome_reason == 'rout'
-    return p_retry, dict(approach='northern', outcome_reason='hero_death', round=13, campaign_turn=turn,
+    return p_retry, dict(approach='northern', outcome_reason='hero_death', round=failed_round, campaign_turn=turn,
                          dead_troop_ids=dead, retreat_gold=20, replacement_gold=replacement_gold,
+                         replacement_troop_ids=replacement_ids,
                          guards_on_retry=[['archer', 20]], orders=p.orders, reward_before_retry=False,
                          entry_gold=entry_gold, entry_crystals=entry_crystals, entry_mana=entry_mana)
 
@@ -242,7 +245,7 @@ def verify(output, *, backend='pyglet', plan='western'):
                   f'{player.reloads} exact reloads ({backend})', flush=True)
             return report
         finally:
-            game._teardown()
+            game.close()
 
 
 if __name__ == '__main__':

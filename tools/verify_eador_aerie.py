@@ -71,7 +71,7 @@ def inspect_briefing(player):
         player.press(str(index+1))
         scene = player.game.scene
         text = '\n'.join(label.text for label in scene.ui.find_all(lambda item:isinstance(item,Label)))
-        guards = player.state.provinces[(0,0)].site_guards
+        guards = player.state.provinces[player.state.hero.pos].site_guards
         assert ('Skyriders cross marsh' in text) == ('skyrider' in guards)
         assert ('Their Pikeman can Brace' in text) == ('pikeman' in guards)
         if 'skyrider' not in guards:
@@ -94,6 +94,7 @@ def inspect_briefing(player):
 
 def failed_retry(state):
     player, output = state.player, state.player.output
+    source = state.hero.pos
     player.output = output/'failure'
     failure = aerie_failed_sortie(state,orders_type=AerieOrders)
     assert isinstance(player.game.scene,ResultScene)
@@ -103,8 +104,8 @@ def failed_retry(state):
     gold,crystals,xp = state.gold,state.crystals,state.hero.xp
     state.resolve_battle()
     assert (state.gold,state.crystals,state.hero.xp)==(gold-20,crystals,xp)
-    assert state.choice is None and not state.provinces[(0,0)].explored
-    assert state.provinces[(0,0)].site_guards==['archer'] and state.provinces[(0,0)].site_guard_hp==[12]
+    assert state.choice is None and not state.provinces[source].explored
+    assert state.provinces[source].site_guards==['archer'] and state.provinces[source].site_guard_hp==[11]
     player.reload(state.to_json()); player.capture('saved-loss')
     gold,crystals=state.gold,state.crystals
     state.recruit('skyrider')
@@ -115,7 +116,7 @@ def failed_retry(state):
     entry = state.gold,state.crystals,state.hero.mana
     retry = aerie_retry_route(state,orders_type=AerieOrders)
     return retry,entry,dict(outcome_reason='hero_death',round=56,dead_troop_ids=dead,retreat_gold=20,
-                            replacement_gold=60,replacement_crystals=3,guards_on_retry=[['archer',12]],
+                            replacement_gold=60,replacement_crystals=3,guards_on_retry=[['archer',11]],
                             reward_before_retry=False,orders=failure.orders)
 
 
@@ -160,10 +161,11 @@ def verify(output, *, backend='pyglet', plan='western'):
                         fee_gold=0,fee_crystals=0,reward_gold=reward.gold,reward_crystals=reward.crystals,reward_relic=reward.relic,
                         mana_spent=mana-battle.mana,survivors=survivors,troops_lost=0,
                         hp_deficit=sum(u['max_hp']-u['hp']for u in survivors),flight_only_landings=play.flight_landings)
+            source=state.hero.pos
             state.resolve_battle()
             assert (state.gold,state.crystals)==(gold+reward.gold,crystals+reward.crystals)
             while isinstance(game.scene,ChoiceScene):player.press('1')
-            assert state.provinces[(0,0)].explored and reward.relic in state.inventory
+            assert state.provinces[source].explored and reward.relic in state.inventory
             before=state.to_json();player.press('x')
             assert state.to_json()==before and isinstance(game.scene,ShardScene)
             player.reload(before)

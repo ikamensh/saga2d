@@ -19,11 +19,11 @@ def test_actual_pre_causeway_shrine_keeps_its_complete_saved_continuation():
 def test_paid_travel_reaches_an_optional_causeway_with_the_recorded_reward():
     """Conquest does not force entry; the free assembly snapshots the inherited Shrine reward."""
     state = State.new(7, theme='ruins')
-    assert state.provinces[(0, 1)].site_kind == 'runebound_causeway'
+    province, = [p for p in state.provinces.values() if p.site_kind == 'runebound_causeway']
     from tools.eador_causeway_campaign import prepare_causeway
 
     prepare_causeway(state=state)
-    assert state.hero.pos == (0, 1) and not state.provinces[(0, 1)].explored
+    assert state.hero.pos == province.pos and not province.explored
     assert state.battle is None
     gold, crystals = state.gold, state.crystals
     state.explore(approach='western')
@@ -36,30 +36,32 @@ def test_paid_travel_reaches_an_optional_causeway_with_the_recorded_reward():
     assert State.from_json(state.to_json()).to_json() == state.to_json()
 
 
-def test_a_thousand_ruins_keep_the_recorded_witness_and_every_other_world_field():
-    """Prechange whole-world hashes protect all authored sources, Crown, fallback and economics."""
+def test_a_thousand_ruins_keep_recorded_reward_packages_and_conquest():
+    """Moved packages retain the inherited loot, cheaper witness, Crown and conquest fields."""
     from dataclasses import asdict
     import gzip
-    import hashlib
     import json
     from eador.worldgen import generate
 
     path = Path(__file__).parents[2] / 'docs/evidence/causeway-placement-2026-09-06.json.gz'
     with gzip.open(path, 'rt') as handle:
         rows = json.load(handle)['source_audit']['witnesses']
+    site_fields = {'site', 'site_kind', 'site_guards', 'site_guard_hp', 'site_relic', 'site_gold', 'site_crystals'}
     for row in rows:
         world = generate(row['seed'], 'ruins')
         before, witness = row['selected'], row['witness']
         pos = tuple(before['pos'])
-        assert world[pos].site_kind == 'runebound_causeway'
-        assert sum(p.site_kind == 'runebound_causeway' for p in world.values()) == 1
+        source, = [p for p in world.values() if p.site_kind == 'runebound_causeway']
         current = json.loads(json.dumps(asdict(world[pos])))
-        for field in ('site', 'site_kind', 'site_guards', 'site_guard_hp'):
-            current[field] = before[field]
-        assert current == before
-        assert json.loads(json.dumps(asdict(world[tuple(witness['pos'])]))) == witness
-        restored = [before if key == pos else asdict(world[key]) for key in sorted(world)]
-        assert hashlib.sha256(json.dumps(restored, sort_keys=True).encode()).hexdigest() == row['original_world_sha256']
+        assert {k: v for k, v in current.items() if k not in site_fields} == {
+            k: v for k, v in before.items() if k not in site_fields}
+        assert (source.site_gold, source.site_crystals, source.site_relic) == (
+            before['site_gold'], before['site_crystals'], before['site_relic'])
+        current_witness = json.loads(json.dumps(asdict(world[tuple(witness['pos'])])))
+        assert {k: v for k, v in current_witness.items() if k not in site_fields} == {
+            k: v for k, v in witness.items() if k not in site_fields}
+        assert any(json.loads(json.dumps({field: getattr(p, field) for field in site_fields})) == {
+            field: witness[field] for field in site_fields} for p in world.values())
         assert world[(1, 0)].site_kind == 'barrow' and world[(1, 0)].site_relic == 'iron_crown'
     for theme in ('frontier', 'elderwild'):
         assert all(p.site_kind != 'runebound_causeway' for p in generate(7, theme).values())
@@ -71,7 +73,7 @@ def test_actual_low_mana_commander_can_prioritize_the_caster_and_escape():
     from tests.eador.test_extraction_journeys import Journey, assert_one_reward
 
     state = prepare_causeway()
-    assert state.turn == 9 and state.hero.mana == 10
+    assert state.turn == 8 and state.hero.mana == 10
     play = causeway_focus_route(state, heal=True, orders_type=Journey)
     assert play.battle.outcome_reason == 'escape' and play.battle.round == 4
     assert play.battle.mana == 2
@@ -87,10 +89,10 @@ def test_guard_and_occupied_landing_trade_real_recovery_for_fewer_wounds():
     from tests.eador.test_extraction_journeys import Journey, assert_one_reward
 
     guard_state = prepare_causeway(mana=12)
-    assert (guard_state.turn, guard_state.hero.mana) == (10, 14)
+    assert (guard_state.turn, guard_state.hero.mana) == (9, 14)
     guard = causeway_guard_route(guard_state, heal=True, orders_type=Journey)
     occupied_state = prepare_causeway(mana=16)
-    assert (occupied_state.turn, occupied_state.hero.mana) == (11, 18)
+    assert (occupied_state.turn, occupied_state.hero.mana) == (10, 18)
     occupied = causeway_guard_route(occupied_state, backstop=True, heal=True, orders_type=Journey)
     assert guard.state.hero.army == occupied.state.hero.army
     for play, wounds, spent in ((guard, 12, 12), (occupied, 14, 16)):
@@ -108,39 +110,40 @@ def test_existing_tower_infusion_can_pay_for_entry_now_instead_of_advancing_the_
     from dataclasses import asdict
 
     state = prepare_causeway()
-    assert (state.turn, state.actions_left, state.hero.mana) == (9, 2, 10)
+    assert (state.turn, state.actions_left, state.hero.mana) == (8, 2, 10)
     gold, crystals, rival = state.gold, state.crystals, asdict(state.rival)
     state.infuse()
-    assert (state.turn, state.actions_left, state.hero.mana) == (9, 1, 18)
+    assert (state.turn, state.actions_left, state.hero.mana) == (8, 1, 18)
     assert (state.gold, state.crystals, asdict(state.rival)) == (gold, crystals - 3, rival)
     saved = state.to_json()
     for backstop, wounds in ((False, 12), (True, 14)):
         play = causeway_guard_route(State.from_json(saved), backstop=backstop, heal=True, orders_type=Journey)
-        assert play.state.turn == 9 and play.state.actions_left == 0
+        assert play.state.turn == 8 and play.state.actions_left == 0
         assert sum(u.max_hp - u.hp for u in play.battle.units if u.team == 'player') == wounds
         assert_one_reward(play)
 
 
-def test_smaller_scout_can_leave_at_low_mana_or_recover_and_finish_with_healing():
-    """A five-body flank needs no Acolyte; later recovery includes the real rival and level gain."""
+def test_smaller_scout_can_escape_now_or_spend_its_exit_order_healing_before_a_rout():
+    """The same paid five-body party trades four mana and another enemy phase for fewer wounds."""
     from tools.eador_causeway_campaign import prepare_causeway, causeway_scout_route
     from tests.eador.test_extraction_journeys import Journey, assert_one_reward
     from tests.eador.test_relief import assert_one_reward as assert_rout_reward
 
     early = prepare_causeway('Scout')
-    assert (early.turn, early.hero.level, early.hero.mana) == (6, 3, 6)
+    assert (early.turn, early.hero.level, early.hero.mana) == (6, 3, 14)
+    saved = early.to_json()
     escape = causeway_scout_route(early, orders_type=Journey)
     assert escape.battle.round == 4 and escape.battle.outcome_reason == 'escape'
     assert sum(u.max_hp - u.hp for u in escape.battle.units if u.team == 'player') == 41
     assert not any(command == 'swap' for command, *_ in escape.orders)
-    assert_one_reward(escape)
-    recovered = prepare_causeway('Scout', mana=8)
-    assert (recovered.turn, recovered.hero.level, recovered.hero.mana) == (8, 4, 8)
-    assert [t.kind for t in recovered.hero.army] == ['militia', 'militia', 'archer', 'warden']
-    healed = causeway_scout_route(recovered, heal=True, orders_type=Journey)
-    assert healed.battle.round == 4 and healed.battle.outcome_reason == 'rout'
+    healing = State.from_json(saved)
+    assert [t.kind for t in healing.hero.army] == ['militia', 'militia', 'archer', 'warden']
+    healed = causeway_scout_route(healing, heal=True, orders_type=Journey)
+    assert healed.battle.round == 5 and healed.battle.outcome_reason == 'rout'
     assert sum(command == 'end_turn' for command, *_ in healed.orders) == 4
-    assert sum(u.max_hp - u.hp for u in healed.battle.units if u.team == 'player') == 19
+    assert escape.battle.mana - healed.battle.mana == healed.battle.spell_cost('heal')
+    assert sum(u.max_hp - u.hp for u in healed.battle.units if u.team == 'player') == 27
+    assert_one_reward(escape)
     assert_rout_reward(healed)
 
 

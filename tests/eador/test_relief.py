@@ -6,12 +6,11 @@ from tools.eador_campaign import finish_battle, march_to, rest
 def test_frontier_offers_an_optional_hold_with_its_original_reward_and_four_defenders():
     """Conquest does not force the signal fight; exploration snapshots its inherited reward."""
     state = State.new(7)
-    province = state.provinces[(0, 0)]
-    assert province.site_kind == 'relief_column'
+    province, = [p for p in state.provinces.values() if p.site_kind == 'relief_column']
     assert (province.site_gold, province.site_crystals, province.site_relic) == (35, 3, 'oak_standard')
     state.build('barracks'); state.recruit('swordsman')
     state.explore(); finish_battle(state)
-    for pos in ((-1, 0), (0, 0)):
+    for pos in ((-1, 0), province.pos):
         march_to(state, pos); rest(state)
     assert not province.explored and state.battle is None
     state.explore(approach='forward')
@@ -42,8 +41,8 @@ def test_codex_quotes_the_recorded_variable_reward_and_never_invents_a_default(t
         game._teardown()
 
 
-def test_a_thousand_frontiers_preserve_the_recorded_ordinary_witness_and_conquest():
-    """Pre-integration witnesses protect cheaper sources and every non-site province field."""
+def test_a_thousand_frontiers_preserve_recorded_reward_packages_and_conquest():
+    """Site packages may move; their cheaper witness and original conquest fields survive."""
     import gzip
     import json
     from dataclasses import asdict
@@ -53,20 +52,23 @@ def test_a_thousand_frontiers_preserve_the_recorded_ordinary_witness_and_conques
     path = Path(__file__).parents[2] / 'docs/evidence/relief-revised-prototype-2026-09-06.json.gz'
     with gzip.open(path, 'rt') as handle:
         witnesses = json.load(handle)['source_audit']['selections']
-    site_fields = {'site', 'site_kind', 'site_guards', 'site_guard_hp'}
+    site_fields = {'site', 'site_kind', 'site_guards', 'site_guard_hp', 'site_relic', 'site_gold', 'site_crystals'}
     for witness in witnesses:
         world = generate(witness['seed'])
         selected = witness['proposed_source']
-        source = world[tuple(selected['pos'])]
-        assert source.site_kind == 'relief_column'
-        assert sum(p.site_kind == 'relief_column' for p in world.values()) == 1
-        current = json.loads(json.dumps(asdict(source)))
+        source, = [p for p in world.values() if p.site_kind == 'relief_column']
+        current = json.loads(json.dumps(asdict(world[tuple(selected['pos'])])))
         assert {k: v for k, v in current.items() if k not in site_fields} == {
             k: v for k, v in selected.items() if k not in site_fields}
+        assert (source.site_gold, source.site_crystals, source.site_relic) == (
+            selected['site_gold'], selected['site_crystals'], selected['site_relic'])
         ordinary = witness['unchanged_ordinary_route']
-        assert json.loads(json.dumps(asdict(world[tuple(ordinary['pos'])]))) == ordinary
+        current_ordinary = json.loads(json.dumps(asdict(world[tuple(ordinary['pos'])])))
+        assert {k: v for k, v in current_ordinary.items() if k not in site_fields} == {
+            k: v for k, v in ordinary.items() if k not in site_fields}
+        assert any(json.loads(json.dumps({field: getattr(p, field) for field in site_fields})) == {
+            field: ordinary[field] for field in site_fields} for p in world.values())
         assert source.site_guards == ['skyrider', 'militia', 'archer', 'guard']
-    assert generate(2)[(0, 0)].site_kind == 'tower'
     for theme in ('elderwild', 'ruins'):
         assert all(p.site_kind != 'relief_column' for p in generate(7, theme).values())
 
@@ -90,7 +92,8 @@ def test_actually_purchased_commanders_intercept_support_and_save_a_manual_hold(
     from tests.eador.test_extraction_journeys import Journey
 
     state = prepare_relief()
-    assert state.hero.pos == (0, 0) and state.hero.mana == state.hero.max_mana
+    assert state.provinces[state.hero.pos].site_kind == 'relief_column'
+    assert state.hero.mana == state.hero.max_mana
     assert [t.kind for t in state.hero.army] == ['militia', 'militia', 'archer', 'pikeman', 'warden', 'adept']
     play = relief_forward_route(state, orders_type=Journey)
     assert play.battle.outcome_reason == 'hold' and play.battle.round == 2
@@ -158,7 +161,7 @@ def test_actual_rally_mistake_loses_a_veteran_then_paid_retry_keeps_finite_wound
     state.resolve_battle()
     assert (state.gold, state.crystals, state.hero.xp) == (gold - 20, crystals, xp)
     assert state.choice is None and not state.provinces[state.hero.pos].explored
-    survivors = [('archer', 20), ('guard', 36)]
+    survivors = [('archer', 20), ('guard', 35)]
     assert list(zip(state.provinces[state.hero.pos].site_guards, state.provinces[state.hero.pos].site_guard_hp)) == survivors
     state = State.from_json(state.to_json())
     price, gold = state.recruit_cost('pikeman'), state.gold

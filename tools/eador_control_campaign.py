@@ -1,16 +1,17 @@
 """Ordinary purchases and travel for the new control/flight encounter demonstrations."""
 from eador.model import BUILDINGS, State, UNITS
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 
 
 def prepare_control_watch(state=None, *, kinds=None, budget=None):
     """Fund a control retinue and reach the unexplored Watch; accepts a real-input adapter."""
     state = State.new(7) if state is None else state
+    watch = site_position(state, 'border_watch')
     kinds = tuple(kinds) if kinds is not None else (('sapper', 'adept', 'skyrider')
                                                    if state.hero.hero_class == 'Commander' else ('sapper', 'adept'))
     state.explore(); finish_battle(state, budget=budget)
     state.build('market')
-    for destination in ((-1, -1), (0, -2)):
+    for destination in ((-1, -1), watch):
         march_to(state, destination, budget=budget); rest(state, budget=budget)
     for kind in kinds:
         spec = UNITS[kind]
@@ -27,7 +28,7 @@ def prepare_control_watch(state=None, *, kinds=None, budget=None):
         else:
             raise AssertionError(f'Could not fund {spec.name}.')
     for _ in range(48):
-        march_to(state, (0, -2), budget=budget)
+        march_to(state, watch, budget=budget)
         if state.actions_left and all(t.hp == t.max_hp for t in state.hero.army) and state.hero.hp == state.hero.max_hp:
             state.explore()
             assert state.battle_encounter == 'border_watch'

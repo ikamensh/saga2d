@@ -187,14 +187,17 @@ def test_relic_catalog_uses_recorded_sources_in_an_older_saved_shard(tmp_path):
         game.push(CodexScene(root))
         press(game, '6')
         assert 'Wolf Den' in rendered_text(game)  # Boots still belong to this saved Den.
-        while 'Watch Bell' not in rendered_text(game):
-            assert game.scene.page + 1 < game.scene.pages
+        entries = {}
+        for page in range(game.scene.pages):
+            for entry in game.scene.visible_entries:
+                assert entry.title in rendered_text(game)
+                assert ' '.join(entry.description.split()) in ' '.join(rendered_text(game).split())
+                entries[entry.title] = entry.facts + ' ' + entry.description
+            if page + 1 == game.scene.pages:
+                break
             press(game, 'right')
-        assert 'Storm Quiver' in rendered_text(game)
-        assert 'No recorded source on this shard' in rendered_text(game)
-        press(game, 'end')
-        assert 'Mirror Badge' in rendered_text(game) and 'Vanguard Drum' in rendered_text(game)
-        assert 'No recorded source on this shard' in rendered_text(game)
+        for title in ('Watch Bell', 'Storm Quiver', 'Mirror Badge', 'Vanguard Drum'):
+            assert 'No recorded source on this shard' in entries[title]
         assert state.to_json() == before
     finally:
         game._teardown()

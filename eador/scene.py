@@ -442,9 +442,8 @@ class ShardScene(Screen):
         elif p.owner != 'player':
             guards = ', '.join(f'{n} {UNITS[kind].name}' for kind, n in Counter(p.guards).items())
             details.append(label('Defenders: ' + (guards or 'None'), width, color=RED))
-        else:
-            details.append(label('Ruins cleared' if p.explored else p.site or 'No ruins in this province',
-                                 width, color=GOLD))
+        site = (p.site + (' · cleared' if p.explored else '')) if p.site else 'No ruins in this province'
+        details.append(label(site, width, color=MUTED if p.explored else GOLD))
         hint = 'Select a neighboring province. Tab cycles neighbors; Home selects your hero.'
         if not s.actions_left:
             hint = 'No actions left. End the turn.'

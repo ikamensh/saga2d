@@ -4,19 +4,13 @@ from tools.eador_campaign import finish_battle, march_to, rest
 from tools.eador_extraction_campaign import AdventureOrders
 
 
-def _rest(state, *, budget=None):
-    """Finish provisioning until the visible attack reaches Westwatch's neighbours."""
-    rest(state, defend=state.rival.intent == 'attack' and state.rival.target is not None
-         and state.grid.distance(state.rival.target, (-2, 0)) <= 1, budget=budget)
-
-
 def prepare_relief(hero_class='Commander', *, seed=7, difficulty='standard', state=None, budget=None):
     state = State.new(seed, hero_class, difficulty=difficulty) if state is None else state
     target = next(p.pos for p in state.provinces.values() if p.site_kind == 'relief_column')
     state.explore(); finish_battle(state, budget=budget)
     state.build('market')
     for destination in ((-1, -1), (-1, 0)):
-        march_to(state, destination, budget=budget); _rest(state, budget=budget)
+        march_to(state, destination, budget=budget); rest(state, budget=budget)
     kinds = ('pikeman', 'warden', 'adept') if state.hero.hero_class == 'Commander' else ('pikeman', 'archer')
     for kind in kinds:
         spec = UNITS[kind]
@@ -29,15 +23,20 @@ def prepare_relief(hero_class='Commander', *, seed=7, difficulty='standard', sta
             if spec.building in state.buildings and state.gold >= state.recruit_cost(kind) and state.crystals >= state.recruit_crystal_cost(kind):
                 state.recruit(kind)
                 break
-            _rest(state, budget=budget)
+            rest(state, budget=budget)
         else:
             raise AssertionError(f'Could not fund {spec.name}.')
     for _ in range(48):
-        march_to(state, target, budget=budget)
-        if (state.actions_left and state.hero.hp == state.hero.max_hp and state.hero.mana == state.hero.max_mana
-                and all(t.hp == t.max_hp for t in state.hero.army)):
+        assert state.status == 'playing', 'The Relief preparation lost its capital.'
+        threat = state.rival.army and state.grid.distance(state.rival.pos, (-2, 0)) <= 2
+        if (threat or not state.actions_left or state.hero.hp < state.hero.max_hp
+                or state.hero.mana < state.hero.max_mana or any(t.hp < t.max_hp for t in state.hero.army)):
+            rest(state, budget=budget)
+            continue
+        if state.hero.pos == target:
             return state
-        _rest(state, budget=budget)
+        # One action at a time: a distant optional signal cannot skip a capital defense.
+        march_to(state, state.grid.path(state.hero.pos, target)[1], budget=budget)
     raise AssertionError('Could not reach the Relief signal recovered.')
 
 
@@ -134,7 +133,7 @@ def relief_passive_route(state, *, orders_type=AdventureOrders):
 
 
 def relief_failed_support(state, *, orders_type=AdventureOrders):
-    """Leaving the two-HP support alive restores flight; inaction then loses the Pike and clock."""
+    """Leaving the wounded support alive restores flight; inaction then loses the Pike and clock."""
     state.explore(approach='forward')
     play = orders_type(state)
     relief_forward_opening(play, finish_support=False)

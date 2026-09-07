@@ -1,6 +1,6 @@
 """Earn active relics through public campaign commands and enter their later demonstrations."""
 from eador.model import BUILDINGS
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure, crossing_route
 
 
@@ -29,7 +29,7 @@ def prepare_censer_watch(state=None, *, orders_type=AdventureOrders, ranger=Fals
         else:
             raise AssertionError('Could not fund the Censer formation’s Ranger')
     state.equip('veil_censer')
-    _recover_at(state, (0, -2), budget=budget)
+    _recover_at(state, site_position(state, 'border_watch'), budget=budget)
     state.explore()
     assert state.battle_encounter == 'border_watch'
     return state
@@ -68,10 +68,10 @@ def _recover_at(state, destination, *, budget=None):
 def prepare_drum_watch(state=None, *, budget=None):
     """Buy a Warden/Ranger army, recover the Drum, and approach the unclaimed Watch."""
     state = prepare_adventure(state=state, support='ranger', budget=budget)
-    _recover_at(state, (-1, 1), budget=budget)
+    _recover_at(state, site_position(state, 'muster_yard'), budget=budget)
     state.explore(); finish_battle(state, budget=budget)
     assert 'vanguard_drum' in state.inventory
-    _recover_at(state, (0, -2), budget=budget)
+    _recover_at(state, site_position(state, 'border_watch'), budget=budget)
     state.equip('vanguard_drum'); state.explore()
     assert state.battle_encounter == 'border_watch'
     return state
@@ -108,7 +108,7 @@ def prepare_relic_gate(relic, state=None, *, reload_state=None, budget=None):
     state.advance('rootward' if relic == 'porter_rune' else 'foundries', **travel_selection(state))
     state = reload_state(state.to_json())
     state.build('barracks'); state.recruit('swordsman')
-    source = (-1, -1) if relic == 'porter_rune' else (-1, 1)
+    source = site_position(state, 'supply_cache' if relic == 'porter_rune' else 'sealed_vault')
     for _ in range(32):
         march_to(state, source, budget=budget)
         if state.actions_left and state.hero.pos == source:

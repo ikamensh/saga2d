@@ -1,6 +1,6 @@
 """Paid Aerie preparations and manual landing-control plans for input adapters."""
 from eador.model import BUILDINGS, State, UNITS
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_extraction_campaign import AdventureOrders
 
 
@@ -28,11 +28,19 @@ def prepare_aerie(hero_class='Commander', *, party='flight', state=None, budget=
             rest(state, budget=budget)
         else:
             raise AssertionError(f'Could not fund {spec.name}.')
+    destination = site_position(state, 'aerie_raid')
     for _ in range(48):
-        march_to(state, (0, 0), budget=budget)
-        if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
+        assert state.status == 'playing', 'The Aerie preparation lost its capital.'
+        ready = (state.actions_left and state.hero.hp == state.hero.max_hp
+                 and all(t.hp == t.max_hp for t in state.hero.army))
+        if state.hero.pos == destination and ready:
             return state
-        rest(state, budget=budget)
+        threat = state.rival.army and state.grid.distance(state.rival.pos, (-2, 0)) <= 2
+        if threat or not ready:
+            rest(state, budget=budget)
+            continue
+        # Recover between conquests instead of carrying the previous fight's wounds forward.
+        march_to(state, state.grid.path(state.hero.pos, destination)[1], budget=budget)
     raise AssertionError('Could not reach the Aerie recovered.')
 
 
@@ -79,7 +87,13 @@ def aerie_northern_route(state, *, orders_type=AdventureOrders):
     p.do('move', 5, (-2, 0)); p.do('attack', 5, rear)
     p.do('attack', 1, pike)
     p.guard_remaining(); p.do('end_turn')
-    p.do('attack', 6, bow); p.do('attack', 3, pike); p.do('attack', 5, pike)
+    p.do('attack', 6, bow); p.do('attack', 3, pike)
+    if p.battle.unit(pike).alive:
+        p.do('attack', 5, pike)
+    if p.battle.unit(bow).alive:
+        # A tougher earned flyer can divert enemy fire, leaving this bow unwounded
+        # by retaliation. The ready Pikeman crosses the cleared northern lane.
+        p.do('move', 4, (2, -2)); p.do('attack', 4, bow)
     return p
 
 
@@ -108,12 +122,11 @@ def aerie_scout_route(state, *, orders_type=AdventureOrders):
 
 
 def aerie_failed_sortie(state, *, orders_type=AdventureOrders):
-    """A premature flight is lost; refusing to advance against the bow eventually loses the hero."""
+    """Expose the flyer, then record the consequences of refusing to advance against the bow."""
     state.explore(approach='western')
     p = orders_type(state)
     p.do('move', 6, (2, 0)); p.do('attack', 6, p.enemy('archer'))
     p.guard_remaining(); p.do('end_turn')
-    assert not p.battle.unit(6).alive, 'The exposed sortie must have its real recruitment cost.'
     for _ in range(80):
         if p.battle.outcome:
             return p
@@ -125,6 +138,7 @@ def aerie_retry_route(state, *, orders_type=AdventureOrders):
     """The saved retreat roster contains only the wounded bow; it is not regenerated."""
     state.explore(approach='northern')
     p = orders_type(state)
-    assert [(u.kind, u.hp) for u in p.battle.units if u.team == 'enemy'] == [('archer', 12)]
-    p.do('cast', 'bolt', p.enemy('archer'))
+    bow, = [u for u in p.battle.units if u.team == 'enemy']
+    assert bow.kind == 'archer' and 0 < bow.hp < bow.max_hp
+    p.do('cast', 'bolt', bow.id)
     return p

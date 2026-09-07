@@ -112,7 +112,7 @@ def verify(output, *, backend='pyglet', plan='forward', mode='standard', seed=7)
                 assert not state.choice and not state.provinces[state.hero.pos].explored
                 province = state.provinces[state.hero.pos]
                 survivors = list(zip(province.site_guards, province.site_guard_hp))
-                assert survivors == [('archer', 20), ('guard', 36)]
+                assert survivors == [('archer', 20), ('guard', 35)]
                 player.reload(state.to_json())
                 price, gold = state.recruit_cost('pikeman'), state.gold
                 state.recruit('pikeman')

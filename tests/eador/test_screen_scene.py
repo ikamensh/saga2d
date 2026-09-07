@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.parametrize('plan,rounds,party', [('western', 4, 6), ('western-heal', 5, 6),
-                                               ('northern', 5, 6), ('scout', 6, 5)])
+                                               ('northern', 5, 6), ('scout', 5, 6)])
 def test_paid_screen_controls_preserve_saved_orders_and_claim_the_reward_once(tmp_path, plan, rounds, party):
     from tools.verify_eador_screen import verify
 
@@ -24,7 +24,13 @@ def test_failed_screen_controls_keep_losses_and_fund_replacements_before_reward(
 
     report = verify(tmp_path, backend='mock', plan='failed-retry')
     failed = report['failed_attempt']
-    assert failed['outcome_reason'] == 'hero_death' and failed['dead_troop_ids'] == [2, 3, 5]
+    assert failed['outcome_reason'] == 'hero_death' and failed['round'] == 53
+    assert failed['dead_troop_ids'] == [1, 2, 3, 4, 5]
     assert failed['replacement_gold'] == 180 and failed['retreat_gold'] == 20
     assert failed['guards_on_retry'] == [['archer', 20]] and not failed['reward_before_retry']
-    assert report['outcome_reason'] == 'rout' and report['battle_rounds'] == 3
+    assert len(failed['replacement_troop_ids']) == 4
+    assert not set(failed['dead_troop_ids']).intersection(failed['replacement_troop_ids'])
+    assert [unit['kind'] for unit in report['survivors']] == ['hero'] + ['swordsman'] * 4
+    assert report['troops_lost'] == 0
+    assert report['outcome_reason'] == 'rout' and report['battle_rounds'] == 1
+    assert all(command != 'auto_turn' for command, _, _ in report['orders'])

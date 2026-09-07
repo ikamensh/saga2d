@@ -8,13 +8,10 @@ from tests.eador.test_extraction_journeys import Journey, assert_one_reward
 
 def test_frontier_explorer_offers_two_free_assemblies_without_replacing_other_sources():
     state = State.new(7)
-    assert state.provinces[(0, -1)].site_kind == 'stranded_explorer'
     assert state.provinces[(-2, 0)].site_kind == 'shrine'
     assert state.provinces[(0, -2)].site_kind == 'border_watch'
-    assert state.provinces[(-2, 2)].site_kind == 'den'
-    assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
-    assert state.provinces[(-1, 1)].site_kind == 'muster_yard'
-    assert state.provinces[(0, 2)].site_kind == 'courier_crossing'
+    assert {'stranded_explorer', 'den', 'explorer_camp', 'muster_yard', 'courier_crossing'} <= {
+        p.site_kind for p in state.provinces.values()}
     from eador.content import SITES
     approaches = SITES['stranded_explorer'].approaches
     assert [a.id for a in approaches] == ['north', 'south']
@@ -55,6 +52,7 @@ def test_saved_failed_northern_assembly_keeps_wounded_patrol_on_free_southern_re
     before = prepare_explorer().to_json()
     complete = explorer_route(State.from_json(before))
     state = State.from_json(before)
+    pos = state.hero.pos
     state.explore(approach='north')
     gold, crystals, xp = state.gold, state.crystals, state.hero.xp
     for command, args, kwargs in complete.orders:
@@ -67,18 +65,18 @@ def test_saved_failed_northern_assembly_keeps_wounded_patrol_on_free_southern_re
     # The assembly is free; the game's ordinary retreat loss still applies.
     assert (state.gold, state.crystals, state.hero.xp) == (gold - 20, crystals, xp)
     state = State.from_json(state.to_json())
-    province = state.provinces[(0, -1)]
+    province = state.provinces[pos]
     assert list(zip(province.site_guards, province.site_guard_hp)) == survivors
     if not state.actions_left:
         rest(state)
-    march_to(state, (0, -1))
+    march_to(state, pos)
     state.explore(approach='south')
     assert [(u.kind, u.hp) for u in state.battle.units if u.team == 'enemy'] == survivors
     assert state.battle_adventure.encounter == 'explorer_south'
     state = State.from_json(state.to_json())
     gold, crystals, reward = state.gold, state.crystals, state.battle_adventure
     finish_battle(state)
-    assert state.provinces[(0, -1)].explored
+    assert state.provinces[pos].explored
     assert (state.gold, state.crystals) == (gold + reward.gold, crystals + reward.crystals)
 
 
@@ -87,13 +85,15 @@ def test_one_hundred_frontier_sources_still_include_every_relic_and_prior_advent
 
     for seed in range(100):
         state = State.new(seed)
-        assert [p.pos for p in state.provinces.values() if p.site_kind == 'stranded_explorer'] == [(0, -1)]
+        explorer, = [p for p in state.provinces.values() if p.site_kind == 'stranded_explorer']
+        assert explorer.pos[0] == 0
         themes = [state, State.new(seed, theme='elderwild'), State.new(seed, theme='ruins')]
         assert set(RELICS) <= {p.site_relic for world in themes for p in world.provinces.values()}
         assert {'moonstone', 'watch_bell', 'storm_quiver', 'wayfarer_boots', 'merchant_seal', 'vanguard_drum', 'veil_censer'} <= {p.site_relic for p in state.provinces.values()}
-        expected = {(-2, 0): 'shrine', (0, -2): 'border_watch', (-2, 2): 'den',
-                    (-1, 2): 'explorer_camp', (-1, 1): 'muster_yard', (0, 2): 'courier_crossing'}
-        assert all(state.provinces[pos].site_kind == kind for pos, kind in expected.items())
+        assert state.provinces[(-2, 0)].site_kind == 'shrine'
+        assert state.provinces[(0, -2)].site_kind == 'border_watch'
+        assert {'den', 'explorer_camp', 'muster_yard', 'courier_crossing'} <= {
+            p.site_kind for p in state.provinces.values()}
 
 
 def test_actual_prior_caravan_battle_keeps_its_site_and_complete_saved_continuation():
@@ -113,7 +113,8 @@ def test_boots_earned_at_camp_make_the_later_explorer_reward_an_explicit_saved_d
     from eador.model import RuleError
 
     state = prepare_explorer(collect_boots=True)
-    assert state.provinces[(-1, 2)].explored and state.inventory.count('wayfarer_boots') == 1
+    assert any(p.site_kind == 'explorer_camp' and p.explored for p in state.provinces.values())
+    assert state.inventory.count('wayfarer_boots') == 1
     play = explorer_route(state, orders_type=Journey)
     state = play.state
     gold, crystals = state.gold, state.crystals
@@ -144,6 +145,7 @@ def test_missed_deadline_keeps_real_losses_and_allows_a_paid_replacement_expedit
     from tools.eador_campaign import finish_battle, march_to, rest
 
     state = prepare_explorer()
+    pos = state.hero.pos
     state.explore(approach='north')
     gold, xp = state.gold, state.hero.xp
     while state.battle.outcome is None:
@@ -157,7 +159,7 @@ def test_missed_deadline_keeps_real_losses_and_allows_a_paid_replacement_expedit
     state.resolve_battle()
     assert (state.gold, state.hero.xp) == (gold - 20, xp)
     assert fallen.isdisjoint(t.id for t in state.hero.army)
-    assert not state.provinces[(0, -1)].explored
+    assert not state.provinces[pos].explored
     state = State.from_json(state.to_json())
     before_recruits = state.gold
     while len(state.hero.army) < state.hero.max_army:
@@ -167,14 +169,14 @@ def test_missed_deadline_keeps_real_losses_and_allows_a_paid_replacement_expedit
         if state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
             break
         rest(state)
-    march_to(state, (0, -1))
+    march_to(state, pos)
     if not state.actions_left:
-        rest(state); march_to(state, (0, -1))
+        rest(state); march_to(state, pos)
     state.explore(approach='south')
     assert [(u.kind, u.hp) for u in state.battle.units if u.team == 'enemy'] == patrol
     state = State.from_json(state.to_json())
     gold, crystals, reward = state.gold, state.crystals, state.battle_adventure
     finish_battle(state)
-    assert state.provinces[(0, -1)].explored
+    assert state.provinces[pos].explored
     assert (state.gold, state.crystals) == (gold + reward.gold, crystals + reward.crystals)
     assert fallen.isdisjoint(t.id for t in state.hero.army)

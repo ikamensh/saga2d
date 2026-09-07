@@ -8,6 +8,11 @@ from dataclasses import dataclass
 from eador.model import BUILDINGS, State
 
 
+def site_position(state, kind):
+    """Locate a recorded source; existing saves keep their own site positions."""
+    return next(province.pos for province in state.provinces.values() if province.site_kind == kind)
+
+
 @dataclass
 class CampaignMetrics:
     battles: int = 0

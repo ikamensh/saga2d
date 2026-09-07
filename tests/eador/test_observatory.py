@@ -113,6 +113,7 @@ def test_failed_cleared_attempt_keeps_its_fee_and_finite_wounds_on_a_saved_free_
     before = prepare_observatory().to_json()
     successful = observatory_route(State.from_json(before), 'clear')
     state = State.from_json(before)
+    pos = state.hero.pos
     crystals, xp = state.crystals, state.hero.xp
     state.explore(approach='clear')
     phases = 0
@@ -126,11 +127,11 @@ def test_failed_cleared_attempt_keeps_its_fee_and_finite_wounds_on_a_saved_free_
     state = State.from_json(state.to_json()); state.retreat()
     assert state.crystals == crystals - 2 and state.hero.xp == xp
     state = State.from_json(state.to_json())
-    province = state.provinces[(-1, 0)]
+    province = state.provinces[pos]
     assert list(zip(province.site_guards, province.site_guard_hp)) == surviving
     if not state.actions_left:
         rest(state)
-    march_to(state, (-1, 0))
+    march_to(state, pos)
     before_gold, before_crystals = state.gold, state.crystals
     state.explore(approach='covered')
     assert state.crystals == before_crystals
@@ -138,23 +139,22 @@ def test_failed_cleared_attempt_keeps_its_fee_and_finite_wounds_on_a_saved_free_
     state = State.from_json(state.to_json())
     reward = state.battle_adventure
     finish_battle(state)
-    assert state.provinces[(-1, 0)].explored
+    assert state.provinces[pos].explored
     assert state.gold == before_gold + reward.gold and state.crystals == before_crystals + reward.crystals
 
 
 def test_new_ruins_get_exactly_one_observatory_and_keep_crown_and_required_sources():
-    """Fixed new-world placement never overwrites the home opening or unique equipment sources."""
+    """Varied discovery locations retain the home opening and unique equipment sources."""
     for seed in range(100):
         state = State.new(seed, theme='ruins')
         assert sum(p.site_kind == 'broken_observatory' for p in state.provinces.values()) == 1
-        assert state.provinces[(-1, 0)].site_kind == 'broken_observatory'
         assert state.provinces[(-2, 0)].site_kind == 'shrine'
-        assert state.provinces[(-2, 2)].site_kind == 'den'
-        assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
-        assert state.provinces[(-1, 1)].site_kind == 'sealed_vault'
-        assert state.provinces[(-1, 1)].site_relic == 'mirror_badge'
+        assert {'den', 'explorer_camp'} <= {p.site_kind for p in state.provinces.values()}
+        vault, = [p for p in state.provinces.values() if p.site_kind == 'sealed_vault']
+        assert vault.site_relic == 'mirror_badge'
         assert sum(p.site_kind == 'border_watch' for p in state.provinces.values()) == 1
         assert state.provinces[(1, 0)].site_relic == 'iron_crown'
-        assert state.provinces[(0, 0)].site_relic == 'watch_bell'
+        aerie, = [p for p in state.provinces.values() if p.site_kind == 'aerie_raid']
+        assert aerie.site_relic == 'watch_bell'
     for theme in ('frontier', 'elderwild'):
         assert not any(p.site_kind == 'broken_observatory' for p in State.new(7, theme=theme).provinces.values())

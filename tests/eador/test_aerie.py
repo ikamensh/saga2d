@@ -6,8 +6,7 @@ from tests.eador.test_pack_hunt import assert_one_rout_reward
 
 def test_paid_control_party_wins_a_saved_aerie_rout_using_a_delayed_sortie():
     state = prepare_aerie()
-    assert state.hero.pos == (0, 0)
-    assert state.provinces[(0, 0)].site_kind == 'aerie_raid'
+    assert state.provinces[state.hero.pos].site_kind == 'aerie_raid'
     assert [t.kind for t in state.hero.army] == ['militia', 'militia', 'archer', 'pikeman', 'adept', 'skyrider']
     play = aerie_western_route(state, orders_type=Journey)
     assert play.battle.outcome_reason == 'rout'
@@ -24,11 +23,11 @@ def test_same_paid_party_uses_landing_control_or_preemptive_fire_in_two_free_ass
     north = aerie_northern_route(State.from_json(original), orders_type=Journey)
     assert (west.battle.round, north.battle.round) == (4, 3)
     assert (sum(u.max_hp - u.hp for u in west.battle.units if u.team == 'player'),
-            sum(u.max_hp - u.hp for u in north.battle.units if u.team == 'player')) == (53, 34)
+            sum(u.max_hp - u.hp for u in north.battle.units if u.team == 'player')) == (53, 40)
     assert west.battle.unit(5).spent_abilities == ('repulse',)
     assert north.battle.unit(5).spent_abilities == ()
     assert west.state.gold == north.state.gold and west.state.crystals == north.state.crystals
-    assert (west.battle.mana, north.battle.mana) == (6, 2)
+    assert (west.state.hero.mana - west.battle.mana, north.state.hero.mana - north.battle.mana) == (4, 8)
     assert [order[0] for order in north.orders[:4]] == ['attack', 'attack', 'attack', 'cast']
     assert_one_rout_reward(west); assert_one_rout_reward(north)
 
@@ -37,36 +36,36 @@ def test_smaller_scout_party_can_rotate_its_ground_escort_without_flight_or_repu
     from tools.eador_aerie_campaign import aerie_scout_route
 
     state = prepare_aerie('Scout', party='ground')
-    assert len(state.hero.army) == 5 and state.hero.level == 2 and state.turn == 5
+    assert len(state.hero.army) == 5 and state.hero.level == 3 and state.turn == 6
     assert [t.kind for t in state.hero.army] == ['militia', 'militia', 'archer', 'pikeman', 'warden']
     assert state.buildings == {'market', 'barracks'}
     play = aerie_scout_route(state, orders_type=Journey)
-    assert play.battle.round == 5 and play.battle.mana == 8
+    assert play.battle.round == 5 and state.hero.mana - play.battle.mana == 4
     assert sum(u.max_hp-u.hp for u in play.battle.units if u.team == 'player') == 27
     assert ('swap', (5, 1), {}) in play.orders
     assert_one_rout_reward(play)
 
 
-def test_aerie_sources_preserve_every_fixed_site_and_all_twelve_relics_for_a_hundred_seeds():
+def test_aerie_sources_preserve_required_sites_and_all_twelve_relics_for_a_hundred_seeds():
     from eador.content import RELICS
     from eador.worldgen import generate
 
-    fixed = {
-        'frontier': {(0, 2): 'courier_crossing', (-1, 1): 'muster_yard', (0, -1): 'stranded_explorer'},
-        'elderwild': {(-1, -1): 'supply_cache', (-1, 1): 'pack_hunt', (0, -1): 'smuggler_screen'},
-        'ruins': {(-1, 1): 'sealed_vault', (-1, 0): 'broken_observatory', (0, 0): 'aerie_raid', (1, 0): 'barrow'},
+    required = {
+        'frontier': {'courier_crossing', 'muster_yard', 'stranded_explorer'},
+        'elderwild': {'supply_cache', 'pack_hunt', 'smuggler_screen'},
+        'ruins': {'sealed_vault', 'broken_observatory', 'aerie_raid', 'barrow'},
     }
     for seed in range(100):
         rewards = set()
-        for theme, sites in fixed.items():
+        for theme, sites in required.items():
             world = generate(seed, theme)
-            for pos, kind in {(-2, 0): 'shrine', (-2, 2): 'den', (-1, 2): 'explorer_camp', **sites}.items():
-                assert world[pos].site_kind == kind
-            assert any(p.site_kind == 'border_watch' for p in world.values())
-            assert world[(-2, 1)].site_kind != 'aerie_raid'
+            assert {'shrine', 'den', 'explorer_camp', 'border_watch'} | sites <= {p.site_kind for p in world.values()}
+            assert world[(-2, 0)].site_kind == 'shrine'
             if theme == 'ruins':
-                assert world[(0, 0)].site_relic == 'watch_bell'
-                assert world[(0, 0)].site_guards == ['skyrider', 'skyrider', 'archer', 'pikeman']
+                aerie, = [p for p in world.values() if p.site_kind == 'aerie_raid']
+                assert aerie.pos[0] == 0
+                assert aerie.site_relic == 'watch_bell'
+                assert aerie.site_guards == ['skyrider', 'skyrider', 'archer', 'pikeman']
             rewards.update(p.site_relic for p in world.values() if p.site_relic)
         assert rewards == set(RELICS)
 
@@ -90,14 +89,15 @@ def test_failed_sortie_and_defense_preserve_finite_losses_across_a_paid_changed_
 
     play = aerie_failed_sortie(prepare_aerie(), orders_type=Journey)
     state = play.state
+    pos = state.hero.pos
     assert play.battle.outcome_reason == 'hero_death' and play.battle.round == 56
     gold, crystals, xp = state.gold, state.crystals, state.hero.xp
     state.resolve_battle()
     assert (state.gold, state.crystals, state.hero.xp) == (gold - 20, crystals, xp)
-    assert not state.provinces[(0, 0)].explored and not state.choice
+    assert not state.provinces[pos].explored and not state.choice
     assert [t.kind for t in state.hero.army] == ['pikeman']
-    assert state.provinces[(0, 0)].site_guards == ['archer']
-    assert state.provinces[(0, 0)].site_guard_hp == [12]
+    assert state.provinces[pos].site_guards == ['archer']
+    assert state.provinces[pos].site_guard_hp == [11]
     state = State.from_json(state.to_json())
     gold, crystals = state.gold, state.crystals
     state.recruit('skyrider')

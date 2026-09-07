@@ -64,18 +64,17 @@ def test_new_relic_sources_and_old_equipment_remain_discoverable_across_themes()
     assert len(RELICS) == 12
     for seed in range(100):
         for theme, sources, old_relic in (
-            ('frontier', {(0, 2): ('courier_crossing', 'veil_censer'), (-1, 1): ('muster_yard', 'vanguard_drum')}, 'merchant_seal'),
-            ('elderwild', {(-1, -1): ('supply_cache', 'porter_rune')}, 'oak_standard'),
-            ('ruins', {(-1, 1): ('sealed_vault', 'mirror_badge')}, 'iron_crown'),
+            ('frontier', {'courier_crossing': 'veil_censer', 'muster_yard': 'vanguard_drum'}, 'merchant_seal'),
+            ('elderwild', {'supply_cache': 'porter_rune'}, 'oak_standard'),
+            ('ruins', {'sealed_vault': 'mirror_badge'}, 'iron_crown'),
         ):
             state = State.new(seed, theme=theme)
-            for pos, identity in sources.items():
-                site = state.provinces[pos]
-                assert (site.site_kind, site.site_relic) == identity
+            for kind, relic in sources.items():
+                sites = [p for p in state.provinces.values() if p.site_kind == kind]
+                assert len(sites) == 1 and sites[0].site_relic == relic
             assert any(site.site_relic == old_relic for site in state.provinces.values())
             assert state.provinces[(-2, 0)].site_kind == 'shrine'
-            assert state.provinces[(-2, 2)].site_kind == 'den'
-            assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
+            assert {'den', 'explorer_camp'} <= {p.site_kind for p in state.provinces.values()}
             assert any(site.site_kind == 'border_watch' for site in state.provinces.values())
             assert State.from_json(state.to_json()).to_json() == state.to_json()
 
@@ -207,7 +206,8 @@ def test_earned_mirror_extends_arrival_but_cannot_evacuate_with_a_spent_hero_ord
     from tools.eador_relic_campaign import prepare_relic_gate, _recover_at
     state = prepare_relic_gate('mirror_badge')
     state.retreat()
-    _recover_at(state, (-1, -1))
+    cache = next(p.pos for p in state.provinces.values() if p.site_kind == 'supply_cache')
+    _recover_at(state, cache)
     state.explore(approach='light')
     battle = state.battle
     ids = {u.pos: u.id for u in battle.units if u.team == 'player'}

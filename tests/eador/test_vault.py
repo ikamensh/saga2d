@@ -23,10 +23,22 @@ def test_spending_crystals_opens_a_second_vault_exit_without_changing_the_encoun
     assert State.from_json(paid.to_json()).to_json() == paid.to_json()
 
 
-def test_crystals_buy_a_shorter_route_while_the_free_route_breaks_a_rescuing_warden():
-    """The same purchased army escapes both ways; Pin, rescue, healing and crossfire matter."""
+@pytest.mark.parametrize('world', ('fresh', 'saved-1524c48'))
+def test_crystals_buy_a_shorter_route_past_a_stationary_or_rescuing_warden(world):
+    """Both real worlds fund their armies; paid escape beats either observed Warden response."""
+    from pathlib import Path
     from tests.eador.test_extraction_journeys import Journey, assert_one_reward
-    before = prepared_vault().to_json()
+
+    if world == 'fresh':
+        initial = State.new(7, theme='ruins')
+    else:
+        # Exact Standard State.new(7, theme='ruins') retained at 1524c48 before site
+        # variation, from shardbound-worldgen-before-1524c48.json.gz. Current rules
+        # still earn and purchase the army; no prepared stats or positions are injected.
+        text = (Path(__file__).parent / 'fixtures/v12_ruins_seed7_before_site_variation.json').read_text()
+        initial = State.from_json(text)
+        assert initial.to_json() == text
+    before = prepared_vault(state=initial).to_json()
     free = vault_route(State.from_json(before), 'crossfire', orders_type=Journey)
     paid = vault_route(State.from_json(before), 'unseal', orders_type=Journey)
     assert free.battle.round == 4 and paid.battle.round == 2
@@ -34,7 +46,14 @@ def test_crystals_buy_a_shorter_route_while_the_free_route_breaks_a_rescuing_war
     assert free.battle.mana == paid.battle.mana - 4
     assert sum(unit.hp for unit in free.battle.units if unit.team == 'player') < sum(
         unit.hp for unit in paid.battle.units if unit.team == 'player')
-    assert any('Warden swaps places with Dread Guard' in line for line in free.battle.log)
+    rescued = any('Warden swaps places with Dread Guard' in line for line in free.battle.log)
+    if world == 'saved-1524c48':
+        assert rescued
+    else:
+        warden = next(u for u in free.battle.units if u.team == 'enemy' and u.kind == 'warden')
+        assert not rescued and not warden.alive and warden.pos == (2, -1)
+        assert ('move', (2, (3, 0)), {}) in free.orders
+        assert ('move', (1, (2, -1)), {}) in free.orders
     assert paid.battle.unit(0).pinned  # Pin restricts walking, but allied delivery preserves evacuation.
     assert sum(u.alive for u in free.battle.units if u.team == 'enemy') == 1
     assert sum(u.alive for u in paid.battle.units if u.team == 'enemy') == 3
@@ -59,7 +78,8 @@ def test_a_failed_paid_attempt_keeps_its_crystal_cost_and_finite_wounded_guard_r
     state = State.from_json(state.to_json())
     state.retreat()
     assert state.crystals == crystals - 2 and not state.choice
-    assert list(zip(state.provinces[(-1, 1)].site_guards, state.provinces[(-1, 1)].site_guard_hp)) == survivors
+    province = state.provinces[state.hero.pos]
+    assert list(zip(province.site_guards, province.site_guard_hp)) == survivors
     if not state.actions_left:
         state.end_turn()
     state.explore(approach='crossfire')
@@ -111,6 +131,5 @@ def test_new_ruins_keep_their_required_sources_and_offer_exactly_one_vault():
         kinds = [province.site_kind for province in state.provinces.values()]
         assert kinds.count('sealed_vault') == kinds.count('border_watch') == 1
         assert state.provinces[(-2, 0)].site_kind == 'shrine'
-        assert state.provinces[(-2, 2)].site_kind == 'den'
-        assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
+        assert {'den', 'explorer_camp'} <= set(kinds)
         assert state.provinces[(2, 0)].site_kind is None

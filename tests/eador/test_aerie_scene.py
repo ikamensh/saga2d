@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.parametrize('plan,rounds,wounds,mana,bodies', [
-    ('western',4,53,4,7), ('western-heal',4,45,8,7), ('northern',3,34,8,7), ('scout',5,27,4,6),
+    ('western',4,53,4,7), ('western-heal',4,45,8,7), ('northern',3,40,8,7), ('scout',5,27,4,6),
 ])
 def test_paid_aerie_input_plans_keep_exact_saves_and_reward_once(tmp_path, plan, rounds, wounds, mana, bodies):
     from tools.verify_eador_aerie import verify
@@ -25,5 +25,5 @@ def test_failed_aerie_inputs_keep_dead_guards_and_fund_the_retry(tmp_path):
     assert failure['outcome_reason'] == 'hero_death' and failure['round'] == 56
     assert failure['dead_troop_ids'] == [1,2,3,5,6]
     assert failure['retreat_gold'] == 20 and failure['replacement_gold'] == 60 and failure['replacement_crystals'] == 3
-    assert failure['guards_on_retry'] == [['archer',12]] and not failure['reward_before_retry']
+    assert failure['guards_on_retry'] == [['archer',11]] and not failure['reward_before_retry']
     assert report['battle_rounds'] == 1 and report['outcome_reason'] == 'rout'

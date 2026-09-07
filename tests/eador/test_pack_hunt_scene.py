@@ -4,7 +4,7 @@ import pytest
 from eador.app import create_game
 from eador.encounter_scene import EncounterScene
 from eador.scene import BattleScene, ShardScene
-from tools.eador_campaign import march_to, rest
+from tools.eador_campaign import march_to, rest, site_position
 from tools.eador_extraction_campaign import prepare_adventure
 from tools.eador_ui import PlayerInput
 
@@ -13,7 +13,7 @@ from tools.eador_ui import PlayerInput
 def test_pack_approach_briefing_and_codex_describe_rout_and_global_exhaustion(tmp_path, number):
     """No mission deadline or seal applies; the battle's global exhaustion limit still does."""
     state = prepare_adventure(theme='elderwild')
-    march_to(state, (-1, 1))
+    march_to(state, site_position(state, 'pack_hunt'))
     if not state.actions_left:
         rest(state)
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')

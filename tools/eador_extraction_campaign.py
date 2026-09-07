@@ -5,7 +5,7 @@ not the opponent or optimal-play rules. Supply an AdventureOrders subclass whose
 `do` dispatches real controls to replay the same route through the UI.
 """
 from eador.model import BUILDINGS, State
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_roles_campaign import prepare_support_watch
 
 
@@ -34,12 +34,14 @@ class AdventureOrders:
 
 
 def prepared_crossing(state=None, *, budget=None):
-    """Buy all three supports, clear their Watch, and travel to the southern crossing."""
+    """Buy all three supports, clear their Watch, and travel to the recorded Crossing."""
     state = prepare_support_watch(state, budget=budget)
     finish_battle(state, budget=budget)
-    march_to(state, (0, 2), budget=budget)
+    destination = site_position(state, 'courier_crossing')
+    march_to(state, destination, budget=budget)
     if not state.actions_left:
         rest(state, defend=False, budget=budget)
+    assert state.status == 'playing' and state.hero.pos == destination, 'The Crossing preparation did not arrive.'
     return state
 
 
@@ -61,10 +63,16 @@ def prepare_adventure(hero_class='Commander', theme='frontier', *, support='heal
         rest(state, budget=budget)
     else:
         raise AssertionError('Could not fund support')
-    destination = (0, 2) if theme == 'frontier' else (-1, -1)
+    # Ruins callers reuse the paid party preparation before choosing their own adventure.
+    destination = (-1, -1)
+    if state.theme == 'frontier':
+        destination = site_position(state, 'courier_crossing')
+    elif state.theme == 'elderwild':
+        destination = site_position(state, 'supply_cache')
     for _ in range(48):
         march_to(state, destination, budget=budget)
-        if state.actions_left and all(t.hp == t.max_hp for t in state.hero.army) and state.hero.hp == state.hero.max_hp:
+        if (state.hero.pos == destination and state.actions_left
+                and all(t.hp == t.max_hp for t in state.hero.army) and state.hero.hp == state.hero.max_hp):
             return state
         rest(state, budget=budget)
     raise AssertionError('Could not reach the adventure recovered')

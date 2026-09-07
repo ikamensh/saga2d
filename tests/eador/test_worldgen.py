@@ -39,7 +39,8 @@ def test_ruins_trade_a_valuable_pike_checkpoint_for_a_weaker_flank():
     state = State.new(7, theme='ruins')
     checkpoint = state.provinces[(0, 0)]
     assert {'pikeman', 'archer'} <= set(checkpoint.guards)
-    assert checkpoint.site_kind == 'aerie_raid'
+    aerie, = [p for p in state.provinces.values() if p.site_kind == 'aerie_raid']
+    assert aerie.pos[0] == 0 and not aerie.capital
     assert state.provinces[(1, 0)].site_kind == 'barrow'
     flanks = [[state.provinces[pos] for pos in road[1:-1]] for road in (NORTH_ROAD, SOUTH_ROAD)]
     weaker = min(flanks, key=lambda provinces: sum(sum(p.guard_hp) for p in provinces))
@@ -144,6 +145,8 @@ def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_eve
     from eador.model import HERO_CLASSES
     from eador.worldgen import THEMES
     from tools.eador_campaign import finish_battle
+    from tools.cpu_budget import CpuBudget
+    budget = CpuBudget(25)
     for theme in THEMES:
         for seed in range(100):
             for hero_class in HERO_CLASSES:
@@ -152,7 +155,7 @@ def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_eve
                     state.build('barracks')
                     state.recruit('swordsman')
                     state.explore() if target is None else state.travel(target)
-                    finish_battle(state)
+                    finish_battle(state, budget=budget)
                     if target is None:
                         assert state.provinces[(-2, 0)].explored
                     else:

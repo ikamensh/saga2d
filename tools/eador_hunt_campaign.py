@@ -1,6 +1,6 @@
 """Purchased Pack Hunt armies and explicit routes reusable through native input."""
 from eador.model import State
-from tools.eador_campaign import finish_battle, march_to, rest
+from tools.eador_campaign import finish_battle, march_to, rest, site_position
 from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure
 
 
@@ -21,9 +21,11 @@ def prepare_hunt_spears(state=None):
 
 
 def _recover_at_hunt(state, *, budget=None):
+    destination = site_position(state, 'pack_hunt')
     for _ in range(32):
-        march_to(state, (-1, 1), budget=budget)
-        if state.actions_left and state.hero.hp == state.hero.max_hp and all(t.hp == t.max_hp for t in state.hero.army):
+        march_to(state, destination, budget=budget)
+        if (state.hero.pos == destination and state.actions_left and state.hero.hp == state.hero.max_hp
+                and all(t.hp == t.max_hp for t in state.hero.army)):
             return state
         rest(state, budget=budget)
     raise AssertionError('Could not reach the Pack Hunt with a recovered purchased army')

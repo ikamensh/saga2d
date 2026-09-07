@@ -90,8 +90,7 @@ def test_frontier_crossing_advertises_two_real_approaches_and_extraction_exits()
     from eador.model import State
     state = State.new(7)
     assert state.provinces[(-2, 0)].site_kind == 'shrine'
-    province = state.provinces[(0, 2)]
-    assert province.site_kind == 'courier_crossing'
+    province, = [p for p in state.provinces.values() if p.site_kind == 'courier_crossing']
     approaches = state.adventure_approaches(province.pos)
     assert [approach.id for approach in approaches] == ['direct', 'guided']
     assert [approach.gold_cost for approach in approaches] == [0, 20]
@@ -108,6 +107,7 @@ def test_paid_entry_is_atomic_saved_once_and_retry_preserves_defender_wounds():
     """A failed guided attempt loses its fee and cannot replenish its damaged guard roster."""
     from eador.model import State
     state = prepared_crossing()
+    pos = state.hero.pos
     before = state.to_json()
     with pytest.raises(RuleError):
         state.explore(approach='missing')
@@ -124,9 +124,9 @@ def test_paid_entry_is_atomic_saved_once_and_retry_preserves_defender_wounds():
     guards = [(u.kind, u.hp) for u in battle.units if u.team == 'enemy' and u.alive]
     state = State.from_json(state.to_json())
     state.retreat()
-    assert state.battle_adventure is None and not state.provinces[(0, 2)].explored
+    assert state.battle_adventure is None and not state.provinces[pos].explored
     assert state.gold == gold - 40  # entry fee plus the already-existing 20-gold retreat loss.
-    assert list(zip(state.provinces[(0, 2)].site_guards, state.provinces[(0, 2)].site_guard_hp)) == guards
+    assert list(zip(state.provinces[pos].site_guards, state.provinces[pos].site_guard_hp)) == guards
     if not state.actions_left:
         state.end_turn()
     before_gold = state.gold
@@ -139,10 +139,10 @@ def test_paid_entry_is_atomic_saved_once_and_retry_preserves_defender_wounds():
 def test_cache_cargo_is_a_saved_battle_burden_not_a_persistent_hero_upgrade():
     """The risky reward buys no extra power: it costs exactly one carrier move point."""
     from eador.model import State
-    from tools.eador_campaign import finish_battle, march_to
+    from tools.eador_campaign import finish_battle, march_to, site_position
     state = State.new(7, theme='elderwild')
     state.explore(); finish_battle(state)
-    march_to(state, (-1, -1))
+    march_to(state, site_position(state, 'supply_cache'))
     if not state.actions_left:
         state.end_turn()
     assert state.provinces[state.hero.pos].site_kind == 'supply_cache'
@@ -188,7 +188,7 @@ def test_malformed_extraction_attempts_cannot_change_or_repeat_the_contract(dama
     from eador.model import State
     state = prepared_crossing(); state.explore(approach='guided')
     data = json.loads(state.to_json())
-    province = next(p for p in data['provinces'] if p['pos'] == [0, 2])
+    province = next(p for p in data['provinces'] if p['pos'] == data['battle_province'])
     if damage == 'reward':
         data['battle_adventure']['gold'] += 1
     elif damage == 'cargo':
@@ -232,6 +232,7 @@ def test_healing_at_an_exit_spends_the_action_needed_to_escape():
 def test_waiting_out_a_paid_adventure_loses_the_fee_and_cargo_reward():
     from eador.model import State
     state = prepared_crossing()
+    pos = state.hero.pos
     gold = state.gold
     state.explore(approach='guided')
     # Return no orders: the defenders retain their exits and the clock advances.
@@ -241,7 +242,7 @@ def test_waiting_out_a_paid_adventure_loses_the_fee_and_cargo_reward():
     assert state.battle.outcome_reason == 'deadline' and state.battle.round == 8
     before_xp = state.hero.xp
     state.resolve_battle()
-    assert not state.provinces[(0, 2)].explored and state.battle_adventure is None
+    assert not state.provinces[pos].explored and state.battle_adventure is None
     assert state.hero.xp == before_xp and not state.choice
     assert state.gold == gold - 40  # Guided fee and existing defeat loss.
 

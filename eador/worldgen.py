@@ -4,6 +4,7 @@ from __future__ import annotations
 import random
 from collections import Counter
 from dataclasses import dataclass
+from itertools import combinations
 from typing import TYPE_CHECKING
 
 from eador.content import SITES
@@ -80,10 +81,11 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
     rival.guards, rival.site = ['guard'] * 5 + ['archer'] * 2, None
     rival.site_kind, rival.site_guards, rival.site_relic = None, [], None
     rival.site_gold = rival.site_crystals = 0
+    road = set()
     if theme == 'elderwild':
-        _elderwild(provinces, seed)
+        road = _elderwild(provinces, seed)
     elif theme == 'ruins':
-        _ruins(provinces, seed)
+        road = _ruins(provinces, seed)
     if theme == 'frontier':
         _site(provinces[(0, 2)], 'courier_crossing')
         _site(provinces[(-1, 1)], 'muster_yard')
@@ -107,10 +109,40 @@ def generate(seed: int, theme: str = 'frontier') -> dict[Pos, Province]:
         _authored_duplicate(provinces, 'relief_column')
     elif theme == 'ruins':
         _authored_duplicate(provinces, 'runebound_causeway', reserved={(1, 0)})
+    _vary_sites(provinces, seed, theme, road)
     for province in provinces.values():
         province.guard_hp = [UNITS[kind].hp for kind in province.guards]
         province.site_guard_hp = [UNITS[kind].hp for kind in province.site_guards]
     return provinces
+
+
+def _vary_sites(provinces: dict[Pos, Province], seed: int, theme: str, road: set[Pos]) -> None:
+    """Vary discovery routes while keeping conquest and the complete site packages.
+
+    Western and central sites stay in their progression band. Home, the Watch,
+    eastern sites, and the economic road's Caravan/Tower sources remain fixed.
+    At least two home-adjacent provinces retain ordinary, untimed sites.
+    """
+    rng = random.Random(f'{seed}:{theme}:discoveries')
+    fields = ('site', 'site_kind', 'site_guards', 'site_relic', 'site_gold', 'site_crystals')
+    reserved = {p.pos for p in provinces.values() if p.capital or p.site_kind == 'border_watch'
+                or p.pos in road and p.site_kind in ('caravan', 'tower')}
+    adjacent = {(-2, 1), (-1, -1), (-1, 0)}
+    for western in (True, False):
+        positions = [pos for pos in sorted(provinces) if pos not in reserved
+                     and (pos[0] < 0 if western else pos[0] == 0)]
+        packages = [tuple(getattr(provinces[pos], field) for field in fields) for pos in positions]
+        authored = [site for site in packages if SITES[site[1]].encounter is not None]
+        ordinary = [site for site in packages if SITES[site[1]].encounter is None]
+        placements = [cells for cells in combinations(positions, len(authored))
+                      if len(adjacent.intersection(cells)) <= 1]
+        targets = list(rng.choice(placements))
+        rng.shuffle(targets)
+        rest = [pos for pos in positions if pos not in targets]
+        rng.shuffle(rest)
+        for pos, site in zip(targets + rest, authored + ordinary):
+            for field, value in zip(fields, site):
+                setattr(provinces[pos], field, value)
 
 
 def _authored_duplicate(provinces: dict[Pos, Province], kind: str, *, reserved=()) -> None:
@@ -146,7 +178,7 @@ def _site(province: Province, kind: str) -> None:
     province.site_gold, province.site_crystals = spec.gold, spec.crystals
 
 
-def _elderwild(provinces: dict[Pos, Province], seed: int) -> None:
+def _elderwild(provinces: dict[Pos, Province], seed: int) -> set[Pos]:
     rng = random.Random(seed ^ 0xE1DE)
     road = set(rng.choice((NORTH_ROAD, SOUTH_ROAD)))
     for pos, province in provinces.items():
@@ -173,9 +205,10 @@ def _elderwild(provinces: dict[Pos, Province], seed: int) -> None:
     for pos in road:
         if pos[0] == 0:
             provinces[pos].name = 'Old Causeway'
+    return road
 
 
-def _ruins(provinces: dict[Pos, Province], seed: int) -> None:
+def _ruins(provinces: dict[Pos, Province], seed: int) -> set[Pos]:
     rng = random.Random(seed ^ 0xA5C1)
     flank = set(rng.choice((NORTH_ROAD, SOUTH_ROAD)))
     direct = {(-1, 0), (0, 0), (1, 0)}
@@ -208,3 +241,4 @@ def _ruins(provinces: dict[Pos, Province], seed: int) -> None:
     for pos in flank:
         if pos[0] == 0:
             provinces[pos].name = 'Salvager’s Track'
+    return flank

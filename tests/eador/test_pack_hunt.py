@@ -121,7 +121,7 @@ def test_saved_failed_lure_keeps_its_cost_and_remaining_wolves_when_retrying_for
     state = State.from_json(state.to_json())
     reward = state.battle_adventure
     finish_battle(state)
-    assert state.provinces[(-1, 1)].explored and state.gold == before_gold + reward.gold
+    assert state.provinces[state.hero.pos].explored and state.gold == before_gold + reward.gold
 
 
 @pytest.mark.parametrize('corruption', ['missing_attempt', 'hold', 'explored', 'displaced_hero', 'missing_guard'])
@@ -130,7 +130,7 @@ def test_a_damaged_rout_attempt_is_refused_before_it_can_lose_state_or_repeat_re
     from eador.model import SaveFormatError
     state = prepared_hunt(); state.explore(approach='lure')
     data = json.loads(state.to_json())
-    province = next(p for p in data['provinces'] if p['pos'] == [-1, 1])
+    province = next(p for p in data['provinces'] if p['pos'] == data['battle_province'])
     if corruption == 'missing_attempt':
         data['battle_adventure'] = None
     elif corruption == 'hold':
@@ -150,9 +150,7 @@ def test_pack_hunt_is_placed_once_in_elderwild_without_replacing_required_source
     for seed in range(100):
         state = State.new(seed, theme='elderwild')
         assert sum(p.site_kind == 'pack_hunt' for p in state.provinces.values()) == 1
-        assert state.provinces[(-1, 1)].site_kind == 'pack_hunt'
         assert state.provinces[(-2, 0)].site_kind == 'shrine'
-        assert state.provinces[(-2, 2)].site_kind == 'den'
-        assert state.provinces[(-2, 2)].site_relic == 'storm_quiver'
-        assert state.provinces[(-1, 2)].site_kind == 'explorer_camp'
+        assert any(p.site_kind == 'den' and p.site_relic == 'storm_quiver' for p in state.provinces.values())
+        assert any(p.site_kind == 'explorer_camp' for p in state.provinces.values())
         assert sum(p.site_kind == 'border_watch' for p in state.provinces.values()) == 1

@@ -35,6 +35,13 @@ class _Entry:
     description: str
 
 
+def _source_locations(provinces, *, with_site=False):
+    """Locate the saved sources, retaining cleared places without promising another reward."""
+    sources = sorted((f'{province.site} at ' if with_site else '') + province.name
+                     + (' (cleared)' if province.explored else '') for province in provinces)
+    return 'Recorded sources: ' + '; '.join(sources) + '.' if sources else 'No recorded source on this shard.'
+
+
 class CodexScene(Screen):
     """Inspect rules without changing the root campaign or writing save files.
 
@@ -304,6 +311,7 @@ class CodexScene(Screen):
 
             entries = []
             for kind, spec in SITES.items():
+                locations = _source_locations(p for p in state.provinces.values() if p.site_kind == kind)
                 variable = spec.inherited_reward
                 base = (spec.gold, spec.crystals, spec.relic)
                 if variable:
@@ -319,7 +327,8 @@ class CodexScene(Screen):
                                   (f" · {RELICS[spec.relic].name}" if spec.relic else ''))
                 entries.append(_Entry(spec.name, base_facts,
                                       f"{spec.description} Base guardians: " + ", ".join(
-                                          f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items()) + "."))
+                                          f"{UNITS[kind].name} ×{count}" for kind, count in Counter(spec.guards).items())
+                                      + '. ' + locations))
                 for option in spec.approaches:
                     attempt = state.battle_adventure
                     current = (attempt is not None and state.provinces[state.battle_province].site_kind == kind
@@ -340,7 +349,7 @@ class CodexScene(Screen):
                     description = option.description + ' ' + objective
                     if option.gold_cost or option.crystals_cost:
                         description += " The fee is not refunded after retreat or defeat."
-                    entries.append(_Entry(f"{spec.name}: {option.title}", facts, description))
+                    entries.append(_Entry(f"{spec.name}: {option.title}", facts, description + ' ' + locations))
             entries.append(_Entry("Failure, retry and finite rewards", "One site · One reward · Wounded defenders persist",
                                   "A retry spends one campaign action and its chosen fee; surviving defenders keep their wounds. "
                                   "Failure gives no reward or victory XP and loses up to 20 more gold. Success pays the chosen reward once and closes the site."))
@@ -356,9 +365,8 @@ class CodexScene(Screen):
         return entries
 
     def relic_sources(self, kind):
-        sources = sorted({province.site for province in self.root.state.provinces.values()
-                          if province.site_relic == kind and province.site})
-        return "Recorded sources: " + ", ".join(sources) + "." if sources else "No recorded source on this shard."
+        return _source_locations((p for p in self.root.state.provinces.values()
+                                  if p.site_relic == kind and p.site), with_site=True)
 
     def draw(self):
         x, y = self.x, self.y

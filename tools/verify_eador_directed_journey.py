@@ -1,4 +1,4 @@
-"""Replay an explicitly directed continuation from a fixed retained earned opening."""
+"""Replay directed orders from an authenticated earned save or a fresh campaign."""
 import argparse
 import gzip
 import hashlib
@@ -18,6 +18,7 @@ from eador.__main__ import create_session
 from eador.model import State
 from eador.persistence import CampaignSaves
 from eador.preferences import reading_scale
+from eador.scene import TitleScene
 from tools.cpu_budget import CpuBudget
 from tools.eador_ui import PLAYER_COMMANDS, PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
@@ -30,15 +31,21 @@ EARNED_OPENINGS = {
 }
 
 
-def load_journal(blob, hashes, budget):
-    """Authenticate the fixed earned source and exact command chain before opening a session."""
-    source = json.loads(gzip.decompress(blob))
-    required = {'source', 'execution_source', 'source_sha256', 'initial_state', 'final_state', 'commands'}
-    if not isinstance(source, dict) or not required <= source.keys():
-        raise ValueError('Directed journal must contain provenance, model hashes and saved commands')
-    supplied = source['source']
-    if (not isinstance(supplied, dict) or not isinstance(supplied.get('path'), str)
-            or supplied['path'] not in EARNED_OPENINGS):
+def _opening(supplied):
+    if not isinstance(supplied, dict):
+        raise ValueError('Directed journal must identify its opening')
+    if supplied.get('kind') == 'new_campaign':
+        if (set(supplied) != {'kind', 'seed', 'hero_class', 'difficulty', 'initial_sha256'}
+                or type(supplied['seed']) is not int
+                or not isinstance(supplied['hero_class'], str)
+                or not isinstance(supplied['difficulty'], str)):
+            raise ValueError('Fresh campaign provenance requires seed, hero and difficulty')
+        initial = State.new_campaign(supplied['seed'], supplied['hero_class'],
+                                     difficulty=supplied['difficulty']).to_json()
+        return initial, dict(kind='new_campaign', seed=supplied['seed'],
+                             hero_class=supplied['hero_class'], difficulty=supplied['difficulty'],
+                             initial_sha256=hashlib.sha256(initial.encode()).hexdigest())
+    if not isinstance(supplied.get('path'), str) or supplied['path'] not in EARNED_OPENINGS:
         raise ValueError('Directed journal must name an authenticated earned opening')
     path = supplied['path']
     checksum, index = EARNED_OPENINGS[path]
@@ -49,8 +56,19 @@ def load_journal(blob, hashes, budget):
     initial = history['commands'][index]['before']
     provenance = dict(path=path, journal_sha256=checksum, journal_source=history['source_commit'],
                       command_index=index, initial_sha256=hashlib.sha256(initial.encode()).hexdigest())
+    return initial, provenance
+
+
+def load_journal(blob, hashes, budget):
+    """Verify a reproducible opening and exact command chain before opening a session."""
+    source = json.loads(gzip.decompress(blob))
+    required = {'source', 'execution_source', 'source_sha256', 'initial_state', 'final_state', 'commands'}
+    if not isinstance(source, dict) or not required <= source.keys():
+        raise ValueError('Directed journal must contain provenance, model hashes and saved commands')
+    supplied = source['source']
+    initial, provenance = _opening(supplied)
     if supplied != provenance or source['initial_state'] != initial:
-        raise ValueError('Directed journal must start from the authenticated earned opening')
+        raise ValueError('Directed journal must start from its authenticated opening')
     manifest = source['source_sha256']
     if not isinstance(manifest, dict):
         raise ValueError('Directed journal must include its model source manifest')
@@ -95,9 +113,15 @@ def verify(input_report, output, *, backend='pyglet', cpu_percent=25):
         game, title = create_session(['--data-dir', directory], backend=backend, visible=False)
         player = PlayerInput(game, native=backend == 'pyglet', output=output)
         try:
-            CampaignSaves(game.save_manager).save(State.from_json(source['initial_state']))
-            game.push(title)
-            player.press('f9')
+            origin = source['source']
+            if origin.get('kind') == 'new_campaign':
+                game.push(TitleScene(origin['seed'], hero_class=origin['hero_class'],
+                                     difficulty=origin['difficulty']))
+                player.press('l')
+            else:
+                CampaignSaves(game.save_manager).save(State.from_json(source['initial_state']))
+                game.push(title)
+                player.press('f9')
             player.button('Text size')
             for key in ('right', 'return'):
                 player.press(key)
@@ -145,8 +169,10 @@ def verify(input_report, output, *, backend='pyglet', cpu_percent=25):
                   input_source=source['source'], input_execution_source=source['execution_source'],
                   exact_commands=len(source['commands']), reloads=player.reloads, inputs=player.events,
                   final_state=final, captures=captures + ['final-state'],
-                  scope='Agent-directed continuation from a historical autoplay opening. Exact game controls '
-                        'and saves; no native opening preparation, independent playtest or full-campaign claim.')
+                  scope=('Agent-directed fresh campaign reproduced through New Campaign input. '
+                         if source['source'].get('kind') == 'new_campaign' else
+                         'Agent-directed continuation from a historical autoplay opening; no native opening preparation. ')
+                        + 'Exact game controls and saves; no independent playtest or full-campaign claim.')
     output.mkdir(parents=True, exist_ok=True)
     (output / 'verification.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f'{backend}: {report["exact_commands"]} exact commands, {len(player.events)} inputs; saved states match', flush=True)
