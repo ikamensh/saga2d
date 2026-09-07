@@ -3,7 +3,8 @@
 An Eador-inspired strategy game built on Saga2D. Develop a stronghold,
 explore guarded sites, lead a persistent army through hex battles, and
 capture Duskspire before the rival takes Westwatch. Its three-shard linked
-campaign and quick standalone mode use original content and procedural art.
+campaign and quick standalone mode use original content, painted artwork,
+procedural miniatures and original music and sound.
 
 From the repository root:
 
@@ -128,6 +129,11 @@ and mix review remain part of release preparation.
 The starting army is usable immediately; Barracks is one possible opening,
 not a required build. Marketplace provides income instead, while Wizard
 starts with both spells and can invest elsewhere.
+New worlds vary adventure locations within progression bands. Select a province
+to inspect its site before conquest; Sites and Relics in the Codex name their
+current sources and mark cleared locations. Loaded saves keep their recorded
+map and rewards. Compare access costs and equipment before following a familiar
+route.
 Investment, exploration and responding to the announced expedition win the
 seed-7 Commander campaign in the integration journey using automatic
 battles; manual decisions and different seeds can change the outcome.

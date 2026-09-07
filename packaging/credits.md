@@ -2,13 +2,14 @@
 
 Game and Saga2D framework: Ilya Kamenshchikov and contributors, under the
 repository's MIT license. Terrain, miniatures, relics and effects use original
-game-owned drawing code. The atmospheric environment painting was generated
-with Codex's built-in image-generation tool; its prompt and provenance ship
-in `eador/assets/VISUAL-PROVENANCE.md`. The music and sound effects are original
+game-owned drawing code. The atmospheric environment painting and four hero
+portraits were generated with Codex's built-in image-generation tool; their
+prompts and provenance ship in `eador/assets/VISUAL-PROVENANCE.md` and
+`eador/assets/hero-portrait-provenance.json`. The music and sound effects are original
 procedural compositions; see `eador/assets/AUDIO-PROVENANCE.md`.
 Eador is the gameplay research reference; this is an independent game.
 
-The application bundles CPython, pyglet, Pillow and NumPy. Original license
+The application bundles CPython, pyglet, Pillow, NumPy and websockets. Original license
 texts found in the installed distributions are included under `licenses/`.
 The PyInstaller bootloader is distributed under its application-bundling
 exception; its license is included there too.
