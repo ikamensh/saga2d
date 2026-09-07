@@ -345,16 +345,19 @@ def test_keyboard_only_tactics_move_cast_attack_reload_and_retreat(tmp_path):
         hero = b.unit(0)
         before = root.state.to_json()
         press(game, "1")
-        press(game, "up")
-        press(game, "return")  # Empty spell targets must not move a unit.
         assert root.state.to_json() == before
-        assert game.scene.message
-        press(game, "escape")
+        assert game.scene.targeting is None and game.scene.message
+        press(game, "up")
         press(game, "return")
         assert hero.moved and hero.pos == (-3, 0)
         press(game, "e")
         mana = b.mana
         press(game, "1")
+        assert game.scene.targeting == 'bolt'
+        before = root.state.to_json()
+        press(game, "up")
+        press(game, "return")  # An invalid aimed spell must never become a move.
+        assert root.state.to_json() == before and game.scene.message
         press(game, "f")
         press(game, "return")
         assert b.mana < mana and hero.acted

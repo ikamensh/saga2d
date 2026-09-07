@@ -1,6 +1,7 @@
 """Shardbound's presentation preferences, independent of campaign state and saves."""
 
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import Any
 
 from saga2d import Game, Settings
@@ -35,6 +36,8 @@ def apply_preferences(game: Game, values: Mapping[str, Any]) -> None:
     game.audio.muted = values["muted"]
     game._shardbound_reduced_motion = values["reduced_motion"]
     game._shardbound_reading_scale = values["codex_text_scale"]
+    game.theme.set_text_style('body', replace(game.theme.get_text_style('body'),
+                                             font_size=round(14 * values['codex_text_scale'] / 100)))
 
 
 def reduced_motion(game: Game) -> bool:

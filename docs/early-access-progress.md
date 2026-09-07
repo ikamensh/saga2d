@@ -891,3 +891,21 @@ reloads, focused integration tests, and both bounded fuzz checks. The existing
 60/15 FPS game caps remain. All owned expensive jobs ran serially and exited.
 The adventure-route branch remains separate; visuals and sound keep priority
 before additional mechanics. G01–G19 remain incomplete.
+
+## Icon controls — 2026-09-07
+
+Recurring toolbar labels, resource words and combat stat labels now use
+original icons with numeric values, hover explanations and retained keyboard
+keycaps. Primary orders and consequences remain in text. Saga2D gains reusable
+layout images, optional button icons and reactive tooltips; the game owns the
+artwork and meanings. Disabled spell keys now match disabled clicks, and larger
+tooltip text survives screen changes.
+
+[Icon evidence](evidence/icon-controls/README.md) retains ten inspected native
+game frames, 104 recorded input/hover events, two exact reloads and 94 state
+checks, plus the independent framework example, focused tests and bounded
+Shardbound/Tribes fuzz checks. Native verification took 19.14 seconds wall and
+4.81 seconds CPU under the existing 25% allowance and 30 FPS verifier cap.
+The assets are prebuilt; game frame caps remain 60 FPS active / 15 FPS inactive.
+This completes the requested icon pass without claiming a new release gate.
+Visuals and sound remain the priority. G01–G19 remain incomplete.

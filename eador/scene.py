@@ -19,6 +19,7 @@ from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RE
 from eador.worldgen import THEMES
 from eador.sound import set_music
 from eador.preferences import reduced_motion
+from eador.ui import icon_path, metric
 
 
 class Screen(Scene):
@@ -28,7 +29,8 @@ class Screen(Scene):
         self.message = ""
 
     def on_enter(self):
-        self.game.theme = build_theme()
+        from eador.preferences import reading_scale
+        self.game.theme = build_theme(reading_size=reading_scale(self.game))
         self.refresh()
 
     def refresh(self):
@@ -58,12 +60,18 @@ class Screen(Scene):
         self.game.clear_and_push(ShardScene(state))
         return True
 
-    def button(self, text, x, y, width, callback, *, hotkey=None, shortcut=None, primary=False, danger=False, enabled=True):
+    def button(self, text, x, y, width, callback, *, hotkey=None, shortcut=None, primary=False, danger=False,
+               enabled=True, icon=None, show_text=True, tooltip=None):
         button = Button(text, on_click=callback, hotkey=hotkey, shortcut=shortcut, width=width, height=40,
                         anchor=Anchor.TOP_LEFT, margin=(round(x), round(y)), enabled=enabled,
+                        icon=icon_path(icon) if icon else None, icon_size=26, show_text=show_text, tooltip=tooltip,
                         style=PRIMARY if primary else DANGER if danger else None)
         self.ui.add(button)
         return button
+
+    def icon_button(self, name, text, x, y, callback, *, hotkey=None, shortcut=None, tooltip=None):
+        return self.button(text, x, y, 80 if hotkey or shortcut else 48, callback,
+                           hotkey=hotkey, shortcut=shortcut, icon=name, show_text=False, tooltip=tooltip)
 
     def text(self, text, x, y, *, size=14, color=TEXT, center=False, serif=False):
         self.draw_text(str(text), x, y, font_size=size, color=color, font="Georgia" if serif else "Verdana",
@@ -210,8 +218,8 @@ class TitleScene(Screen):
         self.button('Enter single shard', w / 2 + 12, h - 124, 336, self.start, hotkey='Enter')
         self.button('Load shard', w / 2 - 202, h - 72, 196, self.browse_saves, hotkey='F6')
         self.button('New seed', w / 2 + 6, h - 72, 196, self.next_seed, shortcut='N')
-        self.button('Settings', w - 178, 26, 152, self.open_settings, shortcut='O')
-        self.button('Text size', 26, 26, 176, self.open_text_settings, shortcut='T')
+        self.icon_button('settings', 'Settings', w - 106, 26, self.open_settings, shortcut='O')
+        self.icon_button('text_size', 'Text size', 26, 26, self.open_text_settings, shortcut='T')
         self.button('About this build', 26, h - 72, 232, self.about, shortcut='A')
 
     def load_game(self, slot=1, *, backup=False):
@@ -344,7 +352,7 @@ class ShardScene(Screen):
         self.game.push(DiagnosticScene(self._notice, return_label='Return to map', title='Complete campaign message'))
 
     def refresh(self):
-        from saga2d import Column, Label
+        from saga2d import Column, Label, Row
         from eador.preferences import reading_scale
         from eador.rival_scene import rival_order
 
@@ -368,9 +376,15 @@ class ShardScene(Screen):
         # Treasury and the hero remain visible while province commands are reviewed.
         economy = [label('WESTWATCH ENCIRCLED' if s.encircled else 'YOUR DOMINION', 390,
                          size=10, color=RED if s.encircled else MUTED),
-                   label(f'{s.gold} gold  ·  {s.crystals} crystals', 390, size=18, color=GOLD, serif=True),
-                   label(f'Income +{s.income}  ·  Upkeep −{s.upkeep} / turn', 390,
-                         color=RED if s.upkeep_shortfall else MUTED),
+                   Row(metric('gold', s.gold, width=170, size=18 * scale, color=GOLD,
+                              detail='Spend on troops, buildings and recovery.'),
+                       metric('crystals', s.crystals, width=210, size=18 * scale, color=BLUE,
+                              detail='Spend on magical investment, special troops and adventure choices.'), spacing=10),
+                   Row(metric('income', f'+{s.income}', width=190, size=12 * scale, color=MUTED,
+                              detail='Gold earned each campaign turn.'),
+                       metric('upkeep', f'−{s.upkeep}', width=190, size=12 * scale,
+                              color=RED if s.upkeep_shortfall else MUTED,
+                              detail='Gold paid each turn to maintain your army.'), spacing=10),
                    label(f'Realm gold yield: {s.rules.gold_percent}% of base production', 390, size=10, color=MUTED)]
         if s.upkeep_shortfall:
             economy.append(label(f'{s.upkeep_shortfall} gold short: unpaid troops will leave.', 390, color=RED))
@@ -379,8 +393,12 @@ class ShardScene(Screen):
         treasury_bottom = column(economy, 390, 26, 108)
         hero_bottom = column([
             label(f'{s.hero.name}, the {s.hero.hero_class}', 390, size=18, serif=True),
-            label(f'Level {s.hero.level} · {s.hero.xp} XP · {s.actions_left} actions left', 390, color=GOLD),
-            label(f'Health {s.hero.hp}/{s.hero.max_hp}  ·  Mana {s.hero.mana}/{s.hero.max_mana}', 390),
+            Row(metric('level', s.hero.level, width=100, size=12 * scale, color=GOLD),
+                metric('xp', s.hero.xp, width=130, size=12 * scale, color=GOLD),
+                metric('actions', s.actions_left, width=140, size=12 * scale, color=GOLD,
+                       detail='Travel and exploration spend an action; End turn restores them.'), spacing=10),
+            Row(metric('health', f'{s.hero.hp} / {s.hero.max_hp}', width=185, size=12 * scale, color=TEAL),
+                metric('mana', f'{s.hero.mana} / {s.hero.max_mana}', width=195, size=12 * scale, color=BLUE), spacing=10),
             label(f'At {s.provinces[s.hero.pos].name}', 390, size=11, color=MUTED),
         ], 390, 452, 108)
         self._summary_bottom = max(treasury_bottom, hero_bottom) + 16
@@ -430,12 +448,14 @@ class ShardScene(Screen):
         column([label(f'Turn {s.turn} · Rival expedition: {len(s.rival.army)} troops', width,
                       size=11, color=MUTED)], width, x, y + 172)
 
-        self.button('Guide', 614, 28, 92, self.help, hotkey='F1')
-        self.button('Hero', 716, 28, 84, self.hero_details, hotkey='H')
-        self.button('Codex', 810, 28, 102, self.codex, shortcut='C')
-        self.button('Text size', 922, 28, 140, self.open_text_settings, shortcut='F2')
-        self.button('Save', 1072, 28, 82, lambda: self.browse_saves('save'))
-        self.button('Load', 1164, 28, 90, self.browse_saves)
+        self.icon_button('guide', 'Guide', 788, 28, self.help, hotkey='F1')
+        self.icon_button('hero', 'Hero', 878, 28, self.hero_details, hotkey='H')
+        self.icon_button('codex', 'Codex', 968, 28, self.codex, shortcut='C')
+        self.icon_button('text_size', 'Text size', 1058, 28, self.open_text_settings, shortcut='F2')
+        self.icon_button('save', 'Save', 1148, 28, lambda: self.browse_saves('save'),
+                         tooltip='Save: choose a manual slot. F5 quicksaves.')
+        self.icon_button('load', 'Load', 1206, 28, self.browse_saves,
+                         tooltip='Load: browse your saved progress. F9 loads the quicksave.')
         column([label(f'{THEMES[s.theme].name.upper()} / SHARD {s.seed} / {s.rules.title.upper()}', 540, size=10, color=GOLD)],
                540, 26, 64)
 
@@ -761,7 +781,7 @@ class CatalogScene(Screen):
         self.ui.add(Column(*rows, spacing=18, anchor=Anchor.TOP_LEFT,
                            margin=(round(self.x + 24), round(self.y + body_y))))
         self.ui.add(Column(footer, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 24), round(self.y + footer_y))))
-        self.button('Text size', self.x + 830, self.y + 41, 186, self.open_text_settings, shortcut='T')
+        self.icon_button('text_size', 'Text size', self.x + 936, self.y + 41, self.open_text_settings, shortcut='T')
         self.button('Previous', self.x + 24, self.y + 684, 150, self.previous_page, hotkey='←', enabled=self.page > 0)
         self.button('Next', self.x + 184, self.y + 684, 150, self.next_page, hotkey='→', enabled=self.page + 1 < self.pages)
         if self.kind == 'recruit':
@@ -848,7 +868,7 @@ class HelpScene(Screen):
         self.button("Return to game", self.x + 28, self.y + 634, 260, self.game.pop, shortcut="Esc", primary=True)
         self.button("Codex", self.x + 402, self.y + 634, 200, self.root.codex, shortcut="C")
         self.button("Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
-        self.button("Settings", self.x + 862, self.y + 26, 150, self.open_settings, shortcut="O")
+        self.icon_button('settings', 'Settings', self.x + 932, self.y + 26, self.open_settings, shortcut='O')
         self.button('About this build', self.x + 602, self.y + 26, 244, self.about, shortcut='A')
 
     def title(self):
@@ -932,10 +952,10 @@ class BattleScene(Screen):
                   (board_top + board_bottom) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
         self._phase_button(x, h - 46)
-        self.button("Guide", 26, 29, 94, self.help, hotkey="F1")
-        self.button("Codex", 130, 29, 110, self.root.codex, shortcut="C")
-        self.button("Save", self.edge - 105, 29, 79, self.save_game)
-        self.button('Text size', x + 126, 16, 174, self.open_text_settings, shortcut='F2')
+        self.icon_button('guide', 'Guide', 26, 29, self.help, hotkey='F1')
+        self.icon_button('codex', 'Codex', 116, 29, self.root.codex, shortcut='C')
+        self.icon_button('save', 'Save', self.edge - 74, 29, self.save_game, tooltip='Save this battle. F5 also quicksaves.')
+        self.icon_button('text_size', 'Text size', self.game.width - 106, 16, self.open_text_settings, shortcut='F2')
         from eador.preferences import reading_scale
         self._reading_view = self.hover, self.message, self.game.window_size, reading_scale(self.game)
 
@@ -961,14 +981,18 @@ class BattleScene(Screen):
             penalties = ['Pinned'] if selected.pinned else []
             if selected.cargo_penalty:
                 penalties.append(f'Cargo −{selected.cargo_penalty}')
-            movement = f"{'Fly' if selected.can_fly else 'Move'} {selected.effective_move_range}"
-            if penalties:
-                movement += f" ({', '.join(penalties)})"
-            sections.append(Column(Label(name, width=300, wrap=True, font='Georgia', font_size=25, text_color=TEXT),
-                                   Row(label(f'{selected.hp} / {selected.max_hp} HP', color=TEAL, width=180),
+            facts = Column(Label(name, width=300, wrap=True, font='Georgia', font_size=25, text_color=TEXT),
+                                   Row(metric('health', f'{selected.hp} / {selected.max_hp}', width=180,
+                                              size=12 * scale, color=TEAL),
                                        label(status, color=GOLD, width=108), spacing=12),
-                                   label(f'Attack {selected.attack}   Defense {selected.effective_defense}', color=TEXT),
-                                   label(f'{movement}   Range {selected.attack_range}'), spacing=6))
+                                   Row(metric('attack', selected.attack, width=144, size=12 * scale),
+                                       metric('defense', selected.effective_defense, width=144, size=12 * scale), spacing=12),
+                                   Row(metric('fly' if selected.can_fly else 'move', selected.effective_move_range,
+                                              width=144, size=12 * scale),
+                                       metric('range', selected.attack_range, width=144, size=12 * scale), spacing=12), spacing=6)
+            if penalties:
+                facts.add(label(' · '.join(penalties), color=GOLD))
+            sections.append(facts)
         orders = []
         if self.unit_order:
             name = self.unit_order
@@ -980,17 +1004,25 @@ class BattleScene(Screen):
             orders.append(Button(title, width=172, height=40, shortcut=key,
                                  on_click=lambda: self.choose_order(name),
                                  style=PRIMARY if self.targeting == name else None,
+                                 tooltip=self.order_hint(),
                                  enabled=bool(getattr(b, name + '_targets')(selected.id))))
         orders.append(Button('Brace' if selected and selected.can_brace else 'Guard', width=116, height=40,
                              shortcut='G', on_click=self.guard,
+                             tooltip=('Select a unit to defend.' if selected is None else
+                                      'This unit has already acted. End the round to regain an order.' if selected.acted else
+                                      'Brace: strike first against the next adjacent melee attacker. Spends this unit’s order.' if selected.can_brace else
+                                      'Guard: gain 2 defense until your next turn. Spends this unit’s order.'),
                              enabled=selected is not None and not selected.acted and b.outcome is None))
         sections.append(Row(*orders, spacing=12))
         healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
-        sections.append(Column(label(f'SHARED MANA   /   {b.mana} REMAINING', size=10, color=BLUE),
+        sections.append(Column(metric('mana', b.mana, width=300, size=12 * scale, color=BLUE,
+                                      detail='Shared pool for the hero and allied spellcasters.'),
                                Button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", width=300, height=40,
-                                      hotkey='1', on_click=self.bolt, enabled=bool(b.spell_targets('bolt'))),
+                                      hotkey='1', on_click=self.bolt, tooltip=self.spell_hint('bolt'),
+                                      enabled=bool(b.spell_targets('bolt'))),
                                Button(f"{healer} Heal · {b.spell_cost('heal')} mana", width=300, height=40,
                                       hotkey='2', on_click=self.heal,
+                                      tooltip=self.spell_hint('heal', self.heal_caster),
                                       enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster))),
                                label('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else
                                      'Spells spend the hero’s order.', size=11), spacing=8))
@@ -1193,6 +1225,27 @@ class BattleScene(Screen):
             return 'Flight crosses bodies and rough ground; land on empty hexes. Pin slows flight, and Brace still strikes first.'
         return 'Select a unit. Blue hexes are reachable; red rings are attack targets.'
 
+    def spell_hint(self, name, caster_id=0):
+        """Explain the current spell control, including why its target list is empty."""
+        b = self.battle
+        if b.outcome is not None:
+            return 'The battle is over.'
+        if b.hero_id is None:
+            return 'This army has no spellcasting hero or shared mana.'
+        caster = b.unit(caster_id)
+        if not caster.alive:
+            return 'This spellcaster has fallen.'
+        if caster_id == b.hero_id and name not in b.spells:
+            return 'Build a Temple to learn Heal.' if name == 'heal' else 'Build a Mage Tower to learn Arcane Bolt.'
+        if caster.acted:
+            return 'This spellcaster has already acted. End the round to regain an order.'
+        if b.mana < b.spell_cost(name):
+            return f'Not enough shared mana: this spell needs {b.spell_cost(name)}, and {b.mana} remains.'
+        target = 'wounded ally' if name == 'heal' else 'enemy'
+        if not b.spell_targets(name, caster_id=caster_id):
+            return f'No visible {target} within 4 hexes of this spellcaster.'
+        return f'Choose a visible {target} within 4 hexes. Spends this spellcaster’s order and {b.spell_cost(name)} shared mana.'
+
     @property
     def heal_caster(self):
         selected = self.battle.unit(self.selected) if self.selected is not None else None
@@ -1209,8 +1262,9 @@ class BattleScene(Screen):
 
     def choose_spell(self, name):
         caster = self.heal_caster if name == 'heal' else 0
-        if caster == 0 and name not in self.battle.spells:
-            self.message = "Build a Temple for Heal or a Mage Tower for Arcane Bolt."
+        if self.targeting != name and not self.battle.spell_targets(name, caster_id=caster):
+            self.message = self.spell_hint(name, caster)
+            self.refresh()
             return
         self.targeting = None if self.targeting == name else name
         source = 'the selected Acolyte' if caster != 0 else 'your hero'
@@ -1620,7 +1674,7 @@ class SaveScene(Screen):
             self.button("Save slots" if self.mode == "load" else "Load slots", x + 28, y + 692, 200, self.toggle, shortcut="Tab")
         self.button('Previous', x + 248, y + 692, 150, self.previous_page, hotkey='←', enabled=self.page > 0)
         self.button('Next', x + 418, y + 692, 150, self.next_page, hotkey='→', enabled=self.page + 1 < self.pages)
-        self.button('Text size', x + 886, y + 32, 206, self.open_text_settings, shortcut='T')
+        self.icon_button('text_size', 'Text size', x + 1012, y + 32, self.open_text_settings, shortcut='T')
         self.button("Close", x + 892, y + 692, 200, self.game.pop, shortcut="Esc")
 
         if diagnostic and self.message != self._shown_diagnostic and self.game.scene is self:
@@ -1748,7 +1802,7 @@ class ChoiceScene(Screen):
         bottom = self.y + self.panel_height - 68
         self.button('Hero & relics', self.x + 28, bottom, 200, self.hero_details, hotkey='H')
         self.button('Codex', self.x + 248, bottom, 170, self.root.codex, shortcut='C')
-        self.button('Text size', self.x + 438, bottom, 200, self.open_text_settings, shortcut='T')
+        self.icon_button('text_size', 'Text size', self.x + 558, bottom, self.open_text_settings, shortcut='T')
         self.button('Saves', self.x + 892, bottom, 200, self.browse_saves, hotkey='F6')
         if self._applied:
             self.button('Return', self.x + 658, bottom, 214, self.game.pop, shortcut=('Enter', 'Esc'))
@@ -1851,9 +1905,10 @@ class HeroScene(Screen):
             return Label(text, width=width, wrap=True, font="Georgia" if serif else "Verdana",
                          font_size=round(size * scale) if scaled else size, text_color=color)
 
-        title = Row(label(hero.name, 32, width=520, color=GOLD, serif=True, scaled=False),
+        title = Row(label(hero.name, 32, width=626, color=GOLD, serif=True, scaled=False),
                     label(f"{s.rules.title} realm", width=310, color=GOLD),
-                    Button("Text size", width=186, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24)
+                    Button("Text size", icon=icon_path('text_size'), show_text=False, icon_size=26,
+                           width=80, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24)
         stats = label(f"Level {hero.level} {hero.hero_class} · {hero.hp}/{hero.max_hp} health · {hero.mana}/{hero.max_mana} mana", 13)
         recovery = s.recovery_preview()
         rest = label(recovery.blocked_reason or
@@ -2040,8 +2095,9 @@ class ResultScene(Screen):
                          font_size=round(size * scale) if scaled else size)
 
         content = Column(
-            Row(label(f"CHRONICLE OF {THEMES[s.theme].name.upper()}", 10, width=534, align="left"),
-                Button("Text size", width=186, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24),
+            Row(label(f"CHRONICLE OF {THEMES[s.theme].name.upper()}", 10, width=640, align="left"),
+                Button("Text size", icon=icon_path('text_size'), show_text=False, icon_size=26,
+                       width=80, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24),
             label(title, 34, color=GOLD, serif=True, scaled=False),
             label(detail, 13, color=TEXT),
             label(self.message or subtitle, 12, color=GOLD if self.message else MUTED),

@@ -28,6 +28,7 @@ from tools.eador_roles_campaign import prepare_support_watch
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_diagnostics import queued_keys, read_all
 from tools.verify_eador_guidance import check_reading_layout
+from tools.verify_eador_shard_reading import check_metric
 
 
 @cache
@@ -52,15 +53,19 @@ def inspect_body(scene, unit):
     """Visible numeric facts and ordinary guidance agree with the actual saved capability."""
     check_reading_layout(scene)
     labels = [component.text for component in scene.ui.walk() if isinstance(component, Label)]
-    assert f'{unit.hp} / {unit.max_hp} HP' in labels
-    assert f'Attack {unit.attack}   Defense {unit.effective_defense}' in labels
-    movement = f"{'Fly' if unit.can_fly else 'Move'} {unit.effective_move_range}"
-    assert any(movement in text and f'Range {unit.attack_range}' in text for text in labels)
+    check_metric(scene, 'health', f'{unit.hp} / {unit.max_hp}', 'Health')
+    check_metric(scene, 'attack', unit.attack, 'Attack')
+    check_metric(scene, 'defense', unit.effective_defense, 'Defense')
+    check_metric(scene, 'fly' if unit.can_fly else 'move', unit.effective_move_range,
+                 'Flight' if unit.can_fly else 'Movement')
+    check_metric(scene, 'range', unit.attack_range, 'Attack range')
     if unit.pinned:
         assert any('Pinned' in text for text in labels)
     if unit.cargo_penalty:
         assert any(f'Cargo −{unit.cargo_penalty}' in text for text in labels)
-    assert any(str(scene.battle.mana) in text and 'SHARED MANA' in text for text in labels)
+    check_metric(scene, 'mana', scene.battle.mana, 'Mana')
+    assert scene.ui.find(lambda item: isinstance(item.tooltip, str) and
+                         item.tooltip.startswith(f'Mana: {scene.battle.mana}. Shared pool'))
     assert scene.order_hint() in labels, (unit.kind, scene.order_hint(), labels)
     assert not scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Read message')
     caster = 'Acolyte' if unit.can_heal else 'Hero'

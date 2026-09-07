@@ -15,3 +15,9 @@ The terrain atlas is generated from original game-owned drawing code in
 the source and output hashes. No image generation or synthesis runs during play.
 Unit silhouettes, castles, relics and all tactical overlays remain original
 code-native art in `eador/art.py` and the battle presentation modules.
+
+The 34 transparent utility and resource icons in `images/icons/` are original
+geometric drawings from `eador/icon_art.py`. `tools/build_eador_icons.py` renders
+96-pixel PNGs with antialiasing for use around 24 pixels and records source and
+output hashes in `icon-art-manifest.json`. They use no icon packs, fonts or
+Unicode glyphs. The project MIT license applies to these source drawings.
