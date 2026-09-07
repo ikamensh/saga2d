@@ -927,3 +927,26 @@ including exact portrait packaging and co-op socket orders. Bounded Shardbound
 and Tribes checks pass at the default CPU allowance. No packaged release or
 large acceptance matrix was repeated; audible artistic review remains open.
 **G01–G19 remain incomplete.**
+
+## Compact tactical controls and seal feedback — 2026-09-07
+
+Battle Auto-play, Retreat and Log now use icons, keycaps and full hover
+explanations. A tighter header and fixed footer give miniatures more room;
+selection, log messages and orders leave the board fixed under the pointer.
+The latest event stays visible, while L opens the full log and M opens long
+messages. Objectives and primary orders keep readable text.
+
+Two original cues and ground rings announce nonterminal seal progress gain/loss.
+Unchanged progress stays quiet; final results retain their existing cues. All
+sixteen prior WAVs are unchanged. Existing framework primitives support this
+pass without new rules, save fields or APIs.
+
+[Retained tactical evidence](evidence/tactical-presentation/README.md) includes
+eight inspected native frames at both reading sizes and three window sizes,
+104 input events and three exact reload pairs. The final run takes 57.83 seconds
+wall and 14.35 seconds CPU. A 38-test focused selection passes after rerunning
+one journey invalidated by a concurrent verifier edit; that failure is retained.
+Bounded Shardbound fuzzing passes, including actual error-reader input. The game
+frame caps remain 60/15 FPS, and expensive verification runs serially at the
+default 25% allowance. Human listening/playtest feedback and all release gates
+remain open. **G01–G19 remain incomplete.**

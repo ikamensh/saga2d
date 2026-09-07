@@ -1,0 +1,49 @@
+Seal progress feedback verification
+Worktree: /tmp/saga2d-tactics-dc8df68
+
+Actual-input RED: tests/eador/test_objective_feedback.py
+  1 failed in 1.40s: recorded earned 0-to-1 hold transition had no seal_gain cue.
+  Raw log: /tmp/shardbound-objective-feedback-red.txt
+Initial GREEN: 1 passed in 1.54s.
+Final focused checks: 10 passed in 4.63s.
+  Raw log: /tmp/shardbound-objective-feedback-focused.txt
+  Six objective cases plus catalogue deterministic/edge checks, exact shipping
+  manifest/source verification, and two existing game-audio integration cases.
+  State remains exact after public orders, refresh, skip, load, and terminal result.
+  Gain and loss are nonterminal; unchanged zero and terminal hold emit no added sting.
+  Reduced-motion ring geometry stays fixed; persistent holder HP remains above the effect.
+
+One default 25% build generated 18 WAVs in 13.39s wall, 3.27 user + .07 system = 3.34 CPU.
+(About 24.9% of one core for this build only.)
+  Build log: /tmp/shardbound-seal-audio-build.txt
+  Exact comparison: /tmp/shardbound-seal-audio-comparison.json
+  All 16 existing WAVs unchanged; two new files only.
+  seal_gain: 0.71s, sampler start 15.706984s.
+  seal_loss: 0.58s, sampler start 16.766984s.
+No music composition, gameplay rule, framework, runtime synthesis or timer changes.
+No long native/audio loop, historical campaign preparation, or audible-quality review ran.
+Native visual inspection is coordinated with the combined tactical-layout QA run.
+
+Earned fixture source:
+  docs/evidence/relief-c6093de/model-orders.json.gz
+  SHA256 a1b288a7fbe5a66944adf072090f4c86653b915316a4188afb08bda7c20989aa
+  plans['standard/7/Commander/passive'].snapshots[13]: before first scoring E.
+  snapshots[14]: after earned first hold, ready for real movement in round 2.
+  snapshots[21]: before second, terminal scoring E.
+Historical preparation included autoplay; this is presentation verification,
+not a new manually-earned campaign or balance claim.
+
+Native gain input: load snapshot 13, press E; observe objective event applied 0-to-1.
+Native loss input: load snapshot 14, move Warden 5 to (-2,-1), holder Militia 2 to (-1,-1),
+then press E; observe objective event applied 1-to-0.
+Both paths were verified with PlayerInput and no saved-field edits.
+
+Native visual follow-up:
+The shared tactical-layout native run exited successfully. Independently viewed:
+  /tmp/shardbound-tactical-layout-native-dc8df68/seal-gain-125.png
+  /tmp/shardbound-tactical-layout-native-dc8df68/seal-loss-125.png
+Gain rings are visible below the holder and its 24 HP plaque. Loss rings are
+visible on the same gold-bordered seal beneath the enemy Skyrider and its 14 HP
+plaque. Header/event values agree at 1/2 and 0/2. No blocking overlap or legibility
+defect found. These frames establish visual presentation, not audible quality.
+No runtime source or asset edits occurred after the native freeze.

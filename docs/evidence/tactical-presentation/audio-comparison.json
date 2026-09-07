@@ -1,0 +1,25 @@
+{
+  "unchanged": [
+    "music/battle.wav",
+    "music/campaign.wav",
+    "sounds/attack_arrow.wav",
+    "sounds/attack_heavy.wav",
+    "sounds/attack_hit.wav",
+    "sounds/bolt.wav",
+    "sounds/confirm.wav",
+    "sounds/defeat.wav",
+    "sounds/end_turn.wav",
+    "sounds/guard.wav",
+    "sounds/heal.wav",
+    "sounds/level_up.wav",
+    "sounds/move.wav",
+    "sounds/refuse.wav",
+    "sounds/reward.wav",
+    "sounds/victory.wav"
+  ],
+  "changed": [],
+  "added": [
+    "sounds/seal_gain.wav",
+    "sounds/seal_loss.wav"
+  ]
+}
