@@ -1,6 +1,6 @@
 # Superseded Relief prototype retirement
 
-The candidate sweep at `b2e3120` stopped in the old detached prototype's
+The candidate sweep stored as `b2e3120` (actual source `6c51f22`) stopped in the old detached prototype's
 `source_audit()`, which assumed the fixed locations used when proposing Relief's
 initial displacement. Production Relief and subsequent seeded placement have
 superseded that experiment. Updating its displacement calculation to today's
