@@ -40,9 +40,10 @@ readiness and active PvE battle state. Capital positions and ownership are
 explicit per realm. Both views project the same map; two independent solo
 campaigns followed by a merge would lose or duplicate encounter consequences.
 
-Existing `State.end_turn` mixes economy/recovery with date advancement, rival
-AI and linked-campaign bookkeeping. Extract realm settlement first, preserving
-the solo behavior. `State.resolve_battle` subsequently needs an explicit split
+`eador.economy.settle_realm` now owns upkeep and recovery for a supplied hero
+and treasury quote, independently of date advancement, rival AI and linked
+campaign bookkeeping. The existing solo `State.end_turn` applies that receipt
+then advances the world in its original order. `State.resolve_battle` subsequently needs an explicit split
 between army/progression results and claimed province/defender/site changes.
 Keep campaign PvP rules in `eador`; transport must not know heroes or battles.
 

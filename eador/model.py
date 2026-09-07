@@ -378,14 +378,8 @@ class State:
 
     def _unpaid_troops(self) -> list[Troop]:
         """Project deterministic desertions against this turn's available treasury."""
-        shortfall, departing = self.upkeep_shortfall, []
-        for troop in sorted(self.hero.army,
-                            key=lambda t: (t.level, t.xp, -UNITS[t.kind].upkeep, -t.id)):
-            if shortfall <= 0:
-                break
-            departing.append(troop)
-            shortfall -= UNITS[troop.kind].upkeep
-        return departing
+        from eador.economy import unpaid_troops
+        return unpaid_troops(self.hero.army, self.gold + self.income)
 
     @property
     def spells(self) -> set[str]:
@@ -769,24 +763,16 @@ class State:
         return self.resolve_battle()
 
     def end_turn(self) -> None:
+        from eador.economy import settle_realm
         self._ready()
         recovery = self.recovery_preview()
-        for deserter in self._unpaid_troops():
-            self.hero.army.remove(deserter)
-            self.log.append(f'Unpaid upkeep: level {deserter.level} {UNITS[deserter.kind].name} deserted.')
-        earnings = self.income - self.upkeep
-        self.gold += earnings
-        self.crystals += self.crystal_income
+        settlement = settle_realm(self.hero, gold=self.gold, crystals=self.crystals,
+                                  income=self.income, crystal_income=self.crystal_income,
+                                  recovery=recovery, turn=self.turn + 1)
+        self.gold, self.crystals = settlement.gold, settlement.crystals
         self.turn += 1
-        self.actions_left = 3 if self.hero.hero_class == 'Scout' else 2
-        can_rest = recovery.blocked_reason is None
-        if can_rest:
-            self.hero.hp += recovery.hero_hp
-            for troop in self.hero.army:
-                troop.hp = min(troop.max_hp, troop.hp + recovery.army_hp)
-            self.hero.mana += recovery.mana
-        rest = 'army rests' if can_rest else 'encirclement blocks recovery'
-        self.log.append(f'Turn {self.turn}: {earnings:+d} gold after upkeep; {rest}.')
+        self.actions_left = settlement.actions_left
+        self.log.extend(settlement.log)
         self.rival.advance(self)
         if self.campaign:
             self.campaign.sync(self)

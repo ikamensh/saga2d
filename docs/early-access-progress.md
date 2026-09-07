@@ -1110,3 +1110,20 @@ Focused regressions and native 100%/125% movies pass; each native run records
 four exact reloads and verifies a paused arrow resumes with one impact sound.
 No rules or framework API changed. The packaged checkpoint, human assessment
 and overall release gates remain unchanged.
+
+## Concurrent campaign foundation — 2026-09-07
+
+The user clarified that simultaneous activity belongs on the global map;
+battles keep ordinary alternating turns. The
+[campaign PvP scope](simultaneous-campaign-pvp.md) defines independent realms,
+concurrent PvE, encounter claims and a shared Ready barrier.
+
+The first extraction separates realm upkeep/recovery from world advancement.
+Existing solo end-turn order and saves are preserved. Thirty-eight economy,
+pressure and recovery checks pass, including deterministic desertion and
+encirclement. A bounded linked fuzz run passes four model campaigns and two
+scene journeys with 517 model and 366 scene state checks, at a 25% CPU allowance;
+all four campaign runs end in defeat, so this is invariant evidence rather than
+victory coverage. [Retained receipt](evidence/realm-settlement/linked-fuzz.json.gz).
+Independent source review found no blockers. This is a prerequisite, not a
+playable independent-realm PvP mode; the acceptance criteria remain open.
