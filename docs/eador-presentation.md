@@ -121,6 +121,14 @@ images, optional button icons and shared reactive hover explanations through
 [small reusable UI interfaces](framework-icon-controls.md). The game owns
 compositions, artwork, icon meanings, asset builds and placement.
 
+Catalog prices and troop statistics, Tower infusion quotes, rival finances and
+health, and expedition resources/rewards now reuse those icon/value readouts.
+Purchase icons retain their numbered shortcuts; hovering describes the offer
+and blockers. Modal utilities use the same symbols as the toolbar. Names,
+roles, entry fees and decision consequences remain readable text. The
+[modal icon evidence](evidence/modal-icons/README.md) includes larger-text
+screenshots, exact values and a real purchase/save/load check.
+
 Asset builders default to the existing 25% CPU allowance. Nothing is
 generated while playing. The normal 60 FPS active / 15 FPS inactive cap remains;
 native verification uses 30 FPS and cooperative 25% CPU pacing. The audio

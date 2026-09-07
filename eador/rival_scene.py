@@ -9,6 +9,7 @@ from eador.preferences import reading_scale
 from eador.reading import reading_pages
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, RED, TEAL, TEXT
+from eador.ui import icon_path, metric
 
 
 def rival_order(state):
@@ -87,8 +88,9 @@ class RivalScene(Screen):
                          font_size=round(size * scale) if scaled else size, text_color=color)
 
         heading = Column(
-            Row(label(f'THE DUSKSPIRE EXPEDITION · {state.rules.title.upper()}', 11, width=854, color=RED),
-                Button('Text size', width=186, height=40, shortcut='T', on_click=self.open_text_settings), spacing=24),
+            Row(label(f'THE DUSKSPIRE EXPEDITION · {state.rules.title.upper()}', 11, width=960, color=RED),
+                Button('Text size', icon=icon_path('text_size'), show_text=False, icon_size=26,
+                       width=80, height=40, shortcut='T', on_click=self.open_text_settings), spacing=24),
             label(rival_order(state), 25, width=1064, color=TEXT, serif=True, scaled=False),
             label(f'At {state.provinces[rival.pos].name} · {len(rival.army)} surviving troops', 12, width=1064), spacing=10)
         footer = label(self.message, 12, width=1064, color=GOLD) if self.message else None
@@ -107,8 +109,12 @@ class RivalScene(Screen):
             advice = (f'After its defeat, the first paid replacement waits {state.rules.replacement_delay} turns. '
                       'Intercept by entering its province, or defend its target. Wounds and casualties persist; '
                       'weakened troops return to Duskspire to pay for recovery. A battle can change its orders.')
-        operations = Column(label(f'{rival.gold} gold', 24, color=GOLD, serif=True, scaled=False),
-                            label(f'Income +{rival.income(state)} · Upkeep −{rival.upkeep} / turn'),
+        operations = Column(metric('gold', rival.gold, width=520, size=24, color=GOLD,
+                                   detail='The rival pays for recruits and healing from this treasury.'),
+                            Row(metric('income', f'+{rival.income(state)}', width=248, size=13 * scale,
+                                       color=MUTED, detail='Rival gold income per campaign turn, before upkeep.'),
+                                metric('upkeep', f'−{rival.upkeep}', width=248, size=13 * scale,
+                                       color=MUTED, detail='Gold paid for its surviving expedition each campaign turn.'), spacing=24),
                             label(f'Refits at Duskspire: {costs} gold. Healing costs 1 gold per health restored.', 11),
                             label(advice), spacing=16)
         if self.measure(operations)[1] > available:
@@ -119,7 +125,8 @@ class RivalScene(Screen):
             for troop in rival.army:
                 portrait, bar = Component(width=56, height=56), Component(width=452, height=4)
                 details = Row(label(UNITS[troop.kind].name, 16, width=274, color=TEXT, serif=True),
-                              label(f'{troop.hp}/{troop.max_hp} health', 11, width=166), spacing=12)
+                              metric('health', f'{troop.hp}/{troop.max_hp}', width=166, size=11 * scale,
+                                     color=MUTED, detail=f'{UNITS[troop.kind].name} #{troop.id} in the rival expedition.'), spacing=12)
                 row = Row(portrait, Column(details, bar, spacing=6), spacing=12)
                 rows.append(row)
                 self._troop_art.append((portrait, bar, troop))

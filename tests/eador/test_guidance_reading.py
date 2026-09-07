@@ -52,9 +52,14 @@ def test_guide_shares_reading_preview_cancel_apply_and_restart(tmp_path):
 
 def test_saved_reading_size_keeps_paid_briefing_choice_cost_and_geometry_reviewable(tmp_path):
     """The old one-key 125% file enlarges all briefing facts; reading never spends its advertised fee."""
+    from saga2d import Button
+    from eador.content import RELICS
     from eador.encounter_scene import EncounterScene
+    from eador.model import UNITS
     from eador.scene import BattleScene
+    from eador.ui import icon_path
     from tools.eador_observatory_campaign import prepare_observatory
+    from tools.verify_eador_shard_reading import check_metric
 
     path = tmp_path / 'settings.json'
     previous = b'{"codex_text_scale": 125}'
@@ -72,6 +77,21 @@ def test_saved_reading_size_keeps_paid_briefing_choice_cost_and_geometry_reviewa
         assert {record['font_size'] for record in game.backend.texts
                 if record['text'].startswith('Hold the marked hex')} == {15}
         check_reading_layout(game.scene)
+        province = state.provinces[state.hero.pos]
+        for name, value, meaning in (
+                ('actions', 1, 'Campaign actions'), ('actions', actions, 'Campaign actions'),
+                ('gold', gold, 'Gold'), ('crystals', crystals, 'Crystals'),
+                ('gold', province.site_gold + approach.bonus_gold, 'Gold'),
+                ('crystals', province.site_crystals, 'Crystals'),
+                ('health', f'{sum(province.site_guard_hp)}/{sum(UNITS[kind].hp for kind in province.site_guards)}', 'Health')):
+            check_metric(game.scene, name, value, meaning)
+        texts = [item.text for item in game.scene.ui.walk() if isinstance(item, Label)]
+        assert all(text in texts for text in (
+            province.name, 'Entry', 'Available', 'REWARDS ON SUCCESS',
+            RELICS[province.site_relic].name, 'Defender wounds persist.'))
+        for title, name in (('Text size', 'text_size'), ('Codex', 'codex')):
+            control = game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == title)
+            assert control.icon == icon_path(name) and not control.show_text
         for key in ('t', 'left', 'escape'):
             player.press(key)
         assert game.scene.approach == approach and state.to_json() == saved

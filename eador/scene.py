@@ -755,8 +755,7 @@ class CatalogScene(Screen):
         spec = BUILDINGS[name] if self.kind == 'build' else UNITS[name]
         if self.kind == 'build':
             return spec.description
-        facts = f'{spec.hp} HP · {spec.attack} attack · range {spec.attack_range} · upkeep {spec.upkeep} gold/turn.'
-        role = {
+        return {
             'pikeman': 'G: Brace strikes first against melee.',
             'healer': 'Heal uses its order and shared mana.',
             'ranger': 'Shoot before moving to retain movement.',
@@ -766,7 +765,6 @@ class CatalogScene(Screen):
             'adept': 'R: one Repulse per battle; Guard anchors.',
             'skyrider': 'Fly over bodies and rough ground; land on empty hexes.',
         }.get(name, '')
-        return facts + (' ' + role if role else '')
 
     def refresh(self):
         from saga2d import Column, Label, Row
@@ -784,7 +782,11 @@ class CatalogScene(Screen):
             return Label(text, width=width, wrap=True, font='Georgia' if serif else 'Verdana',
                          font_size=round(size * scale), text_color=color)
 
-        resources = label(f'{s.gold} gold · {s.crystals} crystals · {len(s.hero.army)}/{s.hero.max_army} troops')
+        resources = Row(metric('gold', s.gold, width=180, size=12 * scale, color=GOLD,
+                               detail='Available to spend.'),
+                        metric('crystals', s.crystals, width=180, size=12 * scale, color=TEAL,
+                               detail='Available to spend.'),
+                        label(f'{len(s.hero.army)}/{s.hero.max_army} troops', width=608), spacing=12)
         blocks, reasons, prices = {}, {}, {}
         for name in self.items:
             spec = BUILDINGS[name] if self.kind == 'build' else UNITS[name]
@@ -793,10 +795,25 @@ class CatalogScene(Screen):
             cost = spec.cost if self.kind == 'build' else s.recruit_cost(name)
             crystals = spec.crystals if self.kind == 'build' else s.recruit_crystal_cost(name)
             prices[name] = f'{cost} gold' + (f' + {crystals} crystal' + ('s' if crystals != 1 else '') if crystals else '')
-            blocks[name] = Column(label(spec.name, 19, width=736, color=TEXT, serif=True),
-                                  label(self._description(name), width=736),
-                                  label(prices[name] + (' · ' + reason if reason else ''), 11, width=736,
-                                        color=MUTED if built else RED if reason else GOLD), spacing=6)
+            content = [label(spec.name, 19, width=884, color=TEXT, serif=True)]
+            if self.kind == 'recruit':
+                content.append(Row(*(metric(stat, value, width=152, size=12 * scale,
+                                            detail=f'{spec.name}: {meaning}.')
+                                     for stat, value, meaning in (
+                                         ('health', spec.hp, 'maximum health'),
+                                         ('attack', spec.attack, 'base attack'),
+                                         ('range', spec.attack_range, 'attack range in hexes'),
+                                         ('upkeep', spec.upkeep, 'gold paid each campaign turn'))), width=884, spacing=12))
+            if description := self._description(name):
+                content.append(label(description, width=884))
+            content.append(Row(label('Cost', 11, width=64),
+                               metric('gold', cost, width=152, size=11 * scale, color=GOLD,
+                                      detail=f'Purchase price for {spec.name}.'),
+                               metric('crystals', crystals, width=152, size=11 * scale, color=TEAL,
+                                      detail=f'Purchase price for {spec.name}.'), width=884, spacing=12))
+            if reason:
+                content.append(label(reason, 11, width=884, color=MUTED if built else RED))
+            blocks[name] = Column(*content, spacing=6)
         policy = ('Buildings are permanent; build even while your hero is away.' if self.kind == 'build'
                   else 'Recruit in a province you control.')
         if self.outgoing_id is not None:
@@ -817,9 +834,14 @@ class CatalogScene(Screen):
         self.ui.add(Column(resources, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 24), round(self.y + 99))))
         rows = []
         for index, name in enumerate(self.visible_items):
+            spec = BUILDINGS[name] if self.kind == 'build' else UNITS[name]
             built = self.kind == 'build' and name in s.buildings
             control = Button('Review' if self.outgoing_id is not None else 'Built' if built else prices[name], on_click=lambda name=name: self.purchase(name),
-                             shortcut=str(index + 1), enabled=self.outgoing_id is not None or not reasons[name], width=228, height=40)
+                             icon=icon_path(self.kind), show_text=False, icon_size=26,
+                             tooltip=('Review replacement' if self.outgoing_id is not None else
+                                      'Build' if self.kind == 'build' else 'Recruit') +
+                                     f' {spec.name}: {prices[name]}. ' + reasons[name],
+                             shortcut=str(index + 1), enabled=self.outgoing_id is not None or not reasons[name], width=80, height=40)
             rows.append(Row(blocks[name], control, spacing=28))
         self.ui.add(Column(*rows, spacing=18, anchor=Anchor.TOP_LEFT,
                            margin=(round(self.x + 24), round(self.y + body_y))))
@@ -908,7 +930,7 @@ class HelpScene(Screen):
         if content.get_preferred_size()[1] > 464:
             raise ValueError(f"Field Guide does not fit at {scale:.0%}")
         self.button("Return to game", self.x + 28, self.y + 634, 260, self.game.pop, shortcut="Esc", primary=True)
-        self.button("Codex", self.x + 402, self.y + 634, 200, self.root.codex, shortcut="C")
+        self.icon_button('codex', 'Codex', self.x + 402, self.y + 634, self.root.codex, shortcut='C')
         self.button("Leave co-op" if getattr(self.root, "live_match", False) else "Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
         self.icon_button('settings', 'Settings', self.x + 932, self.y + 26, self.open_settings, shortcut='O')
         self.button('About this build', self.x + 602, self.y + 26, 244, self.about, shortcut='A')
@@ -1911,10 +1933,11 @@ class ChoiceScene(Screen):
         self.ui.clear()
         self.ui.add(Column(content, anchor=Anchor.TOP_LEFT, margin=(round(self.x + 28), round(self.y + 48))))
         bottom = self.y + self.panel_height - 68
-        self.button('Hero & relics', self.x + 28, bottom, 200, self.hero_details, hotkey='H')
-        self.button('Codex', self.x + 248, bottom, 170, self.root.codex, shortcut='C')
+        self.icon_button('hero', 'Hero & relics', self.x + 28, bottom, self.hero_details, hotkey='H')
+        self.icon_button('codex', 'Codex', self.x + 120, bottom, self.root.codex, shortcut='C')
         self.icon_button('text_size', 'Text size', self.x + 558, bottom, self.open_text_settings, shortcut='T')
-        self.button('Saves', self.x + 892, bottom, 200, self.browse_saves, hotkey='F6')
+        self.icon_button('save', 'Saves', self.x + 1012, bottom, self.browse_saves, hotkey='F6',
+                         tooltip='Save slots (F6). Review, save or load this shard.')
         if self._applied:
             self.button('Return', self.x + 658, bottom, 214, self.game.pop, shortcut=('Enter', 'Esc'))
 
@@ -2034,10 +2057,15 @@ class HeroScene(Screen):
                      f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.",
                      11, width=896, color=RED if recovery.blocked_reason else MUTED)
         quote = s.infusion_preview()
-        infusion = Row(Column(label(f"Tower infusion · +{quote.mana} mana", 14, width=818, color=TEAL),
-                              label(f"{quote.crystals} crystals · {quote.actions} hero action · "
-                                    f"available: {s.crystals} crystal{'s' if s.crystals != 1 else ''}, {s.actions_left} "
-                                    f"hero action{'s' if s.actions_left != 1 else ''}", 11, width=818),
+        infusion = Row(Column(Row(label('Tower infusion', 14, width=260, color=TEAL),
+                                  metric('mana', f'+{quote.mana}', width=180, size=14 * scale, color=TEAL,
+                                         detail='Mana restored by this infusion.'), width=818, spacing=12),
+                              Row(label('Cost', 11, width=68),
+                                  metric('crystals', quote.crystals, width=112, size=11 * scale, detail='Infusion cost.'),
+                                  metric('actions', quote.actions, width=112, size=11 * scale, detail='Infusion cost.'),
+                                  label('Available', 11, width=108),
+                                  metric('crystals', s.crystals, width=124, size=11 * scale, detail='Available before infusion.'),
+                                  metric('actions', s.actions_left, width=124, size=11 * scale, detail='Available before infusion.'), width=818, spacing=12),
                               label(quote.blocked_reason or "Recover mana now; time and the rival advance only when you end the turn.",
                                     11, width=818, color=RED if quote.blocked_reason else MUTED), spacing=4),
                        Button("Infuse mana", width=222, height=40, shortcut="I", on_click=self.infuse,
@@ -2065,10 +2093,11 @@ class HeroScene(Screen):
                                "Find relics in adventure sites. Change equipment between battles.")
         previous = Button("Previous", width=150, height=40, on_click=self.previous_page)
         following = Button("Next", width=130, height=40, on_click=self.next_page)
-        page_label = label("", width=196)
+        page_label = label("", width=336)
         footer = Column(label(hint, 10, color=GOLD if self.message else MUTED),
                         Row(previous, following, page_label,
-                            Button("Codex", width=220, height=40, shortcut="C", on_click=self.root.codex),
+                            Button("Codex", icon=icon_path('codex'), show_text=False, icon_size=26,
+                                   width=80, height=40, shortcut="C", on_click=self.root.codex),
                             Button("Close", width=272, height=40, shortcut="Esc", on_click=self.game.pop), spacing=24), spacing=10)
         blocks = [Column(label(RELICS[relic].name, 17, width=742,
                                color=TEAL if hero.relic == relic else TEXT),
@@ -2186,7 +2215,7 @@ class ResultScene(Screen):
         self.game.push(SaveScene(self.root))
 
     def refresh(self):
-        from saga2d import Column, Label, Row
+        from saga2d import Column, Component, Label, Row
         from eador.preferences import reading_scale
 
         super().refresh()
@@ -2225,8 +2254,12 @@ class ResultScene(Screen):
             label(title, 34, color=GOLD, serif=True, scaled=False),
             label(detail, 13, color=TEXT),
             label(self.message or subtitle, 12, color=GOLD if self.message else MUTED),
-            Row(Button("Saves", width=220, height=40, hotkey="F6", on_click=self.browse_saves),
-                Button("Codex", width=220, height=40, shortcut="C", on_click=self.root.codex),
+            Row(Button("Saves", icon=icon_path('save'), show_text=False, icon_size=26,
+                       width=80, height=40, hotkey="F6", on_click=self.browse_saves,
+                       tooltip='Save slots (F6). Review, save or load this shard.'),
+                Button("Codex", icon=icon_path('codex'), show_text=False, icon_size=26,
+                       width=80, height=40, shortcut="C", on_click=self.root.codex),
+                Component(width=256, height=40),
                 Button("Return to shard" if self.is_battle else "New shard", width=256, height=40,
                        hotkey="E", on_click=self.continue_game, style=PRIMARY), spacing=24), spacing=20)
         self.ui.add(content)

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 os.environ.setdefault('SAGA2D_SILENT', '1')
 
-from saga2d import Label
+from saga2d import Image, Label, Row
 from eador.app import create_game
 from eador.difficulty import DIFFICULTIES
 from eador.model import State, UNITS
@@ -22,6 +22,7 @@ from eador.preferences import reading_scale
 from eador.rival import RECRUIT_COSTS
 from eador.rival_scene import RivalScene, rival_order
 from eador.scene import ShardScene
+from eador.ui import icon_path
 from tools.eador_campaign import finish_battle
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
@@ -103,14 +104,17 @@ def prepared_rivals():
 
 def check_rival(scene):
     """The view shows exact saved orders, current resources, force health and applicable counterplay."""
+    from tools.verify_eador_shard_reading import check_metric
+
     assert isinstance(scene, RivalScene)
     count = check_reading_layout(scene)
     state, rival = scene.root.state, scene.root.state.rival
     texts = [item.text for item in scene.ui.find_all(lambda item: isinstance(item, Label))]
     assert rival_order(state) in texts
     assert f'At {state.provinces[rival.pos].name} · {len(rival.army)} surviving troops' in texts
-    assert f'{rival.gold} gold' in texts
-    assert f'Income +{rival.income(state)} · Upkeep −{rival.upkeep} / turn' in texts
+    check_metric(scene, 'gold', rival.gold, 'Gold')
+    check_metric(scene, 'income', f'+{rival.income(state)}', 'Income')
+    check_metric(scene, 'upkeep', f'−{rival.upkeep}', 'Upkeep')
     assert any(state.rules.title.upper() in text for text in texts)
     for kind, cost in RECRUIT_COSTS.items():
         assert any(f'{UNITS[kind].name} {cost}' in text for text in texts)
@@ -121,9 +125,18 @@ def check_rival(scene):
     else:
         assert any(f'first paid replacement waits {state.rules.replacement_delay} turns' in text for text in texts)
     visible = [troop for troop in rival.army if troop.id in scene.visible_troops]
-    counts = Counter(texts)
-    for text, expected in Counter(f'{troop.hp}/{troop.max_hp} health' for troop in visible).items():
-        assert counts[text] == expected
+    health_rows = [row for row in scene.ui.walk() if isinstance(row, Row) and row.visible
+                   and any(isinstance(child, Image) and child.visible and child.image == icon_path('health')
+                           for child in row.children)]
+    counts = Counter(child.text for row in health_rows for child in row.children
+                     if isinstance(child, Label) and child.visible)
+    assert counts == Counter(f'{troop.hp}/{troop.max_hp}' for troop in visible)
+    for troop in visible:
+        value = f'{troop.hp}/{troop.max_hp}'
+        check_metric(scene, 'health', value, 'Health')
+        assert any(f'{UNITS[troop.kind].name} #{troop.id}' in (row.tooltip or '')
+                   and any(isinstance(child, Label) and child.visible and child.text == value
+                           for child in row.children) for row in health_rows)
     if not rival.army:
         assert 'Its expedition is broken.' in texts
         assert any("the capital's garrison is a separate force" in text for text in texts)

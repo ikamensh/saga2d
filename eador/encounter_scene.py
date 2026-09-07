@@ -10,6 +10,7 @@ from eador.model import UNITS
 from eador.preferences import reading_scale
 from eador.scene import Screen
 from eador.style import GOLD, MUTED, PRIMARY, RED, TEAL, TEXT
+from eador.ui import icon_path, metric
 
 
 class EncounterScene(Screen):
@@ -70,11 +71,21 @@ class EncounterScene(Screen):
             return Label(text, width=width, wrap=True, font="Georgia" if serif else "Verdana",
                          font_size=round(size * scale) if scaled else size, text_color=color)
 
-        title = Column(label("BEFORE THE EXPEDITION", 10, width=836, color=GOLD, scaled=False),
-                       label(definition.name, 32, width=836, color=TEXT, serif=True, scaled=False), spacing=6)
-        heading = Column(Row(title, Button("Text size", width=186, height=40, shortcut="T", on_click=self.open_text_settings),
-                             spacing=42),
-                         label(f"{p.name} · 1 hero action ({state.actions_left} left) · {state.gold} gold · {state.crystals} crystals"), spacing=6)
+        title = Column(label("BEFORE THE EXPEDITION", 10, width=960, color=GOLD, scaled=False),
+                       label(definition.name, 32, width=960, color=TEXT, serif=True, scaled=False), spacing=6)
+        resources = Row(label(p.name, width=294), label('Entry', width=76),
+                        metric('actions', 1, width=80, size=12 * scale, color=GOLD,
+                               detail='Entering spends one campaign action, plus any fee described by the selected approach.'),
+                        label('Available', width=90),
+                        metric('actions', state.actions_left, width=100, size=12 * scale,
+                               color=MUTED, detail='Campaign actions remaining before entry.'),
+                        metric('gold', state.gold, width=160, size=12 * scale, color=GOLD,
+                               detail='Available before paying the selected approach.'),
+                        metric('crystals', state.crystals, width=168, size=12 * scale, color=TEAL,
+                               detail='Available before paying the selected approach.'), spacing=16)
+        heading = Column(Row(title, Button("Text size", icon=icon_path('text_size'), show_text=False, icon_size=26,
+                                          width=80, height=40, shortcut="T", on_click=self.open_text_settings),
+                             spacing=24), resources, spacing=6)
         top = [heading]
         if self.approaches:
             width = (1064 - 20 * (len(self.approaches) - 1)) // len(self.approaches)
@@ -99,12 +110,15 @@ class EncounterScene(Screen):
                          label(legend, 10, width=right_width), spacing=8)
 
         bonus = self.approach.bonus_gold if self.approach else 0
-        reward = (f"{p.site_gold + bonus} gold · {p.site_crystals} crystal{'s' if p.site_crystals != 1 else ''}" if self.kind == "site" else
-                  "Liberate Duskspire and complete the three-shard campaign.")
-        if self.kind == "site" and p.site_relic:
-            reward += f" · {RELICS[p.site_relic].name}"
-        rewards = Column(label("REWARDS ON SUCCESS", 10, width=left_width, color=GOLD),
-                         label(reward, width=left_width, color=TEXT), spacing=6)
+        rewards = Column(label("REWARDS ON SUCCESS", 10, width=left_width, color=GOLD), spacing=6)
+        if self.kind == 'site':
+            rewards.add(Row(metric('gold', p.site_gold + bonus, width=160, size=12 * scale,
+                                   color=GOLD, detail='Reward after this expedition succeeds, including the selected approach bonus.'),
+                            metric('crystals', p.site_crystals, width=140, size=12 * scale,
+                                   color=TEAL, detail='Reward after this expedition succeeds.'),
+                            *([label(RELICS[p.site_relic].name, width=316, color=TEXT)] if p.site_relic else []), spacing=12))
+        else:
+            rewards.add(label('Liberate Duskspire and complete the three-shard campaign.', width=left_width, color=TEXT))
         counts = [f"{UNITS[kind].name} ×{count}" for kind, count in Counter(self.guards).items()]
         defenders = Column(spacing=4)
         if len(counts) > 3:
@@ -119,7 +133,9 @@ class EncounterScene(Screen):
         if self.kind == 'site':
             health = p.site_guard_hp
             total = sum(UNITS[kind].hp for kind in self.guards)
-            defenders.add(label(f'Defenders: {sum(health)}/{total} HP; wounds persist.', 10, width=right_width))
+            defenders.add(Row(metric('health', f'{sum(health)}/{total}', width=160, size=10 * scale,
+                                     color=RED, detail='Combined current and maximum health of the surviving defenders.'),
+                              label('Defender wounds persist.', 10, width=220), spacing=12))
 
         # Measure the paired columns while attached, then align their tops. This
         # keeps the real deployment at its original hex size while text reflows.
@@ -130,8 +146,9 @@ class EncounterScene(Screen):
             height = max(column.get_preferred_size()[1] for column in pair)
             rows.append(Row(*(Column(column, height=height) for column in pair), spacing=32))
         buttons = Row(Button("Return to shard", width=210, height=40, shortcut="Esc", on_click=self.game.pop),
-                      Button("Codex", width=140, height=40, shortcut="C", on_click=self.root.codex),
-                      Component(width=366, height=40),
+                      Button("Codex", icon=icon_path('codex'), show_text=False, icon_size=26,
+                             width=80, height=40, shortcut="C", on_click=self.root.codex),
+                      Component(width=426, height=40),
                       Button("Enter expedition" if self.kind == "site" else "Assault Duskspire",
                              width=276, height=40, shortcut="Enter", on_click=self.enter, style=PRIMARY,
                              enabled=self.entry_blocked_reason is None), spacing=24)

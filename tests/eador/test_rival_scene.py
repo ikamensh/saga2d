@@ -5,6 +5,7 @@ from pathlib import Path
 from eador.app import create_game
 from eador.model import State
 from eador.scene import ShardScene
+from tools.verify_eador_rival_reading import check_rival
 
 
 def press(game, key):
@@ -34,9 +35,7 @@ def test_rival_orders_show_current_forces_and_locate_them_without_advancing_play
         visible = rendered_text(game)
         assert state.provinces[state.rival.pos].name in visible
         assert state.provinces[state.rival.target].name in visible
-        assert f"{state.rival.gold} gold" in visible
-        for troop in state.rival.army:
-            assert f"{troop.hp}/{troop.max_hp} health" in visible
+        check_rival(game.scene)
         press(game, "e")
         assert state.to_json() == before
         press(game, "l")
@@ -106,9 +105,7 @@ def test_rival_reading_size_cancel_apply_and_restart_preserve_saved_forces(tmp_p
         check_reading_layout(game.scene)
         texts = [label.text for label in game.scene.ui.find_all(lambda item: isinstance(item, Label))]
         assert any(state.provinces[state.rival.target].name in text for text in texts)
-        assert any(f'{state.rival.gold} gold' in text for text in texts)
-        for troop in state.rival.army:
-            assert f'{troop.hp}/{troop.max_hp} health' in texts
+        check_rival(game.scene)
         player.press('e')
         assert state.to_json() == before
         player.button('Locate expedition')

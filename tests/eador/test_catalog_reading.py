@@ -9,6 +9,47 @@ from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 
 
+def test_catalog_symbols_preserve_exact_stats_prices_and_purchase(tmp_path):
+    """Compact rows expose the real offer and its blocker; clicking its icon buys that offer once."""
+    from saga2d import Image, Label, Row
+    from eador.model import UNITS
+    from eador.ui import icon_path
+
+    state = State.new(7)
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(ShardScene(state))
+        player = PlayerInput(game)
+        player.press('r')
+        rows = [item for item in game.scene.ui.walk() if isinstance(item, Row) and item.tooltip]
+        values = {(next(child.image for child in row.children if isinstance(child, Image)),
+                   next(child.text for child in row.children if isinstance(child, Label)), row.tooltip)
+                  for row in rows}
+        for name in game.scene.visible_items:
+            spec = UNITS[name]
+            for icon, amount in (('health', spec.hp), ('attack', spec.attack),
+                                 ('range', spec.attack_range), ('upkeep', spec.upkeep),
+                                 ('gold', state.recruit_cost(name)), ('crystals', state.recruit_crystal_cost(name))):
+                assert any(path == icon_path(icon) and value == str(amount) and spec.name in tip
+                           for path, value, tip in values)
+        buttons = [item for item in game.scene.ui.walk() if isinstance(item, Button) and item.icon == icon_path('recruit')]
+        assert len(buttons) == len(game.scene.visible_items)
+        assert all(not item.show_text and item.tooltip for item in buttons)
+        blocked = next(item for item in buttons if not item.enabled)
+        assert 'Requires' in blocked.tooltip
+        expected = State.from_json(state.to_json())
+        expected.recruit(game.scene.visible_items[0])
+        item = buttons[0]
+        x, y, width, height = item.bounds
+        player.click(x + width / 2, y + height / 2)
+        assert state.to_json() == expected.to_json()
+        check_reading_layout(game.scene)
+        player.press('escape')
+        player.reload(expected.to_json())
+    finally:
+        game.close()
+
+
 def test_catalog_reading_preview_purchase_and_restart(tmp_path):
     """Settings reflows complete rows; disabled repeat purchases do not spend or checkpoint again."""
     state = State.new(7)
