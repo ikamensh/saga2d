@@ -1000,7 +1000,8 @@ class BattleScene(Screen):
 
         allies = sum(u.hp > 0 and u.team == 'player' for u in b.units)
         enemies = sum(u.hp > 0 and u.team != 'player' for u in b.units)
-        sections = [label(f'{allies} allies · {enemies} foes · Tab selects')]
+        foe_label = 'foe' if enemies == 1 else 'foes'
+        sections = [label(f'{allies} allies · {enemies} {foe_label} · Tab selects')]
         if selected:
             name = self.root.state.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name
             status = ('Guard +2' if selected.stance == 'guard' else 'Braced' if selected.stance == 'brace' else
@@ -1101,7 +1102,13 @@ class BattleScene(Screen):
 
     @property
     def order_guidance(self):
-        return self.message or ('Click a target for ' + self.targeting if self.targeting else self.order_hint())
+        if self.message:
+            return self.message
+        if self.targeting:
+            return 'Click a target for ' + self.targeting
+        if self.accepts_orders and self.battle.evacuation_blocked_reason is None:
+            return 'Ready: V evacuates your hero and surviving army.'
+        return self.order_hint()
 
     def read_log(self):
         from eador.diagnostics import DiagnosticScene

@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_one_remaining_defender_has_a_singular_header _______________
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-1832/test_one_remaining_defender_ha0')
+
+    def test_one_remaining_defender_has_a_singular_header(tmp_path):
+        """The earned Shrine's lone surviving Brigand is reported as one foe."""
+        game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+        player = PlayerInput(game)
+        try:
+            state = earned_commands()[12]['after']
+            game.push(ShardScene(State.from_json(state)))
+            player.press('tab')
+>           assert '5 allies · 1 foe · Tab selects' in [text['text'] for text in game.backend.texts]
+E           AssertionError: assert '5 allies · 1 foe · Tab selects' in ['BATTLE FOR WESTWATCH', 'SITE   /   ROUND 2', 'COMMAND', '36', '20', '24', ...]
+
+tests/eador/test_escape_guidance.py:63: AssertionError
+=========================== short test summary info ============================
+FAILED tests/eador/test_escape_guidance.py::test_one_remaining_defender_has_a_singular_header
+1 failed in 0.07s

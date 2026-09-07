@@ -1,0 +1,35 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_ready_evacuation_takes_priority_over_the_spent_wardens_default_hint ___
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-1830/test_ready_evacuation_takes_pr0')
+
+    def test_ready_evacuation_takes_priority_over_the_spent_wardens_default_hint(tmp_path):
+        """A legal Swap keeps Warden spent, advertises V, and escapes exactly after save/load."""
+        commands = earned_commands()
+        swap = commands[102]
+        game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+        player = PlayerInput(game)
+        try:
+            game.push(ShardScene(State.from_json(swap['before'])))
+            for key in ('f2', 'right', 'return'):
+                player.press(key)
+            player.order(swap['command'], *swap['args'], **swap['kwargs'])
+            assert player.state.to_json() == swap['after']
+            scene = game.scene
+            assert type(scene) is BattleScene and scene.selected == 4
+            assert scene.battle.unit(4).acted and not scene.battle.unit(0).acted
+            assert scene.battle.evacuation_blocked_reason is None
+            shown = [text['text'] for text in game.backend.texts]
+            assert 'Spent' in shown
+            swap_control = scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Swap ally')
+            assert not swap_control.enabled and 'unspent unit action' in swap_control.tooltip
+            footer = ' '.join(text['text'] for text in game.backend.texts if text['y'] >= scene.footer_top + 40)
+>           assert 'V evacuates your hero and surviving army' in footer, footer
+E           AssertionError: Swap ally needs an unspent unit action. End the round to regain an order. End battle round E
+E           assert 'V evacuates your hero and surviving army' in 'Swap ally needs an unspent unit action. End the round to regain an order. End battle round E'
+
+tests/eador/test_escape_guidance.py:45: AssertionError
+=========================== short test summary info ============================
+FAILED tests/eador/test_escape_guidance.py::test_ready_evacuation_takes_priority_over_the_spent_wardens_default_hint
+1 failed in 0.16s
