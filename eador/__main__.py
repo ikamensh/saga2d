@@ -32,10 +32,11 @@ def create_session(argv=None, **game_options):
         game_options['save_dir'] = args.data_dir.expanduser().resolve() / 'saves'
     game = create_game(**game_options)
     from eador.multiplayer import ShardboundMatch, NetworkShardScene
+    options = {'seed': args.seed if args.seed is not None else 7, 'hero': args.hero,
+               'theme': args.theme or 'frontier', 'difficulty': args.difficulty, 'campaign': args.campaign}
     lobby = match_from_arguments(args, parser, title="Shardbound co-op", game_id="shardbound-v1",
-                                 create_match=lambda: ShardboundMatch(args.seed if args.seed is not None else 7, args.hero,
-                                     theme=args.theme or "frontier", difficulty=args.difficulty, campaign=args.campaign),
-                                 create_scene=NetworkShardScene)
+                                 create_match=lambda: ShardboundMatch(**options), create_scene=NetworkShardScene,
+                                 create_options=lambda: options, game=game)
     if lobby is not None:
         return game, lobby
     if args.campaign:

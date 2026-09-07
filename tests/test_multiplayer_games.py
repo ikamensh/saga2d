@@ -198,6 +198,13 @@ def test_title_opens_a_usable_host_join_form(name, tmp_path):
         game.backend.inject_key('m')
         game.tick(1/30)
         assert isinstance(game.scene, MatchMenu)
+        assert game.scene.mode == 'online'
+        lan = next(button for button in game.scene.ui.walk()
+                   if getattr(button, 'text', None) == 'LAN')
+        x, y, w, h = lan.bounds
+        game.backend.inject_click(x + w / 2, y + h / 2)
+        game.tick(1/30)
+        assert game.scene.mode == 'lan'
         for key in ['1','9','2','period','1','6','8','period','1','period','9']:
             game.backend.inject_key(key)
             game.tick(1/30)

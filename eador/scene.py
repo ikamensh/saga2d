@@ -269,7 +269,10 @@ class TitleScene(Screen):
         from eador.multiplayer import ShardboundMatch, NetworkShardScene
         self.game.push(MatchMenu("Shardbound co-op", "shardbound-v1",
                                 lambda: ShardboundMatch(self.seed, self.hero_class, theme=self.world_theme,
-                                                       difficulty=self.difficulty, campaign=True), NetworkShardScene))
+                                                       difficulty=self.difficulty, campaign=True), NetworkShardScene,
+                                create_options=lambda: {'seed': self.seed, 'hero': self.hero_class,
+                                                        'theme': self.world_theme, 'difficulty': self.difficulty,
+                                                        'campaign': True}))
 
     def start_campaign(self):
         self.enter_state(State.new_campaign(self.seed, self.hero_class, difficulty=self.difficulty))

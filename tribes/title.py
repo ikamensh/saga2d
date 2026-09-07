@@ -99,7 +99,9 @@ class TitleScene(Scene):
     def multiplayer(self) -> None:
         from saga2d import MatchMenu
         from tribes.multiplayer import TribesMatch, NetworkMapScene
-        self.game.push(MatchMenu("Tribes multiplayer", "tribes-v1", TribesMatch, NetworkMapScene))
+        self.game.push(MatchMenu("Tribes multiplayer", "tribes-v1",
+                                lambda: TribesMatch(size=self.size), NetworkMapScene,
+                                create_options=lambda: {'seed': 7, 'size': self.size}))
 
     def new_game(self) -> None:
         self.sfx("button")

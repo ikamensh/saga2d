@@ -89,8 +89,11 @@ class NetworkMapScene(MapScene):
             self.say(self.session.error)
             self.session.error = ""
         if not self.session.ready:
-            self.say('Match paused — waiting for your partner.' if self.session.player == 0 else
-                     'Disconnected — return to the title and rejoin the host.')
+            if getattr(self.session, 'online', False):
+                self.say(self.session.error or 'Match paused — waiting for your partner to reconnect.')
+            else:
+                self.say('Match paused — waiting for your partner.' if self.session.player == 0 else
+                         'Disconnected — return to the title and rejoin the host.')
         if self._revision == self.session.revision:
             return
         self._revision = self.session.revision
@@ -163,10 +166,11 @@ class NetworkMapScene(MapScene):
         return self._submit_order('reward', city=city.id, reward=reward.value)
 
     def quick_save(self):
-        self.say('Multiplayer runs live on the host; offline saves are separate.')
+        self.say('This multiplayer match runs live; offline saves are separate.')
 
     def quick_load(self):
-        self.say('Rejoin the host to resume this multiplayer match.')
+        self.say('Use Multiplayer → Rejoin last room to resume online play.' if getattr(self.session, 'online', False)
+                 else 'Rejoin the host to resume this multiplayer match.')
 
     def open_tech(self):
         if self.session.ready and self.world.current == self.human:

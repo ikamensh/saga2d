@@ -34,8 +34,10 @@ def main() -> None:
     effects.apply_volumes(DEFAULT_SETTINGS)
     bank.start_music()
     from tribes.multiplayer import NetworkMapScene, TribesMatch
+    options = {'seed': args.seed if args.seed is not None else 7, 'size': args.size}
     lobby = match_from_arguments(args, parser, title="Tribes", game_id="tribes-v1",
-                                 create_match=lambda: TribesMatch(args.seed if args.seed is not None else 7, size=args.size), create_scene=NetworkMapScene)
+                                 create_match=lambda: TribesMatch(**options), create_scene=NetworkMapScene,
+                                 create_options=lambda: options, game=game)
     if lobby is not None:
         game.run(lobby)
         return

@@ -95,8 +95,11 @@ class NetworkShardScene(ShardScene):
         self.session.poll()
         notice = self.session.error
         if not self.session.ready:
-            notice = ('Match paused — waiting for your partner.' if self.session.player == 0 else
-                      'Disconnected — return to the title and rejoin the host.')
+            if getattr(self.session, 'online', False):
+                notice = notice or 'Match paused — waiting for your partner to reconnect.'
+            else:
+                notice = ('Match paused — waiting for your partner.' if self.session.player == 0 else
+                          'Disconnected — return to the title and rejoin the host.')
         elif notice:
             self.session.error = ''
         if notice and notice != self.game.scene.message:
@@ -127,13 +130,14 @@ class NetworkShardScene(ShardScene):
                                 revision=self.session.revision)
         except CommandError as exc:
             raise RuleError(str(exc)) from exc
-        raise OrderPending('Order sent to the host.')
+        raise OrderPending('Order sent.')
 
     def save_game(self):
-        self.message = 'Co-op runs live on the host; offline saves are separate.'
+        self.message = 'This co-op campaign runs live; offline saves are separate.'
 
     def load_game(self, slot=1, *, backup=False):
-        self.message = 'Rejoin the host to resume this co-op campaign.'
+        self.message = ('Use Multiplayer → Rejoin last room to resume online play.'
+                        if getattr(self.session, 'online', False) else 'Rejoin the host to resume this co-op campaign.')
         return False
 
     def browse_saves(self, mode="load"):
