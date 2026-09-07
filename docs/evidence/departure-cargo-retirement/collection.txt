@@ -1,0 +1,23 @@
+tests/tools/test_retained_prototype_budget.py::test_late_realm_paid_plan_yields_without_changing_its_economy
+tests/tools/test_retained_prototype_budget.py::test_veteran_recovery_preparation_and_waiting_each_yield_without_changing_results
+tests/tools/test_retained_prototype_budget.py::test_camp_service_and_actual_battle_yield_without_changing_paid_outcome
+
+3 tests collected in 0.01s
+        0.16 real         0.09 user         0.01 sys
+            44220416  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                2985  page reclaims
+                  56  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 488  voluntary context switches
+                  58  involuntary context switches
+          1043847908  instructions retired
+           439045397  cycles elapsed
+            28885544  peak memory footprint

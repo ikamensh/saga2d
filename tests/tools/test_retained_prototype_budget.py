@@ -59,28 +59,6 @@ def test_veteran_recovery_preparation_and_waiting_each_yield_without_changing_re
     assert actual_probe == expected_probe and len(actual_probe['events']) == 4
 
 
-def test_cargo_earned_preparation_and_one_paid_continuation_each_yield(clock):
-    """One departure choice keeps exact paid battles and funding independently of preparation pacing."""
-    from tools.prototype_eador_departure_cargo import earned_departures, run_case
-
-    expected = earned_departures(budget=CpuBudget(100))
-    assert not clock['sleeps']
-    actual = earned_departures()
-    assert clock['sleeps'], 'Earning departure saves must yield'
-    assert actual == expected
-    case = actual[0]['swords']
-    before = json.dumps(case, sort_keys=True)
-
-    clock['sleeps'].clear()
-    expected_run = run_case(case, 'chest', 'economy', budget=CpuBudget(100))
-    assert not clock['sleeps']
-    actual_run = run_case(case, 'chest', 'economy')
-    assert clock['sleeps'], 'The saved continuation must yield independently of preparation'
-    assert actual_run == expected_run and actual_run['fights']
-    assert actual_run['quote']['price'] > 0
-    assert json.dumps(case, sort_keys=True) == before
-
-
 def test_camp_service_and_actual_battle_yield_without_changing_paid_outcome(clock):
     """A retained paid camp keeps its service cost, battle and original save when yielding."""
     from tools.prototype_eador_camp_services import exercise

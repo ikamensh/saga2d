@@ -1,11 +1,17 @@
-# Departure cargo: measured proposal, no production rule
+# Departure cargo: historical proposal, no production rule
 
-The 100-gold chest creates a small linked-opening choice, but does not repair the
-remaining G07 economy problem. I would retain this prototype rather than implement
-cargo as the next economy fix. It can support a future departure-customization
-increment: an earlier broad army sometimes preserves a soldier, while carrying a
-specialist can finish sooner. The controls also show several unchanged outcomes
-and a strong influence from the existing arrival formation.
+This is the retained experiment from source **747b1bf**, not a current candidate
+feature or acceptance check. The live prototype and its dedicated budget test were
+removed after the current paid route lost the Adept required by its original
+comparison. The [retirement diagnosis](evidence/departure-cargo-retirement/README.md)
+records the actual survivors and explains why substituting a troop would change
+the experiment. Historical results and their source remain available unchanged.
+
+The measured 100-gold chest created a small linked-opening choice but did not
+repair G07. An earlier broad army sometimes preserved a soldier, while carrying a
+specialist could finish sooner. Several controls had unchanged outcomes, and the
+existing arrival formation materially affected the comparison. Cargo was deferred
+as a possible departure-customization idea; it was never a production rule.
 
 This follows the rejected [veteran wages](eador-veteran-upkeep-proposal.md) and
 [remittance/outposts](eador-late-realm-proposal.md). No production command, schema,
@@ -129,17 +135,28 @@ or by assuming a player will leave their best specialist behind. A useful furthe
 acceptance target would be an actually chosen different paid objective approach,
 not another large unchanged-policy matrix.
 
-## Reproduction
+## Historical reproduction
 
-Source **747b1bf**, after merging main's Aerie/campaign-reading checkpoint. The
-[tool](../tools/prototype_eador_departure_cargo.py) retains 16 full continuations,
+Source **747b1bf238984431c132f7799e5c5db8ad467d67**, after merging main's
+Aerie/campaign-reading checkpoint. Its historical tool measured 16 full continuations,
 each repeated exactly; 202 battle continuations per pass are paired with an actual
 save/load and compared in full. All 31 recorded source hashes remain unchanged.
+The recorded tool SHA-256 is
+`97d2398630dac4f27052329cd96f606b372e978cedbe4f871bf01dc4f67778fb`.
+Reproduction requires an isolated checkout of that revision, not today's model:
 
 ```sh
-uv run python tools/prototype_eador_departure_cargo.py
+git worktree add --detach /tmp/shardbound-cargo-747b1bf 747b1bf238984431c132f7799e5c5db8ad467d67
+cd /tmp/shardbound-cargo-747b1bf
+uv run --extra dev python tools/prototype_eador_departure_cargo.py --report /tmp/shardbound-cargo-747b1bf.json
 uv run pytest tests/eador/test_difficulty.py -q
 ```
+
+This is an explicitly scheduled historical experiment, not an ordinary candidate
+test: the original tool predates its later CPU-budget change. The separate
+[CPU evidence](evidence/retained-prototype-cpu-83e01be/README.md) and its retained
+probe apply to their named historical revisions; that probe is no longer a live
+current-checkout command. Neither historical experiment was rerun for retirement.
 
 The complete [JSON evidence](evidence/departure-cargo-prototype.json) includes the
 earned inputs, quotes, exact arrivals/endings, individual purchases, real battles,
