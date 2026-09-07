@@ -66,12 +66,18 @@ Competitive snapshots still contain the full world for the existing game
 views, so a modified client can inspect information hidden by normal fog.
 Offline save files remain separate from multiplayer rooms.
 
+Server storage serializes complete authoritative state through the game
+catalog's `checkpoint_match`/`restore_match` pair. Network `snapshot(player)`
+is a separate interface, so future player-view filtering cannot erase private
+state from a saved room. This separation does not add fog filtering to the
+existing games or change their on-disk checkpoint formats.
+
 ## Development checks
 
 ```sh
 uv run python -m online_server --host 127.0.0.1 --port 8765
 SAGA2D_SERVER_URL=ws://127.0.0.1:8765 uv run python -m tribes
-uv run python -m pytest tests/test_online_server.py tests/test_online_client.py tests/test_online_menu.py -q
+uv run python -m pytest tests/test_online_server.py tests/test_online_checkpoints.py tests/test_online_client.py tests/test_online_menu.py -q
 SAGA2D_SILENT=1 uv run python tools/verify_online.py /tmp/saga2d-online
 ```
 

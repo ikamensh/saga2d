@@ -217,7 +217,7 @@ def test_malformed_json_is_a_connection_rejection(server_url, message):
 
 @pytest.mark.parametrize('game', ['tribes-v1', 'warband-v1', 'shardbound-v1'])
 def test_rooms_and_private_seats_survive_server_restart(tmp_path, game):
-    """All game snapshots restore from JSON and both clients recover the same private seats."""
+    """Trusted checkpoints restore private seats and a partly played battle after process loss."""
     with running_server('--state-dir', tmp_path) as (url, process):
         with connect(url, proxy=None) as host, connect(url, proxy=None) as guest:
             seat0 = handshake(host, game=game)
@@ -229,8 +229,14 @@ def test_rooms_and_private_seats_survive_server_restart(tmp_path, game):
                 command(host, {'action': 'end_turn'})
                 before = receive(guest)
             elif game == 'shardbound-v1':
+                from eador.model import State
                 command(host, {'action': 'build', 'target': 'state', 'args': ['barracks']})
+                receive(guest)
+                command(guest, {'action': 'explore', 'target': 'state', 'args': []})
+                receive(guest)
+                command(host, {'action': 'guard', 'target': 'battle', 'args': [0]})
                 before = receive(guest)
+                assert State.from_json(before['state']['campaign']).battle.unit(0).acted
             else:
                 before = receive(guest, predicate=lambda state: state['state']['world']['tick'] >= 4)
             if game != 'warband-v1':
@@ -254,6 +260,13 @@ def test_rooms_and_private_seats_survive_server_restart(tmp_path, game):
             else:
                 assert resumed['state'] == before['state']
                 assert resumed['revision'] > before['revision']
+                if game == 'shardbound-v1':
+                    expected = State.from_json(before['state']['campaign'])
+                    troop = next(unit for unit in expected.battle.units
+                                 if unit.team == 'player' and not unit.acted)
+                    expected.battle.guard(troop.id)
+                    command(guest, {'action': 'guard', 'target': 'battle', 'args': [troop.id]})
+                    assert receive(guest)['state']['campaign'] == expected.to_json()
 
 
 def test_expired_rooms_do_not_return_after_server_restart(tmp_path):

@@ -1,4 +1,6 @@
 """The dedicated server's game catalog; no game knowledge lives in the transport."""
+from copy import deepcopy
+
 from saga2d import CommandError
 
 GAME_IDS = ('tribes-v1', 'warband-v1', 'shardbound-v1')
@@ -49,6 +51,18 @@ def create_match(game, options):
                           theme=choice('theme', 'frontier', THEMES),
                           difficulty=choice('difficulty', 'standard', DIFFICULTIES),
                           campaign=campaign)
+
+
+def checkpoint_match(game, match):
+    """Serialize complete authority for private storage, independently of player views."""
+    if game == 'tribes-v1':
+        return {'seed': match.seed, 'world': deepcopy(match.world.to_dict())}
+    if game == 'warband-v1':
+        return {'seed': match.seed, 'world': deepcopy(match.world.to_dict()),
+                'events': deepcopy(match.events)}
+    if game == 'shardbound-v1':
+        return {'campaign': match.state.to_json()}
+    raise ValueError(f'Checkpoint belongs to an incompatible game version: {game}')
 
 
 def restore_match(game, snapshot):

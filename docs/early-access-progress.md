@@ -1135,3 +1135,17 @@ fixing the detached Range value visible at 125% reading size. The three
 icon-control tests pass. [Native evidence](evidence/inspected-stats/README.md)
 retains both inspected text sizes, hover/layout assertions and two exact
 UI reloads. No battle rules, framework interface or packaged build changed.
+
+## Trusted room checkpoints — 2026-09-07
+
+Room storage now uses an explicit full-state serializer in the server game
+catalog, separate from each player's network view. Existing JSON formats are
+unchanged. A filtered-view regression first reproduced loss of a paid campaign
+and active battle; the checkpoint implementation preserves both.
+
+Twenty-seven server/checkpoint tests pass in 3.66 seconds, including real
+WebSocket processes for all three games, private-seat recovery, expiry and
+restart. Shardbound's restart journey now kills the server after a real battle
+order, rejoins both private seats and continues with an exact next battle order.
+No public deployment occurred. Player-view filtering and independent-realm
+campaign PvP remain unimplemented.

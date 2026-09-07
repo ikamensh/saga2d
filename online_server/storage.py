@@ -4,6 +4,8 @@ from pathlib import Path
 import sqlite3
 import time
 
+from online_server.games import checkpoint_match
+
 
 class RoomStore:
     def __init__(self, directory):
@@ -39,7 +41,7 @@ class RoomStore:
         with self.db:
             self.db.execute('INSERT OR REPLACE INTO rooms VALUES (?, ?, ?, ?, ?, ?)',
                             (room.code, room.game, json.dumps(room.tokens),
-                             json.dumps(room.match.snapshot(0), separators=(',', ':'), allow_nan=False),
+                             json.dumps(checkpoint_match(room.game, room.match), separators=(',', ':'), allow_nan=False),
                              room.revision, time.time() + remaining))
 
     def keep_alive(self, codes, ttl):

@@ -56,11 +56,11 @@ screen; current co-op's whole-scene replacement on every peer update would
 interrupt local battle presentation and controls.
 
 Player snapshots must contain only their entitled information. Trusted server
-checkpoints must instead include both realms and active encounters. Current
-`RoomStore.save` persists `snapshot(0)`; replace that assumption with an explicit
-trusted checkpoint serializer at the server/game catalog seam when the new
-room model is integrated. Preserve private resume tokens and existing room
-expiry behavior. No public-server deployment is implied by source work.
+checkpoints must instead include both realms and active encounters.
+`RoomStore.save` now uses the catalog's explicit `checkpoint_match(game, match)`
+serializer, independently of player snapshots. Existing game formats, private
+resume tokens and room expiry behavior are preserved. The new room model must
+supply its own complete checkpoint representation when it is integrated. No public-server deployment is implied by source work.
 
 ## Acceptance criteria for the first playable increment
 
