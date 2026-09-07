@@ -138,6 +138,12 @@ and clocks, with no new timers or framework API. The
 [attack-motion preview](evidence/attack-motion/README.md) covers melee,
 retaliation, arrows, a final blow and reduced motion.
 
+The [contact-feedback pass](evidence/contact-feedback/README.md) moves damage
+labels above faces and delays attack losses until their own contact. Playback
+notices keep a short readability lifetime across events and natural completion;
+movement removes a recipient's old label. Covering a direct shot with Help or
+Saves pauses its pending impact sound, while loading discards the old scene.
+
 Asset builders default to the existing 25% CPU allowance. Nothing is
 generated while playing. The normal 60 FPS active / 15 FPS inactive cap remains;
 native verification uses 30 FPS and cooperative 25% CPU pacing. The audio

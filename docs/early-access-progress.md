@@ -1096,3 +1096,17 @@ Work stopped at the user's request to conserve credits. The
 [presentation handoff](presentation-handoff.md) records the boundary for a later
 session. The frozen **7b5562d** package predates these changes; human listening,
 playtests, Windows execution and all overall Early Access gates remain open.
+
+## Resumed contact feedback — 2026-09-07
+
+The user authorized continued improvements after checkpoint `c507745`.
+**1e15c1e** fixes lost impact sounds when Help or Saves covers a manual shot;
+20 manual-audio tests pass, including real cover/return and cover/load inputs.
+
+The [contact-feedback evidence](evidence/contact-feedback/README.md) adds
+correctly timed damage notices above the figures' faces, readable durations
+across playback events/completion, and recipient-aware cleanup after movement.
+Focused regressions and native 100%/125% movies pass; each native run records
+four exact reloads and verifies a paused arrow resumes with one impact sound.
+No rules or framework API changed. The packaged checkpoint, human assessment
+and overall release gates remain unchanged.

@@ -1,7 +1,7 @@
 """Small, deterministic drawing effects from an already-resolved battle event."""
 import math
 
-from eador.battle_audio import is_magic_attack, seal_progress_change
+from eador.battle_audio import direct_event_duration, is_magic_attack, seal_progress_change
 from eador.style import BLUE, GOLD, RED, TEAL, TEXT
 
 
@@ -11,9 +11,17 @@ _HITS = ('attack', 'pin', 'brace', 'retaliation', 'bolt')
 
 def trace_event(trace, elapsed):
     """Sample the direct-order clock for miniature poses and contact effects."""
-    duration = min(.65, 1.4 / len(trace.events))
+    duration = direct_event_duration(trace)
     index = int(elapsed / duration)
     return (trace.events[index], elapsed / duration - index) if index < len(trace.events) else (None, 0)
+
+
+def health_notices(trace, duration, started=0):
+    """Schedule recorded health changes at contact on the owning scene's clock."""
+    return [(started + (index + .5) * duration, unit.id, unit.pos,
+             unit.hp - event.before.unit(unit.id).hp)
+            for index, event in enumerate(trace.events)
+            for unit in event.after.units if unit.hp != event.before.unit(unit.id).hp]
 
 
 def attack_offset(event, unit, grid, fraction, *, still=False):

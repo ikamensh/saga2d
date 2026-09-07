@@ -6,6 +6,7 @@ from saga2d import Column, Label
 
 from eador.battle import Battle, SmokeCloud
 from eador.battle_audio import event_cues
+from eador.battle_effects import health_notices
 from eador.preferences import reading_scale, reduced_motion
 from eador.scene import BattleScene, Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
@@ -94,6 +95,7 @@ class BattlePlaybackScene(BattleScene):
         self.finish_contacts_on_skip = finish_contacts_on_skip
         self._contact_cursor = 0
         super().__init__(parent.root)
+        self.floats = health_notices(trace, self.playback.duration)
         self.selected = parent.selected
         self.message = parent.message
         self._shown = None
@@ -167,19 +169,15 @@ class BattlePlaybackScene(BattleScene):
         if self._shown is None or self._shown[0] != shown[0]:
             if release:
                 self.game.audio.play_sound(release)
-        self.floats = []
         if self.playback.applied:
             self._play_contacts(self.playback.index + 1)
-            for unit in event.after.units:
-                amount = unit.hp - event.before.unit(unit.id).hp
-                if amount:
-                    self.floats.append((self.clock, unit.pos, amount))
         self._shown = shown
         self.refresh()
 
     def update(self, dt):
         self.clock += dt
         self.playback.advance(dt)
+        self.update_notices()
         if self.playback.done:
             self._play_contacts(len(self.playback.trace.events))
             self.finish()
@@ -196,6 +194,12 @@ class BattlePlaybackScene(BattleScene):
             self.finished = True
             if self.finish_contacts_on_skip:
                 self._play_contacts(len(self.playback.trace.events))
+            if self.playback.done:
+                # Carry the remaining readability time onto the resumed battle clock.
+                self.parent.floats = [(self.parent.clock + started - self.clock, ident, pos, change)
+                                      for started, ident, pos, change in self.floats
+                                      if 0 <= self.clock - started < 1.6]
+                self.parent.update_notices()
             self.parent.message = self.message
             self.game.pop()
             self.parent.finish_phase()

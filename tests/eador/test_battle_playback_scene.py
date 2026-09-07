@@ -23,6 +23,7 @@ def test_previous_manual_damage_numbers_do_not_survive_a_resolved_enemy_phase(tm
         player.order('battle.attack', archer.id, target.id)
         damage_numbers = lambda: [item['text'] for item in game.backend.texts
                                   if item['text'].startswith(('+', '-')) and item['text'][1:].isdigit()]
+        game.tick(.4)  # Damage is announced at contact, before advancing the phase.
         assert damage_numbers()
         player.press('e'); player.press('space')
         assert not damage_numbers()
@@ -121,13 +122,13 @@ def test_shot_transients_leave_persistent_health_on_top(tmp_path):
         ring = [line for line in game.backend.lines if line['color'] == (*GOLD[:3], 180)]
         assert ring, 'The successful shot must retain its ground focus marker'
         assert all(line['order'] < plaque['order'] and line['order'] < hp['order'] for line in ring)
+        game.tick(.33)  # Damage labels arrive with the real contact, not at release.
         damage = next(text for text in game.backend.texts if text['text'].startswith('-') and text['text'][1:].isdigit())
         neighbor = next(unit for unit in state.battle.units if unit.team == 'enemy' and unit.kind == 'brigand')
         nx, ny = game.scene.grid.center(neighbor.pos)
         neighbor_hp = next(text for text in game.backend.texts if text['text'] == str(neighbor.hp)
                            and abs(text['x'] - nx) < .01 and abs(text['y'] - (ny + game.scene.grid.size * .23)) < .01)
         assert damage['order'] < neighbor_hp['order']
-        game.tick(.33)  # The real shot has reached its target; its impact ring is now visible.
         impact = [line for line in game.backend.lines
                   if line['color'][:3] == RED[:3] and line['color'][3] < 255]
         assert impact, 'The contact frame must retain a visible impact'
@@ -151,7 +152,8 @@ def test_shot_transients_leave_persistent_health_on_top(tmp_path):
             pill = next(bounds(shape) for shape in game.backend.polygons if shape['color'] == INK
                         and bounds(shape)[0] < damage['x'] < bounds(shape)[2]
                         and bounds(shape)[1] <= damage['y'] < bounds(shape)[3])
-            assert left <= pill[0] < pill[2] <= right and top <= pill[1] < pill[3] <= target_y
+            assert left <= pill[0] < pill[2] <= right and game.scene.objective_bottom < pill[1]
+            assert pill[3] <= target_y - game.scene.grid.size * .65, 'Leave faces visible below the damage label'
             assert pill[2] - pill[0] < (right - left) * .75
             assert pill[2] <= neighbor_box[0] or pill[0] >= neighbor_box[2] or pill[3] <= neighbor_box[1] or pill[1] >= neighbor_box[3]
         assert state.to_json() == resolved

@@ -4,6 +4,11 @@
 _CONTACTS = ('attack', 'pin', 'brace', 'retaliation')
 
 
+def direct_event_duration(trace):
+    """One direct-order clock for poses, sound contacts and health notices."""
+    return min(.65, 1.4 / len(trace.events))
+
+
 def is_magic_attack(actor, hero_class):
     """Classify the existing ranged staff/rune weapons for both sound and drawing."""
     return actor.attack_range > 1 and (actor.kind in ('adept', 'healer')
@@ -46,7 +51,7 @@ class AttackSounds:
 
     def __init__(self, battle, trace, hero_class):
         self.pending = []
-        duration = min(.65, 1.4 / len(trace.events))
+        duration = direct_event_duration(trace)
         for index, event in enumerate(trace.events):
             if event.kind not in _CONTACTS:
                 continue

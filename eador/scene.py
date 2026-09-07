@@ -1240,11 +1240,14 @@ class BattleScene(Screen):
                 self.game.audio.play_sound(cue)
             if recorded[0].events:
                 self.feedback = self.clock, recorded[0]
-            for u in self.battle.units:
-                change = u.hp - before[u.id]
-                if change:
-                    self.floats = [item for item in self.floats if item[1] != u.pos]
-                    self.floats.append((self.clock, u.pos, change))
+                from eador.battle_audio import direct_event_duration
+                from eador.battle_effects import health_notices
+                duration = direct_event_duration(recorded[0]) if cue == 'attack_hit' else 0
+                notices = health_notices(recorded[0], duration, self.clock)
+                affected = {ident for _, ident, _, _ in notices}
+                # A newer order replaces pending feedback; never announce its old hits later.
+                self.floats = [item for item in self.floats if item[0] <= self.clock and item[1] not in affected]
+                self.floats.extend(notices)
             self.targeting = None
             self.refresh()
             if checkpoint or self.battle.outcome:
@@ -1444,9 +1447,20 @@ class BattleScene(Screen):
                 self.game.audio.play_sound(cue)
             if not sounds.pending:
                 self.attack_sounds = None
-        self.floats = [f for f in self.floats if self.clock - f[0] < 1.6]
+        self.update_notices()
         if self.feedback and self.clock - self.feedback[0] >= 1.4:
             self.feedback = None
+
+    def update_notices(self):
+        """A health notice belongs to its recipient at the recorded contact cell."""
+        event, _ = self._feedback_event()
+        moving = {unit.id for unit in event.after.units
+                  if unit.pos != event.before.unit(unit.id).pos} if event else set()
+        occupants = {unit.pos: unit.id for unit in self.battle.units if unit.alive}
+        self.floats = [(started, ident, pos, change) for started, ident, pos, change in self.floats
+                       if self.clock - started < 1.6 and (started > self.clock or
+                           (ident not in moving and self.battle.unit(ident).pos == pos
+                            and occupants.get(pos, ident) == ident))]
 
     def handle_input(self, event):
         if event.type == "move":
@@ -1688,15 +1702,18 @@ class BattleScene(Screen):
         with self.screen_layer(8):
             self.draw_effects()
         with self.screen_layer(9):
-            for started, pos, change in self.floats:
+            # Repeated hits replace the same recipient's label instead of overprinting it.
+            visible = {ident: (started, pos, change) for started, ident, pos, change in self.floats
+                       if 0 <= self.clock - started < 1.6}
+            for started, pos, change in visible.values():
                 cx, cy = self.grid.center(pos)
                 size = self.grid.size
-                width, height = min(48, size * 1.15), min(24, size * .56)
-                drift = 0 if reduced_motion(self.game) else min(1, (self.clock - started) / 1.6) * size * .1
-                # Stay below the upper neighbor's health plaque, including at full drift.
-                yy = cy - size * .65 - drift
+                width, height = min(40, size * .8), min(20, size * .42)
+                drift = 0 if still else min(1, (self.clock - started) / 1.6) * size * .05
+                # Clear the face while leaving horizontal space for upper-neighbor HP.
+                yy = cy - size * 1.12 - drift
                 self.draw_rect(cx - width / 2, yy, width, height, INK, radius=3)
-                self.text(f"{change:+}", cx, yy + 1, size=round(min(18, size * .43)),
+                self.text(f"{change:+}", cx, yy + 1, size=round(min(14, size * .31)),
                           color=TEAL if change > 0 else RED, center=True)
         self.rule(26, self.footer_top - 12, self.edge - 52)
 

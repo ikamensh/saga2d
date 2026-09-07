@@ -1,7 +1,9 @@
 # Presentation handoff — 2026-09-07
 
-Stopped at the user's request to conserve credits. The current work is a stable
-source checkpoint, not an Early Access release. Resume only on a new request.
+This records checkpoint `c507745`, when work stopped at the user's request to
+conserve credits. The user subsequently authorized continued useful work.
+See [current progress](early-access-progress.md) for later increments; this
+checkpoint is not an Early Access release.
 
 ## Completed
 
