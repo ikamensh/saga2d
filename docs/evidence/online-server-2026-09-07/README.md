@@ -31,3 +31,8 @@ Bounded follow-up fuzzing at the default 25% CPU budget passed: two Tribes AI
 games plus one random-input run; one Warband AI game plus one 100-input run.
 Their outputs are retained alongside this report. No game rule changes were
 required by these checks.
+
+The final icon integration adds the concurrent Shardbound UI update from main.
+All 64 selected online, game-scene and icon tests passed, and the updated
+release passed all three candidate room checks and public HTTPS health again.
+See `deployment-with-icons.json` and `icon-integration-tests.txt`.
