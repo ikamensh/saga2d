@@ -1,0 +1,1 @@
+PUBLIC TLS RESTART PASS: both clients auto-resumed their private seats; exact acknowledged state survived; subsequent guest order accepted.
