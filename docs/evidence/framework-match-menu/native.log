@@ -1,0 +1,2 @@
+Independent counter room: online room counter
+{"frames": 29, "wall_seconds": 2.4034479999681935, "cpu_seconds": 0.48612399999999995, "child_cpu_seconds": 0.069117, "final_host": {"counts": [2, 1], "you": 0}, "final_guest": {"counts": [2, 1], "you": 1}, "server_returncode": -15, "online_workers_closed": true}
