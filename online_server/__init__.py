@@ -11,6 +11,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from http import HTTPStatus
 import json
+import ipaddress
 import logging
 import math
 import secrets
@@ -21,7 +22,8 @@ from websockets.asyncio.server import serve
 from websockets.exceptions import ConnectionClosed
 
 from saga2d import CommandError
-from online_server.games import GAME_IDS, create_match
+from online_server.games import GAME_IDS, create_match, restore_match
+from online_server.storage import RoomStore
 
 PROTOCOL = 1
 MAX_MESSAGE = 16_384
@@ -126,6 +128,7 @@ class Room:
     revision: int = 0
     disconnected_at: float = field(default_factory=time.monotonic)
     ticks: int = 0
+    checkpointed_at: float = 0.
 
     @property
     def ready(self):
@@ -140,14 +143,43 @@ class Room:
 
 
 class RoomServer:
-    def __init__(self, *, max_rooms=64, max_connections=128, room_ttl=900):
-        if max_rooms < 1 or max_connections < 2 or room_ttl <= 0:
+    def __init__(self, *, max_rooms=64, max_connections=128, room_ttl=900,
+                 state_dir=None, trusted_proxy=False):
+        if max_rooms < 1 or max_connections < 2 or not math.isfinite(room_ttl) or room_ttl <= 0:
             raise ValueError('Room and connection limits must be positive.')
         self.rooms = {}
         self.max_rooms, self.max_connections, self.room_ttl = max_rooms, max_connections, room_ttl
         self.connections = set()
         self.by_ip = {}
         self.creations = {}
+        self.trusted_proxy = trusted_proxy
+        self.store = RoomStore(state_dir) if state_dir is not None else None
+        self.last_keep_alive = time.monotonic()
+        if self.store is not None:
+            for saved in self.store.load():
+                room = Room(saved['game'], restore_match(saved['game'], saved['state']), saved['code'],
+                            tokens=saved['tokens'], revision=saved['revision'])
+                remaining = saved['expires_at'] - time.time()
+                room.disconnected_at = time.monotonic() - (self.room_ttl - remaining)
+                self.rooms[room.code] = room
+
+    def checkpoint(self, room, *, force=False):
+        if self.store is not None and (force or time.monotonic() - room.checkpointed_at >= 5):
+            self.store.save(room, self.room_ttl)
+            room.checkpointed_at = time.monotonic()
+
+    def client_address(self, websocket):
+        address = websocket.remote_address[0]
+        if self.trusted_proxy and ipaddress.ip_address(address).is_loopback:
+            forwarded = websocket.request.headers.get_all('X-Forwarded-For')
+            if forwarded:
+                if len(forwarded) != 1:
+                    raise CommandError('Invalid proxy address.')
+                try:
+                    return str(ipaddress.ip_address(forwarded[0].split(',')[-1].strip()))
+                except ValueError as exc:
+                    raise CommandError('Invalid proxy address.') from exc
+        return address
 
     def enter(self, message, address):
         if type(message.get('protocol')) is not int or message['protocol'] != PROTOCOL:
@@ -198,6 +230,8 @@ class RoomServer:
         for peer in room.peers:
             if peer is not None:
                 peer.reject(error)
+        if self.store is not None:
+            self.store.delete(room.code)
 
     def apply(self, room, player, message):
         if message.get('type') != 'command' or not isinstance(message.get('command'), dict):
@@ -209,10 +243,16 @@ class RoomServer:
             raise CommandError('The match changed. Please try that order again.')
         room.match.apply(player, message['command'])
         room.publish()
+        self.checkpoint(room, force=room.game != 'warband-v1')
 
     async def handle(self, websocket):
-        address = websocket.remote_address[0]
         peer = Peer(websocket)
+        try:
+            address = self.client_address(websocket)
+        except CommandError as exc:
+            peer.reject(str(exc))
+            await peer.write()
+            return
         if len(self.connections) >= self.max_connections or self.by_ip.get(address, 0) >= 16:
             peer.reject('Too many connections. Please try again later.')
             await peer.write()
@@ -229,7 +269,10 @@ class RoomServer:
                        'player': player, 'protocol': PROTOCOL, 'game': room.game})
             room.peers[player] = peer
             room.publish()
+            self.checkpoint(room, force=True)
             async for data in websocket:
+                if room.peers[player] is not peer or peer.closing:
+                    break
                 peer.check_rate()
                 message = decode(data)
                 try:
@@ -262,6 +305,7 @@ class RoomServer:
                 if room.code in self.rooms:
                     try:
                         room.publish()
+                        self.checkpoint(room, force=True)
                     except Exception:
                         LOG.exception('Could not publish disconnected %s room', room.game)
                         self.fail_room(room, 'The match failed on the server. Please create a new room.')
@@ -282,9 +326,13 @@ class RoomServer:
                         room.ticks += 1
                         if room.ticks % 2 == 0:
                             room.publish()
+                        self.checkpoint(room)
                 except Exception:
                     LOG.exception('Simulation failed in %s room', room.game)
                     self.fail_room(room, 'The match failed on the server. Please create a new room.')
+            if self.store is not None and started - self.last_keep_alive >= min(60, self.room_ttl / 3):
+                self.store.keep_alive([room.code for room in self.rooms.values() if room.ready], self.room_ttl)
+                self.last_keep_alive = started
             self.creations = {address: times for address, times in self.creations.items()
                               if times and times[-1] > started - 60}
             await asyncio.sleep(max(0.001, .05 - (time.monotonic() - started)))
@@ -292,21 +340,23 @@ class RoomServer:
     def health(self, connection, request):
         if request.path == '/healthz':
             return connection.respond(HTTPStatus.OK, 'ok\n')
-        if request.path not in ('/', '/ws'):
+        if request.path not in ('/', '/ws', '/play'):
             return connection.respond(HTTPStatus.NOT_FOUND, 'not found\n')
 
 
 async def run(host='127.0.0.1', port=8765, **limits):
-    """Serve until cancelled; close every socket and timer on shutdown."""
+    """Serve until cancelled; close every socket, timer and checkpoint on shutdown."""
     rooms = RoomServer(**limits)
-    async with serve(rooms.handle, host, port, process_request=rooms.health, origins=[None],
-                     max_size=MAX_MESSAGE, max_queue=8, ping_interval=10, ping_timeout=10,
-                     close_timeout=2, open_timeout=10, server_header=None, backlog=64) as server:
-        address = server.sockets[0].getsockname()
-        print(f'LISTENING ws://{address[0]}:{address[1]}', flush=True)
-        maintenance = asyncio.create_task(rooms.maintain())
-        try:
-            await asyncio.Future()
-        finally:
-            maintenance.cancel()
-            await asyncio.gather(maintenance, return_exceptions=True)
+    try:
+        async with serve(rooms.handle, host, port, process_request=rooms.health, origins=[None],
+                         max_size=MAX_MESSAGE, max_queue=8, ping_interval=10, ping_timeout=10,
+                         close_timeout=2, open_timeout=10, server_header=None, backlog=64) as server:
+            address = server.sockets[0].getsockname()
+            print(f'LISTENING ws://{address[0]}:{address[1]}', flush=True)
+            # Awaiting maintenance also makes a broken persistence store fail the service visibly.
+            await rooms.maintain()
+    finally:
+        if rooms.store is not None:
+            for room in rooms.rooms.values():
+                rooms.checkpoint(room, force=True)
+            rooms.store.close()

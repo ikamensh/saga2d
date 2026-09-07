@@ -49,3 +49,27 @@ def create_match(game, options):
                           theme=choice('theme', 'frontier', THEMES),
                           difficulty=choice('difficulty', 'standard', DIFFICULTIES),
                           campaign=campaign)
+
+
+def restore_match(game, snapshot):
+    """Rebuild authoritative rules from trusted JSON, without regenerating any map."""
+    if game == 'tribes-v1':
+        from tribes.multiplayer import TribesMatch
+        from tribes.model import World
+        match = TribesMatch.__new__(TribesMatch)
+        match.seed, match.world = snapshot['seed'], World.from_dict(snapshot['world'])
+    elif game == 'warband-v1':
+        from warband.multiplayer import WarbandMatch
+        from warband.model import World
+        match = WarbandMatch.__new__(WarbandMatch)
+        match.seed, match.world = snapshot['seed'], World.from_dict(snapshot['world'])
+        match.events = snapshot['events']
+        match.event_id = max((event[0] for event in match.events), default=0)
+    elif game == 'shardbound-v1':
+        from eador.multiplayer import ShardboundMatch
+        from eador.model import State
+        match = ShardboundMatch.__new__(ShardboundMatch)
+        match.state = State.from_json(snapshot['campaign'])
+    else:
+        raise ValueError(f'Checkpoint belongs to an incompatible game version: {game}')
+    return match

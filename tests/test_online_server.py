@@ -1,20 +1,22 @@
 """Online players cross real WebSockets and the dedicated process owns game rules."""
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
 import select
 import subprocess
 import sys
+import time
 
 import pytest
 from websockets.sync.client import connect
 
 
-@pytest.fixture
-def server_url():
+@contextmanager
+def running_server(*arguments):
     """Run the production entry point on an OS-assigned local port."""
     process = subprocess.Popen(
-        [sys.executable, '-m', 'online_server', '--port', '0'],
+        [sys.executable, '-m', 'online_server', '--port', '0', *map(str, arguments)],
         cwd=Path(__file__).resolve().parents[1], stdout=subprocess.PIPE,
         stderr=subprocess.PIPE, text=True,
         env={**os.environ, 'PYTHONUNBUFFERED': '1'},
@@ -24,14 +26,22 @@ def server_url():
         assert process.stdout in readable, process.stderr.readline() if readable else 'server startup timed out'
         endpoint = process.stdout.readline().strip()
         assert endpoint.startswith('LISTENING ws://'), endpoint
-        yield endpoint.removeprefix('LISTENING ')
+        yield endpoint.removeprefix('LISTENING '), process
     finally:
         process.terminate()
         try:
-            process.communicate(timeout=5)
+            _, errors = process.communicate(timeout=5)
         except subprocess.TimeoutExpired:
             process.kill()
-            process.communicate(timeout=5)
+            _, errors = process.communicate(timeout=5)
+        assert 'Traceback (most recent call last)' not in errors, errors
+
+
+@pytest.fixture
+def server_url():
+    """The same production process used by the framework client's socket tests."""
+    with running_server() as (url, process):
+        yield url
 
 
 def receive(socket, kind='state', predicate=lambda message: True):
@@ -203,3 +213,88 @@ def test_malformed_json_is_a_connection_rejection(server_url, message):
     with connect(server_url, proxy=None) as good:
         handshake(good)
         assert receive(good)['state']
+
+
+@pytest.mark.parametrize('game', ['tribes-v1', 'warband-v1', 'shardbound-v1'])
+def test_rooms_and_private_seats_survive_server_restart(tmp_path, game):
+    """All game snapshots restore from JSON and both clients recover the same private seats."""
+    with running_server('--state-dir', tmp_path) as (url, process):
+        with connect(url, proxy=None) as host, connect(url, proxy=None) as guest:
+            seat0 = handshake(host, game=game)
+            receive(host)
+            seat1 = handshake(guest, 'join', game=game, room=seat0['room'])
+            receive(host)
+            before = receive(guest)
+            if game == 'tribes-v1':
+                command(host, {'action': 'end_turn'})
+                before = receive(guest)
+            elif game == 'shardbound-v1':
+                command(host, {'action': 'build', 'target': 'state', 'args': ['barracks']})
+                before = receive(guest)
+            else:
+                before = receive(guest, predicate=lambda state: state['state']['world']['tick'] >= 4)
+            if game != 'warband-v1':
+                # Acknowledged turn orders survive even an abrupt power/process loss.
+                process.kill()
+                process.wait(timeout=5)
+    assert (tmp_path / 'rooms.sqlite3').stat().st_mode & 0o777 == 0o600
+    with running_server('--state-dir', tmp_path) as (url, process):
+        with connect(url, proxy=None) as host, connect(url, proxy=None) as guest:
+            returned = handshake(host, 'resume', game=game, room=seat0['room'],
+                                 resume_token=seat0['resume_token'])
+            assert returned['player'] == 0
+            waiting = receive(host)
+            assert not waiting['ready']
+            handshake(guest, 'resume', game=game, room=seat0['room'], resume_token=seat1['resume_token'])
+            resumed = receive(guest)
+            assert resumed['ready']
+            if game == 'warband-v1':
+                assert resumed['state']['world']['tick'] >= before['state']['world']['tick']
+                assert resumed['state']['world']['tick'] >= 4
+            else:
+                assert resumed['state'] == before['state']
+                assert resumed['revision'] > before['revision']
+
+
+def test_expired_rooms_do_not_return_after_server_restart(tmp_path):
+    """Wall time, rather than process uptime, bounds how long a disconnected seat stays resumable."""
+    with running_server('--state-dir', tmp_path, '--room-ttl', '.15') as (url, process):
+        with connect(url, proxy=None) as host:
+            seat = handshake(host)
+            receive(host)
+    time.sleep(.2)
+    with running_server('--state-dir', tmp_path, '--room-ttl', '.15') as (url, process):
+        with connect(url, proxy=None) as returned:
+            returned.send(json.dumps({'type': 'resume', 'protocol': 1, 'game': 'tribes-v1',
+                                      'room': seat['room'], 'resume_token': seat['resume_token']}))
+            assert 'not found' in receive(returned, 'reject')['error']
+
+
+def test_room_capacity_is_explicit_and_health_remains_available():
+    """A full server rejects new rooms while its health endpoint and existing rooms stay usable."""
+    from urllib.request import urlopen
+    with running_server('--max-rooms', '1') as (url, process):
+        with connect(url + '/play', proxy=None) as host:
+            handshake(host)
+            receive(host)
+            with connect(url, proxy=None) as extra:
+                extra.send(json.dumps({'type': 'create', 'protocol': 1, 'game': 'tribes-v1'}))
+                assert 'full' in receive(extra, 'reject')['error']
+            with urlopen(url.replace('ws://', 'http://') + '/healthz', timeout=3) as health:
+                assert health.status == 200 and health.read() == b'ok\n'
+
+
+@pytest.mark.parametrize('trusted', [False, True])
+def test_only_configured_loopback_proxy_can_supply_client_ip(trusted):
+    """An internet client cannot bypass room quotas by forging a forwarding header."""
+    arguments = ['--trusted-proxy'] if trusted else []
+    with running_server(*arguments) as (url, process):
+        for index in range(5):
+            with connect(url, proxy=None, additional_headers={'X-Forwarded-For': f'192.0.2.{index + 1}'}) as host:
+                host.send(json.dumps({'type': 'create', 'protocol': 1, 'game': 'tribes-v1',
+                                      'options': {'size': 11}}))
+                if index == 4 and not trusted:
+                    assert 'Too many' in receive(host, 'reject')['error']
+                else:
+                    receive(host, 'welcome')
+                    assert receive(host)['state']
