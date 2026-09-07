@@ -1,8 +1,9 @@
 """Public multiplayer entry points use room codes online and retain explicit LAN."""
+import argparse
 import time
 
 from saga2d import Game, MatchMenu, Scene
-from tests.test_online_server import server_url
+from tests.test_online_server import server_url, running_server
 
 
 def test_online_menu_needs_only_a_room_code_and_reports_missing_input(tmp_path):
@@ -83,6 +84,19 @@ def test_online_creator_waits_for_partner_and_can_rejoin_after_app_restart(serve
         click_text('Cancel')
         assert isinstance(game.scene, MatchMenu)
         assert any('Rejoin last room' in t['text'] for t in game.backend.texts)
+        # A mistyped server override must leave the real saved seat recoverable.
+        from saga2d import add_match_arguments, match_from_arguments
+        parser = argparse.ArgumentParser()
+        add_match_arguments(parser)
+        with running_server() as (other_server, _):
+            args = parser.parse_args(['--online-resume', '--server', other_server])
+            failed = match_from_arguments(args, parser, title='Tribes', game_id='tribes-v1',
+                                          create_match=local_match, create_scene=RemoteScene, game=game)
+            game.push(failed)
+            wait(lambda: failed.session.closed)
+            assert 'Room not found' in failed.session.error
+            game.pop()
+            game.tick(.03)
         click_text('Rejoin last room')
         wait(lambda: game.scene.session.state is not None)
         guest = OnlineClient('tribes-v1', endpoint=server_url, room=room)
