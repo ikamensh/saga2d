@@ -1,0 +1,107 @@
+name: Shardbound Windows build (manual, runtime unverified)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shardbound-windows-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      UV_PYTHON_PREFERENCE: only-managed
+
+    steps:
+      - name: Preserve committed bytes for asset provenance
+        run: git config --global core.autocrlf false
+
+      - name: Check out the dispatched commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Install pinned uv and select CPython
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.12.10'
+          python-version: '3.13.2'
+          enable-cache: false
+
+      - name: Build without launching a game on the CI runner
+        run: |
+          uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py --skip-smoke 2>&1 |
+            Tee-Object -FilePath "$env:RUNNER_TEMP/shardbound-build.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify build identity and prepare the runtime handoff
+        run: |
+          $output = 'dist/shardbound'
+          $manifest = Get-Content "$output/build-manifest.json" -Raw | ConvertFrom-Json
+          $archive = Get-Item "$output/Shardbound-windows-x64.zip"
+          $digest = (Get-FileHash $archive.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($manifest.source_commit -ne $env:GITHUB_SHA -or $manifest.working_tree_dirty) {
+            throw 'The package does not identify the clean dispatched commit.'
+          }
+          if ($manifest.python -ne '3.13.2' -or $manifest.architecture -notin @('AMD64', 'x86_64')) {
+            throw 'The package was not built with the required x64 CPython 3.13.2.'
+          }
+          if ($manifest.artifact.file -ne $archive.Name -or $manifest.artifact.sha256 -ne $digest -or
+              $manifest.artifact.bytes -ne $archive.Length) {
+            throw 'The ZIP differs from its build manifest.'
+          }
+          if ($null -ne $manifest.smoke -or $manifest.release_ready) {
+            throw 'A build-only job must not claim runtime or release acceptance.'
+          }
+          $locks = @{}
+          foreach ($file in @('uv.lock', 'packaging/requirements.txt')) {
+            $locks[$file] = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
+          }
+          [ordered]@{
+            source_commit = $manifest.source_commit
+            workflow_ref = $env:GITHUB_WORKFLOW_REF
+            workflow_sha = $env:GITHUB_WORKFLOW_SHA
+            run_url = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+            run_attempt = $env:GITHUB_RUN_ATTEMPT
+            runner_image = $env:ImageOS
+            runner_image_version = $env:ImageVersion
+            runner_architecture = $env:RUNNER_ARCH
+            uv = (uv --version)
+            lock_sha256 = $locks
+            artifact = $manifest.artifact
+            runtime_verified = $false
+            scope = 'Windows x64 build only. Clean interactive Windows runtime and G14 remain unverified.'
+          } | ConvertTo-Json -Depth 5 | Set-Content "$output/workflow-build.json" -Encoding utf8
+          "$digest  $($archive.Name)" | Set-Content "$output/SHA256SUMS" -Encoding ascii
+          Copy-Item "$env:RUNNER_TEMP/shardbound-build.log" "$output/build.log"
+          Copy-Item docs/windows-shardbound.md "$output/windows-runtime-handoff.md"
+          @(
+            'Windows x64 build completed; runtime remains UNVERIFIED.'
+            "Source: $($manifest.source_commit)"
+            "ZIP SHA-256: $digest"
+            'Download the artifact and follow windows-runtime-handoff.md on a clean interactive Windows account.'
+          ) | Add-Content $env:GITHUB_STEP_SUMMARY
+
+      - name: Retain the manually requested build for 14 days
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shardbound-windows-x64-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            dist/shardbound/Shardbound-windows-x64.zip
+            dist/shardbound/build-manifest.json
+            dist/shardbound/workflow-build.json
+            dist/shardbound/SHA256SUMS
+            dist/shardbound/build.log
+            dist/shardbound/windows-runtime-handoff.md
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
