@@ -1,0 +1,89 @@
+"""One reproducible ordinary-regression tranche; large policy matrices are explicit exclusions."""
+from pathlib import Path
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import time
+
+ROOT = Path(sys.argv[1]).resolve()
+OUTPUT = Path(sys.argv[2]).resolve()
+OUTPUT.mkdir(parents=True, exist_ok=True)
+os.chdir(ROOT)
+sys.path.insert(0, str(ROOT))
+import pytest
+from tools.cpu_budget import CpuBudget
+
+EXCLUDED = [
+    'tests/eador/test_worldgen.py::test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_every_theme',
+    'tests/eador/test_worldgen.py::test_each_theme_and_hero_can_finish_by_exploring_either_flank_or_the_direct_road',
+    'tests/eador/test_relief.py::test_purchased_active_passive_and_smaller_parties_hold_in_three_modes_and_five_worlds',
+    'tests/eador/test_model.py::test_each_hero_can_complete_a_campaign_by_exploring_and_investing',
+    'tests/eador/test_campaign.py::test_a_recovery_expedition_can_complete_its_contract_and_the_final_shard',
+    'tests/eador/test_campaign.py::test_each_hero_can_finish_each_linked_contract_path',
+    'tests/eador/test_discipline_journeys.py::test_each_preferred_discipline_earns_mastery_and_survives_a_complete_recovered_campaign',
+    'tests/eador/test_army_plan_journey.py::test_commander_completes_linked_campaign_with_paid_sustain_roster',
+    'tests/eador/test_campaign_scene.py::test_linked_campaign_can_be_completed_with_visible_input_and_exact_saved_transitions',
+    'tests/eador/test_difficulty_scene.py::test_complete_visible_linked_run_preserves_selected_difficulty_through_departures',
+    'tests/packaging/test_eador_campaign.py::test_three_shards_resume_the_exact_saved_departure_and_completed_ending',
+    'tests/packaging/test_eador_campaign.py::test_a_lost_capital_resumes_its_saved_recovery_before_finishing_the_campaign',
+]
+
+
+class Receipt:
+    def __init__(self):
+        self.budget = CpuBudget(25)
+        self.selected = []
+        self.deselected = []
+        self.results = []
+
+    def pytest_collection_finish(self, session):
+        self.selected = [item.nodeid for item in session.items]
+
+    def pytest_deselected(self, items):
+        self.deselected.extend(item.nodeid for item in items)
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_teardown(self, item, nextitem):
+        yield
+        self.budget.checkpoint()
+
+    def pytest_runtest_logreport(self, report):
+        if report.when == 'call' or report.failed or report.skipped:
+            value = dict(node=report.nodeid, phase=report.when,
+                         outcome=report.outcome, duration=report.duration)
+            self.results.append(value)
+            with (OUTPUT / 'tests.jsonl').open('a') as stream:
+                stream.write(json.dumps(value) + '\n')
+
+
+def sources():
+    names = subprocess.check_output(['git', 'ls-files', '*.py'], text=True).splitlines()
+    return {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in names}
+
+
+assert not (OUTPUT / 'tests.jsonl').exists(), 'Use a fresh output directory.'
+before = sources()
+commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+started, cpu_started = time.monotonic(), time.process_time()
+receipt = Receipt()
+prior = json.loads(Path(sys.argv[3]).read_text())
+passed = sorted(set(prior.get('previously_passed', [])) |
+                {result['node'] for result in prior['results']
+                 if result['phase'] == 'call' and result['outcome'] == 'passed'})
+args = ['tests', '-q', '--maxfail=1',
+        *[f'--deselect={node}' for node in [*EXCLUDED, *passed]]]
+result = int(pytest.main(args, plugins=[receipt]))
+report = dict(source_commit=commit, source_sha256=before,
+              source_unchanged=before == sources(), arguments=args, cpu_percent=25,
+              pacing='Cooperative between tests; atomic tests may exceed the allowance.',
+              elapsed_seconds=time.monotonic() - started,
+              cpu_seconds=time.process_time() - cpu_started, exit_code=result,
+              selected=receipt.selected, deselected=receipt.deselected,
+              results=receipt.results)
+report['prior_report_sha256'] = hashlib.sha256(Path(sys.argv[3]).read_bytes()).hexdigest()
+report['previously_passed'] = passed
+(OUTPUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
+assert report['source_unchanged'], 'Source changed during the regression sweep.'
+sys.exit(result)

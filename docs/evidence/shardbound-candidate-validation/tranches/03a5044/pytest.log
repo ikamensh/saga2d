@@ -1,0 +1,48 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+.............F
+=================================== FAILURES ===================================
+_ test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing _
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-1835/test_all_paid_briefings_and_wo0')
+
+    def test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing(tmp_path):
+        """Each actual approach, including blocked fees and the linked Gate, stays fully reviewable."""
+        from tools.verify_eador_guidance import verify_briefing_matrix
+    
+        game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+        try:
+>           rows = verify_briefing_matrix(game)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/eador/test_guidance_reading.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/verify_eador_guidance.py:105: in verify_briefing_matrix
+    cases = prepared_briefings(budget=budget)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/verify_eador_guidance.py:92: in prepared_briefings
+    poor.build('archery'); poor.build('market'); poor.recruit('ranger')
+                           ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = State(seed=7, provinces={(-2, 0): Province(pos=(-2, 0), name='Westwatch', terrain='hills', owner='player', income=16, ...l_action=2, next_troop_id=7, defeats=0), theme='frontier', campaign=None, battle_adventure=None, rules_id='standard-1')
+kind = 'market'
+
+    def build(self, kind: str) -> None:
+        self._ready()
+        if kind not in BUILDINGS:
+            raise RuleError('Unknown building.')
+        if kind in self.buildings:
+            raise RuleError('That building is already built.')
+        spec = BUILDINGS[kind]
+        if self.gold < spec.cost or self.crystals < spec.crystals:
+>           raise RuleError('Not enough gold or crystals.')
+E           eador.model.RuleError: Not enough gold or crystals.
+
+eador/model.py:481: RuleError
+=========================== short test summary info ============================
+FAILED tests/eador/test_guidance_reading.py::test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 301 passed, 159 deselected in 282.91s (0:04:42)

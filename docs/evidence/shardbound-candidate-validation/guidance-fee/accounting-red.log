@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/tmp/shardbound-guidance-fee-green.py", line 37, in <module>
+    assert [row['gold_after'] for row in receipt] == [25, 5, 5]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+        0.11 real         0.07 user         0.01 sys
+            42500096  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                2888  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 126  voluntary context switches
+                   9  involuntary context switches
+          1021108872  instructions retired
+           375567028  cycles elapsed
+            27902456  peak memory footprint

@@ -1,0 +1,46 @@
+...                                                                      [100%]
+3 passed in 0.31s
+{
+  "source_commit": "33638bfa1f27d88090febfb6bfbbb4f03444fb20",
+  "source_unchanged": true,
+  "tests": [
+    {
+      "node": "tests/eador/test_pin.py::test_real_adventures_award_equip_and_activate_both_relic_capabilities[frontier]",
+      "outcome": "passed",
+      "duration": 0.01248945901170373
+    },
+    {
+      "node": "tests/eador/test_pin.py::test_real_adventures_award_equip_and_activate_both_relic_capabilities[elderwild]",
+      "outcome": "passed",
+      "duration": 0.026165917050093412
+    },
+    {
+      "node": "tests/eador/test_pin.py::test_real_adventures_award_equip_and_activate_both_relic_capabilities[ruins]",
+      "outcome": "passed",
+      "duration": 0.01927104196511209
+    }
+  ],
+  "exit_code": 0,
+  "requested_cpu_percent": 25,
+  "wall_seconds": 0.5859254579991102,
+  "cpu_seconds": 0.144467,
+  "scope": "Three real paid seed7 relic-source routes, all themes, existing automatic battle helpers, then unchanged earned solo capability/save assertions. No runtime change or native window."
+}
+        0.66 real         0.20 user         0.04 sys
+            49364992  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                6076  page reclaims
+                   8  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  11  voluntary context switches
+                  27  involuntary context switches
+          2275031068  instructions retired
+           746457547  cycles elapsed
+            34013736  peak memory footprint

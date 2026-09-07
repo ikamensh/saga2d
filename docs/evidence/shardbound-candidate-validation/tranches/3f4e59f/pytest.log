@@ -1,0 +1,46 @@
+........................................................................ [  5%]
+.............................................................F
+=================================== FAILURES ===================================
+_ test_real_adventures_award_equip_and_activate_both_relic_capabilities[frontier] _
+
+theme = 'frontier'
+
+    @pytest.mark.parametrize('theme', ['frontier', 'elderwild', 'ruins'])
+    def test_real_adventures_award_equip_and_activate_both_relic_capabilities(theme):
+        """All three sources are obtainable through battles, choices and travel in every theme."""
+        from dataclasses import replace
+        from eador.model import State
+        from tools.eador_campaign import finish_battle, provision_army, rest, march_to
+    
+        state = State.new(7, theme=theme)
+        state.build('barracks')
+        state.recruit('swordsman')
+        state.explore()
+        finish_battle(state)
+        rest(state)
+        provision_army(state)
+        watch = next(p.pos for p in state.provinces.values() if p.site_kind == 'border_watch')
+        for destination in ((-2, 2), (-1, 2), watch):
+            march_to(state, destination)
+            rest(state)
+            provision_army(state)
+            march_to(state, destination)
+            if not state.actions_left:
+                rest(state)
+                march_to(state, destination)
+            state.explore()
+            finish_battle(state)
+            if destination != watch:
+                rest(state)
+                provision_army(state)
+>       assert {'storm_quiver', 'watch_bell', 'wayfarer_boots'} <= set(state.inventory)
+E       AssertionError: assert {'storm_quive...yfarer_boots'} <= {'moonstone',... 'watch_bell'}
+E         
+E         Extra items in the left set:
+E         'wayfarer_boots'
+
+tests/eador/test_pin.py:200: AssertionError
+=========================== short test summary info ============================
+FAILED tests/eador/test_pin.py::test_real_adventures_award_equip_and_activate_both_relic_capabilities[frontier]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 133 passed, 460 deselected in 64.99s (0:01:04)

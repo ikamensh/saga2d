@@ -1,0 +1,84 @@
+........................................................................ [  6%]
+........................................................................ [ 12%]
+.........................................................F
+=================================== FAILURES ===================================
+________ test_complete_campaign_and_saved_victory_through_player_input _________
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-1838/test_complete_campaign_and_sav0')
+
+    def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
+        """Explore, invest, conquer, replay and restore a finished shard through UI."""
+        from eador.model import BUILDINGS, UNITS
+        from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
+    
+        game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
+        try:
+            game.push(TitleScene(seed=7))
+            game.tick(1 / 60)
+            press(game, "return")
+            root, state = game.scene, game.scene.state
+    
+            def battle():
+                assert isinstance(game.scene, BattleScene)
+                for _ in range(80):
+                    if state.battle.outcome:
+                        break
+                    press(game, "a")
+                assert isinstance(game.scene, ResultScene)
+                assert state.battle.outcome == "player"
+                press(game, "e")
+                while isinstance(game.scene, ChoiceScene):
+                    press(game, "1")
+    
+            def prepare():
+                if "temple" not in state.buildings and state.gold >= BUILDINGS["temple"].cost:
+                    press(game, "b")
+                    press(game, "3")
+                    press(game, "escape")
+                press(game, "r")
+                while state.gold >= UNITS["swordsman"].cost and len(state.hero.army) < state.hero.max_army:
+                    press(game, "2")
+                press(game, "escape")
+    
+            def rest():
+                press(game, "e")
+                if state.battle:
+                    battle()
+    
+            press(game, "b")
+            press(game, "1")
+            press(game, "escape")
+            press(game, "r")
+            press(game, "2")
+            press(game, "escape")
+            for destination in ((-2, 0), (-1, 0), (0, 0), (0, 1), (1, 0)):
+                if state.hero.pos != destination:
+                    click(game, *root.grid.center(destination))
+                    press(game, "return")
+                    battle()
+                    rest()
+                    prepare()
+                press(game, "x")
+                if state.provinces[destination].site_kind == 'relief_column':
+                    from eador.encounter_scene import EncounterScene
+                    assert isinstance(game.scene, EncounterScene)
+                    before = state.to_json()
+                    press(game, 'escape')  # The same reward remains at the ordinary Grove next door.
+                    assert state.to_json() == before
+                    continue
+>               battle()
+
+tests/eador/test_scene.py:486: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def battle():
+>       assert isinstance(game.scene, BattleScene)
+E       AssertionError: assert False
+E        +  where False = isinstance(<eador.encounter_scene.EncounterScene object at 0x10eaf6150>, <class 'eador.scene.BattleScene'>)
+E        +    where <eador.encounter_scene.EncounterScene object at 0x10eaf6150> = <saga2d.game.Game object at 0x10e7d84d0>.scene
+
+tests/eador/test_scene.py:439: AssertionError
+=========================== short test summary info ============================
+FAILED tests/eador/test_scene.py::test_complete_campaign_and_saved_victory_through_player_input
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 201 passed, 593 deselected in 133.13s (0:02:13)

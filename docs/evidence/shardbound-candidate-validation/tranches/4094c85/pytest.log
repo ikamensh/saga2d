@@ -1,0 +1,42 @@
+ss....F
+=================================== FAILURES ===================================
+_ test_vault_approaches_share_an_earned_army_and_preserve_their_campaign_consequences _
+
+    def test_vault_approaches_share_an_earned_army_and_preserve_their_campaign_consequences():
+        """Follow ordinary purchases, both manual escapes and bounded rival-aware continuation."""
+        from tools.audit_eador_vault_continuation import compare
+    
+>       report = compare()
+                 ^^^^^^^^^
+
+tests/tools/test_vault_continuation.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def compare(*, cpu_percent=25, campaign_order_limit=24):
+        """Compare one paid and one free manual Vault escape from exactly the same earned entry."""
+        if type(campaign_order_limit) is not int or campaign_order_limit < 1:
+            raise ValueError('Campaign order limit must be a positive integer')
+        budget = CpuBudget(cpu_percent)
+        prepared = _Preparation(State.new(7, 'Commander', theme='ruins'), budget)
+        initial = prepared.to_json()
+        prepare_vault(state=prepared, budget=budget)
+        entry_json = prepared.to_json()
+        entry = State.from_json(entry_json)
+        assert entry.provinces[TARGET].owner != 'player', 'The selected next production objective is already owned'
+        assert entry.provinces[entry.hero.pos].site_kind == 'sealed_vault'
+        branches = {}
+        for approach in ('crossfire', 'unseal'):
+            state = SavedCommands(State.from_json(entry_json), budget)
+            vault_route(state, approach, orders_type=_ManualOrders)
+            entry_order = state.commands[0]
+            mana_reserve = state.battle.spell_cost('heal')
+            vault = _settle(state, entry_order['after'], 'Existing explicit manual Vault route')
+>           assert State.from_json(vault['reward_state']).provinces[(-1, 1)].explored
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tools/audit_eador_vault_continuation.py:217: AssertionError
+=========================== short test summary info ============================
+FAILED tests/tools/test_vault_continuation.py::test_vault_approaches_share_an_earned_army_and_preserve_their_campaign_consequences
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 4 passed, 2 skipped, 1280 deselected in 2.92s

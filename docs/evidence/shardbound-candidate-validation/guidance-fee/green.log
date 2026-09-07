@@ -1,0 +1,61 @@
+....                                                                     [100%]
+4 passed in 11.82s
+{
+  "source_commit": "b1e05924e308321791ec4c8d0abd6ced3fdf1732",
+  "dirty": [
+    " M tests/eador/test_guidance_reading.py",
+    " M tools/verify_eador_guidance.py"
+  ],
+  "source_unchanged": true,
+  "nodes": [
+    "tests/eador/test_guidance_reading.py::test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing",
+    "tests/tools/test_reading_preparation_budget.py::test_briefing_preparation_respects_the_supplied_allowance",
+    "tests/tools/test_reading_preparation_budget.py::test_complete_preparation_defaults_to_yielding_without_changing_saved_results[briefing]",
+    "tests/tools/test_reading_preparation_budget.py::test_briefing_matrix_forwards_its_allowance_to_paid_preparation"
+  ],
+  "tests": [
+    {
+      "node": "tests/eador/test_guidance_reading.py::test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing",
+      "outcome": "passed",
+      "duration": 11.4077717079781
+    },
+    {
+      "node": "tests/tools/test_reading_preparation_budget.py::test_briefing_preparation_respects_the_supplied_allowance",
+      "outcome": "passed",
+      "duration": 0.00028525001835078
+    },
+    {
+      "node": "tests/tools/test_reading_preparation_budget.py::test_complete_preparation_defaults_to_yielding_without_changing_saved_results[briefing]",
+      "outcome": "passed",
+      "duration": 0.35327474994119257
+    },
+    {
+      "node": "tests/tools/test_reading_preparation_budget.py::test_briefing_matrix_forwards_its_allowance_to_paid_preparation",
+      "outcome": "passed",
+      "duration": 0.0003529579844325781
+    }
+  ],
+  "exit_code": 0,
+  "requested_cpu_percent": 25,
+  "wall_seconds": 11.903384042088874,
+  "cpu_seconds": 3.2074759999999998,
+  "scope": "Four focused mock/model checks. Actual paid saved entry80g; Archery55g, guide20g, retreat loses the remaining5g and refunds no fee. No native window or game changes."
+}
+       12.00 real         3.21 user         0.11 sys
+            67059712  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                9532  page reclaims
+                  21  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 428  voluntary context switches
+                 172  involuntary context switches
+         48024939149  instructions retired
+         11410187867  cycles elapsed
+            49955416  peak memory footprint

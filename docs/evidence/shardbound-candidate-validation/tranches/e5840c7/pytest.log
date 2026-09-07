@@ -1,0 +1,41 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+....................ss.................................................. [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................F
+=================================== FAILURES ===================================
+______ test_cargo_earned_preparation_and_one_paid_continuation_each_yield ______
+
+clock = {'cpu': 0.06, 'sleeps': [], 'wall': 0.06}
+
+    def test_cargo_earned_preparation_and_one_paid_continuation_each_yield(clock):
+        """One departure choice keeps exact paid battles and funding independently of preparation pacing."""
+        from tools.prototype_eador_departure_cargo import earned_departures, run_case
+    
+>       expected = earned_departures(budget=CpuBudget(100))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/tools/test_retained_prototype_budget.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def earned_departures(*, budget=None):
+        budget = CpuBudget(25) if budget is None else budget
+        ordinary = play_stage(State.new_campaign(7, 'Commander'), budget=budget)
+        specialists = prepare_control_watch(State.new_campaign(0, 'Commander'), budget=budget)
+        purchased_watch = json.loads(specialists.to_json())
+        watch_control_route(specialists, orders_type=partial(AdventureOrders, budget=budget))
+        finish_battle(specialists, budget=budget)
+        specialists = play_stage(specialists, budget=budget)
+        assert ordinary.campaign.phase == specialists.campaign.phase == 'departure'
+        assert all(next(t for t in ordinary.hero.army if t.id == uid).kind == 'swordsman' for uid in (5, 4))
+>       adept = next(t for t in specialists.hero.army if t.id == 5)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tools/prototype_eador_departure_cargo.py:140: StopIteration
+=========================== short test summary info ============================
+FAILED tests/tools/test_retained_prototype_budget.py::test_cargo_earned_preparation_and_one_paid_continuation_each_yield
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 486 passed, 2 skipped, 794 deselected in 178.72s (0:02:58)

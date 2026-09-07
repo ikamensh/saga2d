@@ -1,0 +1,70 @@
+"""Bounded candidate helper regression and exact paid fee accounting."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+ROOT = Path('/tmp/saga2d-candidate-80a0769')
+sys.path.insert(0, str(ROOT))
+import pytest
+from tools.cpu_budget import CpuBudget
+from eador.model import State
+
+out = Path('/tmp/shardbound-guidance-fee-green-b1e0592')
+out.mkdir(exist_ok=True)
+paths = sorted([*ROOT.joinpath('eador').rglob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
+                *ROOT.joinpath('tools').glob('*.py'), ROOT / 'tests/eador/test_guidance_reading.py',
+                ROOT / 'tests/tools/test_reading_preparation_budget.py'])
+before = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+started, cpu = time.monotonic(), time.process_time()
+budget = CpuBudget(25)
+source = json.loads(Path('/tmp/shardbound-guidance-fee-diagnosis-b1e0592.json').read_text())
+state = State.from_json(source['entry'])
+receipt = []
+for method, args, kwargs in [('build', ('archery',), {}), ('explore', (), {'approach': 'guided'}),
+                             ('retreat', (), {})]:
+    prior = state.to_json()
+    gold, actions = state.gold, state.actions_left
+    getattr(state, method)(*args, **kwargs)
+    budget.checkpoint()
+    saved = state.to_json()
+    assert State.from_json(saved).to_json() == saved
+    receipt.append(dict(command=method, args=args, kwargs=kwargs, before=prior, after=saved,
+                        gold_before=gold, gold_after=state.gold,
+                        actions_before=actions, actions_after=state.actions_left))
+assert [row['gold_after'] for row in receipt] == [25, 5, 0]
+assert [row['actions_after'] for row in receipt] == [2, 1, 1]
+assert state.battle is None and not state.provinces[state.hero.pos].explored
+(out / 'paid-commands.json').write_text(json.dumps(receipt, indent=2) + '\n')
+
+class Pace:
+    def __init__(self):
+        self.results = []
+    def pytest_runtest_logreport(self, report):
+        if report.when == 'call':
+            self.results.append(dict(node=report.nodeid, outcome=report.outcome, duration=report.duration))
+    def pytest_runtest_teardown(self, item, nextitem):
+        budget.checkpoint()
+
+plugin = Pace()
+nodes = [
+    'tests/eador/test_guidance_reading.py::test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing',
+    'tests/tools/test_reading_preparation_budget.py::test_briefing_preparation_respects_the_supplied_allowance',
+    'tests/tools/test_reading_preparation_budget.py::test_complete_preparation_defaults_to_yielding_without_changing_saved_results[briefing]',
+    'tests/tools/test_reading_preparation_budget.py::test_briefing_matrix_forwards_its_allowance_to_paid_preparation',
+]
+code = pytest.main(['-q', '--maxfail=1', *nodes], plugins=[plugin])
+budget.checkpoint()
+after = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+              dirty=subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
+              source_sha256=before, source_unchanged=before == after, nodes=nodes, tests=plugin.results,
+              exit_code=code, requested_cpu_percent=25, wall_seconds=time.monotonic() - started,
+              cpu_seconds=time.process_time() - cpu,
+              scope='Four focused mock/model checks. Actual paid saved entry80g; Archery55g, guide20g, retreat loses the remaining5g and refunds no fee. No native window or game changes.')
+(out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
+print(json.dumps({k:v for k,v in report.items() if k != 'source_sha256'}, indent=2))
+assert before == after
+sys.exit(code)

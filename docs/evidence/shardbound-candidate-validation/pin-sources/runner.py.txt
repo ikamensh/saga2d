@@ -1,0 +1,42 @@
+"""Retain the three focused paid-source migration checks without rerunning the sweep."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+ROOT = Path('/tmp/saga2d-candidate-80a0769')
+sys.path.insert(0, str(ROOT))
+import pytest
+from tools.cpu_budget import CpuBudget
+
+paths = sorted([*ROOT.joinpath('eador').rglob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
+                ROOT / 'tests/eador/test_pin.py', ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
+before = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+started, cpu = time.monotonic(), time.process_time()
+budget = CpuBudget(25)
+
+class Pace:
+    def __init__(self):
+        self.results = []
+    def pytest_runtest_logreport(self, report):
+        if report.when == 'call':
+            self.results.append(dict(node=report.nodeid, outcome=report.outcome, duration=report.duration))
+    def pytest_runtest_teardown(self, item, nextitem):
+        budget.checkpoint()
+
+plugin = Pace()
+node = 'tests/eador/test_pin.py::test_real_adventures_award_equip_and_activate_both_relic_capabilities'
+code = pytest.main(['-q', '--maxfail=1', node], plugins=[plugin])
+budget.checkpoint()
+after = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+report = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+              source_sha256=before, source_unchanged=before == after, tests=plugin.results, exit_code=code,
+              requested_cpu_percent=25, wall_seconds=time.monotonic() - started,
+              cpu_seconds=time.process_time() - cpu,
+              scope='Three real paid seed7 relic-source routes, all themes, existing automatic battle helpers, then unchanged earned solo capability/save assertions. No runtime change or native window.')
+Path('/tmp/shardbound-pin-green-3f4e59f.json').write_text(json.dumps(report, indent=2) + '\n')
+print(json.dumps({k:v for k,v in report.items() if k != 'source_sha256'}, indent=2))
+assert before == after
+sys.exit(code)
