@@ -1,0 +1,2 @@
+5ec03699b9d600e1af787794909b9db723da81a975b8920491280ce600cf0cba  tools/verify_eador_restarts.py
+bd34e394fd9ce5d0906f9c9b62a396fbda83fdc5e4042a8ffd7df76634f723f9  tests/eador/test_phase_restarts.py
