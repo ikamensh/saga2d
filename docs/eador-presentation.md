@@ -100,6 +100,14 @@ finishes pending contacts from the preceding attack, while leaving or loading
 discards them. No sound queue delays an order or changes saved state. Manual
 orders and turn playback share game-owned weapon classification and cue mapping.
 
+A decisive manual hit now uses the same short, skippable playback before the
+result panel. The authoritative outcome and autosave remain immediate; loading
+skips the animation. Contact sounds survive skipping or a long frame without
+replaying the result fanfare. Ordinary nonterminal orders remain immediate.
+The [final-hit evidence](evidence/final-blow/README.md) covers normal and reduced
+motion, interruptions, and exact reloads. Online battles still show accepted
+snapshots rather than these local command traces.
+
 The [audio catalogue](eador-audio.md) records musical choices, provenance and
 technical checks. Audible artistic review is still needed; silent native
 playback and sample checks cannot establish whether music is enjoyable over a

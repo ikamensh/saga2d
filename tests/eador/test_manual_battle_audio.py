@@ -154,13 +154,14 @@ def test_pending_contact_finishes_before_next_order_and_cannot_outlive_loaded_or
         game.close()
 
 
-@pytest.mark.parametrize('player_hp,enemy,enemy_hp,stance,kind,result', [
-    (None, 'brigand', 1, None, 'attack', 'victory'),
-    (1, 'pikeman', None, 'brace', 'brace', 'defeat'),
+@pytest.mark.parametrize('player_hp,enemy,enemy_hp,stance,kinds,result', [
+    (None, 'brigand', 1, None, ['attack'], 'victory'),
+    (1, 'pikeman', None, 'brace', ['brace'], 'defeat'),
+    (1, 'brigand', None, None, ['attack', 'retaliation'], 'defeat'),
 ])
 def test_terminal_direct_order_contacts_once_before_result_without_inventing_a_lethal_brace_attack(
-        tmp_path, player_hp, enemy, enemy_hp, stance, kind, result):
-    """A lethal hit or pre-hit spear flushes the one real contact before the terminal result cue."""
+        tmp_path, player_hp, enemy, enemy_hp, stance, kinds, result):
+    """A lethal hit or reaction plays every real contact before its result, even after a long frame."""
     from eador.scene import ResultScene
     from tests.eador.test_guard import encounter
     state = State.new(); state.explore()
@@ -168,17 +169,20 @@ def test_terminal_direct_order_contacts_once_before_result_without_inventing_a_l
     state.battle.unit(1000).stance = stance
     expected = Battle.from_dict(state.battle.to_dict())
     trace = expected.trace(lambda: expected.attack(0, 1000))
-    assert [event.kind for event in trace.events] == [kind, 'result']
+    assert [event.kind for event in trace.events] == kinds + ['result']
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
     try:
         game.push(ShardScene(state)); game.tick(0)
         player = PlayerInput(game, finish_actions=False)
         game.backend.sounds_played.clear()
         player.order('battle.attack', 0, 1000)
-        assert type(game.scene) is ResultScene
+        assert isinstance(game.scene, BattleScene)
         assert state.battle.to_dict() == expected.to_dict()
-        assert cues(game) == ['attack_hit', result]
-        game.tick(1.5)
-        assert cues(game) == ['attack_hit', result]
+        assert cues(game) == []
+        game.tick(3)
+        assert type(game.scene) is ResultScene
+        assert cues(game) == ['attack_hit'] * len(kinds) + [result]
+        game.tick(3)
+        assert cues(game) == ['attack_hit'] * len(kinds) + [result]
     finally:
         game.close()

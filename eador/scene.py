@@ -1202,6 +1202,11 @@ class BattleScene(Screen):
         before = {u.id: u.hp for u in self.battle.units}
         recorded = []
         if self.command(lambda: recorded.append(self.battle.trace(callback)), cue=None):
+            if self.battle.outcome and any(u.hp < before[u.id] for u in self.battle.units):
+                # Preserve the last victim and its contact before covering the
+                # board. The real outcome is already resolved and saved below.
+                self.begin_playback(recorded[0], finish_contacts_on_skip=True)
+                return
             self.finish_attack_sounds()
             if cue == 'attack_hit':
                 sounds = AttackSounds(self.battle, recorded[0], self.root.state.hero.hero_class)
@@ -1221,11 +1226,7 @@ class BattleScene(Screen):
             self.refresh()
             if checkpoint or self.battle.outcome:
                 self.checkpoint(self.root.state)
-            if self.battle.outcome:
-                self.finish_attack_sounds()
-                set_music(self.game, None)
-                self.game.audio.play_sound("victory" if self.battle.outcome == "player" else "defeat")
-                self.game.push(ResultScene(self.root, battle=True))
+            self.finish_phase()
 
     def _phase_button(self, x, y):
         self.button("End battle round", x, y, 300, self.end_turn,
@@ -1234,20 +1235,24 @@ class BattleScene(Screen):
                     tooltip='End battle round (E). Finish your orders and let the enemy act.')
 
     def play_phase(self, command):
-        from eador.battle_playback_scene import BattlePlaybackScene
         recorded = []
         if self.command(lambda: recorded.append(self.battle.trace(command)), cue=None):
-            self.finish_attack_sounds()
-            self.game.audio.play_sound('end_turn')
-            self.targeting = None
-            self.feedback = None
-            self.floats = []
-            self.checkpoint(self.root.state)
-            self.refresh()
-            if recorded[0].events:
-                self.game.push(BattlePlaybackScene(self, recorded[0]))
-            else:
-                self.finish_phase()
+            self.begin_playback(recorded[0], cue='end_turn')
+
+    def begin_playback(self, trace, *, cue=None, finish_contacts_on_skip=False):
+        from eador.battle_playback_scene import BattlePlaybackScene
+        self.finish_attack_sounds()
+        if cue:
+            self.game.audio.play_sound(cue)
+        self.targeting = None
+        self.feedback = None
+        self.floats = []
+        self.checkpoint(self.root.state)
+        self.refresh()
+        if trace.events:
+            self.game.push(BattlePlaybackScene(self, trace, finish_contacts_on_skip=finish_contacts_on_skip))
+        else:
+            self.finish_phase()
 
     def finish_phase(self):
         if self.battle.outcome:

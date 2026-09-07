@@ -211,9 +211,12 @@ class MovieInput(PlayerInput):
     def enemy_round(self):
         self.chapter('Enemy turn')
         self.do('battle.end_turn', hold=0)
+        self.watch_playback()
+        self.hold(1)
+
+    def watch_playback(self):
         while isinstance(self.game.scene, BattlePlaybackScene):
             self._tick()
-        self.hold(1)
 
 
 def opening(player):
@@ -268,6 +271,7 @@ def opening(player):
         if not player.state.battle.outcome:
             player.enemy_round()
     assert player.state.battle.outcome == 'player', 'The directed opening did not reach victory'
+    player.watch_playback()
     assert isinstance(game.scene, ResultScene)
     player.chapter('Victory')
     player.hold(3)

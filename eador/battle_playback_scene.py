@@ -1,4 +1,4 @@
-"""Bounded, skippable viewing of a turn whose authoritative rules already resolved."""
+"""Bounded, skippable viewing of orders whose authoritative rules already resolved."""
 from dataclasses import asdict, replace
 import math
 
@@ -86,10 +86,14 @@ class BattlePlaybackScene(BattleScene):
                 'f1': 'help', 'f2': 'open_text_settings'}
     accepts_orders = False
 
-    def __init__(self, parent, trace):
+    def __init__(self, parent, trace, *, finish_contacts_on_skip=False):
         self.parent = parent
         self.playback = BattlePlayback(parent.battle, trace)
         self.finished = False
+        # A decisive manual hit keeps its short contact sequence when skipped;
+        # skipping a whole enemy/autoplay turn must not burst every omitted cue.
+        self.finish_contacts_on_skip = finish_contacts_on_skip
+        self._contact_cursor = 0
         super().__init__(parent.root)
         self.selected = parent.selected
         self.message = parent.message
@@ -119,7 +123,7 @@ class BattlePlaybackScene(BattleScene):
             lines.append(label(f'{side} {unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL))
         lines.extend([label('Watch each move, ability and reaction in order.'),
                       label('Space, Enter or Esc finishes playback. Battle orders resume afterward.'),
-                      label('Saves record the resolved turn. Loading resumes after these actions.', 11)])
+                      label('Saving records the outcome of these orders. Loading skips their animation.', 11)])
         return Column(*lines, spacing=18)
 
     def order_hint(self):
@@ -156,19 +160,26 @@ class BattlePlaybackScene(BattleScene):
             return 5
         return 3
 
+    def _play_contacts(self, stop):
+        for event in self.playback.trace.events[self._contact_cursor:stop]:
+            _, contact = event_cues(self.battle, event, self.root.state.hero.hero_class)
+            if contact:
+                self.game.audio.play_sound(contact)
+        self._contact_cursor = stop
+
     def _announce(self):
         shown = self.playback.index, self.playback.applied
         if shown == self._shown:
             return
+        self._play_contacts(self.playback.index)
         event = self.playback.event
-        release, contact = event_cues(self.battle, event, self.root.state.hero.hero_class)
+        release, _ = event_cues(self.battle, event, self.root.state.hero.hero_class)
         if self._shown is None or self._shown[0] != shown[0]:
             if release:
                 self.game.audio.play_sound(release)
         self.floats = []
         if self.playback.applied:
-            if contact:
-                self.game.audio.play_sound(contact)
+            self._play_contacts(self.playback.index + 1)
             for unit in event.after.units:
                 amount = unit.hp - event.before.unit(unit.id).hp
                 if amount:
@@ -180,6 +191,7 @@ class BattlePlaybackScene(BattleScene):
         self.clock += dt
         self.playback.advance(dt)
         if self.playback.done:
+            self._play_contacts(len(self.playback.trace.events))
             self.finish()
             return
         self._announce()
@@ -192,6 +204,8 @@ class BattlePlaybackScene(BattleScene):
     def finish(self):
         if not self.finished:
             self.finished = True
+            if self.finish_contacts_on_skip:
+                self._play_contacts(len(self.playback.trace.events))
             self.parent.message = self.message
             self.game.pop()
             self.parent.finish_phase()
