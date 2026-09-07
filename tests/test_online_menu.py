@@ -8,7 +8,7 @@ from tests.test_online_server import server_url, running_server
 
 def test_online_menu_needs_only_a_room_code_and_reports_missing_input(tmp_path):
     """The default join path asks friends for a code without requiring an IP address."""
-    game = Game('online menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path)
+    game = Game('online menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'saves')
     try:
         game.push(MatchMenu('Test multiplayer', 'tribes-v1', None, None))
         game.tick(.03)
@@ -69,11 +69,12 @@ def test_online_creator_waits_for_partner_and_can_rejoin_after_app_restart(serve
         raise AssertionError('Online menu did not reach the expected state')
 
     monkeypatch.setenv('SAGA2D_SERVER_URL', server_url)
-    game = Game('online menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path)
+    game = Game('online menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'saves')
     guest = None
     try:
         game.push(new_menu())
         game.tick(.03)
+        assert not game.scene.last_room['resume_token']
         click_text('Create room')
         assert isinstance(game.scene, MatchLobby)
         wait(lambda: bool(game.scene.session.resume_token))
@@ -106,7 +107,7 @@ def test_online_creator_waits_for_partner_and_can_rejoin_after_app_restart(serve
         game.scene.session.submit({'action': 'end_turn'}, revision=game.scene.session.revision)
         wait(lambda: guest.state['world']['current'] == 1)
         game.close()
-        game = Game('online menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path)
+        game = Game('online menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'saves')
         game.push(new_menu())
         game.tick(.03)
         wait(lambda: not guest.ready)
