@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 from eador.release import VERSION
 
 TOOL_VERSIONS = {"pyinstaller": "6.22.2", "pyinstaller-hooks-contrib": "2026.7"}
-RUNTIME_PACKAGES = ("numpy", "Pillow", "pyglet")
+RUNTIME_PACKAGES = ("numpy", "Pillow", "pyglet", "websockets")
 
 
 def sha256(path: Path) -> str:

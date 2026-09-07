@@ -1,5 +1,9 @@
 """The scene-facing client works against the real dedicated server process."""
 import time
+import select
+import socket
+import threading
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -60,3 +64,70 @@ def test_public_endpoint_requires_tls():
     """Room codes and private seats may cross plaintext only for local development."""
     with pytest.raises(ValueError, match='TLS'):
         OnlineClient('tribes-v1', endpoint='ws://example.com/play')
+
+
+def test_connection_break_resumes_same_seat_and_authoritative_turn(server_url):
+    """An interrupted TCP route reconnects without requiring the player to leave the match."""
+    target = urlsplit(server_url)
+    listener = socket.socket()
+    listener.bind(('127.0.0.1', 0))
+    listener.listen()
+    stop, interrupt = threading.Event(), threading.Event()
+
+    def relay():
+        pairs = {}
+        try:
+            while not stop.is_set():
+                if interrupt.is_set():
+                    for stream in pairs:
+                        stream.close()
+                    pairs.clear()
+                    interrupt.clear()
+                readable, _, _ = select.select([listener, *pairs], [], [], .02)
+                for stream in readable:
+                    if stream is listener:
+                        incoming, _ = listener.accept()
+                        outgoing = socket.create_connection((target.hostname, target.port), timeout=2)
+                        incoming.settimeout(2)
+                        pairs[incoming], pairs[outgoing] = outgoing, incoming
+                    elif stream in pairs:
+                        other = pairs[stream]
+                        try:
+                            data = stream.recv(65536)
+                            if data:
+                                other.sendall(data)
+                                continue
+                        except OSError:
+                            pass
+                        pairs.pop(stream)
+                        pairs.pop(other)
+                        stream.close()
+                        other.close()
+        finally:
+            for stream in pairs:
+                stream.close()
+
+    worker = threading.Thread(target=relay)
+    worker.start()
+    creator = OnlineClient('tribes-v1', endpoint=f'ws://127.0.0.1:{listener.getsockname()[1]}')
+    guest = None
+    try:
+        pump(creator, until=lambda: bool(creator.room))
+        guest = OnlineClient('tribes-v1', endpoint=server_url, room=creator.room)
+        pump(creator, guest, until=lambda: creator.ready and guest.ready)
+        token = creator.resume_token
+        interrupt.set()
+        pump(creator, guest, until=lambda: not creator.ready)
+        pump(creator, guest, until=lambda: creator.ready and guest.ready)
+        assert creator.resume_token == token and creator.player == 0
+        creator.submit({'action': 'end_turn'}, revision=creator.revision)
+        pump(creator, guest, until=lambda: guest.state['world']['current'] == 1)
+        assert creator.state == guest.state
+    finally:
+        creator.close()
+        if guest is not None:
+            guest.close()
+        stop.set()
+        worker.join(timeout=5)
+        listener.close()
+        assert not worker.is_alive()

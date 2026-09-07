@@ -456,3 +456,7 @@ and active battles.
 Press **M / Co-op** on the title to host or join a two-player shared campaign.
 Both partners command the same realm and army. See the
 [multiplayer guide](../docs/multiplayer.md) for LAN/VPN setup and limitations.
+
+Online co-op defaults to a Scaleway-hosted room: choose **Co-op**, **Create room**,
+then share its code. Your friend chooses **Join room**. **Rejoin last room**
+recovers your private seat after restarting. See [the online guide](../docs/online-multiplayer.md).
