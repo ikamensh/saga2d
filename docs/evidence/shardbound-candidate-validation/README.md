@@ -1,41 +1,58 @@
-# Candidate validation: retained ordinary tranches
+# Candidate validation: completed ordinary selection
 
-These five completed tranches contain **1,125 unique passed test nodes and two
-skipped test nodes**. Each tranche stopped at its first failure. This is historical
-coverage across successive source revisions, **not a completed passing suite at
-one final revision**. The continuation after the Vault assertion repair is still
-pending in this record; its result will be appended separately.
+**All 1,542 current ordinary cases passed**, across seven regression tranches and
+the separate two-test native display check. **159 cases remain explicitly deferred
+from this ordinary selection.** This is scoped coverage across successive test/tool
+revisions, not one full-suite invocation or a claim that the deferred matrices ran.
 
-| Source / directory | Additional passes | Cumulative unique passes | Skips | First failure | Wall / CPU seconds |
+The exact accounting is **1,546 initially selected − 4 retired = 1,542 current
+cases**. Historical mock passes total 1,541, including one subsequently removed
+Relief-prototype test: **1,540 current mock passes + 2 native passes = 1,542**.
+`coverage.jq` verifies set equality against the final collection, not just matching
+counts; `coverage.json.gz` retains its result. There are no missing or unexpected
+current ordinary nodes. The final collection contains 1,701 cases including the
+159 explicit deferrals.
+
+| Actual source / stored directory | Additional mock passes | Cumulative historical mock passes | Display skips | First failure | Wall / CPU seconds |
 | --- | ---: | ---: | ---: | --- | ---: |
 | `03a5044` | 301 | 301 | 0 | Paid briefing preparation | 283.051 / 70.222 |
 | `3f4e59f` | 133 | 434 | 0 | Earned Pin relic sources, Frontier | 65.110 / 16.234 |
 | `7a29510` | 201 | 635 | 0 | Complete saved-victory input journey | 133.263 / 33.243 |
 | `e5840c7` | 486 | 1,121 | 2 | Retained cargo-prototype preparation | 178.842 / 43.098 |
 | `4094c85` | 4 | 1,125 | 2 | Vault continuation's old source coordinate | 3.069 / 0.819 |
+| `6c51f22` / `b2e3120` | 8 | 1,133 | 2 | Superseded detached Relief prototype | 43.213 / 10.846 |
+| `8bf2eb2` / `final` | 408 | 1,541 | 2 | None; exit 0 | 116.980 / 28.780 |
 
-All five exited **1** and report unchanged scoped source hashes during their own
-run. Total measured time was **663.335 seconds wall / 163.616 seconds CPU**.
+The first six tranches exited **1** at their first failure; the seventh exited
+**0**. All seven report unchanged scoped source hashes during their own run.
+Their **110 game/framework Python files under eador, saga2d, tribes and warband
+are byte-identical across all seven receipts**. Total measured tranche time was
+**823.528 seconds wall / 203.241 seconds CPU**. The final pytest console reports
+116.80 seconds; its enclosing receipt measures 116.980 seconds.
 The continuation runner excludes previously passed nodes and authenticates its
-immediate predecessor report by SHA-256; all four links match the retained
+immediate predecessor report by SHA-256; all six links match the retained
 originals. The counts above deduplicate passed call-phase node IDs across the
-five receipts. The two skipped display tests recur in the last tranche; they are
-still only two unique skipped nodes. Focused reruns below overlap this coverage
-and are not added again.
+seven receipts. Repeated display skips are only two unique nodes. Focused reruns
+below overlap this coverage and are not added again. The sixth directory's name
+`b2e3120` is not its execution source: the receipt identifies **6c51f22**.
 
 The initial selection contained 1,546 ordinary cases, with 159 cases explicitly
 excluded by 12 named test families. The retained runner lists the exclusions:
 large world/hero/policy/linked-campaign matrices and two packaged-campaign cases.
 Those two package cases were checked separately. Pacing requested 25% CPU through
 the shared `CpuBudget`, cooperatively between tests; an atomic test can exceed
-that allowance. This archive does not establish a full-suite or native pass.
+that allowance. This archive does not establish a full-suite or packaged-app pass.
 
 Both skips were display-dependent framework tests:
 `test_immediate_images_show_where_this_frame_drew_them_and_nowhere_else` and
 `test_control_click_is_a_right_click_on_a_mac`. Their module requires an available
-display for a hidden pyglet window. They were skipped at setup, not passed.
+display for a hidden pyglet window. They were skipped at setup in the tranches,
+then both **passed in 0.51 seconds** after waking the display with bounded
+`caffeinate`; see `native-framework/pytest.log`. The run owner recorded clean
+**7b5562d** as their launch source. That revision only updates evidence wording
+relative to the final tranche's **8bf2eb2** runtime.
 
-## Five first failures and their disposition
+## Six first failures and their disposition
 
 1. **Paid briefing preparation** —
    `tests/eador/test_guidance_reading.py::test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committing`.
@@ -100,8 +117,36 @@ display for a hidden pyglet window. They were skipped at setup, not passed.
    policy remain unchanged. Two focused checks passed in **1.22 seconds**; see
    the separate [Vault repair record](../vault-continuation-4094c85/README.md).
    Its current paid/free endpoints differ (turn 8 versus turn 13), so the old
-   matched-endpoint net-benefit interpretation does not carry forward. The
-   ordinary continuation after this repair is not yet reported here.
+   matched-endpoint net-benefit interpretation does not carry forward. Both
+   existing audit tests subsequently passed in the sixth ordinary tranche.
+
+6. **Superseded detached Relief prototype** —
+   `tests/tools/test_verifier_preparation_budget.py::test_bounded_prototype_cli_preserves_search_and_world_results_with_default_pacing`.
+   Its detached source audit still assumed the placement used by the original
+   proposal. Production Relief and seeded placement had superseded that runner;
+   there were no production callers. Commit **8bf2eb2** retires it and exactly
+   three dedicated tests, preserving the historical evidence and production
+   witnesses. See [Relief retirement](../relief-prototype-retirement/README.md).
+   `test_prototype_paid_preparation_and_saved_orders_share_the_allowance` had
+   passed in the sixth tranche and is explicitly subtracted from current coverage.
+   The bounded CLI test failed; the detached-search test was not reached. Together
+   with the retired cargo test, these are the four removed nodes recorded in
+   `coverage.json.gz`. No production feature was removed and no missing survivor,
+   reward or source was fabricated to make an old proposal pass.
+
+## Separate bounded campaign model audit
+
+`bounded-campaign/` retains the exact report and log for
+`tools/audit_eador_campaign.py --seeds 1 --cpu-percent 25 --output /tmp/shardbound-current-campaign-audit.json`.
+It completed **24/24 campaigns: 16 direct and 8 recovered, with 72 shard records**,
+in **7.01 seconds** at the requested 25% allowance. This uses the existing explicit
+tactical auto command and one seed index across the tool's configured paths;
+it is not manual tactical play, a seed-diversity result or an additional 24 ordinary
+test nodes. Its final phases are all `completed`.
+
+The report has **no source_commit field**. The run owner recorded launch from clean
+**7b5562d**; the report's **39 exact source hashes** are authoritative and match the
+final tranche's source map. No separate measured CPU-seconds value is supplied.
 
 ## Other retained checks and file provenance
 
@@ -118,7 +163,7 @@ the narrow GREEN and exact saved loss/victory envelopes. Runner copies use
 Python-source fingerprint. The fee runner is the final corrected version; the
 earlier incorrect accounting assertion is evidenced by its RED log.
 
-`originals.tsv` maps all **33 original files** to their archive names and records
+`originals.tsv` maps all **42 original files** to their archive names and records
 the SHA-256 of each original uncompressed file. Every copied file and every
 decompressed JSON/JSONL was compared byte-for-byte with its original. No tests,
 game/model preparation, native windows or builds ran while creating this archive.

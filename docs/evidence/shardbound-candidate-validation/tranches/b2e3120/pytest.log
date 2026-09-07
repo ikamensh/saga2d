@@ -1,0 +1,50 @@
+ss........F
+=================================== FAILURES ===================================
+_ test_bounded_prototype_cli_preserves_search_and_world_results_with_default_pacing _
+
+clock = {'cpu': 0.06, 'sleeps': [], 'wall': 0.06}
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-1842/test_bounded_prototype_cli_pre0')
+
+    def test_bounded_prototype_cli_preserves_search_and_world_results_with_default_pacing(clock, tmp_path):
+        """Two trials per approach and two world seeds exercise real CLI forwarding without the full search."""
+        from tools.prototype_eador_relief import main
+    
+        path = tmp_path / 'prototype.json.gz'
+        args = ['--output', str(path), '--trials', '2', '--world-seeds', '2']
+>       main([*args, '--cpu-percent', '100'])
+
+tests/tools/test_verifier_preparation_budget.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/prototype_eador_relief.py:375: in main
+    report=measure(trials=args.trials,world_seeds=args.world_seeds,budget=budget)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/prototype_eador_relief.py:323: in measure
+    sources = source_audit(seed_count=world_seeds, budget=budget)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def source_audit(*, seed_count=1000, budget=None):
+        """Find a duplicate ordinary reward route; inherit the displaced reward unchanged."""
+        budget = CpuBudget(25) if budget is None else budget
+        fixed = {'frontier': {(0,2):'courier_crossing',(-1,1):'muster_yard',(0,-1):'stranded_explorer'},
+                 'elderwild': {(-1,-1):'supply_cache',(-1,1):'pack_hunt',(0,-1):'smuggler_screen'},
+                 'ruins': {(-1,1):'sealed_vault',(-1,0):'broken_observatory',(0,0):'aerie_raid',(1,0):'barrow'}}
+        protected = {(-2,0),(-2,1),(-2,2),(-1,2),(-1,1),(0,-1),(0,-2),(0,2),(2,0)}
+        selections, counts = [], Counter()
+        def reward(province):
+            return province.site_gold,province.site_crystals,province.site_relic
+        for seed in range(seed_count):
+            budget.checkpoint()
+            rewards = set()
+            for theme,sites in fixed.items():
+                world = generate(seed,theme)
+                for pos,kind in {(-2,0):'shrine',(-2,2):'den',(-1,2):'explorer_camp',**sites}.items():
+>                   assert world[pos].site_kind == kind
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   AssertionError
+
+tools/prototype_eador_relief.py:240: AssertionError
+=========================== short test summary info ============================
+FAILED tests/tools/test_verifier_preparation_budget.py::test_bounded_prototype_cli_preserves_search_and_world_results_with_default_pacing
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 8 passed, 2 skipped, 1284 deselected in 43.03s

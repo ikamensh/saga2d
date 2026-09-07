@@ -31,3 +31,12 @@
 /tmp/shardbound-candidate-regressions-4094c85/report.json	tranches/4094c85/report.json.gz	a35f47917a663838c99f0b14a8b6b0fb3e81bd2150e7b8bc368c0ae1fca1e576
 /tmp/shardbound-candidate-regressions-4094c85/tests.jsonl	tranches/4094c85/tests.jsonl.gz	0b2c555de8461e3bca4c6b5772c76de437f5258e150fa8417c6d58c86e0bba60
 /tmp/shardbound-candidate-regressions-4094c85.log	tranches/4094c85/pytest.log	0ce3d4ae5978287bc6a28adafa643b665dbbb3d0fd3d6f0392919a91c0b1842b
+/tmp/shardbound-candidate-regressions-b2e3120/report.json	tranches/b2e3120/report.json.gz	425858abf97ead990e00f89deaea377198ec56a8497c94f66cb828d94dd71201
+/tmp/shardbound-candidate-regressions-b2e3120/tests.jsonl	tranches/b2e3120/tests.jsonl.gz	bb4d39a98a804de8ec5223d4951e13b98b8e770408e7b53a9f04854a66cee410
+/tmp/shardbound-candidate-regressions-b2e3120.log	tranches/b2e3120/pytest.log	a1bf68645e8999e243814e894f48e30e070abee92c7d313044811879ac6ba159
+/tmp/shardbound-candidate-regressions-final/report.json	tranches/final/report.json.gz	6201565718b7bfc5fdd63d66ccdf20b98bbe91aff22fffdb3215d157cc8731bb
+/tmp/shardbound-candidate-regressions-final/tests.jsonl	tranches/final/tests.jsonl.gz	72dd5791f55448efcbc4bbf70d4a0bdb26b2242c86e41d27cf365ac011603665
+/tmp/shardbound-candidate-regressions-final.log	tranches/final/pytest.log	2558fd1fbc06ce9b4cb3acd3ac2c69c68658222b322c9b9f201cbf7f2f83da3a
+/tmp/shardbound-candidate-native-framework.log	native-framework/pytest.log	6ea82269fd676e5e4f8e3e8bb509696773d6e68fd3dc73f593f2237846f4ea9a
+/tmp/shardbound-current-campaign-audit.json	bounded-campaign/report.json.gz	3fbbfad04048ee292bd9feef8b194be5b06f04318bd9906c430907ddf8460044
+/tmp/shardbound-current-campaign-audit.log	bounded-campaign/audit.log	943579d38c3955d63001ec8f06e21ef8eec3100c0a862f8c2ebb3644893a9ec7
