@@ -1502,7 +1502,7 @@ class BattleScene(Screen):
             self.act(lambda: self.root.order("move", self.selected, pos, target="battle"), cue="move")
 
     def _forecast(self):
-        from saga2d import Column, Label
+        from saga2d import Column, Label, Row
         from eador.preferences import reading_scale
         b = self.battle
         selected = b.unit(self.selected) if self.selected is not None else None
@@ -1555,7 +1555,11 @@ class BattleScene(Screen):
             elif sight_blocked:
                 line('Sight blocked', size=12, color=GOLD)
             else:
-                line(f"Attack {hovered.attack}  ·  Defense {hovered.effective_defense}  ·  Range {hovered.attack_range}", size=11, color=MUTED)
+                labels.append(Row(*(metric(name, value, width=94, size=11 * scale,
+                                           color=MUTED, detail=hovered.name)
+                                    for name, value in (('attack', hovered.attack),
+                                                        ('defense', hovered.effective_defense),
+                                                        ('range', hovered.attack_range))), spacing=8))
             detail = ('Ally keeps order; both moves spent.' if self.targeting == 'swap' else
                       'Clears Pin; spent orders stay spent.' if self.targeting == 'rally' else
                       'One charge; target keeps its orders.' if self.targeting == 'repulse' else

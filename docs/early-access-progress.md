@@ -1127,3 +1127,11 @@ all four campaign runs end in defeat, so this is invariant evidence rather than
 victory coverage. [Retained receipt](evidence/realm-settlement/linked-fuzz.json.gz).
 Independent source review found no blockers. This is a prerequisite, not a
 playable independent-realm PvP mode; the acceptance criteria remain open.
+
+## Inspected statistics stay together — 2026-09-07
+
+Enemy inspection now uses icon/value pairs for attack, defense and range,
+fixing the detached Range value visible at 125% reading size. The three
+icon-control tests pass. [Native evidence](evidence/inspected-stats/README.md)
+retains both inspected text sizes, hover/layout assertions and two exact
+UI reloads. No battle rules, framework interface or packaged build changed.
