@@ -425,9 +425,12 @@ def test_codex_is_reachable_from_campaign_guide_and_battle_without_advancing_pla
 
 def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
     """Explore, invest, conquer, replay and restore a finished shard through UI."""
+    from eador.encounter_scene import EncounterScene
     from eador.model import BUILDINGS, UNITS
     from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
+    from tools.cpu_budget import CpuBudget
 
+    budget = CpuBudget(25)
     game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)
     try:
         game.push(TitleScene(seed=7))
@@ -436,13 +439,16 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         root, state = game.scene, game.scene.state
 
         def battle():
+            if isinstance(game.scene, EncounterScene):
+                press(game, 'return')
             assert isinstance(game.scene, BattleScene)
             for _ in range(80):
                 if state.battle.outcome:
                     break
                 press(game, "a")
+                budget.checkpoint()
             assert isinstance(game.scene, ResultScene)
-            assert state.battle.outcome == "player"
+            assert state.battle.outcome == "player", (state.hero.pos, state.battle.round, state.battle.log)
             press(game, "e")
             while isinstance(game.scene, ChoiceScene):
                 press(game, "1")
@@ -458,9 +464,13 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
             press(game, "escape")
 
         def rest():
+            # Any rest advances the visible rival order, including post-site recovery.
+            if state.rival.target == (-2, 0) and state.rival.turns_until_action == 1:
+                return False
             press(game, "e")
             if state.battle:
                 battle()
+            return True
 
         press(game, "b")
         press(game, "1")
@@ -468,7 +478,8 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         press(game, "r")
         press(game, "2")
         press(game, "escape")
-        for destination in ((-2, 0), (-1, 0), (0, 0), (0, 1), (1, 0)):
+        itinerary = ((-2, 0), (-1, 0), (0, 0), (0, 1), (1, 0))
+        for destination in itinerary:
             if state.hero.pos != destination:
                 click(game, *root.grid.center(destination))
                 press(game, "return")
@@ -476,23 +487,16 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
                 rest()
                 prepare()
             press(game, "x")
-            if state.provinces[destination].site_kind == 'relief_column':
-                from eador.encounter_scene import EncounterScene
-                assert isinstance(game.scene, EncounterScene)
-                before = state.to_json()
-                press(game, 'escape')  # The same reward remains at the ordinary Grove next door.
-                assert state.to_json() == before
-                continue
             battle()
+            assert state.provinces[destination].explored
             rest()
             prepare()
+            budget.checkpoint()
         for _ in range(12):
             if max([state.hero.max_hp - state.hero.hp] + [u.max_hp - u.hp for u in state.hero.army]) <= 6:
                 break
-            # Rest advances the visible rival order; strike before Westwatch falls.
-            if state.rival.target == (-2, 0) and state.rival.turns_until_action == 1:
+            if not rest():
                 break
-            rest()
         assert state.status == "playing"
         assert game.scene is root
         click(game, *root.grid.center((2, 0)))
@@ -511,7 +515,7 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
         assert game.scene.root.state.to_json() == won
         assert len(game.scenes) == 2
     finally:
-        game._teardown()
+        game.close()
 
 
 def test_exhausted_actions_show_complete_guidance_above_the_disabled_travel_control(tmp_path):
