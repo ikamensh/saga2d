@@ -1,0 +1,254 @@
+{
+  "driver": "pyglet.media.drivers.silent.adaptation",
+  "impact_families": [
+    "arrow_armor",
+    "arrow_flesh",
+    "arrow_stone",
+    "arrow_wood",
+    "axe_armor",
+    "axe_flesh",
+    "axe_stone",
+    "axe_wood",
+    "lance_armor",
+    "lance_flesh",
+    "lance_stone",
+    "lance_wood",
+    "spear_armor",
+    "spear_flesh",
+    "spear_stone",
+    "spear_wood",
+    "stone_armor",
+    "stone_flesh",
+    "stone_stone",
+    "stone_wood",
+    "sword_armor",
+    "sword_flesh",
+    "sword_stone",
+    "sword_wood"
+  ],
+  "scene_sounds": [
+    "under_attack",
+    "sword_armor",
+    "axe_wood",
+    "lance_flesh",
+    "arrow_flesh",
+    "arrow_armor",
+    "stone_stone"
+  ],
+  "damage": {
+    "5": 6,
+    "6": 6,
+    "7": 0,
+    "8": 0,
+    "9": 7,
+    "10": 0,
+    "11": 8,
+    "1": 0,
+    "2": 0,
+    "3": 43,
+    "4": 1
+  },
+  "native_plays": [
+    {
+      "sound": "arrow_armor",
+      "player_id": 0,
+      "pitch": 1.0232158962646272,
+      "volume": 0.65
+    },
+    {
+      "sound": "arrow_flesh",
+      "player_id": 1,
+      "pitch": 0.95864359403627,
+      "volume": 0.65
+    },
+    {
+      "sound": "arrow_stone",
+      "player_id": 2,
+      "pitch": 0.9987334926906531,
+      "volume": 0.65
+    },
+    {
+      "sound": "arrow_wood",
+      "player_id": 3,
+      "pitch": 1.0421019995428153,
+      "volume": 0.65
+    },
+    {
+      "sound": "axe_armor",
+      "player_id": 4,
+      "pitch": 1.0075043835509527,
+      "volume": 0.65
+    },
+    {
+      "sound": "axe_flesh",
+      "player_id": 5,
+      "pitch": 1.000421817023565,
+      "volume": 0.65
+    },
+    {
+      "sound": "axe_stone",
+      "player_id": 6,
+      "pitch": 0.9675771206470011,
+      "volume": 0.65
+    },
+    {
+      "sound": "axe_wood",
+      "player_id": 7,
+      "pitch": 1.0106532097007799,
+      "volume": 0.65
+    },
+    {
+      "sound": "lance_armor",
+      "player_id": 8,
+      "pitch": 1.0438533280929712,
+      "volume": 0.65
+    },
+    {
+      "sound": "lance_flesh",
+      "player_id": 9,
+      "pitch": 1.0434506928433889,
+      "volume": 0.65
+    },
+    {
+      "sound": "lance_stone",
+      "player_id": 10,
+      "pitch": 1.0361949355395625,
+      "volume": 0.65
+    },
+    {
+      "sound": "lance_wood",
+      "player_id": 11,
+      "pitch": 0.9638887010193233,
+      "volume": 0.65
+    },
+    {
+      "sound": "spear_armor",
+      "player_id": 12,
+      "pitch": 1.0358954459171195,
+      "volume": 0.65
+    },
+    {
+      "sound": "spear_flesh",
+      "player_id": 13,
+      "pitch": 0.9847177496738199,
+      "volume": 0.65
+    },
+    {
+      "sound": "spear_stone",
+      "player_id": 14,
+      "pitch": 0.964063108726153,
+      "volume": 0.65
+    },
+    {
+      "sound": "spear_wood",
+      "player_id": 15,
+      "pitch": 0.9834577029569435,
+      "volume": 0.65
+    },
+    {
+      "sound": "stone_armor",
+      "player_id": 16,
+      "pitch": 1.0371709947914107,
+      "volume": 0.65
+    },
+    {
+      "sound": "stone_flesh",
+      "player_id": 17,
+      "pitch": 0.9979308798897445,
+      "volume": 0.65
+    },
+    {
+      "sound": "stone_stone",
+      "player_id": 18,
+      "pitch": 0.9784443079352764,
+      "volume": 0.65
+    },
+    {
+      "sound": "stone_wood",
+      "player_id": 19,
+      "pitch": 1.0374395032321195,
+      "volume": 0.65
+    },
+    {
+      "sound": "sword_armor",
+      "player_id": 20,
+      "pitch": 1.0197734217763559,
+      "volume": 0.65
+    },
+    {
+      "sound": "sword_flesh",
+      "player_id": 21,
+      "pitch": 1.0189228081273738,
+      "volume": 0.65
+    },
+    {
+      "sound": "sword_stone",
+      "player_id": 22,
+      "pitch": 1.011273924634627,
+      "volume": 0.65
+    },
+    {
+      "sound": "sword_wood",
+      "player_id": 23,
+      "pitch": 0.9994220079818792,
+      "volume": 0.65
+    },
+    {
+      "sound": "select",
+      "player_id": 24,
+      "pitch": 1.0,
+      "volume": 0.8
+    },
+    {
+      "sound": "under_attack",
+      "player_id": 25,
+      "pitch": 1.0,
+      "volume": 0.8
+    },
+    {
+      "sound": "sword_armor",
+      "player_id": 26,
+      "pitch": 0.9769519789198419,
+      "volume": 0.52
+    },
+    {
+      "sound": "axe_wood",
+      "player_id": 27,
+      "pitch": 1.0183278291548967,
+      "volume": 0.52
+    },
+    {
+      "sound": "lance_flesh",
+      "player_id": 28,
+      "pitch": 0.9721960382352152,
+      "volume": 0.52
+    },
+    {
+      "sound": "arrow_flesh",
+      "player_id": 29,
+      "pitch": 0.9764754335753698,
+      "volume": 0.52
+    },
+    {
+      "sound": "arrow_armor",
+      "player_id": 30,
+      "pitch": 1.0272861522351884,
+      "volume": 0.52
+    },
+    {
+      "sound": "stone_stone",
+      "player_id": 31,
+      "pitch": 0.9632094358447203,
+      "volume": 0.52
+    },
+    {
+      "sound": "stone_stone",
+      "player_id": 32,
+      "pitch": 1.0337578558602531,
+      "volume": 0.52
+    }
+  ],
+  "natural_eos_count": 32,
+  "natural_players_released": true,
+  "teardown_released_active_player": true
+}

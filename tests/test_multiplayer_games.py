@@ -74,6 +74,97 @@ def test_warband_guest_orders_and_host_simulation_stay_in_sync():
         host.close()
 
 
+@pytest.mark.parametrize('audio_schema', ['current', 'basic', 'partial'])
+def test_warband_fatal_impact_keeps_its_material_across_the_socket(tmp_path, audio_schema):
+    """Guests hear fatal impacts, with explicit basic audio only for the old schema."""
+    from saga2d import Game
+    from warband.model import World
+    from warband.multiplayer import WarbandMatch, NetworkGameScene
+    from warband.rules import BuildingType, Terrain, UnitType
+    from warband.style import build_theme
+
+    match = WarbandMatch(3)
+    match.world = World(32, 24, [[Terrain.GRASS] * 32 for _ in range(24)], 2)
+    for player in match.world.players:
+        player.human = True
+    match.world.place_building(0, BuildingType.TOWN_HALL, (3, 3))
+    match.world.place_building(1, BuildingType.TOWN_HALL, (25, 18))
+    attacker = match.world.spawn_unit(1, UnitType.FOOTMAN, (10.5, 10.5))
+    victim = match.world.place_building(0, BuildingType.TOWER, (11, 10), done=False)
+    victim.hp = 1
+    armor = match.world.armor_of(victim)
+    match.world.update_vision()
+    impact_fields = ('source_type', 'target_type', 'target_armor', 'target_complete')
+    omitted_fields = {'current': (), 'basic': impact_fields, 'partial': ('target_type',)}[audio_schema]
+
+    def snapshot(player):
+        state = match.snapshot(player)
+        for _, event in state['events']:
+            for field in omitted_fields:
+                del event[field]
+        return state
+
+    host = MatchHost('warband-v1', match.apply, snapshot, address=('127.0.0.1', 0), token='test')
+    client = MatchClient('warband-v1', host.address, token='test')
+    game = Game('network battle audio', backend='mock', theme=build_theme(), save_dir=tmp_path)
+    try:
+        converge(host, client, lambda: client.ready)
+        scene = NetworkGameScene(client, settings={'tutorial': False})
+        game.push(scene)
+        scene.camera.center_on(11.5 * 32, 10.5 * 32)
+        game.tick(1 / 30)
+        scene.order('attack', [attacker.id], victim.id)
+        converge(host, client, lambda: bool(match.world.units[attacker.id].orders))
+        for _ in range(4):
+            match.step()
+            if match.world.entity(victim.id) is None:
+                break
+        assert match.world.entity(victim.id) is None
+        host.publish()
+        converge(host, client, lambda: client.revision == host.revision)
+        hit = next(event for _, event in client.state['events']
+                   if event['kind'] == 'hit' and event['other'] == victim.id)
+        if audio_schema == 'current':
+            assert {key: hit[key] for key in impact_fields} == {
+                'source_type': 'footman', 'target_type': 'tower', 'target_armor': armor, 'target_complete': False,
+            }
+            assert armor > 0
+        elif audio_schema == 'basic':
+            assert not set(impact_fields).intersection(hit)
+        else:
+            with pytest.raises(ValueError, match='incomplete battle audio metadata'):
+                game.tick(1 / 30)
+            assert 'impact' not in scene.recent_sounds
+            return
+        game.tick(1 / 30)
+        assert scene.world.entity(victim.id) is None
+        assert ('sword_wood' if audio_schema == 'current' else 'impact') in scene.recent_sounds
+        assert 'sword_stone' not in scene.recent_sounds
+        if audio_schema == 'basic':
+            assert scene.status == 'Server uses basic battle audio; update the server for weapon and material sounds.'
+            # Later impacts must leave newer player feedback visible.
+            next_victim = match.world.place_building(0, BuildingType.TOWER, (11, 10), done=False)
+            next_victim.hp = 1
+            scene.say('Holding the line.')
+            scene.order('attack', [attacker.id], next_victim.id)
+            converge(host, client, lambda: bool(match.world.units[attacker.id].orders)
+                     and match.world.units[attacker.id].orders[0].target == next_victim.id)
+            for _ in range(30):
+                match.step()
+                if match.world.entity(next_victim.id) is None:
+                    break
+            assert match.world.entity(next_victim.id) is None
+            host.publish()
+            converge(host, client, lambda: client.revision == host.revision)
+            game.tick(1 / 30)
+            assert scene.world.entity(next_victim.id) is None
+            assert scene.status == 'Holding the line.'
+    finally:
+        game.close()
+        client.close()
+        host.close()
+
+
 def test_shardbound_partners_share_campaign_and_tactical_orders():
     """Both seats can develop one realm, enter battle and act on the same army."""
     from eador.multiplayer import ShardboundMatch

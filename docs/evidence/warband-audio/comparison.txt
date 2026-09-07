@@ -1,0 +1,49 @@
+Warband combat sound comparison
+Times refer to comparison.wav; takes are numbered 1–3.
+Weapon/material clips use the game's 65% impact gain, without playback pitch variation.
+
+000.25–000.49  comparison: sword / flesh · take 1
+000.69–000.94  comparison: sword / flesh · take 2
+001.14–001.39  comparison: sword / flesh · take 3
+001.94–002.34  comparison: sword / armor · take 1
+002.54–002.94  comparison: sword / armor · take 2
+003.14–003.53  comparison: sword / armor · take 3
+004.08–004.33  comparison: sword / wood · take 1
+004.53–004.76  comparison: sword / wood · take 2
+004.96–005.20  comparison: sword / wood · take 3
+005.75–006.00  comparison: sword / stone · take 1
+006.20–006.44  comparison: sword / stone · take 2
+006.64–006.90  comparison: sword / stone · take 3
+007.45–007.79  comparison: axe / wood · take 1
+007.99–008.30  comparison: axe / wood · take 2
+008.50–008.86  comparison: axe / wood · take 3
+009.40–009.61  comparison: spear / flesh · take 1
+009.81–010.03  comparison: spear / flesh · take 2
+010.23–010.44  comparison: spear / flesh · take 3
+010.99–011.39  comparison: lance / armor · take 1
+011.59–011.99  comparison: lance / armor · take 2
+012.19–012.59  comparison: lance / armor · take 3
+013.14–013.31  comparison: arrow / wood · take 1
+013.51–013.69  comparison: arrow / wood · take 2
+013.88–014.06  comparison: arrow / wood · take 3
+014.61–015.18  comparison: stone / stone · take 1
+015.38–015.93  comparison: stone / stone · take 2
+016.13–016.75  comparison: stone / stone · take 3
+017.65–018.05  mixed skirmish: sword / armor · take 1
+017.81–018.01  mixed skirmish: arrow / flesh · take 2
+017.97–018.22  mixed skirmish: sword / flesh · take 3
+018.13–018.47  mixed skirmish: axe / wood · take 1
+018.29–018.69  mixed skirmish: lance / armor · take 2
+018.45–019.00  mixed skirmish: stone / wood · take 3
+018.61–019.01  mixed skirmish: sword / armor · take 1
+018.77–018.99  mixed skirmish: spear / flesh · take 2
+018.93–019.31  mixed skirmish: arrow / armor · take 3
+019.09–019.33  mixed skirmish: sword / stone · take 1
+019.25–019.56  mixed skirmish: axe / flesh · take 2
+019.41–019.72  mixed skirmish: lance / wood · take 3
+019.57–020.14  mixed skirmish: stone / stone · take 1
+019.73–020.12  mixed skirmish: sword / armor · take 2
+019.89–020.06  mixed skirmish: arrow / wood · take 3
+020.05–020.43  mixed skirmish: spear / armor · take 1
+020.21–020.46  mixed skirmish: sword / flesh · take 2
+020.37–020.67  mixed skirmish: lance / flesh · take 3
