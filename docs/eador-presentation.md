@@ -22,6 +22,26 @@ existing hex; ownership, selection, movement, site, seal and exit markers are
 separate overlays. Encounter briefings use the same terrain textures as the
 actual battlefield.
 
+## Icons and readable values
+
+The campaign toolbar uses pictograms for Guide, Hero, Codex, text size, Save
+and Load. Settings and repeated text-size controls use the same symbols across
+screens. Keyboard keycaps remain visible; hovering gives the full control name.
+Save and Load explain the difference between browsing slots and the quicksave.
+
+Gold, crystals, income, upkeep, level, experience, actions, health and mana use
+icons beside their exact numeric values. Battle attack, defense, movement,
+flight and range do the same. Hovering either the symbol or its value reveals
+the meaning; tooltips follow the 100% or 125% reading preference across scenes.
+Unavailable battle orders and spells explain the missing action, cooldown,
+charge, learned spell, mana or legal target.
+
+The 34 original geometric icons share the ink, brass and verdigris palette.
+They are prebuilt transparent PNGs with distinct silhouettes at small sizes;
+their [provenance](../eador/assets/VISUAL-PROVENANCE.md) and hash manifest ship
+with the game. Primary actions, objectives, costs, order consumption and
+consequences retain clear text.
+
 ## Sound and action feedback
 
 The two original music loops now use bowed voices, lute figures, breathed flute,
@@ -46,12 +66,13 @@ long play session.
 
 ## Framework and cost
 
-Saga2D's existing image cache, drawing layers, scene input, audio manager and
-synthesis primitives support this pass. The game owns the compositions,
-artwork, asset builds, effect meanings and their placement. No framework
-interface was added.
+Saga2D's image cache, drawing layers, scene input, audio manager and synthesis
+primitives support the artwork and audio. The icon pass adds ordinary layout
+images, optional button icons and shared reactive hover explanations through
+[small reusable UI interfaces](framework-icon-controls.md). The game owns
+compositions, artwork, icon meanings, asset builds and placement.
 
-Both asset builders default to the existing 25% CPU allowance. Nothing is
+Asset builders default to the existing 25% CPU allowance. Nothing is
 generated while playing. The normal 60 FPS active / 15 FPS inactive cap remains;
 native verification uses 30 FPS and cooperative 25% CPU pacing. The audio
 build measured 9.46 seconds wall time and 2.35 seconds CPU. This is a build
@@ -64,6 +85,7 @@ Run the compact visual journeys with:
 ```bash
 uv run python tools/verify_eador_presentation.py --output /tmp/shardbound-presentation
 uv run python tools/verify_eador_effects.py --output /tmp/shardbound-effects
+uv run python tools/verify_eador_icons.py --output /tmp/shardbound-icons
 ```
 
 The static journey opens all three worlds through native controls, checks
@@ -72,6 +94,12 @@ The effect journey uses a fresh Wizard home battle and a legally prepared
 Observatory army, records the actual orders, and checks that every observed
 frame leaves resolved campaign state unchanged. It is a presentation check,
 not an independent first run or a campaign-depth demonstration.
+
+The icon journey starts a fresh Wizard shard, visits utilities by pointer and
+keyboard, checks numeric readouts, applies larger reading size, tries disabled
+orders, makes a legal Archer move/attack and compares two exact save/load
+round trips. It captures ten native frames. The separate framework demo
+exercises the same primitives without a Shardbound asset or model dependency.
 
 The focused checks cover audio export/decoding and loop seams, deterministic
 terrain builds, exact packaging inputs, title/theme/settings controls, battle

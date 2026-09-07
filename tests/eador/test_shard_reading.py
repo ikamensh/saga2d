@@ -7,6 +7,7 @@ from eador.scene import BattleScene, ShardScene
 from eador.settings_scene import SettingsScene
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
+from tools.verify_eador_shard_reading import check_metric
 
 
 def test_reading_the_selected_province_preserves_and_executes_its_actual_order(tmp_path):
@@ -31,8 +32,8 @@ def test_reading_the_selected_province_preserves_and_executes_its_actual_order(t
             check_reading_layout(root)
             labels = '\n'.join(c.text for c in root.ui.walk() if isinstance(c, Label))
             assert root.state.provinces[destination].name in labels
-            assert f'{root.state.gold} gold' in labels
-            assert f'{root.state.actions_left} actions left' in labels
+            check_metric(root, 'gold', root.state.gold, 'Gold')
+            check_metric(root, 'actions', root.state.actions_left, 'Campaign actions')
         player.press('return')
         assert isinstance(game.scene, BattleScene)
         assert root.state.battle_province == destination

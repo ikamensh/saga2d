@@ -16,12 +16,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 os.environ.setdefault('SAGA2D_SILENT', '1')
 
-from saga2d import Button, Label
+from saga2d import Button, Image, Label, Row
 from eador.app import create_game
 from eador.model import State, UNITS
 from eador.preferences import reading_scale
 from eador.rival_scene import rival_order
 from eador.scene import BattleScene, ShardScene
+from eador.ui import icon_path
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 from tools.verify_eador_rival_reading import prepared_rivals
@@ -58,17 +59,36 @@ def prepared_shards():
     return tuple(cases)
 
 
+def check_metric(scene, name, value, meaning):
+    """A visible icon and its exact value share a row whose tooltip names the fact."""
+    value = str(value)
+    rows = [item for item in scene.ui.walk() if isinstance(item, Row) and item.visible
+            and any(isinstance(child, Image) and child.visible and child.image == icon_path(name)
+                    for child in item.children)
+            and any(isinstance(child, Label) and child.visible and child.text == value
+                    for child in item.children)]
+    assert rows, f'Missing icon/value readout: {name} = {value}'
+    phrase = f'{meaning}: {value}'
+    assert any(isinstance(row.tooltip, str) and
+               (row.tooltip == phrase or row.tooltip.startswith(phrase + '. ')) for row in rows), (
+                   phrase, [row.tooltip for row in rows])
+
+
 def check_shard(scene):
     """All facts remain exact; every province center stays clickable outside the HUD."""
     assert isinstance(scene, ShardScene)
     labels = check_reading_layout(scene)
     text = '\n'.join(item.text for item in scene.ui.walk() if isinstance(item, Label))
     state, province = scene.state, scene.state.provinces[scene.selected]
-    required = [province.name, f'{state.gold} gold', f'{state.crystals} crystals',
-                f'Income +{state.income}', f'Upkeep −{state.upkeep}',
-                f'{state.rules.gold_percent}% of base production',
-                f'Level {state.hero.level}', f'{state.hero.xp} XP', f'{state.actions_left} actions left',
-                f'Health {state.hero.hp}/{state.hero.max_hp}', f'Mana {state.hero.mana}/{state.hero.max_mana}',
+    for name, value, meaning in (
+            ('gold', state.gold, 'Gold'), ('crystals', state.crystals, 'Crystals'),
+            ('income', f'+{state.income}', 'Income'), ('upkeep', f'−{state.upkeep}', 'Upkeep'),
+            ('level', state.hero.level, 'Level'), ('xp', state.hero.xp, 'Experience'),
+            ('actions', state.actions_left, 'Campaign actions'),
+            ('health', f'{state.hero.hp} / {state.hero.max_hp}', 'Health'),
+            ('mana', f'{state.hero.mana} / {state.hero.max_mana}', 'Mana')):
+        check_metric(scene, name, value, meaning)
+    required = [province.name, f'{state.rules.gold_percent}% of base production',
                 f'At {state.provinces[state.hero.pos].name}', f'Turn {state.turn}',
                 state.rules.title.upper(), rival_order(state)]
     for phrase in required:

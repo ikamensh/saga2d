@@ -1,0 +1,142 @@
+{
+  "README.md": {
+    "bytes": 3783,
+    "sha256": "78a778f1153791912c9a70787d4b2eda9159c8384b41d57b57b0ba79f0913db7"
+  },
+  "checks/saga2d-icon-controls-native.txt": {
+    "bytes": 115,
+    "sha256": "eaae719485e9c3b57180f10905d9b5f520f632c6299a2621557d0a2c6a145015"
+  },
+  "checks/saga2d-icons-color-green.log": {
+    "bytes": 98,
+    "sha256": "4250d1f2029068ddc50a143f438d48c0e151e05c734fe713ffea94436ecf9381"
+  },
+  "checks/saga2d-icons-color-red.log.gz": {
+    "bytes": 843,
+    "sha256": "f8001d8583fbe1a146bf070bb8d635f1d16790525d7c9a85ea41212f4e0220f7"
+  },
+  "checks/saga2d-ui-icons-focused.txt": {
+    "bytes": 99,
+    "sha256": "a4d26c4451072c7fc4015ee77de830b90039fa384cd2eb589d01cdadbf72585f"
+  },
+  "checks/shardbound-icon-art-build.log": {
+    "bytes": 108,
+    "sha256": "0be27d90fe260a0106d638709c0ae77df1a8dd0a783230b6ab5bf01d9499d9aa"
+  },
+  "checks/shardbound-icon-art-tests.log": {
+    "bytes": 127,
+    "sha256": "ebd13c31c18f3069f6bd90a4b0d79e18b1204646d2f3ea51d19ce030e80f5f65"
+  },
+  "checks/shardbound-icons-focused.log.gz": {
+    "bytes": 1071,
+    "sha256": "93c619829ed027c008b7964074429b0ebcf930ea8f910b0e8274a3c9c6f70450"
+  },
+  "checks/shardbound-icons-fuzz-eador.json": {
+    "bytes": 10713,
+    "sha256": "88693f5f2f1f0a83d1e56c7d6e6386a73b33916f03eefa6b67afbfee784a94fd"
+  },
+  "checks/shardbound-icons-fuzz-eador.log": {
+    "bytes": 2022,
+    "sha256": "0d1fde563b3ed8ecd0916c347f60f7a0425e21d9c76947b517d072a556288573"
+  },
+  "checks/shardbound-icons-fuzz-tribes.log": {
+    "bytes": 101,
+    "sha256": "80938d4d708ecdce88390e2d1463638fe45fd7336527f60ab1bc09aef0698535"
+  },
+  "checks/shardbound-icons-keyboard-regression.log": {
+    "bytes": 98,
+    "sha256": "e596cce97643441f2f2c7ef01ee068b6705ce1e028a07a32ba3bd3b3d35d7353"
+  },
+  "checks/shardbound-icons-mock-tests-final.log": {
+    "bytes": 98,
+    "sha256": "33b662fdd3508192388779035d895f2d57122672755940fd2356172dbe21537b"
+  },
+  "checks/shardbound-icons-native-67959d2.log": {
+    "bytes": 88,
+    "sha256": "34880587e622740041341c4bec7bc253cda6061fd284659a55d6aef999c039e9"
+  },
+  "checks/shardbound-icons-supplement.log": {
+    "bytes": 42,
+    "sha256": "fe84d0194c1e51a8aa158444b2483510dccdf3601f186c8b959bcdf59a9efded"
+  },
+  "framework/disabled-icon-tooltip.png": {
+    "bytes": 110103,
+    "sha256": "bd740a67bd0ad18a14ea58f68818669849d66676627da4472635137c2cf8e15e"
+  },
+  "framework/modal-suppresses-tooltip.png": {
+    "bytes": 89121,
+    "sha256": "05cd3912b88bdeed036db6046a3cd23613ca57ab60b1fdfb647bf2cd33aa231c"
+  },
+  "framework/resource-row-tooltip.png": {
+    "bytes": 133196,
+    "sha256": "c6cae5684d613e4e270c0c05eaf4a66fb13d09b14c23d180cb77190865fb6e10"
+  },
+  "framework/restored-reactive-tooltip.png": {
+    "bytes": 110960,
+    "sha256": "54f3f0ab3299f2659e76c53dae814494e9e9ee877ac1c9bed4f020e2fd2e07ff"
+  },
+  "icon-catalogue.png": {
+    "bytes": 203918,
+    "sha256": "56cf13f518bb2d7ed004b4c35112077ef09ebf199c0982980c848802a4108516"
+  },
+  "native/battle-icons.png": {
+    "bytes": 2305922,
+    "sha256": "c25495ce41c1b77fd87e85d84292a6f1b35449a106899365fe54e639e28ab1d3"
+  },
+  "native/battle-reloaded.png": {
+    "bytes": 2324310,
+    "sha256": "c60bf0cc760fa0f8d3afcf6d3f6523133ef9e18514de734cb06073875f624607"
+  },
+  "native/campaign-gold-tooltip.png": {
+    "bytes": 2196379,
+    "sha256": "1e5364cb47d0b212f336ff522a3ecae163fad364449a7ca26e88cb0f6dfd63c0"
+  },
+  "native/campaign-icons.png": {
+    "bytes": 2228308,
+    "sha256": "0355004f377664d7d1531732c7d9662284c63a2892513fa785ad8c56f9641671"
+  },
+  "native/campaign-reading-125.png": {
+    "bytes": 2243103,
+    "sha256": "feac41f293209bfe2f1ec6aaee142e5702a0398382a29ad3b1a6a7b8b8781e8d"
+  },
+  "native/disabled-heal-tooltip.png": {
+    "bytes": 2309890,
+    "sha256": "b47e2e1a31dbd7b3ef0fa0456cc5f179a05ef8b433ab22406612ae64ee980587"
+  },
+  "native/disabled-pin-tooltip.png": {
+    "bytes": 2312887,
+    "sha256": "ea4263f1c147d9c4ec71b9c1b5397f43ca963751d3ad8494b58f0d2d8fac4e00"
+  },
+  "native/hero-modal.png": {
+    "bytes": 282503,
+    "sha256": "7d4ff3dce69170a758c404c4f06af0d4f7db181a50dd432edce68a2731061d4f"
+  },
+  "native/save-modal.png": {
+    "bytes": 331878,
+    "sha256": "1cdad18c83f63233615d0ce0fd87581d5ae4a590d945036dc7330777318417a8"
+  },
+  "native/title-icons.png": {
+    "bytes": 2922320,
+    "sha256": "c73f714cb3e72cc10075699d8ae41b925289bd2fab7df911b2b69d0340de3a7d"
+  },
+  "native/verification.json": {
+    "bytes": 48805,
+    "sha256": "7b3f982d24e25a3c569ad18c49cded92c937db83dd731b539e1342b0d32c1bb3"
+  },
+  "supplement/catalog-reading-125.png": {
+    "bytes": 404875,
+    "sha256": "04e4bf2fc01c595e4f1690d41fcaf9ff2907a0961f3244b2b2d78d6d39619b63"
+  },
+  "supplement/choice-reading-125.png": {
+    "bytes": 418251,
+    "sha256": "f42c038dcb622edf49e1bb61c2f78f14bdb3deff6928e0aaccb987e7b21f9e64"
+  },
+  "supplement/result-reading-125.png": {
+    "bytes": 852659,
+    "sha256": "fbd4751cbe8cf5f1bf4bc56db96a07d13a4563d065f3fdb4819bc3506322094a"
+  },
+  "supplement/verification.json": {
+    "bytes": 18284,
+    "sha256": "db8effeb25d06db340e924caed059b1a9eb0f691ff9baff5bbed457119132e0f"
+  }
+}

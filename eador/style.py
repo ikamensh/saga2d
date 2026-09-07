@@ -18,7 +18,7 @@ DANGER = Style(background_color=(82, 49, 45, 255), hover_color=(113, 64, 54, 255
                border_color=RED, border_width=1)
 
 
-def build_theme() -> Theme:
+def build_theme(*, reading_size=100) -> Theme:
     return Theme(
         font="Verdana", font_size=14, text_color=TEXT,
         panel_background_color=PANEL, panel_border_color=LINE, panel_border_width=1,
@@ -29,5 +29,5 @@ def build_theme() -> Theme:
         keycap_color=(255, 255, 255, 14), keycap_text_color=MUTED, keycap_font_size=10,
         text_styles={"title": TextStyle(36, TEXT, "Georgia"),
                      "heading": TextStyle(22, TEXT, "Georgia"),
-                     "caption": TextStyle(11, MUTED), "body": TextStyle(14, TEXT)},
+                     "caption": TextStyle(11, MUTED), "body": TextStyle(round(14 * reading_size / 100), TEXT)},
     )

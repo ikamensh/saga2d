@@ -110,6 +110,8 @@ def test_linked_briefs_show_the_actual_funding_and_warning_then_launch_saved_rul
 
 def test_challenge_explains_base_production_and_its_live_finite_rival_window(tmp_path):
     """A real Marketplace purchase exposes the reduced aggregate yield before the bill is paid."""
+    from tools.verify_eador_shard_reading import check_metric
+
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
     try:
         player = PlayerInput(game)
@@ -120,7 +122,7 @@ def test_challenge_explains_base_production_and_its_live_finite_rival_window(tmp
         shown = ' '.join(t['text'] for t in game.backend.texts)
         assert 'Realm gold yield: 80% of base production' in shown
         assert f'{state.provinces[state.hero.pos].income} base gold' in shown
-        assert f'Income +{state.income}' in shown
+        check_metric(player.root, 'income', f'+{state.income}', 'Income')
         player.press('v')
         shown = ' '.join(t['text'] for t in game.backend.texts)
         assert 'THE DUSKSPIRE EXPEDITION · CHALLENGE' in shown

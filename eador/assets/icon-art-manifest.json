@@ -1,0 +1,192 @@
+{
+  "canvas": [
+    96,
+    96
+  ],
+  "designed_display_size": 24,
+  "files": {
+    "images/icons/actions.png": {
+      "bytes": 7477,
+      "description": "Remaining actions: an hourglass.",
+      "sha256": "5561ab301db9672da8239a1b3366235a407de9aed5f7b350434d5d159328ab2e"
+    },
+    "images/icons/attack.png": {
+      "bytes": 4428,
+      "description": "Attack: an upright sword.",
+      "sha256": "3318a527cd0538890402a20f8e8cd404efce07a200bd1f121ee3bb51745a9ea4"
+    },
+    "images/icons/auto_play.png": {
+      "bytes": 3725,
+      "description": "Auto-play: two advancing triangles.",
+      "sha256": "b27332596a62cdeae3517fcdd42a2cdb7c05e9fc908d5c094fe88b83c9576017"
+    },
+    "images/icons/bolt.png": {
+      "bytes": 5452,
+      "description": "Arcane Bolt: a sharp lightning stroke.",
+      "sha256": "1dbe4ba2240bd69ba38f7cf1c6da133bd2d95cc4cf37c6c43e81fbce82396155"
+    },
+    "images/icons/build.png": {
+      "bytes": 6152,
+      "description": "Build: a hammer.",
+      "sha256": "499841393d2cd335a4f0bf3cb918eca5535022e78d0f9a30bfcc7fccdcd2fc1a"
+    },
+    "images/icons/campaign.png": {
+      "bytes": 5801,
+      "description": "Campaign: a folded map and destination.",
+      "sha256": "51d6d850866eb08c17c4971b05c39cbcc8f7379f26d9a37c5d29f054cc43b649"
+    },
+    "images/icons/codex.png": {
+      "bytes": 4896,
+      "description": "Codex: an open book.",
+      "sha256": "53d5ea1a6f032dc61c75d769284db64f9ff0ea335588068b5ff2b663c449f371"
+    },
+    "images/icons/crystals.png": {
+      "bytes": 6994,
+      "description": "Crystals: a faceted teal crystal.",
+      "sha256": "c2256a0eeef776e78cfb72c9f4cc31457ea040cd2d79b2b8728f9486bbb87a96"
+    },
+    "images/icons/defense.png": {
+      "bytes": 4991,
+      "description": "Defense: a quartered shield.",
+      "sha256": "184d8ed8b260fca1f1fbc756cfaf5c4bc11b4295f348a843b5236f114810c81b"
+    },
+    "images/icons/end_turn.png": {
+      "bytes": 9392,
+      "description": "End turn: a sun and the continuing turn arrow.",
+      "sha256": "04e52857c64066f964a67def878b57f5500243f1dc7ec23b2bec12a275a1bba1"
+    },
+    "images/icons/explore.png": {
+      "bytes": 10733,
+      "description": "Explore: a compass rose.",
+      "sha256": "39f0bce78310d0b6a0b9e70588c0af9131234caf3764359a00fa677b076565ef"
+    },
+    "images/icons/fly.png": {
+      "bytes": 7884,
+      "description": "Flying movement: a swept, feathered wing.",
+      "sha256": "af1b7ef8802ea730ae10475f0cd7fbbfa006ee681338bf120dda568ffe985321"
+    },
+    "images/icons/gold.png": {
+      "bytes": 9637,
+      "description": "Gold: an engraved brass coin.",
+      "sha256": "ec6c2d6a969e5c2ff2d490fd5b8a9e2e120c95d82bc6bdc559e2285ba981faaa"
+    },
+    "images/icons/guard.png": {
+      "bytes": 5630,
+      "description": "Guard: a shield above a firm defensive bar.",
+      "sha256": "a8be20c3d6e3e6abbf215dc8336399bb61e22c4f373d8e2b7b3205ce4d1eb401"
+    },
+    "images/icons/guide.png": {
+      "bytes": 10816,
+      "description": "Help: a hand-drawn question mark within a ring.",
+      "sha256": "4e3d53992a3e8ef414aa8fa54c2d57ab4728967b7c07235ed3190947b66f4999"
+    },
+    "images/icons/heal.png": {
+      "bytes": 2174,
+      "description": "Heal: a teal medical cross.",
+      "sha256": "d8acbecc0150af57b7aef7e2f5de980dcef3434fd5ccc943f1f7168f8e838a5e"
+    },
+    "images/icons/health.png": {
+      "bytes": 5843,
+      "description": "Health: a teal heart.",
+      "sha256": "46af5d2ccab32bc9161f2458b07d7c63371759b8d2dd34220765eac6e4e7a20b"
+    },
+    "images/icons/hero.png": {
+      "bytes": 6744,
+      "description": "Hero: a crested helmet.",
+      "sha256": "2b1cacacf15de9e11db2b46fdba2859e18fa85984b9d32e5f2701bb07eb0a750"
+    },
+    "images/icons/income.png": {
+      "bytes": 9414,
+      "description": "Income: a coin with an upward teal arrow.",
+      "sha256": "82a51816976b20fc57c9bb025f687ee0d27e47f7d932a2589a3527096a4e8ebe"
+    },
+    "images/icons/level.png": {
+      "bytes": 5773,
+      "description": "Level: two ascending chevrons.",
+      "sha256": "7d74a93556380d3fbb882ec6dcddcb032a8f7e95721c6e9f90b134edc15bd986"
+    },
+    "images/icons/load.png": {
+      "bytes": 3204,
+      "description": "Load: upward arrow out of a tray.",
+      "sha256": "a37b617e745386bb800aef5283743c5dcb9c565615935a85edfbaca3a2a5f9f6"
+    },
+    "images/icons/log.png": {
+      "bytes": 4812,
+      "description": "Battle log: an unfurled scroll.",
+      "sha256": "5ad836a2ca31518408df855b050f4659a19dbba67c936fbce06a8aaac868cb2f"
+    },
+    "images/icons/mana.png": {
+      "bytes": 6754,
+      "description": "Mana: an arcane droplet with a brass spark.",
+      "sha256": "6a4be3e7af0e0b7e42b3b4c35615f6f5722fcabab1628ff944ca402dc2bb3a71"
+    },
+    "images/icons/move.png": {
+      "bytes": 4152,
+      "description": "Ground movement: a boot.",
+      "sha256": "3e5853e4e481c2e58656d67f5aa1c094f3f5ae2a4c24791f01b75bc04ef76503"
+    },
+    "images/icons/range.png": {
+      "bytes": 10480,
+      "description": "Range: an arrow crossing a target.",
+      "sha256": "9ff734aafee00c0c526183865e44d930461619c578d040fe7a4e66a89e53e5e4"
+    },
+    "images/icons/recruit.png": {
+      "bytes": 6784,
+      "description": "Recruit: a helmet with a plus sign.",
+      "sha256": "04f044fd92b2aa890b7eb85e37a5fd6a003683d0fcaf4402e05b2ecf0b74a6dc"
+    },
+    "images/icons/retreat.png": {
+      "bytes": 3315,
+      "description": "Retreat: a leftward arrow leaving a doorway.",
+      "sha256": "3d172d15fe883460366e72fa838129f02651a48a4cd449198193b5e0befe8b76"
+    },
+    "images/icons/rival.png": {
+      "bytes": 3072,
+      "description": "Rival: a red war banner.",
+      "sha256": "f4345c256d2a8b69b561221ec8371a8a34eaa7eedeb575de44a5cb2cbc635472"
+    },
+    "images/icons/save.png": {
+      "bytes": 3194,
+      "description": "Save: downward arrow into a tray.",
+      "sha256": "7c14dee9d1efabcd3ae8d2c3d0157eef0bab6201f9c7615574be4dc28fa67100"
+    },
+    "images/icons/settings.png": {
+      "bytes": 8235,
+      "description": "Settings: an eight-tooth gear.",
+      "sha256": "4fbe3f8b26992bd372eb59fa122672ee5f7f36409bb31894e62de08f632680b9"
+    },
+    "images/icons/text_size.png": {
+      "bytes": 7752,
+      "description": "Reading size: hand-drawn uppercase A and lowercase a; no font.",
+      "sha256": "766c1e659157ac00b208f482c2f85da9a6485a116f3c5a0d44e02899309cd53c"
+    },
+    "images/icons/travel.png": {
+      "bytes": 5144,
+      "description": "Travel: a boot with a route arrow.",
+      "sha256": "d3a97581b28191f0783eaa07f941676f6895e2c9a2640ff868c3e470dc98018a"
+    },
+    "images/icons/upkeep.png": {
+      "bytes": 9404,
+      "description": "Upkeep: a coin with a downward red arrow.",
+      "sha256": "8ffc88d9fc05abcbea4cbd08c4c76b4e5e3c12693b9b3d042464720f742c0995"
+    },
+    "images/icons/xp.png": {
+      "bytes": 5978,
+      "description": "Experience: a five-pointed star.",
+      "sha256": "39202683502f2c8cf34e7f1567ae9834fc073dec0a78595cc74a185dcf181134"
+    }
+  },
+  "generator_dependencies": {
+    "pillow": "12.1.1"
+  },
+  "generator_version": 1,
+  "license": "Repository MIT license; see LICENSE.",
+  "product": "Shardbound",
+  "provenance": "Original project-owned geometric illustration. No fonts, Unicode glyphs, external icon packs, images, or Eador assets.",
+  "runtime": "Prebuilt transparent PNGs only; icon composition does not run during play.",
+  "source_sha256": {
+    "eador/icon_art.py": "061c458f8ceaab8469606eccf54a74f2eb74b3df9c4c109e369efa91a60147b2",
+    "tools/build_eador_icons.py": "ef8000f3c79e79892203cf12e40a5d2cd27fb2db64f4e673b7f730d88c9021c8",
+    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"
+  }
+}

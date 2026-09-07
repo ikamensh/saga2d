@@ -5,6 +5,7 @@ from eador.model import State
 from eador.scene import ShardScene
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
+from tools.verify_eador_shard_reading import check_metric
 
 
 def test_unit_facts_guidance_and_log_follow_a_saved_order_at_larger_size(tmp_path):
@@ -21,8 +22,13 @@ def test_unit_facts_guidance_and_log_follow_a_saved_order_at_larger_size(tmp_pat
         for window in ((1280, 720), (1280, 800), (1920, 1080)):
             game.set_window_size(window); game.tick(1 / 60)
             labels = [c.text for c in scene.ui.walk() if isinstance(c, Label)]
-            assert f'{selected.hp} / {selected.max_hp} HP' in labels
-            assert f'Attack {selected.attack}   Defense {selected.effective_defense}' in labels
+            check_metric(scene, 'health', f'{selected.hp} / {selected.max_hp}', 'Health')
+            check_metric(scene, 'attack', selected.attack, 'Attack')
+            check_metric(scene, 'defense', selected.effective_defense, 'Defense')
+            check_metric(scene, 'fly' if selected.can_fly else 'move', selected.effective_move_range,
+                         'Flight' if selected.can_fly else 'Movement')
+            check_metric(scene, 'range', selected.attack_range, 'Attack range')
+            check_metric(scene, 'mana', scene.battle.mana, 'Mana')
             assert scene.order_hint() in labels
             assert all(line in labels for line in scene.battle.log[-3:])
             check_reading_layout(scene)
