@@ -48,6 +48,11 @@ icons beside their exact numeric values. Battle attack, defense, movement,
 flight and range do the same. Hovering either the symbol or its value reveals
 the meaning; tooltips follow the 100% or 125% reading preference across scenes.
 The Hero panel also uses level, health and mana icons beside exact values.
+Battle Auto-play, Retreat and Log use compact icons with A/T/L keycaps and
+hover explanations. The footer shows the latest event; L opens its full history.
+Order guidance spans the board, with an M reader for unusually long messages.
+Its fixed height prevents the board shifting under a pointer after an order.
+Together with a tighter header, this leaves more room for the miniatures.
 Unavailable battle orders and spells explain the missing action, cooldown,
 charge, learned spell, mana or legal target.
 
@@ -60,10 +65,10 @@ consequences retain clear text.
 ## Sound and action feedback
 
 The two original music loops now use bowed voices, lute figures, breathed flute,
-skin drums and stereo room reflections. Fourteen effects distinguish wood,
-metal, footsteps, magic, bow release and heavy contact. The
-[49-second sampler](evidence/shardbound-cue-sampler.wav) contains every cue,
-then campaign music at 15.71 seconds and battle music at 32.46 seconds.
+skin drums and stereo room reflections. Sixteen effects distinguish wood,
+metal, footsteps, magic, bow release, heavy contact and seal progress. The
+[51-second sampler](evidence/shardbound-cue-sampler.wav) contains every cue,
+then campaign music at 17.70 seconds and battle music at 34.45 seconds.
 
 Player orders produce brief projectiles, blade arcs, impacts, healing marks,
 Smoke blooms and Swap/Repulse rings. They use detached facts from the same
@@ -75,6 +80,11 @@ older number at the same position. Ground rings remain beneath miniatures and
 persistent health labels.
 Starting an enemy phase clears the preceding manual damage numbers, so they
 cannot remain above an empty hex after a unit moves.
+
+Gaining hold progress gives the seal a brief teal pulse and rising chime; losing
+it gives a red pulse and falling resonance. The rings remain below the holder
+and health label. Unchanged progress stays quiet; final victory keeps its own
+result cue. Reduced motion keeps these rings stationary.
 
 Manual attacks now play each recorded contact, including Brace and retaliation.
 Arrows have a release followed by impact; Wizard, Rune Adept and Acolyte ranged
@@ -99,7 +109,7 @@ compositions, artwork, icon meanings, asset builds and placement.
 Asset builders default to the existing 25% CPU allowance. Nothing is
 generated while playing. The normal 60 FPS active / 15 FPS inactive cap remains;
 native verification uses 30 FPS and cooperative 25% CPU pacing. The audio
-build measured 9.46 seconds wall time and 2.35 seconds CPU. This is a build
+generator 3 build measured 13.39 seconds wall time and 3.34 seconds CPU. This is a build
 measurement, not a runtime battery measurement.
 
 ## Verification
@@ -111,6 +121,7 @@ uv run python tools/verify_eador_presentation.py --output /tmp/shardbound-presen
 uv run python tools/verify_eador_effects.py --output /tmp/shardbound-effects
 uv run python tools/verify_eador_icons.py --output /tmp/shardbound-icons
 uv run python tools/verify_eador_characters.py --output /tmp/shardbound-characters
+uv run python tools/verify_eador_tactical_layout.py --output /tmp/shardbound-tactics
 ```
 
 The static journey opens all three worlds through native controls, checks
@@ -131,9 +142,11 @@ terrain builds, exact packaging inputs, title/theme/settings controls, battle
 feedback, read-only playback and persistence. Final screenshots and receipts
 are retained in the [presentation evidence](evidence/presentation-pass/README.md).
 
-The Early Access gates remain open. Further visual work should test
-readability across longer, crowded battles. The latest
+The Early Access gates remain open. The
 [character verification](evidence/character-presentation/README.md) covers all
 four portraits, specialist miniatures, equipment pages and manual hit feedback.
+The [tactical verification](evidence/tactical-presentation/README.md) adds crowded
+earned hold/extraction cases, compact controls and seal feedback at both reading
+sizes and physical 720p, 800p and 1080p windows.
 Human listening and playtest feedback remain part of assessing the game's
 presentation quality.

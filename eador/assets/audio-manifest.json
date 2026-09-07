@@ -168,6 +168,28 @@
       "seconds": 0.69,
       "sha256": "38d3b2a520cf4b3760304c0e13a375215acaa323df9238a70ec6b7d06058cc3f"
     },
+    "sounds/seal_gain.wav": {
+      "bytes": 62666,
+      "channels": 1,
+      "description": "Two rising ritual-bell strikes and a soft breath mark one secured holding turn.",
+      "frames": 31311,
+      "peak": 0.46000549,
+      "rms": 0.08738769,
+      "seam_step": 0.0,
+      "seconds": 0.71,
+      "sha256": "47b51154c7e6faa1e357158d467259d196b1770d20bc77b6635cb812a66bf52b"
+    },
+    "sounds/seal_loss.wav": {
+      "bytes": 51200,
+      "channels": 1,
+      "description": "A short falling pair of damped bells and escaping air mark broken seal progress.",
+      "frames": 25578,
+      "peak": 0.43998535,
+      "rms": 0.06957543,
+      "seam_step": 0.0,
+      "seconds": 0.58,
+      "sha256": "73ce572afe153bf114abe4026ee3010a86ecbd4d019de08700ac3d278743397d"
+    },
     "sounds/victory.wav": {
       "bytes": 200258,
       "channels": 1,
@@ -180,7 +202,7 @@
       "sha256": "faeccdac45e107aeb54c599673947d0f18519e7d84e788472de95d931c0ff6d8"
     }
   },
-  "generator_version": "2",
+  "generator_version": "3",
   "license": "Repository MIT license; see LICENSE.",
   "product": "Shardbound",
   "provenance": "Generated solely from project source. No recordings, sampled instruments, Eador assets, or externally sourced melodies were used.",
@@ -191,17 +213,17 @@
   },
   "sample_rate": 44100,
   "sampler": {
-    "bytes": 8724256,
+    "bytes": 9075292,
     "channels": 2,
-    "frames": 2181053,
+    "frames": 2268812,
     "music_excerpts": {
       "battle": {
-        "sampler_start": 32.456984,
+        "sampler_start": 34.446984,
         "seconds": 16,
         "source_start": 0
       },
       "campaign": {
-        "sampler_start": 15.706984,
+        "sampler_start": 17.696984,
         "seconds": 16,
         "source_start": 0
       }
@@ -220,16 +242,18 @@
       "move": 1.55,
       "refuse": 0.895011,
       "reward": 7.276984,
+      "seal_gain": 15.706984,
+      "seal_loss": 16.766984,
       "victory": 9.946984
     },
     "peak": 0.64000366,
-    "rms": 0.05019538,
+    "rms": 0.05081418,
     "seam_step": 0.0,
-    "seconds": 49.456984,
-    "sha256": "b8cc618031e0e16e0574343a5d158a94a3f5f7166593054dfdef65e5aad5f7a7"
+    "seconds": 51.446984,
+    "sha256": "dcb45eddd7713c27e80709ea547221e5d2a558a0ebda4edd5a05c3581e23fece"
   },
   "source_sha256": {
-    "eador/sound.py": "c945aa5b9e5926a6ccdbd0843b36a70269014aad7f2ace49a8947c1e17011ff2",
+    "eador/sound.py": "368e13a022d0971718c326ead2d6b1bc90ffcdd554779603d47d93ee12d9c7cf",
     "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
     "tools/build_eador_audio.py": "91e460f01000a48519194197fa403b337c9112e92624ed615239b7ebabd061a0",
     "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"

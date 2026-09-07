@@ -30,7 +30,7 @@ def test_unit_facts_guidance_and_log_follow_a_saved_order_at_larger_size(tmp_pat
             check_metric(scene, 'range', selected.attack_range, 'Attack range')
             check_metric(scene, 'mana', scene.battle.mana, 'Mana')
             assert scene.order_hint() in labels
-            assert all(line in labels for line in scene.battle.log[-3:])
+            assert scene.battle.log[-1] in labels
             check_reading_layout(scene)
             assert player.state.to_json() == before
         centers = {pos: scene.grid.center(pos) for pos in scene.battle.terrain}
@@ -38,6 +38,10 @@ def test_unit_facts_guidance_and_log_follow_a_saved_order_at_larger_size(tmp_pat
         assert selected.acted and selected.stance == 'guard'
         assert scene.battle.log[-1] in [c.text for c in scene.ui.walk() if isinstance(c, Label)]
         assert {pos: scene.grid.center(pos) for pos in scene.battle.terrain} == centers
+        player.button('Battle log')
+        assert game.scene.message == '\n'.join(scene.battle.log)
+        player.press('escape')
+        assert game.scene is scene
         player.reload(player.state.to_json())
     finally:
         game._teardown()

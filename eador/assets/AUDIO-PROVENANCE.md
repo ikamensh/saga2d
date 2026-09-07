@@ -5,9 +5,11 @@ These WAV files are original Shardbound compositions generated from
 `saga2d.synth` sample primitives. No external recordings, sampled instruments,
 Eador assets or externally sourced melodies are included.
 
-Generator 2 builds fourteen effects and two stereo arrangements from bowed
+Generator 3 builds sixteen effects and two stereo arrangements from bowed
 harmonics, wooden plucks, breathed flute voices, membrane drums and seeded
 material noise. All instrument voices are synthesized from the source above.
+The two seal-progress cues were added in generator 3; all sixteen earlier WAVs
+remain byte for byte unchanged.
 
 The files and composition source are covered by the repository MIT license
 (`LICENSE`). `audio-manifest.json` records generator version, source/runtime

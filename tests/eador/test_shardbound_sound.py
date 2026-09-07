@@ -62,7 +62,7 @@ def test_catalogue_cues_are_distinct_deterministic_and_have_soft_edges():
     """Every requested event has a real distinct cue with finite headroom and click-free endpoints."""
     from eador.sound import CUES
     assert set(CUES) == {'confirm', 'refuse', 'move', 'attack_hit', 'attack_arrow', 'attack_heavy', 'guard', 'bolt', 'heal',
-                         'reward', 'level_up', 'victory', 'defeat', 'end_turn'}
+                         'reward', 'level_up', 'victory', 'defeat', 'end_turn', 'seal_gain', 'seal_loss'}
     encoded = []
     for name, compose in CUES.items():
         samples = compose()
@@ -122,7 +122,7 @@ def test_build_catalogue_decodes_routes_and_regenerates_identically(tmp_path, mo
     assert clock['sleeps'], 'The default real catalogue build must yield between synthesis work'
     before = {name: (root / name).read_bytes() for name in manifest['files']}
     sampler_before = sampler.read_bytes()
-    assert len(manifest['files']) == 16
+    assert len(manifest['files']) == 18
     for name, details in manifest['files'].items():
         pcm = read_pcm(root / name)
         assert len(pcm) == details['frames']

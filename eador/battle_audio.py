@@ -10,8 +10,18 @@ def is_magic_attack(actor, hero_class):
                                       or actor.kind == 'hero' and hero_class == 'Wizard')
 
 
+def seal_progress_change(battle, event):
+    """Only a recorded, nonterminal hold transition can celebrate or break a seal."""
+    if event.kind != 'objective' or battle.objective.kind != 'hold' or event.after.outcome is not None:
+        return 0
+    return event.after.progress - event.before.progress
+
+
 def event_cues(battle, event, hero_class):
     """Return release and contact cues; the composite magic cue plays only at contact."""
+    progress = seal_progress_change(battle, event)
+    if progress:
+        return None, 'seal_gain' if progress > 0 else 'seal_loss'
     if event.kind in _CONTACTS:
         actor = battle.unit(event.actor_id)
         ranged = event.kind in ('attack', 'pin') and actor.attack_range > 1

@@ -958,8 +958,8 @@ class BattleScene(Screen):
         x, h = self.edge + 22, self.game.height
         from saga2d import Column
         objective = self._objective_content()
-        self.objective_bottom = 100 + self.measure(objective)[1] + 24
-        self.ui.add(Column(objective, anchor=Anchor.TOP_LEFT, margin=(38, 112)))
+        self.objective_bottom = 76 + self.measure(objective)[1] + 24
+        self.ui.add(Column(objective, anchor=Anchor.TOP_LEFT, margin=(38, 88)))
         alive = [u for u in b.units if u.team == "player" and u.hp > 0]
         if self.selected is None or not any(u.id == self.selected for u in alive):
             self.selected = alive[0].id if alive else None
@@ -981,9 +981,9 @@ class BattleScene(Screen):
                   (board_top + board_bottom) / 2 - (top + bottom) / 2 * size)
         self.grid = HexGrid(b.terrain, size=size, origin=origin)
         self._phase_button(x, h - 46)
-        self.icon_button('guide', 'Guide', 26, 29, self.help, hotkey='F1')
-        self.icon_button('codex', 'Codex', 116, 29, self.root.codex, shortcut='C')
-        self.icon_button('save', 'Save', self.edge - 74, 29, self.save_game, tooltip='Save this battle. F5 also quicksaves.')
+        self.icon_button('guide', 'Guide', 26, 16, self.help, hotkey='F1')
+        self.icon_button('codex', 'Codex', 116, 16, self.root.codex, shortcut='C')
+        self.icon_button('save', 'Save', self.edge - 74, 16, self.save_game, tooltip='Save this battle. F5 also quicksaves.')
         self.icon_button('text_size', 'Text size', self.game.width - 106, 16, self.open_text_settings, shortcut='F2')
         from eador.preferences import reading_scale
         self._reading_view = self.hover, self.message, self.game.window_size, reading_scale(self.game)
@@ -1063,27 +1063,46 @@ class BattleScene(Screen):
         from eador.preferences import reading_scale
         scale, width = reading_scale(self.game) / 100, self.edge - 60
 
-        def label(text, *, width=380, color=MUTED):
+        def label(text, *, width=width, color=MUTED):
             return Label(text, width=width, wrap=True, font='Verdana', font_size=round(11 * scale), text_color=color)
 
-        logs = Column(*(label(line) for line in self.battle.log[-3:]), spacing=4)
-        if self.measure(logs)[1] > 100:
-            logs = label('Open the battle log to read the latest entries.')
-        hint = label(self.message or ('Click a target for ' + self.targeting if self.targeting else self.order_hint()),
-                     width=width - 396, color=GOLD)
-        overflow = self.measure(hint)[1] > 100
+        hint = label(self.order_guidance, color=GOLD)
+        overflow = self.measure(hint)[1] > 48
         if overflow:
-            hint = label('A complete battle message is available below.', width=width - 396, color=GOLD)
-        controls = Row(Button('Auto-play one round', width=270, height=40, shortcut='A', on_click=self.auto_round,
-                              enabled=self.battle.outcome is None and self.accepts_orders),
-                       Button('Retreat', width=150, height=40, shortcut='T', style=DANGER,
-                              on_click=self.retreat, enabled=self.battle.outcome is None and self.accepts_orders),
-                       Button('Battle log', width=170, height=40, shortcut='L', on_click=self.read_log), spacing=12)
+            hint = label('M: Read the complete battle message.', color=GOLD)
+
+        def icon(name, text, key, callback, *, enabled=True, style=None, tooltip=None):
+            return Button(text, icon=icon_path(name), show_text=False, icon_size=26,
+                          width=80, height=40, shortcut=key, on_click=callback,
+                          enabled=enabled, style=style, tooltip=tooltip)
+
+        available = self.battle.outcome is None and self.accepts_orders
+        retreat_detail = 'Lose up to 20 gold; surviving troops keep their wounds.'
+        if self.root.state.battle_kind == 'defense':
+            retreat_detail += ' Abandon this province; losing Westwatch loses the shard.'
+        unavailable = ('The battle is over.' if self.battle.outcome else
+                       'Finish playback before giving orders.' if not self.accepts_orders else None)
+        controls = Row(icon('auto_play', 'Auto-play one round', 'A', self.auto_round, enabled=available,
+                            tooltip='Auto-play one round (A). ' + (unavailable or 'Let your army act, then resolve the enemy turn.')),
+                       icon('retreat', 'Retreat', 'T', self.retreat, style=DANGER, enabled=available,
+                            tooltip='Retreat (T). ' + (unavailable or retreat_detail)),
+                       icon('log', 'Battle log', 'L', self.read_log,
+                            tooltip='Battle log (L). Read every event from this battle.'), spacing=12)
         if overflow:
-            controls.add(Button('Read message', width=242, height=40, shortcut='M', on_click=self.read_message))
-        # Reserve the same footer height after every order, so the board cannot
-        # move underneath a pointer when recent events or guidance change.
-        return Column(Row(logs, hint, spacing=16, height=100), controls, spacing=12)
+            controls.add(icon('guide', 'Read message', 'M', self.read_message,
+                              tooltip='Read the complete battle message (M).'))
+        log_width = width - self.measure(controls)[0] - 16
+        latest = label(self.battle.log[-1] if self.battle.log else 'No battle events yet.', width=log_width)
+        if self.measure(latest)[1] > 40:
+            latest = label('L: Read the latest event in the battle log.', width=log_width)
+        latest.tooltip = '\n'.join(self.battle.log[-3:])
+        # Fixed height keeps the board under the pointer while text and orders change.
+        return Column(Row(Column(latest, width=log_width, height=40), controls, spacing=16),
+                      Column(hint, height=48), spacing=8)
+
+    @property
+    def order_guidance(self):
+        return self.message or ('Click a target for ' + self.targeting if self.targeting else self.order_hint())
 
     def read_log(self):
         from eador.diagnostics import DiagnosticScene
@@ -1092,7 +1111,7 @@ class BattleScene(Screen):
 
     def read_message(self):
         from eador.diagnostics import DiagnosticScene
-        self.game.push(DiagnosticScene(self.message, title='Complete battle message', return_label='Return to battle'))
+        self.game.push(DiagnosticScene(self.order_guidance, title='Complete battle message', return_label='Return to battle'))
 
     def _objective_content(self):
         from saga2d import Column, Label, Row
@@ -1508,11 +1527,11 @@ class BattleScene(Screen):
         self.draw_rect(self.edge, 0, 344, h, PANEL)
         self.draw_line(self.edge, 0, self.edge, h, LINE)
         header_center = (self.edge + 135) / 2
-        self.text("BATTLE FOR " + s.provinces[s.battle_province].name.upper(), header_center, 26,
-                  size=25, serif=True, center=True)
-        self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", header_center, 63, size=10, color=GOLD, center=True)
-        self.rule(26, 90, self.edge - 52)
-        self.box(26, 100, self.edge - 52, self.objective_bottom - 100)
+        self.text("BATTLE FOR " + s.provinces[s.battle_province].name.upper(), header_center, 14,
+                  size=23, serif=True, center=True)
+        self.text(f"{s.battle_kind.upper()}   /   ROUND {b.round}", header_center, 44, size=10, color=GOLD, center=True)
+        self.rule(26, 66, self.edge - 52)
+        self.box(26, 76, self.edge - 52, self.objective_bottom - 76)
         self.text("COMMAND", x, 30, size=10, color=GOLD)
         selected = b.unit(self.selected) if self.selected is not None else None
         hovered = next((u for u in b.units if u.hp > 0 and u.pos == self.hover), None)

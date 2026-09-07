@@ -1,6 +1,6 @@
-# Shardbound audio catalogue, generator 2
+# Shardbound audio catalogue, generator 3
 
-The shipping catalogue contains fourteen original cues and two stereo loops.
+The shipping catalogue contains sixteen original cues and two stereo loops.
 `eador/sound.py` owns the compositions and instrument voices: note sequences,
 voicings, timing, stereo reflections, balance and deterministic noise seeds.
 `saga2d.synth` supplies sample primitives and PCM encoding. No recorded samples,
@@ -35,8 +35,7 @@ simultaneous runtime cues can still add together.
 ## Cue identity and timing
 
 The effects use layered material sounds: gravel and leather footfalls, wood
-and metal contacts, string plucks, breath and sparks. The former twelve cue
-names remain available, with two weapon cues added:
+and metal contacts, string plucks, breath and sparks:
 
 | Cue | Sound and intended timing |
 |---|---|
@@ -51,6 +50,7 @@ names remain available, with two weapon cues added:
 | `reward`, `level_up` | Hammered-string reward or a wider ascent into flute. |
 | `victory`, `defeat` | Motif and bowed resolution, or an unresolved descent. |
 | `end_turn` | Woodblock tick and muted lute answer. |
+| `seal_gain`, `seal_loss` | Rising metal/flute resonance for hold progress; a falling, damped resonance when progress breaks. |
 
 An arrow release can precede one separately timed ordinary/heavy contact.
 Game scenes own event timing and weapon classification; composition factories
@@ -64,6 +64,12 @@ Another accepted order finishes pending contacts before its own cue; loading,
 retreating and leaving discard them. Redraws do not replay sounds. The queue
 stores only elapsed offsets and cue names, without timers, callbacks or model
 ownership.
+
+Recorded nonterminal hold-progress changes play `seal_gain` (0.71 seconds) or
+`seal_loss` (0.58 seconds) once at their visible contact, accompanied by a ground
+ring on the seal. Unchanged progress plays neither cue. Terminal objectives use
+the existing victory/defeat result instead. Skipping unseen playback or loading
+discards its pending feedback; drawing and reopening a scene cannot repeat it.
 
 ## Runtime integration
 
@@ -123,6 +129,13 @@ checker uses Pyglet's silent driver to play all effects to completion and
 both streams through a full loop, including live mute/mix and cleanup. A
 silent-driver check is a technical playback check, not an audible review.
 
+Generator 3 adds two seal cues while preserving all sixteen previous WAVs byte
+for byte. Its default build wrote eighteen files in **13.39 seconds wall time
+and 3.34 seconds CPU** (about 24.9% of one core). Ten focused integration checks
+pass, covering actual progress gain/loss, unchanged and terminal objectives,
+skip/load cancellation, reduced motion, and the catalogue. See the
+[tactical presentation evidence](evidence/tactical-presentation/README.md).
+
 Generator 2's focused composition/build suite passed **6 tests in 6.81 seconds**.
 The weapon tracer first failed on the missing `attack_arrow` cue; the build
 tracer first failed because default generation never yielded. Both now pass,
@@ -149,4 +162,4 @@ At that checkpoint, the complete suite passed 643 tests before an additional
 manual-cue journey. Native Pin/Watch and source packaged-entry smoke checks
 passed with the silent driver and the then-fourteen-file catalogue. No frozen
 candidate was rebuilt in that step. Those dated checks describe generator 1;
-they are not current proof of generator 2 or artistic listening approval.
+they are not current proof of generator 3 or artistic listening approval.

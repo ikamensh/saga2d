@@ -1,7 +1,7 @@
 """Small, deterministic drawing effects from an already-resolved battle event."""
 import math
 
-from eador.battle_audio import is_magic_attack
+from eador.battle_audio import is_magic_attack, seal_progress_change
 from eador.style import BLUE, GOLD, RED, TEAL, TEXT
 
 
@@ -60,6 +60,16 @@ def draw_event(scene, event, fraction, *, still=False):
     target = scene.battle.unit(event.target_id) if event.target_id is not None else None
     arcane = kind == 'bolt' or (kind in ('attack', 'pin') and
                               is_magic_attack(actor, scene.root.state.hero.hero_class))
+    progress = seal_progress_change(scene.battle, event)
+    if progress and fraction >= .5:
+        x, y = grid.center(scene.battle.objective.target)
+        amount = .5 if still else (fraction - .5) * 2
+        radius = size * (.65 + .25 * amount if progress > 0 else .9 - .25 * amount)
+        color = TEAL if progress > 0 else RED
+        alpha = 220 if still else round(240 * (1 - amount * .65))
+        # Ground rings remain below the holder and its persistent health label.
+        _ring(scene, x, y + size * .12, radius, (*color[:3], alpha), width=3.5, flat=.62)
+        _ring(scene, x, y + size * .12, radius * .8, (*color[:3], alpha // 2), width=2, flat=.62)
 
     def center(frame, ident):
         x, y = grid.center(frame.unit(ident).pos)

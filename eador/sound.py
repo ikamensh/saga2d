@@ -9,7 +9,7 @@ import numpy as np
 
 from saga2d.synth import SAMPLE_RATE, envelope, hz, level, mix, noise, pan, seconds, thump, tone
 
-GENERATOR_VERSION = '2'
+GENERATOR_VERSION = '3'
 
 
 def _plucked(note, length, *, seed=0):
@@ -168,10 +168,25 @@ def end_turn():
                      (.23, _plucked('E4', .39, seed=602) * .8)), .4)
 
 
+def seal_gain():
+    """Two rising ritual-bell strikes and a soft breath mark one secured holding turn."""
+    return level(mix(_metal(hz('E5'), .48) * .62,
+                     (.13, _metal(hz('B5'), .58) * .5),
+                     _flute('E4', .5, seed=610) * .17), .46)
+
+
+def seal_loss():
+    """A short falling pair of damped bells and escaping air mark broken seal progress."""
+    return level(mix(_metal(hz('B4'), .38) * .55,
+                     (.12, _metal(hz('F#4'), .46) * .6),
+                     noise(.4, 180, 1300, attack=.04, tau=.1, seed=611) * .18), .44)
+
+
 CUES = {'confirm': confirm, 'refuse': refuse, 'move': move, 'attack_hit': attack_hit,
         'attack_arrow': attack_arrow, 'attack_heavy': attack_heavy,
         'guard': guard, 'bolt': bolt, 'heal': heal, 'reward': reward, 'level_up': level_up,
-        'victory': victory, 'defeat': defeat, 'end_turn': end_turn}
+        'victory': victory, 'defeat': defeat, 'end_turn': end_turn,
+        'seal_gain': seal_gain, 'seal_loss': seal_loss}
 
 
 # E–F#–B–G is the shared shard motif. Timings and instrument choices belong here,
