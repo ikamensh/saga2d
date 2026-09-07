@@ -9,6 +9,22 @@ apply to their named source snapshots, not to today's build.
 
 ## Current playable checkpoint — 2026-09-07
 
+The latest preserved Mac development archive is clean source **2d9520a**:
+[runnable artifact, exact source and inspected packaged frames](evidence/shardbound-package-2d9520a/README.md).
+It includes the recent attack motion, contact feedback, overlay sound fix and
+inspection icons. Five packaging tests, extracted-app native smoke, an earned
+125% casualty forecast, retained inventory/signature verification and a separate
+LaunchServices smoke pass. The previous package remains preserved.
+
+Economy and army-result extractions are verified prerequisites for concurrent
+campaign PvP. Shared-world independent realms, claims and Ready coordination
+remain to be built; battles retain ordinary turns. Existing multiplayer is
+shared-realm co-op. The new package does not inherit the older build's full
+linked-campaign verification. Windows, human listening/playtests and overall
+Early Access acceptance remain open. **G01–G19 remain incomplete.**
+
+## Earlier playable checkpoint — 2026-09-07
+
 The latest preserved Mac development archive is clean source **7b5562d**:
 [runnable artifact, exact source and packaged frames](evidence/shardbound-package-7b5562d/README.md).
 It now includes the painted environment/portraits, illustrated terrain and role

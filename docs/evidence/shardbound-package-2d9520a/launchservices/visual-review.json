@@ -1,0 +1,47 @@
+{
+  "smoke-battle.png": {
+    "representative": "smoke/packaged-smoke-battle.png",
+    "sha256": "3f812a91f410b2ab2e6eb9e7e1783470814f88354dab4e781077355e51e0a72b",
+    "viewed": true
+  },
+  "smoke-codex.png": {
+    "representative": "smoke/packaged-smoke-codex.png",
+    "sha256": "4992aab88a336375e6febbf023fb250490db07b26ba42985db5eb24da023edff",
+    "viewed": true
+  },
+  "smoke-about-2.png": {
+    "representative": "launchservices/smoke-about-2.png",
+    "sha256": "35cdabdea1461119089734b59a1a693b32c6885939ac205a626fe16954d80c19",
+    "viewed": true
+  },
+  "smoke-settings.png": {
+    "representative": "smoke/packaged-smoke-settings.png",
+    "sha256": "25bee7590430aff43fd2480b49e9f9dc24a5cce1869a071edaae4c45aa8e5e7d",
+    "viewed": true
+  },
+  "smoke-about-1.png": {
+    "representative": "smoke/packaged-smoke-about-1.png",
+    "sha256": "f043fa53c6770719763281d20c29573ff901d0dd97b8462a0c814b48933176e6",
+    "viewed": true
+  },
+  "smoke-shard.png": {
+    "representative": "smoke/packaged-smoke-shard.png",
+    "sha256": "9782dfb0ec9d33d16d54df45a59f6f35ca7d59929d218a2ac74fb7854c72b4b6",
+    "viewed": true
+  },
+  "smoke-guide.png": {
+    "representative": "smoke/packaged-smoke-guide.png",
+    "sha256": "83e788bd3584f42bc6d7b581ac572132b698e80b604205fab3cb5ddb5cdfe518",
+    "viewed": true
+  },
+  "smoke-rival.png": {
+    "representative": "smoke/packaged-smoke-rival.png",
+    "sha256": "e29a0e5d065e35d6f15a5c5113eec0b90716ce2c1141fcf9889d72c6c4ecfa24",
+    "viewed": true
+  },
+  "smoke.png": {
+    "representative": "smoke/packaged-smoke.png",
+    "sha256": "71758670ae854bafae6f554b3e4efef8897c4d9f01319af5435dfbe702bddefd",
+    "viewed": true
+  }
+}

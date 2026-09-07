@@ -1,0 +1,97 @@
+[
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/build-manifest.json",
+    "retained": "build-manifest.json.gz",
+    "sha256": "9bd70b9d14cf53df8fbf5de25ab327c9f7ddc2b1761712a7701d1e60610a5c0c"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke.json",
+    "retained": "packaged-smoke.json.gz",
+    "sha256": "c07f2a357ccecaaf9a2f8a479b370de82c19358cebe85e59d7e1c603f625d600"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-about-1.png",
+    "retained": "smoke/packaged-smoke-about-1.png",
+    "sha256": "f043fa53c6770719763281d20c29573ff901d0dd97b8462a0c814b48933176e6"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-about-2.png",
+    "retained": "smoke/packaged-smoke-about-2.png",
+    "sha256": "e9d0fbc097a96f7d64d2dac6cb5b58637b98422ea9a7f7fd2aef5a4f98e2af10"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-battle.png",
+    "retained": "smoke/packaged-smoke-battle.png",
+    "sha256": "3f812a91f410b2ab2e6eb9e7e1783470814f88354dab4e781077355e51e0a72b"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-codex.png",
+    "retained": "smoke/packaged-smoke-codex.png",
+    "sha256": "4992aab88a336375e6febbf023fb250490db07b26ba42985db5eb24da023edff"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-forecast-125.png",
+    "retained": "smoke/packaged-smoke-forecast-125.png",
+    "sha256": "40ae9e188c1c12cc8ead5a2bb544b448ff969144b8c42824db18f478f260b7ab"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-guide.png",
+    "retained": "smoke/packaged-smoke-guide.png",
+    "sha256": "83e788bd3584f42bc6d7b581ac572132b698e80b604205fab3cb5ddb5cdfe518"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-rival.png",
+    "retained": "smoke/packaged-smoke-rival.png",
+    "sha256": "e29a0e5d065e35d6f15a5c5113eec0b90716ce2c1141fcf9889d72c6c4ecfa24"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-settings.png",
+    "retained": "smoke/packaged-smoke-settings.png",
+    "sha256": "25bee7590430aff43fd2480b49e9f9dc24a5cce1869a071edaae4c45aa8e5e7d"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke-shard.png",
+    "retained": "smoke/packaged-smoke-shard.png",
+    "sha256": "9782dfb0ec9d33d16d54df45a59f6f35ca7d59929d218a2ac74fb7854c72b4b6"
+  },
+  {
+    "original": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/shardbound-checkpoints/2d9520a1a871/packaged-smoke.png",
+    "retained": "smoke/packaged-smoke.png",
+    "sha256": "71758670ae854bafae6f554b3e4efef8897c4d9f01319af5435dfbe702bddefd"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-tests.log",
+    "retained": "tests.log",
+    "sha256": "1e53d7f0a9f25b95646d568c973927e9885dc8e3588eee8fba2a12f812aca3f1"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-build.log",
+    "retained": "build.log",
+    "sha256": "1b7c662662a42c7490f0261e8c257b1ddbb4b9e820c08aed97cffa60840a9754"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-codesign.log",
+    "retained": "codesign.log",
+    "sha256": "4deb11b4dfbb65885965ec86ba91f116cb2b9628585c1675c16c015aacc79ad7"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-retention.json",
+    "retained": "retention.json.gz",
+    "sha256": "12b5ab58d75d037fe4449eee0b92af0cc948814ee75e276c48b2837023d993cd"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-visual-review.json",
+    "retained": "visual-review.json.gz",
+    "sha256": "f5a9894a4ce33672ef61919a2a8986bb07e9a9c9996054b931b65b67ec8cbb34"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-launchservices/smoke.json",
+    "retained": "launchservices/smoke.json.gz",
+    "sha256": "78a3904dfe4ec2e88903c066bb7cb9e4483ec4a90eb75b526667b3be1f2b92ca"
+  },
+  {
+    "original": "/private/tmp/shardbound-package-2d9520a1a871-launchservices/smoke-about-2.png",
+    "retained": "launchservices/smoke-about-2.png",
+    "sha256": "35cdabdea1461119089734b59a1a693b32c6885939ac205a626fe16954d80c19"
+  }
+]
