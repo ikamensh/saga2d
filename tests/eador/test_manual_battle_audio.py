@@ -41,6 +41,48 @@ def test_manual_arrow_plays_one_contact_after_release_without_delaying_rules(tmp
         game.close()
 
 
+@pytest.mark.parametrize('overlay,leave,contacts', [
+    pytest.param('f1', 'escape', 1, id='help-return'),
+    pytest.param('f6', 'escape', 1, id='saves-return'),
+    pytest.param('f6', '1', 0, id='saves-load'),
+])
+def test_covering_a_manual_shot_preserves_its_contact_only_when_returning(tmp_path, overlay, leave, contacts):
+    """Help/Saves pause a real arrow; return resumes its hit, while loading drops the old feedback."""
+    from eador.scene import HelpScene, SaveScene
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(TitleScene(hero_class='Wizard'))
+        player = PlayerInput(game, finish_actions=False)
+        player.press('return'); player.press('x')
+        battle = player.state.battle
+        archer = next(unit for unit in battle.units if unit.team == 'player' and unit.can_pin)
+        player.order('battle.move', archer.id, (-1, 0))
+        target = battle.targets(archer.id)[0]
+        expected = State.from_json(player.state.to_json())
+        expected.battle.attack(archer.id, target.id)
+        game.backend.sounds_played.clear()
+        player.order('battle.attack', archer.id, target.id)
+        assert type(game.scene) is BattleScene and expected.battle.outcome is None
+        battlefield = game.scene
+        player.press('f5')  # Save the resolved shot before its contact, using the real quicksave.
+        assert cues(game) == ['attack_arrow']
+        player.press(overlay)
+        assert type(game.scene) is (HelpScene if overlay == 'f1' else SaveScene)
+        game.tick(3)
+        assert cues(game) == ['attack_arrow'], 'Covered battle feedback must remain paused'
+        assert player.state.to_json() == expected.to_json()
+        player.press(leave)  # Saves' visible slot 1 loads the just-written resolved shot.
+        assert type(game.scene) is BattleScene
+        assert (game.scene is battlefield) == (leave == 'escape')
+        game.tick(1.5)
+        assert cues(game) == ['attack_arrow'] + ['attack_hit'] * contacts
+        game.tick(1.5)
+        assert cues(game).count('attack_hit') == contacts
+        assert player.state.to_json() == expected.to_json()
+    finally:
+        game.close()
+
+
 @pytest.mark.parametrize('kind,building', [('hero', None), ('adept', 'mage_tower'), ('healer', 'temple')])
 @pytest.mark.parametrize('playback', [False, True])
 def test_ranged_magic_uses_one_magic_contact_and_no_bowstring(tmp_path, kind, building, playback):

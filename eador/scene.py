@@ -1217,7 +1217,8 @@ class BattleScene(Screen):
                 self.game.audio.play_sound(cue)
             self.attack_sounds = None
 
-    def on_exit(self):
+    def on_close(self):
+        # Covering pauses the battle clock; only permanent removal discards its contacts.
         self.attack_sounds = None
 
     def act(self, callback, *, checkpoint=False, cue="attack_hit"):
