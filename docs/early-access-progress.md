@@ -1022,3 +1022,58 @@ Twenty-three companion input checks and bounded linked model/scene fuzzing
 also pass. This advances G02/G05 evidence without completing a gate. Human
 listening/playtests, packaged-platform validation and release acceptance remain
 open. **G01–G19 remain incomplete.**
+
+## More icon controls and a gameplay movie — 2026-09-07
+
+**660ce5e** replaces ten more recurring map and battle labels with icons:
+Explore, Build, Recruit, End turn, Campaign, Rival, Guard, Bolt, Heal and End
+round. Hover explanations and keycaps preserve their meaning; spell costs stay
+visible. Changing travel verbs and consequential choices retain text. The army
+strip uses the same level and health metrics. This uses existing primitives and
+adds no framework interface or game rule.
+
+[More-icon evidence](evidence/more-icon-controls/README.md) retains native
+100%/125% frames, 199 inputs, 170 state checks, 87 tooltips and three exact
+reloads. Twenty-two focused tests and the bounded two-scene fuzz run pass.
+
+[The gameplay movie](evidence/gameplay-movie/README.md), committed in
+**42aaceb**, makes the current presentation reviewable in motion: 38.90 seconds,
+1,167 native frames, 33 inputs and 16 exact manual commands through an earned
+Moonstone. Enemy movement, attack and retaliation finish naturally. Audio is
+reconstructed from actual emitted events, shipping WAVs and effective gains;
+it is not hardware-recorded sound. Four capture tests and separate video/audio
+readback pass. Native capture and encoding ran sequentially with a 25% CPU
+allowance; the game retains its 60/15 FPS caps. The movie uses a fixed simulation
+clock and is not a performance measurement. Human listening remains open.
+
+## Save phases across a process restart — 2026-09-07
+
+**da98241** adds [fresh-process evidence](evidence/phase-restarts/README.md)
+for campaign, battle, skill, relic, result, departure, recovery, completed
+campaign and capital loss. Nine writer Games close before one separate Python
+process loads each phase through title save controls, checks full state and
+scene restoration, and performs its next real input. Manual primary files stay
+unchanged. Two starts are current title journeys; later phases come from
+authenticated earned checkpoints with their original provenance retained.
+
+The mock integration passes, and native verification records 76 inputs in
+81.77 seconds wall / 20.54 seconds combined CPU. This advances G12 at source
+level. It does not add packaged-launch or backup-recovery coverage. The frozen
+**7b5562d** candidate remains the last packaged checkpoint; Windows execution,
+human playtests, listening and overall release acceptance remain open.
+
+## An independent multiplayer consumer — 2026-09-07
+
+The [counter-room tutorial](framework-match-menu.md) demonstrates MatchMenu,
+MatchLobby and OnlineClient without importing a reference game or production
+server catalog. Its local authority only increments the authenticated seat's
+counter. The example explains the factory interfaces, JSON commands, scene
+ownership, covered-scene polling and cleanup without adding a framework API.
+
+The focused socket integration passes in 0.29 seconds. Native input verifies
+room creation, lobby handoff, both counters, a peer order under Help, return
+and shutdown. Inspected screenshots caught background text peeking around Help;
+the final example uses an opaque Help scene. The final native run uses 29 paced
+frames and closes both clients, its Game and local server.
+This advances the independent-consumer portion of G17; internet deployment and
+overall release acceptance are unchanged.
