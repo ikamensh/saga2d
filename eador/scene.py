@@ -194,7 +194,8 @@ class TitleScene(Screen):
                    label(THEMES[self.world_theme].description), spacing=6),
             Column(label('DIFFICULTY · Fixed for this run', 11, color=GOLD), modes,
                    label(DIFFICULTIES[self.difficulty].description, 12), spacing=6), spacing=14)
-        if self.measure(body)[1] > h - 148 - 226:
+        self._choices_height = self.measure(body)[1]
+        if self._choices_height > h - 148 - 226:
             raise ValueError('Title choices exceed the available reading space')
         self.ui.add(Column(body, anchor=Anchor.TOP_LEFT, margin=(round(x), 226)))
         message = self.message or ('Settings could not be read. Open Settings (O) to recover them.'
@@ -287,8 +288,15 @@ class TitleScene(Screen):
         self.game.push(SaveScene())
 
     def draw(self):
+        with self.screen_layer(2):
+            self.draw_content()
+
+    def draw_content(self):
         w, h = self.game.resolution
-        art.backdrop(self, w, h)
+        art.backdrop(self, w, h, title=True)
+        self.draw_rect(w / 2 - 118, 213, w / 2 + 76, self._choices_height + 26,
+                       (17, 27, 32, 208), radius=7)
+        self.draw_line(w / 2 - 118, 213, w - 42, 213, (146, 126, 83, 180))
         self.text("C H R O N I C L E S   O F   T H E   S H A R D S", w / 2, 56, size=11, color=GOLD, center=True)
         self.text("SHARDBOUND", w / 2, 88, size=64, serif=True, center=True)
         self.text("One broken world. A kingdom to build.", w / 2, 169, size=17, color=MUTED, center=True)
@@ -296,15 +304,10 @@ class TitleScene(Screen):
             self.text(f'Error details · Page {self.notice_page + 1}/{len(self.notice_pages)}', 74, 219, size=11, color=RED)
         if not self.notice:
             self.text(THEMES[self.world_theme].name.upper(), w * .245, 244, size=12, color=GOLD, center=True)
-            cells = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
-            grid = HexGrid(cells, size=42, origin=(w * .245, 385))
-            from types import SimpleNamespace
-            terrains = {"frontier": ("forest", "hills", "plains"), "elderwild": ("forest", "marsh", "forest"),
-                        "ruins": ("hills", "plains", "hills")}[self.world_theme]
-            for i, pos in enumerate(sorted(cells, key=lambda c: grid.center(c)[1])):
-                data = SimpleNamespace(terrain=terrains[i % 3], owner="player" if pos == (0, 0) else "neutral",
-                                       capital=pos == (0, 0), site=None, explored=False, name="Westwatch" if pos == (0, 0) else "")
-                art.province(self, grid, pos, data)
+            self.draw_line(w * .245 - 74, 275, w * .245 - 12, 275, GOLD)
+            self.draw_line(w * .245 + 12, 275, w * .245 + 74, 275, GOLD)
+            self.draw_polygon([(w * .245, 270), (w * .245 + 5, 275),
+                               (w * .245, 280), (w * .245 - 5, 275)], GOLD)
             self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
 
 
@@ -603,6 +606,10 @@ class ShardScene(Screen):
         return False
 
     def draw(self):
+        with self.screen_layer(2):
+            self.draw_content()
+
+    def draw_content(self):
         s, h = self.state, self.game.height
         art.backdrop(self, self.edge, h)
         self.draw_rect(self.edge, 91, self.game.width - self.edge, h - 91, PANEL)
@@ -910,6 +917,7 @@ class BattleScene(Screen):
         self.cursor = self.battle.unit(0).pos
         self.floats = []
         self.clock = 0.0
+        self.feedback = None
 
     @property
     def battle(self):
@@ -1099,10 +1107,23 @@ class BattleScene(Screen):
 
     def act(self, callback, *, checkpoint=False, cue="attack_hit"):
         before = {u.id: u.hp for u in self.battle.units}
-        if self.command(callback, cue=cue):
+        recorded = []
+        if self.command(lambda: recorded.append(self.battle.trace(callback)), cue=None):
+            if cue == 'attack_hit':
+                event = next(event for event in recorded[0].events if event.kind in ('attack', 'pin', 'brace', 'retaliation'))
+                actor = self.battle.unit(event.actor_id)
+                if actor.attack_range > 1 and event.kind in ('attack', 'pin'):
+                    cue = 'attack_arrow'
+                elif actor.kind in ('guard', 'warden', 'skyrider'):
+                    cue = 'attack_heavy'
+            if cue:
+                self.game.audio.play_sound(cue)
+            if recorded[0].events:
+                self.feedback = self.clock, recorded[0]
             for u in self.battle.units:
                 change = u.hp - before[u.id]
                 if change:
+                    self.floats = [item for item in self.floats if item[1] != u.pos]
                     self.floats.append((self.clock, u.pos, change))
             self.targeting = None
             self.refresh()
@@ -1122,6 +1143,7 @@ class BattleScene(Screen):
         recorded = []
         if self.command(lambda: recorded.append(self.battle.trace(command)), cue='end_turn'):
             self.targeting = None
+            self.feedback = None
             self.checkpoint(self.root.state)
             self.refresh()
             if recorded[0].events:
@@ -1268,6 +1290,8 @@ class BattleScene(Screen):
             self.refresh()
         self.clock += dt
         self.floats = [f for f in self.floats if self.clock - f[0] < 1.6]
+        if self.feedback and self.clock - self.feedback[0] >= 1.4:
+            self.feedback = None
 
     def handle_input(self, event):
         if event.type == "move":
@@ -1392,10 +1416,20 @@ class BattleScene(Screen):
     def _unit_center(self, unit):
         return self.grid.center(unit.pos)
 
+    def draw_effects(self):
+        if self.feedback:
+            from eador.battle_effects import draw_trace
+            started, trace = self.feedback
+            draw_trace(self, trace, self.clock - started, still=reduced_motion(self.game))
+
     def _unit_layer(self, unit):
-        return 0
+        return 3
 
     def draw(self):
+        with self.screen_layer(2):
+            self.draw_content()
+
+    def draw_content(self):
         b, s, h, x = self.battle, self.root.state, self.game.height, self.edge + 22
         art.backdrop(self, self.edge, h)
         self.draw_rect(self.edge, 0, 344, h, PANEL)
@@ -1420,10 +1454,7 @@ class BattleScene(Screen):
         for pos in sorted(b.terrain, key=lambda p: self.grid.center(p)[1]):
             cx, cy = self.grid.center(pos)
             points = [(cx + (px - cx) * .95, cy + (py - cy) * .95) for px, py in self.grid.corners(pos)]
-            color = art.TERRAINS[b.terrain[pos]]
-            self.draw_polygon([(px, py + 8) for px, py in points], art.shade(color, -47))
-            self.draw_polygon(points, art.shade(color, -13))
-            art.outline(self, points, art.shade(color, 5))
+            art.terrain_tile(self, self.grid, pos, b.terrain[pos])
             if pos in reachable:
                 self.draw_polygon(points, (104, 182, 207, 53))
                 art.outline(self, points, (125, 181, 185, 150), 1.5)
@@ -1431,8 +1462,6 @@ class BattleScene(Screen):
             if pos in rally_reachable:
                 self.draw_polygon(points, (104, 207, 162, 53))
                 art.outline(self, points, TEAL, 1.5)
-            if b.terrain[pos] in ("forest", "hills", "marsh"):
-                art.terrain_detail(self, b.terrain[pos], cx, cy + 12, pos[0] * 23 + pos[1], .35)
             if pos in smoke_targets:
                 art.outline(self, points, BLUE, 2)
                 self.draw_circle(cx, cy, 3, BLUE)
@@ -1469,7 +1498,7 @@ class BattleScene(Screen):
             with self.screen_layer(layer):
                 art.piece(self, cx, cy + size * .22, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, size / 56),
                           selected=u.id == self.selected, spent=u.acted)
-            with self.screen_layer(layer + 1):
+            with self.screen_layer(10):
                 if u.stance:
                     self.draw_circle(cx + size * .62, cy + 4, 7, INK)
                     self.text("B" if u.stance == "brace" else "G", cx + size * .62, cy - 2, size=9, color=GOLD, center=True)
@@ -1487,13 +1516,18 @@ class BattleScene(Screen):
                 self.text(u.hp, cx, top, size=min(10, size * .27), center=True)
                 self.bar(cx - width / 2 + 3, top + height - 4, width - 6, u.hp, u.max_hp,
                          TEAL if u.team == "player" else RED)
-        with self.screen_layer(2):
+        with self.screen_layer(8):
+            self.draw_effects()
+        with self.screen_layer(9):
             for started, pos, change in self.floats:
                 cx, cy = self.grid.center(pos)
-                drift = 0 if reduced_motion(self.game) else (self.clock - started) * 20
-                yy = cy - 48 - drift
-                self.draw_rect(cx - 31, yy - 2, 62, 35, INK, radius=4)
-                self.text(f"{change:+}", cx, yy, size=23,
+                size = self.grid.size
+                width, height = min(48, size * 1.15), min(24, size * .56)
+                drift = 0 if reduced_motion(self.game) else min(1, (self.clock - started) / 1.6) * size * .1
+                # Stay below the upper neighbor's health plaque, including at full drift.
+                yy = cy - size * .65 - drift
+                self.draw_rect(cx - width / 2, yy, width, height, INK, radius=3)
+                self.text(f"{change:+}", cx, yy + 1, size=round(min(18, size * .43)),
                           color=TEAL if change > 0 else RED, center=True)
         self.rule(26, self.footer_top - 12, self.edge - 52)
 

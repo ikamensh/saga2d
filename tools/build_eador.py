@@ -80,7 +80,7 @@ def snapshot_sources(source: Path) -> dict:
         shutil.copyfile(ROOT / "packaging" / name, source / name)
     (source / "tools").mkdir()
     (source / "tools" / "__init__.py").write_text('"""Frozen public-input verification helpers."""\n')
-    for name in ("build_eador.py", "build_eador_audio.py", "eador_ui.py",
+    for name in ("build_eador.py", "build_eador_audio.py", "cpu_budget.py", "eador_ui.py",
                  "eador_campaign.py", "eador_linked_campaign.py"):
         shutil.copyfile(ROOT / "tools" / name, source / "tools" / name)
     validate_audio(source)

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-from functools import cache
 import json
 import os
 from pathlib import Path
@@ -21,12 +20,14 @@ from eador.preferences import reading_scale
 from eador.scene import ChoiceScene, ShardScene
 from tools.eador_campaign import play_campaign
 from tools.eador_ui import PlayerInput
+from tools.cpu_budget import CpuBudget
+from tools.native_frames import tick
 from tools.verify_eador_guidance import check_reading_layout
 
 
-@cache
-def prepared_choices():
+def prepared_choices(*, budget=None):
     """Record decisions before the public campaign policy chooses; no invented inventory, XP or text."""
+    budget = CpuBudget(25) if budget is None else budget
     choices = {}
 
     class Rewards:
@@ -44,13 +45,16 @@ def prepared_choices():
 
     for hero in HERO_CLASSES:
         for theme in ('frontier', 'elderwild', 'ruins'):
+            budget.checkpoint()
             state = State.new(0, hero, theme=theme)
             route = [state.hero.pos] + [pos for pos in sorted(state.provinces)
                                        if pos not in (state.hero.pos, (2, 0))] + [(2, 0)]
-            play_campaign(Rewards(state), route, reload_state=lambda snapshot: Rewards(State.from_json(snapshot)))
+            play_campaign(Rewards(state), route, reload_state=lambda snapshot: Rewards(State.from_json(snapshot)),
+                          budget=budget)
     assert {key[1] for key in choices if key[0] == 'relic'} == set(RELICS)
     assert {key[1] for key in choices if key[0] == 'skill'} == set(HERO_CLASSES)
     assert any('Distill the duplicate' in key[2] for key in choices)
+    budget.checkpoint()
     return tuple((f'{index + 1:02}-{kind}-{context.lower()}', snapshot)
                  for index, ((kind, context, _), snapshot) in enumerate(choices.items()))
 
@@ -73,7 +77,8 @@ def check_choice(scene):
     return count
 
 
-def verify(output, *, backend='pyglet'):
+def verify(output, *, backend='pyglet', budget=None):
+    budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     metrics = []
     native = backend == 'pyglet'
@@ -82,7 +87,7 @@ def verify(output, *, backend='pyglet'):
         game = create_game(backend=backend, visible=False, save_dir=saves)
         player = PlayerInput(game, native=native, output=output)
         try:
-            cases = prepared_choices()
+            cases = prepared_choices(budget=budget)
             before = cases[0][1]
             game.push(ShardScene(State.from_json(before)))
             for key in ('t', 'right', 'escape'):
@@ -96,6 +101,7 @@ def verify(output, *, backend='pyglet'):
                 game.set_window_size(size)
                 for percent in (100, 125):
                     for name, snapshot in cases:
+                        budget.checkpoint()
                         state = State.from_json(snapshot)
                         game.clear_and_push(ShardScene(state))
                         for key in ('t', 'left' if percent == 100 else 'right', 'return'):
@@ -103,7 +109,7 @@ def verify(output, *, backend='pyglet'):
                         metrics.append(dict(case=name, kind=state.choice.kind, context=state.choice.context,
                                             options=[option.name for option in state.choice.options],
                                             percent=percent, window=game.window_size,
-                                            labels=check_choice(game.scene)))
+                                            labels=check_choice(game.scene), cpu_percent=budget.percent))
                         assert state.to_json() == snapshot
                         if native:
                             metrics[-1]['framebuffer'] = game.backend.capture_frame().size
@@ -117,8 +123,9 @@ def verify(output, *, backend='pyglet'):
                         if percent == 125 and size == (1280, 720):
                             for index, option in enumerate(state.choice.options):
                                 for method in ('keyboard', 'mouse'):
+                                    budget.checkpoint()
                                     game.clear_and_push(ShardScene(State.from_json(snapshot)))
-                                    game.tick(1 / 60)
+                                    tick(game) if native else game.tick(1 / 60)
                                     expected = State.from_json(snapshot)
                                     expected.choose(option.id)
                                     if method == 'keyboard':
@@ -151,6 +158,7 @@ def verify(output, *, backend='pyglet'):
             assert isinstance(game.scene, ShardScene) and player.state.to_json() == expected.to_json()
             assert all((saves / f'save_{slot}.json').read_bytes() == b'damaged autosave' for slot in AUTO_SLOTS)
             for _, snapshot in cases:
+                budget.checkpoint()
                 state = State.from_json(snapshot)
                 expected = State.from_json(snapshot)
                 expected.choose(expected.choice.options[0].id)
@@ -166,24 +174,35 @@ def verify(output, *, backend='pyglet'):
             player.capture('queued-save-error-125')
             restart = cases[0][1]
         finally:
-            game._teardown()
+            game.close()
         game = create_game(backend=backend, visible=False, save_dir=saves)
         try:
             game.push(ShardScene(State.from_json(restart)))
-            game.tick(1 / 60)
+            tick(game) if native else game.tick(1 / 60)
             assert reading_scale(game) == 125
             check_choice(game.scene)
             PlayerInput(game, native=native, output=output).capture('restarted-125')
         finally:
-            game._teardown()
+            game.close()
+    budget.checkpoint()
     (output / 'matrix.json').write_text(json.dumps(metrics, indent=2) + '\n')
     print(f'{backend} earned choices passed: {len(cases)} decisions / {len(metrics)} layouts / '
           f'{len(player.events)} inputs; {output}')
 
 
-if __name__ == '__main__':
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('/tmp/shardbound-choice-reading'))
     parser.add_argument('--backend', choices=('mock', 'pyglet'), default='pyglet')
-    args = parser.parse_args()
-    verify(args.output, backend=args.backend)
+    parser.add_argument('--cpu-percent', type=float, default=25,
+                        help='CPU allowance as a percent of one core (default 25; 100 for explicit stress)')
+    args = parser.parse_args(argv)
+    try:
+        budget = CpuBudget(args.cpu_percent)
+    except ValueError as error:
+        parser.error(str(error))
+    verify(args.output, backend=args.backend, budget=budget)
+
+
+if __name__ == '__main__':
+    main()

@@ -14,25 +14,27 @@ from tools.cpu_budget import CpuBudget
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def earned_report():
-    """Prepare a few real commands from the authenticated paid Control opening."""
-    path = ROOT / 'docs/evidence/shardbound-army-plans-cd351a9/control.json.gz'
+def earned_report(anchor='control', *, skill='pathfinder'):
+    """Prepare real commands from one fixed, earned opening without replaying its campaign."""
+    index = {'control': 38, 'mobile': 14}[anchor]
+    path = ROOT / f'docs/evidence/shardbound-army-plans-cd351a9/{anchor}.json.gz'
     blob = path.read_bytes()
     history = json.loads(gzip.decompress(blob))
-    initial = history['commands'][38]['before']
+    initial = history['commands'][index]['before']
     played = SavedCommands(State.from_json(initial), CpuBudget(100))
-    for command, args, kwargs in (
+    commands = (
         ('infuse', (), {}),
         ('travel', ((0, -1),), {}),
         ('battle.cast', ('heal', 4), {'caster_id': 5}),
         ('battle.guard', (0,), {}),
         ('battle.end_turn', (), {}),
-    ):
+    ) if anchor == 'control' else (('choose', (skill,), {}),)
+    for command, args, kwargs in commands:
         played.order(command, *args, **kwargs)
         played.commands[-1]['reason'] = 'Exercise the recorded public command through real input.'
     return dict(
         source=dict(path=str(path.relative_to(ROOT)), journal_sha256=hashlib.sha256(blob).hexdigest(),
-                    journal_source=history['source_commit'], command_index=38,
+                    journal_source=history['source_commit'], command_index=index,
                     initial_sha256=hashlib.sha256(initial.encode()).hexdigest()),
         execution_source='test working source',
         source_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
@@ -55,26 +57,85 @@ def test_directed_journal_replays_infusion_and_acolyte_cast_through_saved_input(
     assert result['source_unchanged']
 
 
-@pytest.mark.parametrize('tamper', ('opening', 'source_index', 'model', 'chain', 'autoplay', 'query'))
-def test_directed_replay_rejects_unearned_stale_or_automatic_journals(tmp_path, tamper):
+@pytest.mark.parametrize('skill', ['pathfinder', 'skirmisher'])
+def test_scout_journal_replays_the_earned_skill_choice_through_saved_input(tmp_path, skill):
+    """Either first Scout discipline is earned through ChoiceScene and survives actual F5/F9 controls."""
+    from tools.verify_eador_directed_journey import verify
+
+    source = earned_report('mobile', skill=skill)
+    initial = State.from_json(source['initial_state'])
+    assert initial.hero.hero_class == 'Scout' and initial.hero.skill_ranks == {}
+    assert initial.choice.kind == 'skill'
+    path = tmp_path / 'scout.json.gz'
+    path.write_bytes(gzip.compress(json.dumps(source).encode()))
+    result = verify(path, tmp_path / 'verified', backend='mock')
+    final = State.from_json(result['final_state'])
+    assert final.hero.skill_ranks == {skill: 1} and final.choice is None
+    assert (final.hero.level, final.hero.xp) == (initial.hero.level, initial.hero.xp)
+    assert result['final_state'] == source['final_state']
+    assert result['reloads'] == result['exact_commands'] == 1
+    assert result['input_source'] == source['source'] and result['source_unchanged']
+
+
+def test_scout_replay_captures_the_first_warden_swap(tmp_path):
+    """The tactical action gets its own indexed capture while saved input remains exact."""
+    from tools.verify_eador_directed_journey import verify
+
+    source = earned_report('mobile')
+    played = SavedCommands(State.from_json(source['final_state']), CpuBudget(100))
+    for command, args in (('explore', ()), ('battle.swap', (4, 3))):
+        played.order(command, *args)
+        played.commands[-1]['reason'] = 'Observe the earned Warden swap in the nearby shrine.'
+    source['commands'].extend(played.commands)
+    source['final_state'] = played.state.to_json()
+    path = tmp_path / 'scout-swap.json.gz'
+    path.write_bytes(gzip.compress(json.dumps(source).encode()))
+    result = verify(path, tmp_path / 'verified', backend='mock')
+    assert result['captures'] == ['003-battle-swap', 'final-state']
+    assert result['final_state'] == source['final_state']
+    assert result['reloads'] == result['exact_commands'] == 3
+
+
+@pytest.mark.parametrize('anchor', ['control', 'mobile'])
+@pytest.mark.parametrize('tamper', ('opening', 'source_index', 'source_path', 'source_hash',
+                                   'model', 'chain', 'autoplay', 'query', 'final'))
+def test_directed_replay_rejects_unearned_stale_or_automatic_journals(tmp_path, anchor, tamper):
     """Self-consistent hashes cannot authenticate a fabricated opening or replace explicit commands."""
     from tools.verify_eador_directed_journey import verify
 
-    source = earned_report()
+    source = earned_report(anchor)
     if tamper == 'opening':
         source['initial_state'] = source['commands'][0]['after']
         source['source']['initial_sha256'] = hashlib.sha256(source['initial_state'].encode()).hexdigest()
     elif tamper == 'source_index':
-        source['source']['command_index'] = 37
+        # Even a legal, exactly saved continuation from the next earned command
+        # must not let the journal choose a different authentication checkpoint.
+        history = json.loads(gzip.decompress((ROOT / source['source']['path']).read_bytes()))
+        index = source['source']['command_index'] + 1
+        initial = history['commands'][index]['before']
+        played = SavedCommands(State.from_json(initial), CpuBudget(100))
+        played.order('end_turn')
+        played.commands[-1]['reason'] = 'Continue from a different earned command.'
+        source.update(initial_state=initial, final_state=played.state.to_json(), commands=played.commands)
+        source['source'].update(command_index=index, initial_sha256=hashlib.sha256(initial.encode()).hexdigest())
+    elif tamper == 'source_path':
+        # Matching bytes and provenance elsewhere do not authorize arbitrary file reads.
+        copied = tmp_path / 'copied-opening.json.gz'
+        copied.write_bytes((ROOT / source['source']['path']).read_bytes())
+        source['source']['path'] = str(copied)
+    elif tamper == 'source_hash':
+        source['source']['journal_sha256'] = '0' * 64
     elif tamper == 'model':
         source['source_sha256']['eador/model.py'] = '0' * 64
     elif tamper == 'chain':
-        source['commands'][1]['before'] = source['initial_state']
+        source['commands'][0]['before'] = source['commands'][0]['after']
     elif tamper == 'autoplay':
         source['commands'][0]['command'] = 'battle.auto_turn'
-    else:
+    elif tamper == 'query':
         source['commands'] = [dict(command='to_json', args=[], kwargs={}, reason='Read the current state.',
                                    before=source['initial_state'], after=source['initial_state'])]
+        source['final_state'] = source['initial_state']
+    else:
         source['final_state'] = source['initial_state']
     path = tmp_path / 'invalid.json.gz'
     path.write_bytes(gzip.compress(json.dumps(source).encode()))

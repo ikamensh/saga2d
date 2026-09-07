@@ -1,0 +1,150 @@
+{
+  "README.md": {
+    "bytes": 6207,
+    "sha256": "b7616b61e5085c48092e951f445c10ceafda58e8960d8c5e9e0b2d5a7497ae62"
+  },
+  "audio-build-time.txt": {
+    "bytes": 753,
+    "sha256": "e87abb98b35094624c4bb8358a32a8a490ad4f54e8c8255d55128e4d8017c64a"
+  },
+  "audio-build.txt": {
+    "bytes": 171,
+    "sha256": "a3eda55c74c88b10ddc1f8b56e003c707aa39ca8fa39383389629137e273dce0"
+  },
+  "audio-native.txt": {
+    "bytes": 709,
+    "sha256": "36a413b8cc954d24fcc2435173926eadbb2db1cd5ff0f86cec6cb4390ec0d19d"
+  },
+  "audio-tests.txt": {
+    "bytes": 98,
+    "sha256": "54dbe846845540db65b0d7eab0ab6870b4ec01f9ec037d23988084bc6494b544"
+  },
+  "battle-feedback-tests.txt": {
+    "bytes": 99,
+    "sha256": "177684e7e2a892adcc3880b186053c609ef38a19d042613d5222819f71373b27"
+  },
+  "before/battle.png": {
+    "bytes": 315474,
+    "sha256": "07fe4ad072b16d3b03d02228717564b62945c7cd7fad08d0bf959af016adbc89"
+  },
+  "before/campaign.png": {
+    "bytes": 452328,
+    "sha256": "9b838393a4f5d315d0f9014c407080e76bfa1304d6b74c806e7048bedbe924c4"
+  },
+  "before/title.png": {
+    "bytes": 306525,
+    "sha256": "4b76c240ad3fef4ab70b1add5cf133503e1960d8a4c820334afe4d5503298275"
+  },
+  "eador-fuzz.json": {
+    "bytes": 11844,
+    "sha256": "321d9aa7d0ee190336429b5f0ef4f3cbfd3d4579eed509fe5d83a0bbf5a425e7"
+  },
+  "eador-fuzz.txt": {
+    "bytes": 2116,
+    "sha256": "a119867c7648d48c34ddaceca14a82c52b4b6a51a7866e914e55fca02d500c20"
+  },
+  "effects-native.txt": {
+    "bytes": 54,
+    "sha256": "01656107bb0130a7ba723aa8afbd08139d346352178fe00a28cc46f087517a2c"
+  },
+  "effects/arrow-06.png": {
+    "bytes": 2259361,
+    "sha256": "53b9e179cb5dc61c5c8719967b923fe2b733ef3b76f672061bb102597c868a7d"
+  },
+  "effects/arrow-20.png": {
+    "bytes": 2260388,
+    "sha256": "7676053b13340932bbd82a1e103b16aa86b0aca75d8be42a0f41f69a7c951edc"
+  },
+  "effects/bolt-20.png": {
+    "bytes": 2262845,
+    "sha256": "c362f155f82c90581439622ac9ca716e4e8519c277b47791da6bd44056f168a7"
+  },
+  "effects/briefing-broken-observatory.png": {
+    "bytes": 629142,
+    "sha256": "6ce5d71ea9decbf9a781e176199ff500063930000207fa38754592dbab1093c7"
+  },
+  "effects/heal-20.png": {
+    "bytes": 2231149,
+    "sha256": "6384b9b0edbc9eb278962917d02823d713efae462a17327d3ff489ac818c8261"
+  },
+  "effects/melee-20.png": {
+    "bytes": 2236647,
+    "sha256": "c211d3a90d28fb3badf930791ccd56a09d972818a4fca4325a25a0ce160d9348"
+  },
+  "effects/smoke-20.png": {
+    "bytes": 2245223,
+    "sha256": "e4c13298e21a1af710b0fd76c41b80d03bc3e9207d640d594b340803acac144e"
+  },
+  "effects/swap-20.png": {
+    "bytes": 2240744,
+    "sha256": "68bce1d9f9cc48877dcaf412930383ca2a84d2c513327a52573858e072e8f418"
+  },
+  "effects/verification.json.gz": {
+    "bytes": 93618,
+    "sha256": "a4af40389cbf27f4dfa0e7138bfef0575bfcf4879bdcc5b1ff666d3a076ab4b3"
+  },
+  "scene-assets-tests.txt": {
+    "bytes": 100,
+    "sha256": "dc2eaabb26d100628aa1987d5ded3cadb6e35a3eafde4310af64f93760ec38ba"
+  },
+  "static-native.txt": {
+    "bytes": 85,
+    "sha256": "463fd574fa0d8ce266600c5a13fa9ca8cc376fd3816c8ca200a8a004f1887bce"
+  },
+  "static/battle-reading-125.png": {
+    "bytes": 2309842,
+    "sha256": "1ad1d4b7fc44436417cf8e9dc14a3cba69bfb591363d6fcd7d32368b753afe70"
+  },
+  "static/campaign-elderwild.png": {
+    "bytes": 2226272,
+    "sha256": "d86a18841e88de9c5510f67222a933e51d78a69b58f9c6f019be391b0fefeb59"
+  },
+  "static/campaign-frontier.png": {
+    "bytes": 2222715,
+    "sha256": "8c9843f9bc393c731ec9a23e9ee979b7e23febac84a96c04b118629bd6ba8455"
+  },
+  "static/campaign-reading-125.png": {
+    "bytes": 2223008,
+    "sha256": "4c7c9e11fc45c61302c5d69a5997091746905c6f6eced2388a154791196d6db4"
+  },
+  "static/campaign-ruins.png": {
+    "bytes": 2214593,
+    "sha256": "3ada52278dee9bb8c1f8cafba81188c05be2171e62d2d4ff6666ec195304c3b0"
+  },
+  "static/report.json": {
+    "bytes": 4475,
+    "sha256": "864ae27fcb93eaa91b3ce50b57f797b08120fe56907b63b5d4ba19a6885eb7ef"
+  },
+  "static/title-elderwild.png": {
+    "bytes": 2875953,
+    "sha256": "3a62c478408c9be4529419d253eed5c46c7d40255a44b8ce8bba5a182c546d0b"
+  },
+  "static/title-frontier.png": {
+    "bytes": 2904028,
+    "sha256": "519af40d4245664df587f212399cbc232302045e97dd349cc7461412b51c16eb"
+  },
+  "static/title-reading-125.png": {
+    "bytes": 2813172,
+    "sha256": "17bfffa0b7dea2df381549cfb2ed200c2e8b9e5759ed3696581aa6b68fa6f642"
+  },
+  "static/title-ruins.png": {
+    "bytes": 2875830,
+    "sha256": "8608a76963a779c928cd2921b85b4ecc23047dc1c7e758f74382c2284e4b2be5"
+  },
+  "terrain-build.txt": {
+    "bytes": 123,
+    "sha256": "5b8b7087c0e2fef10c2eed6d74d8a7aaf5009ed0536fac4b0405128149d8be19"
+  },
+  "terrain-comparison.json": {
+    "bytes": 3042,
+    "sha256": "32757b07534e4614d284f1d8fb8531b4a2b76447c12d953dcf413313cb17d3c4"
+  },
+  "terrain-package-tests.txt": {
+    "bytes": 127,
+    "sha256": "ae93c91cda2b1840a960819944040cd8265f3ed2c61e2879c7faddea4cdd949f"
+  },
+  "tribes-fuzz.txt": {
+    "bytes": 101,
+    "sha256": "80938d4d708ecdce88390e2d1463638fe45fd7336527f60ab1bc09aef0698535"
+  }
+}

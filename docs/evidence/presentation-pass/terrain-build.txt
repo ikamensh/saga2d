@@ -1,0 +1,4 @@
+Built and verified 48 terrain PNGs in /private/tmp/saga2d-presentation-1524c48/eador/assets.
+real 10.41
+user 2.54
+sys 0.04
