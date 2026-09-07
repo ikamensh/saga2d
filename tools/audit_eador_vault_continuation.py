@@ -149,7 +149,7 @@ def _continue(state, entry, mana_reserve, limit):
         else:
             path = state.grid.path(state.hero.pos, TARGET)
             assert len(path) > 1, 'An uncaptured target cannot already contain the hero'
-            command, args, reason = 'travel', (path[1],), 'Advance toward the production province; leave its Aerie site unexplored'
+            command, args, reason = 'travel', (path[1],), 'Advance toward the production province; leave its adventure unexplored'
 
         state.order(command, *args)
         order_index = len(state.commands) - 1
@@ -214,7 +214,7 @@ def compare(*, cpu_percent=25, campaign_order_limit=24):
         entry_order = state.commands[0]
         mana_reserve = state.battle.spell_cost('heal')
         vault = _settle(state, entry_order['after'], 'Existing explicit manual Vault route')
-        assert State.from_json(vault['reward_state']).provinces[(-1, 1)].explored
+        assert State.from_json(vault['reward_state']).provinces[entry.hero.pos].explored
         continuation = _continue(state, entry, mana_reserve, campaign_order_limit)
         branches[approach] = dict(entry_fee_gold=entry_order['gold_spent'],
                                  entry_fee_crystals=entry_order['crystals_spent'],
@@ -228,7 +228,7 @@ def compare(*, cpu_percent=25, campaign_order_limit=24):
                 target=asdict(entry.provinces[TARGET]), branches=branches,
                 policy='Ordinary paid seed-seven Warden/Ranger preparation; same saved entry and existing manual Vault routes. '
                        'Keep the equipped relic; take first offered rewards. Then capture production at (0,0), '
-                       'without exploring its Aerie, and observe the first rival operation due after capture. '
+                       'without exploring its adventure, and observe the first rival operation due after capture. '
                        'Before elective healing, intercept an imminent attack on owned land if the current expedition '
                        'is reachable with remaining actions; re-read its position each order. Restore only missing '
                        'entry-roster roles when affordable, at normal prices; do not fill an unused capacity slot. '

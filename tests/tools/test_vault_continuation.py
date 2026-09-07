@@ -8,8 +8,8 @@ def test_vault_approaches_share_an_earned_army_and_preserve_their_campaign_conse
 
     report = compare()
     entry = State.from_json(report['entry_state'])
-    assert entry.hero.pos == (-1, 1)
-    assert entry.provinces[entry.hero.pos].site_kind == 'sealed_vault'
+    vault_pos = entry.hero.pos
+    assert entry.provinces[vault_pos].site_kind == 'sealed_vault'
     assert {troop.kind for troop in entry.hero.army} >= {'warden', 'ranger'}
     preparation = report['preparation_commands']
     assert any(order['command'] == 'recruit' and order['args'] == ('warden',) for order in preparation)
@@ -30,8 +30,8 @@ def test_vault_approaches_share_an_earned_army_and_preserve_their_campaign_conse
     for branch in report['branches'].values():
         resolved = State.from_json(branch['vault']['resolved_state'])
         final = State.from_json(branch['final_state'])
-        assert resolved.provinces[(-1, 1)].explored
-        assert final.provinces[(-1, 1)].explored
+        assert resolved.provinces[vault_pos].explored
+        assert final.provinces[vault_pos].explored
         assert branch['campaign_orders'] <= report['campaign_order_limit']
         assert all(turn['reason'] for turn in branch['end_turns'])
         assert branch['replacement_gold'] == sum(order['gold_spent'] for order in branch['replacement_purchases'])

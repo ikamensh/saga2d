@@ -1,0 +1,21 @@
+crossfire: objective_and_rival_operation; 7 campaign turns, 7 rests, 0 replacement gold; 623 gold / 73 crystals left
+unseal: objective_and_rival_operation; 2 campaign turns, 2 rests, 0 replacement gold; 390 gold / 34 crystals left
+/tmp/shardbound-vault-current-4094c85.json.gz
+        1.04 real         0.34 user         0.02 sys
+            41811968  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                7116  page reclaims
+                  24  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 234  voluntary context switches
+                  53  involuntary context switches
+          5005711085  instructions retired
+          1189707057  cycles elapsed
+            27017720  peak memory footprint
