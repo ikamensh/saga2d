@@ -3,7 +3,7 @@
 from eador.campaign import CONTRACTS, FOUNDRIES
 from eador.content import RELICS, SKILLS
 from eador.model import RuleError, UNITS
-from eador.scene import Screen, TitleScene
+from eador.scene import OrderPending, Screen, TitleScene
 from eador.style import GOLD, MUTED, RED, TEAL, TEXT
 from eador.worldgen import THEMES
 
@@ -443,9 +443,13 @@ class CampaignScene(Screen):
                          relic_ids=tuple(rid for rid in state.inventory if rid in self.relic_ids))
         try:
             if self.phase == 'recovery':
-                state.recover(**selection)
+                self.root.order("recover", **selection)
             else:
-                state.advance(self.offer_id, **selection)
+                self.root.order("advance", self.offer_id, **selection)
+        except OrderPending as pending:
+            self.message = str(pending)
+            self.refresh()
+            return
         except RuleError as error:
             self.message = str(error)
             self.game.audio.play_sound('refuse')
@@ -458,7 +462,8 @@ class CampaignScene(Screen):
 
     def abandon(self):
         if self.checkpoint(self.root.state):
-            self.root.state.abandon_campaign()
+            if not self.command(lambda: self.root.order("abandon_campaign")):
+                return
             self.checkpoint(self.root.state)
             self.phase, self.step = 'lost', 'ending'
             self.game.audio.play_sound('defeat')

@@ -16,6 +16,7 @@ dependencies = [
     "numpy>=2.0.0",
     "Pillow>=12.1.1",
     "pyglet>=2.1.13",
+    "websockets>=15,<18",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +25,9 @@ ai-verify = ["anthropic>=0.39.0"]
 
 [tool.setuptools.packages.find]
 include = ["saga2d*"]
+
+[tool.setuptools.package-data]
+saga2d = ["assets/fonts/*.ttf", "assets/fonts/OFL.txt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

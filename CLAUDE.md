@@ -1,13 +1,15 @@
 # Saga2D — Project Instructions
 
-Framework in `saga2d/`, reference game in `tribes/`, tests in `tests/`.
-Read `DESIGN.md` before changing the framework.
+Framework in `saga2d/`, reference games in `tribes/` (turn-based) and
+`warband/` (real-time strategy), tests in `tests/`.  Read `DESIGN.md` before
+changing the framework.
 
 ## Commands
 
 ```bash
 uv run python -m pytest tests -q        # headless suite (mock backend)
-uv run python -m tribes --seed 7        # play
+uv run python -m tribes --seed 7        # play Tribes
+uv run python -m warband --seed 3       # play Warband
 ```
 
 ## CPU and battery during development
@@ -24,8 +26,8 @@ unpaced and require their caller's clock.
 ## Visual changes must be looked at
 
 Mock tests prove logic, not pixels.  After any change to rendering, the
-pyglet backend, UI components or the Tribes scene, render a real frame
-and open the PNG:
+pyglet backend, UI components or a game scene, render a real frame and
+open the PNG:
 
 ```python
 from saga2d.testing import render_scene
@@ -52,9 +54,15 @@ The display must be awake for pyglet to open windows; a
   and on model state.
 - Tests exercise public behaviour through `Game`/`Scene`/`World`; no
   mocking of internals.  Add a regression test for every bug found.
-- `tribes/model.py` has no saga2d dependency — test rules there directly.
-- After changing rules, the AI or scene input, run `uv run python tools/fuzz.py`:
-  AI-vs-AI games with invariant checks plus random-input runs through the scene.
+- `tribes/model.py` and `warband/model.py` have no saga2d dependency — test
+  rules there directly.
+- After changing rules, the AI or scene input, run `uv run python tools/fuzz.py`
+  (Tribes) or `uv run python tools/fuzz_warband.py` (Warband): AI-vs-AI games
+  with invariant checks plus random-input runs through the scene.
+- `uv run python tools/perf_warband.py` times a 150-unit battle on the real backend
+  (W10 wants p95 < 16 ms); never time frames under a profiler or tracemalloc.
+- `uv run python tools/verify_warband.py DIR` plays a match through real pyglet
+  events and saves frames to look at.
 
 ## Style
 

@@ -13,8 +13,9 @@ from saga2d import (
     Anchor, Button, Camera, Column, Delay, InputEvent, KeyHints, Label, Layout, MoveTo, Panel, ProgressBar, RenderLayer,
     Row, SaveError, Scene, Sequence, Sprite, Style,
 )
+from saga2d.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, Pulse, Toast, hop
 from tribes import ai, effects, mapgen
-from tribes.effects import Banner, Burst, Dissolve, Effects, FloatingText, HitReaction, TilePulse, Toast, hop, play_sound
+from tribes.effects import play_sound
 from tribes.model import City, CombatResult, Pos, RuleError, Unit, World
 from tribes.rules import HARVEST, MAX_ROUNDS, REWARDS, TECHS, UNITS, Reward, Tech, UnitType
 from tribes.scores import HighScores
@@ -66,13 +67,13 @@ class MapScene(Scene):
     }
 
     def __init__(self, world: World, seed: int, *, settings: dict[str, Any] | None = None,
-                 stats: dict[str, int] | None = None, run_id: str | None = None) -> None:
+                 stats: dict[str, int] | None = None, run_id: str | None = None, player: int | None = None) -> None:
         self.world = world
         self.seed = seed
         self.run_id = run_id if run_id is not None else str(uuid4())
         self._game_over_shown = False
         self.rng = random.Random(seed)
-        self.human = next(t.id for t in world.tribes if t.human)
+        self.human = next(t.id for t in world.tribes if t.human) if player is None else player
         self.cursor: Pos = (0, 0)
         self.selected_unit: int | None = None
         self.selected_city: int | None = None
@@ -260,7 +261,7 @@ class MapScene(Scene):
         self.selected_unit = None
         self._refresh_selection()
         if changed and city is not None:
-            self.effects.add(TilePulse(tile_center(city.pos), rgba(self.tribe.color, 160), radius=(10, 40), rings=1, duration=0.5))
+            self.effects.add(Pulse(tile_center(city.pos), rgba(self.tribe.color, 160), radius=(10, 40), rings=1, duration=0.5))
             self.sfx("select")
 
     def cancel(self) -> None:
@@ -361,7 +362,7 @@ class MapScene(Scene):
         for finding in self.world.take_findings():
             center = tile_center(finding.pos)
             self.effects.add(Burst(center, GOLD, 22, rng=self.rng))
-            self.effects.add(TilePulse(center, GOLD, radius=(10, TILE), rings=2, duration=0.9))
+            self.effects.add(Pulse(center, GOLD, radius=(10, TILE), rings=2, duration=0.9))
             self.effects.add(FloatingText(finding.text, (center[0], center[1] - TILE * 0.7), GOLD, font_size=20, rise=36, duration=1.8))
             self.say(f"Ruins explored: {finding.text}")
             self.sfx("level_up")
@@ -457,7 +458,7 @@ class MapScene(Scene):
         color = rgba(self.tribe.color)
         center = tile_center(city.pos)
         self.effects.add(Burst(center, color, 24, rng=self.rng))
-        self.effects.add(TilePulse(center, color, radius=(12, TILE * 1.2), rings=3, duration=1.1))
+        self.effects.add(Pulse(center, color, radius=(12, TILE * 1.2), rings=3, duration=1.1))
         self.effects.add(FloatingText(city.name, (center[0], center[1] - TILE * 0.8), GOLD, font_size=22, rise=36, duration=1.4))
         self.camera.shake(3, 0.25)
         self.say(f"{city.name} is yours")
@@ -489,7 +490,15 @@ class MapScene(Scene):
         self.sfx("train")
         self._refresh_selection()
         hop(self.view.unit_sprite(unit.id), tile_center(unit.pos), height=14, speed=320)
-        self.effects.add(TilePulse(tile_center(city.pos), rgba(self.tribe.color, 150), radius=(8, 34), rings=1, duration=0.45))
+        self.effects.add(Pulse(tile_center(city.pos), rgba(self.tribe.color, 150), radius=(8, 34), rings=1, duration=0.45))
+
+    def research(self, tech: Tech) -> bool:
+        self.world.research(self.human, tech)
+        return True
+
+    def choose_reward(self, city: City, reward: Reward) -> bool:
+        self.world.choose_reward(city, reward)
+        return True
 
     def harvest(self, pos: Pos) -> None:
         tile = self.world.tile(pos)
@@ -512,7 +521,7 @@ class MapScene(Scene):
     def _celebrate_level(self, city: City) -> None:
         center = tile_center(city.pos)
         color = rgba(self.tribe.color)
-        self.effects.add(TilePulse(center, color, radius=(14, TILE * 1.4), rings=3, duration=1.2, delay=0.35))
+        self.effects.add(Pulse(center, color, radius=(14, TILE * 1.4), rings=3, duration=1.2, delay=0.35))
         self.effects.add(FloatingText(f"Level {city.level}!", (center[0], center[1] - TILE * 0.8), GOLD, font_size=24, rise=40, duration=1.6, delay=0.4))
         self.effects.add(Burst(center, color, 26, rng=self.rng, delay=0.4))
         self.after(0.4, lambda: self.sfx("level_up"))
@@ -980,7 +989,8 @@ class TechScene(_Overlay):
 
     def buy(self, tech: Tech) -> None:
         world, scene = self.world, self.map_scene
-        world.research(scene.human, tech)
+        if not scene.research(tech):
+            return
         scene.say(f"Learned {tech.value.title()}")
         scene.sfx("research")
         capital = world.capital_of(scene.human)
@@ -1145,9 +1155,10 @@ class RewardScene(_Overlay):
 
     def pick(self, reward: Reward) -> None:
         scene = self.map_scene
-        scene.world.choose_reward(self.city, reward)
+        if not scene.choose_reward(self.city, reward):
+            return
         center = tile_center(self.city.pos)
-        scene.effects.add(TilePulse(center, rgba(scene.tribe.color), radius=(12, TILE * 1.3), rings=3, duration=1.0))
+        scene.effects.add(Pulse(center, rgba(scene.tribe.color), radius=(12, TILE * 1.3), rings=3, duration=1.0))
         scene.say(f"{self.city.name}: {REWARDS[reward].name}")
         scene.sfx("research")
         scene.sync()
@@ -1251,12 +1262,12 @@ class GameOverScene(_Overlay):
         panel.style = RESULTS_STYLE
         rounds = min(world.round, MAX_ROUNDS)
         cities = len(world.tribe_cities(scene.human))
-        panel.add(Label(
-            f"{_plural(rounds, 'round')} · {cities} {'city' if cities == 1 else 'cities'} held · "
-            f"{_plural(scene.stats['cities_taken'], 'capture')} · {_plural(scene.stats['units_killed'], 'kill')} · "
-            f"{_plural(scene.stats['units_lost'], 'unit')} lost",
-            text_style="body",
-        ))
+        multiplayer = sum(tribe.human for tribe in world.tribes) > 1
+        summary = f"{_plural(rounds, 'round')} · {cities} {'city' if cities == 1 else 'cities'} held"
+        if not multiplayer:
+            summary += (f" · {_plural(scene.stats['cities_taken'], 'capture')} · {_plural(scene.stats['units_killed'], 'kill')} · "
+                        f"{_plural(scene.stats['units_lost'], 'unit')} lost")
+        panel.add(Label(summary, text_style="body"))
         points = world.score_breakdown(scene.human, final=True)
         report = Column(spacing=2, width=330)
         report.add(Label("Your score", text_style="heading"))
@@ -1279,14 +1290,17 @@ class GameOverScene(_Overlay):
         panel.add(Row(report, standings, spacing=24))
         panel.add(Label("Victory +1,000 · Early finish +50 per round remaining", text_style="sub"))
         self.score_error = None
-        try:
-            rank = HighScores(self.game.data_dir).record(world, tribe=scene.human, seed=scene.seed, run_id=scene.run_id)
-            message = f"Your run's best: #{rank} locally" if rank is not None else "Outside the local top 10"
-            panel.add(Label(f"{message} · {world.size}×{world.size} · {len(world.tribes)} tribes", text_style="hud", text_color=GOLD))
-        except SaveError as error:
-            self.score_error = str(error)
-            panel.add(Label("Score could not be saved. Open High scores for details.", text_style="sub", text_color=BAD))
-        panel.add(Row(Button("New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=165),
+        if multiplayer:
+            panel.add(Label("Multiplayer match · 2 human tribes", text_style="hud", text_color=GOLD))
+        else:
+            try:
+                rank = HighScores(self.game.data_dir).record(world, tribe=scene.human, seed=scene.seed, run_id=scene.run_id)
+                message = f"Your run's best: #{rank} locally" if rank is not None else "Outside the local top 10"
+                panel.add(Label(f"{message} · {world.size}×{world.size} · {len(world.tribes)} tribes", text_style="hud", text_color=GOLD))
+            except SaveError as error:
+                self.score_error = str(error)
+                panel.add(Label("Score could not be saved. Open High scores for details.", text_style="sub", text_color=BAD))
+        panel.add(Row(Button("Play solo" if multiplayer else "New game", hotkey="N", on_click=self.new_game, style=ACTION_BUTTON, width=165),
                       Button("High scores", shortcut="L", on_click=self.high_scores, style=GHOST_BUTTON, width=165),
                       Button("Back to title", hotkey="T", on_click=self.back_to_title, style=GHOST_BUTTON, width=165),
                       Button("Quit", hotkey="Q", on_click=self.quit, style=GHOST_BUTTON, width=165), spacing=8))

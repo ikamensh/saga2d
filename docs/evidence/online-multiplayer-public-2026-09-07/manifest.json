@@ -1,0 +1,119 @@
+{
+  "all_inspected_native_frames": {
+    "eador-about-credits-page2.png": "cc7d78fd33096c274204e32b6b7803e93f04efcb055239f1b8da2b52bca741c3",
+    "eador-about-credits.png": "ee4340bf7dc90aa8104debd20af781864b060cadb26e0409e2d504c670be8586",
+    "eador-about.png": "e992e3aa204054857f166b27a1d940a800551e3200cfea91925c18bde33e7734",
+    "eador-join.png": "7f72b52729cee8296048cea36ff4357dfa04d190767bccc435ee66831612f002",
+    "eador-lan.png": "a54e2a11f51be5d30bef69385f9b916a82d7b1c2630f7fce7007150220ad129d",
+    "eador-match.png": "748b87a7213b21469aacc1484292266d5255cc77fc480ec4a34f8e86135bdccd",
+    "eador-online.png": "64e7d3e275c5925bac779511778b018d2b1f486524fe275f08982a38f56e6ae3",
+    "eador-rejoined.png": "3559cadbec090fb74c8f2b08c84dd53800e9e0f10b4f85f54ff4bb0195ab178a",
+    "eador-resume.png": "035a95bd176942f0ec9ef61d8455f66147c408e3bf361a215a4c9878ae39c344",
+    "eador-room.png": "dd2ad5df0df436210ed4dfa0177a373f332de91cb4db16f8ba73b7396c6ad0e4",
+    "tribes-join.png": "370aab68671a7bc4e5f2238024cf3ab184b45ee7f7e4369acc921be829b89601",
+    "tribes-lan.png": "3a0233dfc38db2e515aae831ec6a3badac24222bc9eda02e377c37770d373e8f",
+    "tribes-match.png": "2a7a98665f89ffe474f2199677f73f6fdbe5ac6af965de8ca47e6b1108beb926",
+    "tribes-online.png": "0c3b3dc2c7feea57a55d5cf8fad35e32cd278fc4f9d3135a4650e36559c7b3bf",
+    "tribes-rejoined.png": "e9bac0b6d5aa0fc60c71bb01a0d174fbe54d026fb2bba815d4b2040421e932d0",
+    "tribes-resume.png": "2cacbe4343fc950a6827bfce86734385dc7b6f1b049ea61e58e07f87b588ca41",
+    "tribes-room.png": "1e6408e39959c3256486329899351fee8da30f74c157e4195d4232019f8f65f4",
+    "warband-join.png": "4f9ef7bfddc09ff6ed5c7b7ca2a2d5a4c7f49b663cebb53fb2bf89ccdf63d7b2",
+    "warband-lan.png": "448c5281469d714653abc719311a0baaa9f0b8679530e45c5a2bc8535a893540",
+    "warband-match.png": "927f0cb7c9c9c5e6846d5ed978a6459f6067117c26f84dfa8e25b4d72b2d9f6c",
+    "warband-online.png": "f8d435c7db375fbb2bcf08c0bf76ffd68c2af8311c7146e6b26740f4dc3cc5c0",
+    "warband-rejoined.png": "8ccc232122524b41c6cff3c0076e1b487874be2bcce54b890c87cc625980ef72",
+    "warband-resume.png": "148f757d4eb0ee8bfa7b3a8c66056bd339dd0b5d90a121f69b014a3c76b09dd7",
+    "warband-room.png": "1a8bdd4de7bf6c50fb8af1b71c26c9cdb864b3f13267c05422fc12d1772b0f46"
+  },
+  "assertions": {
+    "all_three_games": [
+      "Online selected by default",
+      "Explicit LAN mode is available",
+      "Native Create room receives a server code before a partner joins",
+      "Native typing and Enter join by room code without an address",
+      "Server accepts gameplay and both peers synchronize",
+      "Closing and reopening the game with the same profile retains Rejoin last room",
+      "Rejoin restores guest seat 1, the same room and authoritative progress"
+    ],
+    "eador": "Native guest enters a site battle, guards and ends round 1; round 2 survives closing/reopening and rejoining.",
+    "eador_about": "About page 1 describes online room-code co-op and optional LAN; page 2 displays the websockets dependency credit.",
+    "tribes": "Partner ends its turn; native guest selects a unit, holds it and ends the turn; authoritative world verifies each action.",
+    "warband": "Native guest selects and moves a unit; server time continues through the local menu; resumed client receives current simulation state."
+  },
+  "command": "SAGA2D_SILENT=1 .venv/bin/python tools/verify_online.py /tmp/saga2d-online-public --server wss://games.tachyon-ai.eu/play",
+  "date": "2026-09-07",
+  "display_wake": "caffeinate -d -u -t 120 was running during native rendering.",
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "platform": "macOS, native pyglet backend, 1280x800 logical window, 2560x1600 Retina captures, paced at 30 FPS",
+  "result": "passed",
+  "retained": {
+    "eador-about-credits-page2.png": {
+      "native_sha256": "cc7d78fd33096c274204e32b6b7803e93f04efcb055239f1b8da2b52bca741c3",
+      "sha256": "153eabd9977da10d4f0fda694aa73f5ca3e1bed8698d5f50e1df79b81ab44572"
+    },
+    "eador-about.png": {
+      "native_sha256": "e992e3aa204054857f166b27a1d940a800551e3200cfea91925c18bde33e7734",
+      "sha256": "64fc6e9ac10bd3066bd05d909e8fc43e7d09374ddcbb84db828f2cddcf26a48f"
+    },
+    "eador-online.png": {
+      "native_sha256": "64e7d3e275c5925bac779511778b018d2b1f486524fe275f08982a38f56e6ae3",
+      "sha256": "e652514b803322f7910d332e864bef14083076ca0faadade3ac2f23145f4cc52"
+    },
+    "eador-rejoined.png": {
+      "native_sha256": "3559cadbec090fb74c8f2b08c84dd53800e9e0f10b4f85f54ff4bb0195ab178a",
+      "sha256": "27beee9aace662537b8b84a0dfef001d4d28c9ede1796388df0e769b0a967902"
+    },
+    "tribes-join.png": {
+      "native_sha256": "370aab68671a7bc4e5f2238024cf3ab184b45ee7f7e4369acc921be829b89601",
+      "sha256": "072f755caaef1025c261e513f8f13d541c987990c541b7061c331f458bdf8f4c"
+    },
+    "tribes-lan.png": {
+      "native_sha256": "3a0233dfc38db2e515aae831ec6a3badac24222bc9eda02e377c37770d373e8f",
+      "sha256": "b79c5ae79fbb7141f90964c3dc22d9da75b99afe2a969ed46b0ee9f79ede821d"
+    },
+    "tribes-match.png": {
+      "native_sha256": "2a7a98665f89ffe474f2199677f73f6fdbe5ac6af965de8ca47e6b1108beb926",
+      "sha256": "3a79ff7ef6f4660796ab7dcebce1e3f9fdd325d68bb969c44dc8ef9af5f70b06"
+    },
+    "tribes-online.png": {
+      "native_sha256": "0c3b3dc2c7feea57a55d5cf8fad35e32cd278fc4f9d3135a4650e36559c7b3bf",
+      "sha256": "920443af9d9b24a3c9435f730491410a77fcef4cc2e17c3a50f0c637e9e72a02"
+    },
+    "tribes-rejoined.png": {
+      "native_sha256": "e9bac0b6d5aa0fc60c71bb01a0d174fbe54d026fb2bba815d4b2040421e932d0",
+      "sha256": "5372e8abe684564e4a2d49c72b5d73b20fb786cea83d354f55ace1ffe16927b6"
+    },
+    "tribes-resume.png": {
+      "native_sha256": "2cacbe4343fc950a6827bfce86734385dc7b6f1b049ea61e58e07f87b588ca41",
+      "sha256": "9a65dcbb8a9ffe3a93fc0e0205cace23df585c5d31c1f1cc9a6a96b226f5047e"
+    },
+    "tribes-room.png": {
+      "native_sha256": "1e6408e39959c3256486329899351fee8da30f74c157e4195d4232019f8f65f4",
+      "sha256": "3f0bae85b2527819d454e32da5c2dea571906e98911552bc4ac415cdac3c87b5"
+    },
+    "warband-online.png": {
+      "native_sha256": "f8d435c7db375fbb2bcf08c0bf76ffd68c2af8311c7146e6b26740f4dc3cc5c0",
+      "sha256": "2657a26d6b3f776b9107276e0cf9647e246a17b8bdd6768c8e127516341d2b3a"
+    },
+    "warband-rejoined.png": {
+      "native_sha256": "8ccc232122524b41c6cff3c0076e1b487874be2bcce54b890c87cc625980ef72",
+      "sha256": "aa5aec90a805550839719d4026ae1404aa8421112c24d1b00c5ceea7c9554788"
+    }
+  },
+  "retained_resolution": [
+    1280,
+    800
+  ],
+  "retained_transform": "Pillow LANCZOS downsample from original native frame; optimized PNG.",
+  "server_release": "0069b9745bb61ef57d94d4ab5bbe7ed09be02c679e411885e80f4744c4e2883b",
+  "source_file_count": 114,
+  "source_files_unchanged_after_verification": true,
+  "source_snapshot": "source-sha256.json",
+  "topology": "One native graphical client and one OnlineClient partner on the same Mac, both connected through public TLS to the remote dedicated server.",
+  "visual_review": {
+    "findings": "Online, LAN, waiting code, join and rejoin menus are readable and unclipped across all three games. Native gameplay renders current artwork and authoritative state. About copy and websockets credit are visible.",
+    "native_frames_inspected": 24,
+    "retained_frames": 13,
+    "supplemental_capture": "The verifier captured About pages 1 and 3. A separate native About-only render with one PageDown captured page 2 (eador-about-credits-page2.png); no room was created for that render."
+  }
+}

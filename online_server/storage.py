@@ -1,0 +1,56 @@
+"""Private, atomic JSON checkpoints; SQLite owns the write/replace transaction."""
+import json
+from pathlib import Path
+import sqlite3
+import time
+
+
+class RoomStore:
+    def __init__(self, directory):
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+        self.path = directory / 'rooms.sqlite3'
+        self.path.touch(mode=0o600, exist_ok=True)
+        self.path.chmod(0o600)
+        self.db = sqlite3.connect(self.path)
+        version = self.db.execute('PRAGMA user_version').fetchone()[0]
+        if version not in (0, 1):
+            raise ValueError(f'Unsupported room checkpoint version: {version}')
+        self.db.execute('PRAGMA journal_mode=WAL')
+        self.db.execute('PRAGMA synchronous=FULL')
+        with self.db:
+            self.db.execute('''CREATE TABLE IF NOT EXISTS rooms (
+                code TEXT PRIMARY KEY, game TEXT NOT NULL, tokens TEXT NOT NULL,
+                state TEXT NOT NULL, revision INTEGER NOT NULL, expires_at REAL NOT NULL
+            )''')
+            self.db.execute('PRAGMA user_version=1')
+
+    def load(self):
+        """Expired rooms stay expired through restarts; corruption fails startup clearly."""
+        with self.db:
+            self.db.execute('DELETE FROM rooms WHERE expires_at <= ?', (time.time(),))
+        return [dict(code=code, game=game, tokens=json.loads(tokens), state=json.loads(state),
+                     revision=revision, expires_at=expires_at)
+                for code, game, tokens, state, revision, expires_at in
+                self.db.execute('SELECT code, game, tokens, state, revision, expires_at FROM rooms')]
+
+    def save(self, room, ttl):
+        remaining = ttl if room.ready else max(0, ttl - (time.monotonic() - room.disconnected_at))
+        with self.db:
+            self.db.execute('INSERT OR REPLACE INTO rooms VALUES (?, ?, ?, ?, ?, ?)',
+                            (room.code, room.game, json.dumps(room.tokens),
+                             json.dumps(room.match.snapshot(0), separators=(',', ':'), allow_nan=False),
+                             room.revision, time.time() + remaining))
+
+    def keep_alive(self, codes, ttl):
+        """Thinking time keeps active turn-based matches alive without rewriting their worlds."""
+        with self.db:
+            self.db.executemany('UPDATE rooms SET expires_at = ? WHERE code = ?',
+                                [(time.time() + ttl, code) for code in codes])
+
+    def delete(self, code):
+        with self.db:
+            self.db.execute('DELETE FROM rooms WHERE code = ?', (code,))
+
+    def close(self):
+        self.db.close()

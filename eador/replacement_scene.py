@@ -4,7 +4,7 @@ from saga2d import Anchor, Button, Column, Label, Row
 from eador.model import RuleError, UNITS
 from eador.preferences import reading_scale
 from eador.reading import reading_pages
-from eador.scene import CatalogScene, SaveScene, Screen, ShardScene
+from eador.scene import CatalogScene, OrderPending, SaveScene, Screen, ShardScene
 from eador.style import GOLD, MUTED, RED, TEXT
 
 
@@ -156,7 +156,9 @@ class ReplacementScene(Screen):
         if self.applied:
             return
         try:
-            self.root.state.replace_troop(self.outgoing_id, self.kind)
+            self.root.order("replace_troop", self.outgoing_id, self.kind)
+        except OrderPending as pending:
+            self.message = str(pending)
         except RuleError as error:
             self.message = str(error)
             self.game.audio.play_sound('refuse')

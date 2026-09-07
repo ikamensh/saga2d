@@ -1,0 +1,13 @@
+/private/tmp/saga2d-lan-final/tribes-title.png
+/private/tmp/saga2d-lan-final/tribes-join.png
+/private/tmp/saga2d-lan-final/tribes-match.png
+/private/tmp/saga2d-lan-final/tribes-result.png
+tribes: native guest commands accepted by separate host process
+/private/tmp/saga2d-lan-final/warband-title.png
+/private/tmp/saga2d-lan-final/warband-join.png
+/private/tmp/saga2d-lan-final/warband-match.png
+warband: native guest commands accepted by separate host process
+/private/tmp/saga2d-lan-final/eador-title.png
+/private/tmp/saga2d-lan-final/eador-join.png
+/private/tmp/saga2d-lan-final/eador-match.png
+eador: native guest commands accepted by separate host process

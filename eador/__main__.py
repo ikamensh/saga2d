@@ -2,6 +2,7 @@
 
 import argparse
 from pathlib import Path
+from saga2d import add_match_arguments, match_from_arguments
 from eador.app import create_game
 from eador.difficulty import DIFFICULTIES
 
@@ -19,12 +20,25 @@ def create_session(argv=None, **game_options):
     parser.add_argument("--theme", choices=THEMES, help="standalone world; linked campaigns begin in Frontier")
     parser.add_argument("--campaign", action="store_true", help="start a linked campaign; default seed 7")
     parser.add_argument("--data-dir", type=Path, help="keep saves and settings in this separate directory")
+    add_match_arguments(parser)
     args = parser.parse_args(argv)
     if args.campaign and args.theme not in (None, "frontier"):
         parser.error("Linked campaigns begin in Frontier. Use --theme without --campaign for a standalone world.")
+    if args.join and not args.room:
+        parser.error("--join requires --room CODE")
+    if (args.host or args.join) and not 1 <= args.port <= 65535:
+        parser.error("--port must be between 1 and 65535")
     if args.data_dir is not None:
         game_options['save_dir'] = args.data_dir.expanduser().resolve() / 'saves'
     game = create_game(**game_options)
+    from eador.multiplayer import ShardboundMatch, NetworkShardScene
+    options = {'seed': args.seed if args.seed is not None else 7, 'hero': args.hero,
+               'theme': args.theme or 'frontier', 'difficulty': args.difficulty, 'campaign': args.campaign}
+    lobby = match_from_arguments(args, parser, title="Shardbound co-op", game_id="shardbound-v1",
+                                 create_match=lambda: ShardboundMatch(**options), create_scene=NetworkShardScene,
+                                 create_options=lambda: options, game=game)
+    if lobby is not None:
+        return game, lobby
     if args.campaign:
         scene = ShardScene(State.new_campaign(args.seed if args.seed is not None else 7, args.hero,
                                              difficulty=args.difficulty))

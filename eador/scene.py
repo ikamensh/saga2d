@@ -23,6 +23,10 @@ from eador.preferences import reduced_motion
 from eador.ui import hero_portrait, icon_path, metric
 
 
+class OrderPending(RuleError):
+    """The network accepted an order for asynchronous host resolution."""
+
+
 class Screen(Scene):
     background_color = INK
 
@@ -42,6 +46,8 @@ class Screen(Scene):
         return CampaignSaves(self.game.save_manager)
 
     def checkpoint(self, state):
+        if getattr(getattr(self, "root", self), "live_match", False):
+            return True
         try:
             self.saves.checkpoint(state)
         except SaveError as error:
@@ -50,6 +56,9 @@ class Screen(Scene):
         return True
 
     def load_game(self, slot=1, *, backup=False):
+        if getattr(getattr(self, "root", self), "live_match", False):
+            self.message = "Leave co-op before loading an offline save."
+            return False
         try:
             state = self.saves.load(slot, backup=backup)
         except SaveError as error:
@@ -95,6 +104,9 @@ class Screen(Scene):
     def command(self, callback, *, cue="confirm"):
         try:
             callback()
+        except OrderPending as pending:
+            self.message = str(pending)
+            return False
         except RuleError as error:
             self.message = str(error)
             self.game.audio.play_sound("refuse")
@@ -225,6 +237,7 @@ class TitleScene(Screen):
         self.icon_button('settings', 'Settings', w - 106, 26, self.open_settings, shortcut='O')
         self.icon_button('text_size', 'Text size', 26, 26, self.open_text_settings, shortcut='T')
         self.button('About this build', 26, h - 72, 232, self.about, shortcut='A')
+        self.button('Co-op', w - 232, h - 72, 206, self.multiplayer, shortcut='M')
 
     def load_game(self, slot=1, *, backup=False):
         loaded = super().load_game(slot, backup=backup)
@@ -263,6 +276,16 @@ class TitleScene(Screen):
     def start(self):
         state = State.new(self.seed, self.hero_class, theme=self.world_theme, difficulty=self.difficulty)
         self.enter_state(state)
+
+    def multiplayer(self):
+        from saga2d import MatchMenu
+        from eador.multiplayer import ShardboundMatch, NetworkShardScene
+        self.game.push(MatchMenu("Shardbound co-op", "shardbound-v1",
+                                lambda: ShardboundMatch(self.seed, self.hero_class, theme=self.world_theme,
+                                                       difficulty=self.difficulty, campaign=True), NetworkShardScene,
+                                create_options=lambda: {'seed': self.seed, 'hero': self.hero_class,
+                                                        'theme': self.world_theme, 'difficulty': self.difficulty,
+                                                        'campaign': True}))
 
     def start_campaign(self):
         self.enter_state(State.new_campaign(self.seed, self.hero_class, difficulty=self.difficulty))
@@ -532,6 +555,10 @@ class ShardScene(Screen):
         from eador.campaign_scene import CampaignPlanScene
         self.game.push(CampaignPlanScene(self))
 
+    def order(self, action, *args, target="state", **kwargs):
+        receiver = self.state if target == "state" else self.state.battle
+        return getattr(receiver, action)(*args, **kwargs)
+
     def act(self, callback, *, cue="confirm"):
         before = self.state.status
         if self.command(callback, cue=cue):
@@ -547,7 +574,7 @@ class ShardScene(Screen):
             from eador.encounter_scene import EncounterScene
             self.game.push(EncounterScene(self, self.selected, kind="conquest"))
         else:
-            self.act(lambda: self.state.travel(self.selected), cue="move")
+            self.act(lambda: self.order("travel", self.selected), cue="move")
 
     def explore(self):
         province = self.state.provinces[self.state.hero.pos]
@@ -556,11 +583,11 @@ class ShardScene(Screen):
             from eador.encounter_scene import EncounterScene
             self.game.push(EncounterScene(self))
         else:
-            self.act(self.state.explore)
+            self.act(lambda: self.order("explore"))
 
     def end_turn(self):
         before = {troop.id: troop.kind for troop in self.state.hero.army}
-        self.act(self.state.end_turn, cue="end_turn")
+        self.act(lambda: self.order("end_turn"), cue="end_turn")
         surviving = {troop.id for troop in self.state.hero.army}
         deserted = Counter(kind for ident, kind in before.items() if ident not in surviving)
         if deserted:
@@ -798,8 +825,7 @@ class CatalogScene(Screen):
             self.game.push(ReplacementScene(self.root, outgoing_id=self.outgoing_id, kind=name,
                                             description=self._description(name)))
             return
-        callback = self.root.state.build if self.kind == 'build' else self.root.state.recruit
-        if self.command(lambda: callback(name)):
+        if self.command(lambda: self.root.order(self.kind, name)):
             if self.checkpoint(self.root.state):
                 self.message = self.root.state.log[-1]
             self.refresh()
@@ -866,12 +892,15 @@ class HelpScene(Screen):
             raise ValueError(f"Field Guide does not fit at {scale:.0%}")
         self.button("Return to game", self.x + 28, self.y + 634, 260, self.game.pop, shortcut="Esc", primary=True)
         self.button("Codex", self.x + 402, self.y + 634, 200, self.root.codex, shortcut="C")
-        self.button("Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
+        self.button("Leave co-op" if getattr(self.root, "live_match", False) else "Save & title", self.x + 752, self.y + 634, 260, self.title, shortcut="S")
         self.icon_button('settings', 'Settings', self.x + 932, self.y + 26, self.open_settings, shortcut='O')
         self.button('About this build', self.x + 602, self.y + 26, 244, self.about, shortcut='A')
 
     def title(self):
-        self.game.push(SaveScene(self.root, mode="save", return_to_title=True))
+        if getattr(self.root, "live_match", False):
+            self.game.clear_and_push(TitleScene())
+        else:
+            self.game.push(SaveScene(self.root, mode="save", return_to_title=True))
 
     def draw(self):
         x, y = self.x, self.y
@@ -1106,7 +1135,7 @@ class BattleScene(Screen):
             self.cursor = self.hover = objective.target
 
     def evacuate(self):
-        self.act(self.battle.evacuate, checkpoint=True, cue='confirm')
+        self.act(lambda: self.root.order("evacuate", target="battle"), checkpoint=True, cue='confirm')
 
     def finish_attack_sounds(self):
         if self.attack_sounds:
@@ -1173,17 +1202,17 @@ class BattleScene(Screen):
             self.game.push(ResultScene(self.root, battle=True))
 
     def end_turn(self):
-        self.play_phase(self.battle.end_turn)
+        self.play_phase(lambda: self.root.order("end_turn", target="battle"))
 
     def auto_round(self):
-        self.play_phase(self.battle.auto_turn)
+        self.play_phase(lambda: self.root.order("auto_turn", target="battle"))
 
     def guard(self):
-        self.act(lambda: self.battle.guard(self.selected), cue="guard")
+        self.act(lambda: self.root.order("guard", self.selected, target="battle"), cue="guard")
 
     def retreat(self):
         try:
-            self.root.state.retreat()
+            self.root.order("retreat")
         except RuleError as error:
             self.message = str(error)
         else:
@@ -1357,14 +1386,14 @@ class BattleScene(Screen):
         unit = next((u for u in self.battle.units if u.hp > 0 and u.pos == pos), None)
         if self.targeting:
             if self.targeting == 'smoke':
-                self.act(lambda: self.battle.smoke(self.selected, pos), cue='confirm')
+                self.act(lambda: self.root.order("smoke", self.selected, pos, target="battle"), cue='confirm')
             elif unit:
                 if self.targeting in self.unit_orders:
                     name = self.targeting
-                    self.act(lambda: getattr(self.battle, name)(self.selected, unit.id), cue=self.unit_orders[name][2])
+                    self.act(lambda: self.root.order(name, self.selected, unit.id, target="battle"), cue=self.unit_orders[name][2])
                 else:
-                    self.act(lambda: self.battle.cast(self.targeting, unit.id,
-                             caster_id=self.heal_caster if self.targeting == 'heal' else 0), cue=self.targeting)
+                    self.act(lambda: self.root.order("cast", self.targeting, unit.id,
+                             caster_id=self.heal_caster if self.targeting == 'heal' else 0, target="battle"), cue=self.targeting)
             else:
                 self.message = "Aim at a unit. F cycles targets; Esc cancels targeting."
         elif unit and unit.team == "player":
@@ -1372,9 +1401,9 @@ class BattleScene(Screen):
             self.message = ''
             self.refresh()
         elif unit and self.selected is not None:
-            self.act(lambda: self.battle.attack(self.selected, unit.id))
+            self.act(lambda: self.root.order("attack", self.selected, unit.id, target="battle"))
         elif self.selected is not None:
-            self.act(lambda: self.battle.move(self.selected, pos), cue="move")
+            self.act(lambda: self.root.order("move", self.selected, pos, target="battle"), cue="move")
 
     def _forecast(self):
         from saga2d import Column, Label
@@ -1719,6 +1748,10 @@ class SaveScene(Screen):
             self.load_game(self.entries[index].slot, backup=True)
 
     def activate(self, index):
+        if getattr(self.root, "live_match", False):
+            self.message = "Offline saves are separate. Rejoin the live host to resume co-op."
+            self.refresh()
+            return
         entry = self.entries[index]
         self._shown_diagnostic = None
         self._next_anchor = index
@@ -1829,7 +1862,11 @@ class ChoiceScene(Screen):
     def choose(self, option_id):
         choice = self.root.state.choice
         try:
-            self.root.state.choose(option_id)
+            self.root.order("choose", option_id)
+        except OrderPending as pending:
+            self.message = str(pending)
+            self.refresh()
+            return
         except RuleError as error:
             self.message = str(error)
             self.game.audio.play_sound("refuse")
@@ -2015,7 +2052,7 @@ class HeroScene(Screen):
     def equip(self, relic):
         if self.root.state.hero.relic == relic:
             return
-        if self.command(lambda: self.root.state.equip(relic)):
+        if self.command(lambda: self.root.order("equip", relic)):
             self.checkpoint(self.root.state)
         self.refresh()
 
@@ -2023,7 +2060,7 @@ class HeroScene(Screen):
         self.equip(None)
 
     def infuse(self):
-        if self.command(self.root.state.infuse, cue="heal"):
+        if self.command(lambda: self.root.order("infuse"), cue="heal"):
             if self.checkpoint(self.root.state):
                 self.message = self.root.state.log[-1]
         self.refresh()
@@ -2060,7 +2097,11 @@ class ResultScene(Screen):
 
     def continue_game(self):
         if self.is_battle:
-            self.root.state.resolve_battle()
+            try:
+                self.root.order("resolve_battle")
+            except RuleError as error:
+                self.message = str(error)
+                return
             if not self.checkpoint(self.root.state):
                 self.root.message = self.message
             game = self.game

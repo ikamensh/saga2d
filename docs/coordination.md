@@ -132,6 +132,44 @@ know about, and read it before touching shared files.
   settings file and autosave/slot browser will be offered as saga2d pieces
   since Shardbound's gates G10/G12 want the same.
 
+- 2026-09-05 (Warband agent, later; the save.py conflict noted above is resolved): merged main's hardened `saga2d/save.py`
+  with the named slots/summaries (`76619dd`; both test files green). Backend
+  performance changes that affect every game: pyglet `debug_gl` is turned off
+  in `saga2d/__init__.py`, `draw_image` pools its GPU sprites, and sprite
+  appearance setters skip unchanged values (`0630136`). A pixel-level pyglet
+  test lives in `tests/framework/test_pyglet_backend.py` and skips without a
+  display. `tools/perf_warband.py` is the frame-time evidence tool.
+- 2026-09-05 (Warband agent, evening): `saga2d.testing.FrameTimer` (wall-clock
+  frame shares; Shardbound's stress tool could use it), a settle rule for plain
+  walks in Warband's model, animated water and burning buildings in the view.
+  Evidence runs (300-match fuzz, 30-minute soak, real-input verify, perf) are
+  queued on this Mac; expect CPU load for ~2 hours.
+- 2026-09-06 (Warband agent): merged main (`7e36c4b`, 607 tests green).
+  On `Button(shortcut=...)`: Warband's command card keeps `hotkey` because a
+  blocked card key must still explain itself ("Requires a Barracks"), which
+  a disabled shortcut swallows by design; the title, pause and settings
+  overlays are candidates for `shortcut` later. Warband's peasants now
+  repair; `tools/map_report.py`, `tools/perf_warband.py` and
+  `saga2d.testing.FrameTimer` are new.
+- 2026-09-06 (Warband agent): merged main's settings store, pure `saga2d.synth`
+  and the Tribes bank rewrite. Warband adopted `Settings` as is and moved its
+  `SynthBank` (render-once WAV cache with a version marker, playback,
+  aliases, pitch variation) into `warband/sound.py`. Note the duplication:
+  Tribes' bank in `tribes/sound.py` does the same job; two games needing the
+  same bank was the reason it sat in saga2d. Left as is to avoid churn; a
+  third game wanting one should lift it back.
+- 2026-09-06 (Warband agent, end of day): `warband` fast-forwards main at its
+  tip; every Early Access gate that machines can prove has evidence in
+  `docs/warband-early-access-progress.md` (final 300-match fuzz clean, soak,
+  perf, AI ladder, refreshed build). Merged main's display API as is. Left
+  for people: the playtest (W15), first-run walkthroughs (W06), Windows.
+- 2026-09-06 (Warband agent): `saga2d.testing.assert_no_text_overlap` and
+  `overlapping_texts` find text drawn over text in a mock frame (Warband
+  sweeps every screen at five window sizes in `tests/warband/test_layout.py`;
+  it caught a title tagline on a menu button and a codex column overrun).
+  Tribes and Shardbound screens could use the same sweep. The pyglet backend
+  now reports a Mac Control+click as the right button.
+
 - 2026-09-06 (Shardbound framework agent): display previews need a public snapshot
   even when opened fullscreen. `Game.windowed_size` now reports actual native
   windowed size or remembered restoration size while fullscreen; no game cache
@@ -178,3 +216,22 @@ know about, and read it before touching shared files.
   and Warband callers all receive the same usable parser diagnostic. Real-file
   tests preserve malformed bytes and backups through refused loads/writes.
   No Warband worktree changed.
+
+- 2026-09-06 (multiplayer task): work is isolated on `codex/multiplayer`, at
+  `.claude/worktrees/multiplayer`, combining current main with the committed
+  Warband branch. Saga2D gains `MatchHost`/`MatchClient`, a host/join form/lobby,
+  and `Scene.on_close` for connections that survive covered scenes. Tribes and
+  Warband get two human factions; Shardbound gets shared-realm co-op. Games own
+  permitted commands, validation, turns/simulation and state schemas. Real
+  sockets and separate-process native input checks cover all three. Main has
+  concurrent Tribes score work; no main game files were changed by this task.
+  Keep network scene overrides when integrating that score work. See
+  `docs/multiplayer.md` in the multiplayer branch.
+
+- 2026-09-06 (multiplayer task, complete): `62de78f` incorporates main through
+  `706a6c9`, preserves its score/progression work, and keeps two-human Tribes
+  finishes out of the solo high-score board. The full suite passed (1,547),
+  followed by all 15 game multiplayer integration tests including the added
+  host-clock check. Native separate-process evidence for all three games is in
+  `docs/evidence/multiplayer-2026-09-06`. Main's checkout was not fast-forwarded,
+  following the ownership protocol above.

@@ -1,0 +1,3 @@
+  seed 1: 2 players 64x48 [e/n] → 8.1 min, winner 1, armies [0, 12], buildings [0, 10]
+AI games: 1 played, 0 failed, outcomes {'decided': 1}
+monkey runs: 1 played, 0 failed

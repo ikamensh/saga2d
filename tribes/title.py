@@ -68,6 +68,7 @@ class TitleScene(Scene):
         cont = Button("Continue", hotkey="C", on_click=self.continue_game, style=MENU_BUTTON, width=300)
         cont.enabled = has_save
         menu.add(cont)
+        menu.add(Button("Multiplayer", shortcut="M", on_click=self.multiplayer, style=MENU_BUTTON, width=300))
         menu.add(Button("How to play", hotkey="H", on_click=self.how_to_play, style=MENU_BUTTON, width=300))
         menu.add(Button("High scores", shortcut="L", on_click=self.high_scores, style=MENU_BUTTON, width=300))
         menu.add(Button("Quit", hotkey="Q", on_click=self.quit, style=MENU_BUTTON, width=300))
@@ -94,6 +95,13 @@ class TitleScene(Scene):
             play_sound(name)
 
     # -- Menu actions ------------------------------------------------------------
+
+    def multiplayer(self) -> None:
+        from saga2d import MatchMenu
+        from tribes.multiplayer import TribesMatch, NetworkMapScene
+        self.game.push(MatchMenu("Tribes multiplayer", "tribes-v1",
+                                lambda: TribesMatch(size=self.size), NetworkMapScene,
+                                create_options=lambda: {'seed': 7, 'size': self.size}))
 
     def new_game(self) -> None:
         self.sfx("button")

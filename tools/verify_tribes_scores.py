@@ -14,13 +14,13 @@ os.environ["SAGA2D_SILENT"] = "1"
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pyglet.window import key, mouse
-from saga2d import Game
+from saga2d import Game, fonts
 from tools.native_frames import tick
 from tribes import mapgen
 from tribes.scene import GameOverScene, MapScene, load_game
 from tribes.score_scene import HighScoresScene
 from tribes.scores import HighScores
-from tribes.style import build_theme, load_fonts
+from tribes.style import build_theme
 from tribes.title import TitleScene
 
 
@@ -38,7 +38,7 @@ def run(output: Path) -> None:
         game = Game("Tribes verification", resolution=(1280, 800), visible=False,
                     save_dir=root / "saves", theme=build_theme())
         try:
-            load_fonts(game)
+            fonts.load(game)
 
             def press(symbol):
                 game.backend.window.dispatch_event("on_key_press", symbol, 0)
@@ -108,7 +108,7 @@ def run(output: Path) -> None:
         game = Game("Tribes verification", resolution=(960, 600), visible=False,
                     save_dir=root / "saves", theme=build_theme())
         try:
-            load_fonts(game)
+            fonts.load(game)
             game.push(load_game(finished))
             tick(game)
             assert isinstance(game.scene, GameOverScene)

@@ -1,0 +1,94 @@
+{
+  "date": "2026-09-07",
+  "result": "passed",
+  "command": "SAGA2D_SILENT=1 uv run python tools/verify_online.py /tmp/saga2d-online-native",
+  "server": "Separate production online_server process on an OS-assigned loopback WebSocket port",
+  "clients": "Two real OnlineClients; one native pyglet window and one polled partner",
+  "native_capture": [
+    2560,
+    1600
+  ],
+  "retained_capture": [
+    1280,
+    800
+  ],
+  "fps_cap": 30,
+  "games": [
+    "Tribes",
+    "Warband",
+    "Shardbound"
+  ],
+  "verified": [
+    "Title shortcut opens Online by default",
+    "Explicit LAN form remains usable",
+    "Create room displays server-assigned code before a partner joins",
+    "Room-code input joins without host address or port",
+    "Tribes: hold and end turn accepted by dedicated server",
+    "Warband: native unit selection/movement and authoritative clock under menu",
+    "Shardbound: explore, guard and end tactical round accepted by dedicated server",
+    "All three: close app, reopen same profile, Rejoin last room restores guest seat and progress",
+    "Shardbound About page 1 correctly describes online room-code co-op",
+    "Native PNGs opened and inspected; shortened wrapped instructions and refreshed Rejoin after cancel"
+  ],
+  "limits": [
+    "Local process validation; public TLS service is verified separately",
+    "About credits page is covered by subsequent public verification"
+  ],
+  "frames": [
+    {
+      "file": "tribes-online.png",
+      "sha256": "35c34089165073d1d2cdcc831e84f8cb6db73bf556924dbf33ebbc7c49403af2",
+      "native_sha256": "56ba64711bd4dc7e2c9d90e40b28d4ffe2c8fb6baa43a1abdffefc57239d7d2f"
+    },
+    {
+      "file": "tribes-lan.png",
+      "sha256": "0b279a9d9b149256e212b528004ab75d931bc45089ade63fa98adfee5e1eafbb",
+      "native_sha256": "dafdc5f475fa5ca8bedbde87f70bf936a13cf2f422244f404b537c2cbf21e634"
+    },
+    {
+      "file": "tribes-room.png",
+      "sha256": "7118025d95c5b80ca1cbea785302226ed16b4ab7dd1fc986d4d2b984e6509fbe",
+      "native_sha256": "3ced761563bc417110c24b8b51a2d295f0927804b1cf9c6bee5d7f380a501e12"
+    },
+    {
+      "file": "tribes-join.png",
+      "sha256": "b2d2714c10d60b167a4fe622ef43219ef4790854148104bc2989715052a49e69",
+      "native_sha256": "ffb2f4095782aaac552b9bd6475ba0fee925521c3cc839d53877bc4a85e1ff69"
+    },
+    {
+      "file": "tribes-match.png",
+      "sha256": "4d4608b1e50148789aeb70a3c41cc7c31d599a2cb723b35e1e131f62f47001dc",
+      "native_sha256": "7451bd3e740138b52bd668257988b7b2b5846a2aba34c64301971a8fccafe4a3"
+    },
+    {
+      "file": "tribes-resume.png",
+      "sha256": "80b890a8a8452627ceb3a7031e59283722dcdc2f0ddbd87b374458383637df99",
+      "native_sha256": "9cb71ec768f2aae45565417f088cbeafe046e1c7479ea65742b9bca2df39e789"
+    },
+    {
+      "file": "warband-online.png",
+      "sha256": "8ff26eb7f7fd6b9e8e8707d08b515494d44cfb92a7b3a0d9be765b7686a447d3",
+      "native_sha256": "c5f3a3819f35fb4a8ebd29dd7035d1ae099cff42bcbb2c819cc46f043d12ba5e"
+    },
+    {
+      "file": "warband-match.png",
+      "sha256": "fbd4b475283ddec6202bdddeab247190132268a4f212fc6f366d0939aa98a94a",
+      "native_sha256": "927f0cb7c9c9c5e6846d5ed978a6459f6067117c26f84dfa8e25b4d72b2d9f6c"
+    },
+    {
+      "file": "eador-online.png",
+      "sha256": "e652514b803322f7910d332e864bef14083076ca0faadade3ac2f23145f4cc52",
+      "native_sha256": "64e7d3e275c5925bac779511778b018d2b1f486524fe275f08982a38f56e6ae3"
+    },
+    {
+      "file": "eador-match.png",
+      "sha256": "25af99cd020a83ed427bbe371528970988a7f2b0059da0979e72cb0a9d5b0938",
+      "native_sha256": "aa2de86d29f3672ce8a84a9414e8d3cb59e24a22e5d18157d16ed12672f897dc"
+    },
+    {
+      "file": "eador-about.png",
+      "sha256": "427c6ca55626013995e4abe098afbf6895676034ccc9cd4d3d633d3b1a7e0ce0",
+      "native_sha256": "8d848639e4c85563b0ce4d096d4ca3100a0aaac43e8f61d10f974178ee6b327c"
+    }
+  ]
+}

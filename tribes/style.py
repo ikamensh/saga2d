@@ -1,24 +1,20 @@
-"""Tribes' look: fonts, palette, theme and the component styles the scenes share.
+"""Tribes' look: palette, theme and the component styles the scenes share.
 
-Text is Nunito (SIL OFL, bundled under ``tribes/assets/fonts``): regular
-for body copy, SemiBold for HUD numbers and headings, ExtraBold for
-titles and the hero.  Each weight is loaded as its own family
-(see ``tools/build_fonts.py``).  Panels are dark translucent slabs with a
-hairline border and rounded corners; hotkeys appear as keycaps.
+Text is saga2d's bundled Nunito: regular for body copy, SemiBold for HUD
+numbers and headings, ExtraBold for titles and the hero.  Panels are dark
+translucent slabs with a hairline border and rounded corners; hotkeys
+appear as keycaps.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
 from dataclasses import replace
 
-from saga2d import Game, Style, TextStyle, Theme
+from saga2d import Style, TextStyle, Theme, fonts
 
 Color = tuple[int, int, int, int]
 
-FONT_DIR = Path(__file__).parent / "assets" / "fonts"
-REGULAR, SEMIBOLD, EXTRABOLD = "Nunito", "Nunito SemiBold", "Nunito ExtraBold"
-FONT_FILES = {REGULAR: "Nunito.ttf", SEMIBOLD: "Nunito-SemiBold.ttf", EXTRABOLD: "Nunito-ExtraBold.ttf"}
+REGULAR, SEMIBOLD, EXTRABOLD = fonts.REGULAR, fonts.SEMIBOLD, fonts.EXTRABOLD
 
 GOLD: Color = (255, 224, 120, 255)
 TEXT: Color = (240, 243, 250, 255)
@@ -67,9 +63,3 @@ def build_theme() -> Theme:
             "floating": TextStyle(18, (255, 255, 255, 255), EXTRABOLD),
         },
     )
-
-
-def load_fonts(game: Game) -> None:
-    """Register the bundled Nunito families with the backend."""
-    for name, file in FONT_FILES.items():
-        game.backend.load_font(name, str(FONT_DIR / file))
