@@ -263,14 +263,17 @@ command above from PowerShell. It produces `Shardbound/Shardbound.exe` and
 executable alone is not the package. PyInstaller requires separate native
 builds for each operating system. [Official multi-platform guidance](https://pyinstaller.org/en/stable/usage.html#supporting-multiple-operating-systems)
 
-For future CI, use a Windows x64 runner, check out an exact source commit,
-install a pinned uv release and the pinned x64 Python, and run the command
-with `--skip-smoke`. Treat the generated archive as build output only. Then
-extract and run it on a clean Windows account with an appropriate graphics
-driver, first with `--smoke-image`, then through a real campaign, save/restart,
-display settings and audio checks. Record the host, archive hash and results.
-The build-only CI job cannot pass the Windows runtime gate. No workflow has
-been enabled and no artifact uploaded as part of this foundation.
+The [manual Windows workflow](../.github/workflows/shardbound-windows.yml)
+checks out an exact source commit, installs pinned tools and runs the recipe
+with `--skip-smoke`. It has no push, pull-request or scheduled trigger. It has
+not been dispatched, and no Windows artifact has been uploaded. Building on
+a runner does not verify an interactive installation.
+
+The [Windows handoff](windows-shardbound.md) describes the concrete dispatch
+and artifact checks, followed by clean-account launch, save/restart, display,
+audio and complete campaign checks. Record the host, archive hash and results.
+Neither build success nor this prepared workflow passes the Windows runtime
+gate.
 
 ## Remaining release work
 
