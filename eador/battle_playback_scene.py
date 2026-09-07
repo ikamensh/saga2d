@@ -5,6 +5,7 @@ import math
 from saga2d import Column, Label
 
 from eador.battle import Battle, SmokeCloud
+from eador.battle_audio import event_cues
 from eador.battle_effects import draw_event
 from eador.preferences import reading_scale, reduced_motion
 from eador.scene import BattleScene, Screen
@@ -160,21 +161,14 @@ class BattlePlaybackScene(BattleScene):
         if shown == self._shown:
             return
         event = self.playback.event
+        release, contact = event_cues(self.battle, event, self.root.state.hero.hero_class)
         if self._shown is None or self._shown[0] != shown[0]:
-            cue = 'move' if event.kind in ('move', 'swap', 'repulse') else None
-            if event.kind in ('attack', 'pin') and self.battle.unit(event.actor_id).attack_range > 1:
-                cue = 'attack_arrow'
-            if cue:
-                self.game.audio.play_sound(cue)
+            if release:
+                self.game.audio.play_sound(release)
         self.floats = []
         if self.playback.applied:
-            cue = {'attack': 'attack_hit', 'pin': 'attack_hit', 'brace': 'attack_hit',
-                   'retaliation': 'attack_hit', 'guard': 'guard', 'bolt': 'bolt',
-                   'heal': 'heal', 'rally': 'confirm', 'swap': 'confirm', 'smoke': 'confirm'}.get(event.kind)
-            if cue == 'attack_hit' and self.battle.unit(event.actor_id).kind in ('guard', 'warden', 'skyrider'):
-                cue = 'attack_heavy'
-            if cue:
-                self.game.audio.play_sound(cue)
+            if contact:
+                self.game.audio.play_sound(contact)
             for unit in event.after.units:
                 amount = unit.hp - event.before.unit(unit.id).hp
                 if amount:

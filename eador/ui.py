@@ -1,9 +1,9 @@
-"""Shardbound's icon meanings and compact numeric readouts."""
+"""Shardbound's portrait frames, icon meanings and compact numeric readouts."""
 from pathlib import Path
 
-from saga2d import Image, Label, Row
+from saga2d import Column, Image, Label, Row, Style
 
-from eador.style import TEXT
+from eador.style import INK, LINE, TEXT
 
 
 _IMAGES = Path(__file__).resolve().parent / 'assets' / 'images' / 'icons'
@@ -17,6 +17,17 @@ _NAMES = {
 
 def icon_path(name):
     return str(_IMAGES / f'{name}.png')
+
+
+def hero_portrait_path(hero_class):
+    return str(_IMAGES.parent / 'heroes' / f'{hero_class.lower()}.png')
+
+
+def hero_portrait(hero_class, size):
+    """A framed original portrait participating in the ordinary measured layout."""
+    return Column(Image(hero_portrait_path(hero_class), width=size - 6, height=size - 6,
+                        tooltip=hero_class),
+                  style=Style(padding=3, border_color=LINE, border_width=1, background_color=INK))
 
 
 def metric(name, value, *, width, size=14, color=TEXT, detail=None):

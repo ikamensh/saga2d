@@ -22,6 +22,20 @@ existing hex; ownership, selection, movement, site, seal and exit markers are
 separate overlays. Encounter briefings use the same terrain textures as the
 actual battlefield.
 
+Four original painted hero portraits appear with class selection and in the
+Hero panel. The selected class controls both views; no portrait choice alters
+the campaign. The game owns their small measured frame composition and the
+asset paths, using Saga2D's existing `Image` and layout primitives. Complete
+text-only generation prompts and exact output hashes are in the
+[portrait provenance](../eador/assets/hero-portrait-provenance.json).
+
+All fourteen troop miniatures and four heroes now have shaded cloth, metal and
+leather, distinct headgear, faces and role equipment. The Wizard's silver hair,
+book and staff, Scout's hood and bow, Warrior's braids and armor, and Commander's
+ochre cloak match their portraits. Bows, pikes, tower shields, rune casting,
+smoke equipment and eagle wings distinguish troop roles at battle and retinue
+sizes. Every stroke scales with the miniature, within the existing cell bounds.
+
 ## Icons and readable values
 
 The campaign toolbar uses pictograms for Guide, Hero, Codex, text size, Save
@@ -33,6 +47,7 @@ Gold, crystals, income, upkeep, level, experience, actions, health and mana use
 icons beside their exact numeric values. Battle attack, defense, movement,
 flight and range do the same. Hovering either the symbol or its value reveals
 the meaning; tooltips follow the 100% or 125% reading preference across scenes.
+The Hero panel also uses level, health and mana icons beside exact values.
 Unavailable battle orders and spells explain the missing action, cooldown,
 charge, learned spell, mana or legal target.
 
@@ -58,6 +73,13 @@ timed to its visible state change. Reduced motion keeps stationary feedback.
 Damage and recovery labels fit within their hex; a fresh change replaces an
 older number at the same position. Ground rings remain beneath miniatures and
 persistent health labels.
+
+Manual attacks now play each recorded contact, including Brace and retaliation.
+Arrows have a release followed by impact; Wizard, Rune Adept and Acolyte ranged
+attacks share a blue arcane projectile and magic contact. A new accepted order
+finishes pending contacts from the preceding attack, while leaving or loading
+discards them. No sound queue delays an order or changes saved state. Manual
+orders and turn playback share game-owned weapon classification and cue mapping.
 
 The [audio catalogue](eador-audio.md) records musical choices, provenance and
 technical checks. Audible artistic review is still needed; silent native
@@ -86,6 +108,7 @@ Run the compact visual journeys with:
 uv run python tools/verify_eador_presentation.py --output /tmp/shardbound-presentation
 uv run python tools/verify_eador_effects.py --output /tmp/shardbound-effects
 uv run python tools/verify_eador_icons.py --output /tmp/shardbound-icons
+uv run python tools/verify_eador_characters.py --output /tmp/shardbound-characters
 ```
 
 The static journey opens all three worlds through native controls, checks
@@ -106,7 +129,6 @@ terrain builds, exact packaging inputs, title/theme/settings controls, battle
 feedback, read-only playback and persistence. Final screenshots and receipts
 are retained in the [presentation evidence](evidence/presentation-pass/README.md).
 
-The Early Access gates remain open. Further visual work should deepen the
-larger hero/troop artwork and test
+The Early Access gates remain open. Further visual work should test
 readability across longer, crowded battles. Human listening and playtest
 feedback remain part of assessing the game's presentation quality.

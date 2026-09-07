@@ -56,6 +56,15 @@ An arrow release can precede one separately timed ordinary/heavy contact.
 Game scenes own event timing and weapon classification; composition factories
 know nothing about units, battle state or scene transitions.
 
+`eador/battle_audio.py` maps actual recorded actors to cues in manual orders and
+turn playback. Direct attacks drain release/contact boundaries against the
+existing visual trace clock, including Brace and retaliation. Ranged staff and
+rune weapons use the composite `bolt` cue once at contact, with an arcane visual.
+Another accepted order finishes pending contacts before its own cue; loading,
+retreating and leaving discard them. Redraws do not replay sounds. The queue
+stores only elapsed offsets and cue names, without timers, callbacks or model
+ownership.
+
 ## Runtime integration
 
 Configure `Game(asset_path=...)` for the shipped `eador/assets` root. Apply

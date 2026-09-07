@@ -11,6 +11,7 @@ from collections import Counter
 from saga2d import Anchor, Button, HexGrid, InputEvent, SaveError, Scene
 
 from eador import art
+from eador.battle_audio import AttackSounds
 from eador.content import RELICS, SITES, SKILLS
 from eador.difficulty import DIFFICULTIES
 from eador.model import BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, RuleError, State
@@ -19,7 +20,7 @@ from eador.style import BLUE, DANGER, GOLD, INK, LINE, MUTED, PANEL, PRIMARY, RE
 from eador.worldgen import THEMES
 from eador.sound import set_music
 from eador.preferences import reduced_motion
-from eador.ui import icon_path, metric
+from eador.ui import hero_portrait, icon_path, metric
 
 
 class Screen(Scene):
@@ -198,6 +199,9 @@ class TitleScene(Screen):
                                   if self.preferences.error else '')
         offset = sum(map(len, self.notice_pages[:self.notice_page])) if message == self.notice else 0
         self.notice = message
+        if not self.notice:
+            self.ui.add(Column(hero_portrait(self.hero_class, 292), anchor=Anchor.TOP_LEFT,
+                               margin=(round(w * .245 - 146), 216)))
         content = self.notice or f'Seed {self.seed} · Linked: three stages from Frontier. Single shard: your selected world.'
         notice = label(content, 11, width=412, color=RED if self.notice else MUTED)
         notice_top = 250 if self.notice else 539
@@ -288,12 +292,7 @@ class TitleScene(Screen):
         if len(self.notice_pages) > 1:
             self.text(f'Error details · Page {self.notice_page + 1}/{len(self.notice_pages)}', 74, 219, size=11, color=RED)
         if not self.notice:
-            self.text(THEMES[self.world_theme].name.upper(), w * .245, 244, size=12, color=GOLD, center=True)
-            self.draw_line(w * .245 - 74, 275, w * .245 - 12, 275, GOLD)
-            self.draw_line(w * .245 + 12, 275, w * .245 + 74, 275, GOLD)
-            self.draw_polygon([(w * .245, 270), (w * .245 + 5, 275),
-                               (w * .245, 280), (w * .245 - 5, 275)], GOLD)
-            self.text("A realm to establish. A rival to overcome.", w * .245, 514, size=11, color=MUTED, center=True)
+            self.text(THEMES[self.world_theme].name.upper(), w * .245, 514, size=12, color=GOLD, center=True)
 
 
 class ShardScene(Screen):
@@ -909,6 +908,7 @@ class BattleScene(Screen):
         self.floats = []
         self.clock = 0.0
         self.feedback = None
+        self.attack_sounds = None
 
     @property
     def battle(self):
@@ -1108,18 +1108,26 @@ class BattleScene(Screen):
     def evacuate(self):
         self.act(self.battle.evacuate, checkpoint=True, cue='confirm')
 
+    def finish_attack_sounds(self):
+        if self.attack_sounds:
+            for cue in self.attack_sounds[1].finish():
+                self.game.audio.play_sound(cue)
+            self.attack_sounds = None
+
+    def on_exit(self):
+        self.attack_sounds = None
+
     def act(self, callback, *, checkpoint=False, cue="attack_hit"):
         before = {u.id: u.hp for u in self.battle.units}
         recorded = []
         if self.command(lambda: recorded.append(self.battle.trace(callback)), cue=None):
+            self.finish_attack_sounds()
             if cue == 'attack_hit':
-                event = next(event for event in recorded[0].events if event.kind in ('attack', 'pin', 'brace', 'retaliation'))
-                actor = self.battle.unit(event.actor_id)
-                if actor.attack_range > 1 and event.kind in ('attack', 'pin'):
-                    cue = 'attack_arrow'
-                elif actor.kind in ('guard', 'warden', 'skyrider'):
-                    cue = 'attack_heavy'
-            if cue:
+                sounds = AttackSounds(self.battle, recorded[0], self.root.state.hero.hero_class)
+                self.attack_sounds = self.clock, sounds
+                for sound in sounds.advance(0):
+                    self.game.audio.play_sound(sound)
+            elif cue:
                 self.game.audio.play_sound(cue)
             if recorded[0].events:
                 self.feedback = self.clock, recorded[0]
@@ -1133,6 +1141,7 @@ class BattleScene(Screen):
             if checkpoint or self.battle.outcome:
                 self.checkpoint(self.root.state)
             if self.battle.outcome:
+                self.finish_attack_sounds()
                 set_music(self.game, None)
                 self.game.audio.play_sound("victory" if self.battle.outcome == "player" else "defeat")
                 self.game.push(ResultScene(self.root, battle=True))
@@ -1144,9 +1153,12 @@ class BattleScene(Screen):
     def play_phase(self, command):
         from eador.battle_playback_scene import BattlePlaybackScene
         recorded = []
-        if self.command(lambda: recorded.append(self.battle.trace(command)), cue='end_turn'):
+        if self.command(lambda: recorded.append(self.battle.trace(command)), cue=None):
+            self.finish_attack_sounds()
+            self.game.audio.play_sound('end_turn')
             self.targeting = None
             self.feedback = None
+            self.floats = []
             self.checkpoint(self.root.state)
             self.refresh()
             if recorded[0].events:
@@ -1175,6 +1187,7 @@ class BattleScene(Screen):
         except RuleError as error:
             self.message = str(error)
         else:
+            self.attack_sounds = None
             self.game.audio.play_sound("defeat")
             if not self.checkpoint(self.root.state):
                 self.root.message = self.message
@@ -1314,6 +1327,12 @@ class BattleScene(Screen):
         if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
             self.refresh()
         self.clock += dt
+        if self.attack_sounds:
+            started, sounds = self.attack_sounds
+            for cue in sounds.advance(self.clock - started):
+                self.game.audio.play_sound(cue)
+            if not sounds.pending:
+                self.attack_sounds = None
         self.floats = [f for f in self.floats if self.clock - f[0] < 1.6]
         if self.feedback and self.clock - self.feedback[0] >= 1.4:
             self.feedback = None
@@ -1905,15 +1924,19 @@ class HeroScene(Screen):
             return Label(text, width=width, wrap=True, font="Georgia" if serif else "Verdana",
                          font_size=round(size * scale) if scaled else size, text_color=color)
 
-        title = Row(label(hero.name, 32, width=626, color=GOLD, serif=True, scaled=False),
-                    label(f"{s.rules.title} realm", width=310, color=GOLD),
+        title = Row(label(hero.name, 32, width=496, color=GOLD, serif=True, scaled=False),
+                    label(f"{s.rules.title} realm", width=272, color=GOLD),
                     Button("Text size", icon=icon_path('text_size'), show_text=False, icon_size=26,
                            width=80, height=40, shortcut="T", on_click=self.open_text_settings), spacing=24)
-        stats = label(f"Level {hero.level} {hero.hero_class} · {hero.hp}/{hero.max_hp} health · {hero.mana}/{hero.max_mana} mana", 13)
+        stats = Row(label(hero.hero_class, 13, width=212),
+                    metric('level', hero.level, width=128, size=13 * scale),
+                    metric('health', f'{hero.hp}/{hero.max_hp}', width=260, size=13 * scale, color=TEAL),
+                    metric('mana', f'{hero.mana}/{hero.max_mana}', width=260, size=13 * scale, color=BLUE),
+                    spacing=12)
         recovery = s.recovery_preview()
         rest = label(recovery.blocked_reason or
                      f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.",
-                     11, color=RED if recovery.blocked_reason else MUTED)
+                     11, width=896, color=RED if recovery.blocked_reason else MUTED)
         quote = s.infusion_preview()
         infusion = Row(Column(label(f"Tower infusion · +{quote.mana} mana", 14, width=818, color=TEAL),
                               label(f"{quote.crystals} crystals · {quote.actions} hero action · "
@@ -1939,7 +1962,8 @@ class HeroScene(Screen):
                                       width=836, color=GOLD),
                                 Button("Unequip", width=204, height=40, shortcut="U", on_click=self.unequip,
                                        enabled=hero.relic is not None), spacing=24)
-        top = Column(Column(title, stats, rest, spacing=6), infusion, learned, inventory_heading, spacing=14)
+        heading = Row(hero_portrait(hero.hero_class, 144), Column(title, stats, rest, spacing=6), spacing=24)
+        top = Column(heading, infusion, learned, inventory_heading, spacing=14)
         hint = self.message or (f"Rank limits: hero {s.hero_level_cap}, troops {s.troop_level_cap}. XP pauses at the limit. "
                                "Change equipment between battles." if s.campaign else
                                "Find relics in adventure sites. Change equipment between battles.")

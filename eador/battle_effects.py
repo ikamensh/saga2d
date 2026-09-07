@@ -1,6 +1,7 @@
 """Small, deterministic drawing effects from an already-resolved battle event."""
 import math
 
+from eador.battle_audio import is_magic_attack
 from eador.style import BLUE, GOLD, RED, TEAL, TEXT
 
 
@@ -57,6 +58,8 @@ def draw_event(scene, event, fraction, *, still=False):
     kind = event.kind
     actor = scene.battle.unit(event.actor_id) if event.actor_id is not None else None
     target = scene.battle.unit(event.target_id) if event.target_id is not None else None
+    arcane = kind == 'bolt' or (kind in ('attack', 'pin') and
+                              is_magic_attack(actor, scene.root.state.hero.hero_class))
 
     def center(frame, ident):
         x, y = grid.center(frame.unit(ident).pos)
@@ -67,13 +70,13 @@ def draw_event(scene, event, fraction, *, still=False):
         _ring(scene, x, y + size * .26, size * .52, (*GOLD[:3], 180), flat=.42)
     if target is not None:
         x, y = center(event.before, target.id)
-        color = TEAL if kind in ('heal', 'rally', 'swap') else BLUE if kind == 'bolt' else RED
+        color = TEAL if kind in ('heal', 'rally', 'swap') else BLUE if arcane else RED
         if kind in _HITS:
             if still or fraction >= .5:
                 _impact(scene, x, y + size * .25, size, color, (fraction - .5) * 2, still)
             elif kind == 'bolt' or actor.attack_range > 1 and kind in ('attack', 'pin'):
                 _projectile(scene, center(event.before, actor.id), (x, y), fraction * 2,
-                            size, arcane=kind == 'bolt')
+                            size, arcane=arcane)
             else:
                 # A brief blade arc closes on the recorded contact point.
                 reach = size * .48

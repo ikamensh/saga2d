@@ -21,3 +21,11 @@ geometric drawings from `eador/icon_art.py`. `tools/build_eador_icons.py` render
 96-pixel PNGs with antialiasing for use around 24 pixels and records source and
 output hashes in `icon-art-manifest.json`. They use no icon packs, fonts or
 Unicode glyphs. The project MIT license applies to these source drawings.
+
+The four hero portraits in `images/heroes/` were generated with Codex's built-in
+image-generation tool on 2026-09-07, from original text prompts only. Each
+selected PNG is shipped unchanged. Their complete prompts, dimensions, byte
+counts and SHA-256 hashes are recorded in `hero-portrait-provenance.json`.
+Commander, Warrior, Scout and Wizard share painted bust framing, restrained
+ink/teal/brass color and upper-left light. Their smaller tactical miniatures
+remain code-native drawings, with matching clothing, equipment and headgear.

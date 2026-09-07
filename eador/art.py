@@ -281,7 +281,12 @@ def expedition(scene, grid, pos, troops):
 
 
 def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
-    """Role silhouettes stay distinct at battle and smaller retinue scales."""
+    """Paint a tabletop figure with upper-left light, inside the existing cell footprint.
+
+    Broad equipment and material planes carry the role at retinue scale; fine
+    face/armour details remain secondary. The base and tactical flags retain
+    their established geometry. No image generation or state changes occur here.
+    """
     s = scale
     color = TEAL if team == "player" else RED
     if spent:
@@ -293,222 +298,368 @@ def piece(scene, x, y, kind, team, *, scale=1, selected=False, spent=False):
     scene.draw_line(x - 15 * s, y + 13 * s, x + 4 * s, y + 15 * s,
                     GOLD if selected else color, 1.5 * s)
     lower = kind.lower()
-    if lower == "wolf":
-        fur = (177, 184, 174, 255)
-        scene.draw_polygon([(x - 18 * s, y - 7 * s), (x - 10 * s, y - 20 * s),
-                            (x + 11 * s, y - 18 * s), (x + 20 * s, y - 7 * s),
-                            (x + 10 * s, y), (x - 12 * s, y)], fur)
-        for dx in (-12, -4, 8, 15):
-            scene.draw_line(x + dx * s, y - 2 * s, x + (dx - 2) * s, y + 10 * s, fur, 3 * s)
-        scene.draw_polygon([(x + 7 * s, y - 14 * s), (x + 11 * s, y - 34 * s),
-                            (x + 17 * s, y - 27 * s), (x + 26 * s, y - 21 * s),
-                            (x + 22 * s, y - 15 * s)], (207, 211, 193, 255))
-        scene.draw_line(x - 14 * s, y - 12 * s, x - 26 * s, y - 24 * s, fur, 5 * s)
-        scene.draw_circle(x + 18 * s, y - 23 * s, 1.5 * s, INK)
-        return
-    if lower == "sapper":
-        # A low work helmet, apron, side canister and curling plume read as a
-        # field engineer rather than another sword-and-shield infantry piece.
-        leather = (170, 133, 87, 255)
-        scene.draw_rect(x - 17 * s, y - 21 * s, 28 * s, 25 * s, color, radius=4 * s)
-        for dx in (-8, 7):
-            scene.draw_line(x + dx * s, y, x + dx * s, y + 12 * s, TEXT, 5 * s)
-        scene.draw_polygon([(x - 10 * s, y - 18 * s), (x + 6 * s, y - 18 * s),
-                            (x + 10 * s, y + 5 * s), (x - 14 * s, y + 5 * s)], leather)
-        scene.draw_line(x - 12 * s, y - 15 * s, x + 7 * s, y - 5 * s, GOLD, 2 * s)
-        scene.draw_circle(x - 3 * s, y - 27 * s, 9 * s, TEXT)
-        scene.draw_rect(x - 16 * s, y - 36 * s, 26 * s, 8 * s, color, radius=3 * s)
-        scene.draw_line(x - 19 * s, y - 28 * s, x + 13 * s, y - 28 * s, GOLD, 3 * s)
-        for dx in (-7, 1):
-            scene.draw_circle(x + dx * s, y - 26 * s, 3.5 * s, INK)
-            scene.draw_circle(x + dx * s, y - 26 * s, 1.5 * s, BLUE)
-        scene.draw_line(x + 7 * s, y - 14 * s, x + 20 * s, y - 6 * s, color, 6 * s)
-        scene.draw_rect(x + 14 * s, y - 10 * s, 17 * s, 22 * s, shade(leather, -28), radius=4 * s)
-        outline(scene, [(x + 14 * s, y - 7 * s), (x + 31 * s, y - 7 * s),
-                        (x + 31 * s, y + 9 * s), (x + 14 * s, y + 9 * s)], GOLD, 2 * s)
-        scene.draw_rect(x + 18 * s, y - 15 * s, 9 * s, 6 * s, TEXT)
-        for dx, dy, radius in ((22, -21, 4), (18, -28, 5), (24, -36, 6)):
-            scene.draw_circle(x + dx * s, y + dy * s, radius * s, (159, 173, 170, 255))
-        return
-    if lower == "adept":
-        # No wizard hat or healer staff: a diamond tablet, floating rune and
-        # extended palm give the Adept a compact, directional silhouette.
-        rune = (192, 170, 222, 255)
-        scene.draw_polygon([(x - 7 * s, y - 19 * s), (x - 17 * s, y + 9 * s),
-                            (x, y + 3 * s), (x + 15 * s, y + 10 * s),
-                            (x + 8 * s, y - 19 * s)], color)
-        scene.draw_line(x - 6 * s, y - 16 * s, x, y + 1 * s, rune, 3 * s)
-        scene.draw_line(x + 6 * s, y - 16 * s, x, y + 1 * s, rune, 3 * s)
-        scene.draw_circle(x, y - 26 * s, 8 * s, TEXT)
-        scene.draw_polygon([(x - 9 * s, y - 27 * s), (x - 7 * s, y - 36 * s),
-                            (x + 7 * s, y - 36 * s), (x + 9 * s, y - 27 * s)], shade(color, -18))
-        scene.draw_line(x - 5 * s, y - 29 * s, x + 5 * s, y - 29 * s, GOLD, 2 * s)
-        outline(scene, [(x, y - 49 * s), (x + 6 * s, y - 43 * s),
-                        (x, y - 37 * s), (x - 6 * s, y - 43 * s)], rune, 2 * s)
-        scene.draw_polygon([(x - 20 * s, y - 23 * s), (x - 10 * s, y - 9 * s),
-                            (x - 19 * s, y + 3 * s), (x - 28 * s, y - 10 * s)], shade(rune, -32))
-        outline(scene, [(x - 20 * s, y - 23 * s), (x - 10 * s, y - 9 * s),
-                        (x - 19 * s, y + 3 * s), (x - 28 * s, y - 10 * s)], GOLD, 2 * s)
-        scene.draw_line(x + 8 * s, y - 13 * s, x + 20 * s, y - 21 * s, color, 5 * s)
-        scene.draw_line(x + 22 * s, y - 14 * s, x + 22 * s, y - 28 * s, TEXT, 4 * s)
-        for dx in (28, 34):
-            scene.draw_line(x + dx * s, y - 28 * s, x + (dx + 4) * s, y - 21 * s, rune, 2 * s)
-            scene.draw_line(x + (dx + 4) * s, y - 21 * s, x + dx * s, y - 14 * s, rune, 2 * s)
-        return
-    if lower == "skyrider":
-        # A rider on an outstretched bird makes flight visible even when the
-        # piece shrinks to a retinue slot; no mounted unit shares these wings.
-        feather = (192, 197, 183, 255)
+    lower = {'acolyte': 'healer', 'mage': 'wizard', 'shaman': 'wizard', 'bow': 'archer'}.get(lower, lower)
+    cloth = tuple(round(c * .60 + 18) for c in color[:3]) + (255,)
+    metal, steel, metal_dark = (122, 143, 147, 255), (215, 225, 212, 255), (62, 79, 88, 255)
+    wood, leather, brass = (111, 75, 46, 255), (139, 98, 60, 255), (187, 151, 88, 255)
+    ivory, skin, edge = (233, 219, 181, 255), (205, 159, 117, 255), (26, 32, 32, 255)
+
+    def poly(points, fill, *, rim=True):
+        points = [(x + a * s, y + b * s) for a, b in points]
+        scene.draw_polygon(points, fill)
+        if rim:
+            outline(scene, points, edge, 1.1 * s)
+
+    def line(a, b, fill, width=1):
+        scene.draw_line(x + a[0] * s, y + a[1] * s, x + b[0] * s, y + b[1] * s, fill, width * s)
+
+    def circle(a, b, radius, fill):
+        scene.draw_circle(x + a * s, y + b * s, radius * s, fill)
+
+    def oval(a, b, rx, ry, fill):
+        ellipse(scene, x + a * s, y + b * s, rx * s, ry * s, fill)
+
+    def legs(spread=7):
         for direction in (-1, 1):
-            wing = [(x + direction * dx * s, y + dy * s) for dx, dy in
-                    ((3, -12), (21, -33), (37, -38), (29, -17), (22, -3), (12, 3))]
-            scene.draw_polygon(wing, feather)
-            for dx, dy in ((14, -13), (21, -20), (28, -27)):
-                scene.draw_line(x + direction * dx * s, y + dy * s,
-                                x + direction * (dx + 2) * s, y + (dy + 11) * s, INK, 2 * s)
-        scene.draw_polygon([(x - 7 * s, y - 16 * s), (x + 11 * s, y - 17 * s),
-                            (x + 15 * s, y - 4 * s), (x + 4 * s, y + 8 * s),
-                            (x - 13 * s, y + 2 * s)], shade(feather, -26))
-        scene.draw_polygon([(x - 5 * s, y), (x - 16 * s, y + 13 * s),
-                            (x - 3 * s, y + 8 * s), (x + 5 * s, y + 11 * s)], feather)
-        scene.draw_circle(x + 13 * s, y - 15 * s, 7 * s, TEXT)
-        scene.draw_polygon([(x + 18 * s, y - 18 * s), (x + 28 * s, y - 14 * s),
-                            (x + 20 * s, y - 10 * s)], GOLD)
-        scene.draw_circle(x + 15 * s, y - 17 * s, 1.5 * s, INK)
-        scene.draw_polygon([(x - 8 * s, y - 15 * s), (x - 6 * s, y - 29 * s),
-                            (x + 4 * s, y - 29 * s), (x + 9 * s, y - 13 * s)], color)
-        scene.draw_line(x + 1 * s, y - 14 * s, x - 1 * s, y - 1 * s, color, 5 * s)
-        scene.draw_circle(x - 1 * s, y - 34 * s, 6 * s, TEXT)
-        scene.draw_polygon([(x - 8 * s, y - 35 * s), (x - 1 * s, y - 44 * s),
-                            (x + 6 * s, y - 35 * s)], color)
-        scene.draw_line(x + 7 * s, y - 22 * s, x + 20 * s, y - 44 * s, GOLD, 2 * s)
-        scene.draw_polygon([(x + 17 * s, y - 43 * s), (x + 25 * s, y - 51 * s),
-                            (x + 22 * s, y - 39 * s)], TEXT)
+            d = direction
+            poly([(d * 2, -3), (d * 9, -3), (d * (spread + 2), 9),
+                  (d * (spread - 3), 10)], (95, 101, 94, 255))
+            line((d * 5, 0), (d * spread, 8), (159, 164, 146, 255), 2)
+            poly([(d * (spread - 4), 6), (d * (spread + 2), 6),
+                  (d * (spread + 6), 12), (d * (spread - 4), 12)], shade(leather, -42))
+            line((d * (spread - 3), 7), (d * (spread + 1), 7), leather, 1.5)
+
+    def torso(coat=cloth, *, plate=False, broad=False):
+        w = 16 if broad else 12
+        poly([(-w, -17), (-8, -23), (7, -23), (w, -16), (w - 2, 4), (-w, 4)], shade(coat, -24))
+        poly([(-w, -17), (-7, -22), (-1, -18), (-4, 3), (-w, 4)], shade(coat, 24), rim=False)
+        poly([(2, -20), (7, -22), (w, -16), (w - 2, 4), (5, 2)], coat, rim=False)
+        if plate:
+            poly([(-11, -20), (9, -20), (12, -10), (7, -3), (-8, -3), (-13, -11)], metal)
+            poly([(-11, -20), (-2, -18), (-4, -5), (-10, -7), (-13, -11)], steel, rim=False)
+            poly([(1, -18), (9, -20), (12, -10), (7, -3), (2, -5)], metal_dark, rim=False)
+            line((-8, -16), (7, -16), shade(metal, 28), 1)
+            for dx in (-15, 13):
+                poly([(dx - 4, -20), (dx + 3, -22), (dx + 5, -14), (dx - 4, -13)], metal)
+                line((dx - 3, -19), (dx + 2, -20), steel, 1.5)
+        else:
+            line((-6, -17), (-8, -5), shade(coat, 40), 1.3)
+            line((5, -17), (8, -7), shade(coat, -42), 1.5)
+        line((-11, -2), (10, -2), shade(leather, -30), 3)
+        poly([(-2, -4), (2, -4), (2, 0), (-2, 0)], brass, rim=False)
+
+    def face(tone=skin, *, dx=0, dy=0):
+        def shifted(points):
+            return [(a + dx, b + dy) for a, b in points]
+        poly(shifted([(-7, -30), (-3, -35), (4, -34), (8, -28), (6, -21), (-2, -19), (-7, -24)]), shade(tone, -34))
+        poly(shifted([(-6, -30), (-3, -34), (2, -33), (2, -23), (-2, -20), (-6, -25)]), tone, rim=False)
+        poly(shifted([(2, -30), (5, -28), (7, -25), (3, -25)]), shade(tone, 23), rim=False)
+        line((dx - 3, dy - 28), (dx + 1, dy - 28), shade(tone, -72), 1)
+        circle(dx + 4, dy - 28, .8, edge)
+        line((dx, dy - 22), (dx + 4, dy - 22), shade(tone, -55), 1)
+
+    def helmet(*, full=False, crest=False):
+        poly([(-10, -29), (-9, -36), (-3, -40), (5, -39), (11, -32), (10, -27)], metal)
+        poly([(-9, -35), (-3, -39), (0, -37), (-1, -30), (-10, -29)], steel, rim=False)
+        poly([(2, -38), (5, -39), (11, -32), (10, -27), (4, -29)], metal_dark, rim=False)
+        line((-12, -29), (12, -29), steel, 2)
+        if full:
+            poly([(-7, -29), (9, -29), (7, -20), (0, -17), (-7, -22)], metal)
+            line((-5, -27), (6, -27), edge, 2.3)
+            line((1, -24), (1, -20), metal_dark, 1.3)
+        if crest:
+            poly([(-3, -38), (-7, -44), (-3, -49), (3, -48), (7, -41), (3, -37)], color)
+            line((-2, -46), (2, -42), shade(color, 42), 1.6)
+
+    def shield(*, tower=False, wooden=False):
+        points = [(-29, -25), (-7, -25), (-6, 4), (-17, 11), (-29, 4)] if tower else [(-25, -18), (-9, -18), (-10, -3), (-17, 4), (-25, -3)]
+        fill = leather if wooden else shade(cloth, -5)
+        poly(points, fill)
+        poly([points[0], (-18, points[0][1] + 2), (-18, points[-2][1] - 2), points[-1]], shade(fill, 30), rim=False)
+        outline(scene, [(x + a * s, y + b * s) for a, b in points], brass, 1.7 * s)
+        if wooden:
+            for xx in (-22, -17, -12):
+                line((xx, -15), (xx, -3), shade(leather, -40), .9)
+            circle(-17, -8, 3.4, metal_dark)
+            circle(-18, -9, 2, steel)
+        elif tower:
+            for d, yy in ((1, -14), (-1, -3)):
+                line((-18 - 6 * d, yy), (-18 + 6 * d, yy), ivory, 2)
+                line((-18 + 2 * d, yy - 3), (-18 + 6 * d, yy), ivory, 2)
+                line((-18 + 2 * d, yy + 3), (-18 + 6 * d, yy), ivory, 2)
+        else:
+            poly([(-17, -14), (-13, -9), (-17, -3), (-21, -9)], ivory, rim=False)
+
+    def sword(*, heavy=False):
+        width = 3.5 if heavy else 2.5
+        poly([(19 - width, -8), (19 - width, -37), (19, -45), (19 + width, -37), (19 + width, -8)], metal)
+        poly([(19 - width, -8), (19 - width, -37), (19, -45), (19, -8)], steel, rim=False)
+        line((12, -9), (26, -9), brass, 3)
+        line((19, -7), (19, 0), shade(leather, -28), 3)
+        circle(19, 1, 2, brass)
+        poly([(8, -17), (13, -18), (19, -11), (18, -5), (13, -8)], cloth)
+        circle(18, -8, 2.5, skin)
+
+    def bow(*, mobile=False):
+        points = [(18, -38), (26, -28), (29, -14), (25, 0), (18, 7)]
+        for a, b in zip(points, points[1:]):
+            line(a, b, edge, 4)
+            line(a, b, brass if mobile else leather, 2.4)
+        line(points[0], points[-1], ivory, .9)
+        line((4, -14), (24, -15), cloth, 5)
+        circle(23, -15, 2.5, skin)
+        line((2, -17), (31, -18), ivory, 1.1)
+        poly([(30, -21), (35, -18), (30, -16)], steel, rim=False)
+
+    if lower == 'wolf':
+        fur, light, dark = (156, 165, 159, 255), (220, 218, 195, 255), (92, 107, 108, 255)
+        poly([(-16, -12), (-29, -24), (-20, -24), (-9, -19)], dark)
+        poly([(-29, -24), (-32, -33), (-20, -24)], dark)
+        poly([(-29, -26), (-32, -33), (-25, -29), (-20, -23)], light, rim=False)
+        for dx in (-13, -3, 10, 18):
+            poly([(dx - 3, -5), (dx + 2, -4), (dx, 8), (dx - 5, 11), (dx - 7, 9)], dark)
+            line((dx - 2, -2), (dx - 3, 7), fur, 2)
+        poly([(-20, -12), (-12, -23), (9, -21), (20, -12), (13, 0), (-15, -2)], fur)
+        poly([(-18, -6), (-8, -10), (13, -8), (13, 0), (-15, -2)], dark, rim=False)
+        poly([(-14, -20), (-6, -24), (6, -22), (13, -14), (-3, -15)], light, rim=False)
+        for dx in (-10, -3, 4):
+            poly([(dx - 4, -19), (dx - 2, -26), (dx + 4, -20)], fur)
+        poly([(7, -15), (7, -29), (13, -35), (21, -30), (28, -24), (26, -18), (17, -17)], fur)
+        poly([(8, -29), (9, -40), (16, -32)], dark)
+        poly([(16, -31), (20, -38), (23, -28)], dark)
+        poly([(12, -27), (20, -29), (28, -24), (25, -21), (16, -23)], light, rim=False)
+        circle(20, -28, 1.1, edge)
+        circle(27, -24, 1.8, edge)
+        line((20, -20), (25, -19), edge, 1.3)
+        poly([(21, -20), (23, -20), (22, -17)], ivory, rim=False)
+        line((8, -16), (16, -19), color, 3)
         return
-    if lower == "ranger":
-        # A low hood, trailing cloak and wide stride distinguish mobile fire
-        # from the Archer's upright pose and pointed cap.
-        scene.draw_polygon([(x - 5 * s, y - 28 * s), (x - 26 * s, y + 3 * s),
-                            (x - 8 * s, y), (x + 8 * s, y - 17 * s)], shade(color, -24))
-        scene.draw_line(x - 3 * s, y - 1 * s, x - 15 * s, y + 12 * s, GOLD, 5 * s)
-        scene.draw_line(x + 5 * s, y - 1 * s, x + 14 * s, y + 10 * s, GOLD, 5 * s)
-        scene.draw_polygon([(x - 10 * s, y + 1 * s), (x - 6 * s, y - 20 * s),
-                            (x + 8 * s, y - 22 * s), (x + 13 * s, y - 2 * s)], color)
-        scene.draw_polygon([(x - 10 * s, y - 20 * s), (x - 8 * s, y - 32 * s),
-                            (x + 1 * s, y - 38 * s), (x + 11 * s, y - 31 * s),
-                            (x + 13 * s, y - 19 * s)], color)
-        scene.draw_polygon([(x - 3 * s, y - 29 * s), (x + 7 * s, y - 30 * s),
-                            (x + 9 * s, y - 20 * s), (x - 3 * s, y - 21 * s)], INK)
-        scene.draw_line(x + 1 * s, y - 27 * s, x + 7 * s, y - 27 * s, TEXT, 2 * s)
-        bow = [(x + 17 * s, y - 36 * s), (x + 25 * s, y - 27 * s),
-               (x + 28 * s, y - 13 * s), (x + 25 * s, y), (x + 20 * s, y + 6 * s)]
-        for a, b in zip(bow, bow[1:]):
-            scene.draw_line(*a, *b, GOLD, 3 * s)
-        scene.draw_line(*bow[0], *bow[-1], TEXT, s)
-        scene.draw_line(x + 5 * s, y - 12 * s, x + 26 * s, y - 14 * s, color, 4 * s)
-        scene.draw_line(x + 7 * s, y - 17 * s, x + 32 * s, y - 19 * s, TEXT, 1.5 * s)
-        scene.draw_polygon([(x + 32 * s, y - 22 * s), (x + 37 * s, y - 19 * s),
-                            (x + 32 * s, y - 16 * s)], TEXT)
+
+    if lower == 'skyrider':
+        feather = (182, 188, 169, 255)
+        for d in (-1, 1):
+            poly([(d * 3, -12), (d * 19, -31), (d * 37, -38), (d * 24, -4), (d * 12, 3)], shade(feather, -32))
+            for tip, root in (((37, -38), (19, -10)), ((31, -28), (15, -4)), ((25, -18), (10, 0))):
+                tx, ty = tip
+                rx, ry = root
+                poly([(d * (rx - 4), ry - 11), (d * tx, ty), (d * rx, ry)], feather)
+                line((d * (rx - 2), ry - 10), (d * (tx - 3), ty + 2), ivory, 1.2)
+        oval(1, -8, 12, 17, shade(feather, -40))
+        poly([(-9, -8), (1, -13), (9, -4), (4, 6), (-7, 1)], feather)
+        for dx in (-7, 0, 7):
+            poly([(dx - 3, -2), (dx + 3, -2), (dx - 5, 13)], feather)
+        poly([(5, -9), (8, -25), (16, -30), (22, -24), (22, -15), (13, -11)], ivory)
+        poly([(20, -23), (30, -19), (22, -15)], brass)
+        circle(17, -23, 1.1, edge)
+        poly([(-10, -17), (-6, -32), (4, -32), (9, -17)], cloth)
+        poly([(-7, -29), (-2, -31), (0, -20), (-8, -19)], metal, rim=False)
+        line((-4, -17), (1, -2), metal_dark, 5)
+        line((-3, -17), (2, -3), metal, 2)
+        circle(-1, -37, 6, shade(skin, -35))
+        circle(-3, -38, 4, skin)
+        poly([(-8, -38), (-6, -44), (2, -46), (6, -39)], metal)
+        line((-6, -40), (3, -41), steel, 1.4)
+        line((8, -22), (22, -49), wood, 3)
+        poly([(19, -48), (25, -56), (24, -45)], steel)
         return
-    if lower == "warden":
-        # Broad armor, a tower shield and an open gauntlet read as extraction,
-        # rather than the Swordsman's narrow shield and raised blade.
-        scene.draw_polygon([(x - 16 * s, y - 21 * s), (x + 14 * s, y - 21 * s),
-                            (x + 17 * s, y + 5 * s), (x - 14 * s, y + 5 * s)], color)
-        for dx in (-7, 10):
-            scene.draw_line(x + dx * s, y + 1 * s, x + dx * s, y + 13 * s, TEXT, 6 * s)
-        scene.draw_polygon([(x - 10 * s, y - 25 * s), (x - 9 * s, y - 35 * s),
-                            (x, y - 40 * s), (x + 10 * s, y - 35 * s),
-                            (x + 11 * s, y - 25 * s)], TEXT)
-        scene.draw_rect(x - 6 * s, y - 30 * s, 13 * s, 4 * s, INK)
-        scene.draw_line(x + 13 * s, y - 15 * s, x + 25 * s, y - 5 * s, color, 7 * s)
-        scene.draw_rect(x + 22 * s, y - 12 * s, 7 * s, 10 * s, TEXT)
-        scene.draw_line(x + 24 * s, y - 13 * s, x + 24 * s, y - 17 * s, TEXT, 3 * s)
-        shield = [(x - 29 * s, y - 25 * s), (x - 3 * s, y - 25 * s),
-                  (x, y + 8 * s), (x - 15 * s, y + 16 * s), (x - 29 * s, y + 8 * s)]
-        scene.draw_polygon(shield, shade(color, -20))
-        outline(scene, shield, GOLD, 2.5 * s)
-        for direction, yy in ((1, -12), (-1, 0)):
-            end = x + (-15 + 7 * direction) * s
-            scene.draw_line(x + (-15 - 7 * direction) * s, y + yy * s, end, y + yy * s, TEXT, 2.5 * s)
-            scene.draw_line(end - 4 * direction * s, y + (yy - 4) * s, end, y + yy * s, TEXT, 2.5 * s)
-            scene.draw_line(end - 4 * direction * s, y + (yy + 4) * s, end, y + yy * s, TEXT, 2.5 * s)
+
+    if lower in ('ranger', 'scout', 'brigand'):
+        poly([(-7, -26), (-26, 4), (-9, 2), (12, -16)], shade(cloth, -34))
+        poly([(-7, -26), (-22, 0), (-14, -3), (-4, -19)], shade(cloth, 10), rim=False)
+    elif lower == 'commander':
+        ochre = (172, 124, 57, 255)
+        poly([(-10, -25), (-25, 7), (20, 7), (9, -25)], shade(ochre, -35))
+        poly([(-10, -25), (-25, 7), (-13, 3), (-4, -23)], ochre, rim=False)
+        line((-10, -22), (-19, 3), GOLD, 2)
+    elif lower in ('warrior', 'swordsman'):
+        poly([(-9, -23), (-23, 3), (-13, 7), (8, -20)], shade(cloth, -22))
+        line((-11, -18), (-18, 1), color, 2)
+
+    legs(14 if lower == 'ranger' else 8 if lower == 'goblin' else 7)
+    if lower == 'guard':
+        metal, steel, metal_dark = (76, 74, 97, 255), (164, 156, 173, 255), (44, 43, 62, 255)
+    armored = lower in ('swordsman', 'warrior', 'warden', 'guard', 'commander', 'pikeman')
+    torso((43, 60, 87, 255) if lower == 'wizard' else cloth, plate=armored, broad=lower in ('warden', 'guard'))
+
+    if lower == 'goblin':
+        green, dark = (157, 171, 101, 255), (85, 111, 66, 255)
+        poly([(-11, -29), (-4, -36), (7, -34), (13, -24), (6, -18), (-8, -19)], dark)
+        poly([(-10, -30), (-23, -34), (-12, -23)], green)
+        poly([(8, -30), (22, -32), (12, -22)], green)
+        poly([(-7, -31), (1, -34), (8, -30), (13, -24), (4, -23), (-5, -25)], green, rim=False)
+        line((-5, -29), (1, -28), edge, 1.4)
+        circle(6, -29, 1.2, ivory)
+        circle(6, -29, .6, edge)
+        poly([(5, -26), (15, -24), (7, -21)], shade(green, 23), rim=False)
+        poly([(-2, -22), (0, -18), (2, -22)], ivory, rim=False)
+        # The goblin's short ranged attack reads as a crude bow, not a sword.
+        for a, b in (((18, -20), (25, -10)), ((25, -10), (18, 3))):
+            line(a, b, wood, 3)
+        line((18, -20), (18, 3), ivory, .9)
+        line((8, -8), (28, -10), ivory, 1.2)
+        poly([(27, -12), (32, -10), (27, -8)], metal, rim=False)
         return
-    if lower == "commander":
-        scene.draw_polygon([(x - 11 * s, y - 21 * s), (x - 23 * s, y + 6 * s),
-                            (x + 19 * s, y + 7 * s), (x + 8 * s, y - 21 * s)], (151, 116, 59, 255))
-        scene.draw_polygon([(x - 11 * s, y - 21 * s), (x - 23 * s, y + 6 * s),
-                            (x - 10 * s, y + 3 * s), (x - 4 * s, y - 19 * s)], GOLD)
-    armor = (82, 77, 97, 255) if lower == "guard" else shade(color, -23)
-    scene.draw_polygon([(x - 13 * s, y + 4 * s), (x - 7 * s, y - 20 * s),
-                        (x + 7 * s, y - 20 * s), (x + 13 * s, y + 4 * s)], armor)
-    scene.draw_polygon([(x - 7 * s, y - 20 * s), (x, y - 18 * s),
-                        (x - 2 * s, y + 3 * s), (x - 13 * s, y + 4 * s)], color)
-    scene.draw_polygon([(x + 3 * s, y - 19 * s), (x + 7 * s, y - 20 * s),
-                        (x + 13 * s, y + 4 * s), (x + 7 * s, y + 1 * s)], shade(armor, -26))
-    scene.draw_line(x - 9 * s, y - 3 * s, x + 9 * s, y - 3 * s, (91, 71, 47, 255), 3 * s)
-    scene.draw_rect(x - 2 * s, y - 5 * s, 4 * s, 4 * s, GOLD)
-    for dx in (-1, 1):
-        scene.draw_line(x + dx * 5 * s, y + 3 * s, x + dx * 7 * s, y + 11 * s,
-                        (118, 123, 109, 255), 4 * s)
-        scene.draw_line(x + dx * 7 * s, y + 10 * s, x + dx * 10 * s, y + 12 * s,
-                        (66, 54, 39, 255), 4 * s)
-    skin = (145, 176, 92, 255) if lower == "goblin" else (220, 199, 157, 255)
-    scene.draw_circle(x, y - 24 * s, 8 * s, shade(skin, -34))
-    scene.draw_circle(x - 2 * s, y - 25 * s, 6 * s, skin)
-    if lower == "goblin":
-        scene.draw_polygon([(x - 7 * s, y - 29 * s), (x - 19 * s, y - 32 * s), (x - 7 * s, y - 21 * s)], skin)
-        scene.draw_polygon([(x + 7 * s, y - 29 * s), (x + 19 * s, y - 32 * s), (x + 7 * s, y - 21 * s)], skin)
-    if any(name in lower for name in ("archer", "scout", "bow")):
-        outline(scene, [(x + 13 * s, y - 28 * s), (x + 24 * s, y - 11 * s),
-                        (x + 13 * s, y + 5 * s)], GOLD, 2 * s)
-        scene.draw_line(x + 13 * s, y - 28 * s, x + 13 * s, y + 5 * s, TEXT, 1)
-        scene.draw_polygon([(x - 10 * s, y - 24 * s), (x, y - 38 * s), (x + 10 * s, y - 24 * s)], color)
-    elif lower in ("healer", "acolyte"):
-        # Rounded vestments and a ring staff distinguish support from a wizard.
-        scene.draw_circle(x, y - 25 * s, 11 * s, color)
-        scene.draw_circle(x, y - 24 * s, 6 * s, skin)
-        scene.draw_line(x - 6 * s, y - 17 * s, x - 3 * s, y + 1 * s, TEXT, 3 * s)
-        scene.draw_line(x + 6 * s, y - 17 * s, x + 3 * s, y + 1 * s, TEXT, 3 * s)
-        scene.draw_line(x + 18 * s, y + 7 * s, x + 18 * s, y - 32 * s, GOLD, 3 * s)
-        scene.draw_circle(x + 18 * s, y - 37 * s, 8 * s, GOLD)
-        scene.draw_circle(x + 18 * s, y - 37 * s, 5 * s, INK)
-        scene.draw_polygon([(x + 18 * s, y - 41 * s), (x + 21 * s, y - 37 * s),
-                            (x + 18 * s, y - 33 * s), (x + 15 * s, y - 37 * s)], TEXT)
-    elif any(name in lower for name in ("mage", "wizard", "shaman")):
-        scene.draw_line(x + 17 * s, y + 7 * s, x + 17 * s, y - 38 * s, GOLD, 3 * s)
-        scene.draw_circle(x + 17 * s, y - 39 * s, 6 * s, BLUE)
-        scene.draw_polygon([(x - 11 * s, y - 28 * s), (x + 1 * s, y - 48 * s),
-                            (x + 9 * s, y - 28 * s)], color)
-    elif lower == "pikeman":
-        # A long angled pike and broad helmet distinguish the defensive recruit.
-        scene.draw_rect(x - 10 * s, y - 33 * s, 20 * s, 9 * s, (187, 198, 184, 255))
-        scene.draw_line(x - 13 * s, y - 25 * s, x + 13 * s, y - 25 * s, TEXT, 2 * s)
-        scene.draw_line(x + 8 * s, y + 9 * s, x + 23 * s, y - 51 * s, (194, 159, 102, 255), 3 * s)
-        scene.draw_polygon([(x + 17 * s, y - 48 * s), (x + 26 * s, y - 61 * s),
-                            (x + 25 * s, y - 45 * s)], TEXT)
-        scene.draw_line(x - 13 * s, y - 12 * s, x + 15 * s, y - 16 * s, color, 4 * s)
+
+    skin = {'warrior': (131, 87, 65, 255), 'commander': (156, 112, 83, 255),
+            'scout': (177, 152, 105, 255), 'wizard': (218, 196, 171, 255),
+            'adept': (164, 119, 87, 255), 'brigand': (191, 143, 100, 255)}.get(lower, skin)
+    if lower not in ('guard', 'warden', 'healer', 'ranger', 'scout'):
+        face(skin)
+
+    if lower in ('archer', 'ranger', 'scout'):
+        poly([(-18, -28), (-11, -25), (-10, -7), (-19, -10)], leather)
+        for dx in (-18, -13):
+            line((dx, -14), (dx - 2, -36), wood, 1.5)
+            poly([(dx - 2, -37), (dx + 1, -32), (dx - 4, -32)], ivory, rim=False)
+        if lower == 'archer':
+            poly([(-11, -29), (-8, -35), (3, -40), (11, -31)], cloth)
+            line((-12, -29), (12, -30), brass, 1.8)
+            poly([(3, -38), (10, -43), (8, -34)], ivory, rim=False)
+        else:
+            dy = 3 if lower == 'ranger' else 0
+            poly([(-11, -22 + dy), (-12, -34 + dy), (-3, -40 + dy), (8, -36 + dy), (12, -25 + dy), (8, -20 + dy)], shade(cloth, -20))
+            face(skin, dy=dy)
+            line((-9, -32 + dy), (-3, -37 + dy), shade(cloth, 40), 1.6)
+            line((-9, -31 + dy), (-8, -23 + dy), shade(cloth, -20), 2.5)
+            line((-7, -22 + dy), (7, -20 + dy), shade(cloth, -45), 3)
+        line((-10, -17), (9, -4), leather, 2)
+        bow(mobile=lower == 'ranger')
+    elif lower == 'wizard':
+        # Silver hair, long beard, dark robes and a grimoire match the portrait.
+        poly([(-11, -17), (-19, 3), (14, 4), (8, -16)], (48, 66, 99, 255))
+        line((-6, -13), (-11, 0), (109, 129, 158, 255), 2)
+        line((8, -12), (11, 1), (27, 41, 64, 255), 2)
+        poly([(-8, -29), (-6, -37), (3, -38), (8, -31), (7, -29)], (182, 190, 188, 255))
+        line((-7, -29), (-7, -24), ivory, 2)
+        poly([(-6, -25), (6, -24), (4, -12), (-1, -8), (-7, -17)], (177, 187, 186, 255))
+        poly([(-6, -24), (-2, -22), (-3, -12), (-6, -17)], ivory, rim=False)
+        line((20, 8), (20, -42), wood, 4)
+        line((19, 5), (19, -41), brass, 1.2)
+        circle(20, -45, 6, metal_dark)
+        circle(19, -46, 4.2, BLUE)
+        circle(17.5, -48, 1.3, ivory)
+        poly([(-29, -17), (-15, -19), (-12, -3), (-27, -1)], shade(leather, -26))
+        poly([(-26, -14), (-16, -15), (-14, -5), (-25, -3)], ivory, rim=False)
+        line((-24, -10), (-17, -11), brass, 1)
+    elif lower == 'healer':
+        oval(0, -28, 11, 13, shade(cloth, -27))
+        oval(-2, -29, 8, 10, ivory)
+        face(skin)
+        poly([(-10, -19), (-5, -19), (-1, 3), (-8, 3)], ivory)
+        poly([(5, -19), (10, -18), (11, 3), (4, 3)], shade(ivory, -31))
+        line((20, 8), (20, -34), wood, 4)
+        line((19, 6), (19, -34), brass, 1.5)
+        circle(20, -41, 8, brass)
+        circle(20, -41, 5.5, edge)
+        poly([(20, -45), (23, -41), (20, -37), (17, -41)], ivory, rim=False)
+        poly([(-26, -13), (-15, -15), (-13, -3), (-25, -1)], leather)
+        line((-23, -10), (-17, -11), ivory, 2)
+    elif lower == 'sapper':
+        poly([(-10, -19), (6, -19), (12, 4), (-13, 4)], leather)
+        poly([(-10, -19), (-6, -19), (-8, 3), (-13, 4)], shade(leather, 34), rim=False)
+        line((-8, -12), (7, -4), brass, 2)
+        for dx in (-7, 2):
+            poly([(dx, -7), (dx + 5, -7), (dx + 5, 0), (dx, 0)], shade(leather, -27))
+        poly([(-13, -30), (-11, -37), (-3, -40), (6, -38), (10, -30)], brass)
+        line((-15, -29), (12, -29), steel, 2.5)
+        line((-9, -27), (8, -27), wood, 2)
+        for dx in (-5, 3):
+            circle(dx, -27, 3.6, edge)
+            circle(dx - .5, -27.5, 2, BLUE)
+        poly([(12, -9), (29, -9), (30, 8), (15, 10)], shade(leather, -28))
+        poly([(14, -7), (20, -7), (21, 8), (15, 8)], brass, rim=False)
+        line((13, -5), (29, -5), metal, 2)
+        line((15, 5), (30, 5), metal, 2)
+        line((23, -9), (23, -15), steel, 4)
+        for dx, dy, radius in ((23, -21, 4), (19, -29, 5), (25, -38, 5.5)):
+            circle(dx, dy, radius, (133, 151, 147, 255))
+            circle(dx - 1.2, dy - 1.2, radius * .65, (191, 201, 187, 255))
+    elif lower == 'adept':
+        rune = (184, 165, 215, 255)
+        poly([(-10, -20), (-18, 4), (14, 6), (10, -20)], shade(cloth, -15))
+        line((-8, -17), (-1, 0), rune, 2)
+        line((7, -16), (1, 0), brass, 2)
+        poly([(-9, -29), (-9, -35), (1, -39), (10, -34), (10, -28)], shade(cloth, -15))
+        line((-7, -32), (7, -32), brass, 2)
+        poly([(-6, -25), (8, -25), (7, -19), (-4, -20)], rune)
+        poly([(0, -53), (6, -47), (0, -41), (-6, -47)], shade(rune, -44))
+        line((-4, -47), (0, -51), ivory, 1.3)
+        poly([(-23, -24), (-11, -11), (-22, 1), (-32, -11)], rune)
+        poly([(-23, -21), (-23, -2), (-29, -11)], shade(rune, 32), rim=False)
+        line((-26, -11), (-19, -11), brass, 2)
+        line((9, -14), (21, -22), cloth, 5)
+        line((22, -16), (22, -28), skin, 4)
+        for dx in (28, 34):
+            line((dx, -28), (dx + 4, -22), rune, 1.5)
+            line((dx + 4, -22), (dx, -16), rune, 1.5)
+    elif lower == 'warden':
+        helmet(full=True)
+        shield(tower=True)
+        poly([(12, -19), (19, -19), (27, -8), (21, -5), (15, -10)], metal)
+        line((15, -17), (22, -10), steel, 2)
+        poly([(22, -14), (28, -14), (29, -5), (22, -5)], metal)
+        for dx in (23, 26):
+            line((dx, -12), (dx, -19), steel, 2)
+    elif lower == 'pikeman':
+        helmet()
+        line((8, 9), (24, -52), wood, 4)
+        line((7, 8), (23, -52), brass, 1.3)
+        poly([(20, -49), (26, -62), (28, -48)], metal)
+        poly([(20, -49), (26, -62), (25, -48)], steel, rim=False)
+        line((-12, -14), (15, -18), metal_dark, 6)
+        line((-12, -15), (14, -19), metal, 3)
+        circle(14, -18, 2.5, skin)
+        line((5, -7), (12, -7), skin, 3)
+    elif lower == 'brigand':
+        poly([(-11, -26), (-9, -36), (0, -40), (10, -33), (11, -26)], shade(leather, -39))
+        line((-8, -32), (-1, -37), leather, 2)
+        poly([(-6, -30), (5, -30), (8, -25), (-6, -25)], skin)
+        line((-4, -28), (-1, -28), edge, 1)
+        circle(4, -28, .8, edge)
+        poly([(-7, -25), (8, -25), (7, -18), (-5, -19)], shade(cloth, -42))
+        poly([(17, -5), (20, -31), (27, -42), (26, -21), (21, -5)], metal)
+        line((21, -30), (26, -38), steel, 1.7)
+        line((15, -5), (24, -5), brass, 2)
+        shield(wooden=True)
+    elif lower == 'guard':
+        helmet(full=True)
+        for dx, direction in ((-9, -1), (8, 1)):
+            poly([(dx, -34), (dx + direction * 8, -47), (dx + direction * 7, -37)], metal)
+        line((-5, -27), (-1, -27), RED, 1.6)
+        line((3, -27), (7, -27), RED, 1.6)
+        shield()
+        line((20, 7), (18, -42), wood, 4)
+        poly([(18, -41), (28, -47), (32, -38), (25, -30), (18, -33)], metal)
+        poly([(18, -41), (10, -47), (6, -37), (13, -30), (18, -33)], metal)
+        line((28, -44), (30, -38), steel, 2)
+        line((9, -43), (7, -37), steel, 2)
+    elif lower == 'warrior':
+        # The portrait's dark braided veteran wears plate without hiding her face.
+        poly([(-8, -29), (-8, -36), (-3, -40), (5, -38), (8, -30)], (45, 37, 32, 255))
+        for dx, dy in ((-7, -30), (-9, -26), (-10, -22), (-11, -18)):
+            circle(dx, dy, 2.6, (46, 37, 31, 255))
+            line((dx - 1, dy - 1), (dx + 1, dy), brass, .8)
+        shield()
+        sword(heavy=True)
+    elif lower == 'commander':
+        poly([(-8, -29), (-8, -35), (-1, -38), (6, -35), (9, -28)], (95, 100, 98, 255))
+        line((-6, -34), (-1, -36), steel, 1.4)
+        poly([(-5, -24), (6, -24), (5, -19), (0, -16), (-5, -20)], (94, 98, 91, 255))
+        line((-3, -22), (0, -18), ivory, 1.1)
+        sword()
+        poly([(-22, -25), (-10, -23), (-12, -6), (-24, -4)], (175, 129, 65, 255))
+        line((-20, -22), (-21, -7), GOLD, 2)
     else:
-        if lower != "goblin":
-            helmet = (111, 117, 129, 255) if lower == "guard" else (187, 198, 184, 255)
-            scene.draw_rect(x - 9 * s, y - 32 * s, 18 * s, 9 * s, helmet)
-        scene.draw_line(x + 19 * s, y - 2 * s, x + 19 * s, y - 42 * s, TEXT, 3 * s)
-        scene.draw_line(x + 13 * s, y - 9 * s, x + 25 * s, y - 9 * s, GOLD, 3 * s)
-        scene.draw_polygon([(x - 24 * s, y - 17 * s), (x - 9 * s, y - 17 * s),
-                            (x - 10 * s, y - 1 * s), (x - 17 * s, y + 5 * s),
-                            (x - 24 * s, y - 1 * s)], color)
-        scene.draw_line(x - 17 * s, y - 14 * s, x - 17 * s, y, GOLD, 2)
-        if lower in ("commander", "guard"):
-            scene.draw_polygon([(x - 9 * s, y - 31 * s), (x - 11 * s, y - 42 * s),
-                                (x - 3 * s, y - 36 * s), (x, y - 43 * s),
-                                (x + 3 * s, y - 36 * s), (x + 11 * s, y - 42 * s),
-                                (x + 9 * s, y - 31 * s)], GOLD if lower == "commander" else RED)
-        elif lower in ("swordsman", "warrior"):
-            scene.draw_rect(x - 3 * s, y - 42 * s, 6 * s, 13 * s, color)
-        elif lower == "militia":
-            scene.draw_line(x + 19 * s, y - 3 * s, x + 19 * s, y - 45 * s, (194, 159, 102, 255), 2 * s)
-            scene.draw_polygon([(x + 15 * s, y - 40 * s), (x + 19 * s, y - 51 * s),
-                                (x + 23 * s, y - 40 * s)], TEXT)
+        helmet(crest=lower == 'swordsman')
+        shield(wooden=lower == 'militia')
+        if lower == 'militia':
+            line((20, 8), (20, -44), wood, 3.5)
+            line((19, 6), (19, -44), brass, 1)
+            poly([(16, -43), (20, -54), (24, -43)], metal)
+            poly([(16, -43), (20, -54), (20, -43)], steel, rim=False)
+            poly([(20, -40), (29, -37), (20, -34)], color)
+        else:
+            sword()
 
 
 def compass(scene, x, y):

@@ -53,6 +53,12 @@ def test_snapshot_freezes_spec_assets_and_regeneration_sources_before_build(tmp_
         assert data[f'eador/assets/{name}'] == {key: expected[key] for key in ('bytes', 'sha256')}
     assert 'eador/assets/images/shard-atmosphere.png' in data
     assert 'eador/assets/VISUAL-PROVENANCE.md' in data
+    portraits = json.loads((source / 'eador/assets/hero-portrait-provenance.json').read_text())
+    from eador.model import HERO_CLASSES
+    assert set(portraits['portraits']) == {name.lower() for name in HERO_CLASSES}
+    for portrait in portraits['portraits'].values():
+        assert data[f'eador/assets/{portrait["path"]}'] == {
+            key: portrait[key] for key in ('bytes', 'sha256')}
     assert not any('sampler' in name for name in data)
     assert validate_audio(source) is None
     assert snapshot_sources(tmp_path / 'second') == data

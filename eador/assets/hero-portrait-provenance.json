@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-07",
+  "method": "Codex built-in image_gen",
+  "provenance": "Four original portraits generated from text only. No Eador assets, external artist references or input images. Selected outputs shipped unchanged.",
+  "portraits": {
+    "commander": {
+      "prompt": "Use case: stylized-concept. Production character portrait for the original dark fantasy strategy game Shardbound. Make ONE square 1024x1024 painted bust portrait, cropped at mid-chest. Hand-painted gouache and restrained oil glaze, sophisticated classic illustrated strategy-game manual quality, tangible worn material, confident broad brushwork, expressive believable anatomy, clear face and silhouette, not a photo or cartoon. Person centered, facing slightly toward the viewer's right; entire head and hair fit with generous 10% top margin; shoulders occupy lower two thirds. A soft dark mottled ink-teal background, no scenery, no vignette border, no frame, no text, no logos. Warm muted brass light from upper left and cool soft shadow; parchment skin highlights, ink navy, muted moss, old gold and verdigris palette. Background and lower corners remain quiet and dark. This is a cohesive set: identical framing, light direction, medium and restrained saturation. Commander: a seasoned middle-aged man with warm brown skin, closely cropped salt-and-pepper hair, a calm authoritative gaze, engraved practical steel half-plate, old brass fittings and a heavy ochre command cloak; one leather-gloved hand rests on the rolled end of a campaign map, and a small weathered standard finial behind one shoulder. A military leader rather than a king; no crown.",
+      "path": "images/heroes/commander.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2440637,
+      "sha256": "c245528902d8c093fa6bc8092f3c1395972d4f105685a14d9b137279b5491f45"
+    },
+    "warrior": {
+      "prompt": "Use case: stylized-concept. Production character portrait for the original dark fantasy strategy game Shardbound. Make ONE square 1024x1024 painted bust portrait, cropped at mid-chest. Hand-painted gouache and restrained oil glaze, sophisticated classic illustrated strategy-game manual quality, tangible worn material, confident broad brushwork, expressive believable anatomy, clear face and silhouette, not a photo or cartoon. Person centered, facing slightly toward the viewer's right; entire head and hair fit with generous 10% top margin; shoulders occupy lower two thirds. A soft dark mottled ink-teal background, no scenery, no vignette border, no frame, no text, no logos. Warm muted brass light from upper left and cool soft shadow; parchment skin highlights, ink navy, muted moss, old gold and verdigris palette. Background and lower corners remain quiet and dark. This is a cohesive set: identical framing, light direction, medium and restrained saturation. Warrior: a powerfully built middle-aged woman with dark brown skin, tightly braided black hair and an old small cheek scar, a steady fearless gaze, practical battered steel plate over chainmail, a deep teal wool cloak and leather straps; a broad sword held vertically beside one shoulder with its hand and guard visible. Grounded veteran armor, fully covered and functional.",
+      "path": "images/heroes/warrior.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2538851,
+      "sha256": "fe37716d0577c4f5bb9e3cb0f80b339f7b07c7d628fdfe00eaad8dbd705c4665"
+    },
+    "scout": {
+      "prompt": "Use case: stylized-concept. Production character portrait for the original dark fantasy strategy game Shardbound. Make ONE square 1024x1024 painted bust portrait, cropped at mid-chest. Hand-painted gouache and restrained oil glaze, sophisticated classic illustrated strategy-game manual quality, tangible worn material, confident broad brushwork, expressive believable anatomy, clear face and silhouette, not a photo or cartoon. Person centered, facing slightly toward the viewer's right; entire head and hair fit with generous 10% top margin; shoulders occupy lower two thirds. A soft dark mottled ink-teal background, no scenery, no vignette border, no frame, no text, no logos. Warm muted brass light from upper left and cool soft shadow; parchment skin highlights, ink navy, muted moss, old gold and verdigris palette. Background and lower corners remain quiet and dark. This is a cohesive set: identical framing, light direction, medium and restrained saturation. Scout: an alert lean young adult with olive skin, short dark tousled hair visible beneath a weathered deep moss-green hood, focused hazel eyes, a narrow face, worn layered leather armor, a muted teal neck scarf and quiver fletchings behind one shoulder; a curved ash bow enters the lower edge. A resourceful pathfinder, understated, neither glamorous nor sinister.",
+      "path": "images/heroes/scout.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2328511,
+      "sha256": "0bbcdc6f04ca0d1abbcc5163f1fd2ab6df344e7370785924c7c3feb931c0218e"
+    },
+    "wizard": {
+      "prompt": "Use case: stylized-concept. Production character portrait for the original dark fantasy strategy game Shardbound. Make ONE square 1024x1024 painted bust portrait, cropped at mid-chest. Hand-painted gouache and restrained oil glaze, sophisticated classic illustrated strategy-game manual quality, tangible worn material, confident broad brushwork, expressive believable anatomy, clear face and silhouette, not a photo or cartoon. Person centered, facing slightly toward the viewer's right; entire head and hair fit with generous 10% top margin; shoulders occupy lower two thirds. A soft dark mottled ink-teal background, no scenery, no vignette border, no frame, no text, no logos. Warm muted brass light from upper left and cool soft shadow; parchment skin highlights, ink navy, muted moss, old gold and verdigris palette. Background and lower corners remain quiet and dark. This is a cohesive set: identical framing, light direction, medium and restrained saturation. Wizard: an elderly man with pale weathered skin, long silver hair tied back and a short forked beard, thoughtful bright grey eyes, layered ink-blue wool robes with restrained old-brass embroidery, a teal mantle and an open leather-bound grimoire visible at the lower edge; a plain wooden staff topped by a small dim blue crystal beside one shoulder. Wise human traveler, no tall conical hat.",
+      "path": "images/heroes/wizard.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 2598176,
+      "sha256": "0de5aa26b65e81c83a3fe0df92076935896977865b34f357e03b50d328528461"
+    }
+  }
+}

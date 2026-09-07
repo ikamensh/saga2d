@@ -7,6 +7,29 @@ from tests.eador.test_battle_trace import relief_before_rally
 import pytest
 
 
+def test_previous_manual_damage_numbers_do_not_survive_a_resolved_enemy_phase(tmp_path):
+    """A phase replaces the prior hit's feedback, so moved units leave no floating ghost damage."""
+    from eador.app import create_game
+    from eador.scene import TitleScene
+    from tools.eador_ui import PlayerInput
+    game = create_game(backend='mock', save_dir=tmp_path)
+    try:
+        game.push(TitleScene(hero_class='Wizard'))
+        player = PlayerInput(game, finish_actions=False)
+        player.press('return'); player.press('x')
+        archer = next(unit for unit in player.state.battle.units if unit.team == 'player' and unit.can_pin)
+        player.order('battle.move', archer.id, (-1, 0))
+        target = player.state.battle.targets(archer.id)[0]
+        player.order('battle.attack', archer.id, target.id)
+        damage_numbers = lambda: [item['text'] for item in game.backend.texts
+                                  if item['text'].startswith(('+', '-')) and item['text'][1:].isdigit()]
+        assert damage_numbers()
+        player.press('e'); player.press('space')
+        assert not damage_numbers()
+    finally:
+        game.close()
+
+
 def test_playback_hit_sound_matches_damage_and_does_not_repeat_on_refresh(tmp_path):
     """A real ranged attack releases first; its one impact accompanies the visible HP change."""
     from eador.battle_playback_scene import BattlePlaybackScene

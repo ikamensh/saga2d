@@ -68,7 +68,7 @@ def test_music_cues_muting_and_saved_results_follow_player_events(tmp_path):
 
 
 def test_successful_move_hit_and_spells_have_their_own_cues(tmp_path):
-    """Actual tactics route their successful effects once, while a rejected cast uses refusal."""
+    """Actual tactics route their successful effects once; a disabled spent order stays silent."""
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
 
     def click(pos):
@@ -101,10 +101,11 @@ def test_successful_move_hit_and_spells_have_their_own_cues(tmp_path):
         press(game, '2')
         click(wounded.pos)
         assert cues(game)[-1] == 'heal'
-        # A deliberately invalid cast retains state and gives the refusal cue only.
+        # The spent caster's disabled Heal shortcut retains state and stays silent.
         before = game.scene.root.state.to_json()
+        count = len(cues(game))
         press(game, '2')
         click(wounded.pos)
-        assert game.scene.root.state.to_json() == before and cues(game)[-1] == 'refuse'
+        assert game.scene.root.state.to_json() == before and len(cues(game)) == count
     finally:
         game._teardown()
