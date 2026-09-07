@@ -26,3 +26,8 @@ Server restarts preserve acknowledged turn-based commands; sudden failure may
 roll Warband back to its last checkpoint (at most five seconds). Rooms expire
 15 minutes after losing a player. Competitive snapshots still contain the full
 world, so this is private friend play rather than ranked anti-cheat.
+
+Bounded follow-up fuzzing at the default 25% CPU budget passed: two Tribes AI
+games plus one random-input run; one Warband AI game plus one 100-input run.
+Their outputs are retained alongside this report. No game rule changes were
+required by these checks.

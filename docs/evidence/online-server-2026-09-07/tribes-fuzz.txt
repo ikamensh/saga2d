@@ -1,0 +1,2 @@
+AI games: 2 played, 0 failed, outcomes {'score': 2}
+monkey runs: 1 played, 0 failed
