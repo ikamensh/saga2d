@@ -1077,3 +1077,22 @@ the final example uses an opaque Help scene. The final native run uses 29 paced
 frames and closes both clients, its Game and local server.
 This advances the independent-consumer portion of G17; internet deployment and
 overall release acceptance are unchanged.
+
+## Presentation checkpoint and wrap — 2026-09-07
+
+Manual final blows now show their contacts before the result screen
+(**3488d50**, inspected frames in **5ae95d1**). Modal statistics, prices and
+utilities reuse icon/value controls (**c1a3df2**). Shared attack and hit motion
+adds a directional lunge, recoil and return, including retaliation and brief
+defeated-figure feedback; reduced motion leaves figures still.
+
+The [latest native preview](evidence/attack-motion/README.md) contains four cases,
+505 frames and four exact UI save/load checks. The related focused suite passed
+53 tests before the final casualty regression; all seven motion tests then
+passed on the final source. Native screenshots were inspected. No full-suite or
+package rebuild was performed for this checkpoint.
+
+Work stopped at the user's request to conserve credits. The
+[presentation handoff](presentation-handoff.md) records the boundary for a later
+session. The frozen **7b5562d** package predates these changes; human listening,
+playtests, Windows execution and all overall Early Access gates remain open.

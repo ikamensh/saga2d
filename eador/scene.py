@@ -1570,11 +1570,18 @@ class BattleScene(Screen):
     def _unit_center(self, unit):
         return self.grid.center(unit.pos)
 
-    def draw_effects(self):
+    def _feedback_event(self):
         if self.feedback:
-            from eador.battle_effects import draw_trace
+            from eador.battle_effects import trace_event
             started, trace = self.feedback
-            draw_trace(self, trace, self.clock - started, still=reduced_motion(self.game))
+            return trace_event(trace, self.clock - started)
+        return None, 0
+
+    def draw_effects(self):
+        from eador.battle_effects import draw_event
+        event, fraction = self._feedback_event()
+        if event:
+            draw_event(self, event, fraction, still=reduced_motion(self.game))
 
     def _unit_layer(self, unit):
         return 3
@@ -1643,14 +1650,21 @@ class BattleScene(Screen):
                     for neighbor in (corners[index - 1], corners[(index + 1) % 6]):
                         self.draw_line(px, py, px + (neighbor[0] - px) * .25,
                                        py + (neighbor[1] - py) * .25, GOLD, 2)
-        for u in sorted((u for u in b.units if u.hp > 0), key=lambda u: self.grid.center(u.pos)[1]):
+        from eador.battle_effects import attack_offset, lingering_units
+        event, fraction = self._feedback_event()
+        still = reduced_motion(self.game)
+        lingering = lingering_units(event, fraction, still=still)
+        for u in sorted((u for u in b.units if u.alive or u.id in lingering), key=lambda u: self.grid.center(u.pos)[1]):
             cx, cy = self._unit_center(u)
             size = self.grid.size
             if u.id in targets:
                 self.draw_circle(cx, cy + 7, 25, TEAL if self.targeting in ('heal', 'swap', 'rally') else RED)
             layer = self._unit_layer(u)
-            with self.screen_layer(layer):
-                art.piece(self, cx, cy + size * .22, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, size / 56),
+            dx, dy = attack_offset(event, u, self.grid, fraction, still=still)
+            # Only the miniature moves. Picking, health and tactical status stay
+            # on the original cell while its authoritative damage is immediate.
+            with self.screen_layer(max(5, layer) if dx or dy else layer):
+                art.piece(self, cx + dx, cy + dy + size * .22, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, size / 56),
                           selected=u.id == self.selected, spent=u.acted)
             with self.screen_layer(10):
                 if u.stance:

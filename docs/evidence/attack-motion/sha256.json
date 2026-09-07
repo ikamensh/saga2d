@@ -1,0 +1,11 @@
+{
+  "02-melee-and-retaliation-lunge.png": "d6e5d045c9339f4481fa17e7aeb7183676bff2f95b85b11ad0f29d5db23b6d44",
+  "03-melee-and-retaliation-recoil.png": "4b13230fe03faa234ca35d587d107e00ab062ca936fc647f6e0df88687f84f94",
+  "11-earned-final-arrow-recoil.png": "bd3a2f5ecc58c3f55812bb9b53a6926c1931b606630e44fb02cc2620f9942543",
+  "15-reduced-motion-melee-recoil.png": "4cd60ca36c6ffa41b53be99537877d385481c31a4e5f248a887b19d20f7f8ca9",
+  "README.md": "1ebbfeff95a373fa73e7dd92b6a205b73962125628a05dc2a2d6b1b86e499f10",
+  "encoder.log": "703bcdce42abf68c5865b9a24baf927e96de9ae1d61c993fe1e207e60c9026ac",
+  "gameplay.mp4": "cc25d4d59b638d9b091e599efabccd0c288acaef77f9afe3450f4e2ec02a302a",
+  "mock.json.gz": "d456aeff8d8df126abd23797420266bd4e5940d67647eb55e264300ea3e57204",
+  "native.json.gz": "0daef7e5d91824fb8a0524c2b3fdcf1982bd321580b712dbe67ed8d6ef8800ca"
+}

@@ -9,6 +9,46 @@ _CIRCLE = tuple((math.cos(i * math.tau / 16), math.sin(i * math.tau / 16)) for i
 _HITS = ('attack', 'pin', 'brace', 'retaliation', 'bolt')
 
 
+def trace_event(trace, elapsed):
+    """Sample the direct-order clock for miniature poses and contact effects."""
+    duration = min(.65, 1.4 / len(trace.events))
+    index = int(elapsed / duration)
+    return (trace.events[index], elapsed / duration - index) if index < len(trace.events) else (None, 0)
+
+
+def attack_offset(event, unit, grid, fraction, *, still=False):
+    """Lean into contact, recoil away from real damage, and return to the same hex."""
+    if still or event is None or event.kind not in _HITS or not 0 < fraction < 1:
+        return 0, 0
+    amount = 0
+    if unit.id == event.actor_id:
+        ranged = event.kind == 'bolt' or event.kind in ('attack', 'pin') and unit.attack_range > 1
+        reach = .12 if ranged else .32
+        amount = grid.size * reach * math.sin(fraction * math.pi)
+    elif (unit.id == event.target_id and .5 < fraction < .9
+          and event.after.unit(unit.id).hp < event.before.unit(unit.id).hp):
+        amount = grid.size * .18 * math.sin((fraction - .5) / .4 * math.pi)
+    if not amount:
+        return 0, 0
+    ax, ay = grid.center(event.before.unit(event.actor_id).pos)
+    tx, ty = grid.center(event.before.unit(event.target_id).pos)
+    distance = math.hypot(tx - ax, ty - ay)
+    return (tx - ax) / distance * amount, (ty - ay) / distance * amount
+
+
+def lingering_units(event, fraction, *, still=False):
+    """Retain recorded actors and brief death recoils for drawing, without restoring HP."""
+    if still or event is None or event.kind not in _HITS:
+        return ()
+    # A direct command can already have killed its actor in a later reaction.
+    # Keep its attack visible before showing that reaction, without popping it in.
+    actors = (event.actor_id,) if event.before.unit(event.actor_id).hp > 0 else ()
+    ident = event.target_id
+    if fraction < .9 and event.before.unit(ident).hp > 0 and event.after.unit(ident).hp <= 0:
+        return actors + (ident,)
+    return actors
+
+
 def _ring(scene, x, y, radius, color, *, width=2, flat=1):
     # Ground ellipses belong below feet and HP; upright impacts belong in front.
     with scene.screen_layer(2 if flat < 1 else 8):
@@ -128,12 +168,3 @@ def draw_event(scene, event, fraction, *, still=False):
     elif kind == 'guard':
         x, y = center(event.after, actor.id)
         _ring(scene, x, y, size * .4, (*GOLD[:3], 160), flat=1.15)
-
-
-def draw_trace(scene, trace, elapsed, *, still=False):
-    """Direct orders stay immediate; their latest trace gets at most 1.4 seconds of feedback."""
-    events = trace.events
-    duration = min(.65, 1.4 / len(events))
-    index = int(elapsed / duration)
-    if index < len(events):
-        draw_event(scene, events[index], elapsed / duration - index, still=still)

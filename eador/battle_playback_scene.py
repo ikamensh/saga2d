@@ -6,7 +6,6 @@ from saga2d import Column, Label
 
 from eador.battle import Battle, SmokeCloud
 from eador.battle_audio import event_cues
-from eador.battle_effects import draw_event
 from eador.preferences import reading_scale, reduced_motion
 from eador.scene import BattleScene, Screen
 from eador.style import GOLD, MUTED, TEAL, TEXT
@@ -122,7 +121,7 @@ class BattlePlaybackScene(BattleScene):
             side = "Enemy" if unit.team == "enemy" else "Your"
             lines.append(label(f'{side} {unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL))
         lines.extend([label('Watch each move, ability and reaction in order.'),
-                      label('Space, Enter or Esc finishes playback. Battle orders resume afterward.'),
+                      label('Space, Enter or Esc finishes playback.'),
                       label('Saving records the outcome of these orders. Loading skips their animation.', 11)])
         return Column(*lines, spacing=18)
 
@@ -143,16 +142,7 @@ class BattlePlaybackScene(BattleScene):
         self.parent.read_log()
 
     def _unit_center(self, unit):
-        still = reduced_motion(self.game)
-        x, y = self.playback.position(unit, self.grid, still=still)
-        event = self.playback.event
-        if not still and event.kind in ('attack', 'brace', 'retaliation') and unit.id == event.actor_id and unit.attack_range == 1:
-            tx, ty = self.grid.center(event.before.unit(event.target_id).pos)
-            distance = math.hypot(tx - x, ty - y)
-            amount = math.sin(min(1, self.playback.fraction * 2) * math.pi) * self.grid.size * .18
-            x += (tx - x) / distance * amount
-            y += (ty - y) / distance * amount
-        return x, y
+        return self.playback.position(unit, self.grid, still=reduced_motion(self.game))
 
     def _unit_layer(self, unit):
         event = self.playback.event
@@ -198,8 +188,8 @@ class BattlePlaybackScene(BattleScene):
         if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
             self.refresh()
 
-    def draw_effects(self):
-        draw_event(self, self.playback.event, self.playback.fraction, still=reduced_motion(self.game))
+    def _feedback_event(self):
+        return (None, 0) if self.playback.done else (self.playback.event, self.playback.fraction)
 
     def finish(self):
         if not self.finished:

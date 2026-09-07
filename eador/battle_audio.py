@@ -37,7 +37,7 @@ def event_cues(battle, event, hero_class):
 
 
 class AttackSounds:
-    """Drain direct attack sounds once, on the same elapsed clock as draw_trace.
+    """Drain direct attack sounds once, on the same elapsed clock as visual feedback.
 
     A newer order may replace the visual trace. Finish its already-earned contacts
     first, without starting late projectile releases. Discard this local object
