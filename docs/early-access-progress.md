@@ -909,3 +909,21 @@ Shardbound/Tribes fuzz checks. Native verification took 19.14 seconds wall and
 The assets are prebuilt; game frame caps remain 60 FPS active / 15 FPS inactive.
 This completes the requested icon pass without claiming a new release gate.
 Visuals and sound remain the priority. G01–G19 remain incomplete.
+
+## Character presentation and contact feedback — 2026-09-07
+
+**de91293**, integrated with current main in **38f770e**, adds four original
+painted hero portraits, clearer role equipment/materials for fourteen troop
+miniatures and four heroes, and Hero level/health/mana icons. Manual attacks now
+play each actual contact, including Brace and retaliation; ranged magical
+weapons share an arcane visual and sound. Phase transitions clear old damage
+numbers. The game uses existing framework primitives without new rules or APIs.
+
+[Final character evidence](evidence/character-presentation/README.md) retains
+18 inspected native frames, 59 input activations, two exact reloads, all eight
+earned relics at 125% and unchanged runtime hashes. The final run took 22.01
+seconds wall and 5.50 seconds CPU. Forty-five focused integrated tests pass,
+including exact portrait packaging and co-op socket orders. Bounded Shardbound
+and Tribes checks pass at the default CPU allowance. No packaged release or
+large acceptance matrix was repeated; audible artistic review remains open.
+**G01–G19 remain incomplete.**

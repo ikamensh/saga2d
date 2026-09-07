@@ -1,0 +1,31 @@
+Manual battle audio focused verification
+Worktree: /tmp/saga2d-characters-6b8fb09
+Backend: mock. No native or audible listening claim.
+
+Initial missing-contact tracer:
+  tests/eador/test_manual_battle_audio.py
+  1 failed in 0.13s: actual Archer shot played attack_arrow without attack_hit.
+After shared event mapping and root's scene integration:
+  1 passed in 0.10s.
+
+Final combined selection:
+  tests/eador/test_manual_battle_audio.py (16 cases)
+  tests/eador/test_game_audio.py (2 cases)
+  tests/eador/test_battle_playback_scene.py::test_playback_hit_sound_matches_damage_and_does_not_repeat_on_refresh
+  18 passed, 1 failed in 0.67s.
+  Failure: the pre-existing test expected refusal from a disabled spent-Heal shortcut.
+  Actual behavior: state unchanged and no new cue, matching the shipped disabled-order behavior.
+Root-authorized correction of that assertion; only corrected case rerun:
+  tests/eador/test_game_audio.py::test_successful_move_hit_and_spells_have_their_own_cues
+  1 passed in 0.13s (raw log: /tmp/shardbound-manual-audio-existing-case.log).
+All 19 selected cases passed across these two final invocations; no claim of a single final all-green invocation.
+
+Coverage: immediate authoritative state; manual release then contact once; real Brace,
+retaliation, and lethal pre-hit traces; one composite cue for Wizard/Adept/Acolyte ranged
+weapons in direct and playback views; rapid next order/end-turn contact flush; reload and
+retreat cancellation; terminal contact before result; redraw/reload non-repetition;
+existing spell and preference routing. Reaction arenas are explicitly authored fixtures,
+not earned campaign evidence. Magic specialist tests use actual funded purchases.
+
+No WAV/assets/composition changes. No runtime synthesis, timer, callback, model or framework changes.
+Execution slot handed to package_refresh_review after final process exit.

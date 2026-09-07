@@ -1,0 +1,2 @@
+AI games: 2 played, 0 failed, outcomes {'domination': 1, 'score': 1}
+monkey runs: 2 played, 0 failed

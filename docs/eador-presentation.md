@@ -73,6 +73,8 @@ timed to its visible state change. Reduced motion keeps stationary feedback.
 Damage and recovery labels fit within their hex; a fresh change replaces an
 older number at the same position. Ground rings remain beneath miniatures and
 persistent health labels.
+Starting an enemy phase clears the preceding manual damage numbers, so they
+cannot remain above an empty hex after a unit moves.
 
 Manual attacks now play each recorded contact, including Brace and retaliation.
 Arrows have a release followed by impact; Wizard, Rune Adept and Acolyte ranged
@@ -130,5 +132,8 @@ feedback, read-only playback and persistence. Final screenshots and receipts
 are retained in the [presentation evidence](evidence/presentation-pass/README.md).
 
 The Early Access gates remain open. Further visual work should test
-readability across longer, crowded battles. Human listening and playtest
-feedback remain part of assessing the game's presentation quality.
+readability across longer, crowded battles. The latest
+[character verification](evidence/character-presentation/README.md) covers all
+four portraits, specialist miniatures, equipment pages and manual hit feedback.
+Human listening and playtest feedback remain part of assessing the game's
+presentation quality.

@@ -1,0 +1,22 @@
+Revision: 38f770e; cooperative CPU allowance: 25%; selection:
+tests/eador/test_character_presentation.py
+tests/eador/test_miniature_art.py
+tests/eador/test_manual_battle_audio.py
+tests/eador/test_game_audio.py
+tests/eador/test_title_reading.py
+tests/packaging/test_eador_build.py
+tests/eador/test_hero_reading.py::test_equipment_reports_checkpoint_failure_without_hiding_or_overwriting_it
+tests/eador/test_hero_reading.py::test_hero_reading_preserves_visible_relic_and_saved_equipment_through_reflow
+tests/eador/test_hero_reading.py::test_paid_tower_infusion_uses_the_visible_quote_once_and_saves_the_result
+tests/eador/test_battle_playback_scene.py::test_previous_manual_damage_numbers_do_not_survive_a_resolved_enemy_phase
+tests/eador/test_battle_playback_scene.py::test_playback_hit_sound_matches_damage_and_does_not_repeat_on_refresh
+tests/eador/test_battle_playback_scene.py::test_direct_shot_has_bounded_feedback_and_keeps_orders_and_saves_live
+tests/eador/test_battle_playback_scene.py::test_shot_transients_leave_persistent_health_on_top
+tests/eador/test_battle_playback_scene.py::test_quick_heal_replaces_the_previous_damage_number_at_its_hex
+tests/eador/test_battle_playback_scene.py::test_enemy_playback_is_read_only_and_visible_finish_restores_ordinary_controls
+tests/eador/test_battle_playback_scene.py::test_playback_transition_discards_queued_orders_and_loading_uses_the_resolved_save
+tests/eador/test_battle_playback_scene.py::test_settings_and_history_pause_playback_without_changing_the_resolved_save
+tests/test_multiplayer_games.py::test_shardbound_partners_share_campaign_and_tactical_orders
+tests/test_multiplayer_games.py::test_guest_controls_reach_host_and_accepted_state_returns_to_the_scene[eador]
+.............................................                            [100%]
+45 passed in 10.35s

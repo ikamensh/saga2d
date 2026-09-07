@@ -1,0 +1,1 @@
+18 captures; 59 inputs; 2 exact reloads (pyglet): docs/evidence/character-presentation/native
