@@ -1,0 +1,71 @@
+{
+  "all_inspected_native_frames": {
+    "eador-about-credits.png": "f0b5b95d645ab1f7ea427b82c24f00131a5204a170d4db3ce8937008c688c2be",
+    "eador-about.png": "52a5b2e34d95aca3887afa3149bac861f6212b102de859e768dd79caed0bb056",
+    "eador-join.png": "28631d182ffc5b822b70213e080e1bee8bf16908166aaf6ac53ccadd74a9ef3b",
+    "eador-lan.png": "a54e2a11f51be5d30bef69385f9b916a82d7b1c2630f7fce7007150220ad129d",
+    "eador-match.png": "790298d5cba033140b41c78ddebcdf03f0f8f0a6ec7205275e82a3520582aba0",
+    "eador-online.png": "64e7d3e275c5925bac779511778b018d2b1f486524fe275f08982a38f56e6ae3",
+    "eador-rejoined.png": "ed5645da1e2196a0d31aeb6434bdd2374321c9ee8fbc227d6780b1af952902c0",
+    "eador-resume.png": "305ca2cb09eb9867b8f8bdf12dd89871554b849cf5c763c8930f16db471b9e58",
+    "eador-room.png": "83893f15b720c2843c4963151e37cc414720efd23a8a32aeb829bf4a6fc7b38a"
+  },
+  "assertions": [
+    "Fresh isolated profile has no saved online seat",
+    "Online is selected by default and explicit LAN remains available",
+    "Create room displays server-assigned room before the partner joins",
+    "Typing the code and Enter joins as guest seat 1",
+    "Native X enters site battle, G guards, E advances authoritative battle to round 2",
+    "Closing and reopening the game preserves the private saved seat",
+    "Rejoin last room restores the same room, guest seat 1 and battle round 2"
+  ],
+  "command": "SAGA2D_SILENT=1 .venv/bin/python tools/verify_online.py /tmp/saga2d-online-public-final-eador-isolated --game eador --server wss://games.tachyon-ai.eu/play",
+  "date": "2026-09-07",
+  "display_wake": "caffeinate -d -u -t 90 kept the native display active.",
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "platform": "macOS native pyglet, 1280x800 logical window, 2560x1600 Retina captures, paced at 30 FPS",
+  "production_source_commit": "cbdb7f33c64ecf5fd62f33a1ff35243cfccaae9a",
+  "profile_isolation_fix": "The verifier now passes <temporary-profile>/saves as save_dir, keeping Settings and the private seat inside the temporary profile. The initial saved-seat assertion and the full public native journey passed. Both online menu integration tests also passed after applying the same isolated layout.",
+  "purpose": "Repeat the full Shardbound public journey after merging the new icon controls from main; earlier all-three evidence is preserved in the parent directory.",
+  "result": "passed",
+  "retained": {
+    "eador-about-credits.png": {
+      "native_sha256": "f0b5b95d645ab1f7ea427b82c24f00131a5204a170d4db3ce8937008c688c2be",
+      "sha256": "abdde3a13fe8ea74f1a6ae181212c6fa7df194512faf055672046d7938699390"
+    },
+    "eador-join.png": {
+      "native_sha256": "28631d182ffc5b822b70213e080e1bee8bf16908166aaf6ac53ccadd74a9ef3b",
+      "sha256": "26ae2e0f0320a08726f8bf9b32c1ca80ac95326a465e482ac620978e9f3b4bbc"
+    },
+    "eador-online.png": {
+      "native_sha256": "64e7d3e275c5925bac779511778b018d2b1f486524fe275f08982a38f56e6ae3",
+      "sha256": "e652514b803322f7910d332e864bef14083076ca0faadade3ac2f23145f4cc52"
+    },
+    "eador-rejoined.png": {
+      "native_sha256": "ed5645da1e2196a0d31aeb6434bdd2374321c9ee8fbc227d6780b1af952902c0",
+      "sha256": "301c62a014ef5434b9eb4391a0d737ad3a09d958221a06697a631fd8de8b3de3"
+    },
+    "eador-resume.png": {
+      "native_sha256": "305ca2cb09eb9867b8f8bdf12dd89871554b849cf5c763c8930f16db471b9e58",
+      "sha256": "f31a176b35637bc88dc90f2c7937ae4772107f9e312e96d4e245cbfe265ca066"
+    },
+    "eador-room.png": {
+      "native_sha256": "83893f15b720c2843c4963151e37cc414720efd23a8a32aeb829bf4a6fc7b38a",
+      "sha256": "aca20ef3e0e37b8f024ca4c60bf003d50bba8c99ad05b55d3d489230b8f140c4"
+    }
+  },
+  "retained_resolution": [
+    1280,
+    800
+  ],
+  "retained_transform": "Pillow LANCZOS downsample from native frames; optimized PNG.",
+  "server_release": "8c888b423fc06f57a5b9e3f2f62c0bfe2fd9980122e36056f24953e5625e248f",
+  "source_files_unchanged_after_verification": true,
+  "source_snapshot": "source-sha256.json",
+  "topology": "One native graphical client and one OnlineClient partner on the same Mac, both connected through public TLS to the remote dedicated server.",
+  "verifier_source_commit": "ea40cfb9e13e46bdca28f736cbf32e2cef69626f",
+  "visual_review": {
+    "findings": "All menu and lobby states are readable and unclipped. New battle controls and unit-stat icons render cleanly. Rejoined battle retains round 2. About confirms online co-op and displays the websockets credit.",
+    "native_frames_inspected": 9
+  }
+}
