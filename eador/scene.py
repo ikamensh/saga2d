@@ -455,19 +455,33 @@ class ShardScene(Screen):
         y = column(details, width, x, 108) + 14
         self.button('Hero is here' if here else 'Intercept expedition' if expedition_here else
                     'Travel here' if p.owner == 'player' else 'Invade province',
-                    x, y, width, self.travel, hotkey='Enter', primary=True,
+                    x, y, width - 92, self.travel, hotkey='Enter', primary=True, icon='travel',
                     enabled=can_act and adjacent and not blocked)
         current = s.provinces[s.hero.pos]
-        self.button('Explore current province', x, y + 50, width, self.explore, hotkey='X',
+        explore_hint = ('This shard has ended.' if not playing else
+                        'No actions left. End the turn to explore.' if not s.actions_left else
+                        'Capture your current province before exploring.' if current.owner != 'player' else
+                        'There is no adventure site in your current province.' if current.site is None else
+                        'This adventure site is already cleared.' if current.explored else
+                        f'Explore {current.site} in {current.name}. Spends one campaign action.')
+        self.button('Explore current province', x + width - 80, y, 80, self.explore, hotkey='X',
+                    icon='explore', show_text=False, tooltip='Explore (X). ' + explore_hint,
                     enabled=can_act and current.owner == 'player' and current.site is not None and not current.explored)
         y = column([label('YOUR STRONGHOLD', width, size=10, color=MUTED),
                     label(f'{len(s.buildings)}/{len(BUILDINGS)} buildings · {len(s.hero.army)}/{s.hero.max_army} troops',
-                          width, color=MUTED)], width, x, y + 114) + 12
-        self.button('Build stronghold', x, y, width, self.buildings, hotkey='B', enabled=playing)
-        self.button('Recruit troops', x, y + 50, width, self.recruitment, hotkey='R', enabled=playing)
-        self.button('End turn', x, y + 116, width, self.end_turn, hotkey='E', primary=True, enabled=playing)
-        column([label(f'Turn {s.turn} · Rival expedition: {len(s.rival.army)} troops', width,
-                      size=11, color=MUTED)], width, x, y + 172)
+                          width, color=MUTED)], width, x, y + 70) + 12
+        self.button('Build stronghold', x, y, 80, self.buildings, hotkey='B', enabled=playing,
+                    icon='build', show_text=False,
+                    tooltip='Build stronghold (B). Review permanent buildings and their costs.')
+        self.button('Recruit troops', x + 92, y, 80, self.recruitment, hotkey='R', enabled=playing,
+                    icon='recruit', show_text=False,
+                    tooltip='Recruit troops (R). Review troops, abilities and recruitment costs.')
+        self.button('End turn', x, y + 70, 80, self.end_turn, hotkey='E', primary=True, enabled=playing,
+                    icon='end_turn', show_text=False,
+                    tooltip='End turn (E). Collect income, pay upkeep, recover and let the rival act.')
+        column([label(f'Turn {s.turn}', width - 96, size=13, color=GOLD)], width - 96, x + 96, y + 80)
+        column([label(f'Rival expedition: {len(s.rival.army)} troops', width,
+                      size=11, color=MUTED)], width, x, y + 126)
 
         self.icon_button('guide', 'Guide', 788, 28, self.help, hotkey='F1')
         self.icon_button('hero', 'Hero', 878, 28, self.hero_details, hotkey='H')
@@ -483,14 +497,16 @@ class ShardScene(Screen):
         # Current objectives sit outside the map; selecting a province does not replace them.
         y = self._summary_bottom + 12
         if s.campaign:
-            self.button('Campaign', 644, y, 210, self.campaign_plan, shortcut='J')
+            self.icon_button('campaign', 'Campaign', 644, y, self.campaign_plan, shortcut='J',
+                             tooltip='Campaign (J). Review your route, objectives and veteran carryover.')
             y = column([label(f'Stage {s.campaign.stage} of 3', 210, size=11, color=MUTED),
                         label(s.campaign.objective, 210, size=12, color=GOLD)],
                        210, 644, y + 48) + 12
         else:
             y = column([label('Capture Duskspire', 210, size=14, color=GOLD, serif=True),
                         label('Protect Westwatch', 210, size=12, color=MUTED)], 210, 644, y) + 16
-        self.button('Rival plan', 644, y, 210, self.rival_details, shortcut='V')
+        self.icon_button('rival', 'Rival plan', 644, y, self.rival_details, shortcut='V',
+                         tooltip='Rival plan (V). Inspect the expedition, its troops and next attack.')
         column([label(rival_order(s), 210, size=11, color=RED)], 210, 644, y + 50)
 
         army_top = h - 158
@@ -506,15 +522,17 @@ class ShardScene(Screen):
             left, top = round(cx - name_width / 2), round(cy + self.grid.size * .60 - name_height)
             column([name], name_width, left, top)
             self._province_name_boxes.append((left, top - 1, name_width, name_height + 2))
-        column([label('YOUR ARMY · Level / health', self.edge - 52, size=10, color=MUTED)],
+        column([label('YOUR ARMY', self.edge - 52, size=10, color=MUTED)],
                self.edge - 52, 26, army_top)
         army_y = army_top + round(22 * scale)
         self._army_art = []
         for i, troop in enumerate(s.hero.army):
             xx = 26 + i * 118
             name_bottom = column([label(UNITS[troop.kind].name, 112, size=11)], 112, xx, army_y)
-            status_bottom = column([label(f'Lv {troop.level}\n{troop.hp}/{troop.max_hp}', 70, size=10, color=MUTED)],
-                                   70, xx + 42, name_bottom + 4)
+            status_bottom = column([metric('level', troop.level, width=76, size=10 * scale, color=MUTED),
+                                    metric('health', f'{troop.hp}/{troop.max_hp}', width=76,
+                                           size=10 * scale, color=TEAL)],
+                                   76, xx + 36, name_bottom + 4, spacing=3)
             self._army_art.append((xx, name_bottom + 38, status_bottom + 3))
         self._notice = self.message or ('Settings could not be read. Open Text size to recover them.'
                                        if self.preferences.error else s.log[-1])
@@ -1035,24 +1053,33 @@ class BattleScene(Screen):
                                  style=PRIMARY if self.targeting == name else None,
                                  tooltip=self.order_hint(),
                                  enabled=bool(getattr(b, name + '_targets')(selected.id))))
-        orders.append(Button('Brace' if selected and selected.can_brace else 'Guard', width=116, height=40,
+        bracing = bool(selected and selected.can_brace)
+        orders.append(Button('Brace' if bracing else 'Guard', width=116 if bracing else 80, height=40,
+                             icon=icon_path('guard'), show_text=bracing, icon_size=26,
                              shortcut='G', on_click=self.guard,
-                             tooltip=('Select a unit to defend.' if selected is None else
+                             tooltip=('Brace (G). ' if bracing else 'Guard (G). ') +
+                                     ('Select a unit to defend.' if selected is None else
                                       'This unit has already acted. End the round to regain an order.' if selected.acted else
-                                      'Brace: strike first against the next adjacent melee attacker. Spends this unit’s order.' if selected.can_brace else
-                                      'Guard: gain 2 defense until your next turn. Spends this unit’s order.'),
+                                      'Strike first against the next adjacent melee attacker. Spends this unit’s order.' if selected.can_brace else
+                                      'Gain 2 defense until your next turn. Spends this unit’s order.'),
                              enabled=selected is not None and not selected.acted and b.outcome is None))
         sections.append(Row(*orders, spacing=12))
         healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
+
+        def spell(name, title, key, caster=0):
+            cost = b.spell_cost(name)
+            return Column(Button(f'{title} · {cost} mana', width=144, height=40,
+                                 icon=icon_path(name), show_text=False, icon_size=26,
+                                 hotkey=key, on_click=self.bolt if name == 'bolt' else self.heal,
+                                 tooltip=f'{title} ({key}) · {cost} mana. ' + self.spell_hint(name, caster),
+                                 enabled=bool(b.spell_targets(name, caster_id=caster))),
+                          metric('mana', cost, width=144, size=11 * scale, color=BLUE,
+                                 detail=f'Cost per {title} cast.'), spacing=6)
+
         sections.append(Column(metric('mana', b.mana, width=300, size=12 * scale, color=BLUE,
                                       detail='Shared pool for the hero and allied spellcasters.'),
-                               Button(f"Arcane Bolt · {b.spell_cost('bolt')} mana", width=300, height=40,
-                                      hotkey='1', on_click=self.bolt, tooltip=self.spell_hint('bolt'),
-                                      enabled=bool(b.spell_targets('bolt'))),
-                               Button(f"{healer} Heal · {b.spell_cost('heal')} mana", width=300, height=40,
-                                      hotkey='2', on_click=self.heal,
-                                      tooltip=self.spell_hint('heal', self.heal_caster),
-                                      enabled=bool(b.spell_targets('heal', caster_id=self.heal_caster))),
+                               Row(spell('bolt', 'Arcane Bolt', '1'),
+                                   spell('heal', f'{healer} Heal', '2', self.heal_caster), spacing=12),
                                label('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else
                                      'Spells spend the hero’s order.', size=11), spacing=8))
         sections.append(self._forecast())
@@ -1202,7 +1229,9 @@ class BattleScene(Screen):
 
     def _phase_button(self, x, y):
         self.button("End battle round", x, y, 300, self.end_turn,
-                    hotkey="E", primary=True, enabled=self.battle.outcome is None)
+                    hotkey="E", primary=True, enabled=self.battle.outcome is None,
+                    icon='end_turn', show_text=False,
+                    tooltip='End battle round (E). Finish your orders and let the enemy act.')
 
     def play_phase(self, command):
         from eador.battle_playback_scene import BattlePlaybackScene

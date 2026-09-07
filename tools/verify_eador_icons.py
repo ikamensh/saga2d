@@ -1,7 +1,8 @@
 """Exercise icon controls with the same bounded input journey in mock and native UI.
 
-One fresh Wizard shard, ordinary toolbar visits, one legal Archer attack and
-two exact save/reloads. No campaign policy or independent first-run claim.
+One fresh linked Wizard opening, ordinary toolbar visits, an End turn, one
+legal Archer attack and Guard, plus exact save/reloads. The Explore icon and
+key are compared from the same real quicksave. No independent first-run claim.
 """
 import argparse
 import hashlib
@@ -41,11 +42,13 @@ def verify(output, *, backend='pyglet', budget=None):
     output.mkdir(parents=True, exist_ok=True)
     budget = budget or CpuBudget()
     started, cpu_started = time.monotonic(), time.process_time()
-    report = {'scope': 'Directed icon presentation and input; silent audio; fresh seed 7 Wizard.',
+    report = {'scope': 'Directed icon presentation and input; silent audio; fresh linked seed 7 Wizard opening.',
               'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'source_sha256': _fingerprints(), 'captures': [], 'tooltips': [],
-              'toolbar_visits': [], 'metrics': [], 'disabled_checks': [], 'state_checks': 0,
+              'toolbar_visits': [], 'metrics': [], 'army_metrics': [], 'spell_costs': [],
+              'travel_controls': [], 'command_checks': [], 'aiming_checks': [],
+              'disabled_checks': [], 'state_checks': 0, 'comparison_loads': 0,
               'cpu_percent_requested': budget.percent}
     with TemporaryDirectory(prefix='shardbound-icons-') as directory:
         game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')
@@ -147,20 +150,46 @@ def verify(output, *, backend='pyglet', budget=None):
                 press('escape')
                 assert game.scene is scene
                 unchanged(before)
-            report['toolbar_visits'].append({'label': label, 'opened': opened, 'shortcut': shortcut})
+            report['toolbar_visits'].append({'label': label, 'opened': opened, 'shortcut': shortcut,
+                                             'reading_size': reading_scale(game)})
 
-        def metric(name, expected_value):
-            row = game.scene.ui.find(lambda item: isinstance(item, Row) and
-                                     any(isinstance(child, Image) and child.image == icon_path(name)
-                                         for child in item.children))
-            assert row is not None, f'No icon/value metric for {name}'
+        def metric(name, expected_value, *, index=0, detail=None, collection='metrics'):
+            rows = [item for item in game.scene.ui.walk() if isinstance(item, Row) and
+                    any(isinstance(child, Image) and child.image == icon_path(name)
+                        for child in item.children) and (detail is None or detail in (item.tooltip or ''))]
+            assert len(rows) > index, f'No icon/value metric for {name} #{index}'
+            row = rows[index]
             image = next(child for child in row.children if isinstance(child, Image))
             value = next(child for child in row.children if isinstance(child, Label))
             assert value.text == str(expected_value), f'{name} no longer shows its authoritative value'
+            for item in (row, image, value):
+                x, y, width, height = item.bounds
+                assert 0 <= x < x + width <= game.width and 0 <= y < y + height <= game.height
             tip = hover(image, owner=row)
             assert hover(value, owner=row) == tip, f'{name} tooltip depends on hitting the tiny icon'
-            report['metrics'].append({'scene': type(game.scene).__name__, 'name': name,
-                                      'value': value.text, 'tooltip': tip})
+            report[collection].append({'scene': type(game.scene).__name__, 'name': name,
+                                       'value': value.text, 'tooltip': tip,
+                                       'reading_size': reading_scale(game)})
+
+        def army_metrics():
+            for index, troop in enumerate(player.state.hero.army, 1):
+                metric('level', troop.level, index=index, collection='army_metrics')
+                metric('health', f'{troop.hp}/{troop.max_hp}', index=index, collection='army_metrics')
+
+        def travel_label(label):
+            item = control(label)
+            assert item.icon == icon_path('travel') and item.show_text
+            if backend == 'mock':
+                x, y, width, height = item.bounds
+                assert any(text['text'] == label and x <= text['x'] < x + width and y <= text['y'] < y + height
+                           for text in game.backend.texts), 'The contextual travel verb disappeared'
+            report['travel_controls'].append({'label': label, 'reading_size': reading_scale(game)})
+
+        def command_check(command, expected, via):
+            assert state() == expected.to_json(), f'{command} {via} differs from the public command'
+            report['command_checks'].append({'command': command, 'via': via,
+                                             'after_sha256': hashlib.sha256(state().encode()).hexdigest()})
+            budget.checkpoint()
 
         def capture(name):
             before = state()
@@ -196,7 +225,7 @@ def verify(output, *, backend='pyglet', budget=None):
             visit('Settings', 'o')
             visit('Text size', 't')
             capture('title-icons')
-            press('return')
+            player.button('Linked campaign')
             assert type(game.scene) is ShardScene
             s = player.state
             for name, value in {'gold': s.gold, 'crystals': s.crystals, 'income': f'+{s.income}',
@@ -204,14 +233,24 @@ def verify(output, *, backend='pyglet', budget=None):
                                 'actions': s.actions_left, 'health': f'{s.hero.hp} / {s.hero.max_hp}',
                                 'mana': f'{s.hero.mana} / {s.hero.max_mana}'}.items():
                 metric(name, value)
+            army_metrics()
             hide_tip()
             capture('campaign-icons')
             metric('gold', s.gold)
             capture('campaign-gold-tooltip')
             hide_tip()
             for label, shortcut in (('Guide', 'f1'), ('Hero', 'h'), ('Codex', 'c'),
-                                    ('Save', None), ('Load', 'f6')):
+                                    ('Save', None), ('Load', 'f6'), ('Build stronghold', 'b'),
+                                    ('Recruit troops', 'r'), ('Rival plan', 'v'), ('Campaign', 'j')):
                 visit(label, shortcut)
+            travel_label('Hero is here')
+            before = state()
+            destination = next(pos for pos in s.grid.neighbors(s.hero.pos)
+                               if s.provinces[pos].owner == 'neutral')
+            player.click(*player.root.grid.center(destination))
+            travel_label('Invade province')
+            unchanged(before)
+            press('home')
             before = state()
             hover(icon('Text size'))
             player.button('Text size')
@@ -221,12 +260,31 @@ def verify(output, *, backend='pyglet', budget=None):
             hide_tip()
             for label in ('Guide', 'Hero', 'Codex', 'Text size', 'Save', 'Load'):
                 icon(label)
+            for label, shortcut in (('Build stronghold', 'b'), ('Recruit troops', 'r'),
+                                    ('Rival plan', 'v'), ('Campaign', 'j')):
+                visit(label, shortcut)
+            army_metrics()
+            travel_label('Hero is here')
+            hide_tip()
             capture('campaign-reading-125')
+            hover(icon('End turn'))
+            expected = State.from_json(state()); expected.end_turn()
+            player.button('End turn')
+            command_check('end_turn', expected, 'icon')
+            before = state()
             player.reload(before)
             budget.checkpoint()
             expected = State.from_json(state()); expected.explore()
+            hover(icon('Explore current province'))
+            player.button('Explore current province')
+            assert type(game.scene) is BattleScene
+            command_check('explore', expected, 'icon')
+            press('f9')
+            assert type(game.scene) is ShardScene and state() == before
+            report['comparison_loads'] += 1
             player.order('explore')
-            assert type(game.scene) is BattleScene and state() == expected.to_json()
+            assert type(game.scene) is BattleScene
+            command_check('explore', expected, 'key X after baseline reload')
             selected = player.state.battle.unit(game.scene.selected)
             for name, value in {'health': f'{selected.hp} / {selected.max_hp}', 'attack': selected.attack,
                                 'defense': selected.effective_defense, 'move': selected.effective_move_range,
@@ -235,24 +293,59 @@ def verify(output, *, backend='pyglet', budget=None):
             hide_tip()
             for label in ('Guide', 'Codex', 'Save', 'Text size'):
                 hover(icon(label))
+            for spell, title in (('bolt', 'Arcane Bolt'), ('heal', 'Hero Heal')):
+                cost = player.state.battle.spell_cost(spell)
+                hover(icon(f'{title} · {cost} mana'))
+                metric('mana', cost, detail=f'Cost per {title} cast.')
+                report['spell_costs'].append({'spell': spell, 'cost': cost, 'reading_size': reading_scale(game)})
             hide_tip()
             capture('battle-icons')
             heal = next(item for item in game.scene.ui.walk() if isinstance(item, Button) and 'Heal ·' in item.text)
             disabled(heal.text, '2', 'disabled-heal-tooltip')
             archer = next(unit for unit in player.state.battle.units if unit.team == 'player' and unit.can_pin)
+            archer_start = archer.pos
             expected = State.from_json(state()); expected.battle.move(archer.id, (-1, 0))
             player.order('battle.move', archer.id, (-1, 0))
-            assert state() == expected.to_json()
+            command_check('battle.move', expected, 'board click')
             target = player.state.battle.targets(archer.id)[0]
             expected.battle.attack(archer.id, target.id)
             player.order('battle.attack', archer.id, target.id)
-            assert state() == expected.to_json()
+            command_check('battle.attack', expected, 'board click')
             disabled('Pin', 'p', 'disabled-pin-tooltip')
+            # The opening Bolt is out of range. The Archer has now cleared this
+            # adjacent hex, so the hero can legally step forward before aiming.
+            assert archer_start in player.state.battle.reachable(0)
+            expected.battle.move(0, archer_start)
+            player.order('battle.move', 0, archer_start)
+            command_check('battle.move', expected, 'hero follows the Archer')
+            bolt = f'Arcane Bolt · {player.state.battle.spell_cost("bolt")} mana'
+            before = state()
+            player.button(bolt)
+            assert game.scene.targeting == 'bolt'
+            click_targets = tuple(unit.id for unit in game.scene.action_targets())
+            assert click_targets
+            press('escape')
+            assert game.scene.targeting is None
+            press('1')
+            assert game.scene.targeting == 'bolt'
+            assert tuple(unit.id for unit in game.scene.action_targets()) == click_targets
+            press('escape')
+            assert game.scene.targeting is None
+            unchanged(before)
+            report['aiming_checks'].append({'label': 'Arcane Bolt', 'targets': click_targets, 'shortcut': '1'})
+            militia = next(unit for unit in player.state.battle.units
+                           if unit.team == 'player' and unit.kind == 'militia' and not unit.acted)
+            player.click(*game.scene.grid.center(militia.pos))
+            assert game.scene.selected == militia.id
+            hover(icon('Guard'))
+            expected.battle.guard(militia.id)
+            player.button('Guard')
+            command_check('battle.guard', expected, 'icon')
             player.reload(expected.to_json())
             hide_tip()
             capture('battle-reloaded')
             report.update(inputs=player.events, input_activations=len(player.events),
-                          exact_save_reloads=player.reloads, final_state=state(),
+                          exact_save_reloads=player.reloads + report['comparison_loads'], final_state=state(),
                           final_reading_size=reading_scale(game))
         finally:
             game.close()

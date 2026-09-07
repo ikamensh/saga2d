@@ -48,6 +48,13 @@ icons beside their exact numeric values. Battle attack, defense, movement,
 flight and range do the same. Hovering either the symbol or its value reveals
 the meaning; tooltips follow the 100% or 125% reading preference across scenes.
 The Hero panel also uses level, health and mana icons beside exact values.
+The map army strip uses the same level and health readouts beside each miniature.
+Explore, Build, Recruit, Campaign and Rival use compact icons with keycaps;
+End turn sits separately beside the current turn number. Travel keeps its
+changing verb (Travel, Invade or Intercept) beside its route icon.
+Guard, Bolt, Heal and End battle round use icons. Each spell's mana cost stays
+visible beneath its button, with the spell and caster named in its tooltip.
+Brace and the sentence explaining which caster spends an order remain explicit.
 Battle Auto-play, Retreat and Log use compact icons with A/T/L keycaps and
 hover explanations. The footer shows the latest event; L opens its full history.
 Order guidance spans the board, with an M reader for unusually long messages.
@@ -59,8 +66,8 @@ charge, learned spell, mana or legal target.
 The 34 original geometric icons share the ink, brass and verdigris palette.
 They are prebuilt transparent PNGs with distinct silhouettes at small sizes;
 their [provenance](../eador/assets/VISUAL-PROVENANCE.md) and hash manifest ship
-with the game. Primary actions, objectives, costs, order consumption and
-consequences retain clear text.
+with the game. Objectives, numeric costs, order consumption and consequences
+remain visible; hover explanations retain the names of compact actions.
 
 ## Sound and action feedback
 
@@ -131,10 +138,11 @@ Observatory army, records the actual orders, and checks that every observed
 frame leaves resolved campaign state unchanged. It is a presentation check,
 not an independent first run or a campaign-depth demonstration.
 
-The icon journey starts a fresh Wizard shard, visits utilities by pointer and
-keyboard, checks numeric readouts, applies larger reading size, tries disabled
-orders, makes a legal Archer move/attack and compares two exact save/load
-round trips. It captures ten native frames. The separate framework demo
+The icon journey starts a fresh Wizard campaign, visits utilities and map
+menus by pointer and keyboard, checks numeric readouts, applies larger reading
+size, tries disabled orders, makes legal campaign and battle orders and checks
+exact save/load round trips. It captures native map, battle and tooltip frames.
+The separate framework demo
 exercises the same primitives without a Shardbound asset or model dependency.
 
 The focused checks cover audio export/decoding and loop seams, deterministic
