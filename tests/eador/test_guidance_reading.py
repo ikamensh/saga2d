@@ -98,7 +98,12 @@ def test_all_paid_briefings_and_wounded_retries_fit_both_sizes_without_committin
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')
     try:
         rows = verify_briefing_matrix(game)
-        assert any(row['blocked'] for row in rows)
+        fee_rows = [row for row in rows if row['screen'] == 'crossing-fee-blocked']
+        assert {row['approach'] for row in fee_rows} == {'direct', 'guided'}
+        assert {row['percent'] for row in fee_rows} == {100, 125}
+        assert all(row['blocked'] == ('This approach needs 20 gold and 0 crystals.'
+                                      if row['approach'] == 'guided' else None)
+                   for row in fee_rows)
         assert {row['percent'] for row in rows} == {100, 125}
     finally:
         game._teardown()

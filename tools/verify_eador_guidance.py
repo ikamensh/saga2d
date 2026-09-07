@@ -89,7 +89,8 @@ def prepared_briefings(*, budget=None):
     causeway.resolve_battle()
     cases.append(('causeway-wounded', causeway, None))
     poor = prepare_adventure(budget=budget)
-    poor.build('archery'); poor.build('market'); poor.recruit('ranger')
+    # The moved Crossing is reached with 80 gold: Archery leaves enough for one guide.
+    poor.build('archery')
     poor.explore(approach='guided'); poor.retreat()
     assert poor.actions_left and poor.gold < poor.adventure_approaches()[1].gold_cost
     cases.append(('crossing-fee-blocked', poor, None))
