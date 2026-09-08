@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "frozen": true,
+  "version": "0.1.0-preview.1",
+  "source_commit": "184584007ac3071dcb901e323a16bcd727877c14",
+  "executable": "/Applications/Shardbound.app/Contents/MacOS/Shardbound",
+  "executable_sha256": "0819572da4c9681fa1f8dc89b63df5eb5154c2a09e97b652fcd85a2ec2cc9f74",
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "online": {
+    "create_join": true,
+    "shared_realm_orders": true,
+    "private_seat_rejoin": true,
+    "campaign_retention_seconds": 604800
+  }
+}

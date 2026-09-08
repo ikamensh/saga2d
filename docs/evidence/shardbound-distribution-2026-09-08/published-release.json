@@ -1,0 +1,25 @@
+{
+  "release": "https://github.com/ikamensh/saga2d/releases/tag/shardbound-v0.1.0-preview.1",
+  "source_commit": "184584007ac3071dcb901e323a16bcd727877c14",
+  "fetched_at_utc": "2026-09-08T13:49:46Z",
+  "fetched_without_authentication": true,
+  "files": {
+    "Shardbound-0.1.0-preview.1-windows-x64-portable.zip": {
+      "bytes": 64333408,
+      "sha256": "ad9e87ca2fe2591a080380f76050ecca7ab2dd365537cfea11db0eddecaed6a4"
+    },
+    "Shardbound-0.1.0-preview.1-windows-x64-setup.exe": {
+      "bytes": 50961934,
+      "sha256": "34bf23da4d5be088d6b35a20e93d38320b01dc87cc43dc509574fd36ba8d4fdc"
+    },
+    "Shardbound-0.1.0-preview.1-darwin-arm64-app.zip": {
+      "bytes": 49304080,
+      "sha256": "0fcff24640abba882b8ee32b87345809246bf23d51d80c853dab345cd56a6376"
+    }
+  },
+  "windows_ci_run": "https://github.com/ikamensh/saga2d/actions/runs/34232824100",
+  "installed_mac_app": {
+    "path": "/Applications/Shardbound.app",
+    "executable_sha256": "0819572da4c9681fa1f8dc89b63df5eb5154c2a09e97b652fcd85a2ec2cc9f74"
+  }
+}

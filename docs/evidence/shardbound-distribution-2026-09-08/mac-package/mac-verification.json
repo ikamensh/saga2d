@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "portable": {
+    "loopback": {
+      "campaign_retention_seconds": 604800,
+      "create_join": true,
+      "private_seat_rejoin": true,
+      "shared_realm_orders": true
+    },
+    "smoke": {
+      "audio_catalogue_decoded_and_played": true,
+      "frozen": true,
+      "native_input_journey": true,
+      "shard_controls_verified": true
+    },
+    "smoke_images": [
+      "portable-smoke-about-1.png",
+      "portable-smoke-about-2.png",
+      "portable-smoke-battle.png",
+      "portable-smoke-codex.png",
+      "portable-smoke-guide.png",
+      "portable-smoke-rival.png",
+      "portable-smoke-settings.png",
+      "portable-smoke-shard-125.png",
+      "portable-smoke-shard-hover-125.png",
+      "portable-smoke-shard.png",
+      "portable-smoke.png"
+    ]
+  },
+  "scope": "Isolated profile on the named host; loopback authority plus the requested public endpoint",
+  "source_commit": "184584007ac3071dcb901e323a16bcd727877c14",
+  "version": "0.1.0-preview.1"
+}

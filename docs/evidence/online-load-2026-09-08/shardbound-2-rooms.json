@@ -1,0 +1,36 @@
+{
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "game": "shardbound",
+  "rooms": [
+    {
+      "code": "j3dsgj9d9cnh",
+      "ready_seconds": 0.444
+    },
+    {
+      "code": "1tfxhedrq9xf",
+      "ready_seconds": 0.425
+    }
+  ],
+  "health_ms": [
+    102.6,
+    85.8,
+    81.1,
+    90.7,
+    102.4
+  ],
+  "seats": 4,
+  "load_seconds": 45.0,
+  "orders_sent": 178,
+  "order_errors": 22,
+  "error_examples": [
+    "This campaign has ended. Start a new shard."
+  ],
+  "state_updates": 134,
+  "state_gap_ms": {
+    "p50": 1008.3,
+    "p95": 1047.2,
+    "max": 1124.9
+  },
+  "disconnects": 0,
+  "total_seconds": 45.9
+}

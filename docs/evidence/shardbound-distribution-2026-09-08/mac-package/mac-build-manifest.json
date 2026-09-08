@@ -1,0 +1,1869 @@
+{
+  "architecture": "arm64",
+  "artifacts": [
+    {
+      "bytes": 49304080,
+      "file": "Shardbound-0.1.0-preview.1-darwin-arm64-app.zip",
+      "sha256": "0fcff24640abba882b8ee32b87345809246bf23d51d80c853dab345cd56a6376"
+    }
+  ],
+  "built_at_utc": "2026-09-08T13:35:28.776632+00:00",
+  "files": {
+    "Contents/Frameworks/PIL/_avif.cpython-313-darwin.so": {
+      "bytes": 73648,
+      "sha256": "3c0b3e77e6a01eb85c844078e9b587a798f452bdc35047156302e6fc6569e176"
+    },
+    "Contents/Frameworks/PIL/_imaging.cpython-313-darwin.so": {
+      "bytes": 568912,
+      "sha256": "162763c34abf84083da9d45b06b202d9884e2e9e69e2a77900c43d2edab2cd1a"
+    },
+    "Contents/Frameworks/PIL/_imagingcms.cpython-313-darwin.so": {
+      "bytes": 98032,
+      "sha256": "82f60321fac918d2a32181cbf9429808ca8e99960169d0f7b764a0e4e444a041"
+    },
+    "Contents/Frameworks/PIL/_imagingmath.cpython-313-darwin.so": {
+      "bytes": 73680,
+      "sha256": "b89997e20e527934efb8ace709bd33d35ed148883576e2d5d83deb6564245368"
+    },
+    "Contents/Frameworks/PIL/_imagingtk.cpython-313-darwin.so": {
+      "bytes": 70528,
+      "sha256": "b3210177cfbe572418714950116a8149c67c21ef68686b9845578671f3cd1887"
+    },
+    "Contents/Frameworks/PIL/_webp.cpython-313-darwin.so": {
+      "bytes": 75904,
+      "sha256": "1eb3f8073af3a8ce803154351b12aec78535eb0c98fa511250023b35aa2145db"
+    },
+    "Contents/Frameworks/base_library.zip": {
+      "symlink": "../Resources/base_library.zip"
+    },
+    "Contents/Frameworks/eador": {
+      "symlink": "../Resources/eador"
+    },
+    "Contents/Frameworks/libXau.6.dylib": {
+      "bytes": 69760,
+      "sha256": "05fc2b5c80a5f0f55cfc17c3828fc31dc1d478ab5e8d75efae629b2ca206bd55"
+    },
+    "Contents/Frameworks/libavif.16.3.0.dylib": {
+      "bytes": 2965872,
+      "sha256": "19eb899f3027324983a096d8edf348c64debfc1091c40d674375ec77aa4ab012"
+    },
+    "Contents/Frameworks/libjpeg.62.4.0.dylib": {
+      "bytes": 649856,
+      "sha256": "9c6a8498bf5e4beeb0aafcea0d1ff3ec2a9a1f7b2b6a98a3a216ac38b814af89"
+    },
+    "Contents/Frameworks/liblcms2.2.dylib": {
+      "bytes": 521728,
+      "sha256": "62b15b6b525a61bf2cbaaa2038d571bc1909dab0d678d6a1b49d0c720a8a06da"
+    },
+    "Contents/Frameworks/liblzma.5.dylib": {
+      "bytes": 323328,
+      "sha256": "09fd13961cfae96f20b253e12a55c0f0a97c752306298843ea7a512cdfe4ade6"
+    },
+    "Contents/Frameworks/libopenjp2.2.5.4.dylib": {
+      "bytes": 662656,
+      "sha256": "b96d82ef1d7276b9f7224552fa78c9d0a297cefdc47f81b1b5a170efa3a2c942"
+    },
+    "Contents/Frameworks/libpython3.13.dylib": {
+      "bytes": 18376000,
+      "sha256": "95c00b6787a9418a28507c6f3e4ab7a18d153d76022e913829e6874e124b2164"
+    },
+    "Contents/Frameworks/libsharpyuv.0.dylib": {
+      "bytes": 85856,
+      "sha256": "e49cd1d0edeaf830cc01d980a29b29cf8b8356f4b66ad209145bc4bb8d79434a"
+    },
+    "Contents/Frameworks/libtiff.6.dylib": {
+      "bytes": 766048,
+      "sha256": "5cb927573ac461a2b8c9c48cb1e9ecc2cd2f2d785d298b765af760a3403d5a47"
+    },
+    "Contents/Frameworks/libwebp.7.dylib": {
+      "bytes": 512832,
+      "sha256": "c5bfadd36a7cc5f59224a4a1d457ed04f9529a3434ecde8b72a28ebc36a55425"
+    },
+    "Contents/Frameworks/libwebpdemux.2.dylib": {
+      "bytes": 69616,
+      "sha256": "07c41f47c7b18325092a0b3630788d2f75bce2321ef5e2e346292106c90cf026"
+    },
+    "Contents/Frameworks/libwebpmux.3.dylib": {
+      "bytes": 105856,
+      "sha256": "aa92a2fee6b2fb7233c1c40afafd0e44524231aebd8e29392cb1fde160437630"
+    },
+    "Contents/Frameworks/libxcb.1.1.0.dylib": {
+      "bytes": 276160,
+      "sha256": "2bed8a7817105810bc3369b6b1531bf0854a98335d665f84d110b01f0a5a9eb3"
+    },
+    "Contents/Frameworks/libz.1.3.1.zlib-ng.dylib": {
+      "bytes": 176416,
+      "sha256": "165e1429d2229ed6ca112b84abe59a47714f366606adaf9e79e2701b93d03986"
+    },
+    "Contents/Frameworks/numpy-2.4.2.dist-info": {
+      "symlink": "../Resources/numpy-2.4.2.dist-info"
+    },
+    "Contents/Frameworks/numpy/_core/_multiarray_tests.cpython-313-darwin.so": {
+      "bytes": 138160,
+      "sha256": "3afd452301ad63e2d99ca19a4ce34d8286cf0c67545ebc363ec5445d2a457c45"
+    },
+    "Contents/Frameworks/numpy/_core/_multiarray_umath.cpython-313-darwin.so": {
+      "bytes": 3674656,
+      "sha256": "780b7fe3505decab3b794a1a63f6a9b0ea04fc70a5a20f61f0bf6beb6b5013da"
+    },
+    "Contents/Frameworks/numpy/fft/_pocketfft_umath.cpython-313-darwin.so": {
+      "bytes": 346096,
+      "sha256": "746230666b2259ccc2305611c6fd1164d8bbf6c0d98e76aa8c54f33b563521cc"
+    },
+    "Contents/Frameworks/numpy/linalg/_umath_linalg.cpython-313-darwin.so": {
+      "bytes": 172064,
+      "sha256": "4c16c45df13a10774ec1d5d43a38fdfeeed8aee818d6bb6ed761c45f8272c724"
+    },
+    "Contents/Frameworks/numpy/random/_bounded_integers.cpython-313-darwin.so": {
+      "bytes": 296224,
+      "sha256": "27918bf9a5235c0e9951a61b4a461317bb81d0519f39147e742f566dff8dac6b"
+    },
+    "Contents/Frameworks/numpy/random/_common.cpython-313-darwin.so": {
+      "bytes": 248736,
+      "sha256": "211cc10231e346df73cc7b24bd30bf59dd8a22daf659203963e4cce01b5cf006"
+    },
+    "Contents/Frameworks/numpy/random/_generator.cpython-313-darwin.so": {
+      "bytes": 665584,
+      "sha256": "b6c3673974088ef86d000f9e5c667294fdc1ac676e4ca26067c737993166d296"
+    },
+    "Contents/Frameworks/numpy/random/_mt19937.cpython-313-darwin.so": {
+      "bytes": 149520,
+      "sha256": "e11bd9a5d19fcbce9ba7122b17233866e21fd9e1546d76b6f3435cfa7828124f"
+    },
+    "Contents/Frameworks/numpy/random/_pcg64.cpython-313-darwin.so": {
+      "bytes": 150704,
+      "sha256": "e32db547d8c25433260be66cb1330c2215c68cdac5adc4fb825ad930c3911f3e"
+    },
+    "Contents/Frameworks/numpy/random/_philox.cpython-313-darwin.so": {
+      "bytes": 133088,
+      "sha256": "487de5e70d548baaa320cbc4abd4e9b3ffb7694ef871f27bd3599e19763bafa5"
+    },
+    "Contents/Frameworks/numpy/random/_sfc64.cpython-313-darwin.so": {
+      "bytes": 114768,
+      "sha256": "029491f651fca5ea703fcc73b2a527512732b540894c92c31931747f7569eefc"
+    },
+    "Contents/Frameworks/numpy/random/bit_generator.cpython-313-darwin.so": {
+      "bytes": 206816,
+      "sha256": "a403c0811891f38daf3acf883681c80a0d8ca02b2565fae74a4e547553399fef"
+    },
+    "Contents/Frameworks/numpy/random/mtrand.cpython-313-darwin.so": {
+      "bytes": 542736,
+      "sha256": "36521a359df48d238de68826be034a0aff85f5c70516b8d3a64a8a9803786785"
+    },
+    "Contents/Frameworks/release": {
+      "symlink": "../Resources/release"
+    },
+    "Contents/Frameworks/saga2d": {
+      "symlink": "../Resources/saga2d"
+    },
+    "Contents/Frameworks/websockets-17.1.dist-info": {
+      "symlink": "../Resources/websockets-17.1.dist-info"
+    },
+    "Contents/Frameworks/websockets/speedups.cpython-313-darwin.so": {
+      "bytes": 69184,
+      "sha256": "7987309f97614fb4e750f83dc2e30ec2805b7aad4f262a0c88a8bc391453c45a"
+    },
+    "Contents/Info.plist": {
+      "bytes": 848,
+      "sha256": "6a36dddea196c99d546f51185e048ca8906a602399ec74752b56629320f227d8"
+    },
+    "Contents/MacOS/Shardbound": {
+      "bytes": 7714208,
+      "sha256": "0819572da4c9681fa1f8dc89b63df5eb5154c2a09e97b652fcd85a2ec2cc9f74"
+    },
+    "Contents/Resources/PIL": {
+      "symlink": "../Frameworks/PIL"
+    },
+    "Contents/Resources/base_library.zip": {
+      "bytes": 1397246,
+      "sha256": "b00b3c2058da7a39bf2b7e4faab689fe862d1222aec3a0941716b16c68cfb694"
+    },
+    "Contents/Resources/eador/README.md": {
+      "bytes": 30246,
+      "sha256": "283746802cd3a0af4cb47f21d5b22ab1360cc738ed1432243f9a10cababbc9a5"
+    },
+    "Contents/Resources/eador/assets/AUDIO-PROVENANCE.md": {
+      "bytes": 1139,
+      "sha256": "e0348efca12caa9b8b7b8b8606dcfa9270e078dc4137f9c88889fb855b9e6c1d"
+    },
+    "Contents/Resources/eador/assets/VISUAL-PROVENANCE.md": {
+      "bytes": 3145,
+      "sha256": "5bb3cf6324bf791222de264f15d000133535461812e5f5e8e120da62cb1becce"
+    },
+    "Contents/Resources/eador/assets/audio-manifest.json": {
+      "bytes": 8853,
+      "sha256": "8ec7dfb0f8e1fdc9fcc00cc288b706f88c1f23855583e5d14f892d23375af49d"
+    },
+    "Contents/Resources/eador/assets/hero-portrait-provenance.json": {
+      "bytes": 6652,
+      "sha256": "5b596154fda1f5e5382dcea868d60452c80daff496d55c851e73754d04c28b1b"
+    },
+    "Contents/Resources/eador/assets/icon-art-manifest.json": {
+      "bytes": 7666,
+      "sha256": "e8c31a07b93d1217a4127cb6f740c20e25e2e542350de09c02313e3e03cef3f1"
+    },
+    "Contents/Resources/eador/assets/images/heroes/commander.png": {
+      "bytes": 2440637,
+      "sha256": "c245528902d8c093fa6bc8092f3c1395972d4f105685a14d9b137279b5491f45"
+    },
+    "Contents/Resources/eador/assets/images/heroes/scout.png": {
+      "bytes": 2328511,
+      "sha256": "0bbcdc6f04ca0d1abbcc5163f1fd2ab6df344e7370785924c7c3feb931c0218e"
+    },
+    "Contents/Resources/eador/assets/images/heroes/warrior.png": {
+      "bytes": 2538851,
+      "sha256": "fe37716d0577c4f5bb9e3cb0f80b339f7b07c7d628fdfe00eaad8dbd705c4665"
+    },
+    "Contents/Resources/eador/assets/images/heroes/wizard.png": {
+      "bytes": 2598176,
+      "sha256": "0de5aa26b65e81c83a3fe0df92076935896977865b34f357e03b50d328528461"
+    },
+    "Contents/Resources/eador/assets/images/icons/actions.png": {
+      "bytes": 7477,
+      "sha256": "5561ab301db9672da8239a1b3366235a407de9aed5f7b350434d5d159328ab2e"
+    },
+    "Contents/Resources/eador/assets/images/icons/attack.png": {
+      "bytes": 4428,
+      "sha256": "3318a527cd0538890402a20f8e8cd404efce07a200bd1f121ee3bb51745a9ea4"
+    },
+    "Contents/Resources/eador/assets/images/icons/auto_play.png": {
+      "bytes": 3725,
+      "sha256": "b27332596a62cdeae3517fcdd42a2cdb7c05e9fc908d5c094fe88b83c9576017"
+    },
+    "Contents/Resources/eador/assets/images/icons/bolt.png": {
+      "bytes": 5452,
+      "sha256": "1dbe4ba2240bd69ba38f7cf1c6da133bd2d95cc4cf37c6c43e81fbce82396155"
+    },
+    "Contents/Resources/eador/assets/images/icons/build.png": {
+      "bytes": 6152,
+      "sha256": "499841393d2cd335a4f0bf3cb918eca5535022e78d0f9a30bfcc7fccdcd2fc1a"
+    },
+    "Contents/Resources/eador/assets/images/icons/campaign.png": {
+      "bytes": 5801,
+      "sha256": "51d6d850866eb08c17c4971b05c39cbcc8f7379f26d9a37c5d29f054cc43b649"
+    },
+    "Contents/Resources/eador/assets/images/icons/codex.png": {
+      "bytes": 4896,
+      "sha256": "53d5ea1a6f032dc61c75d769284db64f9ff0ea335588068b5ff2b663c449f371"
+    },
+    "Contents/Resources/eador/assets/images/icons/crystals.png": {
+      "bytes": 6994,
+      "sha256": "c2256a0eeef776e78cfb72c9f4cc31457ea040cd2d79b2b8728f9486bbb87a96"
+    },
+    "Contents/Resources/eador/assets/images/icons/defense.png": {
+      "bytes": 4991,
+      "sha256": "184d8ed8b260fca1f1fbc756cfaf5c4bc11b4295f348a843b5236f114810c81b"
+    },
+    "Contents/Resources/eador/assets/images/icons/end_turn.png": {
+      "bytes": 9392,
+      "sha256": "04e52857c64066f964a67def878b57f5500243f1dc7ec23b2bec12a275a1bba1"
+    },
+    "Contents/Resources/eador/assets/images/icons/explore.png": {
+      "bytes": 10733,
+      "sha256": "39f0bce78310d0b6a0b9e70588c0af9131234caf3764359a00fa677b076565ef"
+    },
+    "Contents/Resources/eador/assets/images/icons/fly.png": {
+      "bytes": 7884,
+      "sha256": "af1b7ef8802ea730ae10475f0cd7fbbfa006ee681338bf120dda568ffe985321"
+    },
+    "Contents/Resources/eador/assets/images/icons/gold.png": {
+      "bytes": 9637,
+      "sha256": "ec6c2d6a969e5c2ff2d490fd5b8a9e2e120c95d82bc6bdc559e2285ba981faaa"
+    },
+    "Contents/Resources/eador/assets/images/icons/guard.png": {
+      "bytes": 5630,
+      "sha256": "a8be20c3d6e3e6abbf215dc8336399bb61e22c4f373d8e2b7b3205ce4d1eb401"
+    },
+    "Contents/Resources/eador/assets/images/icons/guide.png": {
+      "bytes": 10816,
+      "sha256": "4e3d53992a3e8ef414aa8fa54c2d57ab4728967b7c07235ed3190947b66f4999"
+    },
+    "Contents/Resources/eador/assets/images/icons/heal.png": {
+      "bytes": 2174,
+      "sha256": "d8acbecc0150af57b7aef7e2f5de980dcef3434fd5ccc943f1f7168f8e838a5e"
+    },
+    "Contents/Resources/eador/assets/images/icons/health.png": {
+      "bytes": 5843,
+      "sha256": "46af5d2ccab32bc9161f2458b07d7c63371759b8d2dd34220765eac6e4e7a20b"
+    },
+    "Contents/Resources/eador/assets/images/icons/hero.png": {
+      "bytes": 6744,
+      "sha256": "2b1cacacf15de9e11db2b46fdba2859e18fa85984b9d32e5f2701bb07eb0a750"
+    },
+    "Contents/Resources/eador/assets/images/icons/income.png": {
+      "bytes": 9414,
+      "sha256": "82a51816976b20fc57c9bb025f687ee0d27e47f7d932a2589a3527096a4e8ebe"
+    },
+    "Contents/Resources/eador/assets/images/icons/level.png": {
+      "bytes": 5773,
+      "sha256": "7d74a93556380d3fbb882ec6dcddcb032a8f7e95721c6e9f90b134edc15bd986"
+    },
+    "Contents/Resources/eador/assets/images/icons/load.png": {
+      "bytes": 3204,
+      "sha256": "a37b617e745386bb800aef5283743c5dcb9c565615935a85edfbaca3a2a5f9f6"
+    },
+    "Contents/Resources/eador/assets/images/icons/log.png": {
+      "bytes": 4812,
+      "sha256": "5ad836a2ca31518408df855b050f4659a19dbba67c936fbce06a8aaac868cb2f"
+    },
+    "Contents/Resources/eador/assets/images/icons/mana.png": {
+      "bytes": 6754,
+      "sha256": "6a4be3e7af0e0b7e42b3b4c35615f6f5722fcabab1628ff944ca402dc2bb3a71"
+    },
+    "Contents/Resources/eador/assets/images/icons/move.png": {
+      "bytes": 4152,
+      "sha256": "3e5853e4e481c2e58656d67f5aa1c094f3f5ae2a4c24791f01b75bc04ef76503"
+    },
+    "Contents/Resources/eador/assets/images/icons/range.png": {
+      "bytes": 10480,
+      "sha256": "9ff734aafee00c0c526183865e44d930461619c578d040fe7a4e66a89e53e5e4"
+    },
+    "Contents/Resources/eador/assets/images/icons/recruit.png": {
+      "bytes": 6784,
+      "sha256": "04f044fd92b2aa890b7eb85e37a5fd6a003683d0fcaf4402e05b2ecf0b74a6dc"
+    },
+    "Contents/Resources/eador/assets/images/icons/retreat.png": {
+      "bytes": 3315,
+      "sha256": "3d172d15fe883460366e72fa838129f02651a48a4cd449198193b5e0befe8b76"
+    },
+    "Contents/Resources/eador/assets/images/icons/rival.png": {
+      "bytes": 3072,
+      "sha256": "f4345c256d2a8b69b561221ec8371a8a34eaa7eedeb575de44a5cb2cbc635472"
+    },
+    "Contents/Resources/eador/assets/images/icons/save.png": {
+      "bytes": 3194,
+      "sha256": "7c14dee9d1efabcd3ae8d2c3d0157eef0bab6201f9c7615574be4dc28fa67100"
+    },
+    "Contents/Resources/eador/assets/images/icons/settings.png": {
+      "bytes": 8235,
+      "sha256": "4fbe3f8b26992bd372eb59fa122672ee5f7f36409bb31894e62de08f632680b9"
+    },
+    "Contents/Resources/eador/assets/images/icons/text_size.png": {
+      "bytes": 7752,
+      "sha256": "766c1e659157ac00b208f482c2f85da9a6485a116f3c5a0d44e02899309cd53c"
+    },
+    "Contents/Resources/eador/assets/images/icons/travel.png": {
+      "bytes": 5144,
+      "sha256": "d3a97581b28191f0783eaa07f941676f6895e2c9a2640ff868c3e470dc98018a"
+    },
+    "Contents/Resources/eador/assets/images/icons/upkeep.png": {
+      "bytes": 9404,
+      "sha256": "8ffc88d9fc05abcbea4cbd08c4c76b4e5e3c12693b9b3d042464720f742c0995"
+    },
+    "Contents/Resources/eador/assets/images/icons/xp.png": {
+      "bytes": 5978,
+      "sha256": "39202683502f2c8cf34e7f1567ae9834fc073dec0a78595cc74a185dcf181134"
+    },
+    "Contents/Resources/eador/assets/images/shard-atmosphere.png": {
+      "bytes": 1616451,
+      "sha256": "35a9cb77b7292b049751ab4d950170a6726d5d5534a1555c9b7e50447e465de7"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-forest-0.png": {
+      "bytes": 72010,
+      "sha256": "7061ecd14a7aad299f1349a470ca1b97c74ebf8bef264fb0b45b468213ea8079"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-forest-1.png": {
+      "bytes": 71622,
+      "sha256": "1cee1fbc954839be8d9a2fb0630a68bdd76fe585d835db88f8b24765e0971d0d"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-forest-2.png": {
+      "bytes": 71920,
+      "sha256": "3b2e32eaec66ffcb93e9ba0dcbf9306540550bfeb4cadd0052e313f43256813b"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-forest-3.png": {
+      "bytes": 71906,
+      "sha256": "4638bd01d89a04aac189469024cc11bc4f89047b561ff732725011ef2aab323e"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-hills-0.png": {
+      "bytes": 73486,
+      "sha256": "77ed3dd37766278b9dddb762268c24d6cf0bb69f9c789021a11be1dce06f106d"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-hills-1.png": {
+      "bytes": 73381,
+      "sha256": "31b5afdec074fd4a521d1febd051c5480bb0b1302d90c178dde148b819a8d1f0"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-hills-2.png": {
+      "bytes": 73019,
+      "sha256": "0f2f7f1bd461e17b4bd6c3d2cfae4de98573360927fee3fbdfb86705631ad534"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-hills-3.png": {
+      "bytes": 72823,
+      "sha256": "2cb09971ad232d7e56dd54b0fb1b28421c17c0200edbeab47b36d12b490e57ce"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-marsh-0.png": {
+      "bytes": 70920,
+      "sha256": "5b6e0cab4264aa37d96b7f6ca91a31c3344ea1332f038f19963d4796a9b4d310"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-marsh-1.png": {
+      "bytes": 70773,
+      "sha256": "b49001b64168fd8642d2b5c325aeb9e8efbd0b0b197669838034c3590e10abe7"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-marsh-2.png": {
+      "bytes": 71042,
+      "sha256": "6725429e8505e1e2e42e5dc25b31485cc5b56b8f0f0cb9e72446755a1b59e859"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-marsh-3.png": {
+      "bytes": 71035,
+      "sha256": "71ff474cf61409ec0e8605d973d5d140aa69ea457b02165dcd15987e154019fc"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-mountains-0.png": {
+      "bytes": 69564,
+      "sha256": "078c3267eb260ec53344563ebb40267cf9acbb8467ad2ec02b3653ef05295e90"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-mountains-1.png": {
+      "bytes": 68774,
+      "sha256": "fe96307731a250b86ee5d4b760f48badad507d5cda7fc75131a417c76e764825"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-mountains-2.png": {
+      "bytes": 70034,
+      "sha256": "581861f57791be76f48d1b9716c88840f83b23a4cc704558c5e669e09dcfb941"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-mountains-3.png": {
+      "bytes": 69184,
+      "sha256": "dec31b395496eb924b39e754845cb08316725cd184dbaa9d18b761b5e241b7bb"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-plains-0.png": {
+      "bytes": 68833,
+      "sha256": "dbbf2c76690163da7ce27926ce3dac7eb1950e37475e05ab56baee6450208f12"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-plains-1.png": {
+      "bytes": 69368,
+      "sha256": "2297a3f0ddb057f0e6edcc9d328ffe821ae6d87e9fbf2bc79f7b78635ba7311a"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-plains-2.png": {
+      "bytes": 68878,
+      "sha256": "0f8b165a71c87e3f52f3ac572e4c9e020adefc2cfe4c180cdbb79e5686a7f9f1"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-plains-3.png": {
+      "bytes": 69072,
+      "sha256": "5cdcc2d4d82db558fe52472e62b98c751cbe948c56d81891c95cd06f7a004ffc"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-water-0.png": {
+      "bytes": 64062,
+      "sha256": "c4a203c9183e3ca103ca1487870160f494470578a13bcea7429a3ebb4ca2a7d7"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-water-1.png": {
+      "bytes": 64117,
+      "sha256": "e61896d9d21aa564a40c94aef33c9b5e805a47b320d388257f1768499ead78da"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-water-2.png": {
+      "bytes": 63997,
+      "sha256": "cf000d221341adb3b20fb36548d9fbd610801175f2593dda4946738cbfe0d098"
+    },
+    "Contents/Resources/eador/assets/images/terrain/ground-water-3.png": {
+      "bytes": 63882,
+      "sha256": "0541293455aa7711ea71785491cc995d722ca22feb6cea7512dfac4a3358bc2a"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-forest-0.png": {
+      "bytes": 89969,
+      "sha256": "f60ab785b2db063e1842e201f7fdff2694e4df6ccc52840ebcdfd7c756419930"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-forest-1.png": {
+      "bytes": 90766,
+      "sha256": "850ae9cc39f2030fa5dfe6914724107ddcd8a6e3322dc2e2f4f42adbd54212d4"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-forest-2.png": {
+      "bytes": 90350,
+      "sha256": "020bac21dab93472b7942ad7af6c33197509c88b301050e4b8fb4b9272bd200e"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-forest-3.png": {
+      "bytes": 90710,
+      "sha256": "35ef80e8e815e3551d46cb9a6a7142de5db9479c12a62a8917132759b57a4b5f"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-hills-0.png": {
+      "bytes": 84998,
+      "sha256": "61b2c5503d0391913e754b585baf16189c60816add8ffa4adfe7a422d06c1425"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-hills-1.png": {
+      "bytes": 85409,
+      "sha256": "4e860120bfbdd0c77a0c50327d7660dc147656cd37d5c983fd22976b78b79d25"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-hills-2.png": {
+      "bytes": 86540,
+      "sha256": "d133f5cf72cec8ff6860189404a2f3d5d20b56195acfa370ac4f88ad8eaf6a54"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-hills-3.png": {
+      "bytes": 85647,
+      "sha256": "8fc624d8a9696ef558a3ceec7fe09000124c12f5ae3dfef1ee54c64f44630c1f"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-marsh-0.png": {
+      "bytes": 84249,
+      "sha256": "8e22d06f2f8d8d422876e963cb1e37fa4660af9cd8750f861d3ffc95a02f8bde"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-marsh-1.png": {
+      "bytes": 83992,
+      "sha256": "4fd3a94330053fff9c5fd78633f35cf8241e5124c12ae0ebe5abd6ee1cc536cc"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-marsh-2.png": {
+      "bytes": 82550,
+      "sha256": "0ba256efd429bd9d582e187c52b9bb3c24dbf5cf08561d19d47bed55da4b5a7b"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-marsh-3.png": {
+      "bytes": 84415,
+      "sha256": "54ef736ea5e68147c8b001ef896426511bae9ce829dc269048724245176e62ea"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-mountains-0.png": {
+      "bytes": 77882,
+      "sha256": "28cbde1a675534c3def2f75f28ac97bc15696d17b31feeb1fe2c66f15a6d58b3"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-mountains-1.png": {
+      "bytes": 79331,
+      "sha256": "63e4fb81f4d2448981c76ac52a4b32a839cd9cc0afe24a72ea0831f415e0dcaf"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-mountains-2.png": {
+      "bytes": 78907,
+      "sha256": "a2536649188d507754e5772995986ec66e87398014082319a9da36d23dd8de16"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-mountains-3.png": {
+      "bytes": 77481,
+      "sha256": "6fd7a017a5f0c798ea09e2c78108051fc72c6f7738247274599af3822d655939"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-plains-0.png": {
+      "bytes": 91077,
+      "sha256": "b1562ec703a35454812726a48ccfb64e5a2cbfdeaf31ba6957567e0e1b1eca26"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-plains-1.png": {
+      "bytes": 90540,
+      "sha256": "94dd6db1e5cd271e3af9127f8a8c94499624631a2d2e342e16d98a801a1a73bb"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-plains-2.png": {
+      "bytes": 91041,
+      "sha256": "85d04d14fd3839fcbd030c65692895c01aed6ce12b6260dd7062baeb67c46d39"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-plains-3.png": {
+      "bytes": 91275,
+      "sha256": "975012e7b5768601257db828864c9b3a055fc5a6109fced773a5699944115a4f"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-water-0.png": {
+      "bytes": 81471,
+      "sha256": "1be815f40ed90397e1dde16ff1577df9a63c7ffc653ea72adeec9004c30af22f"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-water-1.png": {
+      "bytes": 81013,
+      "sha256": "fc27c4d5a0cbdb77b08d232a6cb732fd2065974880c067de79b61cff33639c15"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-water-2.png": {
+      "bytes": 81368,
+      "sha256": "6d0fb6809b2d79f830a8b4ce846d3789c75596657bffe23c69c3bb29f81a4d92"
+    },
+    "Contents/Resources/eador/assets/images/terrain/province-water-3.png": {
+      "bytes": 81639,
+      "sha256": "1c4629580c064e5c29bee871030208009efd49768eee6448ba55d7e4bc1ab036"
+    },
+    "Contents/Resources/eador/assets/music/battle.wav": {
+      "bytes": 5644844,
+      "sha256": "2ca436c4e9c805bf368608754e7cc4f8f02c9df4ecd52917ea96e60e9ee9750d"
+    },
+    "Contents/Resources/eador/assets/music/campaign.wav": {
+      "bytes": 8467244,
+      "sha256": "771d3d1cb73e5a9068d7d253ce81af4c491c615cbcca57ae0795c011a7e8fc67"
+    },
+    "Contents/Resources/eador/assets/sounds/attack_arrow.wav": {
+      "bytes": 26944,
+      "sha256": "99fbe5c9483ebe4bd75e7e4fd31711885a2e671fe1025c79b306a78fc4b359e5"
+    },
+    "Contents/Resources/eador/assets/sounds/attack_heavy.wav": {
+      "bytes": 44320,
+      "sha256": "770f6b5cb41e1616dac95349ae740bba1e2d0af62a8a3722e0df3d64f705ac12"
+    },
+    "Contents/Resources/eador/assets/sounds/attack_hit.wav": {
+      "bytes": 27386,
+      "sha256": "359f020027cef8a8fa67047172971ec8d5d17862b976142c93b26ae08869b679"
+    },
+    "Contents/Resources/eador/assets/sounds/bolt.wav": {
+      "bytes": 43262,
+      "sha256": "d2bbd1d5c6bec673c9fc34eecacfb0f2fec2cb3a8389bb8376cdbe350697028c"
+    },
+    "Contents/Resources/eador/assets/sounds/confirm.wav": {
+      "bytes": 26064,
+      "sha256": "bddf784fb5dfde4584fe88fcef924400ec5bcf9445c1b3ab91832205c688cdc4"
+    },
+    "Contents/Resources/eador/assets/sounds/defeat.wav": {
+      "bytes": 160568,
+      "sha256": "20105eecbcee0637966b6234cc309a98b31bb4fb766c147cccc004e6785beca2"
+    },
+    "Contents/Resources/eador/assets/sounds/end_turn.wav": {
+      "bytes": 54728,
+      "sha256": "f8e8b9df41e83c1660ace884be4b093c0d4602f762084fddd3d9b9d46887c73a"
+    },
+    "Contents/Resources/eador/assets/sounds/guard.wav": {
+      "bytes": 41498,
+      "sha256": "af073d45fb9c35ea0b3b2ff8e97b5060883bfa38ff993319388ca1925a7cc393"
+    },
+    "Contents/Resources/eador/assets/sounds/heal.wav": {
+      "bytes": 75014,
+      "sha256": "814b9e92639e58346d23a5c79f1e78a4105e24824f6980a04b19f77c9eb75e27"
+    },
+    "Contents/Resources/eador/assets/sounds/level_up.wav": {
+      "bytes": 112940,
+      "sha256": "ea0de7ac685e05a56d5f2babd1bddfb8cae17731135eeb0bbe4a7fada3bb32d6"
+    },
+    "Contents/Resources/eador/assets/sounds/move.wav": {
+      "bytes": 30914,
+      "sha256": "c9a88c645ec428f2ed613da41ad177c0be0daec527ced293352935a70471135a"
+    },
+    "Contents/Resources/eador/assets/sounds/refuse.wav": {
+      "bytes": 26944,
+      "sha256": "79ea4b91d918d5a52dfd784326058895a2ac7ea544616e3e34c71adddadf0690"
+    },
+    "Contents/Resources/eador/assets/sounds/reward.wav": {
+      "bytes": 60902,
+      "sha256": "38d3b2a520cf4b3760304c0e13a375215acaa323df9238a70ec6b7d06058cc3f"
+    },
+    "Contents/Resources/eador/assets/sounds/seal_gain.wav": {
+      "bytes": 62666,
+      "sha256": "47b51154c7e6faa1e357158d467259d196b1770d20bc77b6635cb812a66bf52b"
+    },
+    "Contents/Resources/eador/assets/sounds/seal_loss.wav": {
+      "bytes": 51200,
+      "sha256": "73ce572afe153bf114abe4026ee3010a86ecbd4d019de08700ac3d278743397d"
+    },
+    "Contents/Resources/eador/assets/sounds/victory.wav": {
+      "bytes": 200258,
+      "sha256": "faeccdac45e107aeb54c599673947d0f18519e7d84e788472de95d931c0ff6d8"
+    },
+    "Contents/Resources/eador/assets/terrain-art-manifest.json": {
+      "bytes": 12074,
+      "sha256": "e989107a731cbebc86183477e55e52d95f2f96f22a3d932520bb411e33529319"
+    },
+    "Contents/Resources/icon-windowed.icns": {
+      "bytes": 110199,
+      "sha256": "b90a3b56e59169be0f86fe0410699f42ccaa16a0c85d980ef0eb6068032f0b36"
+    },
+    "Contents/Resources/libXau.6.dylib": {
+      "symlink": "../Frameworks/libXau.6.dylib"
+    },
+    "Contents/Resources/libavif.16.3.0.dylib": {
+      "symlink": "../Frameworks/libavif.16.3.0.dylib"
+    },
+    "Contents/Resources/libjpeg.62.4.0.dylib": {
+      "symlink": "../Frameworks/libjpeg.62.4.0.dylib"
+    },
+    "Contents/Resources/liblcms2.2.dylib": {
+      "symlink": "../Frameworks/liblcms2.2.dylib"
+    },
+    "Contents/Resources/liblzma.5.dylib": {
+      "symlink": "../Frameworks/liblzma.5.dylib"
+    },
+    "Contents/Resources/libopenjp2.2.5.4.dylib": {
+      "symlink": "../Frameworks/libopenjp2.2.5.4.dylib"
+    },
+    "Contents/Resources/libpython3.13.dylib": {
+      "symlink": "../Frameworks/libpython3.13.dylib"
+    },
+    "Contents/Resources/libsharpyuv.0.dylib": {
+      "symlink": "../Frameworks/libsharpyuv.0.dylib"
+    },
+    "Contents/Resources/libtiff.6.dylib": {
+      "symlink": "../Frameworks/libtiff.6.dylib"
+    },
+    "Contents/Resources/libwebp.7.dylib": {
+      "symlink": "../Frameworks/libwebp.7.dylib"
+    },
+    "Contents/Resources/libwebpdemux.2.dylib": {
+      "symlink": "../Frameworks/libwebpdemux.2.dylib"
+    },
+    "Contents/Resources/libwebpmux.3.dylib": {
+      "symlink": "../Frameworks/libwebpmux.3.dylib"
+    },
+    "Contents/Resources/libxcb.1.1.0.dylib": {
+      "symlink": "../Frameworks/libxcb.1.1.0.dylib"
+    },
+    "Contents/Resources/libz.1.3.1.zlib-ng.dylib": {
+      "symlink": "../Frameworks/libz.1.3.1.zlib-ng.dylib"
+    },
+    "Contents/Resources/numpy": {
+      "symlink": "../Frameworks/numpy"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/INSTALLER": {
+      "bytes": 2,
+      "sha256": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/METADATA": {
+      "bytes": 6608,
+      "sha256": "67823aca536aca254a9b49a5de1f896b4a631b38992b13867d2cf5b97ece5c46"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/RECORD": {
+      "bytes": 84465,
+      "sha256": "97a6bb8aff05d727a36b8ee6a78cb8cf02f9fd2892eab3f594b855838f938341"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/REQUESTED": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/WHEEL": {
+      "bytes": 122,
+      "sha256": "a5fa49ef7bbd7f99f88dd454c0b7e2e5eec792738810217a54e384f4e4eebab6"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/entry_points.txt": {
+      "bytes": 220,
+      "sha256": "ec26fade0c8bdac211a6c1dd003a65eb16885b925395423e93fcaa115af4052c"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/LICENSE.txt": {
+      "bytes": 46826,
+      "sha256": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt": {
+      "bytes": 1018,
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING": {
+      "bytes": 690,
+      "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE": {
+      "bytes": 20785,
+      "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt": {
+      "bytes": 1414,
+      "sha256": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md": {
+      "bytes": 1514,
+      "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE": {
+      "bytes": 1543,
+      "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md": {
+      "bytes": 1498,
+      "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt": {
+      "bytes": 2266,
+      "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE": {
+      "bytes": 1593,
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md": {
+      "bytes": 3511,
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md": {
+      "bytes": 2745,
+      "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md": {
+      "bytes": 2926,
+      "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md": {
+      "bytes": 1154,
+      "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md": {
+      "bytes": 1509,
+      "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md": {
+      "bytes": 1226,
+      "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f"
+    },
+    "Contents/Resources/numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md": {
+      "bytes": 332,
+      "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9"
+    },
+    "Contents/Resources/release/LICENSE": {
+      "bytes": 1075,
+      "sha256": "2dd9083999dd489890c90f0397cd2ef0ae4183e2b5b3cfd6482fcf670461adf1"
+    },
+    "Contents/Resources/release/build-info.json": {
+      "bytes": 46987,
+      "sha256": "f13aedcfd56541907a264148499d5afb8171eb4d07b598dd789648ea9de31038"
+    },
+    "Contents/Resources/release/build-tools.txt": {
+      "bytes": 2959,
+      "sha256": "8a1534a4a5ab1e8e7b9f388e8f18155e728db5437393b5460a9154616b1e7245"
+    },
+    "Contents/Resources/release/credits.md": {
+      "bytes": 1420,
+      "sha256": "7346be881f5d7e04dc39a228d73c8549590b79d9ef5c705279a0cee2b35988b2"
+    },
+    "Contents/Resources/release/licenses/CPython-LICENSE.txt": {
+      "bytes": 13809,
+      "sha256": "78b12c3a81360b357002334f0e70ea0e92eebf7a9b358805c03c48484945f3bb"
+    },
+    "Contents/Resources/release/licenses/Pillow/pillow-12.1.1.dist-info/licenses/LICENSE": {
+      "bytes": 68061,
+      "sha256": "30178bf7aff9f8dc82afed35086cd378a9064e77fcb4380485f38b5da3377052"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/LICENSE.txt": {
+      "bytes": 46826,
+      "sha256": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt": {
+      "bytes": 1018,
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING": {
+      "bytes": 690,
+      "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE": {
+      "bytes": 20785,
+      "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt": {
+      "bytes": 1414,
+      "sha256": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md": {
+      "bytes": 1514,
+      "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE": {
+      "bytes": 1543,
+      "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md": {
+      "bytes": 1498,
+      "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt": {
+      "bytes": 2266,
+      "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE": {
+      "bytes": 1593,
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md": {
+      "bytes": 3511,
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md": {
+      "bytes": 2745,
+      "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md": {
+      "bytes": 2926,
+      "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md": {
+      "bytes": 1154,
+      "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md": {
+      "bytes": 1509,
+      "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md": {
+      "bytes": 1226,
+      "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md": {
+      "bytes": 332,
+      "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy/_core/include/numpy/random/LICENSE.txt": {
+      "bytes": 1018,
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy/ma/LICENSE": {
+      "bytes": 1593,
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    "Contents/Resources/release/licenses/numpy/numpy/random/LICENSE.md": {
+      "bytes": 3511,
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    "Contents/Resources/release/licenses/pyglet/pyglet-2.1.13.dist-info/licenses/LICENSE": {
+      "bytes": 1546,
+      "sha256": "57e7eecb673c8d40cf3192633c4807fba8c81685329a37e1b763e1556d5ded34"
+    },
+    "Contents/Resources/release/licenses/pyinstaller/pyinstaller-6.22.2.dist-info/licenses/COPYING.txt": {
+      "bytes": 32138,
+      "sha256": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245"
+    },
+    "Contents/Resources/release/licenses/websockets/websockets-17.1.dist-info/licenses/LICENSE": {
+      "bytes": 1514,
+      "sha256": "3d6a0c050d8bec52fabad502e45fb25bd02bcadbd70dea34d447b6a0ff4e6da8"
+    },
+    "Contents/Resources/release/player-guide.md": {
+      "bytes": 30246,
+      "sha256": "283746802cd3a0af4cb47f21d5b22ab1360cc738ed1432243f9a10cababbc9a5"
+    },
+    "Contents/Resources/release/runtime-uv.lock": {
+      "bytes": 116576,
+      "sha256": "80704755b469ccb10ac1d317ef5b40eccd686c965dd13d66534a431a835c9bec"
+    },
+    "Contents/Resources/saga2d/assets/fonts/Nunito-ExtraBold.ttf": {
+      "bytes": 132240,
+      "sha256": "527d4747a1ce7d16648e9b48112ca33f4b28dc9f6c7bedbcc2b8fec10e4467a9"
+    },
+    "Contents/Resources/saga2d/assets/fonts/Nunito-SemiBold.ttf": {
+      "bytes": 132316,
+      "sha256": "90a455a675585501b2181a2f021d0394bdecbbd5970519f3c1e9e3df3dd5f907"
+    },
+    "Contents/Resources/saga2d/assets/fonts/Nunito.ttf": {
+      "bytes": 132300,
+      "sha256": "cbc183f97f8858236cdb9aa47620479b5734f58e97cfeab876066335865cb6b5"
+    },
+    "Contents/Resources/saga2d/assets/fonts/OFL.txt": {
+      "bytes": 4385,
+      "sha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65"
+    },
+    "Contents/Resources/websockets": {
+      "symlink": "../Frameworks/websockets"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/INSTALLER": {
+      "bytes": 2,
+      "sha256": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/METADATA": {
+      "bytes": 6340,
+      "sha256": "17c70f9c6a34a204f2a969c73e47eba77289ef2a29914208ab10ae49973e1ada"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/RECORD": {
+      "bytes": 5371,
+      "sha256": "cccd90f25f3faa721505e9225290d9ba7bc5858ce615ef8d8be644ca87dbc78b"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/REQUESTED": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/WHEEL": {
+      "bytes": 136,
+      "sha256": "5bdbcdb311edb8f8c16abead5b2d3c887060fe334af958323a9a32a0d3f01efd"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/entry_points.txt": {
+      "bytes": 51,
+      "sha256": "0e7867e1d9b912c23864c02c1e574617a0b005766b1979d1edc9cadbe5d1ef36"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/licenses/LICENSE": {
+      "bytes": 1514,
+      "sha256": "3d6a0c050d8bec52fabad502e45fb25bd02bcadbd70dea34d447b6a0ff4e6da8"
+    },
+    "Contents/Resources/websockets-17.1.dist-info/top_level.txt": {
+      "bytes": 11,
+      "sha256": "08ca5d2a49712acbd980283296dc5458e1e26d95d9d6e60856971af71b10f079"
+    },
+    "Contents/_CodeSignature/CodeResources": {
+      "bytes": 67388,
+      "sha256": "04c837b450e4741bababc9a38af1f0728d53a6b38a492935e7d93e3faafd65f0"
+    }
+  },
+  "game": "shardbound",
+  "package_data": {
+    "eador/README.md": {
+      "bytes": 30246,
+      "sha256": "283746802cd3a0af4cb47f21d5b22ab1360cc738ed1432243f9a10cababbc9a5"
+    },
+    "eador/assets/AUDIO-PROVENANCE.md": {
+      "bytes": 1139,
+      "sha256": "e0348efca12caa9b8b7b8b8606dcfa9270e078dc4137f9c88889fb855b9e6c1d"
+    },
+    "eador/assets/VISUAL-PROVENANCE.md": {
+      "bytes": 3145,
+      "sha256": "5bb3cf6324bf791222de264f15d000133535461812e5f5e8e120da62cb1becce"
+    },
+    "eador/assets/audio-manifest.json": {
+      "bytes": 8853,
+      "sha256": "8ec7dfb0f8e1fdc9fcc00cc288b706f88c1f23855583e5d14f892d23375af49d"
+    },
+    "eador/assets/hero-portrait-provenance.json": {
+      "bytes": 6652,
+      "sha256": "5b596154fda1f5e5382dcea868d60452c80daff496d55c851e73754d04c28b1b"
+    },
+    "eador/assets/icon-art-manifest.json": {
+      "bytes": 7666,
+      "sha256": "e8c31a07b93d1217a4127cb6f740c20e25e2e542350de09c02313e3e03cef3f1"
+    },
+    "eador/assets/images/heroes/commander.png": {
+      "bytes": 2440637,
+      "sha256": "c245528902d8c093fa6bc8092f3c1395972d4f105685a14d9b137279b5491f45"
+    },
+    "eador/assets/images/heroes/scout.png": {
+      "bytes": 2328511,
+      "sha256": "0bbcdc6f04ca0d1abbcc5163f1fd2ab6df344e7370785924c7c3feb931c0218e"
+    },
+    "eador/assets/images/heroes/warrior.png": {
+      "bytes": 2538851,
+      "sha256": "fe37716d0577c4f5bb9e3cb0f80b339f7b07c7d628fdfe00eaad8dbd705c4665"
+    },
+    "eador/assets/images/heroes/wizard.png": {
+      "bytes": 2598176,
+      "sha256": "0de5aa26b65e81c83a3fe0df92076935896977865b34f357e03b50d328528461"
+    },
+    "eador/assets/images/icons/actions.png": {
+      "bytes": 7477,
+      "sha256": "5561ab301db9672da8239a1b3366235a407de9aed5f7b350434d5d159328ab2e"
+    },
+    "eador/assets/images/icons/attack.png": {
+      "bytes": 4428,
+      "sha256": "3318a527cd0538890402a20f8e8cd404efce07a200bd1f121ee3bb51745a9ea4"
+    },
+    "eador/assets/images/icons/auto_play.png": {
+      "bytes": 3725,
+      "sha256": "b27332596a62cdeae3517fcdd42a2cdb7c05e9fc908d5c094fe88b83c9576017"
+    },
+    "eador/assets/images/icons/bolt.png": {
+      "bytes": 5452,
+      "sha256": "1dbe4ba2240bd69ba38f7cf1c6da133bd2d95cc4cf37c6c43e81fbce82396155"
+    },
+    "eador/assets/images/icons/build.png": {
+      "bytes": 6152,
+      "sha256": "499841393d2cd335a4f0bf3cb918eca5535022e78d0f9a30bfcc7fccdcd2fc1a"
+    },
+    "eador/assets/images/icons/campaign.png": {
+      "bytes": 5801,
+      "sha256": "51d6d850866eb08c17c4971b05c39cbcc8f7379f26d9a37c5d29f054cc43b649"
+    },
+    "eador/assets/images/icons/codex.png": {
+      "bytes": 4896,
+      "sha256": "53d5ea1a6f032dc61c75d769284db64f9ff0ea335588068b5ff2b663c449f371"
+    },
+    "eador/assets/images/icons/crystals.png": {
+      "bytes": 6994,
+      "sha256": "c2256a0eeef776e78cfb72c9f4cc31457ea040cd2d79b2b8728f9486bbb87a96"
+    },
+    "eador/assets/images/icons/defense.png": {
+      "bytes": 4991,
+      "sha256": "184d8ed8b260fca1f1fbc756cfaf5c4bc11b4295f348a843b5236f114810c81b"
+    },
+    "eador/assets/images/icons/end_turn.png": {
+      "bytes": 9392,
+      "sha256": "04e52857c64066f964a67def878b57f5500243f1dc7ec23b2bec12a275a1bba1"
+    },
+    "eador/assets/images/icons/explore.png": {
+      "bytes": 10733,
+      "sha256": "39f0bce78310d0b6a0b9e70588c0af9131234caf3764359a00fa677b076565ef"
+    },
+    "eador/assets/images/icons/fly.png": {
+      "bytes": 7884,
+      "sha256": "af1b7ef8802ea730ae10475f0cd7fbbfa006ee681338bf120dda568ffe985321"
+    },
+    "eador/assets/images/icons/gold.png": {
+      "bytes": 9637,
+      "sha256": "ec6c2d6a969e5c2ff2d490fd5b8a9e2e120c95d82bc6bdc559e2285ba981faaa"
+    },
+    "eador/assets/images/icons/guard.png": {
+      "bytes": 5630,
+      "sha256": "a8be20c3d6e3e6abbf215dc8336399bb61e22c4f373d8e2b7b3205ce4d1eb401"
+    },
+    "eador/assets/images/icons/guide.png": {
+      "bytes": 10816,
+      "sha256": "4e3d53992a3e8ef414aa8fa54c2d57ab4728967b7c07235ed3190947b66f4999"
+    },
+    "eador/assets/images/icons/heal.png": {
+      "bytes": 2174,
+      "sha256": "d8acbecc0150af57b7aef7e2f5de980dcef3434fd5ccc943f1f7168f8e838a5e"
+    },
+    "eador/assets/images/icons/health.png": {
+      "bytes": 5843,
+      "sha256": "46af5d2ccab32bc9161f2458b07d7c63371759b8d2dd34220765eac6e4e7a20b"
+    },
+    "eador/assets/images/icons/hero.png": {
+      "bytes": 6744,
+      "sha256": "2b1cacacf15de9e11db2b46fdba2859e18fa85984b9d32e5f2701bb07eb0a750"
+    },
+    "eador/assets/images/icons/income.png": {
+      "bytes": 9414,
+      "sha256": "82a51816976b20fc57c9bb025f687ee0d27e47f7d932a2589a3527096a4e8ebe"
+    },
+    "eador/assets/images/icons/level.png": {
+      "bytes": 5773,
+      "sha256": "7d74a93556380d3fbb882ec6dcddcb032a8f7e95721c6e9f90b134edc15bd986"
+    },
+    "eador/assets/images/icons/load.png": {
+      "bytes": 3204,
+      "sha256": "a37b617e745386bb800aef5283743c5dcb9c565615935a85edfbaca3a2a5f9f6"
+    },
+    "eador/assets/images/icons/log.png": {
+      "bytes": 4812,
+      "sha256": "5ad836a2ca31518408df855b050f4659a19dbba67c936fbce06a8aaac868cb2f"
+    },
+    "eador/assets/images/icons/mana.png": {
+      "bytes": 6754,
+      "sha256": "6a4be3e7af0e0b7e42b3b4c35615f6f5722fcabab1628ff944ca402dc2bb3a71"
+    },
+    "eador/assets/images/icons/move.png": {
+      "bytes": 4152,
+      "sha256": "3e5853e4e481c2e58656d67f5aa1c094f3f5ae2a4c24791f01b75bc04ef76503"
+    },
+    "eador/assets/images/icons/range.png": {
+      "bytes": 10480,
+      "sha256": "9ff734aafee00c0c526183865e44d930461619c578d040fe7a4e66a89e53e5e4"
+    },
+    "eador/assets/images/icons/recruit.png": {
+      "bytes": 6784,
+      "sha256": "04f044fd92b2aa890b7eb85e37a5fd6a003683d0fcaf4402e05b2ecf0b74a6dc"
+    },
+    "eador/assets/images/icons/retreat.png": {
+      "bytes": 3315,
+      "sha256": "3d172d15fe883460366e72fa838129f02651a48a4cd449198193b5e0befe8b76"
+    },
+    "eador/assets/images/icons/rival.png": {
+      "bytes": 3072,
+      "sha256": "f4345c256d2a8b69b561221ec8371a8a34eaa7eedeb575de44a5cb2cbc635472"
+    },
+    "eador/assets/images/icons/save.png": {
+      "bytes": 3194,
+      "sha256": "7c14dee9d1efabcd3ae8d2c3d0157eef0bab6201f9c7615574be4dc28fa67100"
+    },
+    "eador/assets/images/icons/settings.png": {
+      "bytes": 8235,
+      "sha256": "4fbe3f8b26992bd372eb59fa122672ee5f7f36409bb31894e62de08f632680b9"
+    },
+    "eador/assets/images/icons/text_size.png": {
+      "bytes": 7752,
+      "sha256": "766c1e659157ac00b208f482c2f85da9a6485a116f3c5a0d44e02899309cd53c"
+    },
+    "eador/assets/images/icons/travel.png": {
+      "bytes": 5144,
+      "sha256": "d3a97581b28191f0783eaa07f941676f6895e2c9a2640ff868c3e470dc98018a"
+    },
+    "eador/assets/images/icons/upkeep.png": {
+      "bytes": 9404,
+      "sha256": "8ffc88d9fc05abcbea4cbd08c4c76b4e5e3c12693b9b3d042464720f742c0995"
+    },
+    "eador/assets/images/icons/xp.png": {
+      "bytes": 5978,
+      "sha256": "39202683502f2c8cf34e7f1567ae9834fc073dec0a78595cc74a185dcf181134"
+    },
+    "eador/assets/images/shard-atmosphere.png": {
+      "bytes": 1616451,
+      "sha256": "35a9cb77b7292b049751ab4d950170a6726d5d5534a1555c9b7e50447e465de7"
+    },
+    "eador/assets/images/terrain/ground-forest-0.png": {
+      "bytes": 72010,
+      "sha256": "7061ecd14a7aad299f1349a470ca1b97c74ebf8bef264fb0b45b468213ea8079"
+    },
+    "eador/assets/images/terrain/ground-forest-1.png": {
+      "bytes": 71622,
+      "sha256": "1cee1fbc954839be8d9a2fb0630a68bdd76fe585d835db88f8b24765e0971d0d"
+    },
+    "eador/assets/images/terrain/ground-forest-2.png": {
+      "bytes": 71920,
+      "sha256": "3b2e32eaec66ffcb93e9ba0dcbf9306540550bfeb4cadd0052e313f43256813b"
+    },
+    "eador/assets/images/terrain/ground-forest-3.png": {
+      "bytes": 71906,
+      "sha256": "4638bd01d89a04aac189469024cc11bc4f89047b561ff732725011ef2aab323e"
+    },
+    "eador/assets/images/terrain/ground-hills-0.png": {
+      "bytes": 73486,
+      "sha256": "77ed3dd37766278b9dddb762268c24d6cf0bb69f9c789021a11be1dce06f106d"
+    },
+    "eador/assets/images/terrain/ground-hills-1.png": {
+      "bytes": 73381,
+      "sha256": "31b5afdec074fd4a521d1febd051c5480bb0b1302d90c178dde148b819a8d1f0"
+    },
+    "eador/assets/images/terrain/ground-hills-2.png": {
+      "bytes": 73019,
+      "sha256": "0f2f7f1bd461e17b4bd6c3d2cfae4de98573360927fee3fbdfb86705631ad534"
+    },
+    "eador/assets/images/terrain/ground-hills-3.png": {
+      "bytes": 72823,
+      "sha256": "2cb09971ad232d7e56dd54b0fb1b28421c17c0200edbeab47b36d12b490e57ce"
+    },
+    "eador/assets/images/terrain/ground-marsh-0.png": {
+      "bytes": 70920,
+      "sha256": "5b6e0cab4264aa37d96b7f6ca91a31c3344ea1332f038f19963d4796a9b4d310"
+    },
+    "eador/assets/images/terrain/ground-marsh-1.png": {
+      "bytes": 70773,
+      "sha256": "b49001b64168fd8642d2b5c325aeb9e8efbd0b0b197669838034c3590e10abe7"
+    },
+    "eador/assets/images/terrain/ground-marsh-2.png": {
+      "bytes": 71042,
+      "sha256": "6725429e8505e1e2e42e5dc25b31485cc5b56b8f0f0cb9e72446755a1b59e859"
+    },
+    "eador/assets/images/terrain/ground-marsh-3.png": {
+      "bytes": 71035,
+      "sha256": "71ff474cf61409ec0e8605d973d5d140aa69ea457b02165dcd15987e154019fc"
+    },
+    "eador/assets/images/terrain/ground-mountains-0.png": {
+      "bytes": 69564,
+      "sha256": "078c3267eb260ec53344563ebb40267cf9acbb8467ad2ec02b3653ef05295e90"
+    },
+    "eador/assets/images/terrain/ground-mountains-1.png": {
+      "bytes": 68774,
+      "sha256": "fe96307731a250b86ee5d4b760f48badad507d5cda7fc75131a417c76e764825"
+    },
+    "eador/assets/images/terrain/ground-mountains-2.png": {
+      "bytes": 70034,
+      "sha256": "581861f57791be76f48d1b9716c88840f83b23a4cc704558c5e669e09dcfb941"
+    },
+    "eador/assets/images/terrain/ground-mountains-3.png": {
+      "bytes": 69184,
+      "sha256": "dec31b395496eb924b39e754845cb08316725cd184dbaa9d18b761b5e241b7bb"
+    },
+    "eador/assets/images/terrain/ground-plains-0.png": {
+      "bytes": 68833,
+      "sha256": "dbbf2c76690163da7ce27926ce3dac7eb1950e37475e05ab56baee6450208f12"
+    },
+    "eador/assets/images/terrain/ground-plains-1.png": {
+      "bytes": 69368,
+      "sha256": "2297a3f0ddb057f0e6edcc9d328ffe821ae6d87e9fbf2bc79f7b78635ba7311a"
+    },
+    "eador/assets/images/terrain/ground-plains-2.png": {
+      "bytes": 68878,
+      "sha256": "0f8b165a71c87e3f52f3ac572e4c9e020adefc2cfe4c180cdbb79e5686a7f9f1"
+    },
+    "eador/assets/images/terrain/ground-plains-3.png": {
+      "bytes": 69072,
+      "sha256": "5cdcc2d4d82db558fe52472e62b98c751cbe948c56d81891c95cd06f7a004ffc"
+    },
+    "eador/assets/images/terrain/ground-water-0.png": {
+      "bytes": 64062,
+      "sha256": "c4a203c9183e3ca103ca1487870160f494470578a13bcea7429a3ebb4ca2a7d7"
+    },
+    "eador/assets/images/terrain/ground-water-1.png": {
+      "bytes": 64117,
+      "sha256": "e61896d9d21aa564a40c94aef33c9b5e805a47b320d388257f1768499ead78da"
+    },
+    "eador/assets/images/terrain/ground-water-2.png": {
+      "bytes": 63997,
+      "sha256": "cf000d221341adb3b20fb36548d9fbd610801175f2593dda4946738cbfe0d098"
+    },
+    "eador/assets/images/terrain/ground-water-3.png": {
+      "bytes": 63882,
+      "sha256": "0541293455aa7711ea71785491cc995d722ca22feb6cea7512dfac4a3358bc2a"
+    },
+    "eador/assets/images/terrain/province-forest-0.png": {
+      "bytes": 89969,
+      "sha256": "f60ab785b2db063e1842e201f7fdff2694e4df6ccc52840ebcdfd7c756419930"
+    },
+    "eador/assets/images/terrain/province-forest-1.png": {
+      "bytes": 90766,
+      "sha256": "850ae9cc39f2030fa5dfe6914724107ddcd8a6e3322dc2e2f4f42adbd54212d4"
+    },
+    "eador/assets/images/terrain/province-forest-2.png": {
+      "bytes": 90350,
+      "sha256": "020bac21dab93472b7942ad7af6c33197509c88b301050e4b8fb4b9272bd200e"
+    },
+    "eador/assets/images/terrain/province-forest-3.png": {
+      "bytes": 90710,
+      "sha256": "35ef80e8e815e3551d46cb9a6a7142de5db9479c12a62a8917132759b57a4b5f"
+    },
+    "eador/assets/images/terrain/province-hills-0.png": {
+      "bytes": 84998,
+      "sha256": "61b2c5503d0391913e754b585baf16189c60816add8ffa4adfe7a422d06c1425"
+    },
+    "eador/assets/images/terrain/province-hills-1.png": {
+      "bytes": 85409,
+      "sha256": "4e860120bfbdd0c77a0c50327d7660dc147656cd37d5c983fd22976b78b79d25"
+    },
+    "eador/assets/images/terrain/province-hills-2.png": {
+      "bytes": 86540,
+      "sha256": "d133f5cf72cec8ff6860189404a2f3d5d20b56195acfa370ac4f88ad8eaf6a54"
+    },
+    "eador/assets/images/terrain/province-hills-3.png": {
+      "bytes": 85647,
+      "sha256": "8fc624d8a9696ef558a3ceec7fe09000124c12f5ae3dfef1ee54c64f44630c1f"
+    },
+    "eador/assets/images/terrain/province-marsh-0.png": {
+      "bytes": 84249,
+      "sha256": "8e22d06f2f8d8d422876e963cb1e37fa4660af9cd8750f861d3ffc95a02f8bde"
+    },
+    "eador/assets/images/terrain/province-marsh-1.png": {
+      "bytes": 83992,
+      "sha256": "4fd3a94330053fff9c5fd78633f35cf8241e5124c12ae0ebe5abd6ee1cc536cc"
+    },
+    "eador/assets/images/terrain/province-marsh-2.png": {
+      "bytes": 82550,
+      "sha256": "0ba256efd429bd9d582e187c52b9bb3c24dbf5cf08561d19d47bed55da4b5a7b"
+    },
+    "eador/assets/images/terrain/province-marsh-3.png": {
+      "bytes": 84415,
+      "sha256": "54ef736ea5e68147c8b001ef896426511bae9ce829dc269048724245176e62ea"
+    },
+    "eador/assets/images/terrain/province-mountains-0.png": {
+      "bytes": 77882,
+      "sha256": "28cbde1a675534c3def2f75f28ac97bc15696d17b31feeb1fe2c66f15a6d58b3"
+    },
+    "eador/assets/images/terrain/province-mountains-1.png": {
+      "bytes": 79331,
+      "sha256": "63e4fb81f4d2448981c76ac52a4b32a839cd9cc0afe24a72ea0831f415e0dcaf"
+    },
+    "eador/assets/images/terrain/province-mountains-2.png": {
+      "bytes": 78907,
+      "sha256": "a2536649188d507754e5772995986ec66e87398014082319a9da36d23dd8de16"
+    },
+    "eador/assets/images/terrain/province-mountains-3.png": {
+      "bytes": 77481,
+      "sha256": "6fd7a017a5f0c798ea09e2c78108051fc72c6f7738247274599af3822d655939"
+    },
+    "eador/assets/images/terrain/province-plains-0.png": {
+      "bytes": 91077,
+      "sha256": "b1562ec703a35454812726a48ccfb64e5a2cbfdeaf31ba6957567e0e1b1eca26"
+    },
+    "eador/assets/images/terrain/province-plains-1.png": {
+      "bytes": 90540,
+      "sha256": "94dd6db1e5cd271e3af9127f8a8c94499624631a2d2e342e16d98a801a1a73bb"
+    },
+    "eador/assets/images/terrain/province-plains-2.png": {
+      "bytes": 91041,
+      "sha256": "85d04d14fd3839fcbd030c65692895c01aed6ce12b6260dd7062baeb67c46d39"
+    },
+    "eador/assets/images/terrain/province-plains-3.png": {
+      "bytes": 91275,
+      "sha256": "975012e7b5768601257db828864c9b3a055fc5a6109fced773a5699944115a4f"
+    },
+    "eador/assets/images/terrain/province-water-0.png": {
+      "bytes": 81471,
+      "sha256": "1be815f40ed90397e1dde16ff1577df9a63c7ffc653ea72adeec9004c30af22f"
+    },
+    "eador/assets/images/terrain/province-water-1.png": {
+      "bytes": 81013,
+      "sha256": "fc27c4d5a0cbdb77b08d232a6cb732fd2065974880c067de79b61cff33639c15"
+    },
+    "eador/assets/images/terrain/province-water-2.png": {
+      "bytes": 81368,
+      "sha256": "6d0fb6809b2d79f830a8b4ce846d3789c75596657bffe23c69c3bb29f81a4d92"
+    },
+    "eador/assets/images/terrain/province-water-3.png": {
+      "bytes": 81639,
+      "sha256": "1c4629580c064e5c29bee871030208009efd49768eee6448ba55d7e4bc1ab036"
+    },
+    "eador/assets/music/battle.wav": {
+      "bytes": 5644844,
+      "sha256": "2ca436c4e9c805bf368608754e7cc4f8f02c9df4ecd52917ea96e60e9ee9750d"
+    },
+    "eador/assets/music/campaign.wav": {
+      "bytes": 8467244,
+      "sha256": "771d3d1cb73e5a9068d7d253ce81af4c491c615cbcca57ae0795c011a7e8fc67"
+    },
+    "eador/assets/sounds/attack_arrow.wav": {
+      "bytes": 26944,
+      "sha256": "99fbe5c9483ebe4bd75e7e4fd31711885a2e671fe1025c79b306a78fc4b359e5"
+    },
+    "eador/assets/sounds/attack_heavy.wav": {
+      "bytes": 44320,
+      "sha256": "770f6b5cb41e1616dac95349ae740bba1e2d0af62a8a3722e0df3d64f705ac12"
+    },
+    "eador/assets/sounds/attack_hit.wav": {
+      "bytes": 27386,
+      "sha256": "359f020027cef8a8fa67047172971ec8d5d17862b976142c93b26ae08869b679"
+    },
+    "eador/assets/sounds/bolt.wav": {
+      "bytes": 43262,
+      "sha256": "d2bbd1d5c6bec673c9fc34eecacfb0f2fec2cb3a8389bb8376cdbe350697028c"
+    },
+    "eador/assets/sounds/confirm.wav": {
+      "bytes": 26064,
+      "sha256": "bddf784fb5dfde4584fe88fcef924400ec5bcf9445c1b3ab91832205c688cdc4"
+    },
+    "eador/assets/sounds/defeat.wav": {
+      "bytes": 160568,
+      "sha256": "20105eecbcee0637966b6234cc309a98b31bb4fb766c147cccc004e6785beca2"
+    },
+    "eador/assets/sounds/end_turn.wav": {
+      "bytes": 54728,
+      "sha256": "f8e8b9df41e83c1660ace884be4b093c0d4602f762084fddd3d9b9d46887c73a"
+    },
+    "eador/assets/sounds/guard.wav": {
+      "bytes": 41498,
+      "sha256": "af073d45fb9c35ea0b3b2ff8e97b5060883bfa38ff993319388ca1925a7cc393"
+    },
+    "eador/assets/sounds/heal.wav": {
+      "bytes": 75014,
+      "sha256": "814b9e92639e58346d23a5c79f1e78a4105e24824f6980a04b19f77c9eb75e27"
+    },
+    "eador/assets/sounds/level_up.wav": {
+      "bytes": 112940,
+      "sha256": "ea0de7ac685e05a56d5f2babd1bddfb8cae17731135eeb0bbe4a7fada3bb32d6"
+    },
+    "eador/assets/sounds/move.wav": {
+      "bytes": 30914,
+      "sha256": "c9a88c645ec428f2ed613da41ad177c0be0daec527ced293352935a70471135a"
+    },
+    "eador/assets/sounds/refuse.wav": {
+      "bytes": 26944,
+      "sha256": "79ea4b91d918d5a52dfd784326058895a2ac7ea544616e3e34c71adddadf0690"
+    },
+    "eador/assets/sounds/reward.wav": {
+      "bytes": 60902,
+      "sha256": "38d3b2a520cf4b3760304c0e13a375215acaa323df9238a70ec6b7d06058cc3f"
+    },
+    "eador/assets/sounds/seal_gain.wav": {
+      "bytes": 62666,
+      "sha256": "47b51154c7e6faa1e357158d467259d196b1770d20bc77b6635cb812a66bf52b"
+    },
+    "eador/assets/sounds/seal_loss.wav": {
+      "bytes": 51200,
+      "sha256": "73ce572afe153bf114abe4026ee3010a86ecbd4d019de08700ac3d278743397d"
+    },
+    "eador/assets/sounds/victory.wav": {
+      "bytes": 200258,
+      "sha256": "faeccdac45e107aeb54c599673947d0f18519e7d84e788472de95d931c0ff6d8"
+    },
+    "eador/assets/terrain-art-manifest.json": {
+      "bytes": 12074,
+      "sha256": "e989107a731cbebc86183477e55e52d95f2f96f22a3d932520bb411e33529319"
+    },
+    "saga2d/assets/fonts/Nunito-ExtraBold.ttf": {
+      "bytes": 132240,
+      "sha256": "527d4747a1ce7d16648e9b48112ca33f4b28dc9f6c7bedbcc2b8fec10e4467a9"
+    },
+    "saga2d/assets/fonts/Nunito-SemiBold.ttf": {
+      "bytes": 132316,
+      "sha256": "90a455a675585501b2181a2f021d0394bdecbbd5970519f3c1e9e3df3dd5f907"
+    },
+    "saga2d/assets/fonts/Nunito.ttf": {
+      "bytes": 132300,
+      "sha256": "cbc183f97f8858236cdb9aa47620479b5734f58e97cfeab876066335865cb6b5"
+    },
+    "saga2d/assets/fonts/OFL.txt": {
+      "bytes": 4385,
+      "sha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65"
+    }
+  },
+  "packages": {
+    "Pillow": "12.1.1",
+    "numpy": "2.4.2",
+    "pyglet": "2.1.13",
+    "pyinstaller": "6.22.2",
+    "pyinstaller-hooks-contrib": "2026.7",
+    "websockets": "17.1"
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "product": "Shardbound",
+  "python": "3.13.2",
+  "release_ready": false,
+  "smoke": {
+    "about_build_label": "0.1.0-preview.1 \u00b7 184584007ac3",
+    "about_pages_rendered": 2,
+    "asset_path": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-aj0mqx6w/Shardbound.app/Contents/Resources/eador/assets",
+    "audio_catalogue_decoded_and_played": true,
+    "audio_files": {
+      "music/battle.wav": {
+        "bytes": 5644844,
+        "channels": 2,
+        "frames": 1411200,
+        "sample_rate": 44100,
+        "seconds": 32.0,
+        "sha256": "2ca436c4e9c805bf368608754e7cc4f8f02c9df4ecd52917ea96e60e9ee9750d"
+      },
+      "music/campaign.wav": {
+        "bytes": 8467244,
+        "channels": 2,
+        "frames": 2116800,
+        "sample_rate": 44100,
+        "seconds": 48.0,
+        "sha256": "771d3d1cb73e5a9068d7d253ce81af4c491c615cbcca57ae0795c011a7e8fc67"
+      },
+      "sounds/attack_arrow.wav": {
+        "bytes": 26944,
+        "channels": 1,
+        "frames": 13450,
+        "sample_rate": 44100,
+        "seconds": 0.30498866213151926,
+        "sha256": "99fbe5c9483ebe4bd75e7e4fd31711885a2e671fe1025c79b306a78fc4b359e5"
+      },
+      "sounds/attack_heavy.wav": {
+        "bytes": 44320,
+        "channels": 1,
+        "frames": 22138,
+        "sample_rate": 44100,
+        "seconds": 0.5019954648526077,
+        "sha256": "770f6b5cb41e1616dac95349ae740bba1e2d0af62a8a3722e0df3d64f705ac12"
+      },
+      "sounds/attack_hit.wav": {
+        "bytes": 27386,
+        "channels": 1,
+        "frames": 13671,
+        "sample_rate": 44100,
+        "seconds": 0.31,
+        "sha256": "359f020027cef8a8fa67047172971ec8d5d17862b976142c93b26ae08869b679"
+      },
+      "sounds/bolt.wav": {
+        "bytes": 43262,
+        "channels": 1,
+        "frames": 21609,
+        "sample_rate": 44100,
+        "seconds": 0.49,
+        "sha256": "d2bbd1d5c6bec673c9fc34eecacfb0f2fec2cb3a8389bb8376cdbe350697028c"
+      },
+      "sounds/confirm.wav": {
+        "bytes": 26064,
+        "channels": 1,
+        "frames": 13010,
+        "sample_rate": 44100,
+        "seconds": 0.2950113378684807,
+        "sha256": "bddf784fb5dfde4584fe88fcef924400ec5bcf9445c1b3ab91832205c688cdc4"
+      },
+      "sounds/defeat.wav": {
+        "bytes": 160568,
+        "channels": 1,
+        "frames": 80262,
+        "sample_rate": 44100,
+        "seconds": 1.82,
+        "sha256": "20105eecbcee0637966b6234cc309a98b31bb4fb766c147cccc004e6785beca2"
+      },
+      "sounds/end_turn.wav": {
+        "bytes": 54728,
+        "channels": 1,
+        "frames": 27342,
+        "sample_rate": 44100,
+        "seconds": 0.62,
+        "sha256": "f8e8b9df41e83c1660ace884be4b093c0d4602f762084fddd3d9b9d46887c73a"
+      },
+      "sounds/guard.wav": {
+        "bytes": 41498,
+        "channels": 1,
+        "frames": 20727,
+        "sample_rate": 44100,
+        "seconds": 0.47,
+        "sha256": "af073d45fb9c35ea0b3b2ff8e97b5060883bfa38ff993319388ca1925a7cc393"
+      },
+      "sounds/heal.wav": {
+        "bytes": 75014,
+        "channels": 1,
+        "frames": 37485,
+        "sample_rate": 44100,
+        "seconds": 0.85,
+        "sha256": "814b9e92639e58346d23a5c79f1e78a4105e24824f6980a04b19f77c9eb75e27"
+      },
+      "sounds/level_up.wav": {
+        "bytes": 112940,
+        "channels": 1,
+        "frames": 56448,
+        "sample_rate": 44100,
+        "seconds": 1.28,
+        "sha256": "ea0de7ac685e05a56d5f2babd1bddfb8cae17731135eeb0bbe4a7fada3bb32d6"
+      },
+      "sounds/move.wav": {
+        "bytes": 30914,
+        "channels": 1,
+        "frames": 15435,
+        "sample_rate": 44100,
+        "seconds": 0.35,
+        "sha256": "c9a88c645ec428f2ed613da41ad177c0be0daec527ced293352935a70471135a"
+      },
+      "sounds/refuse.wav": {
+        "bytes": 26944,
+        "channels": 1,
+        "frames": 13450,
+        "sample_rate": 44100,
+        "seconds": 0.30498866213151926,
+        "sha256": "79ea4b91d918d5a52dfd784326058895a2ac7ea544616e3e34c71adddadf0690"
+      },
+      "sounds/reward.wav": {
+        "bytes": 60902,
+        "channels": 1,
+        "frames": 30429,
+        "sample_rate": 44100,
+        "seconds": 0.69,
+        "sha256": "38d3b2a520cf4b3760304c0e13a375215acaa323df9238a70ec6b7d06058cc3f"
+      },
+      "sounds/seal_gain.wav": {
+        "bytes": 62666,
+        "channels": 1,
+        "frames": 31311,
+        "sample_rate": 44100,
+        "seconds": 0.71,
+        "sha256": "47b51154c7e6faa1e357158d467259d196b1770d20bc77b6635cb812a66bf52b"
+      },
+      "sounds/seal_loss.wav": {
+        "bytes": 51200,
+        "channels": 1,
+        "frames": 25578,
+        "sample_rate": 44100,
+        "seconds": 0.58,
+        "sha256": "73ce572afe153bf114abe4026ee3010a86ecbd4d019de08700ac3d278743397d"
+      },
+      "sounds/victory.wav": {
+        "bytes": 200258,
+        "channels": 1,
+        "frames": 100107,
+        "sample_rate": 44100,
+        "seconds": 2.27,
+        "sha256": "faeccdac45e107aeb54c599673947d0f18519e7d84e788472de95d931c0ff6d8"
+      }
+    },
+    "audio_live_mix_and_cleanup": true,
+    "battle_save_load_roundtrip": true,
+    "codex_and_rival_rendered": true,
+    "cwd": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-aj0mqx6w",
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-outside-repo-aj0mqx6w/Shardbound.app/Contents/MacOS/Shardbound",
+    "frozen": true,
+    "guard_save_load_roundtrip": true,
+    "guide_about_return_preserves_campaign": true,
+    "image": "/private/tmp/claude-501/-Users-ikamen-ai-workspace-experiments-by-kodo-saga2d/cd3da207-db7c-4b68-bad3-d023716740f6/scratchpad/shardbound-release/dist/shardbound/packaged-smoke.png",
+    "isolated_launch_data_directory": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/shardbound-smoke-saves-94ka6u_4",
+    "native_input_journey": true,
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "save_load_roundtrip": true,
+    "settings_apply_cancel_restart": true,
+    "shard_controls": {
+      "backend": "pyglet",
+      "cpu_percent_requested": 25,
+      "exact_orders": [
+        "explore",
+        "retreat",
+        "end_turn"
+      ],
+      "hover_name": "Amber Fields",
+      "images": [
+        "/private/tmp/claude-501/-Users-ikamen-ai-workspace-experiments-by-kodo-saga2d/cd3da207-db7c-4b68-bad3-d023716740f6/scratchpad/shardbound-release/dist/shardbound/packaged-smoke-shard-125.png",
+        "/private/tmp/claude-501/-Users-ikamen-ai-workspace-experiments-by-kodo-saga2d/cd3da207-db7c-4b68-bad3-d023716740f6/scratchpad/shardbound-release/dist/shardbound/packaged-smoke-shard-hover-125.png"
+      ],
+      "input_activations": 14,
+      "state_sha256": "dc02e2f21269badffe47afac0df8648353e7ae8f247c163174c108e1fdb89899",
+      "verified": true
+    },
+    "shard_controls_verified": true,
+    "title_and_shard_rendered": true
+  },
+  "source_commit": "184584007ac3071dcb901e323a16bcd727877c14",
+  "source_sha256": {
+    "campaign_check.py": "4adef776d871c1352abfc4106e8ffc7888d6872cd2bb67ad2b93d6764f308518",
+    "eador/README.md": "283746802cd3a0af4cb47f21d5b22ab1360cc738ed1432243f9a10cababbc9a5",
+    "eador/__init__.py": "dda7b80fb74a71b9eb7a2efbef35c9fbe6a4738650d760a20f3654b7bc73f245",
+    "eador/__main__.py": "6fbcf24b54232fd56002266060fd294fe91501dee66126c3e50d688b8c60e985",
+    "eador/adventures.py": "5b1a41a85ea98db20f47738eae0514a22fdb2a17cc6bb54c36b61494e923c653",
+    "eador/app.py": "6b6f17393e70ff6e75a9f4550e2faac5543b922e5ebcc46092302b1486512d55",
+    "eador/art.py": "bdb199f2e3435a0807c4a553e2ceb2e8f173577aec6be213eabf4d8415bd5dfa",
+    "eador/assets/AUDIO-PROVENANCE.md": "e0348efca12caa9b8b7b8b8606dcfa9270e078dc4137f9c88889fb855b9e6c1d",
+    "eador/assets/VISUAL-PROVENANCE.md": "5bb3cf6324bf791222de264f15d000133535461812e5f5e8e120da62cb1becce",
+    "eador/assets/audio-manifest.json": "8ec7dfb0f8e1fdc9fcc00cc288b706f88c1f23855583e5d14f892d23375af49d",
+    "eador/assets/hero-portrait-provenance.json": "5b596154fda1f5e5382dcea868d60452c80daff496d55c851e73754d04c28b1b",
+    "eador/assets/icon-art-manifest.json": "e8c31a07b93d1217a4127cb6f740c20e25e2e542350de09c02313e3e03cef3f1",
+    "eador/assets/images/heroes/commander.png": "c245528902d8c093fa6bc8092f3c1395972d4f105685a14d9b137279b5491f45",
+    "eador/assets/images/heroes/scout.png": "0bbcdc6f04ca0d1abbcc5163f1fd2ab6df344e7370785924c7c3feb931c0218e",
+    "eador/assets/images/heroes/warrior.png": "fe37716d0577c4f5bb9e3cb0f80b339f7b07c7d628fdfe00eaad8dbd705c4665",
+    "eador/assets/images/heroes/wizard.png": "0de5aa26b65e81c83a3fe0df92076935896977865b34f357e03b50d328528461",
+    "eador/assets/images/icons/actions.png": "5561ab301db9672da8239a1b3366235a407de9aed5f7b350434d5d159328ab2e",
+    "eador/assets/images/icons/attack.png": "3318a527cd0538890402a20f8e8cd404efce07a200bd1f121ee3bb51745a9ea4",
+    "eador/assets/images/icons/auto_play.png": "b27332596a62cdeae3517fcdd42a2cdb7c05e9fc908d5c094fe88b83c9576017",
+    "eador/assets/images/icons/bolt.png": "1dbe4ba2240bd69ba38f7cf1c6da133bd2d95cc4cf37c6c43e81fbce82396155",
+    "eador/assets/images/icons/build.png": "499841393d2cd335a4f0bf3cb918eca5535022e78d0f9a30bfcc7fccdcd2fc1a",
+    "eador/assets/images/icons/campaign.png": "51d6d850866eb08c17c4971b05c39cbcc8f7379f26d9a37c5d29f054cc43b649",
+    "eador/assets/images/icons/codex.png": "53d5ea1a6f032dc61c75d769284db64f9ff0ea335588068b5ff2b663c449f371",
+    "eador/assets/images/icons/crystals.png": "c2256a0eeef776e78cfb72c9f4cc31457ea040cd2d79b2b8728f9486bbb87a96",
+    "eador/assets/images/icons/defense.png": "184d8ed8b260fca1f1fbc756cfaf5c4bc11b4295f348a843b5236f114810c81b",
+    "eador/assets/images/icons/end_turn.png": "04e52857c64066f964a67def878b57f5500243f1dc7ec23b2bec12a275a1bba1",
+    "eador/assets/images/icons/explore.png": "39f0bce78310d0b6a0b9e70588c0af9131234caf3764359a00fa677b076565ef",
+    "eador/assets/images/icons/fly.png": "af1b7ef8802ea730ae10475f0cd7fbbfa006ee681338bf120dda568ffe985321",
+    "eador/assets/images/icons/gold.png": "ec6c2d6a969e5c2ff2d490fd5b8a9e2e120c95d82bc6bdc559e2285ba981faaa",
+    "eador/assets/images/icons/guard.png": "a8be20c3d6e3e6abbf215dc8336399bb61e22c4f373d8e2b7b3205ce4d1eb401",
+    "eador/assets/images/icons/guide.png": "4e3d53992a3e8ef414aa8fa54c2d57ab4728967b7c07235ed3190947b66f4999",
+    "eador/assets/images/icons/heal.png": "d8acbecc0150af57b7aef7e2f5de980dcef3434fd5ccc943f1f7168f8e838a5e",
+    "eador/assets/images/icons/health.png": "46af5d2ccab32bc9161f2458b07d7c63371759b8d2dd34220765eac6e4e7a20b",
+    "eador/assets/images/icons/hero.png": "2b1cacacf15de9e11db2b46fdba2859e18fa85984b9d32e5f2701bb07eb0a750",
+    "eador/assets/images/icons/income.png": "82a51816976b20fc57c9bb025f687ee0d27e47f7d932a2589a3527096a4e8ebe",
+    "eador/assets/images/icons/level.png": "7d74a93556380d3fbb882ec6dcddcb032a8f7e95721c6e9f90b134edc15bd986",
+    "eador/assets/images/icons/load.png": "a37b617e745386bb800aef5283743c5dcb9c565615935a85edfbaca3a2a5f9f6",
+    "eador/assets/images/icons/log.png": "5ad836a2ca31518408df855b050f4659a19dbba67c936fbce06a8aaac868cb2f",
+    "eador/assets/images/icons/mana.png": "6a4be3e7af0e0b7e42b3b4c35615f6f5722fcabab1628ff944ca402dc2bb3a71",
+    "eador/assets/images/icons/move.png": "3e5853e4e481c2e58656d67f5aa1c094f3f5ae2a4c24791f01b75bc04ef76503",
+    "eador/assets/images/icons/range.png": "9ff734aafee00c0c526183865e44d930461619c578d040fe7a4e66a89e53e5e4",
+    "eador/assets/images/icons/recruit.png": "04f044fd92b2aa890b7eb85e37a5fd6a003683d0fcaf4402e05b2ecf0b74a6dc",
+    "eador/assets/images/icons/retreat.png": "3d172d15fe883460366e72fa838129f02651a48a4cd449198193b5e0befe8b76",
+    "eador/assets/images/icons/rival.png": "f4345c256d2a8b69b561221ec8371a8a34eaa7eedeb575de44a5cb2cbc635472",
+    "eador/assets/images/icons/save.png": "7c14dee9d1efabcd3ae8d2c3d0157eef0bab6201f9c7615574be4dc28fa67100",
+    "eador/assets/images/icons/settings.png": "4fbe3f8b26992bd372eb59fa122672ee5f7f36409bb31894e62de08f632680b9",
+    "eador/assets/images/icons/text_size.png": "766c1e659157ac00b208f482c2f85da9a6485a116f3c5a0d44e02899309cd53c",
+    "eador/assets/images/icons/travel.png": "d3a97581b28191f0783eaa07f941676f6895e2c9a2640ff868c3e470dc98018a",
+    "eador/assets/images/icons/upkeep.png": "8ffc88d9fc05abcbea4cbd08c4c76b4e5e3c12693b9b3d042464720f742c0995",
+    "eador/assets/images/icons/xp.png": "39202683502f2c8cf34e7f1567ae9834fc073dec0a78595cc74a185dcf181134",
+    "eador/assets/images/shard-atmosphere.png": "35a9cb77b7292b049751ab4d950170a6726d5d5534a1555c9b7e50447e465de7",
+    "eador/assets/images/terrain/ground-forest-0.png": "7061ecd14a7aad299f1349a470ca1b97c74ebf8bef264fb0b45b468213ea8079",
+    "eador/assets/images/terrain/ground-forest-1.png": "1cee1fbc954839be8d9a2fb0630a68bdd76fe585d835db88f8b24765e0971d0d",
+    "eador/assets/images/terrain/ground-forest-2.png": "3b2e32eaec66ffcb93e9ba0dcbf9306540550bfeb4cadd0052e313f43256813b",
+    "eador/assets/images/terrain/ground-forest-3.png": "4638bd01d89a04aac189469024cc11bc4f89047b561ff732725011ef2aab323e",
+    "eador/assets/images/terrain/ground-hills-0.png": "77ed3dd37766278b9dddb762268c24d6cf0bb69f9c789021a11be1dce06f106d",
+    "eador/assets/images/terrain/ground-hills-1.png": "31b5afdec074fd4a521d1febd051c5480bb0b1302d90c178dde148b819a8d1f0",
+    "eador/assets/images/terrain/ground-hills-2.png": "0f2f7f1bd461e17b4bd6c3d2cfae4de98573360927fee3fbdfb86705631ad534",
+    "eador/assets/images/terrain/ground-hills-3.png": "2cb09971ad232d7e56dd54b0fb1b28421c17c0200edbeab47b36d12b490e57ce",
+    "eador/assets/images/terrain/ground-marsh-0.png": "5b6e0cab4264aa37d96b7f6ca91a31c3344ea1332f038f19963d4796a9b4d310",
+    "eador/assets/images/terrain/ground-marsh-1.png": "b49001b64168fd8642d2b5c325aeb9e8efbd0b0b197669838034c3590e10abe7",
+    "eador/assets/images/terrain/ground-marsh-2.png": "6725429e8505e1e2e42e5dc25b31485cc5b56b8f0f0cb9e72446755a1b59e859",
+    "eador/assets/images/terrain/ground-marsh-3.png": "71ff474cf61409ec0e8605d973d5d140aa69ea457b02165dcd15987e154019fc",
+    "eador/assets/images/terrain/ground-mountains-0.png": "078c3267eb260ec53344563ebb40267cf9acbb8467ad2ec02b3653ef05295e90",
+    "eador/assets/images/terrain/ground-mountains-1.png": "fe96307731a250b86ee5d4b760f48badad507d5cda7fc75131a417c76e764825",
+    "eador/assets/images/terrain/ground-mountains-2.png": "581861f57791be76f48d1b9716c88840f83b23a4cc704558c5e669e09dcfb941",
+    "eador/assets/images/terrain/ground-mountains-3.png": "dec31b395496eb924b39e754845cb08316725cd184dbaa9d18b761b5e241b7bb",
+    "eador/assets/images/terrain/ground-plains-0.png": "dbbf2c76690163da7ce27926ce3dac7eb1950e37475e05ab56baee6450208f12",
+    "eador/assets/images/terrain/ground-plains-1.png": "2297a3f0ddb057f0e6edcc9d328ffe821ae6d87e9fbf2bc79f7b78635ba7311a",
+    "eador/assets/images/terrain/ground-plains-2.png": "0f8b165a71c87e3f52f3ac572e4c9e020adefc2cfe4c180cdbb79e5686a7f9f1",
+    "eador/assets/images/terrain/ground-plains-3.png": "5cdcc2d4d82db558fe52472e62b98c751cbe948c56d81891c95cd06f7a004ffc",
+    "eador/assets/images/terrain/ground-water-0.png": "c4a203c9183e3ca103ca1487870160f494470578a13bcea7429a3ebb4ca2a7d7",
+    "eador/assets/images/terrain/ground-water-1.png": "e61896d9d21aa564a40c94aef33c9b5e805a47b320d388257f1768499ead78da",
+    "eador/assets/images/terrain/ground-water-2.png": "cf000d221341adb3b20fb36548d9fbd610801175f2593dda4946738cbfe0d098",
+    "eador/assets/images/terrain/ground-water-3.png": "0541293455aa7711ea71785491cc995d722ca22feb6cea7512dfac4a3358bc2a",
+    "eador/assets/images/terrain/province-forest-0.png": "f60ab785b2db063e1842e201f7fdff2694e4df6ccc52840ebcdfd7c756419930",
+    "eador/assets/images/terrain/province-forest-1.png": "850ae9cc39f2030fa5dfe6914724107ddcd8a6e3322dc2e2f4f42adbd54212d4",
+    "eador/assets/images/terrain/province-forest-2.png": "020bac21dab93472b7942ad7af6c33197509c88b301050e4b8fb4b9272bd200e",
+    "eador/assets/images/terrain/province-forest-3.png": "35ef80e8e815e3551d46cb9a6a7142de5db9479c12a62a8917132759b57a4b5f",
+    "eador/assets/images/terrain/province-hills-0.png": "61b2c5503d0391913e754b585baf16189c60816add8ffa4adfe7a422d06c1425",
+    "eador/assets/images/terrain/province-hills-1.png": "4e860120bfbdd0c77a0c50327d7660dc147656cd37d5c983fd22976b78b79d25",
+    "eador/assets/images/terrain/province-hills-2.png": "d133f5cf72cec8ff6860189404a2f3d5d20b56195acfa370ac4f88ad8eaf6a54",
+    "eador/assets/images/terrain/province-hills-3.png": "8fc624d8a9696ef558a3ceec7fe09000124c12f5ae3dfef1ee54c64f44630c1f",
+    "eador/assets/images/terrain/province-marsh-0.png": "8e22d06f2f8d8d422876e963cb1e37fa4660af9cd8750f861d3ffc95a02f8bde",
+    "eador/assets/images/terrain/province-marsh-1.png": "4fd3a94330053fff9c5fd78633f35cf8241e5124c12ae0ebe5abd6ee1cc536cc",
+    "eador/assets/images/terrain/province-marsh-2.png": "0ba256efd429bd9d582e187c52b9bb3c24dbf5cf08561d19d47bed55da4b5a7b",
+    "eador/assets/images/terrain/province-marsh-3.png": "54ef736ea5e68147c8b001ef896426511bae9ce829dc269048724245176e62ea",
+    "eador/assets/images/terrain/province-mountains-0.png": "28cbde1a675534c3def2f75f28ac97bc15696d17b31feeb1fe2c66f15a6d58b3",
+    "eador/assets/images/terrain/province-mountains-1.png": "63e4fb81f4d2448981c76ac52a4b32a839cd9cc0afe24a72ea0831f415e0dcaf",
+    "eador/assets/images/terrain/province-mountains-2.png": "a2536649188d507754e5772995986ec66e87398014082319a9da36d23dd8de16",
+    "eador/assets/images/terrain/province-mountains-3.png": "6fd7a017a5f0c798ea09e2c78108051fc72c6f7738247274599af3822d655939",
+    "eador/assets/images/terrain/province-plains-0.png": "b1562ec703a35454812726a48ccfb64e5a2cbfdeaf31ba6957567e0e1b1eca26",
+    "eador/assets/images/terrain/province-plains-1.png": "94dd6db1e5cd271e3af9127f8a8c94499624631a2d2e342e16d98a801a1a73bb",
+    "eador/assets/images/terrain/province-plains-2.png": "85d04d14fd3839fcbd030c65692895c01aed6ce12b6260dd7062baeb67c46d39",
+    "eador/assets/images/terrain/province-plains-3.png": "975012e7b5768601257db828864c9b3a055fc5a6109fced773a5699944115a4f",
+    "eador/assets/images/terrain/province-water-0.png": "1be815f40ed90397e1dde16ff1577df9a63c7ffc653ea72adeec9004c30af22f",
+    "eador/assets/images/terrain/province-water-1.png": "fc27c4d5a0cbdb77b08d232a6cb732fd2065974880c067de79b61cff33639c15",
+    "eador/assets/images/terrain/province-water-2.png": "6d0fb6809b2d79f830a8b4ce846d3789c75596657bffe23c69c3bb29f81a4d92",
+    "eador/assets/images/terrain/province-water-3.png": "1c4629580c064e5c29bee871030208009efd49768eee6448ba55d7e4bc1ab036",
+    "eador/assets/music/battle.wav": "2ca436c4e9c805bf368608754e7cc4f8f02c9df4ecd52917ea96e60e9ee9750d",
+    "eador/assets/music/campaign.wav": "771d3d1cb73e5a9068d7d253ce81af4c491c615cbcca57ae0795c011a7e8fc67",
+    "eador/assets/sounds/attack_arrow.wav": "99fbe5c9483ebe4bd75e7e4fd31711885a2e671fe1025c79b306a78fc4b359e5",
+    "eador/assets/sounds/attack_heavy.wav": "770f6b5cb41e1616dac95349ae740bba1e2d0af62a8a3722e0df3d64f705ac12",
+    "eador/assets/sounds/attack_hit.wav": "359f020027cef8a8fa67047172971ec8d5d17862b976142c93b26ae08869b679",
+    "eador/assets/sounds/bolt.wav": "d2bbd1d5c6bec673c9fc34eecacfb0f2fec2cb3a8389bb8376cdbe350697028c",
+    "eador/assets/sounds/confirm.wav": "bddf784fb5dfde4584fe88fcef924400ec5bcf9445c1b3ab91832205c688cdc4",
+    "eador/assets/sounds/defeat.wav": "20105eecbcee0637966b6234cc309a98b31bb4fb766c147cccc004e6785beca2",
+    "eador/assets/sounds/end_turn.wav": "f8e8b9df41e83c1660ace884be4b093c0d4602f762084fddd3d9b9d46887c73a",
+    "eador/assets/sounds/guard.wav": "af073d45fb9c35ea0b3b2ff8e97b5060883bfa38ff993319388ca1925a7cc393",
+    "eador/assets/sounds/heal.wav": "814b9e92639e58346d23a5c79f1e78a4105e24824f6980a04b19f77c9eb75e27",
+    "eador/assets/sounds/level_up.wav": "ea0de7ac685e05a56d5f2babd1bddfb8cae17731135eeb0bbe4a7fada3bb32d6",
+    "eador/assets/sounds/move.wav": "c9a88c645ec428f2ed613da41ad177c0be0daec527ced293352935a70471135a",
+    "eador/assets/sounds/refuse.wav": "79ea4b91d918d5a52dfd784326058895a2ac7ea544616e3e34c71adddadf0690",
+    "eador/assets/sounds/reward.wav": "38d3b2a520cf4b3760304c0e13a375215acaa323df9238a70ec6b7d06058cc3f",
+    "eador/assets/sounds/seal_gain.wav": "47b51154c7e6faa1e357158d467259d196b1770d20bc77b6635cb812a66bf52b",
+    "eador/assets/sounds/seal_loss.wav": "73ce572afe153bf114abe4026ee3010a86ecbd4d019de08700ac3d278743397d",
+    "eador/assets/sounds/victory.wav": "faeccdac45e107aeb54c599673947d0f18519e7d84e788472de95d931c0ff6d8",
+    "eador/assets/terrain-art-manifest.json": "e989107a731cbebc86183477e55e52d95f2f96f22a3d932520bb411e33529319",
+    "eador/battle.py": "dc61c1ec35d4c54c09020370ecb51f7247df5751bec676f1f1036cf64089645a",
+    "eador/battle_audio.py": "5381fab2822277001a94abf23f4b2aec3abaf7ff6fbfe02a893fe28910c8ee68",
+    "eador/battle_effects.py": "f84b05a703d2d3fcc0a1a4f96768e0f99932b02615d3ed49168c0ffaff0ccb74",
+    "eador/battle_playback_scene.py": "21bf10572f3801b33ea558b83305a8daf1a1f34bd2de9848bdac5c3494ae3154",
+    "eador/battle_results.py": "4847b9195dea64fe055a830f3b5d94fc127a84120e3d206f7c5489713bdcc529",
+    "eador/battle_trace.py": "185e92c60352d5ffb1b8db8ab9a21264b2770d815b4d20815dd9494fc99e3946",
+    "eador/campaign.py": "904b5e8319fa9f09c276544da383bb791331165c09fb9c3ff163ecd691882c27",
+    "eador/campaign_scene.py": "41e763528b63bb43ccd057e5a37d5e5db2abca4573a3c13cef1107050975dd99",
+    "eador/codex.py": "d43b0f6a653b88d1a20ebfc5e8e25da5216cafc41ea50149c62384b1548844e3",
+    "eador/combat_journal.py": "42ad08f106206fde07fd9cbafebbc5189e46771162625848ed3ac07b92420ab9",
+    "eador/concurrent_campaign.py": "a111559b030e0ac5c197eb978e6ac028605a152eb6f4355965dda2344206023c",
+    "eador/concurrent_playback.py": "db3b0964282e29b5a1fb6e8ab3029b5b15464a9a4390e00f872d8cbead5852ad",
+    "eador/concurrent_scene.py": "5de689b769ad8240178136de27ca29b29dde851b24bd41e3afc5455e4bbad6d3",
+    "eador/concurrent_view.py": "8a18ed0de8377f7889817db94640ecb8c3821027cec1abfe2d61650e89bad412",
+    "eador/content.py": "6dbac37f87693364516ea10c3c19e96b67892df4d74d224c15f824dc900128db",
+    "eador/diagnostics.py": "353410502931eef6d32bafe9d4b6c4dbde63dfc8d9b154657ce8663dd9b58d7c",
+    "eador/difficulty.py": "35c260efa2383b6bbf6007338ea770db1ee4f181ea67738ddf9cc44a881ecc00",
+    "eador/economy.py": "171525b136d1199f6b0b8be565ffcb2eb10d3067a52477b3a859e55df1f13a23",
+    "eador/encounter_scene.py": "089a19ab87157c410d03eb7d4d3e40c659244635415e015cb5ac0cc0634867c8",
+    "eador/encounters.py": "66878812c1406fbbc1dc3d1d3d98cf9d067e3f01d6f9cfccb1e8649719c0737d",
+    "eador/entities.py": "f8127d4ce1826472d8b3d14af33962c0f3d35880167f3e57c632849d84de3a73",
+    "eador/icon_art.py": "061c458f8ceaab8469606eccf54a74f2eb74b3df9c4c109e369efa91a60147b2",
+    "eador/landscape.py": "9c3ae952cf0da62b110d8b2c85a77227f0a94ed09d122b164e7c6cfdaa0a3f72",
+    "eador/model.py": "5cb25f69737b3ef2f12862f1e63451b3fb3d88b6782b920828f52c72d8298243",
+    "eador/multiplayer.py": "5a90bced886d2b230e0bbc2d3ce554997cbfbc8d0095edb4e3aebc734197b6c0",
+    "eador/orders.py": "1fad53d326cd7de447cd1eb9619529990131b99af73d32e426445563f04fc17b",
+    "eador/persistence.py": "8cf053baca4e6926c4c9a58a715054174c67aef3efef3a27848418ff23071172",
+    "eador/preferences.py": "f165c3b03779dcb14dfc12928258f52d605aec4b3278a02e21e16fa76814da89",
+    "eador/reading.py": "303952c77eec9965d73e30fcc47068fd4e8ce1cd1186089ab8d8d80ca8d4073c",
+    "eador/realm.py": "0b6286fedbe27c1aa6c180d92b12af90726dbef7cf51c22c4d96ad13a6a64f6e",
+    "eador/release.py": "b8fc4796e3065a155ad27285308f6b9ef905152fc48bc8c843ac04e9c48f30f3",
+    "eador/replacement_scene.py": "99946c6e8c7b9260a89947937e383c7ac505e25e1533ebca2b1628a191d22d1f",
+    "eador/rival.py": "ad4d2227c4aa6b24ba05df9a9c8b0a6ffeab84f245e51ad2b12e511ad2f3ba9e",
+    "eador/rival_scene.py": "1b439c7eb79e2e5f4818e08e4d6624a73b510cab9ae16bf83dadd13040364307",
+    "eador/scene.py": "a842f2ca0797d279cf5f350258d8938d17f0c49849c5b8583afb61e8ecfef5df",
+    "eador/settings_scene.py": "cf16efa9d04153ea94c4ac50862c871fae6d04feb4b02d48aea13dd07a53f9ca",
+    "eador/sight.py": "c6a9e4fe525097a91672d2a46012153030c870779797b4f812cbd849e14d1796",
+    "eador/sound.py": "368e13a022d0971718c326ead2d6b1bc90ffcdd554779603d47d93ee12d9c7cf",
+    "eador/style.py": "387fbaa8d3718a9b966610e044d2ad7675709830c8aee96e85bf66aa96a07b40",
+    "eador/ui.py": "f24bd1d3dcab4a57e237bd31be3d34e4e3af96ee03592260675c27dccca61e74",
+    "eador/worldgen.py": "07042bd83c96edfcbbd5dfd2941dcc332932b4bc47f942112af510b57cdf5690",
+    "entry.py": "cad7a17a82c7dcf885bff28d9801cef810ceb48bf37adf582eba154f3d1dfea3",
+    "package-data.json": "9ad9decc289cd337a89398a0023f23704c8a948cb55ff41fd3eed47e806431aa",
+    "release/LICENSE": "2dd9083999dd489890c90f0397cd2ef0ae4183e2b5b3cfd6482fcf670461adf1",
+    "release/build-tools.txt": "8a1534a4a5ab1e8e7b9f388e8f18155e728db5437393b5460a9154616b1e7245",
+    "release/credits.md": "7346be881f5d7e04dc39a228d73c8549590b79d9ef5c705279a0cee2b35988b2",
+    "release/licenses/CPython-LICENSE.txt": "78b12c3a81360b357002334f0e70ea0e92eebf7a9b358805c03c48484945f3bb",
+    "release/licenses/Pillow/pillow-12.1.1.dist-info/licenses/LICENSE": "30178bf7aff9f8dc82afed35086cd378a9064e77fcb4380485f38b5da3377052",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/LICENSE.txt": "649a589ab31076e79e9ce62ba24eae9959598124176640dbc95f87bd10f34fcf",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt": "f7b14309e5f54e5022b26448eefd419988ada2aec01d3c1162d84a0ea8f21f2c",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f",
+    "release/licenses/numpy/numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9",
+    "release/licenses/numpy/numpy/_core/include/numpy/random/LICENSE.txt": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+    "release/licenses/numpy/numpy/ma/LICENSE": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+    "release/licenses/numpy/numpy/random/LICENSE.md": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+    "release/licenses/pyglet/pyglet-2.1.13.dist-info/licenses/LICENSE": "57e7eecb673c8d40cf3192633c4807fba8c81685329a37e1b763e1556d5ded34",
+    "release/licenses/pyinstaller/pyinstaller-6.22.2.dist-info/licenses/COPYING.txt": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245",
+    "release/licenses/websockets/websockets-17.1.dist-info/licenses/LICENSE": "3d6a0c050d8bec52fabad502e45fb25bd02bcadbd70dea34d447b6a0ff4e6da8",
+    "release/player-guide.md": "283746802cd3a0af4cb47f21d5b22ab1360cc738ed1432243f9a10cababbc9a5",
+    "release/runtime-uv.lock": "80704755b469ccb10ac1d317ef5b40eccd686c965dd13d66534a431a835c9bec",
+    "saga2d/__init__.py": "f205e2a61701af1ea0ff503e2de6e332da5d2f96df106e7eec69d61b9f0b335c",
+    "saga2d/_fileio.py": "9aeead95c990242cffd862e013910f7c5b7d1d53651c8d8a8940b11d1606a39e",
+    "saga2d/_scene_stack.py": "a66531b746ec36d430285de69f5667460953657a636f07d3acabef4b6d5b5ca9",
+    "saga2d/actions.py": "c10552f2226f1f72277edac3e154bf405f54bd3f847332a811fe9d0f959df229",
+    "saga2d/animation.py": "de233f4aeab3b18ce337b35f82992350ffd8350112432a22b8a7646894f6b815",
+    "saga2d/assets.py": "95feb9b12f6f6599b20f1b65108df45f74c4a1220180fc77e22d4d8ff82f148d",
+    "saga2d/assets/fonts/Nunito-ExtraBold.ttf": "527d4747a1ce7d16648e9b48112ca33f4b28dc9f6c7bedbcc2b8fec10e4467a9",
+    "saga2d/assets/fonts/Nunito-SemiBold.ttf": "90a455a675585501b2181a2f021d0394bdecbbd5970519f3c1e9e3df3dd5f907",
+    "saga2d/assets/fonts/Nunito.ttf": "cbc183f97f8858236cdb9aa47620479b5734f58e97cfeab876066335865cb6b5",
+    "saga2d/assets/fonts/OFL.txt": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+    "saga2d/audio.py": "486ab6eedbf82cd595c078b79ab726f7144b23e78f2b608ce00a2be8e994ae7e",
+    "saga2d/backends/__init__.py": "b3d81969df4a852ce04043fd5dfef5eb1fbfb37b1b2784045d7280886906c416",
+    "saga2d/backends/base.py": "87a3f1b54b3787e435ca525a5d12741d418de70f34a14f6c3a48dfef7cc97bd9",
+    "saga2d/backends/mock_backend.py": "6c6b3203e856c34279789ebd8787cad6aec43e02add51cb9f5650adeefc79fc4",
+    "saga2d/backends/pyglet_backend.py": "b31134f3e326847d1f2d0327595f8622e8cb51cb5fe75949cc1839c4ffb39bfd",
+    "saga2d/effects.py": "1c2fb48355e9d354930f46ed31fc19a7730e8d252b1f44e3bb2b39884d0ccd2f",
+    "saga2d/fonts.py": "de72fcba8a3fc25c7c7d35f6cea63da1b92f8a952fdf9add7a809344d2e79bb3",
+    "saga2d/game.py": "a33769ac1cb8b6ba23205726a61f4334edf37902f229a8899564e3ae8b6d9314",
+    "saga2d/hexgrid.py": "30cec9bc665a6f7d663ec466a133e3e71c7740a2e2fb3f39456348cecc14a4a0",
+    "saga2d/input.py": "fb0055d3c8ec9b8d88c7122804b1fe74e2b6d8a13783fc6ac1f4065f49e0d2ce",
+    "saga2d/multiplayer_ui.py": "96f23dc3a505552477a0ea3ccaeb3436fbf5db451ab850a9f23c7313452b066c",
+    "saga2d/network.py": "2063939f9ee0ee25f8b8570909636368cd18b97f66e4d0ad74bfff4b2c3ca048",
+    "saga2d/online.py": "796d637866e55f497174250a50523648971b55640d5708abf45a35f98ba46e3a",
+    "saga2d/release.py": "b7050e49dd89c96ce56e28317207cfd4f46f701189462dac255d11d65a6a6902",
+    "saga2d/render3d.py": "daf7879b175243b8ba6c9cf42e1fa5e91073b89d17c07c62d2c58b3d1e0a9a83",
+    "saga2d/rendering/__init__.py": "5f1e0adfc0d2307bca8355632f94ccc758859ccf9ed1bf4033b893b416169a4a",
+    "saga2d/rendering/_text.py": "1aa59433145a52a8f8cd38bf42a4695ca4d0cc7c18b35b68a758168a322170f1",
+    "saga2d/rendering/camera.py": "477c1d06c7cc2966e27512251f4eb712b0a40e0ae5f22c7ea59634362c3f85b0",
+    "saga2d/rendering/layers.py": "dba2c570c21342f884148af68db2f4221314a0e1a9b6ad625bf6e3b44ccf9ee9",
+    "saga2d/rendering/particles.py": "8b43b358ca3fdae75ea213a742d374de8957c274ead4960fb7d5d0558475c2fd",
+    "saga2d/rendering/shapes.py": "02ff72f56536072a817e61197ae5ee83a59c4581b6e0322698e7adfbff93077e",
+    "saga2d/rendering/sprite.py": "05ecd5530866e85016861cc637293497a0edaf3c5d9f217b21d986fc73a683a1",
+    "saga2d/save.py": "4109dccf7cebed78d3774472544de32e105fb390ab448c123492fe5a35a4acbd",
+    "saga2d/scene.py": "b9a0a39359f537443906380590ca2af503ee0a80aae260b6559836a95bb01bdd",
+    "saga2d/settings.py": "f616ac2970c8f9eb85c22e34a9627d655172ca81d3cb0303ca17fdc97b782446",
+    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/testing.py": "b52398fd8d5b596e24765f46fc863b5c9b3ea2427e8dc9f714c891e35493ffdd",
+    "saga2d/ui/__init__.py": "2bea66dfb37a58edd032eca8557c9917cfe5dc6cd19571c5d39011b553ba00ec",
+    "saga2d/ui/base.py": "94eefc68cc0010c9ba9329de8663ca96674b935b9ee91f2d5bc54faaa2958700",
+    "saga2d/ui/components.py": "78d1d911a8f2509a735438cdfbe66a2a03fc247c2432ef78f046ef3b5d048e75",
+    "saga2d/ui/layout.py": "d2dc94802e363df709878dd0d1ef0cb87480efe091e016676acdc97fda274f1f",
+    "saga2d/ui/minimap.py": "5fea0a2e75158ee10aef69d8dcb8e5688720c144c2dfc5e817d576aa9442203d",
+    "saga2d/ui/theme.py": "4578019d57c6e674f07695d19caf0a6b9ccf2983fccccb592476e2cb17416dbc",
+    "saga2d/util/__init__.py": "88188aa7c986e2771b67153f21fae72604aa02ae50c6042a2dc3f4e113fc1d8e",
+    "saga2d/util/collision.py": "bd4052cc13c98c697a7c7e1153f90fe868848906824a20e135fd702dccf2347e",
+    "saga2d/util/reactive.py": "f39d57b4186d2cf246631c4963bc4dd26f2e47d1cff01c81b32ee8c6bdf20c30",
+    "saga2d/util/timer.py": "e77300dcb9ec728dbfa7f84f8179796cc1ab6573e6918eb6a2f3fa2348828c5b",
+    "saga2d/util/tween.py": "e63a62e61d65531a7fc5f9158e28e1c52b3dbe27ba2f19ecc730bad827f1a061",
+    "shardbound.spec": "cd2c832e47ce7164959f7afea521daabf80d8d4f6c455471ce3b2769d24cd31f",
+    "tools/__init__.py": "cc6c419ccbf7b0095267c2a64c9b4884986050497dd7b108cad50138da8f5413",
+    "tools/build_eador.py": "c50507495e9633296964d1fab97281e86719d6a19c09954c11a7150ea692ccef",
+    "tools/build_eador_audio.py": "91e460f01000a48519194197fa403b337c9112e92624ed615239b7ebabd061a0",
+    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2",
+    "tools/eador_campaign.py": "d098c1b31f57ff748a5723d68b49b50174d35d9c71b66a6c043f6dc6f24fbbee",
+    "tools/eador_linked_campaign.py": "80395033aab224c6d1bb653d28a16dc20ac525906d5598047725a6e230827271",
+    "tools/eador_ui.py": "00be82dda4f002519f75688252aa472456f051cf31c0d82aaca440d5ae8b508b"
+  },
+  "spec_sha256": "cd2c832e47ce7164959f7afea521daabf80d8d4f6c455471ce3b2769d24cd31f",
+  "validation_scope": "Local host only; no clean account, Windows, signing or notarization claim.",
+  "version": "0.1.0-preview.1",
+  "working_tree_dirty": false
+}

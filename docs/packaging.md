@@ -14,13 +14,16 @@ human playtest/listening or co-op connectivity acceptance.
 
 ## Installed local copy
 
-`/Applications/Shardbound.app` is the extracted `Shardbound-macos-arm64.zip`
-from clean source `5ba80b8`, installed 2026-09-08. The installed executable
-hash matches the dist build and manifest, `codesign --verify --deep --strict`
-passes for the ad-hoc signature, and the installed app passed the full packaged
-smoke journey launched through LaunchServices from `/Applications`. To update
-it, rebuild, extract the new archive and replace the app in Finder; saves and
-settings live in the game's data directory and are preserved.
+`/Applications/Shardbound.app` is the extracted
+`Shardbound-0.1.0-preview.1-darwin-arm64-app.zip` from clean source `1845840`
+(tag `shardbound-v0.1.0-preview.1`), installed 2026-09-08 with the previous
+app retained under `dist/local-app-backups/`. The installed executable hash
+matches the published archive and manifest, `codesign --verify --deep --strict`
+passes for the ad-hoc signature, and the installed app passed the online co-op
+diagnostic against `wss://games.tachyon-ai.eu/play`. To update it, download
+the next release from https://games.tachyon-ai.eu/shardbound/, extract and
+replace the app in Finder; saves and settings live in the game's data
+directory and are preserved.
 
 ## Build locally
 
