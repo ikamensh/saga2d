@@ -1,0 +1,64 @@
+{
+  "seat-0": {
+    "source_directory": "/tmp/shardbound-concurrent-ui-accepted-0",
+    "wall_seconds": 13.31937529204879,
+    "cpu_seconds": 3.362623,
+    "cpu_percent_of_one_core": 25.2461014594834,
+    "input_activations": 23,
+    "png_count": 13,
+    "all_recorded_files_match_checkpoint": true,
+    "recorded_file_differences": [],
+    "closed": true,
+    "source_checkpoint": "1cce62a83cc1a1a5d9977da629c22f75bea0a4b4"
+  },
+  "seat-1": {
+    "source_directory": "/tmp/shardbound-concurrent-ui-accepted-1",
+    "wall_seconds": 13.658224625047296,
+    "cpu_seconds": 3.459419,
+    "cpu_percent_of_one_core": 25.328467608124583,
+    "input_activations": 23,
+    "png_count": 13,
+    "all_recorded_files_match_checkpoint": true,
+    "recorded_file_differences": [],
+    "closed": true,
+    "source_checkpoint": "1cce62a83cc1a1a5d9977da629c22f75bea0a4b4"
+  },
+  "conflict": {
+    "source_directory": "/tmp/shardbound-concurrent-conflict-native",
+    "wall_seconds": 11.876252791960724,
+    "cpu_seconds": 2.919183,
+    "cpu_percent_of_one_core": 24.58000053666805,
+    "input_activations": 17,
+    "png_count": 7,
+    "all_recorded_files_match_checkpoint": false,
+    "recorded_file_differences": [
+      "eador/replacement_scene.py"
+    ],
+    "closed": true,
+    "source_checkpoint": "1cce62a83cc1a1a5d9977da629c22f75bea0a4b4"
+  },
+  "human-defender": {
+    "source_directory": "/tmp/shardbound-human-ui-accepted",
+    "wall_seconds": 27.517640667036176,
+    "cpu_seconds": 6.510967999999999,
+    "cpu_percent_of_one_core": 23.661069198420023,
+    "input_activations": 22,
+    "png_count": 4,
+    "all_recorded_files_match_checkpoint": true,
+    "recorded_file_differences": [],
+    "closed": true,
+    "source_checkpoint": "1cce62a83cc1a1a5d9977da629c22f75bea0a4b4"
+  },
+  "replacement": {
+    "source_directory": "/tmp/shardbound-replacement-row-native",
+    "wall_seconds": 8.897198374965228,
+    "cpu_seconds": 2.261276,
+    "cpu_percent_of_one_core": 25.415596064068172,
+    "input_activations": 12,
+    "png_count": 3,
+    "all_recorded_files_match_checkpoint": true,
+    "recorded_file_differences": [],
+    "closed": true,
+    "source_checkpoint": "1cce62a83cc1a1a5d9977da629c22f75bea0a4b4"
+  }
+}

@@ -5,9 +5,10 @@ map. Battles retain their normal alternating turns. Players spend most of their
 time fighting the environment, so one player's PvE battle must not prevent
 the other player from developing, exploring or fighting elsewhere.
 
-This is an implementation target, not a currently playable mode. Existing
-Shardbound multiplayer remains shared-realm co-op. The tactical simultaneous
-planning proposal was discarded after this clarification.
+This is a development implementation, exercised through verification tools and
+the dedicated server's `shardbound-pvp-v1` game ID. It is not selectable in the
+title or CLI yet. Existing selectable Shardbound multiplayer remains shared-realm
+co-op. The tactical simultaneous planning proposal was discarded after this clarification.
 
 ## Player experience
 
@@ -84,10 +85,33 @@ Corrupt waiting destinations and unsupported shared outcomes are rejected;
 valid waits at a departed army's origin retain their exact continuation.
 
 The [earlier independent-PvE evidence](evidence/concurrent-pve/README.md)
-establishes the separate battle and Ready-barrier foundation. Neither set is a
-native PvP playtest. Concurrent campaign screens, server catalog integration,
-dedicated-server process restart and a refreshed packaged PvP build remain
-unfinished. Selectable multiplayer is still shared-realm co-op.
+establishes the separate battle and Ready-barrier foundation. Neither earlier
+set is a native PvP playtest.
+
+In **d3ebdc9**, the server catalog adds `shardbound-pvp-v1`, ordered hero choices,
+and complete trusted checkpoints. Twenty selected integration checks include
+three actual server processes: abrupt restart during a paid wait and during
+the defender's human phase, followed by reconnect and retreat. **2915a91**
+adds authoritative troop replacement and infusion, plus public seed/theme and
+an opponent's choosing status; 42 selected service, socket and solo checks pass.
+
+**1cce62a** adds development presentation: a detached local Realm view, quiet
+shared map, independent catalogs/readers/PvE, Ready and paid waiting controls,
+local-team tactical input, result/choice acceptance, and room persistence
+information. Opponent updates retain Help and local PvE. The framework's
+**44fbe78** `Game.pop_to(scene)` removes stale overlays without revealing them.
+The battle kernel, catalogs, progression and economy remain shared game code;
+transport and scene lifetime primitives remain in Saga2D.
+
+[Retained UI/server evidence](evidence/concurrent-ui-2026-09-08/README.md) records
+the final 34 selected integration checks, both native local-seat routes, an
+earned waiting/shared-battle/retreat journey, and the defender's own mana/input
+adapter. These are directed checks, not independent human play.
+Peer orders currently refresh shared combat immediately; only the local
+client's checked accepted order produces a playback trace. Peer animation,
+the complete mode setup/leave/rejoin flow, two independent native game processes,
+native capital victory/loss and a packaged PvP build remain unfinished.
+Selectable multiplayer is still shared-realm co-op.
 
 The existing socket interfaces already accept commands without a global
 revision precondition. New campaign commands should validate the global day,

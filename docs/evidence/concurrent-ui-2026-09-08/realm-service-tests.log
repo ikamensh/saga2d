@@ -1,0 +1,4 @@
+SELECTION ['tests/eador/test_concurrent_campaign.py', 'tests/eador/test_concurrent_network.py', 'tests/eador/test_infusion.py::test_paid_infusion_matches_its_live_quote_and_preserves_saved_continuation', 'tests/eador/test_replacement.py::test_full_paid_army_can_quote_and_replace_a_veteran_in_its_saved_formation_slot']
+..........................................                               [100%]
+42 passed in 2.67s
+{'wall_seconds': 2.719539999961853, 'cpu_seconds': 0.7009380000000001, 'cpu_allowance_percent': 25, 'exit_code': <ExitCode.OK: 0>}

@@ -1,0 +1,4 @@
+Selection: ['tests/test_online_campaign_pvp.py', 'tests/test_online_checkpoints.py', 'tests/test_online_server.py::test_shardbound_coop_runs_campaign_and_battle_rules_for_both_partners', 'tests/test_online_server.py::test_rooms_and_private_seats_survive_server_restart[shardbound-v1]']
+....................                                                     [100%]
+20 passed in 2.54s
+{'wall_seconds': 2.5894178750459105, 'parent_cpu_seconds': 0.245129, 'cpu_budget_percent': 25, 'exit_code': 0}

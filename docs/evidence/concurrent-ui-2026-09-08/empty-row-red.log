@@ -1,0 +1,39 @@
+SELECTION ['tests/eador/test_concurrent_scene.py', 'tests/eador/test_human_battle_scene.py', 'tests/eador/test_shard_map.py', 'tests/eador/test_shard_reading.py', 'tests/eador/test_replacement_scene.py', 'tests/eador/test_scene.py::test_stronghold_unlocks_recruitment_through_keyboard_and_mouse', 'tests/eador/test_scene.py::test_adventure_choices_restore_then_equip_a_relic_through_input', 'tests/eador/test_scene.py::test_battle_save_restores_playable_tactics_and_returns_wounds_to_map', 'tests/eador/test_scene.py::test_keyboard_only_tactics_move_cast_attack_reload_and_retreat', 'tests/eador/test_scene.py::test_exhausted_actions_show_complete_guidance_above_the_disabled_travel_control']
+...........................F
+=================================== FAILURES ===================================
+__________ test_complete_replacement_reading_and_saved_manual_rescue ___________
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-2046/test_complete_replacement_read0')
+
+    def test_complete_replacement_reading_and_saved_manual_rescue(tmp_path):
+        """Every offered role reflows; file errors preserve all roster rows and the paid Warden rescues a real flank."""
+        from tools.verify_eador_replacement import verify
+>       verify(tmp_path, backend='mock')
+
+tests/eador/test_replacement_scene.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/verify_eador_replacement.py:147: in verify
+    quote=asdict(game.scene.quote), labels=check_reading_layout(game.scene))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scene = <eador.replacement_scene.ReplacementScene object at 0x10be1cc00>
+
+    def check_reading_layout(scene):
+        """Every reading Label stays on canvas and clear of other text and controls."""
+        labels = scene.ui.find_all(lambda item: isinstance(item, Label) and item.visible)
+        controls = scene.ui.find_all(lambda item: isinstance(item, Button) and item.visible)
+        assert labels
+        for index, label in enumerate(labels):
+            x, y, width, height = label.bounds
+            assert 0 <= x < x + width <= scene.game.width
+>           assert 0 <= y < y + height <= scene.game.height
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError
+
+tools/verify_eador_guidance.py:31: AssertionError
+=========================== short test summary info ============================
+FAILED tests/eador/test_replacement_scene.py::test_complete_replacement_reading_and_saved_manual_rescue
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 27 passed in 16.94s
+{'wall_seconds': 17.040190665982664, 'cpu_seconds': 4.293198, 'cpu_allowance_percent': 25, 'exit_code': 1, 'source_unchanged': True}

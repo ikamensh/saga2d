@@ -9,6 +9,26 @@ apply to their named source snapshots, not to today's build.
 
 ## Current source work — 2026-09-08
 
+**1cce62a** connects the development concurrent campaign UI to independent PvE
+and ordinary alternating human battles. The map retains quiet province names,
+separate army banners/cards and text scaling; shared readers use the local
+capital and the actual campaign day. Paid challenges explain their wait, and
+accepted results/replacements remove obsolete panels without interrupting the
+live room. A compatibility failure also removed an empty ability row from the
+ordinary troop replacement review.
+[UI/server evidence](evidence/concurrent-ui-2026-09-08/README.md) records **34 final
+integration checks**, directed native routes for both seats and an earned
+wait/battle/retreat/choice journey. Earlier increments add server checkpoint
+restart support (**d3ebdc9**, 20 selected tests), paid Realm services
+(**2915a91**, 42 selected tests), and generic retained-scene return
+(**44fbe78**, 38 focused tests). These selections overlap; they are not a unique
+test total. All execution jobs in this task closed.
+
+This PvP entry remains development-only. Peer-order playback, player-facing
+setup/leave/rejoin, two independent native game processes, native capital
+outcomes and packaged multiplayer acceptance are still open. The preserved
+Mac archive is unchanged; **G01–G19 remain incomplete**.
+
 **3ea107e** refines the shard through three further inspected passes: adventure
 markers appear on owned or inspected provinces, colored frontiers outline
 territories, and hover names sit over the pointed province without splitting
