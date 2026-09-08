@@ -265,7 +265,7 @@ class State(Realm):
         self.log.append(f'Battle at {title}.')
 
     def resolve_battle(self) -> str:
-        from eador.battle_results import apply_army_result
+        from eador.battle_results import persist_province_defenders
         if self.battle is None or self.battle.outcome is None:
             raise RuleError('The battle is not finished.')
         battle = self.battle
@@ -283,31 +283,13 @@ class State(Realm):
                 expedition_lost = True
                 self.rival.defeated(self)
         else:
-            survivors = [unit for unit in enemies if unit.hp > 0]
-            if self.battle_kind == 'site':
-                province.site_guards = [unit.kind for unit in survivors]
-                province.site_guard_hp = [unit.hp for unit in survivors]
-            else:
-                province.guards = [unit.kind for unit in survivors]
-                province.guard_hp = [unit.hp for unit in survivors]
-        army_result = apply_army_result(self.hero, battle, hero_level_cap=self.hero_level_cap,
-                                        troop_level_cap=self.troop_level_cap)
+            persist_province_defenders(province, battle, kind=self.battle_kind)
+        army_result = self.apply_battle_progression(battle, hero_level_cap=self.hero_level_cap,
+                                                    troop_level_cap=self.troop_level_cap)
         casualties = army_result.casualties
         if victory:
-            for level in army_result.hero_levels:
-                self.log.append(f'{self.hero.name} reached level {level}.')
-                choice = self._skill_choice()
-                if choice:
-                    self._choices.append(choice)
             if self.battle_kind == 'site':
-                province.explored = True
-                reward = self.battle_adventure
-                gold, crystals, relic = (reward.gold, reward.crystals, reward.relic) if reward else (province.site_gold, province.site_crystals, province.site_relic)
-                self.gold += gold
-                self.crystals += crystals
-                message = f'Explored {province.site}: +{gold} gold, +{crystals} crystals.'
-                if relic:
-                    self._choices.append(self._relic_choice(relic))
+                message = self.reward_site(province)
             elif self.battle_kind == 'intercept' and province.guards:
                 self.gold += 25
                 message = f'The rival expedition is broken: +25 gold. {province.name} still has a garrison.'

@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import TYPE_CHECKING
 
+from eador.battle_results import ArmyResult, apply_army_result
 from eador.content import AdventureAttempt, Choice, ChoiceOption, RELICS, SKILLS
 from eador.difficulty import RULESETS, DifficultySpec
 from eador.entities import (BUILDINGS, RECRUITABLE, UNITS, Hero, InfusionPreview, Pos,
@@ -81,6 +82,30 @@ class Realm:
         return Choice(f'Discovered {spec.name}', 'Keep its power or fund your realm. Only one relic can be equipped.',
                       (first, ChoiceOption('sell', f'Sell for {spec.value} gold', 'Trade the relic for immediate resources.')),
                       'relic', relic)
+
+    def apply_battle_progression(self, battle: Battle, *, hero_level_cap: int | None = None,
+                                 troop_level_cap: int | None = None) -> ArmyResult:
+        """Apply earned wounds and ranks, queuing skill choices before encounter rewards."""
+        result = apply_army_result(self.hero, battle, hero_level_cap=hero_level_cap,
+                                   troop_level_cap=troop_level_cap)
+        for level in result.hero_levels:
+            self.log.append(f'{self.hero.name} reached level {level}.')
+            choice = self._skill_choice()
+            if choice:
+                self._choices.append(choice)
+        return result
+
+    def reward_site(self, province: Province) -> str:
+        """Pay a won site's recorded attempt once; the caller owns result acceptance."""
+        province.explored = True
+        reward = self.battle_adventure
+        gold, crystals, relic = ((reward.gold, reward.crystals, reward.relic) if reward else
+                                 (province.site_gold, province.site_crystals, province.site_relic))
+        self.gold += gold
+        self.crystals += crystals
+        if relic:
+            self._choices.append(self._relic_choice(relic))
+        return f'Explored {province.site}: +{gold} gold, +{crystals} crystals.'
 
     def choose(self, option_id: str) -> None:
         choice = self.choice

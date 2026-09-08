@@ -1,10 +1,10 @@
-"""A hero's earned PvE wounds and progression, separate from province and realm rewards."""
+"""Earned PvE army progression and surviving defenders, separate from world ownership."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from eador.model import Hero, RuleError, UNITS
+from eador.entities import Hero, Province, RuleError, UNITS
 
 if TYPE_CHECKING:
     from eador.battle import Battle
@@ -14,6 +14,24 @@ if TYPE_CHECKING:
 class ArmyResult:
     casualties: tuple[str, ...]
     hero_levels: tuple[int, ...]
+
+
+def persist_province_defenders(province: Province, battle: Battle, *, kind: str) -> None:
+    """Retain actual enemy survivors after a completed conquest or site attempt.
+
+    Victory by holding or escaping can leave living defenders. Site completion
+    and ownership belong to the caller; neither this battle nor its outcome changes.
+    """
+    if battle.outcome is None:
+        raise RuleError('The battle is not finished.')
+    if kind not in ('conquest', 'site'):
+        raise RuleError('Choose a conquest or site encounter.')
+    survivors = [unit for unit in battle.units if unit.team == 'enemy' and unit.hp > 0]
+    kinds, health = [unit.kind for unit in survivors], [unit.hp for unit in survivors]
+    if kind == 'site':
+        province.site_guards, province.site_guard_hp = kinds, health
+    else:
+        province.guards, province.guard_hp = kinds, health
 
 
 def apply_army_result(hero: Hero, battle: Battle, *, hero_level_cap: int | None = None,
