@@ -201,7 +201,8 @@ def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, 
         if not all(report[key] for key in ("frozen", "save_load_roundtrip", "codex_and_rival_rendered",
                                           "battle_save_load_roundtrip", "guard_save_load_roundtrip",
                                           "settings_apply_cancel_restart", "audio_catalogue_decoded_and_played",
-                                          "audio_live_mix_and_cleanup", "native_input_journey")):
+                                          "audio_live_mix_and_cleanup", "native_input_journey",
+                                          "shard_controls_verified")):
             raise RuntimeError(f"Packaged smoke verification failed: {report}")
         if Path(report["executable"]).resolve() != executable.resolve():
             raise RuntimeError("Smoke verification did not run the extracted executable")
