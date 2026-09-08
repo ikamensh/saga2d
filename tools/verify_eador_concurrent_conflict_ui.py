@@ -20,6 +20,7 @@ from saga2d import Button, Label, MatchClient, MatchHost
 from eador.app import create_game
 from eador.concurrent_campaign import ConcurrentCampaign
 from eador.concurrent_scene import ConcurrentShardScene
+from eador.concurrent_playback import RecordedCombatPlayback
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ChoiceScene
 from tools.cpu_budget import CpuBudget
@@ -64,7 +65,7 @@ def verify(output, *, backend='pyglet'):
         assert match.realms[seat].battle.outcome == 'player', 'The paid preparation did not win.'
         send('resolve_battle')
 
-    def settle(until):
+    def settle(until, *, applied=True):
         deadline = time.monotonic() + 6
         while time.monotonic() < deadline:
             host.poll()
@@ -72,17 +73,17 @@ def verify(output, *, backend='pyglet'):
             player._tick()
             assert not host.error and not client.error, (host.error, client.error)
             if (until() and host.state == match.snapshot(0) and client.state == match.snapshot(1)
-                    and (root is None or root._revision == client.revision)):
+                    and (not applied or root is None or root._revision == client.revision)):
                 return
             time.sleep(.005)
         raise AssertionError('Conflict UI and both socket views did not converge.')
 
-    def peer_order(action, *args):
+    def peer_order(action, *args, applied=True):
         nonlocal source
         source = 'seat-0 socket host public order'
         revision = match.realms[0].revision
         host.submit(envelope(0, action, *args))
-        settle(lambda: match.realms[0].revision > revision)
+        settle(lambda: match.realms[0].revision > revision, applied=applied)
 
     def control(text, *, enabled=True):
         button = game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == text)
@@ -182,22 +183,57 @@ def verify(output, *, backend='pyglet'):
         before = match.checkpoint()
         player.press('e')
         assert match.checkpoint() == before
-        peer_order('battle.guard', match.encounter.battle.enemy_magic.hero_id)
+        player.press('f1')
+        reader = game.scene
+        hero_id = match.encounter.battle.enemy_magic.hero_id
+        destination = sorted(match.encounter.battle.reachable(hero_id))[0]
+        peer_order('battle.move', hero_id, list(destination), applied=False)
+        peer_order('battle.guard', hero_id, applied=False)
         gold = [realm.gold for realm in match.realms]
-        peer_order('retreat')
+        peer_order('retreat', applied=False)
+        accepted = match.checkpoint()
+        assert game.scene is reader and root.state.battle is not None
+        capture('06-help-retains-peer-move-guard-retreat-125')
+        player.press('escape')
+        settle(lambda: isinstance(game.scene, RecordedCombatPlayback), applied=False)
+        historical = game.scene
+        assert historical.team == 'player' and not historical.accepts_orders
+        assert historical.playback.trace.after.outcome_reason == 'retreat'
+        assert any(event.kind == 'move' for event in historical.playback.trace.events)
+        settle(lambda: historical.playback.event.kind == 'move' and historical.playback.fraction >= .3,
+               applied=False)
+        capture('07-peer-move-playback-125')
+        player.button('Battle log')
+        assert game.scene.title == 'Recorded battle log'
+        capture('08-historical-log-125')
+        player.press('escape')
+        assert game.scene is historical
+        player.press('f6')
+        assert game.scene.title == 'Live room'
+        capture('09-historical-live-save-125')
+        player.press('escape')
+        player.press('space')
         settle(lambda: isinstance(game.scene, ChoiceScene) and root.state.battle is None)
+        assert match.checkpoint() == accepted
         assert match.encounter is None and not match.claims
         assert match.provinces[(0, 0)].owner == 'realm:1' and match.realms[1].hero.pos == (0, 0)
         assert match.realms[0].hero.pos == match.realms[0].capital
         assert [realm.gold for realm in match.realms] == [max(0, gold[0] - 20), gold[1]]
         assert match.day == 1 and match.winner is None
         assert root.state.choice.kind == 'skill' and root.state.hero.level == 2
-        capture('06-attacker-earned-choice-125')
+        capture('10-attacker-earned-choice-125')
         choice = root.state.choice.options[0].id
         ui_order('choose', (choice,), lambda: player.press('1'),
                  lambda: game.scene is root and root.state.choice is None)
         assert game.scenes == [root]
-        capture('07-returned-map-125')
+        capture('11-returned-map-125')
+        before = match.checkpoint()
+        match = ConcurrentCampaign.restore(before)
+        host.snapshot = match.snapshot
+        host.publish()
+        settle(lambda: 'room restarted' in root.message)
+        assert match.checkpoint() == before
+        capture('12-restored-authority-notice-125')
         report['completed'] = True
     finally:
         try:

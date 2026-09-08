@@ -17,6 +17,7 @@ from eador.economy import income_preview, recovery_preview, settle_realm
 from eador.entities import Hero, Pos, Province, RuleError, SaveFormatError, Troop
 from eador.realm import Realm
 from eador.battle import Battle
+from eador.combat_journal import CombatJournal
 
 
 @dataclass
@@ -82,6 +83,7 @@ class ConcurrentCampaign:
     claims: dict[Pos, int] = field(default_factory=dict)
     winner: int | None = None
     encounter: ArmyEncounter | None = None
+    combat_journal: CombatJournal = field(default_factory=CombatJournal, repr=False, compare=False)
 
     @classmethod
     def new(cls, seed=7, *, heroes=('Commander', 'Commander'), theme='frontier',
@@ -256,6 +258,7 @@ class ConcurrentCampaign:
                                              self.provinces[encounter.destination].terrain,
                                              attacker.spells, defender.spells,
                                              seed=self.seed + self.day * 37)
+        self.combat_journal.begin()
         self.claims[encounter.destination] = attacker.seat
         for realm in (attacker, defender):
             realm.log.append(f'Armies meet at {self.provinces[encounter.destination].name}.')
@@ -278,14 +281,21 @@ class ConcurrentCampaign:
                     raise RuleError('Retreat takes no arguments.')
                 if battle.outcome is not None:
                     raise RuleError('The battle is over; accept its result.')
+                before = battle.to_dict()
                 battle.outcome = 'enemy' if team == 'player' else 'player'
                 battle.outcome_reason = 'retreat'
+                self.combat_journal.record(before, battle.to_dict(),
+                                           {'action': 'retreat', 'outcome': battle.outcome, 'reason': battle.outcome_reason},
+                                           attacker=self.encounter.attacker, destination=self.encounter.destination)
                 self._resolve_armies()
             else:
                 action = action.removeprefix('battle.')
                 if action not in BATTLE_ORDERS:
                     raise RuleError('Unknown battle order.')
+                before = battle.to_dict()
                 invoke_order(battle, action, args, kwargs)
+                self.combat_journal.record(before, battle.to_dict(), {'action': action, 'args': args, 'kwargs': kwargs},
+                                           attacker=self.encounter.attacker, destination=self.encounter.destination)
         else:
             raise RuleError('Finish the shared army battle first.')
         return {0, 1}
@@ -578,6 +588,7 @@ class ConcurrentCampaign:
         other = self.realms[1 - seat]
         return json.loads(json.dumps({
             'seed': self.seed, 'theme': self.theme, 'day': self.day, 'seat': seat, 'winner': self.winner,
+            'presentation': self.combat_journal.snapshot(),
             'encounter': self.encounter.to_dict() if self.encounter else None,
             'realm': _realm_data(self.realms[seat]),
             'provinces': [asdict(self.provinces[pos]) for pos in sorted(self.provinces)],

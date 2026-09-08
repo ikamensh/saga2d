@@ -2,6 +2,7 @@
 from saga2d import Anchor, Column, Label, Row, CommandError
 from eador import art
 from eador.concurrent_view import ConcurrentView
+from eador.concurrent_playback import CombatInbox, RecordedCombatPlayback
 from eador.model import UNITS, RuleError
 from eador.preferences import load_preferences, reading_scale
 from eador.scene import ShardScene, Screen, OrderPending, CatalogScene, HeroScene, BattleScene, ChoiceScene
@@ -16,6 +17,7 @@ class ConcurrentShardScene(ShardScene):
         self.session = session
         self._revision = session.revision
         self._pending = None
+        self._combat = CombatInbox(session.state['presentation'])
         super().__init__(ConcurrentView.from_snapshot(session.state))
 
     @property
@@ -92,10 +94,13 @@ class ConcurrentShardScene(ShardScene):
             top.refresh()
 
     def _poll(self):
-        from eador.battle_playback_scene import BattlePlaybackScene
+        from eador.battle_playback_scene import CombatPlaybackScene
         from eador.encounter_scene import EncounterScene
         from eador.replacement_scene import ReplacementScene
         self.session.poll()
+        # Transport snapshots may coalesce and realm revisions differ by seat.
+        # Consume the independent combat cursor even while a reader is open.
+        self._combat.observe(self.session.state['presentation'])
         if self.session.error:
             self.message = self.session.error
             self.session.error = ''
@@ -104,25 +109,36 @@ class ConcurrentShardScene(ShardScene):
                                             CampaignOutcome, EncounterScene, ReplacementScene)):
                 self.game.scene.message = self.message
                 self.game.scene.refresh()
+        # Keep Help/settings and accepted playback intact. The socket continues
+        # receiving into a bounded inbox until the reader returns.
+        if isinstance(self.game.scene, CombatPlaybackScene) or not isinstance(
+                self.game.scene, (ConcurrentShardScene, BattleScene, CatalogScene, HeroScene,
+                                  ChoiceScene, CampaignOutcome, EncounterScene, ReplacementScene)):
+            return
+        while self._combat.pending:
+            try:
+                recording = self._combat.take()
+            except CommandError as error:
+                self._combat.reset(self.session.state['presentation'], str(error))
+                break
+            if recording.trace.events:
+                self.game.push(RecordedCombatPlayback(self, recording))
+                return
         if self._revision == self.session.revision:
+            self._show_combat_notice()
             return
         previous = self.state
         changed = self.session.state['realm']['revision'] != previous.revision
-        # Keep Help/settings and accepted playback intact. The socket continues
-        # receiving; a later tick applies its latest state when the reader returns.
-        if changed and (isinstance(self.game.scene, BattlePlaybackScene) or not isinstance(
-                self.game.scene, (ConcurrentShardScene, BattleScene, CatalogScene, HeroScene,
-                                  ChoiceScene, CampaignOutcome, EncounterScene, ReplacementScene))):
-            return
         next_state = ConcurrentView.from_snapshot(self.session.state)
         trace = None
         if not changed:
             if (next_state.provinces == previous.provinces and next_state.opponent == previous.opponent
                     and next_state.claims == previous.claims and next_state.encounter == previous.encounter):
                 self._revision = self.session.revision
+                self._show_combat_notice()
                 return
             next_state.battle = previous.battle
-        elif self._pending:
+        elif self._pending and previous.battle_kind != 'army':
             command, preview, proposed_trace = self._pending
             if (next_state.battle and next_state.revision == command['realm_revision'] + 1
                     and preview == next_state.battle.to_dict()):
@@ -137,9 +153,19 @@ class ConcurrentShardScene(ShardScene):
         self.refresh()
         if changed:
             self._reconcile(trace)
+        self._show_combat_notice()
+
+    def _show_combat_notice(self):
+        notice = self._combat.take_notice()
+        if notice:
+            self.message = notice
+            self.game.scene.message = notice
+            self.game.scene.refresh()
 
     def order(self, action, *args, target='state', **kwargs):
-        if self._pending is not None:
+        from eador.battle_playback_scene import CombatPlaybackScene
+        if (self._pending is not None or self._combat.pending or self._revision != self.session.revision
+                or isinstance(self.game.scene, CombatPlaybackScene)):
             raise RuleError('Wait for the previous order to arrive.')
         command = {'day': self.state.day, 'realm_revision': self.state.revision,
                    'action': 'battle.' + action if target == 'battle' else action,

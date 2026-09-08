@@ -82,25 +82,22 @@ class BattlePlayback:
         return x, y
 
 
-class BattlePlaybackScene(BattleScene):
+class CombatPlaybackScene(BattleScene):
     """Reuse the battle HUD in a modal scene that owns all playback input."""
     controls = {'space': 'finish', 'return': 'finish', 'escape': 'finish',
                 'f5': 'save_game', 'f9': 'load_game', 'f6': 'browse_saves',
                 'f1': 'help', 'f2': 'open_text_settings'}
     accepts_orders = False
 
-    def __init__(self, parent, trace, *, finish_contacts_on_skip=False):
-        self.parent = parent
-        self.playback = BattlePlayback(parent.battle, trace)
+    def __init__(self, root, battle, trace, *, finish_contacts_on_skip=False):
+        self.playback = BattlePlayback(battle, trace)
         self.finished = False
         # A decisive manual hit keeps its short contact sequence when skipped;
         # skipping a whole enemy/autoplay turn must not burst every omitted cue.
         self.finish_contacts_on_skip = finish_contacts_on_skip
         self._contact_cursor = 0
-        super().__init__(parent.root)
+        super().__init__(root)
         self.floats = health_notices(trace, self.playback.duration)
-        self.selected = parent.selected
-        self.message = parent.message
         self._shown = None
 
     @property
@@ -134,11 +131,17 @@ class BattlePlaybackScene(BattleScene):
             lines.append(label(f'{side} {unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL if local else RED))
         lines.extend([label('Watch each move, ability and reaction in order.'),
                       label('Space, Enter or Esc finishes playback.'),
-                      label('Saving records the outcome of these orders. Loading skips their animation.', 11)])
+                      label('The room continues while you watch. Finish playback to see its current state.'
+                            if getattr(self.root, 'live_match', False) else
+                            'Saving records the outcome of these orders. Loading skips their animation.', 11)])
         return Column(*lines, spacing=18)
 
     def order_hint(self):
         return 'Watching resolved actions. Space finishes playback; L opens the complete battle log.'
+
+    @property
+    def order_blocked_reason(self):
+        return self.order_hint()
 
     def action_targets(self):
         return []
@@ -151,7 +154,10 @@ class BattlePlaybackScene(BattleScene):
         return False
 
     def read_log(self):
-        self.parent.read_log()
+        from eador.diagnostics import DiagnosticScene
+        self.game.push(DiagnosticScene('\n'.join(event.text for event in self.playback.trace.events),
+                                       title='Recorded battle log', body_color=MUTED,
+                                       return_label='Return to playback'))
 
     def _unit_center(self, unit):
         return self.playback.position(unit, self.grid, still=reduced_motion(self.game))
@@ -202,6 +208,23 @@ class BattlePlaybackScene(BattleScene):
 
     def _feedback_event(self):
         return (None, 0) if self.playback.done else (self.playback.event, self.playback.fraction)
+
+    def finish(self):
+        """Completion belongs to the scene that supplies this historical view."""
+        raise NotImplementedError
+
+
+class BattlePlaybackScene(CombatPlaybackScene):
+    """Resume the same solo/private battle after its accepted local command."""
+
+    def __init__(self, parent, trace, *, finish_contacts_on_skip=False):
+        self.parent = parent
+        super().__init__(parent.root, parent.battle, trace,
+                         finish_contacts_on_skip=finish_contacts_on_skip)
+        self.selected, self.message = parent.selected, parent.message
+
+    def read_log(self):
+        self.parent.read_log()
 
     def finish(self):
         if not self.finished:

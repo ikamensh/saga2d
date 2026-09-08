@@ -21,6 +21,14 @@ def realm_order(view, action, *args):
             'action': action, 'args': list(args), 'kwargs': {}}
 
 
+def assert_restored_view(actual, previous):
+    """Authority restart retains every realm/map fact and resets only the ephemeral presentation stream."""
+    actual, previous = dict(actual), dict(previous)
+    fresh, old = actual.pop('presentation'), previous.pop('presentation')
+    assert actual == previous
+    assert fresh['epoch'] != old['epoch'] and fresh['head'] == 0 and fresh['records'] == []
+
+
 def test_private_campaign_checkpoint_preserves_both_realms_and_their_next_commands(tmp_path):
     """The catalog stores complete authority rather than erasing seat 1 through seat 0's view."""
     budget = CpuBudget(25)
@@ -48,7 +56,7 @@ def test_private_campaign_checkpoint_preserves_both_realms_and_their_next_comman
     assert len(saved['state']['realms']) == 2
     resumed = restore_match(saved['game'], json.loads(json.dumps(saved['state'])))
     for seat in (0, 1):
-        assert resumed.snapshot(seat) == views[seat]
+        assert_restored_view(resumed.snapshot(seat), views[seat])
         following = realm_order(views[seat], 'battle.guard', 0)
         match.apply(seat, following)
         resumed.apply(seat, following)
@@ -116,7 +124,7 @@ def test_hosted_campaign_private_wait_and_human_turn_survive_two_process_restart
                                          resume_token=seats[0]['resume_token'])
                     waiting = receive(host)
                     assert returned['player'] == 0 and not waiting['ready']
-                    assert waiting['state'] == before[0]
+                    assert_restored_view(waiting['state'], before[0])
                     returned = handshake(guest, 'resume', game=GAME, room=seats[1]['room'],
                                          resume_token=seats[1]['resume_token'])
                     assert returned['player'] == 1
@@ -125,7 +133,8 @@ def test_hosted_campaign_private_wait_and_human_turn_survive_two_process_restart
                 assert all('realms' not in view['state'] and 'gold' not in view['state']['opponent']
                            for view in views)
                 if before is not None:
-                    assert [view['state'] for view in views] == before
+                    for view, previous in zip(views, before):
+                        assert_restored_view(view['state'], previous)
 
                 if phase == 0:
                     for seat, destination in ((0, [-1, 0]), (1, [1, 0])):
@@ -176,4 +185,5 @@ def test_hosted_campaign_private_wait_and_human_turn_survive_two_process_restart
             store.close()
         assert saved['game'] == GAME and len(saved['state']['realms']) == 2
         resumed = restore_match(GAME, saved['state'])
-        assert [resumed.snapshot(seat) for seat in (0, 1)] == before
+        for seat in (0, 1):
+            assert_restored_view(resumed.snapshot(seat), before[seat])

@@ -39,6 +39,14 @@ def approaching_armies(budget):
     return match
 
 
+def assert_restored_view(actual, previous):
+    """All persisted/public facts survive restore; ephemeral combat history starts at the current baseline."""
+    actual, previous = dict(actual), dict(previous)
+    fresh, old = actual.pop('presentation'), previous.pop('presentation')
+    assert actual == previous
+    assert fresh['epoch'] != old['epoch'] and fresh['head'] == 0 and fresh['records'] == []
+
+
 def test_paid_replacement_uses_the_own_realm_quote_and_keeps_its_saved_formation():
     """Replacing a real starter troop pays once, keeps its slot and leaves the peer unchanged."""
     from eador.concurrent_campaign import ConcurrentCampaign
@@ -52,7 +60,9 @@ def test_paid_replacement_uses_the_own_realm_quote_and_keeps_its_saved_formation
     before = match.checkpoint()
     peer = match.snapshot(1)
     resumed = ConcurrentCampaign.restore(before)
+    assert_restored_view(resumed.snapshot(1), peer)
     for room in (match, resumed):
+        peer = room.snapshot(1)
         order(room, 0, 'replace_troop', 1, 'swordsman')
         actual = room.realms[0]
         assert [troop.id for troop in actual.hero.army] == [quote.incoming.id, 2, 3]
@@ -98,7 +108,9 @@ def test_paid_infusion_uses_won_shrine_crystals_and_restores_only_its_own_hero()
     before = match.checkpoint()
     peer = match.snapshot(1)
     resumed = ConcurrentCampaign.restore(before)
+    assert_restored_view(resumed.snapshot(1), peer)
     for room in (match, resumed):
+        peer = room.snapshot(1)
         order(room, 0, 'infuse')
         actual = room.realms[0]
         assert actual.hero.mana == before['realms'][0]['hero']['mana'] + quote.mana
@@ -119,7 +131,8 @@ def test_both_views_publish_the_same_saved_map_seed_and_theme():
         assert (view['seed'], view['theme']) == (-7, 'ruins')
         assert view['realm']['seat'] == seat and 'realms' not in view
     resumed = ConcurrentCampaign.restore(match.checkpoint())
-    assert [resumed.snapshot(seat) for seat in (0, 1)] == [match.snapshot(seat) for seat in (0, 1)]
+    for seat in (0, 1):
+        assert_restored_view(resumed.snapshot(seat), match.snapshot(seat))
 
 
 @pytest.mark.parametrize('action,args,kwargs,reason', [
