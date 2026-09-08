@@ -1,0 +1,91 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-09-08T10:33:56Z",
+  "databaseId": 34216123836,
+  "headSha": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+  "jobs": [
+    {
+      "name": "build",
+      "id": 102028161136,
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve source bytes",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+          "conclusion": "success"
+        },
+        {
+          "name": "Resolve exact release identity",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run Warband and shared transport regression tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build pinned runtime, portable ZIP and per-user installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Prepare pinned Mesa WGL driver for native CI checks only",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify extracted and installed executables over real sockets",
+          "conclusion": "success"
+        },
+        {
+          "name": "Retain build and verification evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "publish",
+      "id": 102029793169,
+      "conclusion": "skipped",
+      "steps": []
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-09-08T10:39:45Z",
+  "url": "https://github.com/ikamensh/saga2d/actions/runs/34216123836",
+  "workflowName": "Warband Windows installer",
+  "artifact": {
+    "id": 10052026640,
+    "name": "warband-windows-85becd0fda8493fffc14ad33baee32f4fccdee64-1",
+    "size_in_bytes": 67254744,
+    "digest": "sha256:ba686f957f2a6013db19f12b0b598a5e8de3a862bc0da9550cd0a177574d49bf",
+    "created_at": "2026-09-08T10:39:40Z",
+    "expires_at": "2026-10-08T10:39:38Z",
+    "expired": false
+  },
+  "superseded_cancelled_run": {
+    "id": 34215610599,
+    "source_commit": "9e8cadb1950a8891a509cc12d834efc4c04ac085",
+    "reason": "Cancelled before packaging to fix camera retention beneath transparent overlays and improve native input verification."
+  }
+}

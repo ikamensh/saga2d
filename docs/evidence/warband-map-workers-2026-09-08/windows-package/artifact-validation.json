@@ -1,0 +1,60 @@
+{
+  "validated_at": "2026-09-08T10:42:33.121170+00:00",
+  "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+  "version": "0.1.0-preview.3",
+  "run_id": 34216123836,
+  "artifact_id": 10052026640,
+  "artifacts": {
+    "Warband-0.1.0-preview.3-windows-x64-portable.zip": {
+      "bytes": 37340330,
+      "sha256": "945fcccc5055781d43c6c725b4c0da94bcff1ca406e90fa17ef8bb172bae2de7"
+    },
+    "Warband-0.1.0-preview.3-windows-x64-setup.exe": {
+      "bytes": 27055132,
+      "sha256": "10a1a78748f9b2954fa3a18119dee359d8254d4e36efb8226032e1fd1d190a26"
+    }
+  },
+  "executable_sha256": "3bf4924485503977cff21dc32797c6fa2449b313cd9fae3563239615f3c1c2f5",
+  "diagnostics": {
+    "portable.json": {
+      "passed": true,
+      "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+      "version": "0.1.0-preview.3",
+      "executable_sha256": "3bf4924485503977cff21dc32797c6fa2449b313cd9fae3563239615f3c1c2f5"
+    },
+    "installed.json": {
+      "passed": true,
+      "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+      "version": "0.1.0-preview.3",
+      "executable_sha256": "3bf4924485503977cff21dc32797c6fa2449b313cd9fae3563239615f3c1c2f5"
+    },
+    "public-server.json": {
+      "passed": true,
+      "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+      "version": "0.1.0-preview.3",
+      "executable_sha256": "3bf4924485503977cff21dc32797c6fa2449b313cd9fae3563239615f3c1c2f5"
+    },
+    "native.json": {
+      "passed": true,
+      "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+      "version": "0.1.0-preview.3",
+      "executable_sha256": "3bf4924485503977cff21dc32797c6fa2449b313cd9fae3563239615f3c1c2f5"
+    }
+  },
+  "all_diagnostics_match_executable": true,
+  "embedded_build_info_matches_manifest": true,
+  "mesa_dlls_absent_from_portable_zip": true,
+  "mesa_dlls_absent_from_installer_extraction_log": true,
+  "installer_mesa_scope": "Installer uses the same pre-Mesa build directory as the portable ZIP; native test DLLs are added only after install and removed after acceptance.",
+  "screenshots_visually_inspected": [
+    "native-title.png",
+    "native-multiplayer.png",
+    "native-room-code.png",
+    "native-paste-code.png",
+    "native-online-match.png",
+    "native-settlement-train.png",
+    "native-settlement-plans.png",
+    "native-match-menu.png",
+    "native.png"
+  ]
+}
