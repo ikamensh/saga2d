@@ -346,6 +346,7 @@ def test_warband_selection_facts_are_drawn_above_their_background(tmp_path):
 
 def test_shardbound_offline_save_controls_preserve_the_live_match(tmp_path):
     """The battle's save browser cannot replace co-op with a local campaign."""
+    from eador.diagnostics import DiagnosticScene
     from eador.app import create_game
     from eador.model import State
     from eador.multiplayer import ShardboundMatch, NetworkShardScene
@@ -367,15 +368,16 @@ def test_shardbound_offline_save_controls_preserve_the_live_match(tmp_path):
         assert isinstance(game.scene, BattleScene)
         assert not game.scene.load_game()
         assert game.scene.root is root
-        browser = SaveScene(root, mode='load')
-        game.push(browser)
-        browser.activate(0)
-        assert game.scene is browser
-        browser.toggle()
-        browser.activate(0)
-        assert saves.load(1).seed == 99
-        assert client.ready
-        game.pop()
+        for mode in ('load', 'save'):
+            game.push(SaveScene(root, mode=mode))
+            assert isinstance(game.scene, DiagnosticScene)
+            assert 'live' in game.scene.message.lower()
+            assert saves.load(1).seed == 99
+            assert client.ready
+            game.backend.inject_key('escape')
+            game.tick(.03)
+            assert isinstance(game.scene, BattleScene)
+            assert game.scene.root is root
         help_scene = HelpScene(root)
         game.push(help_scene)
         help_scene.title()
