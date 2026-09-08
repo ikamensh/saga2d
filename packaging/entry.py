@@ -154,6 +154,91 @@ def verify_forecast_save(save_path: Path, image_path: Path, *, backend='pyglet')
     return report
 
 
+def verify_shard_controls(game, image_path: Path, *, backend='pyglet', budget=None) -> dict:
+    """Read the installed map and click its primary orders, then restore the smoke save."""
+    from saga2d import Button, Label
+    from eador.model import State
+    from eador.preferences import load_preferences, reading_scale
+    from eador.scene import BattleScene, ShardScene
+    from tools.cpu_budget import CpuBudget
+    from tools.eador_ui import PlayerInput
+
+    budget = CpuBudget(25) if budget is None else budget
+
+    class PacedInput(PlayerInput):
+        def _tick(self):
+            super()._tick()  # Native inputs already cap explicit frames at 30 FPS.
+            budget.checkpoint()
+
+    image_path = image_path.resolve()
+    player = PacedInput(game, native=backend == 'pyglet', output=image_path.parent, finish_actions=False)
+    assert isinstance(game.scene, ShardScene) and reading_scale(game) == 100
+    saved = player.state.to_json()
+    preferences = load_preferences(game)
+    saved_preferences = preferences.path.read_bytes()
+
+    def pointer(x, y):
+        player.events.append((type(game.scene).__name__, 'hover', (round(x), round(y))))
+        if player.native:
+            window = game.backend.window
+            scale = min(window.width / game.width, window.height / game.height)
+            px = (window.width - game.width * scale) / 2 + x * scale
+            py = (window.height - game.height * scale) / 2 + (game.height - y) * scale
+            window.dispatch_event('on_mouse_motion', round(px), round(py), 0, 0)
+        else:
+            game.backend.inject_mouse_move(round(x), round(y))
+        player._tick()
+        assert player.state.to_json() == saved
+
+    for key in ('f2', 'right', 'return', 'home'):
+        player.press(key)
+    assert reading_scale(game) == 125 and player.state.to_json() == saved
+    pointer(10, 100)
+    assert player.root.hover is None
+    clean_image = image_path.stem + '-shard-125'
+    hover_image = image_path.stem + '-shard-hover-125'
+    player.capture(clean_image, settle=False)
+    root = player.root
+    position = max((pos for pos, province in root.state.provinces.items() if not province.capital),
+                   key=lambda pos: len(root.state.provinces[pos].name))
+    pointer(*root.grid.center(position))
+    assert root.hover == position and root.selected == root.state.hero.pos
+    label, = root._hover_name.find_all(lambda item: isinstance(item, Label) and item.visible)
+    assert label.text == root.state.provinces[position].name
+    x, y, width, height = root._hover_name.bounds
+    assert 26 <= x < x + width <= root.edge - 26
+    assert root._summary_bottom <= y < y + height <= game.height - 158
+    lx, ly, lw, lh = label.bounds
+    assert x <= lx < lx + lw <= x + width and y <= ly < ly + lh <= y + height
+    player.capture(hover_image, settle=False)
+    pointer(10, 100)
+    explore = root.ui.find(lambda item: isinstance(item, Button) and item.text == 'Explore current province')
+    assert explore is not None and explore.show_text and explore.enabled
+    expected = State.from_json(saved)
+    orders = []
+    for action, control in (('explore', 'Explore current province'), ('retreat', 't'), ('end_turn', 'End turn')):
+        getattr(expected, action)()
+        if action == 'retreat':
+            player.press(control)
+        else:
+            player.button(control)
+        assert player.state.to_json() == expected.to_json(), action
+        assert isinstance(game.scene, BattleScene if action == 'explore' else ShardScene)
+        orders.append(action)
+    player.press('f9')
+    assert isinstance(game.scene, ShardScene) and game.scene is not root
+    assert player.state.to_json() == saved
+    for key in ('f2', 'left', 'return'):
+        player.press(key)
+    assert reading_scale(game) == 100 and player.state.to_json() == saved
+    assert preferences.path.read_bytes() == saved_preferences
+    return dict(verified=True, backend=backend, exact_orders=orders, hover_name=label.text,
+                state_sha256=hashlib.sha256(saved.encode()).hexdigest(),
+                input_activations=len(player.events), cpu_percent_requested=budget.percent,
+                images=[str(image_path.parent / (name + '.png')) for name in (clean_image, hover_image)]
+                       if player.native else [])
+
+
 def smoke(image_path: Path, *, forecast_save: Path | None = None) -> None:
     os.environ["SAGA2D_SILENT"] = "1"
     import eador
@@ -228,6 +313,7 @@ def smoke(image_path: Path, *, forecast_save: Path | None = None) -> None:
             saved = root.state.to_json()
             press(key.F9)
             assert game.scene.state.to_json() == saved
+            shard_controls = verify_shard_controls(game, image_path)
             root = game.scene
             capture("-shard")
             press(key.F1)
@@ -287,6 +373,8 @@ def smoke(image_path: Path, *, forecast_save: Path | None = None) -> None:
                 "battle_save_load_roundtrip": True,
                 "guard_save_load_roundtrip": True,
                 "native_input_journey": True,
+                "shard_controls_verified": shard_controls['verified'],
+                "shard_controls": shard_controls,
                 "audio_catalogue_decoded_and_played": True,
                 "audio_live_mix_and_cleanup": True,
                 "asset_path": str(assets),

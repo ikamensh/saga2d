@@ -56,3 +56,35 @@ def test_packaged_forecast_check_reads_an_external_earned_save_without_spending_
     assert report['input_activations'] > 0
     assert supplied.read_bytes() == original
     assert not Path(report['isolated_data_directory']).exists()
+
+
+def test_packaged_map_controls_read_and_spend_real_orders_then_restore_the_smoke_opening(tmp_path):
+    """The installed check clicks Explore/End turn, then restores the original save and settings."""
+    check = runpy.run_path(str(ENTRY))['verify_shard_controls']
+    from eador.__main__ import create_session
+    from eador.preferences import load_preferences, reading_scale
+    from eador.scene import ShardScene
+    from tools.eador_ui import PlayerInput
+
+    game, title = create_session(['--data-dir', str(tmp_path / 'player')], backend='mock', visible=False)
+    try:
+        game.push(title)
+        player = PlayerInput(game, finish_actions=False)
+        for key in ('o', 'left', 'down', 'left', 'return', 'return', 'f5', 'f9'):
+            player.press(key)
+        initial_root = game.scene
+        saved = player.state.to_json()
+        preferences = load_preferences(game)
+        original_preferences = preferences.path.read_bytes()
+
+        report = check(game, tmp_path / 'package.png', backend='mock')
+
+        assert report['verified'] and report['exact_orders'] == ['explore', 'retreat', 'end_turn']
+        assert report['input_activations'] > 0 and report['hover_name']
+        assert report['state_sha256'] == hashlib.sha256(saved.encode()).hexdigest()
+        assert isinstance(game.scene, ShardScene) and game.scene is not initial_root
+        assert player.state.to_json() == saved and reading_scale(game) == 100
+        assert preferences.path.read_bytes() == original_preferences
+        assert game.audio.get_volume('master') == .7 and game.audio.get_volume('music') == .4
+    finally:
+        game.close()
