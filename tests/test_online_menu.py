@@ -2,6 +2,8 @@
 import argparse
 import time
 
+import pytest
+
 from saga2d import Game, MatchMenu, Scene
 from tests.test_online_server import server_url, running_server
 
@@ -82,6 +84,9 @@ def test_online_creator_waits_for_partner_and_can_rejoin_after_app_restart(serve
         room = lobby.session.room
         assert not lobby.session.ready
         assert any(f'Room code: {room}' in t['text'] for t in game.backend.texts)
+        click_text('Copy room code')
+        assert game.backend.get_clipboard_text() == room
+        assert any('Copied' in t['text'] for t in game.backend.texts)
         click_text('Cancel')
         assert isinstance(game.scene, MatchMenu)
         assert any('Rejoin last room' in t['text'] for t in game.backend.texts)
@@ -120,3 +125,34 @@ def test_online_creator_waits_for_partner_and_can_rejoin_after_app_restart(serve
         game.close()
         if guest is not None:
             guest.close()
+
+
+@pytest.mark.parametrize('shortcut', [None, 'ctrl', 'meta'])
+def test_online_code_paste_replaces_input_and_rejects_unrelated_clipboard(tmp_path, shortcut):
+    """Friends can paste a copied code; unrelated text never becomes a partial room code."""
+    game = Game('paste room', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'saves')
+    try:
+        game.push(MatchMenu('Warband multiplayer', 'warband-v1', None, None))
+        game.tick(.03)
+        game.backend.inject_key('z')
+        game.tick(.03)
+        game.backend.set_clipboard_text('  ab12Cd34ef56\n')
+
+        def paste():
+            if shortcut:
+                game.backend.inject_key('v', **{shortcut: True})
+            else:
+                button = next(b for b in game.scene.ui.walk() if getattr(b, 'text', '') == 'Paste code')
+                x, y, w, h = button.bounds
+                game.backend.inject_click(x + w / 2, y + h / 2)
+            game.tick(.03)
+
+        paste()
+        assert game.scene.fields[2] == 'AB12CD34EF56'
+        for invalid in ('', 'room: ab12cd34ef56', 'abcdefghijklmnop', 'åbc123'):
+            game.backend.set_clipboard_text(invalid)
+            paste()
+            assert game.scene.fields[2] == 'AB12CD34EF56'
+            assert 'Copy just the room code' in game.scene.message
+    finally:
+        game.close()

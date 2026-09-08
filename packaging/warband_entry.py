@@ -17,7 +17,7 @@ def main():
         report = args.package_smoke or args.package_native_smoke.with_suffix(".json")
         report.parent.mkdir(parents=True, exist_ok=True)
         try:
-            result = smoke(args.endpoint) if args.package_smoke else native_smoke(args.package_native_smoke)
+            result = smoke(args.endpoint) if args.package_smoke else native_smoke(args.package_native_smoke, args.endpoint)
         except Exception as exc:
             report.write_text(json.dumps({"passed": False, "error_type": type(exc).__name__, "error": str(exc),
                                           "traceback": traceback.format_exc()}, indent=2), encoding="utf-8")

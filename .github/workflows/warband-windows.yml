@@ -58,7 +58,7 @@ jobs:
           }
       - name: Run Warband and shared transport regression tests
         run: |
-          uv run --locked --python 3.13.2 --extra dev python -m pytest tests/warband tests/framework/test_render3d.py tests/framework/test_network.py tests/test_multiplayer_games.py -q
+          uv run --locked --python 3.13.2 --extra dev python -m pytest tests/warband tests/framework/test_render3d.py tests/framework/test_network.py tests/test_multiplayer_games.py tests/test_online_menu.py -q
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build pinned runtime, portable ZIP and per-user installer
         run: |
