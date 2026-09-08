@@ -8,6 +8,7 @@ import math
 from pathlib import Path
 
 from eador.style import BLUE, GOLD, INK, LINE, MUTED, RED, TEAL, TEXT
+from eador.ui import icon_path
 
 OWNERS = {"player": TEAL, "rival": RED, "neutral": (160, 160, 126, 255)}
 IMAGES = Path(__file__).resolve().parent / 'assets' / 'images'
@@ -226,12 +227,12 @@ def castle(scene, x, y, color, scale=1):
                         (x, y - 63 * scale)], color)
 
 
-def terrain_tile(scene, grid, pos, terrain, *, mode='ground'):
+def terrain_tile(scene, grid, pos, terrain, *, mode='ground', inset=.95):
     """Paint one prebuilt diorama below interactive shapes; picking stays on HexGrid."""
     terrain = {'swamp': 'marsh', 'mountain': 'mountains'}.get(terrain, terrain)
     variant = (pos[0] * 7 + pos[1] * 11) % 4
     x, y = grid.center(pos)
-    scale = grid.size * .95 / 150
+    scale = grid.size * inset / 150
     with scene.screen_layer(1):
         scene.draw_image(str(IMAGES / 'terrain' / f'{mode}-{terrain}-{variant}.png'),
                          x - 160 * scale, y - 160 * scale, 320 * scale, 352 * scale)
@@ -242,8 +243,8 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
     x, y = grid.center(pos)
     s = grid.size / 78
     points = grid.corners(pos)
-    inner = [(x + (px - x) * .95, y + (py - y) * .95) for px, py in points]
-    terrain_tile(scene, grid, pos, data.terrain, mode='ground' if data.capital else 'province')
+    inner = [(x + (px - x) * .99, y + (py - y) * .99) for px, py in points]
+    terrain_tile(scene, grid, pos, data.terrain, mode='ground' if data.capital else 'province', inset=.99)
     if hover:
         scene.draw_polygon(inner, (238, 220, 165, 27))
     if data.owner != 'neutral':
@@ -253,18 +254,19 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
     if data.capital:
         castle(scene, x, y + 4 * s, OWNERS[data.owner], .83 * s)
     if data.site and not data.explored:
-        scene.draw_circle(x + 39 * s, y - 24 * s, 9 * s, INK)
-        scene.draw_text("?", x + 39 * s, y - 24 * s, color=GOLD, font_size=12,
-                        anchor_x="center", anchor_y="center")
+        sx, sy = x + 39 * s, y - 24 * s
+        scene.draw_image(icon_path('explore'), sx - 11 * s, sy - 11 * s, 22 * s, 22 * s)
     if data.name and name_label:
         scene.draw_rect(x - 53 * s, y + 25 * s, 106 * s, 21 * s, (23, 37, 33, 218), radius=3)
         scene.draw_text(data.name, x, y + 35 * s, font_size=max(9, round(10 * s)), color=TEXT,
                         anchor_x="center", anchor_y="center")
     if hero:
-        scene.draw_circle(x - 40 * s, y - 29 * s, 16 * s, INK)
-        scene.draw_circle(x - 40 * s, y - 29 * s, 13 * s, TEAL)
-        scene.draw_polygon([(x - 40 * s, y - 39 * s), (x - 47 * s, y - 25 * s),
-                            (x - 33 * s, y - 25 * s)], INK)
+        hx, hy = x - 40 * s, y - 29 * s
+        banner = [(hx + dx * s, hy + dy * s) for dx, dy in
+                  ((-17, -18), (17, -18), (17, 10), (0, 22), (-17, 10))]
+        scene.draw_polygon(banner, INK)
+        outline(scene, banner, TEAL, 1.5)
+        scene.draw_image(icon_path('hero'), hx - 15 * s, hy - 16 * s, 30 * s, 30 * s)
 
 
 def expedition(scene, grid, pos, troops):

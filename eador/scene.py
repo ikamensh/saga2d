@@ -374,7 +374,7 @@ class ShardScene(Screen):
         self.game.push(DiagnosticScene(self._notice, return_label='Return to map', title='Complete campaign message'))
 
     def refresh(self):
-        from saga2d import Column, Label, Row
+        from saga2d import Column, Image, Label, Row
         from eador.preferences import reading_scale
         from eador.rival_scene import rival_order
 
@@ -433,17 +433,22 @@ class ShardScene(Screen):
         blocked = self.selected == (2, 0) and s.assault_blocked_reason
         expedition_here = s.rival.army and self.selected == s.rival.pos
         province_income = 0 if s.encircled and p.pos == (-2, 0) else p.income
-        details = [label('SELECTED PROVINCE', width, size=10, color=MUTED),
-                   label(p.name, width, size=22, serif=True),
-                   label(f'{p.terrain.title()} · {p.owner.title()} · {province_income} base gold', width,
-                         color=art.OWNERS[p.owner])]
+        ownership = {'player': 'YOUR PROVINCE', 'rival': 'RIVAL PROVINCE', 'neutral': 'UNCLAIMED PROVINCE'}
+        details = [label(ownership[p.owner], width, size=10, color=art.OWNERS[p.owner]),
+                   label(p.name, width, size=20, serif=True),
+                   Row(label(p.terrain.title(), width - 126, size=11, color=MUTED),
+                       metric('income', f'+{province_income}', width=118, size=11 * scale, color=GOLD,
+                              detail='Base province gold per turn, before realm yield. Earned when you own it.'),
+                       spacing=8)]
         if expedition_here:
             details.append(label(f'Expedition: {len(s.rival.army)} troops · V for strengths', width, color=RED))
         elif p.owner != 'player':
             guards = ', '.join(f'{n} {UNITS[kind].name}' for kind, n in Counter(p.guards).items())
             details.append(label('Defenders: ' + (guards or 'None'), width, color=RED))
         site = (p.site + (' · cleared' if p.explored else '')) if p.site else 'No ruins in this province'
-        details.append(label(site, width, color=MUTED if p.explored else GOLD))
+        details.append(Row(Image(icon_path('explore'), width=22, height=22,
+                                 tooltip='Adventure site' if p.site else 'No adventure site'),
+                           label(site, width - 30, size=11, color=MUTED if p.explored else GOLD), spacing=8))
         hint = 'Tab: nearby provinces · Home: hero'
         if not s.actions_left:
             hint = 'No actions left. End the turn.'
@@ -541,14 +546,16 @@ class ShardScene(Screen):
                self.edge - 52, 26, army_top)
         army_y = army_top + round(22 * scale)
         self._army_art = []
+        self._army_cards = []
         for i, troop in enumerate(s.hero.army):
-            xx = 26 + i * 118
+            xx = 30 + i * 128
             name_bottom = column([label(UNITS[troop.kind].name, 112, size=11)], 112, xx, army_y)
             status_bottom = column([metric('level', troop.level, width=76, size=10 * scale, color=MUTED),
                                     metric('health', f'{troop.hp}/{troop.max_hp}', width=76,
                                            size=10 * scale, color=TEAL)],
                                    76, xx + 36, name_bottom + 4, spacing=3)
             self._army_art.append((xx, name_bottom + 38, status_bottom + 3))
+            self._army_cards.append((xx - 5, army_y - 5, 122, status_bottom - army_y + 17))
         self._notice = self.message or ('Settings could not be read. Open Text size to recover them.'
                                        if self.preferences.error else s.log[-1])
         notice = label(self._notice, self.edge - 52, size=11, color=GOLD if self.message else MUTED)
@@ -710,6 +717,8 @@ class ShardScene(Screen):
                 cx, cy = cx + self.grid.size * .50, cy + self.grid.size * .05
                 self.draw_circle(cx, cy, 10, INK)
                 self.text(str(index + 1), cx, cy - 8, size=11, color=TEAL if complete else GOLD, center=True)
+        for box in self._army_cards:
+            self.draw_rect(*box, (17, 29, 33, 220), border_color=LINE, border_width=.5, radius=4)
         for troop, (xx, piece_y, bar_y) in zip(s.hero.army, self._army_art):
             art.piece(self, xx + 19, piece_y, troop.kind, 'player', scale=.53)
             self.bar(xx + 42, bar_y, 66, troop.hp, troop.max_hp)
