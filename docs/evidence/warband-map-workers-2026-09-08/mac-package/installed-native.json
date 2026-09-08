@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+  "version": "0.1.0-preview.3",
+  "executable": "/Applications/Warband.app/Contents/MacOS/Warband",
+  "executable_sha256": "ee4e2cdcf94c97520e88c491b3e942d1176a5ce3da3e17fc73106d67b5ec89fc",
+  "renderer": "Apple M4",
+  "opengl_version": "4.1 Metal - 90.5",
+  "vendor": "Apple",
+  "backend": "pyglet",
+  "native_multiplayer_input": true,
+  "native_clipboard_join": true,
+  "live_match_menu": true,
+  "native_settlement_planning": true,
+  "sound_catalogue": 87,
+  "images": [
+    "installed-native-title.png",
+    "installed-native-multiplayer.png",
+    "installed-native-room-code.png",
+    "installed-native-paste-code.png",
+    "installed-native-online-match.png",
+    "installed-native-settlement-train.png",
+    "installed-native-settlement-plans.png",
+    "installed-native-match-menu.png",
+    "installed-native.png"
+  ]
+}

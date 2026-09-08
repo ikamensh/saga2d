@@ -1,0 +1,99 @@
+{
+  "installed_native": {
+    "backend": "pyglet",
+    "executable": "/Applications/Warband.app/Contents/MacOS/Warband",
+    "executable_sha256": "ee4e2cdcf94c97520e88c491b3e942d1176a5ce3da3e17fc73106d67b5ec89fc",
+    "images": [
+      "installed-native-title.png",
+      "installed-native-multiplayer.png",
+      "installed-native-room-code.png",
+      "installed-native-paste-code.png",
+      "installed-native-online-match.png",
+      "installed-native-settlement-train.png",
+      "installed-native-settlement-plans.png",
+      "installed-native-match-menu.png",
+      "installed-native.png"
+    ],
+    "live_match_menu": true,
+    "native_clipboard_join": true,
+    "native_multiplayer_input": true,
+    "native_settlement_planning": true,
+    "opengl_version": "4.1 Metal - 90.5",
+    "passed": true,
+    "renderer": "Apple M4",
+    "sound_catalogue": 87,
+    "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+    "vendor": "Apple",
+    "version": "0.1.0-preview.3"
+  },
+  "installed_public_server": {
+    "bundled_fonts": true,
+    "endpoint": "wss://games.tachyon-ai.eu/play",
+    "executable": "/Applications/Warband.app/Contents/MacOS/Warband",
+    "executable_sha256": "ee4e2cdcf94c97520e88c491b3e942d1176a5ce3da3e17fc73106d67b5ec89fc",
+    "frozen": true,
+    "online": {
+      "assembly_point": true,
+      "authoritative_movement": true,
+      "automatic_plan_builder": true,
+      "cancel_plans": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "global_production": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+    "version": "0.1.0-preview.3"
+  },
+  "native": {
+    "backend": "pyglet",
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/warband-extracted-dd08mwg4/Warband/Warband",
+    "executable_sha256": "1e7ec52c1484ced71e7b471618801472798d7266604d3407cb0ee312dcb0eeef",
+    "images": [
+      "native-title.png",
+      "native-multiplayer.png",
+      "native-room-code.png",
+      "native-paste-code.png",
+      "native-online-match.png",
+      "native-settlement-train.png",
+      "native-settlement-plans.png",
+      "native-match-menu.png",
+      "native.png"
+    ],
+    "live_match_menu": true,
+    "native_clipboard_join": true,
+    "native_multiplayer_input": true,
+    "native_settlement_planning": true,
+    "opengl_version": "4.1 Metal - 90.5",
+    "passed": true,
+    "renderer": "Apple M4",
+    "sound_catalogue": 87,
+    "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+    "vendor": "Apple",
+    "version": "0.1.0-preview.3"
+  },
+  "passed": true,
+  "portable": {
+    "bundled_fonts": true,
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/warband-extracted-dd08mwg4/Warband/Warband",
+    "executable_sha256": "1e7ec52c1484ced71e7b471618801472798d7266604d3407cb0ee312dcb0eeef",
+    "frozen": true,
+    "online": {
+      "assembly_point": true,
+      "authoritative_movement": true,
+      "automatic_plan_builder": true,
+      "cancel_plans": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "global_production": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+    "version": "0.1.0-preview.3"
+  },
+  "scope": "Loopback authority; isolated profile on the named CI host",
+  "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+  "version": "0.1.0-preview.3"
+}

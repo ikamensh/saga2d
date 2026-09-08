@@ -1,0 +1,13 @@
+{
+  "backup": "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/dist/local-app-backups/Warband-before-preview3-20260908.app",
+  "executable_sha256": "ee4e2cdcf94c97520e88c491b3e942d1176a5ce3da3e17fc73106d67b5ec89fc",
+  "installed_app": "/Applications/Warband.app",
+  "installed_at_utc": "2026-09-08T10:36:14.881377+00:00",
+  "previous_app": {
+    "executable_sha256": "0a34507d5bd152ea61139ff46d2c60c19af2394fb67e4248f49dcf9b10a213ec",
+    "path": "/Applications/Warband.app"
+  },
+  "saved_games_and_settings": "Existing user profile untouched",
+  "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+  "version": "0.1.0-preview.3"
+}
