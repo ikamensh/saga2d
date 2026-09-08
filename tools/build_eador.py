@@ -48,10 +48,11 @@ def write_json(path: Path, value) -> None:
 
 def collect_package_data(source: Path) -> dict:
     """Return the exact, ordered non-Python package files the artifact will ship."""
+    # Order by the shipped POSIX name so Windows and macOS builds agree on the collection.
     return {path.relative_to(source).as_posix():
             {"bytes": path.stat().st_size, "sha256": sha256(path)}
             for package in ("eador", "saga2d")
-            for path in sorted((source / package).rglob("*"))
+            for path in sorted((source / package).rglob("*"), key=lambda item: item.relative_to(source).as_posix())
             if path.is_file() and path.suffix not in (".py", ".pyc")
             and "__pycache__" not in path.parts}
 

@@ -257,7 +257,8 @@ def test_rooms_and_private_seats_survive_server_restart(tmp_path, game):
                 # Acknowledged turn orders survive even an abrupt power/process loss.
                 process.kill()
                 process.wait(timeout=5)
-    assert (tmp_path / 'rooms.sqlite3').stat().st_mode & 0o777 == 0o600
+    if os.name != 'nt':  # Windows has no POSIX mode bits to check.
+        assert (tmp_path / 'rooms.sqlite3').stat().st_mode & 0o777 == 0o600
     with running_server('--state-dir', tmp_path) as (url, process):
         with connect(url, proxy=None) as host, connect(url, proxy=None) as guest:
             returned = handshake(host, 'resume', game=game, room=seat0['room'],
