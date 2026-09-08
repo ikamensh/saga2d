@@ -1,0 +1,63 @@
+........................................................................ [ 20%]
+........................................................................ [ 40%]
+........................................................................ [ 60%]
+........................................................................ [ 80%]
+...............................................................F........ [100%]
+=================================== FAILURES ===================================
+________ test_shardbound_offline_save_controls_preserve_the_live_match _________
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-2068/test_shardbound_offline_save_c0')
+
+    def test_shardbound_offline_save_controls_preserve_the_live_match(tmp_path):
+        """The battle's save browser cannot replace co-op with a local campaign."""
+        from eador.app import create_game
+        from eador.model import State
+        from eador.multiplayer import ShardboundMatch, NetworkShardScene
+        from eador.persistence import CampaignSaves
+        from eador.scene import BattleScene, SaveScene, HelpScene, TitleScene
+        match = ShardboundMatch()
+        host = MatchHost('co-op', match.apply, match.snapshot, address=('127.0.0.1', 0), token='test')
+        client = MatchClient('co-op', host.address, token='test')
+        game = create_game(backend='mock', save_dir=tmp_path)
+        try:
+            saves = CampaignSaves(game.save_manager)
+            saves.save(State.new(99), 1)
+            converge(host, client, lambda: client.ready)
+            host.submit({'target': 'state', 'action': 'explore', 'args': []})
+            converge(host, client, lambda: client.revision == host.revision)
+            root = NetworkShardScene(client)
+            game.push(root)
+            game.tick(.03)
+            assert isinstance(game.scene, BattleScene)
+            assert not game.scene.load_game()
+            assert game.scene.root is root
+            browser = SaveScene(root, mode='load')
+            game.push(browser)
+>           browser.activate(0)
+
+tests/test_multiplayer_games.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+eador/scene.py:2041: in activate
+    self.refresh()
+eador/scene.py:1955: in refresh
+    super().refresh()
+eador/scene.py:42: in refresh
+    self.ui.clear()
+    ^^^^^^^
+saga2d/scene.py:386: in ui
+    self._ui = _UIRoot(self)
+               ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <saga2d.ui.base._UIRoot object at 0x126d3ff20>
+scene = <eador.scene.SaveScene object at 0x126bd3b60>
+
+    def __init__(self, scene: Scene) -> None:
+>       w, h = scene.game.resolution
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'resolution'
+
+saga2d/ui/base.py:243: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_multiplayer_games.py::test_shardbound_offline_save_controls_preserve_the_live_match
+1 failed, 359 passed in 71.67s (0:01:11)

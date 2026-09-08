@@ -1,0 +1,103 @@
+{
+  "seed": 3,
+  "resolution": [
+    1280,
+    800
+  ],
+  "fixture_resource_grant": {
+    "gold": 5000,
+    "lumber": 5000
+  },
+  "selection": [],
+  "farm_site": [
+    10,
+    8
+  ],
+  "assembly": [
+    7.375,
+    10.5
+  ],
+  "waiting_plans": [
+    {
+      "id": 1,
+      "kind": "building",
+      "type": "farm",
+      "status": "Not enough gold (500 needed)",
+      "position": [
+        10,
+        8
+      ],
+      "worker": null,
+      "building": null
+    },
+    {
+      "id": 2,
+      "kind": "unit",
+      "type": "footman",
+      "status": "Requires a Barracks",
+      "position": null,
+      "worker": null,
+      "building": null
+    },
+    {
+      "id": 3,
+      "kind": "unit",
+      "type": "peasant",
+      "status": "Not enough gold (400 needed)",
+      "position": null,
+      "worker": null,
+      "building": null
+    },
+    {
+      "id": 4,
+      "kind": "upgrade",
+      "type": "blades_1",
+      "status": "Requires a Blacksmith",
+      "position": null,
+      "worker": null,
+      "building": null
+    }
+  ],
+  "active_plans": [
+    {
+      "id": 1,
+      "kind": "building",
+      "type": "farm",
+      "status": "Building",
+      "position": [
+        10,
+        8
+      ],
+      "worker": 4,
+      "building": 13
+    },
+    {
+      "id": 2,
+      "kind": "unit",
+      "type": "footman",
+      "status": "Requires a Barracks",
+      "position": null,
+      "worker": null,
+      "building": null
+    }
+  ],
+  "town_hall_queue": [
+    "peasant"
+  ],
+  "farm_foundation_ids": [
+    13
+  ],
+  "world_time": 2.9999999999999973,
+  "captures": [
+    "01-settlement-unselected.png",
+    "02-build-catalogue-costs.png",
+    "03-blueprint-placement.png",
+    "04-upgrade-catalogue-costs.png",
+    "05-waiting-plans.png",
+    "06-plan-cancelled.png",
+    "07-blueprint-and-assembly.png",
+    "08-automatic-construction.png",
+    "09-active-production.png"
+  ],
+  "result": "passed"
+}
