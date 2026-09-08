@@ -1,7 +1,8 @@
 """Concurrent campaign authority: one map, separate realms and one shared day.
 
-This development authority supports independent PvE and alternating human army
-battles. Its campaign multiplayer presentation is not yet selectable by players.
+This development authority supports independent PvE, ordinary human army turns
+and per-realm presentation. Player-facing integration is in progress; this
+module alone does not establish a selectable or packaged multiplayer mode.
 """
 from __future__ import annotations
 
@@ -195,6 +196,16 @@ class ConcurrentCampaign:
                 realm.build(args[0])
             else:
                 realm.purchase_recruit(args[0], province=self.provinces[realm.hero.pos], owner=realm.owner)
+        elif action == 'replace_troop':
+            if len(args) != 2 or type(args[0]) is not int or not isinstance(args[1], str):
+                raise RuleError('Choose a troop to retire and a replacement role.')
+            realm.purchase_replacement(args[0], args[1], province=self.provinces[realm.hero.pos],
+                                       owner=realm.owner)
+        elif action == 'infuse':
+            if args:
+                raise RuleError('Infusion takes no arguments.')
+            realm.purchase_infusion(province=self.provinces[realm.hero.pos], owner=realm.owner,
+                                    encircled=realm.hero.pos == realm.capital and self.income(seat).encircled)
         elif action in ('travel', 'challenge'):
             if (len(args) != 1 or not isinstance(args[0], (list, tuple)) or len(args[0]) != 2
                     or any(type(n) is not int for n in args[0])):
@@ -566,11 +577,12 @@ class ConcurrentCampaign:
             raise CommandError('Unknown realm.')
         other = self.realms[1 - seat]
         return json.loads(json.dumps({
-            'day': self.day, 'seat': seat, 'winner': self.winner,
+            'seed': self.seed, 'theme': self.theme, 'day': self.day, 'seat': seat, 'winner': self.winner,
             'encounter': self.encounter.to_dict() if self.encounter else None,
             'realm': _realm_data(self.realms[seat]),
             'provinces': [asdict(self.provinces[pos]) for pos in sorted(self.provinces)],
             'opponent': {'seat': other.seat, 'capital': other.capital, 'hero_pos': other.hero.pos,
+                         'choosing': other.choice is not None,
                          'ready': other.ready, 'in_battle': other.battle is not None
                          or self.encounter is not None and self.encounter.battle is not None},
             'claims': [{'pos': pos, 'seat': player} for pos, player in sorted(self.claims.items())],

@@ -39,6 +39,146 @@ def approaching_armies(budget):
     return match
 
 
+def test_paid_replacement_uses_the_own_realm_quote_and_keeps_its_saved_formation():
+    """Replacing a real starter troop pays once, keeps its slot and leaves the peer unchanged."""
+    from eador.concurrent_campaign import ConcurrentCampaign
+
+    match = ConcurrentCampaign.new(11, theme='elderwild')
+    order(match, 0, 'build', 'barracks')
+    realm = match.realms[0]
+    quote = realm.quote_replacement(1, 'swordsman', province=match.provinces[realm.hero.pos],
+                                    owner=realm.owner)
+    assert quote.blocked_reason is None
+    before = match.checkpoint()
+    peer = match.snapshot(1)
+    resumed = ConcurrentCampaign.restore(before)
+    for room in (match, resumed):
+        order(room, 0, 'replace_troop', 1, 'swordsman')
+        actual = room.realms[0]
+        assert [troop.id for troop in actual.hero.army] == [quote.incoming.id, 2, 3]
+        assert actual.hero.army[0].kind == 'swordsman'
+        assert (actual.gold, actual.crystals, actual.actions_left) == (
+            before['realms'][0]['gold'] - quote.gold,
+            before['realms'][0]['crystals'] - quote.crystals,
+            before['realms'][0]['actions_left'] - quote.actions)
+        assert actual.next_troop_id == quote.incoming.id + 1
+        assert room.snapshot(1) == peer
+    assert resumed.checkpoint() == match.checkpoint()
+
+
+def test_paid_infusion_uses_won_shrine_crystals_and_restores_only_its_own_hero():
+    """A real Tower and Shrine fight supply the mana deficit, crystals and remaining action."""
+    from eador.concurrent_campaign import ConcurrentCampaign
+
+    budget = CpuBudget(25)
+    match = ConcurrentCampaign.new(7, heroes=('Wizard', 'Warrior'))
+    order(match, 0, 'build', 'mage_tower')
+    order(match, 0, 'explore')
+    busy = match.checkpoint()
+    for action, args in (('infuse', ()), ('replace_troop', (1, 'militia'))):
+        with pytest.raises(CommandError, match='battle'):
+            order(match, 0, action, *args)
+        assert match.checkpoint() == busy
+    win_battle(match, 0, budget)
+    public = match.snapshot(1)['opponent']
+    assert public['choosing'] is True and public['in_battle'] is False
+    assert 'choices' not in public and 'inventory' not in public
+    choosing = match.checkpoint()
+    for action, args in (('infuse', ()), ('replace_troop', (1, 'militia'))):
+        with pytest.raises(CommandError, match='choice'):
+            order(match, 0, action, *args)
+        assert match.checkpoint() == choosing
+    while match.realms[0].choice:
+        order(match, 0, 'choose', match.realms[0].choice.options[0].id)
+    assert match.snapshot(1)['opponent']['choosing'] is False
+    realm = match.realms[0]
+    quote = realm.quote_infusion(province=match.provinces[realm.hero.pos], owner=realm.owner,
+                                encircled=match.income(0).encircled)
+    assert quote.blocked_reason is None and quote.mana > 0
+    before = match.checkpoint()
+    peer = match.snapshot(1)
+    resumed = ConcurrentCampaign.restore(before)
+    for room in (match, resumed):
+        order(room, 0, 'infuse')
+        actual = room.realms[0]
+        assert actual.hero.mana == before['realms'][0]['hero']['mana'] + quote.mana
+        assert actual.gold == before['realms'][0]['gold']
+        assert actual.crystals == before['realms'][0]['crystals'] - quote.crystals
+        assert actual.actions_left == before['realms'][0]['actions_left'] - quote.actions
+        assert room.day == 1 and room.snapshot(1) == peer
+    assert resumed.checkpoint() == match.checkpoint()
+
+
+def test_both_views_publish_the_same_saved_map_seed_and_theme():
+    """Presentation reads public map metadata without receiving the other realm's private records."""
+    from eador.concurrent_campaign import ConcurrentCampaign
+
+    match = ConcurrentCampaign.new(-7, theme='ruins', heroes=('Wizard', 'Scout'))
+    for seat in (0, 1):
+        view = match.snapshot(seat)
+        assert (view['seed'], view['theme']) == (-7, 'ruins')
+        assert view['realm']['seat'] == seat and 'realms' not in view
+    resumed = ConcurrentCampaign.restore(match.checkpoint())
+    assert [resumed.snapshot(seat) for seat in (0, 1)] == [match.snapshot(seat) for seat in (0, 1)]
+
+
+@pytest.mark.parametrize('action,args,kwargs,reason', [
+    ('replace_troop', [], {}, 'replacement'),
+    ('replace_troop', [True, 'militia'], {}, 'replacement'),
+    ('replace_troop', [1, {}], {}, 'replacement'),
+    ('replace_troop', [1, 'militia', 2], {}, 'replacement'),
+    ('replace_troop', [1, 'militia'], {'owner': 'realm:1'}, 'option'),
+    ('replace_troop', [999, 'militia'], {}, 'living troop'),
+    ('replace_troop', [1, 'not-a-troop'], {}, 'cannot be recruited'),
+    ('infuse', [1], {}, 'arguments'),
+    ('infuse', [], {'encircled': False}, 'option'),
+])
+def test_service_orders_reject_malformed_arguments_without_retiring_or_spending(action, args, kwargs, reason):
+    """A malformed packet cannot bypass the authority's location rules or partially buy a service."""
+    from eador.concurrent_campaign import ConcurrentCampaign
+
+    match = ConcurrentCampaign.new(7)
+    before = match.checkpoint()
+    with pytest.raises(CommandError, match=reason):
+        order(match, 0, action, *args, **kwargs)
+    assert match.checkpoint() == before
+
+
+def test_public_conquests_encircle_the_wounded_mana_capital_and_block_infusion():
+    """Three actual surrounding captures block a purchased Tower without refunding the earlier fight."""
+    from eador.concurrent_campaign import ConcurrentCampaign
+
+    budget = CpuBudget(25)
+    match = ConcurrentCampaign.new(7, heroes=('Wizard', 'Warrior'))
+    order(match, 0, 'build', 'mage_tower')
+    order(match, 1, 'build', 'barracks')
+    order(match, 1, 'recruit', 'swordsman')
+
+    def finish(seat):
+        win_battle(match, seat, budget)
+        while match.realms[seat].choice:
+            order(match, seat, 'choose', match.realms[seat].choice.options[0].id)
+
+    for itinerary in (((1, 0), (0, 0)), ((-1, 0), (-1, -1))):
+        for destination in itinerary:
+            order(match, 1, 'travel', list(destination))
+            finish(1)
+        order(match, 0, 'ready')
+        order(match, 1, 'ready')
+    order(match, 0, 'explore')
+    finish(0)
+    realm = match.realms[0]
+    assert realm.hero.mana < realm.hero.max_mana and realm.actions_left == 1 and realm.crystals >= 3
+    order(match, 1, 'travel', [-1, 0])
+    order(match, 1, 'travel', [-2, 1])
+    finish(1)
+    assert match.day == 3 and match.income(0).encircled
+    before = match.checkpoint()
+    with pytest.raises(CommandError, match='Encirclement blocks infusion'):
+        order(match, 0, 'infuse')
+    assert match.checkpoint() == before
+
+
 def test_two_realms_develop_independently_then_settle_one_shared_day():
     """Ready grants nothing until both realms finish, and a duplicate cannot settle again."""
     from eador.concurrent_campaign import ConcurrentCampaign
@@ -57,8 +197,11 @@ def test_two_realms_develop_independently_then_settle_one_shared_day():
     order(match, 0, 'ready')
     assert match.day == 1
     assert before == [(r.gold, r.crystals, r.actions_left) for r in match.realms]
-    with pytest.raises(CommandError, match='ready'):
-        order(match, 0, 'build', 'market')
+    waiting = match.checkpoint()
+    for action, args in (('build', ('market',)), ('infuse', ()), ('replace_troop', (1, 'militia'))):
+        with pytest.raises(CommandError, match='ready'):
+            order(match, 0, action, *args)
+        assert match.checkpoint() == waiting
     order(match, 1, 'build', 'temple')
     quote = [match.income(seat) for seat in (0, 1)]
     before = [(r.gold, r.crystals, r.upkeep) for r in match.realms]
@@ -201,7 +344,8 @@ def test_waiting_attack_reserves_one_action_without_interrupting_the_incumbent()
     pending = match.snapshot(1)['encounter']
     assert pending['attacker'] == 1 and pending['destination'] == [0, 0] and pending['battle'] is None
     saved = match.checkpoint()
-    for action, args in (('ready', ()), ('equip', (None,)), ('travel', ([2, 0],))):
+    for action, args in (('ready', ()), ('equip', (None,)), ('travel', ([2, 0],)),
+                         ('infuse', ()), ('replace_troop', (1, 'militia'))):
         with pytest.raises(CommandError, match='waiting'):
             order(match, 1, action, *args)
         assert match.checkpoint() == saved
@@ -241,7 +385,8 @@ def test_pve_rewards_and_choices_finish_before_a_saved_shared_human_battle():
     assert match.realms[1].actions_left == 0 and match.realms[1].hero.pos == (1, 0)
     rejected = match.checkpoint()
     for action, args in (('battle.end_turn', ()), ('battle.cast', ('heal', battle.hero_id)),
-                         ('retreat', ()), ('equip', (None,)), ('ready', ())):
+                         ('retreat', ()), ('equip', (None,)), ('ready', ()),
+                         ('infuse', ()), ('replace_troop', (1, 'militia'))):
         with pytest.raises(CommandError):
             order(match, 0, action, *args)
         assert match.checkpoint() == rejected

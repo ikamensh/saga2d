@@ -46,7 +46,7 @@ def test_two_socket_players_resume_active_battles_and_wait_for_both_rewards(tmp_
         client.submit(peer_order)
         converge(host, client, lambda: client.state['realm']['battle'] is not None)
         assert host.state == match.snapshot(0) and client.state == match.snapshot(1)
-        assert set(client.state['opponent']) == {'seat', 'capital', 'hero_pos', 'ready', 'in_battle'}
+        assert set(client.state['opponent']) == {'seat', 'capital', 'hero_pos', 'ready', 'in_battle', 'choosing'}
         assert 'realms' not in client.state
         client.submit(command(client.state, 'battle.guard', 0))
         host.submit(command(host.state, 'battle.guard', 0))
