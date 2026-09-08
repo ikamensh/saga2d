@@ -2,7 +2,8 @@
 
 Reviewed the native pyglet captures at a 1280 × 800 logical canvas: ten
 initial map/gameplay frames, followed by the refreshed summer, winter and
-wasteland surveys after the ground and atlas fixes. Survey views deliberately
+wasteland surveys after the ground and atlas fixes, then nine initial
+Settlement UI captures. Survey views deliberately
 reveal fog and freeze the simulation; they are inspection views.
 
 ## Confirmed findings and fixes
@@ -18,11 +19,25 @@ reveal fog and freeze the simulation; they are inspection views.
   southeast views, the stone rim gives the board an intentional boundary and
   no bright ground or trees spill beyond the fog/rim. The rim remains intact
   in the refreshed full-map surveys across all three themes.
-- **Gameplay UI follow-up pending.** The initial gameplay frames showed the
-  tutorial covering the Menu/F10 button and an empty command-card outline
-  at the lower-right when nothing was selected. Both were reported to the UI
-  agent; their fixes and the new Settlement planning row need a fresh native
-  gameplay inspection before acceptance.
+- **Tutorial/Menu collision and empty command-card stub resolved.** The
+  initial gameplay frames showed the tutorial covering Menu/F10 and an empty
+  command-card outline at the lower-right with nothing selected. The first
+  [Settlement capture](settlement/01-settlement-unselected.png) shows the
+  tutorial below the top controls and the empty outline removed.
+- **Plans and map markers are readable.** All nine Settlement captures were
+  inspected. The [waiting list](settlement/05-waiting-plans.png),
+  [cancelled plan](settlement/06-plan-cancelled.png) and
+  [active production](settlement/09-active-production.png) keep names,
+  reasons, costs and cancellation buttons distinct. The
+  [blueprint and assembly flag](settlement/07-blueprint-and-assembly.png)
+  have different colours and clear labels.
+- **Final gameplay recapture pending.** The initial Settlement heading
+  touches the Build button, and Workshop's hotkey badge crowds its label.
+  Both were reported and are being fixed. The active-production capture
+  also catches the Farm's status before its next scheduler refresh: a paid
+  foundation is already visible in the preceding frame, but the list still
+  says “Builder en route” and “Cost”. The final sequence should allow the
+  status to refresh and the opening banner to finish before capture.
 
 ## Optional art refinements
 
