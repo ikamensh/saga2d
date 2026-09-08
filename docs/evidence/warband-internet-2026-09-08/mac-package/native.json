@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "source_commit": "90f30676de97d8bda327ef4fbd50b1149b7715ce",
+  "version": "0.1.0-preview.1",
+  "backend": "pyglet",
+  "native_multiplayer_input": true,
+  "sound_catalogue": 87,
+  "images": [
+    "native-title.png",
+    "native-multiplayer.png",
+    "native.png"
+  ]
+}

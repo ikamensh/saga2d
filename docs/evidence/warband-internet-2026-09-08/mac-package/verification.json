@@ -1,0 +1,32 @@
+{
+  "native": {
+    "backend": "pyglet",
+    "images": [
+      "native-title.png",
+      "native-multiplayer.png",
+      "native.png"
+    ],
+    "native_multiplayer_input": true,
+    "passed": true,
+    "sound_catalogue": 87,
+    "source_commit": "90f30676de97d8bda327ef4fbd50b1149b7715ce",
+    "version": "0.1.0-preview.1"
+  },
+  "passed": true,
+  "portable": {
+    "bundled_fonts": true,
+    "frozen": true,
+    "online": {
+      "authoritative_movement": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "90f30676de97d8bda327ef4fbd50b1149b7715ce",
+    "version": "0.1.0-preview.1"
+  },
+  "scope": "Loopback authority; isolated profile on the named CI host",
+  "source_commit": "90f30676de97d8bda327ef4fbd50b1149b7715ce",
+  "version": "0.1.0-preview.1"
+}
