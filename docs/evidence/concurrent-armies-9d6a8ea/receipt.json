@@ -1,0 +1,97 @@
+{
+  "source_commit": "9d6a8ea6ef2e1a5a14fec916ce191f4256a44872",
+  "battle_kernel_commit": "96eb2219e36e7ee3878ca3d6d83ba0bdc8e900f6",
+  "source_scope": "The final test run preceded the commit and validated its three backend source/test paths. Separate eador/art.py visual changes were in progress; this is not a clean whole-worktree or packaged-build receipt. Earlier logs are intermediate development runs.",
+  "source_git_blob_manifest": "source-files.git.txt",
+  "source_manifest_scope": "Selected backend/kernel files and the ten selected test files; not a complete dependency manifest.",
+  "final_selection": {
+    "log": "concurrent-armies-stable.log",
+    "pytest_arguments": [
+      "-q",
+      "--maxfail=1",
+      "tests/eador/test_concurrent_campaign.py",
+      "tests/eador/test_concurrent_network.py",
+      "tests/eador/test_duel.py",
+      "tests/eador/test_battle.py",
+      "tests/eador/test_guard.py",
+      "tests/eador/test_pin.py",
+      "tests/eador/test_battle_trace.py",
+      "tests/eador/test_army_results.py",
+      "tests/eador/test_realm.py",
+      "tests/eador/test_progression.py"
+    ],
+    "passed": 146,
+    "failed": 0,
+    "pytest_seconds": 3.76,
+    "wall_seconds": 3.809033375000581,
+    "cpu_seconds": 0.960655,
+    "cpu_budget_percent": 25,
+    "mean_one_core_cpu_percent": 25.220440605875595,
+    "exit_code": 0,
+    "pacing": "CpuBudget(25) checkpoint in pytest_runtest_teardown; preparation and socket helpers also checkpoint. Cooperative, not an instantaneous OS limit."
+  },
+  "earlier_runs": [
+    {
+      "log": "concurrent-armies-network.log",
+      "selection": [
+        "tests/eador/test_concurrent_network.py"
+      ],
+      "passed": 2,
+      "pytest_seconds": 0.93,
+      "wall_seconds": 1.036719249910675,
+      "cpu_seconds": 0.29023,
+      "cpu_budget_percent": 25,
+      "exit_code": 0
+    },
+    {
+      "log": "concurrent-armies-restore-red.log",
+      "selection": [
+        "tests/eador/test_concurrent_campaign.py",
+        "-q",
+        "-k",
+        "redirected_away or (cannot_return_both_real_armies and outcome)"
+      ],
+      "failed": 2,
+      "deselected": 22,
+      "pytest_seconds": 0.38,
+      "reason": "Both corrupted checkpoints were accepted instead of raising SaveFormatError.",
+      "exit_code": 1
+    },
+    {
+      "log": "concurrent-armies-restore-green.log",
+      "selection": [
+        "tests/eador/test_concurrent_campaign.py",
+        "-q",
+        "-k",
+        "redirected_away or (cannot_return_both_real_armies and outcome)"
+      ],
+      "passed": 2,
+      "deselected": 22,
+      "pytest_seconds": 0.24,
+      "exit_code": 0
+    },
+    {
+      "log": "concurrent-armies-choice-wait.log",
+      "selection": [
+        "tests/eador/test_concurrent_campaign.py",
+        "-q",
+        "-k",
+        "choice_only_wait"
+      ],
+      "passed": 1,
+      "deselected": 24,
+      "pytest_seconds": 0.07,
+      "exit_code": 0
+    }
+  ],
+  "counting": "The final 146 includes the earlier targeted cases; do not add these run counts.",
+  "execution": "All test processes exited. Socket connections close in finally blocks. No native windows or packaging jobs ran for this backend unit.",
+  "limitations": [
+    "Development model and loopback sockets only.",
+    "Authority reconstruction occurs within one test process, not a dedicated-server process restart.",
+    "PvE preparation uses public autoplay orders; shared human turn commands are supplied by tests, not human playtesters.",
+    "Concurrent campaign presentation and server catalog integration are unfinished.",
+    "Native PvP and refreshed packaged PvP remain unverified.",
+    "No full-suite or release gate claim; G01–G19 remain incomplete."
+  ]
+}

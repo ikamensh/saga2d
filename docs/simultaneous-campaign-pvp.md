@@ -44,11 +44,12 @@ campaigns followed by a merge would lose or duplicate encounter consequences.
 and treasury quote, independently of date advancement, rival AI and linked
 campaign bookkeeping. The existing solo `State.end_turn` applies that receipt
 then advances the world in its original order.
-`eador.battle_results.apply_army_result` now applies one completed PvE battle's
-wounds, casualties and advancement to a supplied hero, leaving the battle and
-world unchanged. `State.resolve_battle` retains province/defender/site changes,
-rewards, choices and encounter cleanup. The shared-world room still needs to
-coordinate those changes against its claims.
+`eador.battle_results.apply_army_result` applies a completed battle's wounds,
+casualties and advancement to the supplied hero and team, leaving the battle
+and world unchanged. Solo and concurrent campaigns share progression, site
+rewards and defender persistence; each caller coordinates its own claims,
+ownership, choices and encounter cleanup. Solo rival and linked-campaign
+transitions remain in `State`.
 Keep campaign PvP rules in `eador`; transport must not know heroes or battles.
 
 The development `ConcurrentCampaign` now supports separate site and neutral
@@ -57,18 +58,36 @@ conquest battles on its single map. The ordinary `Battle` handles each realm's
 `persist_province_defenders` share the same earned army, reward and survivor
 rules with solo play. There is no copied solo world or second combat engine.
 
-An active encounter claims its destination until its result is accepted.
-A competing arrival is currently rejected with an explicit reason before any
-action is spent; retreat persists defenders before releasing the claim.
-Opponent-owned land and the other hero's occupied origin are also blocked
-until human encounters are implemented. This does **not** yet implement the
-pending army conflict described above. Earned choices block only their own
-realm's Ready, and both realms must finish before the shared day advances.
+In **9d6a8ea**, an ordinary competing arrival is rejected before spending an
+action. An explicit `challenge` instead spends one action and waits behind
+the opposing army's PvE battle or earned choice. `withdraw` cancels that wait
+without refunding the action. The incumbent's combat and rewards finish first.
+The challenger then enters the reserved destination: it meets the incumbent
+in a shared battle if still there, or enters the vacated province without
+chasing the departed army. Retreat retains actual wounds and clears the claim.
 
-[Current integration evidence](evidence/concurrent-pve/README.md) exercises
-both active battles over loopback sockets, restores the authority from its
-trusted checkpoint, resolves both rewards and crosses the Ready barrier.
-This is model/transport evidence, not a selectable mode or a native UI playtest.
+The **96eb221** battle kernel gives both humans ordinary alternating turns,
+their own hero and shared army mana, unique combat IDs and retained realm troop
+IDs. The room authorizes each tactical order by seat and active team; a shared
+order advances both realm revisions. Both armies' casualties and progression
+are applied once. Attack reopens a ready defender's participation. Capital
+capture ends the shard; an already finished PvE encounter pays its earned
+reward, while unfinished combat retreats with actual wounds.
+
+[Current backend evidence](evidence/concurrent-armies-9d6a8ea/README.md) contains
+146 passing model, loopback and solo compatibility cases. Its socket journey
+buys both armies, waits through conquest and a skill choice, enters a shared
+human battle, closes both connections, reconstructs the authority during the
+defender turn and reconnects before retreat. Checkpoint schema 2 retains the
+pending/shared encounter and still reads the earlier development schema.
+Corrupt waiting destinations and unsupported shared outcomes are rejected;
+valid waits at a departed army's origin retain their exact continuation.
+
+The [earlier independent-PvE evidence](evidence/concurrent-pve/README.md)
+establishes the separate battle and Ready-barrier foundation. Neither set is a
+native PvP playtest. Concurrent campaign screens, server catalog integration,
+dedicated-server process restart and a refreshed packaged PvP build remain
+unfinished. Selectable multiplayer is still shared-realm co-op.
 
 The existing socket interfaces already accept commands without a global
 revision precondition. New campaign commands should validate the global day,
@@ -82,8 +101,9 @@ Player snapshots must contain only their entitled information. Trusted server
 checkpoints must instead include both realms and active encounters.
 `RoomStore.save` now uses the catalog's explicit `checkpoint_match(game, match)`
 serializer, independently of player snapshots. Existing game formats, private
-resume tokens and room expiry behavior are preserved. The new room model must
-supply its own complete checkpoint representation when it is integrated.
+resume tokens and room expiry behavior are preserved. The concurrent model's
+complete checkpoint is ready to connect to that catalog; the current loopback
+test constructs `MatchHost` directly and does not register a hosted mode.
 No public-server deployment is implied by source work.
 
 ## Acceptance criteria for the first playable increment

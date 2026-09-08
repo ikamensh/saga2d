@@ -1,0 +1,4 @@
+Selection: ['tests/eador/test_concurrent_network.py']
+..                                                                       [100%]
+2 passed in 0.93s
+{'wall_seconds': 1.036719249910675, 'cpu_seconds': 0.29023, 'cpu_budget_percent': 25, 'exit_code': 0}

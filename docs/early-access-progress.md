@@ -27,20 +27,19 @@ include 25 targeted tests, a bounded input audit, and five native cases with
 were inspected; the accepted native run averaged about 25% of one CPU core.
 This visual work is included in the preserved Mac archive below.
 
-The development-only concurrent campaign model now supports two independent
-realms developing, fighting separate ordinary PvE battles and settling a shared
-day after both finish their rewards and mark Ready. One shared map retains
-claims, surviving defenders and earned rewards. [Integration evidence](evidence/concurrent-pve/README.md)
-covers both active battles over real loopback sockets, trusted checkpoint
-restoration and rejected duplicate/contested orders, with 119 solo compatibility
-checks and 14 concurrent/co-op/server checks passing. This source change is
-newer than the packaged archive below. Pending human conflicts and playable
-network presentation remain open; selectable multiplayer is still shared-realm co-op.
-
-**96eb221** adds the underlying alternating human battle kernel: two heroes,
-separate magic pools, correct source troop IDs, both armies' results and a saved
-active side. Its 119 focused duel/solo compatibility tests pass. This is a model
-checkpoint; campaign encounter integration and playable PvP remain unfinished.
+**9d6a8ea** connects the development concurrent campaign to ordinary alternating
+human battles, building on kernel **96eb221** and the
+[independent-PvE foundation](evidence/concurrent-pve/README.md). An explicit paid
+challenge waits through the incumbent's PvE combat and earned choice; shared
+battles retain both armies' wounds, progression and source troop IDs. Ready
+defenders reopen for attacks, and capital capture ends the shard.
+[Backend evidence](evidence/concurrent-armies-9d6a8ea/README.md) records **146
+passing selected tests**, including a real loopback wait/battle/restart/retreat
+journey, corrupted-checkpoint regressions and solo combat compatibility.
+The final selection took 3.76 seconds at the cooperative 25% CPU allowance.
+This is model and socket integration: campaign presentation, server catalog
+integration, native PvP and a refreshed packaged mode remain unfinished.
+Selectable multiplayer is still shared-realm co-op; **G01–G19 remain incomplete**.
 
 ## Current packaged checkpoint — 2026-09-08
 

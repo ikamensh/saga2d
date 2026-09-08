@@ -1,0 +1,6 @@
+Selection: ['tests/eador/test_concurrent_campaign.py', 'tests/eador/test_concurrent_network.py', 'tests/eador/test_duel.py', 'tests/eador/test_battle.py', 'tests/eador/test_guard.py', 'tests/eador/test_pin.py', 'tests/eador/test_battle_trace.py', 'tests/eador/test_army_results.py', 'tests/eador/test_realm.py', 'tests/eador/test_progression.py']
+........................................................................ [ 49%]
+........................................................................ [ 98%]
+..                                                                       [100%]
+146 passed in 3.76s
+{'wall_seconds': 3.809033375000581, 'cpu_seconds': 0.960655, 'cpu_budget_percent': 25, 'exit_code': 0}

@@ -1,0 +1,69 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_checkpoint_rejects_shared_combat_that_cannot_return_both_real_armies[outcome] _
+
+corruption = 'outcome'
+
+    @pytest.mark.parametrize('corruption', ['source', 'source_shape', 'combat_id', 'defending_hero',
+                                           'turn', 'outcome', 'ended_active', 'private_human'])
+    def test_checkpoint_rejects_shared_combat_that_cannot_return_both_real_armies(corruption):
+        """A corrupted shared battle must not drop troops or apply one army's wounds to the other."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+        from eador.entities import SaveFormatError
+    
+        budget = CpuBudget(25)
+        match = approaching_armies(budget)
+        order(match, 0, 'travel', [0, 0])
+        win_battle(match, 0, budget)
+        order(match, 0, 'choose', match.realms[0].choice.options[0].id)
+        order(match, 1, 'travel', [0, 0])
+        saved = match.checkpoint()
+        battle = saved['encounter']['battle']
+        if corruption == 'source':
+            battle['units'][-1]['source_id'] = 999
+        elif corruption == 'source_shape':
+            battle['units'][-1]['source_id'] = []
+        elif corruption == 'combat_id':
+            battle['units'][-1]['id'] = battle['units'][0]['id']
+        elif corruption == 'defending_hero':
+            battle['enemy_magic']['hero_id'] = battle['hero_id']
+        elif corruption == 'turn':
+            battle['active_team'] = 'spectator'
+        elif corruption == 'outcome':
+            battle['outcome'] = 'victory'
+        elif corruption == 'ended_active':
+            saved['winner'] = 1
+        else:
+            saved['encounter'] = None
+            realm = saved['realms'][1]
+            realm.update(battle=battle, battle_kind='conquest', battle_province=[0, 0])
+>       with pytest.raises(SaveFormatError, match='encounter'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'eador.entities.SaveFormatError'>
+
+tests/eador/test_concurrent_campaign.py:445: Failed
+_ test_checkpoint_rejects_a_waiting_arrival_redirected_away_from_the_busy_army _
+
+    def test_checkpoint_rejects_a_waiting_arrival_redirected_away_from_the_busy_army():
+        """A corrupt destination cannot turn a paid wait into entry to an unrelated province."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+        from eador.entities import SaveFormatError
+    
+        budget = CpuBudget(25)
+        match = approaching_armies(budget)
+        order(match, 0, 'travel', [0, 0])
+        order(match, 1, 'challenge', [0, 0])
+        saved = match.checkpoint()
+        assert ConcurrentCampaign.restore(saved).checkpoint() == saved
+        unrelated = (1, -1)
+        assert unrelated != match.realms[0].hero.pos and unrelated not in match.claims
+        saved['encounter']['destination'] = list(unrelated)
+>       with pytest.raises(SaveFormatError, match='waiting.*encounter'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'eador.entities.SaveFormatError'>
+
+tests/eador/test_concurrent_campaign.py:463: Failed
+=========================== short test summary info ============================
+FAILED tests/eador/test_concurrent_campaign.py::test_checkpoint_rejects_shared_combat_that_cannot_return_both_real_armies[outcome]
+FAILED tests/eador/test_concurrent_campaign.py::test_checkpoint_rejects_a_waiting_arrival_redirected_away_from_the_busy_army
+2 failed, 22 deselected in 0.38s
