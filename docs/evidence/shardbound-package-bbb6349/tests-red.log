@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_packaged_map_controls_read_and_spend_real_orders_then_restore_the_smoke_opening _
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-1986/test_packaged_map_controls_rea0')
+
+    def test_packaged_map_controls_read_and_spend_real_orders_then_restore_the_smoke_opening(tmp_path):
+        """The installed check clicks Explore/End turn, then restores the original save and settings."""
+>       check = runpy.run_path(str(ENTRY))['verify_shard_controls']
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'verify_shard_controls'
+
+tests/packaging/test_eador_smoke.py:63: KeyError
+=========================== short test summary info ============================
+FAILED tests/packaging/test_eador_smoke.py::test_packaged_map_controls_read_and_spend_real_orders_then_restore_the_smoke_opening
+1 failed in 0.06s

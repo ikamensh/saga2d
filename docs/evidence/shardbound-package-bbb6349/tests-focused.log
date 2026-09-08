@@ -1,0 +1,3 @@
+......                                                                   [100%]
+6 passed in 2.40s
+RECEIPT wall=2.4526s cpu=0.6279s requested=25% checkpoint=per-test; map-input=per-frame

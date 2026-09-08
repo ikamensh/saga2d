@@ -1,7 +1,8 @@
 # Shard map: three critique and improvement cycles
 
 Fresh native pyglet captures, 8 September 2026. This is source-game evidence;
-the preserved Mac archive from `2d9520a` predates these changes.
+the subsequent [bbb6349 Mac package](../shardbound-package-bbb6349/README.md)
+includes these changes and verifies them in the extracted frozen app.
 Accepted source: **ed27f24**, following the first two visual commits `ddf6d95`
 and `763820a`. The accepted receipt records its pre-commit HEAD; its three
 recorded source hashes match the committed files exactly.

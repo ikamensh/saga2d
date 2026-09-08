@@ -1,0 +1,620 @@
+[
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/build-manifest.json",
+    "retained": "build-manifest.json.gz",
+    "original_bytes": 101649,
+    "original_sha256": "92df5967d745bbb77b8d5ef00c7b76d7c58f2329553a937caa3a404e9c9261ea"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-about-1.png",
+    "retained": "smoke/packaged-smoke-about-1.png",
+    "original_bytes": 343687,
+    "original_sha256": "d52d6c5ff80cd6ce4260991e5f97edc3704336eaa2f2022320a80163e10b807d"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-about-2.png",
+    "retained": "smoke/packaged-smoke-about-2.png",
+    "original_bytes": 346569,
+    "original_sha256": "c57f7c85d89ffa058871dd1a3e1c6a7d7043c7483e699705d92019e363bff53a"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-battle.png",
+    "retained": "smoke/packaged-smoke-battle.png",
+    "original_bytes": 2458222,
+    "original_sha256": "5cfb05c413f57624ec32143e105ebcd381ad414b3f17b6f5c2bd84a95b5140ca"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-codex.png",
+    "retained": "smoke/packaged-smoke-codex.png",
+    "original_bytes": 393848,
+    "original_sha256": "bb485c736883a74ebbe1b5fe4fd84366a37cd375bccee8c24348b81954a9db59"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-forecast-125.png",
+    "retained": "smoke/packaged-smoke-forecast-125.png",
+    "original_bytes": 2451891,
+    "original_sha256": "40ae9e188c1c12cc8ead5a2bb544b448ff969144b8c42824db18f478f260b7ab"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-guide.png",
+    "retained": "smoke/packaged-smoke-guide.png",
+    "original_bytes": 411677,
+    "original_sha256": "08b12367d45ae091a662f98079152700aad9d86531c4fa6e72883b3f342a4c87"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-rival.png",
+    "retained": "smoke/packaged-smoke-rival.png",
+    "original_bytes": 374999,
+    "original_sha256": "4f59cd5989820f313fb0daf2bfdc84998aabbbee5d93b2fbd56441f098b1c204"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-settings.png",
+    "retained": "smoke/packaged-smoke-settings.png",
+    "original_bytes": 792261,
+    "original_sha256": "25bee7590430aff43fd2480b49e9f9dc24a5cce1869a071edaae4c45aa8e5e7d"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-shard-125.png",
+    "retained": "smoke/packaged-smoke-shard-125.png",
+    "original_bytes": 2401196,
+    "original_sha256": "2de4587b0d561cc1def1255b035732c4f12252c5a306a33076e158435f0131e4"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-shard-hover-125.png",
+    "retained": "smoke/packaged-smoke-shard-hover-125.png",
+    "original_bytes": 2382658,
+    "original_sha256": "d712f3878dcde574d9765de1bd042b7989dfb27170df236305d885126a7ea37e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke-shard.png",
+    "retained": "smoke/packaged-smoke-shard.png",
+    "original_bytes": 2395084,
+    "original_sha256": "49e140f4a530167ec1ddd456b22f6f8a706084a86b45ab4d6c1906a6bfb12a1e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke.json",
+    "retained": "smoke/packaged-smoke.json.gz",
+    "original_bytes": 9373,
+    "original_sha256": "62a6f7bc3b66b09e782016185ae8f6d6649729163ab6e619f63cd5c0c00c6647"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/packaged-smoke.png",
+    "retained": "smoke/packaged-smoke.png",
+    "original_bytes": 3199652,
+    "original_sha256": "71758670ae854bafae6f554b3e4efef8897c4d9f01319af5435dfbe702bddefd"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-1/briefing-courier\u2019s-crossing.png",
+    "retained": "campaign/direct/phase-1/briefing-courier\u2019s-crossing.png",
+    "original_bytes": 649774,
+    "original_sha256": "d7cd4544de4b76131d2e9e20b23f3e69c11ff438237de92aed59d80010522efc"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-1/contract-125.png",
+    "retained": "campaign/direct/phase-1/contract-125.png",
+    "original_bytes": 403184,
+    "original_sha256": "84ea0a1c36e491b87f3cce15a6d68865b0e93d6b1c0f3e003aacc085a02e5c5d"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-1/saved-departure-125.png",
+    "retained": "campaign/direct/phase-1/saved-departure-125.png",
+    "original_bytes": 309793,
+    "original_sha256": "c895e36c4a80da544d0466d79f41e00931826475a500a3b344f786b63424eda7"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-1/title-125.png",
+    "retained": "campaign/direct/phase-1/title-125.png",
+    "original_bytes": 3109544,
+    "original_sha256": "23ce637ade475fd20e81473add8a537ad03c2cea6cf80b55bfe7c56544714dda"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-1.json",
+    "retained": "campaign/direct/phase-1.json.gz",
+    "original_bytes": 31366,
+    "original_sha256": "c96495e8f56b796a4cdf3e8fb47a12e4d4639a9421622d33f164f81111dbafa3"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/briefing-border-watch.png",
+    "retained": "campaign/direct/phase-2/briefing-border-watch.png",
+    "original_bytes": 663551,
+    "original_sha256": "0a7555a7956e7d3dac3965cd7635fb636d7be2c2b5e667eb3f7c5bd1238e1c46"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/briefing-pack-hunt.png",
+    "retained": "campaign/direct/phase-2/briefing-pack-hunt.png",
+    "original_bytes": 640991,
+    "original_sha256": "8324d4eb091b2d8a11d02641843e25a0d76110450dc71a4ff384d6a5866d5761"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/contract-125.png",
+    "retained": "campaign/direct/phase-2/contract-125.png",
+    "original_bytes": 402635,
+    "original_sha256": "2cc3a8e8fa1139052f4362ed40f4d7696ff60af3bbb0b22a3510c3b81a7fcfc9"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/restored-checkpoint-125.png",
+    "retained": "campaign/direct/phase-1/saved-departure-125.png",
+    "original_bytes": 309793,
+    "original_sha256": "c895e36c4a80da544d0466d79f41e00931826475a500a3b344f786b63424eda7"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/saved-departure-125.png",
+    "retained": "campaign/direct/phase-2/saved-departure-125.png",
+    "original_bytes": 314415,
+    "original_sha256": "8899c2d396b013bc3879d29d7f3f5488bf8619e123d29c1e0a18a629783afbb5"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/stage-1-earned-retinue.png",
+    "retained": "campaign/direct/phase-2/stage-1-earned-retinue.png",
+    "original_bytes": 319273,
+    "original_sha256": "08560421cf40f9053d266f2fd201696a22536af27adbbfa9ad20f0bb1fbe438e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2/stage-2-earned-arrival.png",
+    "retained": "campaign/direct/phase-2/stage-2-earned-arrival.png",
+    "original_bytes": 2416289,
+    "original_sha256": "7fab828cd6d9649bdc0fe7d28e33d6d4af8fa277ef0d87acc005c14852160572"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-2.json",
+    "retained": "campaign/direct/phase-2.json.gz",
+    "original_bytes": 55890,
+    "original_sha256": "1f8aba0e1b67878ad56e2263cb77c439afe3c46ee1c314cb2d06fade862b244a"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/briefing-aerie-raid.png",
+    "retained": "campaign/direct/phase-3/briefing-aerie-raid.png",
+    "original_bytes": 674314,
+    "original_sha256": "fd02d3c6047ce34b481c9cfbb6c61ab4499cf1981ec31a237413ba21388cfd3e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/briefing-the-last-gate.png",
+    "retained": "campaign/direct/phase-3/briefing-the-last-gate.png",
+    "original_bytes": 675846,
+    "original_sha256": "5d2852e5c277264f10a687e4f9831c1a43854b3a95c7b6eb45cc29b546f6e670"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/contract-125.png",
+    "retained": "campaign/direct/phase-3/contract-125.png",
+    "original_bytes": 379995,
+    "original_sha256": "c154d5f301e4841f7533038a7291698bfd5000993da983b724b62b383615c3ed"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/restored-checkpoint-125.png",
+    "retained": "campaign/direct/phase-2/saved-departure-125.png",
+    "original_bytes": 314415,
+    "original_sha256": "8899c2d396b013bc3879d29d7f3f5488bf8619e123d29c1e0a18a629783afbb5"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/saved-ending-125.png",
+    "retained": "campaign/direct/phase-3/saved-ending-125.png",
+    "original_bytes": 255513,
+    "original_sha256": "0c5050b510d62bfe0a992c2f5907f066d59313f0257b60c32facdaeffd5226bc"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/stage-2-earned-retinue.png",
+    "retained": "campaign/direct/phase-3/stage-2-earned-retinue.png",
+    "original_bytes": 288987,
+    "original_sha256": "245aa4ecabe966d0c652f246bce80838d990139d5301b858b96bf98010f7563b"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3/stage-3-earned-arrival.png",
+    "retained": "campaign/direct/phase-3/stage-3-earned-arrival.png",
+    "original_bytes": 2417673,
+    "original_sha256": "b54e7b4570558419d9dd5ecf109c63facdb4d86e013b0ec1efbb5da6ee5d647f"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-3.json",
+    "retained": "campaign/direct/phase-3.json.gz",
+    "original_bytes": 55395,
+    "original_sha256": "cc448e64091b7921253ee8cc0a5a2b3ff6fe9dd1003a10e61650bf22c2a15fda"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-4/restored-checkpoint-125.png",
+    "retained": "campaign/direct/phase-3/saved-ending-125.png",
+    "original_bytes": 255513,
+    "original_sha256": "0c5050b510d62bfe0a992c2f5907f066d59313f0257b60c32facdaeffd5226bc"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-4/return-to-title-125.png",
+    "retained": "campaign/direct/phase-4/return-to-title-125.png",
+    "original_bytes": 3109893,
+    "original_sha256": "50ebca3d491f494b7a88fd285610e9d00e760963b76f48bb0d2fda34f5c44260"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/phase-4.json",
+    "retained": "campaign/direct/phase-4.json.gz",
+    "original_bytes": 45437,
+    "original_sha256": "0df0871bf5c3ea1dd0b6db20551a7c08e51f7725910aa843690ffa36a8be1c19"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_1.backup.json",
+    "retained": "campaign/direct/saves/save_1.backup.json.gz",
+    "original_bytes": 21952,
+    "original_sha256": "fa7ac6e8c7775f287795820823a2f0aa508e4bee646b9e4d34ecf19ccb08760e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_1.json",
+    "retained": "campaign/direct/saves/save_1.json.gz",
+    "original_bytes": 21952,
+    "original_sha256": "e71c69ca15899276f011ea4b224e2aa18961f10014f3239242ac03057889e542"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_10.backup.json",
+    "retained": "campaign/direct/saves/save_10.backup.json.gz",
+    "original_bytes": 31576,
+    "original_sha256": "b7d5de4d1e195eeadd75002b1de72b2c67e10195d693a324eee4e9acacec83c3"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_10.json",
+    "retained": "campaign/direct/saves/save_10.json.gz",
+    "original_bytes": 32596,
+    "original_sha256": "5bafc6b3a6dc536d103cce3e3221b53f8591a5fca2da43c1bbe24fc2457b28f3"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_11.backup.json",
+    "retained": "campaign/direct/saves/save_11.backup.json.gz",
+    "original_bytes": 32113,
+    "original_sha256": "042944c8ea5ceefc1acdcf6c54920f7fa90a03b59efb2c8580a8b461d447c558"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_11.json",
+    "retained": "campaign/direct/saves/save_11.json.gz",
+    "original_bytes": 21952,
+    "original_sha256": "21cd2ee5ca4fc29d913fadec0831a931bb6e395d31b1b62e6c768141245f2e59"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_12.backup.json",
+    "retained": "campaign/direct/saves/save_12.backup.json.gz",
+    "original_bytes": 30934,
+    "original_sha256": "371261ba0ec6d360f7fe201dfd2adf3282f6d53e258f23f5438a88401b3c8e9e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/saves/save_12.json",
+    "retained": "campaign/direct/saves/save_12.json.gz",
+    "original_bytes": 32509,
+    "original_sha256": "a3df5f54e4fa03ee9add93275adce3c3781005d54a9173b5805cfec028e344f3"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/direct/settings.json",
+    "retained": "campaign/direct/settings.json.gz",
+    "original_bytes": 186,
+    "original_sha256": "7311f985879d60aa5d496c967e1586f136c3d81ad5f5df84b5d9623db2166c82"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-1/briefing-courier\u2019s-crossing.png",
+    "retained": "campaign/direct/phase-1/briefing-courier\u2019s-crossing.png",
+    "original_bytes": 649774,
+    "original_sha256": "d7cd4544de4b76131d2e9e20b23f3e69c11ff438237de92aed59d80010522efc"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-1/contract-125.png",
+    "retained": "campaign/direct/phase-1/contract-125.png",
+    "original_bytes": 403184,
+    "original_sha256": "84ea0a1c36e491b87f3cce15a6d68865b0e93d6b1c0f3e003aacc085a02e5c5d"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-1/saved-departure-125.png",
+    "retained": "campaign/direct/phase-1/saved-departure-125.png",
+    "original_bytes": 309793,
+    "original_sha256": "c895e36c4a80da544d0466d79f41e00931826475a500a3b344f786b63424eda7"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-1/title-125.png",
+    "retained": "campaign/direct/phase-1/title-125.png",
+    "original_bytes": 3109544,
+    "original_sha256": "23ce637ade475fd20e81473add8a537ad03c2cea6cf80b55bfe7c56544714dda"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-1.json",
+    "retained": "campaign/recovery/phase-1.json.gz",
+    "original_bytes": 31364,
+    "original_sha256": "f0c15bd4ce5ad6ff5e896a74f0598ff5581a9cadf5929fb50a419e56620c8757"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-2/contract-125.png",
+    "retained": "campaign/direct/phase-2/contract-125.png",
+    "original_bytes": 402635,
+    "original_sha256": "2cc3a8e8fa1139052f4362ed40f4d7696ff60af3bbb0b22a3510c3b81a7fcfc9"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-2/restored-checkpoint-125.png",
+    "retained": "campaign/direct/phase-1/saved-departure-125.png",
+    "original_bytes": 309793,
+    "original_sha256": "c895e36c4a80da544d0466d79f41e00931826475a500a3b344f786b63424eda7"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-2/saved-capital-loss-125.png",
+    "retained": "campaign/recovery/phase-2/saved-capital-loss-125.png",
+    "original_bytes": 314405,
+    "original_sha256": "08408eff56e1b9d4fb8bf19eb11ff9d0845a58e086850bb83ede1378cc73379b"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-2/stage-1-earned-retinue.png",
+    "retained": "campaign/direct/phase-2/stage-1-earned-retinue.png",
+    "original_bytes": 319273,
+    "original_sha256": "08560421cf40f9053d266f2fd201696a22536af27adbbfa9ad20f0bb1fbe438e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-2/stage-2-earned-arrival.png",
+    "retained": "campaign/direct/phase-2/stage-2-earned-arrival.png",
+    "original_bytes": 2416289,
+    "original_sha256": "7fab828cd6d9649bdc0fe7d28e33d6d4af8fa277ef0d87acc005c14852160572"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-2.json",
+    "retained": "campaign/recovery/phase-2.json.gz",
+    "original_bytes": 47016,
+    "original_sha256": "66fafb00e35b1beb67cdc567b7045d71ceffb45e999ba26b85a3dd3ffdc90215"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-3/briefing-border-watch.png",
+    "retained": "campaign/recovery/phase-3/briefing-border-watch.png",
+    "original_bytes": 662385,
+    "original_sha256": "2ec5e81160092b406811505e1995db2330b7a8a448f81bc857ec3bcc641beef2"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-3/briefing-pack-hunt.png",
+    "retained": "campaign/recovery/phase-3/briefing-pack-hunt.png",
+    "original_bytes": 639979,
+    "original_sha256": "562b36b99a4a50abf7e919661d8044d230a2f2b30ab16b06fe6c443d1e700ae5"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-3/contract-125.png",
+    "retained": "campaign/recovery/phase-3/contract-125.png",
+    "original_bytes": 384608,
+    "original_sha256": "4d550e5f4ace9e759ea9459280073a37e039c498044bb368eed081d77db52eea"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-3/restored-checkpoint-125.png",
+    "retained": "campaign/recovery/phase-2/saved-capital-loss-125.png",
+    "original_bytes": 314405,
+    "original_sha256": "08408eff56e1b9d4fb8bf19eb11ff9d0845a58e086850bb83ede1378cc73379b"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-3/saved-departure-125.png",
+    "retained": "campaign/recovery/phase-3/saved-departure-125.png",
+    "original_bytes": 314243,
+    "original_sha256": "0720d785363d61db1471a7a7ceabf6af079953aa33838d8b7d5c983a3d557d57"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-3.json",
+    "retained": "campaign/recovery/phase-3.json.gz",
+    "original_bytes": 55393,
+    "original_sha256": "61975a3b0836cd09590755a071497636b08c3951c10794810d3ccb00da3c93ee"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/briefing-aerie-raid.png",
+    "retained": "campaign/direct/phase-3/briefing-aerie-raid.png",
+    "original_bytes": 674314,
+    "original_sha256": "fd02d3c6047ce34b481c9cfbb6c61ab4499cf1981ec31a237413ba21388cfd3e"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/briefing-the-last-gate.png",
+    "retained": "campaign/direct/phase-3/briefing-the-last-gate.png",
+    "original_bytes": 675846,
+    "original_sha256": "5d2852e5c277264f10a687e4f9831c1a43854b3a95c7b6eb45cc29b546f6e670"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/contract-125.png",
+    "retained": "campaign/recovery/phase-4/contract-125.png",
+    "original_bytes": 362465,
+    "original_sha256": "65dafd4256ae8b6925e5b1daaa33f552a846407c14323ae29707effca5959081"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/restored-checkpoint-125.png",
+    "retained": "campaign/recovery/phase-3/saved-departure-125.png",
+    "original_bytes": 314243,
+    "original_sha256": "0720d785363d61db1471a7a7ceabf6af079953aa33838d8b7d5c983a3d557d57"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/saved-ending-125.png",
+    "retained": "campaign/recovery/phase-4/saved-ending-125.png",
+    "original_bytes": 251659,
+    "original_sha256": "ff73b9b7853d0be624d88eb32d66480050d0029a831a9150f2b0feb551f64a80"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/stage-2-earned-retinue.png",
+    "retained": "campaign/recovery/phase-4/stage-2-earned-retinue.png",
+    "original_bytes": 288855,
+    "original_sha256": "a7aab95780ba89cd9ac21b6a9d5220c1f375a66c4187ff41a250aa701fda48ab"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4/stage-3-earned-arrival.png",
+    "retained": "campaign/direct/phase-3/stage-3-earned-arrival.png",
+    "original_bytes": 2417673,
+    "original_sha256": "b54e7b4570558419d9dd5ecf109c63facdb4d86e013b0ec1efbb5da6ee5d647f"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-4.json",
+    "retained": "campaign/recovery/phase-4.json.gz",
+    "original_bytes": 55484,
+    "original_sha256": "6b06742965003501573c9ffe972abf11d6667864fba727ff761012a1c432e2e6"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-5/restored-checkpoint-125.png",
+    "retained": "campaign/recovery/phase-4/saved-ending-125.png",
+    "original_bytes": 251659,
+    "original_sha256": "ff73b9b7853d0be624d88eb32d66480050d0029a831a9150f2b0feb551f64a80"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-5/return-to-title-125.png",
+    "retained": "campaign/direct/phase-4/return-to-title-125.png",
+    "original_bytes": 3109893,
+    "original_sha256": "50ebca3d491f494b7a88fd285610e9d00e760963b76f48bb0d2fda34f5c44260"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/phase-5.json",
+    "retained": "campaign/recovery/phase-5.json.gz",
+    "original_bytes": 45445,
+    "original_sha256": "f88e23797d1747c51b4f72df4c2bf125332a738a6529ec2cbe4dc93832f5c812"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_1.backup.json",
+    "retained": "campaign/recovery/saves/save_1.backup.json.gz",
+    "original_bytes": 21952,
+    "original_sha256": "a8b911368a7b578d87b1ac6f396a51db1b7596a6789d7d7f0b6b2b3a80142154"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_1.json",
+    "retained": "campaign/recovery/saves/save_1.json.gz",
+    "original_bytes": 21952,
+    "original_sha256": "582335780e412b296c69f1abfb19168c0201610582feac8d942fc3f6f08ec47a"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_10.backup.json",
+    "retained": "campaign/recovery/saves/save_10.backup.json.gz",
+    "original_bytes": 30935,
+    "original_sha256": "93dc6486e995042734a00e48d399065bd22e75ba3d11a24e1ba3fe43dfc8b00f"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_10.json",
+    "retained": "campaign/recovery/saves/save_10.json.gz",
+    "original_bytes": 32510,
+    "original_sha256": "4689ccdef78811bcbda0ec8e7aa3f309124a88c1748b923d9424fcd1acdb67e7"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_11.backup.json",
+    "retained": "campaign/recovery/saves/save_11.backup.json.gz",
+    "original_bytes": 31577,
+    "original_sha256": "ddc2e6202c81fd72e7a8f0f1d9c08c8232b1dae5b5bccea34bb2931e22df0926"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_11.json",
+    "retained": "campaign/recovery/saves/save_11.json.gz",
+    "original_bytes": 32597,
+    "original_sha256": "352cde7d0c96dd21469d93043b1a0403864393e53daf0519eaae4934c3d84420"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_12.backup.json",
+    "retained": "campaign/recovery/saves/save_12.backup.json.gz",
+    "original_bytes": 32114,
+    "original_sha256": "6f5e526b187cd863563f2b79c0e6d2937fc50b5c4990bd37a578ee6c1b779203"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/saves/save_12.json",
+    "retained": "campaign/recovery/saves/save_12.json.gz",
+    "original_bytes": 21952,
+    "original_sha256": "5f109407227d4a40d53dbdd166ade2b91e2d33d8ebd83cefd4c40556255bafe7"
+  },
+  {
+    "original": "/tmp/saga2d-candidate-bbb63492b4e5/dist/shardbound/campaign-verification/recovery/settings.json",
+    "retained": "campaign/recovery/settings.json.gz",
+    "original_bytes": 186,
+    "original_sha256": "7311f985879d60aa5d496c967e1586f136c3d81ad5f5df84b5d9623db2166c82"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/launch.log",
+    "retained": "launchservices/launch.log",
+    "original_bytes": 0,
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-about-1.png",
+    "retained": "smoke/packaged-smoke-about-1.png",
+    "original_bytes": 343687,
+    "original_sha256": "d52d6c5ff80cd6ce4260991e5f97edc3704336eaa2f2022320a80163e10b807d"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-about-2.png",
+    "retained": "launchservices/smoke-about-2.png",
+    "original_bytes": 345820,
+    "original_sha256": "53ad47a6b78d30eb5899b92b0b3ecf2866a3ab7ed6a8c1810bf4ddc42acd20dd"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-battle.png",
+    "retained": "smoke/packaged-smoke-battle.png",
+    "original_bytes": 2458222,
+    "original_sha256": "5cfb05c413f57624ec32143e105ebcd381ad414b3f17b6f5c2bd84a95b5140ca"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-codex.png",
+    "retained": "smoke/packaged-smoke-codex.png",
+    "original_bytes": 393848,
+    "original_sha256": "bb485c736883a74ebbe1b5fe4fd84366a37cd375bccee8c24348b81954a9db59"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-guide.png",
+    "retained": "smoke/packaged-smoke-guide.png",
+    "original_bytes": 411677,
+    "original_sha256": "08b12367d45ae091a662f98079152700aad9d86531c4fa6e72883b3f342a4c87"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-rival.png",
+    "retained": "smoke/packaged-smoke-rival.png",
+    "original_bytes": 374999,
+    "original_sha256": "4f59cd5989820f313fb0daf2bfdc84998aabbbee5d93b2fbd56441f098b1c204"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-settings.png",
+    "retained": "smoke/packaged-smoke-settings.png",
+    "original_bytes": 792261,
+    "original_sha256": "25bee7590430aff43fd2480b49e9f9dc24a5cce1869a071edaae4c45aa8e5e7d"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-shard-125.png",
+    "retained": "smoke/packaged-smoke-shard-125.png",
+    "original_bytes": 2401196,
+    "original_sha256": "2de4587b0d561cc1def1255b035732c4f12252c5a306a33076e158435f0131e4"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-shard-hover-125.png",
+    "retained": "smoke/packaged-smoke-shard-hover-125.png",
+    "original_bytes": 2382658,
+    "original_sha256": "d712f3878dcde574d9765de1bd042b7989dfb27170df236305d885126a7ea37e"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke-shard.png",
+    "retained": "smoke/packaged-smoke-shard.png",
+    "original_bytes": 2395084,
+    "original_sha256": "49e140f4a530167ec1ddd456b22f6f8a706084a86b45ab4d6c1906a6bfb12a1e"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke.json",
+    "retained": "launchservices/smoke.json.gz",
+    "original_bytes": 5980,
+    "original_sha256": "11dc34cc8cea4a76908a55f961ea8a4806f04db7fe26b5c60f3b11f8fe63d7f0"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-launch/smoke.png",
+    "retained": "smoke/packaged-smoke.png",
+    "original_bytes": 3199652,
+    "original_sha256": "71758670ae854bafae6f554b3e4efef8897c4d9f01319af5435dfbe702bddefd"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-build.log",
+    "retained": "build.log",
+    "original_bytes": 11581,
+    "original_sha256": "43caf1016e5f01220b9438b536c41eb8c215d3756cc51edd4ce8b8679aa94ca5"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-codesign.log",
+    "retained": "codesign.log",
+    "original_bytes": 7,
+    "original_sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+  },
+  {
+    "original": "/tmp/shardbound-package-bbb6349-retention.json",
+    "retained": "retention.json.gz",
+    "original_bytes": 3301,
+    "original_sha256": "50a131a25daade6006e923b0d087f12ba014decf619af71d153dfe5cfd1e76af"
+  },
+  {
+    "original": "/tmp/shardbound-packaged-map-red.log",
+    "retained": "tests-red.log",
+    "original_bytes": 1059,
+    "original_sha256": "87f3c8dc03171bc32ffa364d70ba1279e23279a5a8232f5cefb67f5899bf38d1"
+  },
+  {
+    "original": "/tmp/shardbound-packaged-map-green.log",
+    "retained": "tests-green.log",
+    "original_bytes": 98,
+    "original_sha256": "c91dad03511eb111dba9f317cdb7962c64ec389c7d259de488e167c78aac1b31"
+  },
+  {
+    "original": "/tmp/shardbound-packaged-map-focused.log",
+    "retained": "tests-focused.log",
+    "original_bytes": 186,
+    "original_sha256": "6bbbf6f634cd2ffed85bc600460fd75fb3f9d842dd01c5dcbffe49fd7ead2f5b"
+  }
+]

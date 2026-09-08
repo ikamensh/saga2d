@@ -16,7 +16,7 @@ actions. [Before/after frames and validation](evidence/shard-ui-2026-09-08/READM
 include 25 targeted tests, a bounded input audit, and five native cases with
 95 province selections and four exact command comparisons. Seven final PNGs
 were inspected; the accepted native run averaged about 25% of one CPU core.
-This source work is newer than the preserved Mac archive below.
+This visual work is included in the preserved Mac archive below.
 
 The development-only concurrent campaign model now supports two independent
 realms buying buildings/troops and settling a shared day after both mark Ready.
@@ -24,7 +24,25 @@ Shared realm purchases and solo compatibility are checkpointed. Independent
 PvE encounters, conflict claims, human PvP and playable network presentation
 remain open; the selectable multiplayer mode is still shared-realm co-op.
 
-## Current packaged checkpoint — 2026-09-07
+## Current packaged checkpoint — 2026-09-08
+
+The latest preserved Mac development archive is clean source **bbb6349**:
+[runnable artifact, exact source and inspected packaged frames](evidence/shardbound-package-bbb6349/README.md).
+It includes the refreshed shard map and shared realm extraction. Six packaging
+tests pass; the extracted native app now explicitly verifies 125% hover names,
+the named Explore and End turn controls, retreat, and exact save/settings
+restoration. Asset/audio, saved combat, settings and earned casualty checks pass.
+
+Both direct and actual capital-loss recovery campaigns complete all three shards
+across nine frozen app processes: **976 native inputs, 17 UI save/reloads and
+seven exact process continuations**. All 55 packaged frames were checked using
+exact-hash representatives. A second extraction, local ad-hoc signature and
+separate LaunchServices smoke pass. The 49,280,904-byte archive, source hashes,
+38 unique inspected frames and exact receipts are retained with the evidence.
+All execution jobs ended. Windows, clean-account, human listening/playtests,
+artifact multiplayer and overall acceptance remain open. **G01–G19 remain incomplete.**
+
+## Earlier packaged checkpoint — 2026-09-07
 
 The latest preserved Mac development archive is clean source **2d9520a**:
 [runnable artifact, exact source and inspected packaged frames](evidence/shardbound-package-2d9520a/README.md).

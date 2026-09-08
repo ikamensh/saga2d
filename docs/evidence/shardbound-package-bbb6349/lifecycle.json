@@ -1,0 +1,17 @@
+{
+  "campaign_process_ids": [
+    26497,
+    26685,
+    26934,
+    27081,
+    27106,
+    27294,
+    27331,
+    27577,
+    27798
+  ],
+  "all_campaign_processes_exited": true,
+  "build_exit_code": 0,
+  "launchservices_exit_code": 0,
+  "remaining_shardbound_processes_observed": 0
+}
