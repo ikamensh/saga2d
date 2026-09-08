@@ -35,3 +35,12 @@ The headless-client integration suite additionally passed four tests in
 5.34 seconds: create/join as either seat, actual AI orders through real
 sockets, invalid-room failure and bounded lobby timeout. These short checks
 establish connection and early play, not a complete human-versus-AI match.
+
+The hosted server was then updated from immutable commit `2205d6d`, including
+the current Warband battle-event metadata. The candidate passed room creation
+and joining for all three games on the VM before activation; the public TLS
+smoke passed all three again afterwards. The frozen source passed **37 online
+server, checkpoint, client, menu and headless-AI tests in 11.93 seconds**.
+See `server-deployment.json`, `server-regressions.txt` and
+`public-server-smoke.txt`. This update does not change Warband order rules or
+simulation timing relative to the native run above.

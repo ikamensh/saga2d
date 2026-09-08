@@ -1,0 +1,7 @@
+Using CPython 3.13.2
+Creating virtual environment at: .venv
+   Building saga2d @ file:///private/tmp/saga2d-warband-server-20260908
+      Built saga2d @ file:///private/tmp/saga2d-warband-server-20260908
+Installed 10 packages in 41ms
+.....................................                                    [100%]
+37 passed in 11.93s

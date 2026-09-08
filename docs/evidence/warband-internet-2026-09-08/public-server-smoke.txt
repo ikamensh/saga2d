@@ -1,0 +1,3 @@
+tribes-v1: create and join passed
+warband-v1: create and join passed
+shardbound-v1: create and join passed

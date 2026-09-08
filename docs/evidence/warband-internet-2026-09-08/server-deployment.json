@@ -1,0 +1,14 @@
+{
+  "name": "saga2d-online",
+  "project_id": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+  "server_id": "d56b46e5-fe7d-404c-9b5d-48bc87143433",
+  "zone": "fr-par-1",
+  "ip": "51.159.207.49",
+  "domain": "games.tachyon-ai.eu",
+  "state": "running",
+  "release": "420cd24ad8bc8e3d4874b96b9cc150b4917ebb577777e64de591e1ae68d32315",
+  "files": 128,
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "health": "ok",
+  "source_commit": "2205d6d"
+}
