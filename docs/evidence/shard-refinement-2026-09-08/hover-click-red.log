@@ -1,0 +1,53 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_province_names_reveal_on_hover_and_keyboard_selection_without_orders ___
+
+tmp_path = PosixPath('/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/pytest-of-ikamen/pytest-2006/test_province_names_reveal_on_0')
+
+    def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tmp_path):
+        """Ordinary provinces do not cover the terrain; pointing or Tab reveals their full name."""
+        game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+        try:
+            state = State.new(7)
+            game.push(ShardScene(state))
+            player = PlayerInput(game)
+            before = state.to_json()
+            for key in ('f2', 'right', 'return'):
+                player.press(key)
+            province = state.provinces[(-1, 0)]
+    
+            def visible_names():
+                return {item.text for item in game.scene.ui.walk() if isinstance(item, Label) and item.visible}
+    
+            assert province.name not in visible_names()
+            assert state.provinces[state.rival.target].name in visible_names(), 'The announced attack stays locatable'
+            game.backend.inject_mouse_move(*game.scene.grid.center(province.pos))
+            game.tick(1 / 60)
+            assert province.name in visible_names()
+            name = game.scene.ui.find(lambda item: isinstance(item, Label) and item.text == province.name)
+            assert name.bounds[1] > 100, 'Hover name belongs beside the map, clear of the title toolbar'
+            x, y, width, height = name.bounds
+            cx, cy = game.scene.grid.center(province.pos)
+            assert x <= cx <= x + width and y <= cy <= y + height, (
+                'The revealed name must belong visually to the hovered province, not its neighbor')
+            game.backend.inject_mouse_move(2, 2)
+            game.tick(1 / 60)
+            assert province.name not in visible_names()
+            player.press('tab')
+            assert game.scene.selected == province.pos and province.name in visible_names()
+            other = state.provinces[(-2, 1)]
+            game.backend.inject_mouse_move(*game.scene.grid.center(other.pos))
+            game.tick(1 / 60)
+            assert other.name in visible_names()
+            player.click(*game.scene.grid.center(other.pos))
+>           assert game.scene.selected == other.pos, 'Hover names must not consume province clicks'
+E           AssertionError: Hover names must not consume province clicks
+E           assert (-1, 0) == (-2, 1)
+E             
+E             At index 0 diff: -1 != -2
+E             Use -v to get more diff
+
+tests/eador/test_shard_map.py:45: AssertionError
+=========================== short test summary info ============================
+FAILED tests/eador/test_shard_map.py::test_province_names_reveal_on_hover_and_keyboard_selection_without_orders
+1 failed in 0.39s

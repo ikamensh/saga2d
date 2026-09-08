@@ -1,0 +1,16 @@
+{
+  "source_sha256": {
+    "eador/art.py": "7f53259292dc0c6682dec242cda9773347cbe1d6e0d9280d9dd69911db53cae7",
+    "eador/scene.py": "aef957e1e8e702ef3222d56368549e6edd72248db2ab86c5ba287c91056315e3"
+  },
+  "captures": [
+    "opening",
+    "hover",
+    "army",
+    "encircled"
+  ],
+  "input_activations": 14,
+  "game_closed": true,
+  "wall_seconds": 7.145354917040095,
+  "cpu_seconds": 1.801515
+}

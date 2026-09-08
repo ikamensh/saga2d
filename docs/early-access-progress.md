@@ -9,6 +9,15 @@ apply to their named source snapshots, not to today's build.
 
 ## Current source work — 2026-09-08
 
+**3ea107e** refines the shard through three further inspected passes: adventure
+markers appear on owned or inspected provinces, colored frontiers outline
+territories, and hover names sit over the pointed province without splitting
+words or consuming clicks. [Before/after evidence](evidence/shard-refinement-2026-09-08/README.md)
+records 22 targeted integration tests, a final seven-test subset rerun and seven
+native cases with 133 hover-then-click selections and four exact orders.
+All 12 final PNGs were inspected; the final native job averaged 25.22% of one
+core and closed successfully. These source changes are newer than the Mac archive.
+
 **3e1e75b** adds three further shard critique cycles: a quieter province inspector,
 compass site markers, a helmet banner for the hero, connected terrain edges,
 separate army cards and a direction cue for an available selected journey.

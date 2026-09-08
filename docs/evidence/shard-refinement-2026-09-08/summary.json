@@ -1,0 +1,13 @@
+{
+  "accepted_source": "3ea107e1d4acb12746c2e9e34799ac6e98d9e7e8",
+  "native_source_hashes_match_commit": true,
+  "all_12_final_pngs_inspected": true,
+  "independent_review": "Territory frontiers, ordinary hover and final whole-word hover accepted.",
+  "native_cpu_share_of_one_core_percent": 25.218674528899157,
+  "cycles": [
+    "Owned or inspected adventure markers",
+    "Territory frontiers with quiet province seams",
+    "Anchored hover names, whole words and click-through"
+  ],
+  "verification_limits": "Source gameplay only. Existing package not refreshed. This is not a human playtest or full accessibility certification."
+}

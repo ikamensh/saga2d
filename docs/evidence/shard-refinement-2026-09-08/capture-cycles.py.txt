@@ -1,0 +1,51 @@
+from pathlib import Path
+import hashlib, json, os, sys, time
+from tempfile import TemporaryDirectory
+ROOT = Path('/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d')
+sys.path.insert(0, str(ROOT))
+os.environ['SAGA2D_SILENT'] = '1'
+from eador.app import create_game
+from eador.model import State
+from eador.scene import ShardScene
+from tools.cpu_budget import CpuBudget
+from tools.verify_eador_shard_look import PacedInput
+from tools.verify_eador_shard_reading import prepared_shards, check_shard
+output = Path(sys.argv[1])
+output.mkdir(parents=True, exist_ok=False)
+budget = CpuBudget(25)
+wall, cpu = time.monotonic(), time.process_time()
+prepared = dict(prepared_shards())
+budget.checkpoint()
+report = {'source_sha256': {p: hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in ('eador/art.py', 'eador/scene.py')}, 'captures': []}
+with TemporaryDirectory(prefix='shard-refinement-') as directory:
+    game = create_game(backend='pyglet', visible=False, save_dir=Path(directory)/'saves')
+    player = PacedInput(game, budget, native=True, output=output)
+    try:
+        game.set_window_size((1280, 720))
+        for name, snapshot in [('opening', State.new_campaign(7, 'Wizard').to_json()), ('army', prepared['paid-full-army']), ('encircled', prepared['saved-encircled'])]:
+            game.clear_and_push(ShardScene(State.from_json(snapshot)))
+            player._tick()
+            for key in ('f2', 'right', 'return'):
+                player.press(key)
+            if name == 'opening':
+                player.click(*player.root.grid.center((-1, 0)))
+            player.pointer(10, 100)
+            check_shard(player.root)
+            player.capture(name, settle=False)
+            report['captures'].append(name)
+            assert player.state.to_json() == snapshot
+            if name == 'opening':
+                destination = max((pos for pos in player.state.provinces if not player.state.provinces[pos].capital), key=lambda p: len(player.state.provinces[p].name))
+                player.pointer(*player.root.grid.center(destination))
+                player.capture('hover', settle=False)
+                report['captures'].append('hover')
+                assert player.state.to_json() == snapshot
+        report['input_activations'] = len(player.events)
+    finally:
+        game.close()
+        assert game.backend.window is None and not game.scenes
+        report['game_closed'] = True
+budget.checkpoint()
+report.update(wall_seconds=time.monotonic()-wall, cpu_seconds=time.process_time()-cpu)
+(output/'receipt.json').write_text(json.dumps(report, indent=2)+'\n')
+print(json.dumps(report))

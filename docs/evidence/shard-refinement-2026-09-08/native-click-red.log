@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/tools/verify_eador_shard_look.py", line 215, in <module>
+    verify(args.output, backend=args.backend, budget=CpuBudget(args.cpu_percent))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/tools/verify_eador_shard_look.py", line 149, in verify
+    assert player.root.selected == pos
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

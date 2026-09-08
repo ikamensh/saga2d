@@ -1,0 +1,4 @@
+{'selection': ['tests/eador/test_shard_map.py', 'tests/eador/test_shard_reading.py', 'tests/eador/test_scene.py', '-q'], 'cpu_percent': 25}
+......................                                                   [100%]
+22 passed in 14.70s
+{'wall_seconds': 14.95972583303228, 'cpu_seconds': 3.722649}
