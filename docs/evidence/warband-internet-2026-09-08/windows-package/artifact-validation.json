@@ -1,0 +1,23 @@
+{
+  "source_commit": "fd6e0c911fa68aa0355d4b56dd8e4f0885c739d8",
+  "run_id": 34202934123,
+  "artifact_id": 10046695851,
+  "artifacts": {
+    "Warband-0.1.0-preview.1-windows-x64-portable.zip": {
+      "bytes": 37277059,
+      "sha256": "65168d56f015a7caeaa5774d2ab6e50d62f34118375cc1f9645a0d7808675368"
+    },
+    "Warband-0.1.0-preview.1-windows-x64-setup.exe": {
+      "bytes": 26997400,
+      "sha256": "f2fcabad5bb14dde52630246005f900c37c0f80d2d46d12d433966c1e603500b"
+    }
+  },
+  "executable_sha256": "dace5f255e41f39746aa0cf69ad90f84faa4f63be2549a020342cd2f87b92b1c",
+  "all_diagnostics_match_executable": true,
+  "mesa_dlls_absent_from_portable_zip": true,
+  "screenshots_visually_inspected": [
+    "native-title.png",
+    "native-multiplayer.png",
+    "native.png"
+  ]
+}

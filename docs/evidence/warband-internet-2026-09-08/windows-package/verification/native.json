@@ -1,0 +1,25 @@
+{
+  "backend": "pyglet",
+  "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\warband-extracted-w4fsvzuu\\Installed Warband\\Warband.exe",
+  "executable_sha256": "dace5f255e41f39746aa0cf69ad90f84faa4f63be2549a020342cd2f87b92b1c",
+  "graphics_test_context": {
+    "dll_sha256": {
+      "libgallium_wgl.dll": "1a2e49cd5fdb1a857d98117ab04240d723b57da5dffe6d07f5386f42014557c1",
+      "opengl32.dll": "33b217ed7947b48684baa987914475898a2b4d7d64cce96b078216c67a633582"
+    },
+    "driver": "Mesa llvmpipe (test only)"
+  },
+  "images": [
+    "native-title.png",
+    "native-multiplayer.png",
+    "native.png"
+  ],
+  "native_multiplayer_input": true,
+  "opengl_version": "4.6 (Compatibility Profile) Mesa 26.2.0 (git-aacd123e02)",
+  "passed": true,
+  "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+  "sound_catalogue": 87,
+  "source_commit": "fd6e0c911fa68aa0355d4b56dd8e4f0885c739d8",
+  "vendor": "Mesa",
+  "version": "0.1.0-preview.1"
+}
