@@ -87,6 +87,11 @@ def test_online_creator_waits_for_partner_and_can_rejoin_after_app_restart(serve
         click_text('Copy room code')
         assert game.backend.get_clipboard_text() == room
         assert any('Copied' in t['text'] for t in game.backend.texts)
+        click_text('Copy invite link')
+        site = server_url.replace('ws://', 'http://').removesuffix('/play')
+        assert game.backend.get_clipboard_text() == f'{site}/join/tribes-v1/{room}'
+        assert lobby.session.resume_token not in game.backend.get_clipboard_text()
+        assert any('kept for 15 minutes' in t['text'] for t in game.backend.texts)
         click_text('Cancel')
         assert isinstance(game.scene, MatchMenu)
         assert any('Rejoin last room' in t['text'] for t in game.backend.texts)

@@ -23,12 +23,23 @@ players receive the server's world, including the creator. The room starts
 when both connect and pauses whenever a seat disconnects. Menus do not pause
 a connected match; in particular Warband continues while a menu is open.
 
+The waiting screen offers **Copy room code** and **Copy invite link**. The link
+(`https://games.tachyon-ai.eu/join/<game id>/<code>`) opens a page that shows
+the code, explains how to join and offers the download for a friend who has not
+installed the game yet. It contains only the game and room code.
+
 A short connection interruption reconnects automatically. After leaving or
 restarting the app, choose **Rejoin last room**. Each computer privately saves
 its own seat credential alongside its game settings; the shared room code
 only admits the second player initially. Keep the private credential private.
-Rooms expire after 15 minutes without both players. Starting another online
-room replaces that game's locally remembered room.
+Match rooms expire after 15 minutes without both players; Shardbound campaign
+rooms are kept for seven days, so a co-op campaign can continue on another
+day. Starting another online room replaces that game's locally remembered room.
+
+Installed games check the release catalog when Multiplayer opens and show
+**Update available** with an **Open download page** button when a newer build
+is published. A client the server no longer accepts sees **Update required**
+with the same button; both players need the same version.
 
 Commands interrupted by a lost connection are never replayed automatically.
 Check the refreshed world before repeating an order. Simultaneous decisions in
