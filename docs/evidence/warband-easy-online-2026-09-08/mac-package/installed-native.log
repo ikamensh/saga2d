@@ -1,0 +1,4 @@
+Warband multiplayer: online room rjv0s2jyxowl
+Warband multiplayer: online room rjv0s2jyxowl
+2026-09-08 11:12:20.766 Warband[10882:28800793] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/org.saga2d.warband.savedState
+pyglet/media/codecs/__init__.py:113: UserWarning: FFmpeg release version not found. This may be a new or untested release. Unknown behavior may occur. Versions Loaded: {'avcodec': 63, 'avformat': 63, 'avutil': 61, 'swresample': 7, 'swscale': 10}
