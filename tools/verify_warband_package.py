@@ -138,11 +138,14 @@ def verify(output: Path, *, native=False, public_server: str | None = None) -> d
             if os.name != "nt":
                 raise RuntimeError("Installer verification requires Windows")
             installed = extracted / "Installed Warband"
-            group = f"Warband verification {manifest['version']}"
-            shortcut = Path(os.environ["APPDATA"]) / "Microsoft/Windows/Start Menu/Programs" / group / "Warband.lnk"
+            # DisableProgramGroupPage=yes makes Inno ignore /GROUP. Check the
+            # same standard per-user shortcut that a normal install creates.
+            shortcut = Path(os.environ["APPDATA"]) / "Microsoft/Windows/Start Menu/Programs/Warband/Warband.lnk"
+            if shortcut.exists():
+                raise RuntimeError("Run installer verification in a Windows account without an existing Warband installation")
             try:
                 subprocess.run([str(installers[0]), "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-",
-                                f"/DIR={installed}", f"/GROUP={group}", f"/LOG={evidence / 'install.log'}"], check=True, timeout=120)
+                                f"/DIR={installed}", f"/LOG={evidence / 'install.log'}"], check=True, timeout=120)
                 assert shortcut.is_file(), shortcut
                 executable = installed / "Warband.exe"
                 report["installed"] = executable_smoke(executable, endpoint, evidence / "installed.json", manifest)
