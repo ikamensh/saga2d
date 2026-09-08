@@ -121,7 +121,7 @@ def test_challenge_explains_base_production_and_its_live_finite_rival_window(tmp
         state = player.root.state
         shown = ' '.join(t['text'] for t in game.backend.texts)
         assert 'Realm gold yield: 80% of base production' in shown
-        assert f'{state.provinces[state.hero.pos].income} base gold' in shown
+        check_metric(player.root, 'income', f'{state.provinces[state.hero.pos].income} base', 'Income')
         check_metric(player.root, 'income', f'+{state.income}', 'Income')
         player.press('v')
         shown = ' '.join(t['text'] for t in game.backend.texts)

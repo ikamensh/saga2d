@@ -223,27 +223,26 @@ class ConcurrentShardScene(ShardScene):
             return top + height
 
         from eador.worldgen import THEMES
-        block([label(f'CAMPAIGN PvP · {THEMES[s.theme].name.upper()} · SHARD {s.seed}', 700, 11, GOLD)], 26, 65, 700)
+        block([label(f'CAMPAIGN PvP · {THEMES[s.theme].name.upper()} · SHARD {s.seed}', 570, 10, MUTED)], 280, 24, 570)
         for index, (icon, title, action, key) in enumerate((
                 ('guide', 'Guide', self.help, 'F1'), ('hero', 'Hero', self.hero_details, 'H'),
                 ('codex', 'Codex', self.codex, 'C'), ('text_size', 'Text size', self.open_text_settings, 'F2'))):
-            self.icon_button(icon, title, 878 + index * 90, 26, action, shortcut=key)
+            self.icon_button(icon, title, 878 + index * 90, 12, action, shortcut=key)
         production = s.production
         economy_bottom = block([
-            label('YOUR REALM' if not production.encircled else 'CAPITAL ENCIRCLED', 402, 10, MUTED),
+            label(('CAPITAL ENCIRCLED' if production.encircled else 'YOUR REALM') +
+                  f' · Day {s.day} · ' + ('Ready' if s.ready else 'Orders open'), 402, 10, MUTED),
             Row(metric('gold', s.gold, width=110, size=16 * scale, color=GOLD),
                 metric('crystals', s.crystals, width=80, size=16 * scale, color=TEAL),
                 metric('income', f'+{production.gold}', width=92, size=12 * scale),
                 metric('upkeep', f'−{s.upkeep}', width=92, size=12 * scale), spacing=8),
-            label(f'Day {s.day} · ' + ('Ready' if s.ready else 'Orders open'), 402, 11, GOLD),
-        ], 26, 108, 402)
+        ], 26, 82, 402)
         hero_bottom = block([
             label(f'{s.hero.name}, the {s.hero.hero_class}', 402, 16, TEXT, True),
             Row(metric('health', f'{s.hero.hp}/{s.hero.max_hp}', width=142, size=12 * scale, color=TEAL),
                 metric('mana', f'{s.hero.mana}/{s.hero.max_mana}', width=142, size=12 * scale),
                 metric('actions', s.actions_left, width=100, size=12 * scale, color=GOLD), spacing=8),
-            label('At ' + s.provinces[s.hero.pos].name, 402, 11, MUTED),
-        ], 452, 108, 402)
+        ], 452, 82, 402)
         self._summary_bottom = max(economy_bottom, hero_bottom) + 18
         province = s.provinces[self.selected]
         owners = {'player': 'YOUR PROVINCE', 'rival': 'OPPOSING PROVINCE', 'neutral': 'UNCLAIMED PROVINCE'}
@@ -261,7 +260,7 @@ class ConcurrentShardScene(ShardScene):
         claim = s.claims.get(self.selected)
         if claim is not None:
             details.append(label('Your battle here' if claim == s.seat else 'Opponent is fighting here', color=RED))
-        y = block(details, x, 108) + 18
+        y = block(details, x, 82) + 18
         active = s.status == 'playing' and not s.ready and not s.waiting
         adjacent = self.selected in s.grid.neighbors(s.hero.pos)
         self._travel_destination = self.selected if active and s.actions_left and adjacent else None
@@ -303,7 +302,7 @@ class ConcurrentShardScene(ShardScene):
                         tooltip='Commit your day. Both players must be ready before income, upkeep and rest.')
         army_top = h - 158
         from saga2d import HexGrid
-        self.grid = HexGrid(s.provinces, size=min(59, (army_top - self._summary_bottom - 24) / 8),
+        self.grid = HexGrid(s.provinces, size=min(67, (army_top - self._summary_bottom - 24) / 8),
                             origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
         self._territory_borders = art.territory_borders(self.grid, s.provinces)
         self._province_name_boxes = []
@@ -316,7 +315,8 @@ class ConcurrentShardScene(ShardScene):
             self._province_name_boxes.append((left - 5, top - 1, name_width + 10, name_height + 2))
         self._hover_name = None
         self._update_hover_label()
-        block([label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', self.edge - 52, 10, MUTED)],
+        block([Row(label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', 320, 10, MUTED),
+                   label('At ' + s.provinces[s.hero.pos].name, 300, 10, MUTED), spacing=8)],
               26, army_top, self.edge - 52)
         self._army_art, self._army_cards = [], []
         army_y = army_top + round(22 * scale)
@@ -338,13 +338,7 @@ class ConcurrentShardScene(ShardScene):
 
     def draw_content(self):
         s, h = self.state, self.game.height
-        art.backdrop(self, self.edge, h)
-        self.draw_rect(self.edge, 91, self.game.width - self.edge, h - 91, PANEL)
-        self.draw_line(self.edge, 91, self.edge, h, LINE)
-        self.draw_rect(0, 0, self.game.width, 91, INK)
-        self.rule(24, 90, self.game.width - 48)
-        self.text('SHARDBOUND', 26, 22, size=27, serif=True)
-        self.rule(26, self._summary_bottom - 4, self.edge - 52)
+        self.draw_map_frame()
         for pos in sorted(s.provinces, key=lambda cell: self.grid.center(cell)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
                          hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)

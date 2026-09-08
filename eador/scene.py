@@ -406,23 +406,19 @@ class ShardScene(Screen):
                               detail='Gold earned each campaign turn.'),
                        metric('upkeep', f'−{s.upkeep}', width=95, size=12 * scale,
                               color=RED if s.upkeep_shortfall else MUTED,
-                              detail='Gold paid each turn to maintain your army.'), spacing=8),
-                   label(f'Realm gold yield: {s.rules.gold_percent}% of base production', 414, size=10, color=MUTED)]
+                              detail='Gold paid each turn to maintain your army.'), spacing=8)]
         if s.upkeep_shortfall:
             economy.append(label(f'{s.upkeep_shortfall} gold short: unpaid troops will leave.', 390, color=RED))
         elif s.encircled:
             economy.append(label('Capital supply blocked · V for breakout routes', 390, color=RED))
-        treasury_bottom = column(economy, 414, 26, 108)
+        treasury_bottom = column(economy, 414, 26, 82)
         hero_bottom = column([
             label(f'{s.hero.name}, the {s.hero.hero_class}', 402, size=16, serif=True),
             Row(metric('health', f'{s.hero.hp} / {s.hero.max_hp}', width=140, size=12 * scale, color=TEAL),
                 metric('mana', f'{s.hero.mana} / {s.hero.max_mana}', width=140, size=12 * scale, color=BLUE),
                 metric('actions', s.actions_left, width=106, size=12 * scale, color=GOLD,
                        detail='Travel and exploration spend an action; End turn restores them.'), spacing=8),
-            Row(label(f'At {s.provinces[s.hero.pos].name}', 216, size=10, color=MUTED),
-                metric('level', s.hero.level, width=65, size=10 * scale, color=GOLD),
-                metric('xp', s.hero.xp, width=105, size=10 * scale, color=GOLD), spacing=8),
-        ], 402, 452, 108)
+        ], 402, 452, 82)
         self._summary_bottom = max(treasury_bottom, hero_bottom) + 16
 
         p = s.provinces[self.selected]
@@ -439,7 +435,8 @@ class ShardScene(Screen):
                    Row(label(p.terrain.title(), width - 148, size=11, color=MUTED),
                        metric('income', f'{province_income} base', width=140, size=11 * scale, color=GOLD,
                               detail='Base province gold per turn, before realm yield. Earned when you own it.'),
-                       spacing=8)]
+                       spacing=8),
+                   label(f'Realm gold yield: {s.rules.gold_percent}% of base production', width, size=10, color=MUTED)]
         if expedition_here:
             details.append(label(f'Expedition: {len(s.rival.army)} troops · V for strengths', width, color=RED))
         elif p.owner != 'player':
@@ -457,7 +454,7 @@ class ShardScene(Screen):
         elif blocked:
             hint = 'Assault locked. J lists objectives.'
         details.append(label(hint, width, size=11, color=MUTED))
-        y = column(details, width, x, 108) + 14
+        y = column(details, width, x, 82) + 14
         self._travel_destination = None
         if not here:
             travel = self.button('Intercept expedition' if expedition_here else
@@ -495,16 +492,16 @@ class ShardScene(Screen):
         objective_top = y + 62
         self._sidebar_rules.append(objective_top - 12)
 
-        self.icon_button('guide', 'Guide', 788, 28, self.help, hotkey='F1')
-        self.icon_button('hero', 'Hero', 878, 28, self.hero_details, hotkey='H')
-        self.icon_button('codex', 'Codex', 968, 28, self.codex, shortcut='C')
-        self.icon_button('text_size', 'Text size', 1058, 28, self.open_text_settings, shortcut='F2')
-        self.icon_button('save', 'Save', 1148, 28, lambda: self.browse_saves('save'),
+        self.icon_button('guide', 'Guide', 788, 12, self.help, hotkey='F1')
+        self.icon_button('hero', 'Hero', 878, 12, self.hero_details, hotkey='H')
+        self.icon_button('codex', 'Codex', 968, 12, self.codex, shortcut='C')
+        self.icon_button('text_size', 'Text size', 1058, 12, self.open_text_settings, shortcut='F2')
+        self.icon_button('save', 'Save', 1148, 12, lambda: self.browse_saves('save'),
                          tooltip='Save: choose a manual slot. F5 quicksaves.')
-        self.icon_button('load', 'Load', 1206, 28, self.browse_saves,
+        self.icon_button('load', 'Load', 1206, 12, self.browse_saves,
                          tooltip='Load: browse your saved progress. F9 loads the quicksave.')
-        column([label(f'{THEMES[s.theme].name.upper()} / SHARD {s.seed} / {s.rules.title.upper()}', 540, size=10, color=GOLD)],
-               540, 26, 64)
+        column([label(f'{THEMES[s.theme].name.upper()} / SHARD {s.seed} / {s.rules.title.upper()}', 484, size=10, color=MUTED)],
+               484, 280, 24)
 
         # The inspector carries the full objective, leaving the board its own space.
         y = objective_top
@@ -526,7 +523,7 @@ class ShardScene(Screen):
         column([label(rival_order(s), width, size=11, color=RED)], width, x, y + 50)
 
         army_top = h - 158
-        self.grid = HexGrid(s.provinces, size=min(59, (army_top - self._summary_bottom - 24) / 8),
+        self.grid = HexGrid(s.provinces, size=min(67, (army_top - self._summary_bottom - 24) / 8),
                             origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
         self._territory_borders = art.territory_borders(self.grid, s.provinces)
         self._province_name_boxes = []
@@ -546,7 +543,10 @@ class ShardScene(Screen):
             self._province_name_boxes.append((left - 5, top - 1, name_width + 10, name_height + 2))
         self._hover_name = None
         self._update_hover_label()
-        column([label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', self.edge - 52, size=10, color=MUTED)],
+        column([Row(label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', 320, size=10, color=MUTED),
+                    label(f'At {s.provinces[s.hero.pos].name}', 300, size=10, color=MUTED),
+                    metric('level', s.hero.level, width=65, size=10 * scale, color=GOLD),
+                    metric('xp', s.hero.xp, width=105, size=10 * scale, color=GOLD), spacing=8)],
                self.edge - 52, 26, army_top)
         army_y = army_top + round(22 * scale)
         self._army_art = []
@@ -695,15 +695,20 @@ class ShardScene(Screen):
         with self.screen_layer(2):
             self.draw_content()
 
+    def draw_map_frame(self):
+        """The shared atlas frame leaves the province inspector and orders to each mode."""
+        h = self.game.height
+        art.backdrop(self, self.edge, h)
+        self.draw_rect(self.edge, 64, self.game.width - self.edge, h - 64, PANEL)
+        self.draw_line(self.edge, 64, self.edge, h, LINE)
+        self.draw_rect(0, 0, self.game.width, 64, INK)
+        self.rule(24, 63, self.game.width - 48)
+        self.text('SHARDBOUND', 26, 14, size=22, serif=True)
+        self.rule(26, self._summary_bottom - 4, self.edge - 52)
+
     def draw_content(self):
         s, h = self.state, self.game.height
-        art.backdrop(self, self.edge, h)
-        self.draw_rect(self.edge, 91, self.game.width - self.edge, h - 91, PANEL)
-        self.draw_line(self.edge, 91, self.edge, h, LINE)
-        self.draw_rect(0, 0, self.game.width, 91, INK)
-        self.rule(24, 90, self.game.width - 48)
-        self.text('SHARDBOUND', 26, 22, size=27, serif=True)
-        self.rule(26, self._summary_bottom - 4, self.edge - 52)
+        self.draw_map_frame()
         for y in self._sidebar_rules:
             self.rule(self.edge + 22, y, 356)
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
