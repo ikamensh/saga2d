@@ -1,0 +1,55 @@
+{
+  "verified_at": "2026-09-08T09:04:13.452931+00:00",
+  "deleted_resources": {
+    "instance": {
+      "path": "/instance/v1/zones/nl-ams-1/servers/c14893d7-0610-4714-9d8d-f84009467322",
+      "http_status": 404
+    },
+    "disk": {
+      "path": "/block/v1/zones/nl-ams-1/volumes/eb73decb-5680-4fb6-be75-0c7ac209033c",
+      "http_status": 404
+    },
+    "reserved_ipv4": {
+      "path": "/instance/v1/zones/nl-ams-1/ips/75f89c9d-e7e9-4c47-8f49-662e94a44639",
+      "http_status": 404
+    }
+  },
+  "amsterdam_project_inventory": {
+    "project": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+    "zone": "nl-ams-1",
+    "instances": 0,
+    "reserved_ips": 0
+  },
+  "paris": {
+    "id": "d56b46e5-fe7d-404c-9b5d-48bc87143433",
+    "name": "saga2d-online",
+    "state": "running",
+    "project": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+    "public_ips": [
+      {
+        "id": "5a472e6d-09d4-461e-a2b8-394991b3b464",
+        "address": "51.159.207.49",
+        "dynamic": false,
+        "gateway": "62.210.0.1",
+        "netmask": "32",
+        "family": "inet",
+        "provisioning_mode": "dhcp",
+        "tags": [],
+        "state": "attached",
+        "ipam_id": "5a472e6d-09d4-461e-a2b8-394991b3b464"
+      }
+    ]
+  },
+  "paris_health": {
+    "url": "https://games.tachyon-ai.eu/healthz",
+    "status": 200,
+    "body": "ok"
+  },
+  "local_target": {
+    "active_path": "dist/online-ai/target.json",
+    "active_exists": false,
+    "historical_path": "dist/online-ai/target.retired.json",
+    "historical_not_usable_as_target": true
+  },
+  "retained_resources": "Paris multiplayer instance, disk and IP; Saga2D project/IAM; Amsterdam security group; shared OS image snapshot. No delete calls targeted these."
+}

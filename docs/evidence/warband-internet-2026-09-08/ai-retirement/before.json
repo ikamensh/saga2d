@@ -1,0 +1,111 @@
+{
+  "captured_at": "2026-09-08T09:02:15.747918+00:00",
+  "authorization": "Retire temporary Amsterdam AI client after successful Internet-play proof; preserve Paris room server.",
+  "ai": {
+    "id": "c14893d7-0610-4714-9d8d-f84009467322",
+    "name": "saga2d-warband-ai",
+    "project": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+    "tags": [
+      "saga2d-online-managed"
+    ],
+    "state": "running",
+    "commercial_type": "DEV1-S",
+    "volumes": {
+      "0": {
+        "boot": false,
+        "volume_type": "sbs_volume",
+        "id": "eb73decb-5680-4fb6-be75-0c7ac209033c",
+        "state": "available",
+        "zone": "nl-ams-1"
+      }
+    },
+    "public_ips": [
+      {
+        "id": "75f89c9d-e7e9-4c47-8f49-662e94a44639",
+        "address": "51.158.175.125",
+        "dynamic": false,
+        "gateway": "62.210.0.1",
+        "netmask": "32",
+        "family": "inet",
+        "provisioning_mode": "dhcp",
+        "tags": [],
+        "state": "attached",
+        "ipam_id": "75f89c9d-e7e9-4c47-8f49-662e94a44639"
+      }
+    ],
+    "security_group": {
+      "id": "5c1a0b8b-cd18-423e-8855-241ffe4b2566",
+      "name": "saga2d-warband-ai-firewall"
+    }
+  },
+  "disk": {
+    "id": "eb73decb-5680-4fb6-be75-0c7ac209033c",
+    "name": "Ubuntu 24.04 Noble Numbat_sbs_volume_0",
+    "project_id": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+    "size": 20000000000,
+    "status": "in_use",
+    "references": [
+      {
+        "id": "fc905df7-48f3-435a-a450-f97c78d9a75a",
+        "product_resource_type": "instance_server",
+        "product_resource_id": "c14893d7-0610-4714-9d8d-f84009467322",
+        "created_at": "2026-09-08T07:32:02.548811Z",
+        "type": "exclusive",
+        "status": "attached"
+      }
+    ],
+    "zone": "nl-ams-1",
+    "parent_snapshot_id": "c8287edd-7f99-478a-a977-6ccb1fc36414"
+  },
+  "ip": {
+    "id": "75f89c9d-e7e9-4c47-8f49-662e94a44639",
+    "address": "51.158.175.125",
+    "project": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+    "server": {
+      "id": "c14893d7-0610-4714-9d8d-f84009467322",
+      "name": "saga2d-warband-ai"
+    },
+    "zone": "nl-ams-1",
+    "state": "attached",
+    "type": "routed_ipv4"
+  },
+  "ssh_marker": "saga2d-warband-ai",
+  "paris": {
+    "id": "d56b46e5-fe7d-404c-9b5d-48bc87143433",
+    "name": "saga2d-online",
+    "state": "running",
+    "project": "42ae77f6-b012-4e0f-b76d-93be6a61c56f",
+    "public_ips": [
+      {
+        "id": "5a472e6d-09d4-461e-a2b8-394991b3b464",
+        "address": "51.159.207.49",
+        "dynamic": false,
+        "gateway": "62.210.0.1",
+        "netmask": "32",
+        "family": "inet",
+        "provisioning_mode": "dhcp",
+        "tags": [],
+        "state": "attached",
+        "ipam_id": "5a472e6d-09d4-461e-a2b8-394991b3b464"
+      }
+    ]
+  },
+  "paris_health": {
+    "url": "https://games.tachyon-ai.eu/healthz",
+    "status": 200,
+    "body": "ok"
+  },
+  "journal": {
+    "rows": 27,
+    "bytes": 4917,
+    "events": [
+      "authoritative_state",
+      "created",
+      "error",
+      "match_paused",
+      "match_ready",
+      "order_submitted"
+    ],
+    "sanitization": "Only allowlisted AI event fields; non-JSON service chatter omitted; freeform errors omitted except fixed lifecycle errors."
+  }
+}
