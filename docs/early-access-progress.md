@@ -1257,3 +1257,23 @@ earned victory and defeat, exact saved continuation, a linked-shard advancement
 cap and bounded linked fuzzing. The same fuzz campaign/scene metrics match
 before and after extraction. This keeps the global campaign PvP work game-local;
 separate realms, claims and Ready coordination still need implementation.
+
+## Shared combat playback — 2026-09-08
+
+**6d6ac93** completes the pending development PvP playback increment. Both seats
+watch accepted shared orders, including updates received during Help or an
+earlier animation. Bounded game-owned history retains terminal retreats after
+campaign settlement; playback never repeats casualties, ownership or rewards.
+Joining starts from the current state, while missing history and authority
+restores show an explicit catch-up notice. Existing tactical presentation and
+rules are reused without adding a Saga2D interface.
+
+The [retained verification](evidence/concurrent-playback-2026-09-08/README.md)
+includes 116 passing selected integration checks, five final notice regressions
+and 12 inspected native states. The accepted native run uses 29 inputs, four
+exact UI order comparisons, a 30 FPS cap and a cooperative 25% CPU allowance;
+all game/socket resources close. Preparation buys both armies and wins three
+real PvE fights with six disclosed autoplay commands. This is directed
+verification, not independent human play. The mode setup/leave/rejoin flow,
+two native clients, capital outcomes and a packaged PvP build remain unfinished.
+**G01–G19 remain incomplete.**

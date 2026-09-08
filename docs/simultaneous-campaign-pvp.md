@@ -107,9 +107,21 @@ transport and scene lifetime primitives remain in Saga2D.
 the final 34 selected integration checks, both native local-seat routes, an
 earned waiting/shared-battle/retreat journey, and the defender's own mana/input
 adapter. These are directed checks, not independent human play.
-Peer orders currently refresh shared combat immediately; only the local
-client's checked accepted order produces a playback trace. Peer animation,
-the complete mode setup/leave/rejoin flow, two independent native game processes,
+Shared tactical orders now have a bounded, game-owned presentation journal.
+Both seats watch accepted orders in sequence, including updates received during
+Help or another animation. Contiguous orders share one skippable playback of at
+most eight seconds. Retreat history survives campaign settlement; watching it
+never reapplies wounds, ownership or rewards. Private PvE remains private.
+
+Authority history and the viewer inbox each retain at most 24 orders / 192 KiB.
+Joining begins at the current state. A retained viewer sees an explicit catch-up
+notice after a missing sequence, full queue or authority restart. Detached
+replay checks the existing battle rules against the recorded result digest;
+incompatible presentation returns to the authoritative state with an explanation.
+This adds no framework API. [Playback verification](evidence/concurrent-playback-2026-09-08/README.md)
+records the socket/regression selection and inspected native journey.
+
+The complete mode setup/leave/rejoin flow, two independent native game processes,
 native capital victory/loss and a packaged PvP build remain unfinished.
 Selectable multiplayer is still shared-realm co-op.
 
@@ -125,9 +137,11 @@ Player snapshots must contain only their entitled information. Trusted server
 checkpoints must instead include both realms and active encounters.
 `RoomStore.save` now uses the catalog's explicit `checkpoint_match(game, match)`
 serializer, independently of player snapshots. Existing game formats, private
-resume tokens and room expiry behavior are preserved. The concurrent model's
-complete checkpoint is ready to connect to that catalog; the current loopback
-test constructs `MatchHost` directly and does not register a hosted mode.
+resume tokens and room expiry behavior are preserved. The catalog registers
+`shardbound-pvp-v1` and stores its complete checkpoint. Presentation history is
+ephemeral and starts a new epoch after restore; persisted campaign facts retain
+their exact continuation. Native verification uses `MatchHost` directly, while
+separate hosted tests exercise real server restarts.
 No public-server deployment is implied by source work.
 
 ## Acceptance criteria for the first playable increment

@@ -1,0 +1,13 @@
+{
+  "codex_text_scale": 125,
+  "fullscreen": false,
+  "master": 0.8,
+  "music": 0.5,
+  "muted": false,
+  "reduced_motion": false,
+  "sfx": 0.8,
+  "window_size": [
+    1280,
+    720
+  ]
+}

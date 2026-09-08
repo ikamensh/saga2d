@@ -1,0 +1,51 @@
+{
+  "source_commit": "6d6ac934245668807c1b2cea56f28a8b68a43be4",
+  "recorded_source_files": 93,
+  "all_capture_source_hashes_match_commit": true,
+  "integration_selection": [
+    "tests/eador/test_concurrent_playback.py",
+    "tests/eador/test_combat_journal.py",
+    "tests/eador/test_concurrent_campaign.py",
+    "tests/eador/test_concurrent_network.py",
+    "tests/test_online_campaign_pvp.py",
+    "tests/eador/test_concurrent_scene.py",
+    "tests/eador/test_battle_playback_scene.py",
+    "tests/eador/test_manual_battle_audio.py"
+  ],
+  "integration_passed": 116,
+  "integration_wall_seconds": 33.349064250011,
+  "integration_parent_cpu_seconds": 7.938484,
+  "final_copy_change": "Catch-up notices say current state, since combat can already be settled.",
+  "final_copy_regression_passed": 5,
+  "native_inputs": 29,
+  "native_commands": 24,
+  "native_exact_ui_orders": [
+    "challenge",
+    "battle.guard",
+    "battle.end_turn",
+    "choose"
+  ],
+  "native_autoplay_preparation_commands": 6,
+  "native_wall_seconds": 17.116753082955256,
+  "native_cpu_seconds": 4.431387,
+  "native_fps_cap": 30,
+  "cpu_allowance_percent": 25,
+  "game_closed": true,
+  "sockets_closed": true,
+  "inspected_captures": {
+    "01-wait-and-attack-125.png": "identical SHA256 to directly inspected preceding pass",
+    "02-paid-waiting-125.png": "identical SHA256 to directly inspected preceding pass",
+    "03-peer-earned-choice-125.png": "identical SHA256 to directly inspected preceding pass",
+    "04-shared-attacker-phase-125.png": "identical SHA256 to directly inspected preceding pass",
+    "05-defender-phase-waiting-125.png": "identical SHA256 to directly inspected preceding pass",
+    "06-help-retains-peer-move-guard-retreat-125.png": "identical SHA256 to directly inspected preceding pass",
+    "07-peer-move-playback-125.png": "identical SHA256 to directly inspected preceding pass",
+    "08-historical-log-125.png": "identical SHA256 to directly inspected preceding pass",
+    "09-historical-live-save-125.png": "identical SHA256 to directly inspected preceding pass",
+    "10-attacker-earned-choice-125.png": "identical SHA256 to directly inspected preceding pass",
+    "11-returned-map-125.png": "identical SHA256 to directly inspected preceding pass",
+    "12-restored-authority-notice-125.png": "opened and directly inspected after final wording correction"
+  },
+  "native_scope": "Paid public PvE autoplay preparation, then directed seat-1 input against a loopback peer. No independent human, hosted-server restart, full campaign or release-readiness claim.",
+  "native_authority_restore": "Restore the exact earned checkpoint and publish through the retained real socket host; no native process restart claimed."
+}
