@@ -269,6 +269,23 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
         scene.draw_image(icon_path('hero'), hx - 15 * s, hy - 16 * s, 30 * s, 30 * s)
 
 
+def travel_arrow(scene, grid, origin, destination):
+    """A short static direction cue across the selected journey's province edge."""
+    x, y = grid.center(origin)
+    end_x, end_y = grid.center(destination)
+    dx, dy = end_x - x, end_y - y
+    length = math.hypot(dx, dy)
+    ux, uy = dx / length, dy / length
+    start = x + dx * .40, y + dy * .40
+    tip = x + dx * .68, y + dy * .68
+    wings = [(tip[0] - ux * 7 + uy * side * 5, tip[1] - uy * 7 - ux * side * 5)
+             for side in (-1, 1)]
+    for color, width in ((INK, 5), (GOLD, 2)):
+        scene.draw_line(*start, *tip, color, width)
+        for wing in wings:
+            scene.draw_line(*wing, *tip, color, width)
+
+
 def expedition(scene, grid, pos, troops):
     """A numbered diamond distinguishes the moving army from province ownership."""
     x, y = grid.center(pos)

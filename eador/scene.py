@@ -436,8 +436,8 @@ class ShardScene(Screen):
         ownership = {'player': 'YOUR PROVINCE', 'rival': 'RIVAL PROVINCE', 'neutral': 'UNCLAIMED PROVINCE'}
         details = [label(ownership[p.owner], width, size=10, color=art.OWNERS[p.owner]),
                    label(p.name, width, size=20, serif=True),
-                   Row(label(p.terrain.title(), width - 126, size=11, color=MUTED),
-                       metric('income', f'+{province_income}', width=118, size=11 * scale, color=GOLD,
+                   Row(label(p.terrain.title(), width - 148, size=11, color=MUTED),
+                       metric('income', f'{province_income} base', width=140, size=11 * scale, color=GOLD,
                               detail='Base province gold per turn, before realm yield. Earned when you own it.'),
                        spacing=8)]
         if expedition_here:
@@ -458,11 +458,14 @@ class ShardScene(Screen):
             hint = 'Assault locked. J lists objectives.'
         details.append(label(hint, width, size=11, color=MUTED))
         y = column(details, width, x, 108) + 14
+        self._travel_destination = None
         if not here:
-            self.button('Intercept expedition' if expedition_here else
+            travel = self.button('Intercept expedition' if expedition_here else
                         'Travel here' if p.owner == 'player' else 'Invade province',
                         x, y, width - 92, self.travel, hotkey='Enter', primary=True, icon='travel',
                         enabled=can_act and adjacent and not blocked)
+            if travel.enabled:
+                self._travel_destination = self.selected
         current = s.provinces[s.hero.pos]
         explore_hint = ('This shard has ended.' if not playing else
                         'No actions left. End the turn to explore.' if not s.actions_left else
@@ -705,6 +708,8 @@ class ShardScene(Screen):
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
                          hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)
+        if self._travel_destination is not None:
+            art.travel_arrow(self, self.grid, s.hero.pos, self._travel_destination)
         for box in self._province_name_boxes:
             self.draw_rect(*box, (23, 37, 33, 235), radius=3)
         if s.rival.army:

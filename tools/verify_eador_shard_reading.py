@@ -80,6 +80,8 @@ def check_shard(scene):
     labels = check_reading_layout(scene)
     text = '\n'.join(item.text for item in scene.ui.walk() if isinstance(item, Label))
     state, province = scene.state, scene.state.provinces[scene.selected]
+    base_income = 0 if state.encircled and province.pos == (-2, 0) else province.income
+    check_metric(scene, 'income', f'{base_income} base', 'Income')
     for name, value, meaning in (
             ('gold', state.gold, 'Gold'), ('crystals', state.crystals, 'Crystals'),
             ('income', f'+{state.income}', 'Income'), ('upkeep', f'−{state.upkeep}', 'Upkeep'),

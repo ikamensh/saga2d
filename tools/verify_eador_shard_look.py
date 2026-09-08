@@ -77,7 +77,8 @@ def verify(output, *, backend='pyglet', budget=None):
     output.mkdir(parents=True, exist_ok=True)
     budget = CpuBudget(25) if budget is None else budget
     started, cpu_started = time.monotonic(), time.process_time()
-    paths = (ROOT / 'eador/scene.py', Path(__file__).resolve(), ROOT / 'tools/verify_eador_shard_reading.py')
+    paths = (ROOT / 'eador/scene.py', ROOT / 'eador/art.py', ROOT / 'eador/ui.py',
+             Path(__file__).resolve(), ROOT / 'tools/verify_eador_shard_reading.py')
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     report = dict(backend=backend, cpu_percent_requested=budget.percent,
                   source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -90,6 +91,8 @@ def verify(output, *, backend='pyglet', budget=None):
     report['historical_contract'] = origin
     cases = [('solo-opening', State.new(7).to_json(), 100),
              ('linked-opening', State.new_campaign(7, 'Wizard').to_json(), 125),
+             ('ruins-opening', State.new(7, theme='ruins').to_json(), 125),
+             ('no-actions', prepared['paid-no-actions'], 125),
              ('paid-full-army', prepared['paid-full-army'], 125),
              ('saved-encircled', prepared['saved-encircled'], 125),
              ('longest-contract', longest, 125)]
@@ -158,6 +161,11 @@ def verify(output, *, backend='pyglet', budget=None):
                     clear_pointer()
                     check_shard(player.root)
                     capture('linked-opening-125-neighbor')
+                    for direction, destination in (('north', (-1, -1)), ('south', (-2, 1))):
+                        player.click(*player.root.grid.center(destination))
+                        clear_pointer()
+                        check_shard(player.root)
+                        capture(f'linked-opening-125-{direction}')
                 assert player.state.to_json() == snapshot
                 case.update(state_unchanged=True, state_sha256=hashlib.sha256(snapshot.encode()).hexdigest())
                 report['cases'].append(case)
