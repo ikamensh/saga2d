@@ -1,8 +1,47 @@
 """One realm's upkeep and recovery, independent of the world's turn or opponents."""
 from dataclasses import dataclass
+from collections.abc import Collection, Mapping
 
-from eador.difficulty import RecoveryPreview
-from eador.model import Hero, Troop, UNITS
+from saga2d import HexGrid
+
+from eador.difficulty import DifficultySpec, RecoveryPreview
+from eador.entities import Hero, Pos, Province, Troop, UNITS
+
+
+@dataclass(frozen=True)
+class IncomePreview:
+    gold: int
+    crystals: int
+    encircled: bool
+
+
+def income_preview(provinces: Mapping[Pos, Province], *, owner: str, capital: Pos,
+                   buildings: Collection[str], rules: DifficultySpec) -> IncomePreview:
+    """Quote one owner's production on the shared map; neutral neighbors do not besiege."""
+    home = provinces[capital]
+    encircled = home.owner == owner and all(
+        provinces[pos].owner not in (owner, 'neutral') for pos in HexGrid(provinces).neighbors(capital))
+    owned = [province for province in provinces.values() if province.owner == owner]
+    production = sum(province.income for province in owned) - (home.income if encircled else 0)
+    if 'market' in buildings and not encircled:
+        production += 8
+    crystals = sum(province.crystals for province in owned) - (home.crystals if encircled else 0)
+    return IncomePreview(production * rules.gold_percent // 100, crystals, encircled)
+
+
+def recovery_preview(hero: Hero, *, buildings: Collection[str], rules: DifficultySpec,
+                     available_gold: int, blocked_reason: str | None = None) -> RecoveryPreview:
+    """Quote recovery before payment, counting only support troops who can be paid."""
+    if blocked_reason is not None:
+        return RecoveryPreview(0, 0, 0, blocked_reason)
+    departing = {troop.id for troop in unpaid_troops(hero.army, available_gold)}
+    recovery = (rules.army_recovery + (3 if 'temple' in buildings else 0)
+                + hero.skill_ranks.get('quartermaster', 0)
+                + (3 if hero.relic == 'oak_standard' else 0)
+                + (2 if any(t.kind == 'healer' and t.id not in departing for t in hero.army) else 0))
+    hero_recovery = recovery + 2 + 2 * hero.skill_ranks.get('vigor', 0)
+    return RecoveryPreview(min(hero.max_hp - hero.hp, hero_recovery), recovery,
+                           min(hero.max_mana - hero.mana, rules.mana_recovery))
 
 
 @dataclass(frozen=True)

@@ -15,199 +15,23 @@ from eador.content import AdventureApproach, AdventureAttempt, Choice, ChoiceOpt
 from eador.campaign import Campaign
 from eador.difficulty import DIFFICULTIES, RULESETS, DifficultySpec, RecoveryPreview
 from eador.rival import INTENTS, STRONGHOLD, RivalState, RivalTroop
+from eador.entities import (BUILDINGS, HERO_CLASSES, RECRUITABLE, UNITS, BuildingSpec, Hero,
+                            HeroClass, InfusionPreview, Pos, Province, ReplacementPreview,
+                            RuleError, SaveFormatError, Troop, TroopSnapshot, UnitSpec, starting_hero)
+from eador.realm import Realm
 
 if TYPE_CHECKING:
     from eador.battle import Battle
 
-Pos = tuple[int, int]
-
-
-class SaveFormatError(ValueError):
-    """A save is incompatible or does not describe a valid campaign."""
-
-
-class RuleError(ValueError):
-    """A legal game command cannot be performed in the current state."""
-
-
-@dataclass(frozen=True)
-class UnitSpec:
-    name: str
-    hp: int
-    attack: int
-    defense: int
-    move_range: int
-    attack_range: int
-    cost: int
-    upkeep: int
-    building: str | None
-    color: tuple[int, int, int]
-    abilities: tuple[str, ...] = ()
-    skirmisher: bool = False
-    crystals: int = 0
-
-
-UNITS = {
-    'militia': UnitSpec('Militia', 24, 8, 2, 3, 1, 20, 1, None, (208, 181, 127), ('rally',)),
-    'swordsman': UnitSpec('Swordsman', 34, 11, 4, 3, 1, 45, 2, 'barracks', (131, 177, 185)),
-    'archer': UnitSpec('Archer', 20, 8, 1, 3, 3, 35, 2, 'archery', (155, 185, 112), ('pin',)),
-    'healer': UnitSpec('Acolyte', 22, 7, 2, 3, 2, 45, 2, 'temple', (210, 197, 233), ('heal',)),
-    'brigand': UnitSpec('Brigand', 20, 7, 1, 3, 1, 0, 0, None, (185, 102, 91)),
-    'goblin': UnitSpec('Goblin', 16, 6, 1, 3, 2, 0, 0, None, (144, 160, 89)),
-    'wolf': UnitSpec('Wolf', 17, 8, 1, 4, 1, 0, 0, None, (176, 166, 162)),
-    'guard': UnitSpec('Dread Guard', 42, 12, 4, 3, 1, 0, 0, None, (173, 130, 196)),
-    'warden': UnitSpec('Warden', 38, 8, 4, 2, 1, 55, 2, 'barracks', (140, 164, 203), ('swap',)),
-    'ranger': UnitSpec('Ranger', 22, 7, 1, 3, 3, 50, 2, 'archery', (118, 185, 157), skirmisher=True),
-    'pikeman': UnitSpec('Pikeman', 28, 9, 3, 2, 1, 40, 2, 'barracks', (173, 188, 149)),
-    'sapper': UnitSpec('Sapper', 26, 7, 2, 3, 1, 60, 2, 'market', (190, 161, 105), ('smoke',), crystals=1),
-    'adept': UnitSpec('Rune Adept', 28, 6, 2, 3, 2, 65, 2, 'mage_tower', (173, 143, 206), ('repulse',), crystals=2),
-    'skyrider': UnitSpec('Skyrider', 28, 10, 2, 4, 1, 85, 3, 'temple', (137, 189, 221), ('fly',), crystals=3),
-}
-RECRUITABLE = ('militia', 'swordsman', 'archer', 'healer', 'pikeman', 'ranger', 'warden', 'sapper', 'adept', 'skyrider')
-
-
-@dataclass(frozen=True)
-class BuildingSpec:
-    name: str
-    cost: int
-    crystals: int
-    description: str
-
-
-BUILDINGS = {
-    'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen, defensive pikemen and extracting wardens.'),
-    'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit pinning archers and mobile rangers.'),
-    'temple': BuildingSpec('Temple', 65, 0, 'Recruit acolytes; learn Heal; faster recovery.'),
-    'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana. In your territory, H then I spends 3 crystals and 1 action to restore up to 8 mana. Encirclement blocks infusion at Westwatch.'),
-    'market': BuildingSpec('Marketplace', 60, 0, '+8 gold income each turn.'),
-}
-
-
-@dataclass(frozen=True)
-class HeroClass:
-    name: str
-    description: str
-
-
-HERO_CLASSES = {
-    'Commander': HeroClass('Commander', 'Army +1 attack; command six troops.'),
-    'Warrior': HeroClass('Warrior', '+12 health and +4 attack in battle.'),
-    'Scout': HeroClass('Scout', 'Three campaign actions; ranged hero attacks.'),
-    'Wizard': HeroClass('Wizard', '+6 mana; ranged attacks; begin with Bolt and Heal.'),
-}
-
 
 @dataclass
-class Troop:
-    id: int
-    kind: str
-    hp: int
-    max_hp: int
-    level: int = 1
-    xp: int = 0
-
-
-@dataclass(frozen=True)
-class TroopSnapshot:
-    """A detached troop description for a camp decision, not a live army member."""
-    id: int
-    kind: str
-    hp: int
-    max_hp: int
-    level: int
-    xp: int
-
-
-@dataclass(frozen=True)
-class ReplacementPreview:
-    outgoing: TroopSnapshot
-    incoming: TroopSnapshot
-    gold: int
-    crystals: int
-    actions: int
-    upkeep_before: int
-    upkeep_after: int
-    blocked_reason: str | None = None
-
-
-@dataclass(frozen=True)
-class InfusionPreview:
-    """Capped potential mana gain, fixed price, and the reason an order is blocked."""
-    mana: int
-    crystals: int
-    actions: int
-    blocked_reason: str | None = None
-
-
-@dataclass
-class Hero:
-    name: str
-    hero_class: str
-    pos: Pos
-    hp: int
-    max_hp: int
-    mana: int
-    max_mana: int
-    army: list[Troop]
-    level: int = 1
-    xp: int = 0
-
-    skill_ranks: dict[str, int] = field(default_factory=dict)
-    relic: str | None = None
-
-    @property
-    def skills(self) -> set[str]:
-        return set(self.skill_ranks)
-
-    @property
-    def max_army(self) -> int:
-        return 6 if self.hero_class == 'Commander' else 5
-
-
-@dataclass
-class Province:
-    pos: Pos
-    name: str
-    terrain: str
-    owner: str
-    income: int
-    crystals: int
-    guards: list[str]
-    site: str | None
-    explored: bool = False
-    capital: bool = False
-    site_kind: str | None = None
-    site_guards: list[str] = field(default_factory=list)
-    site_relic: str | None = None
-    site_gold: int = 0
-    site_crystals: int = 0
-    guard_hp: list[int] = field(default_factory=list)
-    site_guard_hp: list[int] = field(default_factory=list)
-
-
-@dataclass
-class State:
+class State(Realm):
     seed: int
     provinces: dict[Pos, Province]
-    hero: Hero
-    gold: int = 100
-    crystals: int = 4
     turn: int = 1
-    buildings: set[str] = field(default_factory=set)
-    actions_left: int = 2
-    status: str = 'playing'
-    log: list[str] = field(default_factory=list)
-    battle: Battle | None = None
-    battle_province: Pos | None = None
-    battle_kind: str | None = None
-    next_troop_id: int = 4
-    inventory: list[str] = field(default_factory=list)
-    _choices: list[Choice] = field(default_factory=list, repr=False)
     rival: RivalState = field(default_factory=RivalState)
     theme: str = 'frontier'
     campaign: Campaign | None = None
-    battle_adventure: AdventureAttempt | None = None
-    rules_id: str = 'standard-1'
 
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier',
@@ -227,12 +51,8 @@ class State:
         from eador.worldgen import generate
         provinces = generate(seed, theme)
         home = provinces[(-2, 0)]
-        max_hp = 48 if hero_class == 'Warrior' else 36
-        mana = 16 if hero_class == 'Wizard' else 10
-        army = [Troop(i, kind, UNITS[kind].hp, UNITS[kind].hp)
-                for i, kind in enumerate(('militia', 'militia', 'archer'), 1)]
-        hero = Hero('Alden', hero_class, home.pos, max_hp, max_hp, mana, mana, army)
-        state = cls(seed, provinces, hero, theme=theme, rules_id=rules.id,
+        hero = starting_hero(hero_class, home.pos)
+        state = cls(seed=seed, provinces=provinces, hero=hero, theme=theme, rules_id=rules.id,
                     gold=rules.starting_gold, crystals=rules.starting_crystals,
                     actions_left=3 if hero_class == 'Scout' else 2)
         state.rival = RivalState.initial()
@@ -329,48 +149,30 @@ class State:
     def grid(self) -> HexGrid:
         return HexGrid(self.provinces)
 
-    @property
-    def rules(self) -> DifficultySpec:
-        return RULESETS[self.rules_id]
-
-    @property
-    def difficulty(self) -> str:
-        return self.rules_id.rsplit('-', 1)[0]
-
     def recovery_preview(self) -> RecoveryPreview:
         """Read the coming rest without spending a turn or copying recovery rules."""
-        if self.encircled and self.hero.pos == (-2, 0):
-            return RecoveryPreview(0, 0, 0, 'Encirclement blocks recovery at Westwatch.')
-        departing = {troop.id for troop in self._unpaid_troops()}
-        recovery = (self.rules.army_recovery + (3 if 'temple' in self.buildings else 0)
-                    + self.hero.skill_ranks.get('quartermaster', 0)
-                    + (3 if self.hero.relic == 'oak_standard' else 0)
-                    + (2 if any(t.kind == 'healer' and t.id not in departing for t in self.hero.army) else 0))
-        hero_recovery = recovery + 2 + 2 * self.hero.skill_ranks.get('vigor', 0)
-        return RecoveryPreview(min(self.hero.max_hp - self.hero.hp, hero_recovery), recovery,
-                               min(self.hero.max_mana - self.hero.mana, self.rules.mana_recovery))
+        from eador.economy import recovery_preview
+        blocked = ('Encirclement blocks recovery at Westwatch.'
+                   if self.encircled and self.hero.pos == (-2, 0) else None)
+        return recovery_preview(self.hero, buildings=self.buildings, rules=self.rules,
+                                available_gold=self.gold + self.income, blocked_reason=blocked)
+
+    def _income_preview(self):
+        from eador.economy import income_preview
+        return income_preview(self.provinces, owner='player', capital=(-2, 0),
+                              buildings=self.buildings, rules=self.rules)
 
     @property
     def encircled(self) -> bool:
-        return self.provinces[(-2, 0)].owner == 'player' and all(
-            self.provinces[pos].owner == 'rival' for pos in self.grid.neighbors((-2, 0)))
+        return self._income_preview().encircled
 
     @property
     def income(self) -> int:
-        blocked = self.encircled
-        income = sum(p.income for p in self.provinces.values() if p.owner == 'player')
-        production = income - (self.provinces[(-2, 0)].income if blocked else 0) + (
-            8 if 'market' in self.buildings and not blocked else 0)
-        return production * self.rules.gold_percent // 100
+        return self._income_preview().gold
 
     @property
     def crystal_income(self) -> int:
-        income = sum(p.crystals for p in self.provinces.values() if p.owner == 'player')
-        return income - (self.provinces[(-2, 0)].crystals if self.encircled else 0)
-
-    @property
-    def upkeep(self) -> int:
-        return sum(UNITS[t.kind].upkeep for t in self.hero.army)
+        return self._income_preview().crystals
 
     @property
     def upkeep_shortfall(self) -> int:
@@ -381,203 +183,27 @@ class State:
         from eador.economy import unpaid_troops
         return unpaid_troops(self.hero.army, self.gold + self.income)
 
-    @property
-    def spells(self) -> set[str]:
-        spells = {'bolt', 'heal'} if self.hero.hero_class == 'Wizard' else set()
-        if 'temple' in self.buildings:
-            spells.add('heal')
-        if 'mage_tower' in self.buildings or self.hero.relic == 'ember_lens':
-            spells.add('bolt')
-        if self.hero.relic == 'moonstone':
-            spells.add('heal')
-        return spells
-
-    @property
-    def choice(self) -> Choice | None:
-        return self._choices[0] if self._choices else None
-
-    def recruit_cost(self, kind: str) -> int:
-        if kind not in RECRUITABLE:
-            raise RuleError('That unit cannot be recruited.')
-        discount = 15 * self.hero.skill_ranks.get('quartermaster', 0)
-        if self.hero.relic == 'merchant_seal':
-            discount += 25
-        return max(1, (UNITS[kind].cost * (100 - discount) + 99) // 100)
-
-    def _skill_choice(self) -> Choice | None:
-        options = tuple(ChoiceOption(key, f'{spec.name} {self.hero.skill_ranks.get(key, 0) + 1}', spec.description)
-                        for key, spec in SKILLS.items() if spec.hero_class == self.hero.hero_class
-                        and self.hero.skill_ranks.get(key, 0) < spec.max_rank)
-        if not options:
-            return None
-        return Choice('Shape your hero', 'Master your current path or learn a different discipline.', options, 'skill', self.hero.hero_class)
-
-    def _relic_choice(self, relic: str) -> Choice:
-        spec = RELICS[relic]
-        first = (ChoiceOption('distill', 'Distill the duplicate', 'Gain 4 crystals instead of another copy.')
-                 if relic in self.inventory else ChoiceOption('take', f'Keep {spec.name}', spec.description))
-        return Choice(f'Discovered {spec.name}', 'Keep its power or fund your realm. Only one relic can be equipped.',
-                      (first, ChoiceOption('sell', f'Sell for {spec.value} gold', 'Trade the relic for immediate resources.')),
-                      'relic', relic)
-
     def choose(self, option_id: str) -> None:
-        choice = self.choice
-        if choice is None:
-            raise RuleError('There is no pending choice.')
-        if option_id not in {option.id for option in choice.options}:
-            raise RuleError('Choose one of the offered options.')
-        if choice.kind == 'skill':
-            self.hero.skill_ranks[option_id] = self.hero.skill_ranks.get(option_id, 0) + 1
-            self.log.append(f'Learned {SKILLS[option_id].name} {self.hero.skill_ranks[option_id]}.')
-        elif option_id == 'take':
-            self.inventory.append(choice.context)
-            self.log.append(f'Kept {RELICS[choice.context].name}. Equip it in the hero panel.')
-        elif option_id == 'sell':
-            self.gold += RELICS[choice.context].value
-            self.log.append(f'Sold {RELICS[choice.context].name}.')
-        else:
-            self.crystals += 4
-            self.log.append('Distilled a duplicate relic into 4 crystals.')
-        self._choices.pop(0)
-        # Several levels from one reward must offer the newly learned rank next.
-        for i, pending in enumerate(self._choices):
-            if pending.kind == 'skill':
-                self._choices[i] = self._skill_choice()
+        super().choose(option_id)
         if self.campaign:
             self.campaign.sync(self)
 
-    def equip(self, relic_id: str | None) -> None:
-        if self.battle is not None:
-            raise RuleError('Change equipment between battles.')
-        if relic_id is not None and relic_id not in self.inventory:
-            raise RuleError('You do not own that relic.')
-        self.hero.relic = relic_id
-        self.log.append(f'Equipped {RELICS[relic_id].name}.' if relic_id else 'Unequipped the relic.')
-
-    def _ready(self, action: bool = False) -> None:
-        if self.status != 'playing':
-            raise RuleError('This campaign has ended. Start a new shard.')
-        if self.battle is not None:
-            raise RuleError('Finish or retreat from the battle first.')
-        if self.choice is not None:
-            raise RuleError('Resolve the pending choice first.')
-        if action and self.actions_left <= 0:
-            raise RuleError('No campaign actions remain. End the turn.')
-
-    def build(self, kind: str) -> None:
-        self._ready()
-        if kind not in BUILDINGS:
-            raise RuleError('Unknown building.')
-        if kind in self.buildings:
-            raise RuleError('That building is already built.')
-        spec = BUILDINGS[kind]
-        if self.gold < spec.cost or self.crystals < spec.crystals:
-            raise RuleError('Not enough gold or crystals.')
-        self.gold -= spec.cost
-        self.crystals -= spec.crystals
-        self.buildings.add(kind)
-        if kind == 'mage_tower':
-            self.hero.max_mana += 4
-            self.hero.mana += 4
-        self.log.append(f'Built {spec.name}.')
-
     def infusion_preview(self) -> InfusionPreview:
-        """Quote an optional Tower infusion without spending mana, currency or an action."""
-        mana = min(8, self.hero.max_mana - self.hero.mana)
-        try:
-            self._ready(action=True)
-        except RuleError as error:
-            reason = str(error)
-        else:
-            if self.provinces[self.hero.pos].owner != 'player':
-                reason = 'Infuse in one of your provinces.'
-            elif self.encircled and self.hero.pos == (-2, 0):
-                reason = 'Encirclement blocks infusion at Westwatch.'
-            elif 'mage_tower' not in self.buildings:
-                reason = 'Build a Mage Tower to infuse mana.'
-            elif not mana:
-                reason = 'Mana is already full.'
-            elif self.crystals < 3:
-                reason = 'Infusion requires 3 crystals.'
-            else:
-                reason = None
-        return InfusionPreview(mana, 3, 1, reason)
+        return self.quote_infusion(province=self.provinces[self.hero.pos], owner='player',
+                                   encircled=self.encircled and self.hero.pos == (-2, 0))
 
     def infuse(self) -> None:
-        """Trade crystals and one campaign action for up to eight mana in a supplied camp."""
-        quote = self.infusion_preview()
-        if quote.blocked_reason:
-            raise RuleError(quote.blocked_reason)
-        self.crystals -= quote.crystals
-        self.actions_left -= quote.actions
-        self.hero.mana += quote.mana
-        self.log.append(f'Infused {quote.mana} mana for {quote.crystals} crystals and one action.')
-
-    def recruit_crystal_cost(self, kind: str) -> int:
-        if kind not in RECRUITABLE:
-            raise RuleError('That unit cannot be recruited.')
-        return UNITS[kind].crystals
-
-    def _check_recruit(self, kind: str, *, replacing: bool = False) -> None:
-        self._ready(action=replacing)
-        if kind not in RECRUITABLE:
-            raise RuleError('That unit cannot be recruited.')
-        if self.provinces[self.hero.pos].owner != 'player':
-            raise RuleError('Recruit in one of your provinces.')
-        spec = UNITS[kind]
-        if spec.building and spec.building not in self.buildings:
-            raise RuleError(f'Build {BUILDINGS[spec.building].name} first.')
-        if not replacing and len(self.hero.army) >= self.hero.max_army:
-            raise RuleError('Your army is full.')
-        cost = self.recruit_cost(kind)
-        if self.gold < cost or self.crystals < self.recruit_crystal_cost(kind):
-            raise RuleError('Not enough gold or crystals.')
-
-    def _fresh_troop(self, kind: str) -> Troop:
-        return Troop(self.next_troop_id, kind, UNITS[kind].hp, UNITS[kind].hp)
-
-    def _purchase_troop(self, kind: str) -> Troop:
-        troop = self._fresh_troop(kind)
-        self.gold -= self.recruit_cost(kind)
-        self.crystals -= self.recruit_crystal_cost(kind)
-        self.next_troop_id += 1
-        return troop
+        self.purchase_infusion(province=self.provinces[self.hero.pos], owner='player',
+                               encircled=self.encircled and self.hero.pos == (-2, 0))
 
     def recruit(self, kind: str) -> None:
-        self._check_recruit(kind)
-        self.hero.army.append(self._purchase_troop(kind))
-        self.log.append(f'Recruited {UNITS[kind].name}.')
+        self.purchase_recruit(kind, province=self.provinces[self.hero.pos], owner='player')
 
     def replacement_preview(self, outgoing_id: int, kind: str) -> ReplacementPreview:
-        """Quote permanent retirement and a fresh paid role without changing the army."""
-        outgoing = next((troop for troop in self.hero.army if troop.id == outgoing_id), None)
-        if outgoing is None:
-            raise RuleError('Choose a living troop to retire.')
-        gold, crystals = self.recruit_cost(kind), self.recruit_crystal_cost(kind)
-        incoming = self._fresh_troop(kind)
-        try:
-            self._check_recruit(kind, replacing=True)
-        except RuleError as error:
-            reason = str(error)
-        else:
-            reason = None
-        upkeep = self.upkeep
-        return ReplacementPreview(TroopSnapshot(**asdict(outgoing)), TroopSnapshot(**asdict(incoming)),
-                                  gold, crystals, 1, upkeep,
-                                  upkeep - UNITS[outgoing.kind].upkeep + UNITS[kind].upkeep, reason)
+        return self.quote_replacement(outgoing_id, kind, province=self.provinces[self.hero.pos], owner='player')
 
     def replace_troop(self, outgoing_id: int, kind: str) -> None:
-        """Retire one troop and buy a fresh recruit in its slot for one campaign action."""
-        quote = self.replacement_preview(outgoing_id, kind)
-        if quote.blocked_reason:
-            raise RuleError(quote.blocked_reason)
-        index = next(i for i, troop in enumerate(self.hero.army) if troop.id == outgoing_id)
-        self.hero.army[index] = self._purchase_troop(kind)
-        self.actions_left -= quote.actions
-        self.log.append(f'Retired {UNITS[quote.outgoing.kind].name} #{outgoing_id} '
-                        f'(rank {quote.outgoing.level}, XP {quote.outgoing.xp}); '
-                        f'recruited {UNITS[kind].name} #{quote.incoming.id} for '
-                        f'{quote.gold} gold and {quote.crystals} crystals; spent one action.')
+        self.purchase_replacement(outgoing_id, kind, province=self.provinces[self.hero.pos], owner='player')
 
     def travel(self, destination: Pos) -> None:
         self._ready(action=True)
@@ -607,28 +233,19 @@ class State:
             self.campaign.sync(self)
 
     def explore(self, *, approach: str | None = None) -> None:
+        from eador.adventures import quote_adventure
         self._ready(action=True)
         province = self.provinces[self.hero.pos]
         if province.owner != 'player':
             raise RuleError('Explore a province you control.')
         if province.explored or province.site is None:
             raise RuleError('This province has no unexplored site.')
-        options = self.adventure_approaches()
-        selected = None
-        if options:
-            selected_id = options[0].id if approach is None else approach
-            selected = next((option for option in options if option.id == selected_id), None)
-        if approach is not None and selected is None:
-            raise RuleError('Choose one of the offered adventure approaches.')
-        if selected and (self.gold < selected.gold_cost or self.crystals < selected.crystals_cost):
-            raise RuleError('Not enough gold or crystals for that approach.')
-        self.battle_adventure = (AdventureAttempt(selected.id, selected.encounter, province.site_gold + selected.bonus_gold,
-                                 province.site_crystals, province.site_relic, selected.cargo_penalty) if selected else None)
+        quote = quote_adventure(province, gold=self.gold, crystals=self.crystals, approach=approach)
+        self.battle_adventure = quote.attempt
         self._start_battle(province.pos, 'site', province.site_guards)
         self.actions_left -= 1
-        if selected:
-            self.gold -= selected.gold_cost
-            self.crystals -= selected.crystals_cost
+        self.gold -= quote.gold
+        self.crystals -= quote.crystals
 
     def _start_battle(self, province: Pos, kind: str, enemies: list[str]) -> None:
         from eador.battle import Battle
