@@ -44,3 +44,20 @@ server, checkpoint, client, menu and headless-AI tests in 11.93 seconds**.
 See `server-deployment.json`, `server-regressions.txt` and
 `public-server-smoke.txt`. This update does not change Warband order rules or
 simulation timing relative to the native run above.
+
+The final [0.1.0-preview.1 release](https://github.com/ikamensh/saga2d/releases/tag/warband-v0.1.0-preview.1)
+was published from `fd6e0c911fa68aa0355d4b56dd8e4f0885c739d8` after Windows
+CI run 34202934123 passed 285 scoped tests, portable/installed socket checks,
+installed public TLS, native rendering with a test-only Mesa driver and
+shortcut/uninstall checks. All three Windows frames were viewed; see
+[`windows-package`](windows-package/README.md). The matching Apple Silicon app
+passed native rendering and public TLS separately; see
+[`mac-release`](mac-release/README.md). Earlier `mac-package` receipts are
+historical candidates.
+
+`published-release.json` records the immutable tag and the public assets.
+The Windows installer, Windows portable ZIP and Mac app ZIP were downloaded
+without authentication and their SHA-256 hashes matched the tested artifacts.
+`linux-suite-summary.txt` preserves the separate broad source-suite result:
+1,772 passed, 19 failed in Eador and two skipped. It is not a green whole-repo
+result or a Linux desktop package acceptance check.

@@ -1,0 +1,24 @@
+Run: https://github.com/ikamensh/saga2d/actions/runs/34201304813
+Commit: 0be1f4bc3620de3f0980d28f3269b52c77bd99dd
+Scope: full repository; all reported failures are in Eador, outside the Warband package.
+
+2026-09-08T08:07:10.1393331Z FAILED tests/eador/test_causeway_scene.py::test_causeway_briefing_teaches_choices_at_both_sizes_and_removes_dead_caster_advice - AssertionError: assert '45 gold · 2 crystals · Moonstone' in 'BEFORE THE EXPEDITION\nRunebound Causeway\nRaven Hill\nEntry\n1\nAvailable\n2\n213\n26\nFree. Assemble west of the ma...nPikeman ×1\nRanger ×1\nDread Guard ×1\n120/120\nDefender wounds persist.\nReturning from this briefing costs nothing.'
+2026-09-08T08:07:10.1396402Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[focus] - AssertionError
+2026-09-08T08:07:10.1397703Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[guard] - AssertionError
+2026-09-08T08:07:10.1398914Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[backstop] - AssertionError
+2026-09-08T08:07:10.1400159Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[infused-guard] - AssertionError
+2026-09-08T08:07:10.1401385Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[scout] - AssertionError
+2026-09-08T08:07:10.1402597Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[scout-heal] - AssertionError
+2026-09-08T08:07:10.1403850Z FAILED tests/eador/test_causeway_scene.py::test_paid_causeway_orders_and_saved_retry_use_actual_player_input[failed-retry] - AssertionError
+2026-09-08T08:07:10.1406775Z FAILED tests/eador/test_difficulty_scene.py::test_challenge_explains_base_production_and_its_live_finite_rival_window - AssertionError: assert '16 base gold' in 'SHARDBOUND 6 N YOUR DOMINION 30 2 +19 −4 Realm gold yield: 80% of base production Alden, the Commander 36 / 36 10 / 1... turns Westwatch Frostmere Duskspire YOUR ARMY · 3/6 Militia 1 24/24 Militia 1 24/24 Archer 1 20/20 Built Marketplace.'
+2026-09-08T08:07:10.1409248Z FAILED tests/eador/test_relief.py::test_purchased_active_passive_and_smaller_parties_hold_in_three_modes_and_five_worlds - eador.entities.RuleError: Unknown unit.
+2026-09-08T08:07:10.1410857Z FAILED tests/eador/test_relief_scene.py::test_paid_relief_manual_orders_and_saved_recovery_use_actual_player_input[forward] - AssertionError
+2026-09-08T08:07:10.1412114Z FAILED tests/eador/test_relief_scene.py::test_paid_relief_manual_orders_and_saved_recovery_use_actual_player_input[western] - AssertionError
+2026-09-08T08:07:10.1413558Z FAILED tests/eador/test_relief_scene.py::test_paid_relief_manual_orders_and_saved_recovery_use_actual_player_input[scout] - AssertionError
+2026-09-08T08:07:10.1414798Z FAILED tests/eador/test_relief_scene.py::test_paid_relief_manual_orders_and_saved_recovery_use_actual_player_input[passive] - AssertionError
+2026-09-08T08:07:10.1416083Z FAILED tests/eador/test_relief_scene.py::test_paid_relief_manual_orders_and_saved_recovery_use_actual_player_input[failed-retry] - AssertionError
+2026-09-08T08:07:10.1417484Z FAILED tests/eador/test_replacement_scene.py::test_complete_replacement_reading_and_saved_manual_rescue - AssertionError
+2026-09-08T08:07:10.1418662Z FAILED tests/eador/test_roster_scene.py::test_recruit_buttons_require_crystals_and_deduct_both_displayed_costs[sapper] - assert False
+2026-09-08T08:07:10.1421209Z FAILED tests/eador/test_roster_scene.py::test_recruit_buttons_require_crystals_and_deduct_both_displayed_costs[adept] - assert False
+2026-09-08T08:07:10.1423725Z FAILED tests/eador/test_roster_scene.py::test_recruit_buttons_require_crystals_and_deduct_both_displayed_costs[skyrider] - assert False
+2026-09-08T08:07:10.1425972Z =========== 19 failed, 1772 passed, 2 skipped in 1021.91s (0:17:01) ============
