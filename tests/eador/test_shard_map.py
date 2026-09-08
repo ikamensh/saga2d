@@ -14,6 +14,8 @@ def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tm
         game.push(ShardScene(state))
         player = PlayerInput(game)
         before = state.to_json()
+        for key in ('f2', 'right', 'return'):
+            player.press(key)
         province = state.provinces[(-1, 0)]
 
         def visible_names():
@@ -26,11 +28,21 @@ def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tm
         assert province.name in visible_names()
         name = game.scene.ui.find(lambda item: isinstance(item, Label) and item.text == province.name)
         assert name.bounds[1] > 100, 'Hover name belongs beside the map, clear of the title toolbar'
+        x, y, width, height = name.bounds
+        cx, cy = game.scene.grid.center(province.pos)
+        assert x <= cx <= x + width and y <= cy <= y + height, (
+            'The revealed name must belong visually to the hovered province, not its neighbor')
         game.backend.inject_mouse_move(2, 2)
         game.tick(1 / 60)
         assert province.name not in visible_names()
         player.press('tab')
         assert game.scene.selected == province.pos and province.name in visible_names()
+        other = state.provinces[(-2, 1)]
+        game.backend.inject_mouse_move(*game.scene.grid.center(other.pos))
+        game.tick(1 / 60)
+        assert other.name in visible_names()
+        player.click(*game.scene.grid.center(other.pos))
+        assert game.scene.selected == other.pos, 'Hover names must not consume province clicks'
         assert state.to_json() == before
     finally:
         game.close()

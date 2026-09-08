@@ -238,6 +238,25 @@ def terrain_tile(scene, grid, pos, terrain, *, mode='ground', inset=.95):
                          x - 160 * scale, y - 160 * scale, 320 * scale, 352 * scale)
 
 
+def territory_borders(grid, provinces):
+    """Prepare colored frontiers; the terrain's quiet seams still divide provinces."""
+    borders = []
+    for pos, data in provinces.items():
+        if data.owner == 'neutral':
+            continue
+        x, y = grid.center(pos)
+        points = grid.corners(pos)
+        for a, b in zip(points, points[1:] + points[:1]):
+            # Pick just across this edge without duplicating HexGrid's axial math.
+            mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+            neighbor = grid.cell_at(x + (mx - x) * 1.05, y + (my - y) * 1.05)
+            if neighbor is not None and provinces[neighbor].owner == data.owner:
+                continue
+            start, end = [(x + (px - x) * .985, y + (py - y) * .985) for px, py in (a, b)]
+            borders.append((start, end, OWNERS[data.owner]))
+    return borders
+
+
 def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False, name_label=True):
     """Draw a province; compact maps may lay out the complete name separately."""
     x, y = grid.center(pos)
@@ -247,13 +266,12 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
     terrain_tile(scene, grid, pos, data.terrain, mode='ground' if data.capital else 'province', inset=.99)
     if hover:
         scene.draw_polygon(inner, (238, 220, 165, 27))
-    if data.owner != 'neutral':
-        outline(scene, inner, OWNERS[data.owner], 2)
     if selected:
         outline(scene, [(x + (px - x) * .92, y + (py - y) * .92) for px, py in points], GOLD, 2.5)
     if data.capital:
         castle(scene, x, y + 4 * s, OWNERS[data.owner], .83 * s)
-    if data.site and not data.explored:
+    # Keep owned adventures visible; reveal other sites while inspecting them.
+    if data.site and not data.explored and (data.owner == 'player' or selected or hover):
         sx, sy = x + 39 * s, y - 24 * s
         scene.draw_image(icon_path('explore'), sx - 11 * s, sy - 11 * s, 22 * s, 22 * s)
     if data.name and name_label:

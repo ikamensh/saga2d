@@ -120,6 +120,8 @@ def verify(output, *, backend='pyglet', budget=None):
             labels = box.find_all(lambda item: isinstance(item, Label) and item.visible)
             assert len(labels) == 1 and labels[0].text == root.state.provinces[pos].name
             x, y, width, height = box.bounds
+            cx, cy = root.grid.center(pos)
+            assert x <= cx <= x + width and y <= cy <= y + height
             assert 26 <= x < x + width <= root.edge - 26
             assert root._summary_bottom <= y < y + height <= game.height - 158
             lx, ly, lw, lh = labels[0].bounds
@@ -140,14 +142,15 @@ def verify(output, *, backend='pyglet', budget=None):
                 check_shard(player.root)
                 capture(f'{name}-{percent}-home')
                 for pos in player.state.provinces:
+                    hover(pos)
+                    case['hover_count'] += 1
+                    # The on-map name must not swallow selection at the pointer.
                     player.click(*player.root.grid.center(pos))
                     assert player.root.selected == pos
                     clear_pointer()  # Exclude transient hover overlays from static HUD overlap checks.
                     check_shard(player.root)
                     assert player.state.to_json() == snapshot
                     case['selected_count'] += 1
-                    hover(pos)
-                    case['hover_count'] += 1
                 clear_pointer()
                 player.press('home')
                 if name == 'linked-opening':
@@ -156,6 +159,10 @@ def verify(output, *, backend='pyglet', budget=None):
                                       key=lambda pos: len(player.state.provinces[pos].name))
                     hover(destination)
                     capture('linked-opening-125-hover')
+                    destination = max(player.state.provinces,
+                                      key=lambda pos: max(map(len, player.state.provinces[pos].name.split())))
+                    hover(destination)
+                    capture('linked-opening-125-hover-word')
                     clear_pointer()
                     player.click(*player.root.grid.center((-1, 0)))
                     clear_pointer()

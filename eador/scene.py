@@ -528,6 +528,7 @@ class ShardScene(Screen):
         army_top = h - 158
         self.grid = HexGrid(s.provinces, size=min(59, (army_top - self._summary_bottom - 24) / 8),
                             origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
+        self._territory_borders = art.territory_borders(self.grid, s.provinces)
         self._province_name_boxes = []
         landmarks = {(-2, 0), (2, 0)}
         rival_target = s.rival.target if s.rival.army and s.rival.intent in ('march', 'attack', 'return') else None
@@ -678,15 +679,18 @@ class ShardScene(Screen):
             self.ui.remove(self._hover_name)
             self._hover_name = None
         if self.hover is not None:
-            name = Label(self.state.provinces[self.hover].name, font='Verdana',
-                         font_size=round(11 * reading_scale(self.game) / 100), text_color=TEXT)
+            title = self.state.provinces[self.hover].name
+            font_size = round(11 * reading_scale(self.game) / 100)
+            word_width = max(self.measure(Label(word, font='Verdana', font_size=font_size))[0]
+                             for word in title.split())
+            name = Label(title, font='Verdana', font_size=font_size, text_color=TEXT,
+                         width=max(round(self.grid.size * 1.4), word_width), wrap=True, align='center')
             width, height = self.measure(name)
             cx, cy = self.grid.center(self.hover)
-            self._hover_name = Column(name, anchor=Anchor.TOP_LEFT,
-                                     margin=(round(max(26, min(cx - width / 2 - 8, self.edge - width - 42))),
-                                             round(max(self._summary_bottom + 6,
-                                                       cy - self.grid.size * .65 - height - 16))),
-                                     style=Style(padding=8, background_color=INK, border_color=LINE,
+            # This is a reading annotation; the province underneath receives input.
+            self._hover_name = Column(name, anchor=Anchor.TOP_LEFT, enabled=False,
+                                     margin=(round(cx - width / 2 - 6), round(cy - height / 2 - 6)),
+                                     style=Style(padding=6, background_color=INK, border_color=LINE,
                                                  border_width=1, radius=4))
             self.ui.add(self._hover_name)
 
@@ -708,6 +712,8 @@ class ShardScene(Screen):
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
                          hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)
+        for start, end, color in self._territory_borders:
+            self.draw_line(*start, *end, color, 1.5)
         if self._travel_destination is not None:
             art.travel_arrow(self, self.grid, s.hero.pos, self._travel_destination)
         for box in self._province_name_boxes:
