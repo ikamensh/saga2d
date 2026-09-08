@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import json
 import os
 from pathlib import Path
 import queue
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -89,10 +90,33 @@ def isolated_environment(profile: Path, original=None) -> dict:
     return env
 
 
-def executable_smoke(executable: Path, endpoint: str, report: Path, manifest: dict, *, native=False) -> dict:
-    with tempfile.TemporaryDirectory(prefix="warband-clean-profile-") as directory:
+@contextmanager
+def mesa_test_context(executable: Path, mesa_dir: Path):
+    """Provide a temporary software GL driver without changing shipping artifacts."""
+    files = [(mesa_dir / name, executable.parent / name) for name in ("opengl32.dll", "libgallium_wgl.dll")]
+    for origin, target in files:
+        if not origin.is_file():
+            raise FileNotFoundError(origin)
+        if target.exists():
+            raise FileExistsError(f"The test driver must not replace an installed file: {target}")
+    copied = []
+    try:
+        for origin, target in files:
+            shutil.copyfile(origin, target)
+            copied.append(target)
+        yield {"driver": "Mesa llvmpipe (test only)", "dll_sha256": {target.name: sha256(target) for target in copied}}
+    finally:
+        for target in copied:
+            target.unlink()
+
+
+def executable_smoke(executable: Path, endpoint: str, report: Path, manifest: dict, *, native=False, mesa_dir: Path | None = None) -> dict:
+    context = mesa_test_context(executable, mesa_dir) if mesa_dir is not None else nullcontext({})
+    with tempfile.TemporaryDirectory(prefix="warband-clean-profile-") as directory, context as graphics:
         profile = Path(directory)
         env = isolated_environment(profile)
+        if graphics:
+            env.update(GALLIUM_DRIVER="llvmpipe", LP_NUM_THREADS="2")
         option = "--package-native-smoke" if native else "--package-smoke"
         target = report.with_suffix(".png") if native else report
         process = subprocess.run([str(executable), option, str(target), "--endpoint", endpoint], cwd=profile,
@@ -101,19 +125,22 @@ def executable_smoke(executable: Path, endpoint: str, report: Path, manifest: di
         if not report.is_file():
             raise RuntimeError(f"The shipped executable produced no receipt: exit {process.returncode}; {process.stderr}")
         result = json.loads(report.read_text(encoding="utf-8"))
-        if native and process.returncode and result.get("error_type") in {"NoSuchConfigException", "ContextException", "NoSuchDisplayException"}:
-            result["status"] = "runner_has_no_supported_graphics_context"
-            write_json(report, result)
-            return result
         if process.returncode or not result["passed"]:
             raise RuntimeError(f"Packaged check failed: {result}")
         assert result["source_commit"] == manifest["source_commit"] and result["version"] == manifest["version"], result
+        assert result["executable_sha256"] == sha256(executable), "The receipt does not identify the launched executable"
+        if graphics:
+            assert "llvmpipe" in result["renderer"].lower(), result["renderer"]
+            result["graphics_test_context"] = graphics
+            write_json(report, result)
         return result
 
 
-def verify(output: Path, *, native=False, public_server: str | None = None) -> dict:
+def verify(output: Path, *, native=False, public_server: str | None = None, mesa_dir: Path | None = None) -> dict:
     if public_server is not None and not public_server.startswith("wss://"):
         raise ValueError("Public-server acceptance requires an explicit wss:// TLS endpoint")
+    if mesa_dir is not None and not native:
+        raise ValueError("A Mesa test context requires --native")
     output = output.resolve()
     manifest = json.loads((output / "build-manifest.json").read_text(encoding="utf-8"))
     for item in manifest["artifacts"]:
@@ -153,7 +180,7 @@ def verify(output: Path, *, native=False, public_server: str | None = None) -> d
                     report["public_server"] = {"endpoint": public_server,
                                                **executable_smoke(executable, public_server, evidence / "public-server.json", manifest)}
                 if native:
-                    report["native"] = executable_smoke(executable, endpoint, evidence / "native.json", manifest, native=True)
+                    report["native"] = executable_smoke(executable, endpoint, evidence / "native.json", manifest, native=True, mesa_dir=mesa_dir)
             finally:
                 uninstaller = installed / "unins000.exe"
                 if uninstaller.is_file():
@@ -162,7 +189,7 @@ def verify(output: Path, *, native=False, public_server: str | None = None) -> d
             assert not executable.exists() and not shortcut.exists(), "Uninstall left the application or Start menu shortcut"
             report["install_shortcut_uninstall"] = True
         elif native:
-            report["native"] = executable_smoke(executable, endpoint, evidence / "native.json", manifest, native=True)
+            report["native"] = executable_smoke(executable, endpoint, evidence / "native.json", manifest, native=True, mesa_dir=mesa_dir)
     report["passed"] = True
     write_json(output / "verification.json", report)
     print(json.dumps(report, indent=2), flush=True)
@@ -174,5 +201,6 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--native", action="store_true")
     parser.add_argument("--public-server", help="Also require the installed executable to pass its online check over this wss:// endpoint")
+    parser.add_argument("--mesa-dir", type=Path, help="Test-only x64 Mesa WGL DLLs for CI hosts without a graphics driver")
     args = parser.parse_args()
-    verify(args.output, native=args.native, public_server=args.public_server)
+    verify(args.output, native=args.native, public_server=args.public_server, mesa_dir=args.mesa_dir)

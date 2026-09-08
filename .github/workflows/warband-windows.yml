@@ -73,12 +73,30 @@ jobs:
             runner_image_version = $env:ImageVersion
             inno_setup = (Get-Item $compiler).VersionInfo.ProductVersion
           } | ConvertTo-Json | Set-Content dist/warband/workflow-build.json -Encoding utf8
+      - name: Prepare pinned Mesa WGL driver for native CI checks only
+        run: |
+          $url = 'https://github.com/pal1000/mesa-dist-win/releases/download/26.2.0/mesa3d-26.2.0-release-msvc.7z'
+          $expected = 'dcb2719ef346dab5b609fcb193a5f13cfc4b0502e3f4de1ad43d349477402f47'
+          $archive = Join-Path $env:RUNNER_TEMP 'mesa3d-26.2.0-release-msvc.7z'
+          $folder = Join-Path $env:RUNNER_TEMP 'warband-mesa-test'
+          Invoke-WebRequest $url -OutFile $archive
+          $digest = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($digest -ne $expected) { throw 'Mesa test archive differs from its pinned SHA-256.' }
+          7z x $archive "-o$folder" 'x64/opengl32.dll' 'x64/libgallium_wgl.dll' -y
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "WARBAND_TEST_MESA=$folder/x64" | Add-Content $env:GITHUB_ENV
+          @{
+            version = '26.2.0'
+            source = $url
+            archive_sha256 = $digest
+            scope = 'Software WGL driver for native CI only; absent from shipping ZIP and installer.'
+          } | ConvertTo-Json | Set-Content dist/warband/mesa-test-context.json -Encoding utf8
       - name: Verify extracted and installed executables over real sockets
         run: |
-          uv run --locked --python 3.13.2 python tools/verify_warband_package.py dist/warband --native --public-server wss://games.tachyon-ai.eu/play
+          uv run --locked --python 3.13.2 python tools/verify_warband_package.py dist/warband --native --mesa-dir $env:WARBAND_TEST_MESA --public-server wss://games.tachyon-ai.eu/play
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $result = Get-Content dist/warband/verification.json -Raw | ConvertFrom-Json
-          if (-not $result.passed -or -not $result.install_shortcut_uninstall -or -not $result.public_server.passed -or $result.source_commit -ne $env:GITHUB_SHA) {
+          if (-not $result.passed -or -not $result.install_shortcut_uninstall -or -not $result.public_server.passed -or -not $result.native.passed -or $result.source_commit -ne $env:GITHUB_SHA) {
             throw 'Package verification did not accept the dispatched build.'
           }
           @(
@@ -91,7 +109,7 @@ jobs:
             ''
             'CI verified the extracted and installed applications against an authoritative WebSocket server, including accepted movement, rejected foreign orders and seat reconnection; shortcut creation and uninstall also passed.'
             "The installed Windows executable also passed those multiplayer checks over TLS against $($result.public_server.endpoint)."
-            "Native rendering passed: $($result.native.passed). Native result: $($result.native.status)"
+            "Native title, multiplayer input and match rendering passed with the test-only software driver: $($result.native.renderer), $($result.native.opengl_version)."
             'The installer is unsigned. CI host checks are recorded in verification.json; they do not establish GPU or audio quality on every Windows PC.'
           ) | Set-Content dist/warband/release-notes.md -Encoding utf8
       - name: Retain build and verification evidence
@@ -130,4 +148,4 @@ jobs:
           flags=()
           if [[ "$version" == *-* ]]; then flags+=(--prerelease); fi
           gh release create "warband-v$version" --verify-tag --title "Warband $version" --notes-file release/release-notes.md "${flags[@]}" \
-            release/*-setup.exe release/*-portable.zip release/SHA256SUMS release/build-manifest.json release/verification.json release/workflow-build.json
+            release/*-setup.exe release/*-portable.zip release/SHA256SUMS release/build-manifest.json release/verification.json release/workflow-build.json release/mesa-test-context.json
