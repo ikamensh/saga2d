@@ -47,7 +47,7 @@ def verify(output, *, backend='pyglet', budget=None):
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'source_sha256': _fingerprints(), 'captures': [], 'tooltips': [],
               'toolbar_visits': [], 'metrics': [], 'army_metrics': [], 'spell_costs': [],
-              'travel_controls': [], 'command_checks': [], 'aiming_checks': [],
+              'contextual_controls': [], 'command_checks': [], 'aiming_checks': [],
               'disabled_checks': [], 'state_checks': 0, 'comparison_loads': 0,
               'cpu_percent_requested': budget.percent}
     with TemporaryDirectory(prefix='shardbound-icons-') as directory:
@@ -176,14 +176,15 @@ def verify(output, *, backend='pyglet', budget=None):
                 metric('level', troop.level, index=index, collection='army_metrics')
                 metric('health', f'{troop.hp}/{troop.max_hp}', index=index, collection='army_metrics')
 
-        def travel_label(label):
+        def contextual_label(label, name):
             item = control(label)
-            assert item.icon == icon_path('travel') and item.show_text
+            assert item.icon == icon_path(name) and item.show_text
             if backend == 'mock':
                 x, y, width, height = item.bounds
                 assert any(text['text'] == label and x <= text['x'] < x + width and y <= text['y'] < y + height
-                           for text in game.backend.texts), 'The contextual travel verb disappeared'
-            report['travel_controls'].append({'label': label, 'reading_size': reading_scale(game)})
+                           for text in game.backend.texts), 'The contextual action verb disappeared'
+            report['contextual_controls'].append({'label': label, 'reading_size': reading_scale(game)})
+            return item
 
         def command_check(command, expected, via):
             assert state() == expected.to_json(), f'{command} {via} differs from the public command'
@@ -243,12 +244,12 @@ def verify(output, *, backend='pyglet', budget=None):
                                     ('Save', None), ('Load', 'f6'), ('Build stronghold', 'b'),
                                     ('Recruit troops', 'r'), ('Rival plan', 'v'), ('Campaign', 'j')):
                 visit(label, shortcut)
-            travel_label('Hero is here')
+            contextual_label('Explore current province', 'explore')
             before = state()
             destination = next(pos for pos in s.grid.neighbors(s.hero.pos)
                                if s.provinces[pos].owner == 'neutral')
             player.click(*player.root.grid.center(destination))
-            travel_label('Invade province')
+            contextual_label('Invade province', 'travel')
             unchanged(before)
             press('home')
             before = state()
@@ -264,10 +265,10 @@ def verify(output, *, backend='pyglet', budget=None):
                                     ('Rival plan', 'v'), ('Campaign', 'j')):
                 visit(label, shortcut)
             army_metrics()
-            travel_label('Hero is here')
+            contextual_label('Explore current province', 'explore')
             hide_tip()
             capture('campaign-reading-125')
-            hover(icon('End turn'))
+            hover(contextual_label('End turn', 'end_turn'))
             expected = State.from_json(state()); expected.end_turn()
             player.button('End turn')
             command_check('end_turn', expected, 'icon')
@@ -275,7 +276,7 @@ def verify(output, *, backend='pyglet', budget=None):
             player.reload(before)
             budget.checkpoint()
             expected = State.from_json(state()); expected.explore()
-            hover(icon('Explore current province'))
+            hover(contextual_label('Explore current province', 'explore'))
             player.button('Explore current province')
             assert type(game.scene) is BattleScene
             command_check('explore', expected, 'icon')

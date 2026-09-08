@@ -453,10 +453,11 @@ class ShardScene(Screen):
             hint = 'Assault locked. J lists objectives.'
         details.append(label(hint, width, size=11, color=MUTED))
         y = column(details, width, x, 108) + 14
-        self.button('Hero is here' if here else 'Intercept expedition' if expedition_here else
-                    'Travel here' if p.owner == 'player' else 'Invade province',
-                    x, y, width - 92, self.travel, hotkey='Enter', primary=True, icon='travel',
-                    enabled=can_act and adjacent and not blocked)
+        if not here:
+            self.button('Intercept expedition' if expedition_here else
+                        'Travel here' if p.owner == 'player' else 'Invade province',
+                        x, y, width - 92, self.travel, hotkey='Enter', primary=True, icon='travel',
+                        enabled=can_act and adjacent and not blocked)
         current = s.provinces[s.hero.pos]
         explore_hint = ('This shard has ended.' if not playing else
                         'No actions left. End the turn to explore.' if not s.actions_left else
@@ -464,10 +465,12 @@ class ShardScene(Screen):
                         'There is no adventure site in your current province.' if current.site is None else
                         'This adventure site is already cleared.' if current.explored else
                         f'Explore {current.site} in {current.name}. Spends one campaign action.')
-        self.button('Explore current province', x + width - 80, y, 80, self.explore, hotkey='X',
-                    icon='explore', show_text=False, tooltip='Explore (X). ' + explore_hint,
+        self.button('Explore current province', x if here else x + width - 80, y,
+                    width if here else 80, self.explore, hotkey='X', primary=here,
+                    icon='explore', show_text=here, tooltip='Explore (X). ' + explore_hint,
                     enabled=can_act and current.owner == 'player' and current.site is not None and not current.explored)
         y += 58
+        self._sidebar_rules = [y - 9, h - 82]
         column([label('STRONGHOLD', 170, size=10, color=MUTED),
                     label(f'{len(s.buildings)}/{len(BUILDINGS)} buildings',
                           170, size=10, color=MUTED)], 170, x, y)
@@ -478,10 +481,11 @@ class ShardScene(Screen):
                     icon='recruit', show_text=False,
                     tooltip='Recruit troops (R). Review troops, abilities and recruitment costs.')
         self.button('End turn', x, h - 66, 176, self.end_turn, hotkey='E', primary=True, enabled=playing,
-                    icon='end_turn', show_text=False,
+                    icon='end_turn',
                     tooltip='End turn (E). Collect income, pay upkeep, recover and let the rival act.')
         column([label(f'Turn {s.turn}', width - 196, size=13, color=GOLD)], width - 196, x + 196, h - 56)
         objective_top = y + 62
+        self._sidebar_rules.append(objective_top - 12)
 
         self.icon_button('guide', 'Guide', 788, 28, self.help, hotkey='F1')
         self.icon_button('hero', 'Hero', 878, 28, self.hero_details, hotkey='H')
@@ -517,17 +521,20 @@ class ShardScene(Screen):
         self.grid = HexGrid(s.provinces, size=min(59, (army_top - self._summary_bottom - 24) / 8),
                             origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
         self._province_name_boxes = []
+        landmarks = {(-2, 0), (2, 0)}
+        rival_target = s.rival.target if s.rival.army and s.rival.intent in ('march', 'attack', 'return') else None
+        if rival_target is not None:
+            landmarks.add(rival_target)
         for pos, province in s.provinces.items():
-            if pos not in ((-2, 0), (2, 0)):
+            if pos not in landmarks:
                 continue
             cx, cy = self.grid.center(pos)
-            name_width = round(self.grid.size * 1.69)
-            name = Label(province.name, width=name_width, wrap=True, align='center',
-                         font='Verdana', font_size=9, text_color=TEXT)
-            name_height = self.measure(name)[1]
+            name = Label(province.name, font='Verdana', font_size=9,
+                         text_color=RED if pos == rival_target else TEXT)
+            name_width, name_height = self.measure(name)
             left, top = round(cx - name_width / 2), round(cy + self.grid.size * .60 - name_height)
             column([name], name_width, left, top)
-            self._province_name_boxes.append((left, top - 1, name_width, name_height + 2))
+            self._province_name_boxes.append((left - 5, top - 1, name_width + 10, name_height + 2))
         self._hover_name = None
         self._update_hover_label()
         column([label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', self.edge - 52, size=10, color=MUTED)],
@@ -666,8 +673,9 @@ class ShardScene(Screen):
             width, height = self.measure(name)
             cx, cy = self.grid.center(self.hover)
             self._hover_name = Column(name, anchor=Anchor.TOP_LEFT,
-                                     margin=(round(cx - width / 2 - 8),
-                                             round(cy - self.grid.size * .65 - height - 16)),
+                                     margin=(round(max(26, min(cx - width / 2 - 8, self.edge - width - 42))),
+                                             round(max(self._summary_bottom + 6,
+                                                       cy - self.grid.size * .65 - height - 16))),
                                      style=Style(padding=8, background_color=INK, border_color=LINE,
                                                  border_width=1, radius=4))
             self.ui.add(self._hover_name)
@@ -685,6 +693,8 @@ class ShardScene(Screen):
         self.rule(24, 90, self.game.width - 48)
         self.text('SHARDBOUND', 26, 22, size=27, serif=True)
         self.rule(26, self._summary_bottom - 4, self.edge - 52)
+        for y in self._sidebar_rules:
+            self.rule(self.edge + 22, y, 356)
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
                          hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)

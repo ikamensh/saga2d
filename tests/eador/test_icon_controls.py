@@ -20,7 +20,7 @@ def test_icon_journey_preserves_input_explanations_and_exact_saves(tmp_path):
         'campaign-icons', 'campaign-reading-125', 'battle-icons', 'battle-reloaded'}
     assert {item['name'] for item in receipt['army_metrics']} == {'level', 'health'}
     assert {item['spell'] for item in receipt['spell_costs']} == {'bolt', 'heal'}
-    assert {item['label'] for item in receipt['travel_controls']} >= {'Hero is here', 'Invade province'}
+    assert {item['label'] for item in receipt['contextual_controls']} >= {'Explore current province', 'Invade province'}
     assert {item['name'] for item in receipt['metrics']} >= {
         'gold', 'crystals', 'income', 'upkeep', 'actions', 'health', 'mana',
         'attack', 'defense', 'move', 'range'}

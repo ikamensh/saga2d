@@ -20,6 +20,7 @@ def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tm
             return {item.text for item in game.scene.ui.walk() if isinstance(item, Label) and item.visible}
 
         assert province.name not in visible_names()
+        assert state.provinces[state.rival.target].name in visible_names(), 'The announced attack stays locatable'
         game.backend.inject_mouse_move(*game.scene.grid.center(province.pos))
         game.tick(1 / 60)
         assert province.name in visible_names()
@@ -31,5 +32,29 @@ def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tm
         player.press('tab')
         assert game.scene.selected == province.pos and province.name in visible_names()
         assert state.to_json() == before
+    finally:
+        game.close()
+
+
+def test_current_province_promotes_the_available_exploration_order(tmp_path):
+    """The starting site has a named action, and clicking it enters that exact adventure."""
+    from saga2d import Button
+    from eador.scene import BattleScene
+
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        state = State.new(7)
+        game.push(ShardScene(state))
+        player = PlayerInput(game)
+        game.tick(0)
+        explore = game.scene.ui.find(lambda item: isinstance(item, Button)
+                                     and item.text == 'Explore current province')
+        assert explore.enabled and explore.show_text
+        assert game.scene.ui.find(lambda item: isinstance(item, Button) and item.text == 'Hero is here') is None
+        expected = State.from_json(state.to_json())
+        expected.explore()
+        player.button('Explore current province')
+        assert isinstance(game.scene, BattleScene)
+        assert state.to_json() == expected.to_json()
     finally:
         game.close()
