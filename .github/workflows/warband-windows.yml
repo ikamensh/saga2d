@@ -1,0 +1,132 @@
+name: Warband Windows installer
+
+on:
+  push:
+    tags: ['warband-v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Explicit version, for example 0.1.0-preview.1'
+        required: true
+        type: string
+      publish:
+        description: 'Publish the matching existing warband-vVERSION tag after verification'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: warband-windows-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      UV_PYTHON_PREFERENCE: only-managed
+      REQUESTED_VERSION: ${{ inputs.version }}
+      REQUESTED_PUBLISH: ${{ inputs.publish }}
+    steps:
+      - name: Preserve source bytes
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.12.10'
+          python-version: '3.13.2'
+          enable-cache: false
+      - name: Resolve exact release identity
+        run: |
+          $version = $env:REQUESTED_VERSION
+          if ($env:GITHUB_REF_TYPE -eq 'tag') { $version = $env:GITHUB_REF_NAME -replace '^warband-v', '' }
+          $version = uv run --locked --python 3.13.2 python -c 'import sys; from tools.build_warband import version; print(version(sys.argv[1]))' $version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "WARBAND_VERSION=$version" | Add-Content $env:GITHUB_ENV
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -or $env:REQUESTED_PUBLISH -eq 'true') {
+            $revision = git rev-parse "refs/tags/warband-v$version^{commit}"
+            if ($LASTEXITCODE -ne 0 -or $revision -ne $env:GITHUB_SHA) { throw 'Publishing requires an existing version tag at the dispatched commit.' }
+          }
+      - name: Run Warband and shared transport regression tests
+        run: |
+          uv run --locked --python 3.13.2 --extra dev python -m pytest tests/warband tests/framework/test_render3d.py tests/framework/test_network.py tests/test_multiplayer_games.py -q
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build pinned runtime, portable ZIP and per-user installer
+        run: |
+          $compiler = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe'
+          if (-not (Test-Path $compiler)) { throw 'The Windows runner is missing its documented Inno Setup compiler.' }
+          uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_warband.py --version $env:WARBAND_VERSION --installer --iscc $compiler --require-clean
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          @{
+            run_url = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+            commit = $env:GITHUB_SHA
+            runner_image = $env:ImageOS
+            runner_image_version = $env:ImageVersion
+            inno_setup = (Get-Item $compiler).VersionInfo.ProductVersion
+          } | ConvertTo-Json | Set-Content dist/warband/workflow-build.json -Encoding utf8
+      - name: Verify extracted and installed executables over real sockets
+        run: |
+          uv run --locked --python 3.13.2 python tools/verify_warband_package.py dist/warband --native
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $result = Get-Content dist/warband/verification.json -Raw | ConvertFrom-Json
+          if (-not $result.passed -or -not $result.install_shortcut_uninstall -or $result.source_commit -ne $env:GITHUB_SHA) {
+            throw 'Package verification did not accept the dispatched build.'
+          }
+          @(
+            "Warband $env:WARBAND_VERSION"
+            ''
+            "Source: $env:GITHUB_SHA"
+            ''
+            'Download the setup EXE, run it, and launch Warband from the Start menu. No Python or administrator account is required.'
+            'For internet play choose Multiplayer, create a room, and share its code.'
+            ''
+            'CI verified the extracted and installed applications against an authoritative WebSocket server, including accepted movement, rejected foreign orders and seat reconnection; shortcut creation and uninstall also passed.'
+            "Native rendering passed: $($result.native.passed). Native result: $($result.native.status)"
+            'The installer is unsigned. CI host checks are recorded in verification.json; they do not establish GPU or audio quality on every Windows PC.'
+          ) | Set-Content dist/warband/release-notes.md -Encoding utf8
+      - name: Retain build and verification evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: warband-windows-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            dist/warband/*-setup.exe
+            dist/warband/*-portable.zip
+            dist/warband/*.json
+            dist/warband/SHA256SUMS
+            dist/warband/release-notes.md
+            dist/warband/verification/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/warband-v') || inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: warband-windows-${{ github.sha }}-${{ github.run_attempt }}
+          path: release
+      - name: Publish the verified version without replacing existing assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version=$(python -c 'import json; print(json.load(open("release/build-manifest.json"))["version"])')
+          flags=()
+          if [[ "$version" == *-* ]]; then flags+=(--prerelease); fi
+          gh release create "warband-v$version" --verify-tag --title "Warband $version" --notes-file release/release-notes.md "${flags[@]}" \
+            release/*-setup.exe release/*-portable.zip release/SHA256SUMS release/build-manifest.json release/verification.json release/workflow-build.json
