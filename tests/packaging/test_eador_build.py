@@ -89,3 +89,17 @@ def test_audio_validation_refuses_corrupt_missing_unrecorded_and_stale_inputs(tm
     generator.write_bytes(generator.read_bytes() + b'\n# changed composition build\n')
     with pytest.raises(RuntimeError, match='Audio generator differs.*build_eador_audio'):
         validate_audio(source)
+
+
+def test_clean_environment_keeps_the_windows_system_root_whatever_its_case(monkeypatch):
+    """CI runners spell SystemRoot differently; the isolated launch must still find System32."""
+    import os
+    from tools.build_eador import clean_environment
+
+    monkeypatch.setattr(os, 'name', 'nt')
+    monkeypatch.setattr(os, 'pathsep', ';')
+    monkeypatch.setenv('SYSTEMROOT', 'C:\\Windows')
+    monkeypatch.setenv('PYTHONPATH', 'developer-checkout')
+    env = clean_environment({'SAGA2D_SILENT': '1'})
+    assert env['PATH'].startswith('C:\\Windows') and 'System32' in env['PATH']
+    assert 'PYTHONPATH' not in env and env['PYTHONNOUSERSITE'] == '1' and env['SAGA2D_SILENT'] == '1'

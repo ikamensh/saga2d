@@ -194,7 +194,11 @@ def clean_environment(extra=None) -> dict:
     """Keep OS configuration while excluding user Python and repository overrides."""
     env = {key: value for key, value in os.environ.items()
            if key not in ("PYTHONPATH", "PYTHONHOME", "VIRTUAL_ENV", "UV_PROJECT_ENVIRONMENT")}
-    env["PATH"] = os.defpath if os.name != "nt" else str(Path(env["SystemRoot"]) / "System32") + os.pathsep + env["SystemRoot"]
+    if os.name == "nt":
+        system_root = next(value for name, value in env.items() if name.upper() == "SYSTEMROOT")
+        env["PATH"] = os.path.join(system_root, "System32") + os.pathsep + system_root
+    else:
+        env["PATH"] = os.defpath
     env["PYTHONNOUSERSITE"] = "1"
     env.update(extra or {})
     return env
