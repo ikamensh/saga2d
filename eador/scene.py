@@ -514,6 +514,8 @@ class ShardScene(Screen):
                             origin=(326, (self._summary_bottom + army_top) / 2))
         self._province_name_boxes = []
         for pos, province in s.provinces.items():
+            if pos not in ((-2, 0), (2, 0)):
+                continue
             cx, cy = self.grid.center(pos)
             name_width = round(self.grid.size * 1.69)
             name = Label(province.name, width=name_width, wrap=True, align='center',
@@ -522,6 +524,8 @@ class ShardScene(Screen):
             left, top = round(cx - name_width / 2), round(cy + self.grid.size * .60 - name_height)
             column([name], name_width, left, top)
             self._province_name_boxes.append((left, top - 1, name_width, name_height + 2))
+        self._hover_name = None
+        self._update_hover_label()
         column([label('YOUR ARMY', self.edge - 52, size=10, color=MUTED)],
                self.edge - 52, 26, army_top)
         army_y = army_top + round(22 * scale)
@@ -632,7 +636,10 @@ class ShardScene(Screen):
 
     def handle_input(self, event: InputEvent):
         if event.type == "move":
-            self.hover = self.grid.cell_at(event.x, event.y)
+            hover = self.grid.cell_at(event.x, event.y)
+            if hover != self.hover:
+                self.hover = hover
+                self._update_hover_label()
         if event.type == "click" and event.button == "left" and self.state.status == "playing":
             pos = self.grid.cell_at(event.x, event.y)
             if pos is not None:
@@ -640,6 +647,26 @@ class ShardScene(Screen):
                 self.refresh()
                 return True
         return False
+
+    def _update_hover_label(self):
+        """Reveal one name without rebuilding the HUD for every pointer movement."""
+        from saga2d import Column, Label, Style
+        from eador.preferences import reading_scale
+
+        if self._hover_name is not None:
+            self.ui.remove(self._hover_name)
+            self._hover_name = None
+        if self.hover is not None:
+            name = Label(self.state.provinces[self.hover].name, font='Verdana',
+                         font_size=round(11 * reading_scale(self.game) / 100), text_color=TEXT)
+            width, height = self.measure(name)
+            cx, cy = self.grid.center(self.hover)
+            self._hover_name = Column(name, anchor=Anchor.TOP_LEFT,
+                                     margin=(round(cx - width / 2 - 8),
+                                             round(cy - self.grid.size * .65 - height - 16)),
+                                     style=Style(padding=8, background_color=INK, border_color=LINE,
+                                                 border_width=1, radius=4))
+            self.ui.add(self._hover_name)
 
     def draw(self):
         with self.screen_layer(2):
