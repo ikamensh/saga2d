@@ -3,7 +3,7 @@ from copy import deepcopy
 
 from saga2d import CommandError
 
-GAME_IDS = ('tribes-v1', 'warband-v1', 'shardbound-v1')
+GAME_IDS = ('tribes-v1', 'warband-v1', 'shardbound-v1', 'shardbound-pvp-v1')
 
 
 def create_match(game, options):
@@ -14,6 +14,7 @@ def create_match(game, options):
         'tribes-v1': {'size'},
         'warband-v1': {'width', 'height', 'theme'},
         'shardbound-v1': {'hero', 'theme', 'difficulty', 'campaign'},
+        'shardbound-pvp-v1': {'heroes', 'theme', 'difficulty'},
     }[game]
     if options.keys() - allowed:
         raise CommandError('Unknown match option.')
@@ -40,10 +41,19 @@ def create_match(game, options):
         return WarbandMatch(seed, width=integer('width', 48, 40, 64),
                             height=integer('height', 40, 32, 48),
                             theme=MapTheme(choice('theme', 'summer', {t.value for t in MapTheme})))
-    from eador.multiplayer import ShardboundMatch
     from eador.model import HERO_CLASSES
     from eador.worldgen import THEMES
     from eador.difficulty import DIFFICULTIES
+    if game == 'shardbound-pvp-v1':
+        from eador.concurrent_campaign import ConcurrentCampaign
+        heroes = options.get('heroes', ('Commander', 'Commander'))
+        if (not isinstance(heroes, (list, tuple)) or len(heroes) != 2
+                or any(not isinstance(hero, str) or hero not in HERO_CLASSES for hero in heroes)):
+            raise CommandError('Choose two supported heroes.')
+        return ConcurrentCampaign.new(seed, heroes=heroes,
+                                      theme=choice('theme', 'frontier', THEMES),
+                                      difficulty=choice('difficulty', 'standard', DIFFICULTIES))
+    from eador.multiplayer import ShardboundMatch
     campaign = options.get('campaign', False)
     if type(campaign) is not bool:
         raise CommandError('campaign must be true or false.')
@@ -62,6 +72,8 @@ def checkpoint_match(game, match):
                 'events': deepcopy(match.events)}
     if game == 'shardbound-v1':
         return {'campaign': match.state.to_json()}
+    if game == 'shardbound-pvp-v1':
+        return match.checkpoint()
     raise ValueError(f'Checkpoint belongs to an incompatible game version: {game}')
 
 
@@ -84,6 +96,9 @@ def restore_match(game, snapshot):
         from eador.model import State
         match = ShardboundMatch.__new__(ShardboundMatch)
         match.state = State.from_json(snapshot['campaign'])
+    elif game == 'shardbound-pvp-v1':
+        from eador.concurrent_campaign import ConcurrentCampaign
+        match = ConcurrentCampaign.restore(snapshot)
     else:
         raise ValueError(f'Checkpoint belongs to an incompatible game version: {game}')
     return match
