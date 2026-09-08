@@ -1,7 +1,11 @@
-"""Build a standalone Shardbound development artifact and verify the archive.
+"""Build a standalone Shardbound artifact and verify the archive.
 
 Run from the repository root:
 uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py
+
+Release builds name their version (``--version 0.1.0-preview.1 --require-clean``)
+and, on Windows, add ``--installer``. Publication is a separate recorded step:
+see tools/verify_shardbound_package.py and .github/workflows/shardbound-windows.yml.
 """
 
 import argparse
@@ -22,9 +26,11 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.release import VERSION
+from tools.build_game import version as release_version
 
 TOOL_VERSIONS = {"pyinstaller": "6.22.2", "pyinstaller-hooks-contrib": "2026.7"}
 RUNTIME_PACKAGES = ("numpy", "Pillow", "pyglet", "websockets")
+INSTALLER_ID = "{7C1F0D6A-3B52-4E0F-9C0B-5D2A6F4E8B31}"
 
 
 def sha256(path: Path) -> str:
@@ -107,7 +113,7 @@ def copy_licenses(destination: Path) -> None:
     shutil.copyfile(python_license, destination / "CPython-LICENSE.txt")
 
 
-def snapshot(source: Path) -> dict:
+def snapshot(source: Path, version: str) -> dict:
     data = snapshot_sources(source)
     release = source / "release"
     release.mkdir()
@@ -121,7 +127,7 @@ def snapshot(source: Path) -> dict:
     source_hashes = {str(path.relative_to(source)): sha256(path)
                      for path in sorted(source.rglob("*")) if path.is_file()}
     info = {
-        "product": "Shardbound", "version": VERSION,
+        "product": "Shardbound", "game": "shardbound", "version": version,
         "release_ready": False,
         "built_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
@@ -174,57 +180,78 @@ def verify_campaign_processes(executable: Path, folder: Path, env: dict, output:
                 reports=[f'phase-{p["phase"]}.json' for p in phases])
 
 
+def extract_archive(archive: Path, folder: Path, macos: bool) -> Path:
+    """Unpack the shipping archive outside the repository and return its executable."""
+    if macos:
+        run(["/usr/bin/ditto", "-x", "-k", archive, folder])
+        return folder / "Shardbound.app" / "Contents" / "MacOS" / "Shardbound"
+    shutil.unpack_archive(archive, folder)
+    return folder / "Shardbound" / "Shardbound.exe"
+
+
+def clean_environment(extra=None) -> dict:
+    """Keep OS configuration while excluding user Python and repository overrides."""
+    env = {key: value for key, value in os.environ.items()
+           if key not in ("PYTHONPATH", "PYTHONHOME", "VIRTUAL_ENV", "UV_PROJECT_ENVIRONMENT")}
+    env["PATH"] = os.defpath if os.name != "nt" else str(Path(env["SystemRoot"]) / "System32") + os.pathsep + env["SystemRoot"]
+    env["PYTHONNOUSERSITE"] = "1"
+    env.update(extra or {})
+    return env
+
+
+def run_smoke(executable: Path, folder: Path, image: Path, env: dict, *, forecast_save: Path | None = None) -> dict:
+    """Run the frozen smoke journey and check that it exercised the extracted files."""
+    command = [executable, "--smoke-image", image]
+    forecast_payload = None
+    if forecast_save is not None:
+        # Verification input stays outside the archive and cannot fall back to repository data.
+        forecast_payload = forecast_save.read_bytes()
+        relocated_save = folder / 'forecast-input.json'
+        relocated_save.write_bytes(forecast_payload)
+        command.extend(['--forecast-save', relocated_save])
+    run(command, cwd=folder, env=env, timeout=180)
+    report = json.loads(image.with_suffix(".json").read_text())
+    if not all(report[key] for key in ("frozen", "save_load_roundtrip", "codex_and_rival_rendered",
+                                      "battle_save_load_roundtrip", "guard_save_load_roundtrip",
+                                      "settings_apply_cancel_restart", "audio_catalogue_decoded_and_played",
+                                      "audio_live_mix_and_cleanup", "native_input_journey",
+                                      "shard_controls_verified")):
+        raise RuntimeError(f"Packaged smoke verification failed: {report}")
+    if Path(report["executable"]).resolve() != executable.resolve():
+        raise RuntimeError("Smoke verification did not run the extracted executable")
+    if not Path(report["asset_path"]).resolve().is_relative_to(folder.resolve()):
+        raise RuntimeError("Smoke verification loaded audio from outside the extracted archive")
+    if forecast_save is not None:
+        check = report['casualty_forecast']
+        if check['input_sha256'] != hashlib.sha256(forecast_payload).hexdigest():
+            raise RuntimeError('Packaged forecast check loaded different input bytes')
+        if (check['backend'] != 'pyglet' or not check['state_unchanged']
+                or check['exact_save_reloads'] != 1 or check['reading_percent'] != 125
+                or check['input_activations'] <= 0):
+            raise RuntimeError('Packaged forecast inspection or exact save reload failed')
+        forecast_image = image.with_stem(image.stem + '-forecast-125')
+        if Path(check['image']).resolve() != forecast_image.resolve() or not forecast_image.is_file():
+            raise RuntimeError('Packaged forecast check did not capture its native frame')
+    return report
+
+
+def check_shipped_audio(report: dict, package_data: dict) -> None:
+    expected_audio = {name.removeprefix("eador/assets/"): record for name, record in package_data.items()
+                      if name.startswith("eador/assets/") and name.endswith(".wav")}
+    actual_audio = {name: {key: record[key] for key in ("bytes", "sha256")}
+                    for name, record in report["audio_files"].items()}
+    if actual_audio != expected_audio:
+        raise RuntimeError("Packaged audio bytes differ from the build source snapshot")
+
+
 def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, *,
                   campaign=False, forecast_save: Path | None = None) -> dict:
     with TemporaryDirectory(prefix="shardbound-outside-repo-") as temporary:
         folder = Path(temporary)
-        if macos:
-            run(["/usr/bin/ditto", "-x", "-k", archive, folder])
-            executable = folder / "Shardbound.app" / "Contents" / "MacOS" / "Shardbound"
-        else:
-            shutil.unpack_archive(archive, folder)
-            executable = folder / "Shardbound" / "Shardbound.exe"
-        env = {key: value for key, value in os.environ.items()
-               if key not in ("PYTHONPATH", "PYTHONHOME", "VIRTUAL_ENV", "UV_PROJECT_ENVIRONMENT")}
-        env["PATH"] = os.defpath
-        env["PYTHONNOUSERSITE"] = "1"
-        image = output / "packaged-smoke.png"
-        command = [executable, "--smoke-image", image]
-        if forecast_save is not None:
-            # Verification input stays outside the archive and cannot fall back to repository data.
-            forecast_payload = forecast_save.read_bytes()
-            relocated_save = folder / 'forecast-input.json'
-            relocated_save.write_bytes(forecast_payload)
-            command.extend(['--forecast-save', relocated_save])
-        run(command, cwd=folder, env=env, timeout=90)
-        report = json.loads(image.with_suffix(".json").read_text())
-        if not all(report[key] for key in ("frozen", "save_load_roundtrip", "codex_and_rival_rendered",
-                                          "battle_save_load_roundtrip", "guard_save_load_roundtrip",
-                                          "settings_apply_cancel_restart", "audio_catalogue_decoded_and_played",
-                                          "audio_live_mix_and_cleanup", "native_input_journey",
-                                          "shard_controls_verified")):
-            raise RuntimeError(f"Packaged smoke verification failed: {report}")
-        if Path(report["executable"]).resolve() != executable.resolve():
-            raise RuntimeError("Smoke verification did not run the extracted executable")
-        if not Path(report["asset_path"]).resolve().is_relative_to(folder.resolve()):
-            raise RuntimeError("Smoke verification loaded audio from outside the extracted archive")
-        expected_audio = {name.removeprefix("eador/assets/"): record for name, record in package_data.items()
-                          if name.startswith("eador/assets/") and name.endswith(".wav")}
-        actual_audio = {name: {key: record[key] for key in ("bytes", "sha256")}
-                        for name, record in report["audio_files"].items()}
-        if actual_audio != expected_audio:
-            raise RuntimeError("Packaged audio bytes differ from the build source snapshot")
-        if forecast_save is not None:
-            check = report['casualty_forecast']
-            if check['input_sha256'] != hashlib.sha256(forecast_payload).hexdigest():
-                raise RuntimeError('Packaged forecast check loaded different input bytes')
-            if (check['backend'] != 'pyglet' or not check['state_unchanged']
-                    or check['exact_save_reloads'] != 1 or check['reading_percent'] != 125
-                    or check['input_activations'] <= 0):
-                raise RuntimeError('Packaged forecast inspection or exact save reload failed')
-            forecast_image = image.with_stem(image.stem + '-forecast-125')
-            if Path(check['image']).resolve() != forecast_image.resolve() or not forecast_image.is_file():
-                raise RuntimeError('Packaged forecast check did not capture its native frame')
+        executable = extract_archive(archive, folder, macos)
+        env = clean_environment()
+        report = run_smoke(executable, folder, output / "packaged-smoke.png", env, forecast_save=forecast_save)
+        check_shipped_audio(report, package_data)
         if campaign:
             campaign_output = output / 'campaign-verification'
             if campaign_output.exists():
@@ -237,6 +264,11 @@ def smoke_archive(archive: Path, output: Path, macos: bool, package_data: dict, 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--version", type=release_version, default=VERSION,
+                        help="release version for file names and build identity (default: development)")
+    parser.add_argument("--installer", action="store_true", help="also compile the Windows per-user installer")
+    parser.add_argument("--iscc", type=Path, help="path to Inno Setup's ISCC.exe")
+    parser.add_argument("--require-clean", action="store_true", help="refuse to build from a modified working tree")
     parser.add_argument("--skip-smoke", action="store_true", help="build only; artifact remains unverified")
     parser.add_argument("--check-campaign", action="store_true", help="also complete three linked shards across app restarts")
     parser.add_argument('--forecast-save', type=Path,
@@ -260,29 +292,43 @@ def main() -> None:
     macos = sys.platform == "darwin"
     if not macos and platform.machine().lower() not in ("amd64", "x86_64"):
         parser.error("Windows packaging requires an x64 Python runtime")
+    if args.installer and macos:
+        parser.error("The Windows installer must be built on Windows")
+    if args.require_clean and subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip():
+        parser.error("Release builds require a clean working tree")
     work = ROOT / "build" / "shardbound"
     source = work / "source"
     output = ROOT / "dist" / "shardbound"
     output.mkdir(parents=True, exist_ok=True)
-    info = snapshot(source)
+    info = snapshot(source, args.version)
     env = {**os.environ, "SHARDBOUND_BUILD_SOURCE": str(source)}
     run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean",
          "--distpath", output, "--workpath", work / "pyinstaller",
          source / "shardbound.spec"], cwd=source, env=env)
     artifact = output / ("Shardbound.app" if macos else "Shardbound")
-    target = "macos-" + platform.machine() if macos else "windows-x64"
-    archive = output / f"Shardbound-{target}.zip"
+    target = f"darwin-{platform.machine().lower()}-app" if macos else "windows-x64-portable"
+    archive = output / f"Shardbound-{args.version}-{target}.zip"
     if macos:
         run(["/usr/bin/ditto", "-c", "-k", "--sequesterRsrc", "--keepParent", artifact, archive])
     else:
         shutil.make_archive(str(archive.with_suffix("")), "zip", output, artifact.name)
-    info["artifact"] = {"file": archive.name, "sha256": sha256(archive), "bytes": archive.stat().st_size}
+    artifacts = [archive]
+    if args.installer:
+        compiler = args.iscc or shutil.which("ISCC.exe") or Path(os.environ["ProgramFiles(x86)"]) / "Inno Setup 6" / "ISCC.exe"
+        if not Path(compiler).is_file():
+            parser.error("Install Inno Setup or pass --iscc with the path to ISCC.exe")
+        run([compiler, "/DAppName=Shardbound", f"/DAppId={INSTALLER_ID}", f"/DAppVersion={args.version}",
+             f"/DAppNumericVersion={args.version.partition('-')[0]}.0", f"/DSourceDir={artifact}",
+             f"/DOutputDir={output}", ROOT / "packaging" / "game.iss"])
+        artifacts.append(output / f"Shardbound-{args.version}-windows-x64-setup.exe")
+    info["artifacts"] = [{"file": path.name, "sha256": sha256(path), "bytes": path.stat().st_size} for path in artifacts]
     info["files"] = inventory(artifact)
     info["smoke"] = None if args.skip_smoke else smoke_archive(
         archive, output, macos, info["package_data"], campaign=args.check_campaign,
         forecast_save=args.forecast_save)
     write_json(output / "build-manifest.json", info)
-    print(f"Built {archive}\nSHA256 {info['artifact']['sha256']}\nManifest {output / 'build-manifest.json'}", flush=True)
+    (output / "SHA256SUMS").write_text("".join(f"{item['sha256']}  {item['file']}\n" for item in info["artifacts"]), encoding="ascii")
+    print(f"Built {archive}\nSHA256 {info['artifacts'][0]['sha256']}\nManifest {output / 'build-manifest.json'}", flush=True)
 
 
 if __name__ == "__main__":

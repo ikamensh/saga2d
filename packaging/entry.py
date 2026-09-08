@@ -239,6 +239,67 @@ def verify_shard_controls(game, image_path: Path, *, backend='pyglet', budget=No
                        if player.native else [])
 
 
+def online_smoke(endpoint: str) -> dict:
+    """Two real WebSocket clients share one server-owned campaign and reclaim a seat."""
+    if not endpoint:
+        raise ValueError("The online smoke check requires an explicit --endpoint")
+    from saga2d.online import OnlineClient
+    from eador.model import State
+
+    clients = []
+
+    def wait(condition):
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline:
+            for client in clients:
+                client.poll()
+            if condition():
+                return
+            time.sleep(.02)
+        raise AssertionError([(client.ready, client.closed, client.error) for client in clients])
+
+    def campaign(client):
+        return State.from_json(client.state["campaign"])
+
+    try:
+        creator = OnlineClient("shardbound-v1", endpoint=endpoint, options={"seed": 7, "campaign": True})
+        clients.append(creator)
+        wait(lambda: bool(creator.room) and creator.state is not None)
+        assert creator.resume_token and not creator.ready and creator.retention >= 3600
+        guest = OnlineClient("shardbound-v1", endpoint=endpoint, room=creator.room)
+        clients.append(guest)
+        wait(lambda: creator.ready and guest.ready)
+        assert (creator.player, guest.player) == (0, 1)
+        gold = campaign(creator).gold
+        creator.submit({"action": "build", "target": "state", "args": ["barracks"]})
+        wait(lambda: campaign(creator).gold < gold and campaign(guest).gold < gold)
+        guest.submit({"action": "explore", "target": "state", "args": []})
+        wait(lambda: campaign(creator).to_json() == campaign(guest).to_json() and creator.revision >= 4)
+        room, token = creator.room, creator.resume_token
+        creator.close()
+        wait(lambda: not guest.ready)
+        resumed = OnlineClient("shardbound-v1", endpoint=endpoint, room=room, resume_token=token)
+        clients.append(resumed)
+        wait(lambda: resumed.ready and guest.ready)
+        assert resumed.player == 0 and campaign(resumed).to_json() == campaign(guest).to_json()
+        return {"create_join": True, "shared_realm_orders": True, "private_seat_rejoin": True,
+                "campaign_retention_seconds": creator.retention}
+    finally:
+        for client in clients:
+            client.close()
+
+
+def online_report(report_path: Path, endpoint: str) -> None:
+    from eador.release import build_info
+    info = build_info()
+    result = {"passed": True, "frozen": True, "version": info["version"], "source_commit": info["source_commit"],
+              "executable": str(Path(sys.executable).resolve()),
+              "executable_sha256": hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest(),
+              "endpoint": endpoint, "online": online_smoke(endpoint)}
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(result, indent=2) + "\n")
+
+
 def smoke(image_path: Path, *, forecast_save: Path | None = None) -> None:
     os.environ["SAGA2D_SILENT"] = "1"
     import eador
@@ -410,6 +471,12 @@ if __name__ == "__main__":
         parser.add_argument("--recovery", action="store_true")
         args = parser.parse_args()
         run(args.campaign_check, phase=args.phase, recovery=args.recovery)
+    elif "--online-smoke" in sys.argv:
+        parser = argparse.ArgumentParser(description="Verify the packaged Shardbound co-op client")
+        parser.add_argument("--online-smoke", required=True, type=Path)
+        parser.add_argument("--endpoint", required=True)
+        args = parser.parse_args()
+        online_report(args.online_smoke, args.endpoint)
     elif "--smoke-image" in sys.argv:
         parser = argparse.ArgumentParser(description="Verify the packaged Shardbound runtime")
         parser.add_argument("--smoke-image", required=True, type=Path)

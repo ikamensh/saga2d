@@ -30,6 +30,27 @@ From the repository root, with uv installed:
 uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py
 ```
 
+A release build names its version and refuses a modified tree; on Windows it
+also compiles the per-user installer from the shared `packaging/game.iss`:
+
+```bash
+uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py --version 0.1.0-preview.1 --require-clean
+uv run python tools/verify_shardbound_package.py dist/shardbound          # extracted app: smoke journey + online co-op diagnostic
+```
+
+Artifacts are versioned: `Shardbound-<version>-darwin-arm64-app.zip` on a Mac,
+`Shardbound-<version>-windows-x64-portable.zip` and
+`Shardbound-<version>-windows-x64-setup.exe` on Windows, listed with hashes in
+`build-manifest.json` (`artifacts`) and `SHA256SUMS`. The frozen entry's
+`--online-smoke REPORT --endpoint URL` mode creates a co-op room, joins it,
+applies a build and an exploration from both seats and reclaims the creator's
+seat; the verifier runs it against a loopback server and, on Windows with
+`--public-server`, from the installed executable against the live service.
+The [Windows workflow](../.github/workflows/shardbound-windows.yml) runs the
+smoke journey under a test-only Mesa driver, installs and uninstalls the
+installer, and publishes `shardbound-v*` tags as GitHub releases; the website
+lists accepted releases from `releases/catalog.json`.
+
 Add `--check-campaign` to exercise two complete linked campaigns in the extracted
 app. The direct journey uses four separate app processes; the recovery journey
 uses five, including a restart at the lost-capital recovery decision. Every
@@ -91,7 +112,7 @@ All generated files stay under ignored `build/shardbound/` and
 | Output | Purpose |
 |---|---|
 | `Shardbound.app` | Normal windowed application; open it in Finder |
-| `Shardbound-macos-arm64.zip` | Local archive preserving bundle symbolic links |
+| `Shardbound-<version>-darwin-arm64-app.zip` | Archive preserving bundle symbolic links |
 | `build-manifest.json` | Source and package-data hashes, commit/dirty status, versions, platform, file inventory, archive hash and smoke result |
 | `packaged-smoke.png` | Real title-screen capture from the extracted archive |
 | `packaged-smoke-shard.png` | Real campaign-screen capture from the extracted archive |
@@ -277,7 +298,7 @@ Earlier archives and the original pending playtest are unchanged.
 
 Build on a Windows x64 host using x64 CPython 3.13.2. Run the same uv build
 command above from PowerShell. It produces `Shardbound/Shardbound.exe` and
-`Shardbound-windows-x64.zip`. Preserve the entire application folder; the
+`Shardbound-<version>-windows-x64-portable.zip`. Preserve the entire application folder; the
 executable alone is not the package. PyInstaller requires separate native
 builds for each operating system. [Official multi-platform guidance](https://pyinstaller.org/en/stable/usage.html#supporting-multiple-operating-systems)
 

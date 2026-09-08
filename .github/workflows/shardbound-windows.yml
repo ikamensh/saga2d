@@ -1,107 +1,149 @@
-name: Shardbound Windows build (manual, runtime unverified)
+name: Shardbound Windows installer
 
 on:
+  push:
+    tags: ['shardbound-v*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Explicit version, for example 0.1.0-preview.1'
+        required: true
+        type: string
+      publish:
+        description: 'Publish the matching existing shardbound-vVERSION tag after verification'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: shardbound-windows-build
+  group: shardbound-windows-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   build:
-    runs-on: windows-2025
-    timeout-minutes: 30
+    runs-on: windows-latest
+    timeout-minutes: 60
     defaults:
       run:
         shell: pwsh
     env:
       UV_PYTHON_PREFERENCE: only-managed
-
+      REQUESTED_VERSION: ${{ inputs.version }}
+      REQUESTED_PUBLISH: ${{ inputs.publish }}
     steps:
       - name: Preserve committed bytes for asset provenance
         run: git config --global core.autocrlf false
-
-      - name: Check out the dispatched commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
-
-      - name: Install pinned uv and select CPython
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: '0.12.10'
           python-version: '3.13.2'
           enable-cache: false
-
-      - name: Build without launching a game on the CI runner
+      - name: Resolve exact release identity
         run: |
-          uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py --skip-smoke 2>&1 |
-            Tee-Object -FilePath "$env:RUNNER_TEMP/shardbound-build.log"
+          $version = $env:REQUESTED_VERSION
+          if ($env:GITHUB_REF_TYPE -eq 'tag') { $version = $env:GITHUB_REF_NAME -replace '^shardbound-v', '' }
+          $version = uv run --locked --python 3.13.2 python -c 'import sys; from tools.build_game import version; print(version(sys.argv[1]))' $version
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Verify build identity and prepare the runtime handoff
+          "SHARDBOUND_VERSION=$version" | Add-Content $env:GITHUB_ENV
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -or $env:REQUESTED_PUBLISH -eq 'true') {
+            $revision = git rev-parse "refs/tags/shardbound-v$version^{commit}"
+            if ($LASTEXITCODE -ne 0 -or $revision -ne $env:GITHUB_SHA) { throw 'Publishing requires an existing version tag at the dispatched commit.' }
+          }
+      - name: Run packaging, save and online regression tests
         run: |
-          $output = 'dist/shardbound'
-          $manifest = Get-Content "$output/build-manifest.json" -Raw | ConvertFrom-Json
-          $archive = Get-Item "$output/Shardbound-windows-x64.zip"
-          $digest = (Get-FileHash $archive.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($manifest.source_commit -ne $env:GITHUB_SHA -or $manifest.working_tree_dirty) {
-            throw 'The package does not identify the clean dispatched commit.'
-          }
-          if ($manifest.python -ne '3.13.2' -or $manifest.architecture -notin @('AMD64', 'x86_64')) {
-            throw 'The package was not built with the required x64 CPython 3.13.2.'
-          }
-          if ($manifest.artifact.file -ne $archive.Name -or $manifest.artifact.sha256 -ne $digest -or
-              $manifest.artifact.bytes -ne $archive.Length) {
-            throw 'The ZIP differs from its build manifest.'
-          }
-          if ($null -ne $manifest.smoke -or $manifest.release_ready) {
-            throw 'A build-only job must not claim runtime or release acceptance.'
-          }
-          $locks = @{}
-          foreach ($file in @('uv.lock', 'packaging/requirements.txt')) {
-            $locks[$file] = (Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()
-          }
-          [ordered]@{
-            source_commit = $manifest.source_commit
-            workflow_ref = $env:GITHUB_WORKFLOW_REF
-            workflow_sha = $env:GITHUB_WORKFLOW_SHA
+          uv run --locked --python 3.13.2 --extra dev python -m pytest tests/packaging/test_eador_build.py tests/packaging/test_eador_smoke.py tests/packaging/test_eador_campaign.py tests/test_online_server.py tests/test_online_checkpoints.py tests/test_online_menu.py tests/test_release.py -q
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build pinned runtime, portable ZIP and per-user installer
+        run: |
+          $compiler = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe'
+          if (-not (Test-Path $compiler)) { throw 'The Windows runner is missing its documented Inno Setup compiler.' }
+          uv run --locked --isolated --python 3.13.2 --with-requirements packaging/requirements.txt python tools/build_eador.py --version $env:SHARDBOUND_VERSION --skip-smoke --installer --iscc $compiler --require-clean
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          @{
             run_url = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
-            run_attempt = $env:GITHUB_RUN_ATTEMPT
+            commit = $env:GITHUB_SHA
             runner_image = $env:ImageOS
             runner_image_version = $env:ImageVersion
-            runner_architecture = $env:RUNNER_ARCH
-            uv = (uv --version)
-            lock_sha256 = $locks
-            artifact = $manifest.artifact
-            runtime_verified = $false
-            scope = 'Windows x64 build only. Clean interactive Windows runtime and G14 remain unverified.'
-          } | ConvertTo-Json -Depth 5 | Set-Content "$output/workflow-build.json" -Encoding utf8
-          "$digest  $($archive.Name)" | Set-Content "$output/SHA256SUMS" -Encoding ascii
-          Copy-Item "$env:RUNNER_TEMP/shardbound-build.log" "$output/build.log"
-          Copy-Item docs/windows-shardbound.md "$output/windows-runtime-handoff.md"
+            inno_setup = (Get-Item $compiler).VersionInfo.ProductVersion
+          } | ConvertTo-Json | Set-Content dist/shardbound/workflow-build.json -Encoding utf8
+      - name: Prepare pinned Mesa WGL driver for native CI checks only
+        run: |
+          $url = 'https://github.com/pal1000/mesa-dist-win/releases/download/26.2.0/mesa3d-26.2.0-release-msvc.7z'
+          $expected = 'dcb2719ef346dab5b609fcb193a5f13cfc4b0502e3f4de1ad43d349477402f47'
+          $archive = Join-Path $env:RUNNER_TEMP 'mesa3d-26.2.0-release-msvc.7z'
+          $folder = Join-Path $env:RUNNER_TEMP 'shardbound-mesa-test'
+          Invoke-WebRequest $url -OutFile $archive
+          $digest = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($digest -ne $expected) { throw 'Mesa test archive differs from its pinned SHA-256.' }
+          7z x $archive "-o$folder" 'x64/opengl32.dll' 'x64/libgallium_wgl.dll' -y
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "SHARDBOUND_TEST_MESA=$folder/x64" | Add-Content $env:GITHUB_ENV
+          @{
+            version = '26.2.0'
+            source = $url
+            archive_sha256 = $digest
+            scope = 'Software WGL driver for native CI only; absent from shipping ZIP and installer.'
+          } | ConvertTo-Json | Set-Content dist/shardbound/mesa-test-context.json -Encoding utf8
+      - name: Verify extracted and installed executables, native smoke and online co-op
+        run: |
+          uv run --locked --python 3.13.2 python tools/verify_shardbound_package.py dist/shardbound --mesa-dir $env:SHARDBOUND_TEST_MESA --public-server wss://games.tachyon-ai.eu/play
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $result = Get-Content dist/shardbound/verification.json -Raw | ConvertFrom-Json
+          if (-not $result.passed -or -not $result.install_shortcut_uninstall -or -not $result.installed.public_server.create_join -or $result.source_commit -ne $env:GITHUB_SHA) {
+            throw 'Package verification did not accept the dispatched build.'
+          }
           @(
-            'Windows x64 build completed; runtime remains UNVERIFIED.'
-            "Source: $($manifest.source_commit)"
-            "ZIP SHA-256: $digest"
-            'Download the artifact and follow windows-runtime-handoff.md on a clean interactive Windows account.'
-          ) | Add-Content $env:GITHUB_STEP_SUMMARY
-
-      - name: Retain the manually requested build for 14 days
+            "Shardbound $env:SHARDBOUND_VERSION"
+            ''
+            "Source: $env:GITHUB_SHA"
+            ''
+            'Download the setup EXE, run it, and launch Shardbound from the Start menu. No Python or administrator account is required.'
+            'For online co-op choose Co-op, create a room, and send the invite link. Installation steps: https://games.tachyon-ai.eu/shardbound/'
+            ''
+            'CI ran the frozen smoke journey (title, About, settings, shard, codex, rival, battle and saves) in the extracted and installed applications with a test-only software GL driver, and the online co-op diagnostic against a loopback authority; the installed executable also passed that diagnostic over TLS against wss://games.tachyon-ai.eu/play. Shortcut creation and uninstall passed.'
+            'The installer is unsigned. This is a development preview; CI host checks are recorded in verification.json and do not establish GPU or audio quality on every Windows PC.'
+          ) | Set-Content dist/shardbound/release-notes.md -Encoding utf8
+      - name: Retain build and verification evidence
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: shardbound-windows-x64-${{ github.sha }}-${{ github.run_attempt }}
+          name: shardbound-windows-${{ github.sha }}-${{ github.run_attempt }}
           path: |
-            dist/shardbound/Shardbound-windows-x64.zip
-            dist/shardbound/build-manifest.json
-            dist/shardbound/workflow-build.json
+            dist/shardbound/*-setup.exe
+            dist/shardbound/*-portable.zip
+            dist/shardbound/*.json
             dist/shardbound/SHA256SUMS
-            dist/shardbound/build.log
-            dist/shardbound/windows-runtime-handoff.md
-          if-no-files-found: error
+            dist/shardbound/release-notes.md
+            dist/shardbound/verification/
+          if-no-files-found: warn
           compression-level: 0
-          retention-days: 14
+          retention-days: 30
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/shardbound-v') || inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: shardbound-windows-${{ github.sha }}-${{ github.run_attempt }}
+          path: release
+      - name: Publish the verified version without replacing existing assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version=$(python -c 'import json; print(json.load(open("release/build-manifest.json"))["version"])')
+          flags=()
+          if [[ "$version" == *-* ]]; then flags+=(--prerelease); fi
+          gh release create "shardbound-v$version" --verify-tag --title "Shardbound $version" --notes-file release/release-notes.md "${flags[@]}" \
+            release/*-setup.exe release/*-portable.zip release/SHA256SUMS release/build-manifest.json release/verification.json release/workflow-build.json release/mesa-test-context.json

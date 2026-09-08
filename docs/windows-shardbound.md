@@ -1,22 +1,21 @@
 # Shardbound Windows x64 build and runtime handoff
 
-The [manual workflow](../.github/workflows/shardbound-windows.yml) prepares an
-**unverified development package**. It has no push, pull-request, schedule or
-deployment trigger. A maintainer must explicitly choose **Run workflow** in
-GitHub Actions. Adding this file locally does not run it or upload an artifact.
-The workflow must first exist on the repository's default branch for manual
-dispatch to become available. This document does not authorize a push or run.
+The [Windows workflow](../.github/workflows/shardbound-windows.yml) builds the
+portable ZIP and per-user installer, runs the frozen smoke journey and the online
+co-op diagnostic in the extracted and installed applications (with a test-only
+Mesa driver), uninstalls, and publishes a `shardbound-v*` tag as a GitHub
+release. A `workflow_dispatch` with a version builds and verifies without
+publishing unless `publish` is set and the tag exists at that commit.
 
 ## Prepare the build
 
-When a Windows build is explicitly requested, select **Shardbound Windows build
-(manual, runtime unverified)** and the reviewed branch or tag. The job checks out
-the dispatch's exact commit, uses the x64 `windows-2025` runner, and runs:
+The job checks out the exact commit, uses the x64 Windows runner, and runs:
 
 ```sh
 uv run --locked --isolated --python 3.13.2 \
   --with-requirements packaging/requirements.txt \
-  python tools/build_eador.py --skip-smoke
+  python tools/build_eador.py --version VERSION --skip-smoke --installer --require-clean
+uv run python tools/verify_shardbound_package.py dist/shardbound --mesa-dir MESA --public-server wss://games.tachyon-ai.eu/play
 ```
 
 CPython 3.13.2, uv 0.12.10 and the action revisions are pinned. Runtime packages
@@ -30,23 +29,26 @@ promised. The job has read-only repository access, no persistent cache, a
 After a successful build, download the workflow artifact before its 14-day
 retention expires. Keep these files together:
 
-- `Shardbound-windows-x64.zip`: the application and its bundled runtime/assets.
+- `Shardbound-VERSION-windows-x64-setup.exe` and `-portable.zip`: the installer
+  and the application folder with its bundled runtime/assets.
 - `build-manifest.json`: exact source, Python/build versions, asset inventory,
-  file hashes and ZIP identity; `smoke` is null and `release_ready` is false.
-- `workflow-build.json`, `SHA256SUMS` and `build.log`: run URL, workflow commit,
-  runner/uv versions, lock hashes and independently checked ZIP hash.
-- `windows-runtime-handoff.md`: this checklist.
+  file hashes and artifact identity; `release_ready` stays false because the
+  Early Access gates are separate from distribution.
+- `verification.json` and `verification/`: smoke frames, loopback and public
+  online receipts, install and uninstall logs from the CI host.
+- `workflow-build.json`, `SHA256SUMS` and `mesa-test-context.json`.
 
 The Actions artifact wrapper has its own digest. Compare the **inner application
 ZIP** with `SHA256SUMS` and `build-manifest.json`. In PowerShell, after extracting
 the workflow download:
 
 ```powershell
-Get-FileHash .\Shardbound-windows-x64.zip -Algorithm SHA256
+Get-FileHash .\Shardbound-VERSION-windows-x64-setup.exe -Algorithm SHA256
 ```
 
-No app is launched by this workflow. A green job proves a build, not clean
-Windows runtime acceptance, platform support or G14 completion.
+A green job proves the build and the automated checks on the CI host with a
+software GL driver. It does not establish clean interactive Windows
+acceptance on real hardware, platform support or G14 completion.
 
 ## Clean interactive Windows check
 
