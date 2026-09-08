@@ -1,0 +1,605 @@
+{
+  "status": "passed",
+  "server": "wss://games.tachyon-ai.eu/play",
+  "room": "tmnv1gx59wt6",
+  "local_ai": false,
+  "orders": [
+    {
+      "action": "move",
+      "entity": 8,
+      "revision": 14,
+      "tick": 12,
+      "received_state": {
+        "id": 8,
+        "type": "peasant",
+        "player": 1,
+        "x": 38.5,
+        "y": 29.5,
+        "hp": 30,
+        "facing": 1.5707963267948966,
+        "orders": [
+          {
+            "kind": "Move",
+            "target": [
+              37.5,
+              31.5
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "idle",
+        "charge": 0.0
+      },
+      "target": [
+        37.5,
+        31.5
+      ]
+    },
+    {
+      "action": "harvest",
+      "entity": 8,
+      "revision": 17,
+      "tick": 17,
+      "received_state": {
+        "id": 8,
+        "type": "peasant",
+        "player": 1,
+        "x": 37.90000000000001,
+        "y": 29.5,
+        "hp": 30,
+        "facing": 3.141592653589793,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              33,
+              30
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "idle",
+        "charge": 0.0
+      },
+      "target": [
+        33,
+        30
+      ]
+    },
+    {
+      "action": "train",
+      "entity": 6,
+      "revision": 45,
+      "tick": 67,
+      "received_state": {
+        "id": 6,
+        "type": "town_hall",
+        "player": 1,
+        "x": 38,
+        "y": 30,
+        "hp": 1200,
+        "progress": 60.0,
+        "queue": [
+          "peasant"
+        ],
+        "train_progress": 0.0,
+        "rally": null,
+        "gold": 0,
+        "builder": null,
+        "cooldown": 0.0,
+        "research": null,
+        "research_progress": 0.0
+      },
+      "unit_type": "peasant"
+    },
+    {
+      "action": "scout",
+      "entity": 9,
+      "revision": 49,
+      "tick": 72,
+      "received_state": {
+        "id": 9,
+        "type": "peasant",
+        "player": 1,
+        "x": 39.5,
+        "y": 29.5,
+        "hp": 30,
+        "facing": 1.5707963267948966,
+        "orders": [
+          {
+            "kind": "Move",
+            "target": [
+              11.28,
+              10.538922155688624
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "idle",
+        "charge": 0.0
+      },
+      "target": [
+        11.5,
+        10.5
+      ]
+    }
+  ],
+  "screenshots": [
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/01-online-room.png",
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/02-connected-base.png",
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/03-authoritative-chopping.png",
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/04-authoritative-training.png",
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/05-remote-ai-visible.png",
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/06-remote-ai-progression.png",
+    "/Users/ikamen/ai-workspace/experiments/by_kodo/saga2d/docs/evidence/warband-internet-2026-09-08/07-local-economy.png"
+  ],
+  "player": 1,
+  "opponent": 0,
+  "initial_tick": 6,
+  "seed": 3,
+  "map_size": [
+    48,
+    40
+  ],
+  "opponent_before": {
+    "tick": 6,
+    "revision": 8,
+    "player": {
+      "id": 0,
+      "human": true,
+      "gold": 1000,
+      "lumber": 500,
+      "alive": true,
+      "last_alert": -1000.0,
+      "upgrades": []
+    },
+    "units": [
+      {
+        "id": 3,
+        "type": "peasant",
+        "player": 0,
+        "x": 7.98,
+        "y": 10.5,
+        "hp": 30,
+        "facing": 0.0,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              8
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "move",
+        "charge": 0.0
+      },
+      {
+        "id": 4,
+        "type": "peasant",
+        "player": 0,
+        "x": 8.739999999999998,
+        "y": 10.5,
+        "hp": 30,
+        "facing": 0.0,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              8
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "move",
+        "charge": 0.0
+      },
+      {
+        "id": 5,
+        "type": "peasant",
+        "player": 0,
+        "x": 9.5,
+        "y": 10.5,
+        "hp": 30,
+        "facing": 1.5707963267948966,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              8
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "idle",
+        "charge": 0.0
+      }
+    ],
+    "buildings": [
+      {
+        "id": 1,
+        "type": "town_hall",
+        "player": 0,
+        "x": 7,
+        "y": 7,
+        "hp": 1200,
+        "progress": 60.0,
+        "queue": [],
+        "train_progress": 0.0,
+        "rally": null,
+        "gold": 0,
+        "builder": null,
+        "cooldown": 0.0,
+        "research": null,
+        "research_progress": 0.0
+      }
+    ]
+  },
+  "visible_opponent": {
+    "id": 14,
+    "position": [
+      13.459999999999994,
+      10.5
+    ],
+    "tick": 378,
+    "state": {
+      "id": 14,
+      "type": "peasant",
+      "player": 0,
+      "x": 13.459999999999994,
+      "y": 10.5,
+      "hp": 30,
+      "facing": -0.7657928325402407,
+      "orders": [
+        {
+          "kind": "Harvest",
+          "target": [
+            14,
+            9
+          ]
+        }
+      ],
+      "cooldown": 0.0,
+      "carrying": null,
+      "carry": 0,
+      "timer": 2.6499999999999986,
+      "inside": null,
+      "constructing": null,
+      "home": null,
+      "state": "chop",
+      "charge": 0.0
+    }
+  },
+  "visible_opponent_progress": [
+    {
+      "id": 5,
+      "type": "peasant",
+      "player": 0,
+      "x": 13.038735642010533,
+      "y": 9.108563587621253,
+      "hp": 30,
+      "facing": -0.8561824466646054,
+      "orders": [],
+      "cooldown": 0.0,
+      "carrying": null,
+      "carry": 0,
+      "timer": 0.0,
+      "inside": null,
+      "constructing": null,
+      "home": null,
+      "state": "idle",
+      "charge": 0.0
+    },
+    {
+      "id": 14,
+      "type": "peasant",
+      "player": 0,
+      "x": 13.459999999999994,
+      "y": 10.5,
+      "hp": 30,
+      "facing": -0.7657928325402407,
+      "orders": [
+        {
+          "kind": "Harvest",
+          "target": [
+            14,
+            9
+          ]
+        }
+      ],
+      "cooldown": 0.0,
+      "carrying": null,
+      "carry": 0,
+      "timer": 3.049999999999997,
+      "inside": null,
+      "constructing": null,
+      "home": null,
+      "state": "chop",
+      "charge": 0.0
+    }
+  ],
+  "harvest_result": {
+    "unit": {
+      "id": 8,
+      "type": "peasant",
+      "player": 1,
+      "x": 37.09999999999999,
+      "y": 29.5,
+      "hp": 30,
+      "facing": 0.0,
+      "orders": [
+        {
+          "kind": "Deposit"
+        },
+        {
+          "kind": "Harvest",
+          "target": [
+            32,
+            30
+          ]
+        }
+      ],
+      "cooldown": 0.0,
+      "carrying": "lumber",
+      "carry": 100,
+      "timer": 0.0,
+      "inside": null,
+      "constructing": null,
+      "home": null,
+      "state": "idle",
+      "charge": 0.0
+    },
+    "initial_lumber": 500,
+    "final_lumber": 600
+  },
+  "final_tick": 386,
+  "opponent_after": {
+    "tick": 386,
+    "revision": 213,
+    "player": {
+      "id": 0,
+      "human": true,
+      "gold": 100,
+      "lumber": 450,
+      "alive": true,
+      "last_alert": -1000.0,
+      "upgrades": []
+    },
+    "units": [
+      {
+        "id": 3,
+        "type": "peasant",
+        "player": 0,
+        "x": 7.0,
+        "y": 12.0,
+        "hp": 30,
+        "facing": 0.1764704735782205,
+        "orders": [
+          {
+            "kind": "Build",
+            "type": "farm",
+            "pos": [
+              6,
+              11
+            ],
+            "building": 13
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": 13,
+        "home": null,
+        "state": "build",
+        "charge": 0.0
+      },
+      {
+        "id": 4,
+        "type": "peasant",
+        "player": 0,
+        "x": 13.5,
+        "y": 7.5,
+        "hp": 30,
+        "facing": -0.7853981633974483,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              6
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 3.4499999999999957,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "chop",
+        "charge": 0.0
+      },
+      {
+        "id": 5,
+        "type": "peasant",
+        "player": 0,
+        "x": 13.038735642010533,
+        "y": 9.108563587621253,
+        "hp": 30,
+        "facing": -0.8561824466646054,
+        "orders": [],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 0.0,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "idle",
+        "charge": 0.0
+      },
+      {
+        "id": 14,
+        "type": "peasant",
+        "player": 0,
+        "x": 13.459999999999994,
+        "y": 10.5,
+        "hp": 30,
+        "facing": -0.7657928325402407,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              9
+            ]
+          }
+        ],
+        "cooldown": 0.0,
+        "carrying": null,
+        "carry": 0,
+        "timer": 3.049999999999997,
+        "inside": null,
+        "constructing": null,
+        "home": null,
+        "state": "chop",
+        "charge": 0.0
+      }
+    ],
+    "buildings": [
+      {
+        "id": 1,
+        "type": "town_hall",
+        "player": 0,
+        "x": 7,
+        "y": 7,
+        "hp": 1200,
+        "progress": 60.0,
+        "queue": [],
+        "train_progress": 0.0,
+        "rally": null,
+        "gold": 0,
+        "builder": null,
+        "cooldown": 0.0,
+        "research": null,
+        "research_progress": 0.0
+      },
+      {
+        "id": 13,
+        "type": "farm",
+        "player": 0,
+        "x": 6,
+        "y": 11,
+        "hp": 282,
+        "progress": 17.650000000000116,
+        "queue": [],
+        "train_progress": 0.0,
+        "rally": null,
+        "gold": 0,
+        "builder": 3,
+        "cooldown": 0.0,
+        "research": null,
+        "research_progress": 0.0
+      }
+    ]
+  },
+  "trained_units": [
+    15
+  ],
+  "remote_progress": {
+    "moved_units": [
+      3,
+      4,
+      5
+    ],
+    "new_units": [
+      14
+    ],
+    "construction": [
+      13
+    ],
+    "active_orders": [
+      {
+        "unit": 3,
+        "orders": [
+          {
+            "kind": "Build",
+            "type": "farm",
+            "pos": [
+              6,
+              11
+            ],
+            "building": 13
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              6
+            ]
+          }
+        ]
+      },
+      {
+        "unit": 14,
+        "orders": [
+          {
+            "kind": "Harvest",
+            "target": [
+              14,
+              9
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "elapsed_seconds": 21.613
+}

@@ -1,0 +1,8 @@
+saga2d-warband-ai
+saga2d-warband-aiExecMainStatus=0
+MemoryCurrent=20545536
+CPUUsageNSec=3973037000
+ActiveState=active
+SubState=running
+/opt/saga2d-warband-ai/current/.venv/bin/python -u -m warband.online_ai --create --server wss://games.tachyon-ai.eu/play --difficulty normal --duration 600.0
+ESTAB 0      0      51.158.175.125:54444 51.159.207.49:443 users:(("python",pid=3261,fd=6))

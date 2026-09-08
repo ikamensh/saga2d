@@ -1,0 +1,25 @@
+Started saga2d-warband-ai.service - /opt/saga2d-warband-ai/current/.venv/bin/python -u -m warband.online_ai --create --server wss://games.tachyon-ai.eu/play --difficulty normal --duration 600.0.
+{"event":"created","room":"tmnv1gx59wt6","player":0,"difficulty":"normal"}
+{"event":"authoritative_state","revision":1,"tick":0,"world_time":0.0,"ready":false,"player":0,"gold":1000,"lumber":500,"units":3,"buildings":1,"winner":null,"order_counts":{},"unit_orders":[],"training_queue":0,"researching":0}
+{"event":"match_ready","revision":2}
+{"event":"authoritative_state","revision":2,"tick":0,"world_time":0.0,"ready":true,"player":0,"gold":1000,"lumber":500,"units":3,"buildings":1,"winner":null,"order_counts":{},"unit_orders":[],"training_queue":0,"researching":0}
+{"event":"order_submitted","sequence":1,"revision":2,"tick":0,"command":{"action":"smart","args":[[3],[14.5,8.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":2,"revision":4,"tick":2,"command":{"action":"smart","args":[[4],[14.5,8.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":3,"revision":6,"tick":4,"command":{"action":"smart","args":[[5],[14.5,8.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":4,"revision":8,"tick":6,"command":{"action":"build","args":[3,"barracks",[8,12]],"kwargs":{}}}
+{"event":"order_submitted","sequence":5,"revision":10,"tick":8,"command":{"action":"train","args":[1,"peasant"],"kwargs":{}}}
+{"event":"order_submitted","sequence":6,"revision":24,"tick":30,"command":{"action":"smart","args":[[3],[14.5,8.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":7,"revision":26,"tick":32,"command":{"action":"build","args":[3,"farm",[6,11]],"kwargs":{}}}
+{"event":"authoritative_state","revision":63,"tick":100,"world_time":4.99999999999999,"ready":true,"player":0,"gold":100,"lumber":250,"units":3,"buildings":2,"winner":null,"order_counts":{"Build":1,"Harvest":2},"unit_orders":[{"unit":3,"order":{"kind":"Build","type":"farm","pos":[6,11],"building":13}},{"unit":4,"order":{"kind":"Harvest","target":[14,8]}},{"unit":5,"order":{"kind":"Harvest","target":[14,8]}}],"training_queue":1,"researching":0}
+{"event":"authoritative_state","revision":113,"tick":200,"world_time":10.000000000000007,"ready":true,"player":0,"gold":100,"lumber":350,"units":3,"buildings":2,"winner":null,"order_counts":{"Build":1,"Harvest":1},"unit_orders":[{"unit":3,"order":{"kind":"Build","type":"farm","pos":[6,11],"building":13}},{"unit":4,"order":{"kind":"Harvest","target":[14,7]}}],"training_queue":1,"researching":0}
+{"event":"order_submitted","sequence":8,"revision":122,"tick":218,"command":{"action":"smart","args":[[5],[14.5,7.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":9,"revision":138,"tick":248,"command":{"action":"smart","args":[[5],[14.5,7.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":10,"revision":154,"tick":278,"command":{"action":"smart","args":[[5],[14.5,9.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":11,"revision":156,"tick":280,"command":{"action":"smart","args":[[14],[14.5,9.5]],"kwargs":{"queue":false}}}
+{"event":"authoritative_state","revision":167,"tick":300,"world_time":15.000000000000078,"ready":true,"player":0,"gold":100,"lumber":450,"units":4,"buildings":2,"winner":null,"order_counts":{"Build":1,"Harvest":2},"unit_orders":[{"unit":3,"order":{"kind":"Build","type":"farm","pos":[6,11],"building":13}},{"unit":4,"order":{"kind":"Harvest","target":[14,6]}},{"unit":14,"order":{"kind":"Harvest","target":[14,9]}}],"training_queue":0,"researching":0}
+{"event":"order_submitted","sequence":12,"revision":171,"tick":308,"command":{"action":"smart","args":[[5],[14.5,9.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":13,"revision":187,"tick":338,"command":{"action":"smart","args":[[5],[14.5,9.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":14,"revision":203,"tick":368,"command":{"action":"smart","args":[[5],[14.5,9.5]],"kwargs":{"queue":false}}}
+{"event":"order_submitted","sequence":15,"revision":219,"tick":398,"command":{"action":"smart","args":[[5],[14.5,9.5]],"kwargs":{"queue":false}}}
+{"event":"authoritative_state","revision":220,"tick":399,"world_time":19.95000000000015,"ready":true,"player":0,"gold":100,"lumber":450,"units":4,"buildings":2,"winner":null,"order_counts":{"Build":1,"Harvest":3},"unit_orders":[{"unit":3,"order":{"kind":"Build","type":"farm","pos":[6,11],"building":13}},{"unit":4,"order":{"kind":"Harvest","target":[14,6]}},{"unit":5,"order":{"kind":"Harvest","target":[14,9]}},{"unit":14,"order":{"kind":"Harvest","target":[14,9]}}],"training_queue":0,"researching":0}
+{"event":"match_paused","revision":223}

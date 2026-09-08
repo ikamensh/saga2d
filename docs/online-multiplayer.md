@@ -15,6 +15,9 @@ Use the same game build on both computers. Rooms have two seats:
 | Warband | Competitive, simultaneous RTS | Orders and the 20 Hz simulation clock |
 | Shardbound | Shared-realm campaign co-op | Campaign decisions, tactical orders and campaign progression |
 
+Warband also supports a [headless AI client on a separate computer](warband-remote-ai.md)
+that takes one ordinary player seat, for testing or playing against a remote bot.
+
 The creator's selected map and campaign options configure the room. Both
 players receive the server's world, including the creator. The room starts
 when both connect and pauses whenever a seat disconnects. Menus do not pause
