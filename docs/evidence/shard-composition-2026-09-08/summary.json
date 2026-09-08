@@ -1,0 +1,27 @@
+{
+  "source_checkpoint": "87cd67af08ca711f25471c7eaa9a19546a6d0e2f",
+  "receipts": {
+    "solo": {
+      "source_matches_checkpoint": true,
+      "source_files": 5
+    },
+    "concurrent": {
+      "source_matches_checkpoint": true,
+      "source_files": 9
+    }
+  },
+  "tests": {
+    "passed": 21,
+    "pytest_seconds": 12.2,
+    "wall_seconds": 12.437430332996882,
+    "cpu_seconds": 3.098269,
+    "selection": [
+      "tests/eador/test_shard_map.py",
+      "tests/eador/test_shard_reading.py",
+      "tests/eador/test_difficulty_scene.py::test_challenge_explains_base_production_and_its_live_finite_rival_window",
+      "tests/eador/test_concurrent_scene.py"
+    ]
+  },
+  "retained_final_pngs": 14,
+  "retained_iteration_pngs": 4
+}

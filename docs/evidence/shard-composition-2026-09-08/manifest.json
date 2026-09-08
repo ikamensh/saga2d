@@ -1,0 +1,92 @@
+{
+  "files": {
+    "README.md": {
+      "sha256": "338310886dc1092789e47d01b169944e1865ee2306c4862df42af6dcee7a10d9",
+      "bytes": 3486
+    },
+    "accepted/linked-opening-125-home.png": {
+      "sha256": "a168fa8fb79f029bdb1310edf4ce2f50a36aef4e0629a494afa95a0cf15abef0",
+      "bytes": 2217835
+    },
+    "accepted/linked-opening-125-hover-word.png": {
+      "sha256": "e3a025d26917a38b11bce0c4ff73e05b8154fde7c2ca1bdce20b0edaf6e4fd8f",
+      "bytes": 2212414
+    },
+    "accepted/linked-opening-125-hover.png": {
+      "sha256": "2066d587a0eadc82af10a05b4cfbcd14838c41a3bc98fb8a49fcd762a5213139",
+      "bytes": 2211424
+    },
+    "accepted/linked-opening-125-neighbor.png": {
+      "sha256": "753fbef80dcd2755a748ca80f9afaa44e4a363e14dd87053fbac39ff70741ad3",
+      "bytes": 2236797
+    },
+    "accepted/linked-opening-125-north.png": {
+      "sha256": "c88ab0d305b812537729f0d88e3bd08e89c5a57577299d0ff508913c8895de77",
+      "bytes": 2233869
+    },
+    "accepted/linked-opening-125-south.png": {
+      "sha256": "564ca4d3df900a9ca1b06469cbfba6cc9765d083314892c7b325582fbad63b01",
+      "bytes": 2236124
+    },
+    "accepted/longest-contract-125-home.png": {
+      "sha256": "9f9784ff4821cdbfc3e9592d6915a24b167a97935b34cbfa8614b5a2ea6a731b",
+      "bytes": 2240562
+    },
+    "accepted/no-actions-125-home.png": {
+      "sha256": "82f8702d1cb41564301f210b854f4b211dd1c8dba38e021095b728a353ed4013",
+      "bytes": 2195800
+    },
+    "accepted/paid-full-army-125-home.png": {
+      "sha256": "20e4f8e53e13f730b75ba9fefef7fa1604f66d3446490d85483e737e16710f97",
+      "bytes": 2198652
+    },
+    "accepted/ruins-opening-125-home.png": {
+      "sha256": "67d5e2b8569c9a142979a1a21d0af09c3d863fdd676f9009117d41458c970c87",
+      "bytes": 2195389
+    },
+    "accepted/saved-encircled-125-home.png": {
+      "sha256": "e48295b1ea6d2eab56b63d490cd088b3d81f8c215a5fc976a40b55e6aa4e03b8",
+      "bytes": 2173678
+    },
+    "accepted/solo-opening-100-home.png": {
+      "sha256": "72bc2a10ba3f69ddda33654e901fdf3af4bd8eeefddcd5222f5f7466dd60d3f5",
+      "bytes": 2174131
+    },
+    "baseline/frontier-home.png": {
+      "sha256": "8ff6d70cd901c76b5458f0f20c94fec1fbab59471e60bc34b506e9766f55d581",
+      "bytes": 2123723
+    },
+    "baseline/frontier-hover.png": {
+      "sha256": "b483762fe995f69011563935809ca9fb04dfcdab029873603fda3ddb88219cdb",
+      "bytes": 2106509
+    },
+    "concurrent/01-map.png": {
+      "sha256": "e42c5ae5363f4c70046e1c29740a2be8e54179a902c810ea7ddc8e9a1cc0ed7c",
+      "bytes": 2378878
+    },
+    "concurrent/10-map-large-text.png": {
+      "sha256": "614fd9d42625683b19859224d6dcb23d660416825e883c8998c078c81bcab1e1",
+      "bytes": 2376407
+    },
+    "concurrent-verification.json": {
+      "sha256": "6b514d5cb973b30966d07924c91cc2c7a31e8391354437f9b340e6f3acc5e01a",
+      "bytes": 335450
+    },
+    "pass-1/frontier-hover.png": {
+      "sha256": "96675ac124ae6daf755c8a57d3d6b156dbee7624abb8854323baa0b772a3b4d6",
+      "bytes": 2118091
+    },
+    "pass-2/ruins-neighbor.png": {
+      "sha256": "51f644084d5ff31f200c19da76642d94de9d03b11a057914b0d9b096203f7a9c",
+      "bytes": 2241590
+    },
+    "solo-verification.json": {
+      "sha256": "d4e3e3812817d287db4c1aebe03e2009bb56286c440c4c67e173cba972cf5d1e",
+      "bytes": 5548
+    },
+    "summary.json": {
+      "sha256": "9e50e40b45b8f39fb8deda4f92b8d854a78f513792eaacdbbed6d51429215602",
+      "bytes": 734
+    }
+  }
+}
