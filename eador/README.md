@@ -142,6 +142,12 @@ adds mana to support the two spells already learned.
 
 ## Controls
 
+The shard keeps only capital names and announced rival destinations on the
+terrain. Hover a province to read its full name, or select it to inspect its
+defenders and adventure in the right panel. At your hero's location, the large
+Explore button enters the local adventure; selecting a neighbor exposes Travel
+or Invade instead. End turn stays at the bottom of the panel.
+
 | Screen | Input | Action |
 |---|---|---|
 | Title | Tab / click class | Choose hero class |
@@ -156,6 +162,7 @@ adds mana to support the two spells already learned.
 | Settings | Up / Down, Left / Right | Select a row, adjust its value |
 | Settings | Enter / Esc | Apply preferences / cancel live preview |
 | Shard | Click province | Select and inspect it |
+| Shard | Hover province | Reveal its full name without spending an action |
 | Shard | Tab | Cycle provinces adjacent to the hero |
 | Shard | Home | Select the hero's current province |
 | Shard | V | Inspect the rival's expedition and next order |
