@@ -1,0 +1,31 @@
+Local native performance comparison, 2026-09-08
+
+Fixture: tools.perf_warband.battle, 150 spawned soldiers plus starting workers.
+Units/images fully pre-rendered; 12 settling frames, then 360 frames paced at
+30 FPS with tools.native_frames.tick. Pacing excluded from measured Game.tick.
+FrameTimer wraps world.step, view.sync, scene.draw, backend.end_frame.
+No profiler or tracemalloc. Both comparisons ended with 136 units alive.
+Baseline loads warband/textures.py and warband/view.py from b7f8eb6^; current
+loads the art overhaul. Both use the same other source and seeded fixture.
+
+Baseline: all 360 frames p50 8.3 ms, p95 17.5 ms, max 39.5 ms.
+Current:  all 360 frames p50 8.9 ms, p95 18.5 ms, max 42.0 ms.
+
+Late 120 frames:
+Baseline: p50 7.92 ms, p95 14.56 ms, max 36.77 ms.
+Current:  p50 8.45 ms, p95 18.38 ms, max 36.51 ms.
+
+Mean component times over all 360 frames:
+                  baseline   current
+backend.end_frame  4.89 ms    5.09 ms
+world.step         3.49 ms    3.83 ms  (120 fixed simulation steps)
+view.sync          1.12 ms    1.27 ms
+scene.draw         0.83 ms    0.88 ms
+
+Earlier 180-frame current-only check (148 units alive): p50 7.25 ms,
+p95 16.68 ms, max 31.84 ms. The 10_battle.png capture is from this run.
+
+The art is pre-rendered; it adds no per-frame mesh growth. This short local
+comparison shows a modest mean rendering increase but does NOT establish the
+project's W10 p95 <16 ms gate. That target remains unmet in this current run.
+These are bounded checks, not a long-match or multiplayer performance soak.

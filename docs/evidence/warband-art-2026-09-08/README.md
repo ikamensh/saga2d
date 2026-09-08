@@ -21,4 +21,7 @@ forest/mine variants after loading, the harvesting-to-carry transition, pause
 behavior, and incremental image warming. A separate image digest check found
 twenty different rendered images in every resource bank (140 total).
 
-These are local art and rendering checks, not a multiplayer or long-match soak.
+The bounded 150-unit battle comparison is in `performance.txt`. Current
+late-frame p95 was 18.38 ms versus 14.56 ms for the previous art; this does
+not pass the project's 16 ms W10 target. Average backend drawing increased
+from 4.89 to 5.09 ms. These are local checks, not a multiplayer or long-match soak.
