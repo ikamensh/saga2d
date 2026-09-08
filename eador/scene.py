@@ -934,7 +934,8 @@ class CatalogScene(Screen):
         x, y = self.x, self.y
         self.draw_rect(0, 0, self.game.width, self.game.height, (6, 14, 19, 200))
         self.box(x, y, 1040, 740)
-        self.text('WESTWATCH / STRONGHOLD', x + 24, y + 22, size=10, color=GOLD)
+        capital = self.root.state.provinces[self.root.state.capital].name.upper()
+        self.text(capital + ' / STRONGHOLD', x + 24, y + 22, size=10, color=GOLD)
         title = 'Choose a fresh recruit' if self.outgoing_id is not None else 'Build your kingdom' if self.kind == 'build' else 'Raise an army'
         self.text(title, x + 24, y + 46, size=31, serif=True)
         self.text(f'Page {self.page + 1}/{self.pages}', x + 400, y + 696, size=12, color=MUTED)
@@ -1013,7 +1014,6 @@ class HelpScene(Screen):
 
 
 class BattleScene(Screen):
-    accepts_orders = True
     unit_orders = {
         'pin': ('Pin', 'P', 'attack_hit', 'Choose an unpinned enemy in sight within 3 hexes.'),
         'swap': ('Swap ally', 'S', 'move', 'Choose an adjacent ally. Both moves are spent; its unspent action remains.'),
@@ -1033,7 +1033,7 @@ class BattleScene(Screen):
         self.selected = None
         self.targeting = None
         self.hover = None
-        self.cursor = self.battle.unit(0).pos
+        self.cursor = self.battle.unit(self.hero_id if self.hero_id is not None else self.battle.units[0].id).pos
         self.floats = []
         self.clock = 0.0
         self.feedback = None
@@ -1044,13 +1044,39 @@ class BattleScene(Screen):
         return self.root.state.battle
 
     @property
+    def team(self):
+        return getattr(self.root, 'battle_team', 'player')
+
+    @property
+    def magic(self):
+        return self.battle if self.team == 'player' else self.battle.enemy_magic
+
+    @property
+    def hero_id(self):
+        return self.magic.hero_id
+
+    @property
+    def accepts_orders(self):
+        return self.battle.enemy_magic is None or self.battle.active_team == self.team
+
+    @property
+    def order_blocked_reason(self):
+        if self.battle.outcome:
+            return 'The battle is over.'
+        if self.battle.enemy_magic is not None and self.battle.active_team != self.team:
+            return 'Waiting for opponent.'
+        if not self.accepts_orders:
+            return 'Finish playback before giving orders.'
+        return None
+
+    @property
     def edge(self):
         return self.game.width - 344
 
     def on_enter(self):
         super().on_enter()
         if self.battle.outcome:
-            self.game.push(ResultScene(self.root, battle=True))
+            self.show_result()
 
     def refresh(self):
         super().refresh()
@@ -1060,7 +1086,7 @@ class BattleScene(Screen):
         objective = self._objective_content()
         self.objective_bottom = 76 + self.measure(objective)[1] + 24
         self.ui.add(Column(objective, anchor=Anchor.TOP_LEFT, margin=(38, 88)))
-        alive = [u for u in b.units if u.team == "player" and u.hp > 0]
+        alive = [u for u in b.units if u.team == self.team and u.hp > 0]
         if self.selected is None or not any(u.id == self.selected for u in alive):
             self.selected = alive[0].id if alive else None
         command = self._command_content()
@@ -1086,7 +1112,7 @@ class BattleScene(Screen):
         self.icon_button('save', 'Save', self.edge - 74, 16, self.save_game, tooltip='Save this battle. F5 also quicksaves.')
         self.icon_button('text_size', 'Text size', self.game.width - 106, 16, self.open_text_settings, shortcut='F2')
         from eador.preferences import reading_scale
-        self._reading_view = self.hover, self.message, self.game.window_size, reading_scale(self.game)
+        self._reading_view = self.hover, self.message, self.game.window_size, reading_scale(self.game), b.active_team
 
     def _command_content(self):
         from saga2d import Column, Label, Row
@@ -1099,12 +1125,12 @@ class BattleScene(Screen):
             return Label(text, width=width, wrap=True, font='Verdana',
                          font_size=round(size * scale), text_color=color)
 
-        allies = sum(u.hp > 0 and u.team == 'player' for u in b.units)
-        enemies = sum(u.hp > 0 and u.team != 'player' for u in b.units)
+        allies = sum(u.hp > 0 and u.team == self.team for u in b.units)
+        enemies = sum(u.hp > 0 and u.team != self.team for u in b.units)
         foe_label = 'foe' if enemies == 1 else 'foes'
         sections = [label(f'{allies} allies · {enemies} {foe_label} · Tab selects')]
         if selected:
-            name = self.root.state.hero.hero_class if selected.id == 0 else UNITS[selected.kind].name
+            name = self.root.state.hero.hero_class if selected.id == self.hero_id else UNITS[selected.kind].name
             status = ('Guard +2' if selected.stance == 'guard' else 'Braced' if selected.stance == 'brace' else
                       'Can move' if selected.acted and b.reachable(selected.id) else
                       'Spent' if selected.acted else 'Moved' if selected.moved else 'Ready')
@@ -1135,35 +1161,35 @@ class BattleScene(Screen):
                                  on_click=lambda: self.choose_order(name),
                                  style=PRIMARY if self.targeting == name else None,
                                  tooltip=self.order_hint(),
-                                 enabled=bool(getattr(b, name + '_targets')(selected.id))))
+                                 enabled=self.accepts_orders and bool(getattr(b, name + '_targets')(selected.id))))
         bracing = bool(selected and selected.can_brace)
         orders.append(Button('Brace' if bracing else 'Guard', width=116 if bracing else 80, height=40,
                              icon=icon_path('guard'), show_text=bracing, icon_size=26,
                              shortcut='G', on_click=self.guard,
                              tooltip=('Brace (G). ' if bracing else 'Guard (G). ') +
-                                     ('Select a unit to defend.' if selected is None else
+                                     (self.order_blocked_reason or ('Select a unit to defend.' if selected is None else
                                       'This unit has already acted. End the round to regain an order.' if selected.acted else
                                       'Strike first against the next adjacent melee attacker. Spends this unit’s order.' if selected.can_brace else
-                                      'Gain 2 defense until your next turn. Spends this unit’s order.'),
-                             enabled=selected is not None and not selected.acted and b.outcome is None))
+                                      'Gain 2 defense until your next turn. Spends this unit’s order.')),
+                             enabled=self.accepts_orders and selected is not None and not selected.acted and b.outcome is None))
         sections.append(Row(*orders, spacing=12))
-        healer = 'Acolyte' if self.heal_caster != 0 else 'Hero'
+        healer = 'Acolyte' if self.heal_caster != self.hero_id else 'Hero'
 
-        def spell(name, title, key, caster=0):
-            cost = b.spell_cost(name)
+        def spell(name, title, key, caster):
+            cost = self.magic.spell_costs[name]
             return Column(Button(f'{title} · {cost} mana', width=144, height=40,
                                  icon=icon_path(name), show_text=False, icon_size=26,
                                  hotkey=key, on_click=self.bolt if name == 'bolt' else self.heal,
                                  tooltip=f'{title} ({key}) · {cost} mana. ' + self.spell_hint(name, caster),
-                                 enabled=bool(b.spell_targets(name, caster_id=caster))),
+                                 enabled=self.accepts_orders and bool(b.spell_targets(name, caster_id=caster))),
                           metric('mana', cost, width=144, size=11 * scale, color=BLUE,
                                  detail=f'Cost per {title} cast.'), spacing=6)
 
-        sections.append(Column(metric('mana', b.mana, width=300, size=12 * scale, color=BLUE,
+        sections.append(Column(metric('mana', self.magic.mana, width=300, size=12 * scale, color=BLUE,
                                       detail='Shared pool for the hero and allied spellcasters.'),
-                               Row(spell('bolt', 'Arcane Bolt', '1'),
+                               Row(spell('bolt', 'Arcane Bolt', '1', self.hero_id),
                                    spell('heal', f'{healer} Heal', '2', self.heal_caster), spacing=12),
-                               label('Heal spends this Acolyte’s order.' if self.heal_caster != 0 else
+                               label('Heal spends this Acolyte’s order.' if self.heal_caster != self.hero_id else
                                      'Spells spend the hero’s order.', size=11), spacing=8))
         sections.append(self._forecast())
         return Column(*sections, spacing=18)
@@ -1190,14 +1216,15 @@ class BattleScene(Screen):
         retreat_detail = 'Lose up to 20 gold; surviving troops keep their wounds.'
         if self.root.state.battle_kind == 'defense':
             retreat_detail += ' Abandon this province; losing Westwatch loses the shard.'
-        unavailable = ('The battle is over.' if self.battle.outcome else
-                       'Finish playback before giving orders.' if not self.accepts_orders else None)
-        controls = Row(icon('auto_play', 'Auto-play one round', 'A', self.auto_round, enabled=available,
-                            tooltip='Auto-play one round (A). ' + (unavailable or 'Let your army act, then resolve the enemy turn.')),
-                       icon('retreat', 'Retreat', 'T', self.retreat, style=DANGER, enabled=available,
-                            tooltip='Retreat (T). ' + (unavailable or retreat_detail)),
-                       icon('log', 'Battle log', 'L', self.read_log,
-                            tooltip='Battle log (L). Read every event from this battle.'), spacing=12)
+        unavailable = self.order_blocked_reason
+        controls = Row(spacing=12)
+        if self.battle.enemy_magic is None:
+            controls.add(icon('auto_play', 'Auto-play one round', 'A', self.auto_round, enabled=available,
+                              tooltip='Auto-play one round (A). ' + (unavailable or 'Let your army act, then resolve the enemy turn.')))
+        controls.add(icon('retreat', 'Retreat', 'T', self.retreat, style=DANGER, enabled=available,
+                          tooltip='Retreat (T). ' + (unavailable or retreat_detail)))
+        controls.add(icon('log', 'Battle log', 'L', self.read_log,
+                          tooltip='Battle log (L). Read every event from this battle.'))
         if overflow:
             controls.add(icon('guide', 'Read message', 'M', self.read_message,
                               tooltip='Read the complete battle message (M).'))
@@ -1214,6 +1241,8 @@ class BattleScene(Screen):
     def order_guidance(self):
         if self.message:
             return self.message
+        if self.order_blocked_reason:
+            return self.order_blocked_reason
         if self.targeting:
             return 'Click a target for ' + self.targeting
         if self.accepts_orders and self.battle.evacuation_blocked_reason is None:
@@ -1238,7 +1267,10 @@ class BattleScene(Screen):
         def label(text, *, size=10, color=MUTED, width=width):
             return Label(text, width=width, wrap=True, font='Verdana', font_size=round(size * scale), text_color=color)
 
-        if b.objective.kind == 'hold':
+        if b.enemy_magic is not None:
+            heading = label('ARMY BATTLE', size=12, color=GOLD)
+            detail = 'Defeat the opposing hero or army. Your armies take alternating phases.'
+        elif b.objective.kind == 'hold':
             objective = b.objective
             title = label(f'HOLD THE SEAL · {objective.progress}/{objective.required} turns · By round {objective.deadline}',
                           size=12, color=GOLD, width=width - 174)
@@ -1283,6 +1315,10 @@ class BattleScene(Screen):
         self.attack_sounds = None
 
     def act(self, callback, *, checkpoint=False, cue="attack_hit"):
+        if self.order_blocked_reason:
+            self.message = self.order_blocked_reason
+            self.refresh()
+            return
         before = {u.id: u.hp for u in self.battle.units}
         recorded = []
         if self.command(lambda: recorded.append(self.battle.trace(callback)), cue=None):
@@ -1316,12 +1352,23 @@ class BattleScene(Screen):
             self.finish_phase()
 
     def _phase_button(self, x, y):
+        if self.battle.enemy_magic is not None:
+            self.button('End phase' if self.accepts_orders else 'Waiting for opponent', x, y, 300,
+                        self.end_turn, hotkey='E', primary=True,
+                        enabled=self.battle.outcome is None and self.accepts_orders, icon='end_turn',
+                        tooltip='End phase (E). Hand control to the opposing army.' if self.accepts_orders else
+                                'Waiting for opponent. You can inspect the battlefield while they act.')
+            return
         self.button("End battle round", x, y, 300, self.end_turn,
                     hotkey="E", primary=True, enabled=self.battle.outcome is None,
                     icon='end_turn', show_text=False,
                     tooltip='End battle round (E). Finish your orders and let the enemy act.')
 
     def play_phase(self, command):
+        if self.order_blocked_reason:
+            self.message = self.order_blocked_reason
+            self.refresh()
+            return
         recorded = []
         if self.command(lambda: recorded.append(self.battle.trace(command)), cue=None):
             self.begin_playback(recorded[0], cue='end_turn')
@@ -1331,6 +1378,7 @@ class BattleScene(Screen):
         self.finish_attack_sounds()
         if cue:
             self.game.audio.play_sound(cue)
+        self.message = ''
         self.targeting = None
         self.feedback = None
         self.floats = []
@@ -1344,19 +1392,34 @@ class BattleScene(Screen):
     def finish_phase(self):
         if self.battle.outcome:
             set_music(self.game, None)
-            self.game.audio.play_sound('victory' if self.battle.outcome == 'player' else 'defeat')
+            self.game.audio.play_sound('victory' if self.battle.outcome == self.team else 'defeat')
+            self.show_result()
+
+    def show_result(self):
+        callback = getattr(self.root, 'show_battle_result', None)
+        if callback is not None:
+            callback()
+        else:
             self.game.push(ResultScene(self.root, battle=True))
 
     def end_turn(self):
         self.play_phase(lambda: self.root.order("end_turn", target="battle"))
 
     def auto_round(self):
+        if self.battle.enemy_magic is not None:
+            self.message = 'Human armies give their own orders. Auto-play is unavailable.'
+            self.refresh()
+            return
         self.play_phase(lambda: self.root.order("auto_turn", target="battle"))
 
     def guard(self):
         self.act(lambda: self.root.order("guard", self.selected, target="battle"), cue="guard")
 
     def retreat(self):
+        if self.order_blocked_reason:
+            self.message = self.order_blocked_reason
+            self.refresh()
+            return
         try:
             self.root.order("retreat")
         except RuleError as error:
@@ -1376,7 +1439,10 @@ class BattleScene(Screen):
         self.game.push(SaveScene(self.root))
 
     def help(self):
-        self.game.push(HelpScene(self.root))
+        if getattr(self.root, 'live_match', False) and hasattr(self.root, 'help'):
+            self.root.help()
+        else:
+            self.game.push(HelpScene(self.root))
 
     def cancel(self):
         if self.targeting:
@@ -1393,11 +1459,17 @@ class BattleScene(Screen):
         return next((name for name in self.unit_orders if name in self.battle.unit(self.selected).abilities), None)
 
     def choose_order(self, name):
+        if self.order_blocked_reason:
+            self.message = self.order_blocked_reason
+            self.refresh()
+            return
         self.targeting = None if self.targeting == name else name
         self.message = self.unit_orders[name][3] + ' F aims; Enter acts; Esc cancels.' if self.targeting else ''
         self.refresh()
 
     def order_hint(self):
+        if self.order_blocked_reason:
+            return self.order_blocked_reason
         selected = self.battle.unit(self.selected) if self.selected is not None else None
         name = self.unit_order
         if name:
@@ -1413,49 +1485,57 @@ class BattleScene(Screen):
             return 'Flight crosses bodies and rough ground; land on empty hexes. Pin slows flight, and Brace still strikes first.'
         return 'Select a unit. Blue hexes are reachable; red rings are attack targets.'
 
-    def spell_hint(self, name, caster_id=0):
+    def spell_hint(self, name, caster_id=None):
         """Explain the current spell control, including why its target list is empty."""
         b = self.battle
-        if b.outcome is not None:
-            return 'The battle is over.'
-        if b.hero_id is None:
+        if self.order_blocked_reason:
+            return self.order_blocked_reason
+        if self.hero_id is None:
             return 'This army has no spellcasting hero or shared mana.'
+        caster_id = self.hero_id if caster_id is None else caster_id
         caster = b.unit(caster_id)
         if not caster.alive:
             return 'This spellcaster has fallen.'
-        if caster_id == b.hero_id and name not in b.spells:
+        if caster_id == self.hero_id and name not in self.magic.spells:
             return 'Build a Temple to learn Heal.' if name == 'heal' else 'Build a Mage Tower to learn Arcane Bolt.'
         if caster.acted:
             return 'This spellcaster has already acted. End the round to regain an order.'
-        if b.mana < b.spell_cost(name):
-            return f'Not enough shared mana: this spell needs {b.spell_cost(name)}, and {b.mana} remains.'
+        cost = self.magic.spell_costs[name]
+        if self.magic.mana < cost:
+            return f'Not enough shared mana: this spell needs {cost}, and {self.magic.mana} remains.'
         target = 'wounded ally' if name == 'heal' else 'enemy'
         if not b.spell_targets(name, caster_id=caster_id):
             return f'No visible {target} within 4 hexes of this spellcaster.'
-        return f'Choose a visible {target} within 4 hexes. Spends this spellcaster’s order and {b.spell_cost(name)} shared mana.'
+        return f'Choose a visible {target} within 4 hexes. Spends this spellcaster’s order and {cost} shared mana.'
 
     @property
     def heal_caster(self):
         selected = self.battle.unit(self.selected) if self.selected is not None else None
-        return selected.id if selected and selected.can_heal else 0
+        return selected.id if selected and selected.can_heal else self.hero_id
 
     def action_targets(self):
+        if self.order_blocked_reason:
+            return []
         if self.targeting == 'smoke':
             return []  # Smoke targets hexes, including empty ground.
         if self.targeting in self.unit_orders:
             return getattr(self.battle, self.targeting + '_targets')(self.selected)
         if self.targeting in ('bolt', 'heal'):
-            return self.battle.spell_targets(self.targeting, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
+            return self.battle.spell_targets(self.targeting, caster_id=self.heal_caster if self.targeting == 'heal' else self.hero_id)
         return self.battle.targets(self.selected) if self.selected is not None else []
 
     def choose_spell(self, name):
-        caster = self.heal_caster if name == 'heal' else 0
+        if self.order_blocked_reason:
+            self.message = self.order_blocked_reason
+            self.refresh()
+            return
+        caster = self.heal_caster if name == 'heal' else self.hero_id
         if self.targeting != name and not self.battle.spell_targets(name, caster_id=caster):
             self.message = self.spell_hint(name, caster)
             self.refresh()
             return
         self.targeting = None if self.targeting == name else name
-        source = 'the selected Acolyte' if caster != 0 else 'your hero'
+        source = 'the selected Acolyte' if caster != self.hero_id else 'your hero'
         self.message = (("Choose a wounded ally" if name == "heal" else "Choose an enemy") +
                         f" within 4 hexes of {source}. Casting spends that unit's order." if self.targeting else '')
         self.refresh()
@@ -1467,7 +1547,7 @@ class BattleScene(Screen):
         self.choose_spell("heal")
 
     def next_unit(self):
-        units = [u for u in self.battle.units if u.team == "player" and u.hp > 0
+        units = [u for u in self.battle.units if u.team == self.team and u.hp > 0
                  and (not u.acted or self.battle.reachable(u.id))]
         if units:
             ids = [u.id for u in units]
@@ -1488,7 +1568,7 @@ class BattleScene(Screen):
     def next_target(self):
         targets = sorted(self.battle.smoke_targets(self.selected)) if self.targeting == 'smoke' else [
             u.pos for u in self.action_targets()] if self.targeting else [
-            u.pos for u in self.battle.units if u.hp > 0 and u.team == 'enemy']
+            u.pos for u in self.battle.units if u.hp > 0 and u.team != self.team]
         if targets:
             index = (targets.index(self.cursor) + 1) % len(targets) if self.cursor in targets else 0
             self.cursor = self.hover = targets[index]
@@ -1499,7 +1579,7 @@ class BattleScene(Screen):
 
     def update(self, dt):
         from eador.preferences import reading_scale
-        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
+        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game), self.battle.active_team):
             self.refresh()
         self.clock += dt
         if self.attack_sounds:
@@ -1541,6 +1621,12 @@ class BattleScene(Screen):
         if self.battle.outcome is not None:
             return
         unit = next((u for u in self.battle.units if u.hp > 0 and u.pos == pos), None)
+        if not self.accepts_orders:
+            if unit and unit.team == self.team:
+                self.selected = unit.id
+            self.message = self.order_blocked_reason
+            self.refresh()
+            return
         if self.targeting:
             if self.targeting == 'smoke':
                 self.act(lambda: self.root.order("smoke", self.selected, pos, target="battle"), cue='confirm')
@@ -1550,10 +1636,10 @@ class BattleScene(Screen):
                     self.act(lambda: self.root.order(name, self.selected, unit.id, target="battle"), cue=self.unit_orders[name][2])
                 else:
                     self.act(lambda: self.root.order("cast", self.targeting, unit.id,
-                             caster_id=self.heal_caster if self.targeting == 'heal' else 0, target="battle"), cue=self.targeting)
+                             caster_id=self.heal_caster if self.targeting == 'heal' else self.hero_id, target="battle"), cue=self.targeting)
             else:
                 self.message = "Aim at a unit. F cycles targets; Esc cancels targeting."
-        elif unit and unit.team == "player":
+        elif unit and unit.team == self.team:
             self.selected = unit.id
             self.message = ''
             self.refresh()
@@ -1575,7 +1661,7 @@ class BattleScene(Screen):
 
         def casualties(attacker, target, damage, reaction):
             if reaction >= attacker.hp:
-                loss = ' Battle lost.' if attacker.id == b.hero_id else ''
+                loss = ' Battle lost.' if attacker.id == self.hero_id else ''
                 another = any(u.alive and u.team == attacker.team and u.id != attacker.id and not u.acted for u in b.units)
                 hint = 'Tab selects another unit.' if another else 'Choose another order.'
                 line(f'{attacker.name} falls.{loss} {hint}', size=11, color=RED)
@@ -1591,7 +1677,7 @@ class BattleScene(Screen):
             line(f"{hovered.name}  ·  {hovered.hp}/{hovered.max_hp} HP", size=13, color=GOLD)
             pin_target = selected and self.targeting == "pin" and hovered in b.pin_targets(selected.id)
             pin_survives = False
-            caster = b.unit(self.heal_caster if self.targeting == 'heal' else 0) if self.targeting in ('bolt', 'heal') else selected
+            caster = b.unit(self.heal_caster if self.targeting == 'heal' else self.hero_id) if self.targeting in ('bolt', 'heal') else selected
             sight_blocked = caster and (self.targeting in ('bolt', 'heal', 'pin') or caster.attack_range > 1) and not b.has_sight(caster.pos, hovered.pos)
             if pin_target:
                 damage, retaliation = b.pin_preview(selected.id, hovered.id)
@@ -1599,7 +1685,7 @@ class BattleScene(Screen):
                 casualties(selected, hovered, damage, retaliation)
                 pin_survives = damage < hovered.hp
             elif self.targeting in ('bolt', 'heal') and hovered in self.action_targets():
-                amount = b.spell_preview(self.targeting, hovered.id, caster_id=self.heal_caster if self.targeting == 'heal' else 0)
+                amount = b.spell_preview(self.targeting, hovered.id, caster_id=self.heal_caster if self.targeting == 'heal' else self.hero_id)
                 line(f'Restore {amount} HP' if self.targeting == 'heal' else f'Deal {amount} HP damage', size=12, color=TEAL if self.targeting == 'heal' else RED)
             elif self.targeting == 'swap' and hovered in self.action_targets():
                 line('Exchange positions', size=12, color=TEAL)
@@ -1625,7 +1711,7 @@ class BattleScene(Screen):
                       'Clears Pin; spent orders stay spent.' if self.targeting == 'rally' else
                       'One charge; target keeps its orders.' if self.targeting == 'repulse' else
                       'Forest and smoke block ranged orders.' if sight_blocked else
-                      f'{b.spell_cost(self.targeting)} shared mana · caster spends its order.' if self.targeting in ('bolt', 'heal') else
+                      f'{self.magic.spell_costs[self.targeting]} shared mana · caster spends its order.' if self.targeting in ('bolt', 'heal') else
                       f"Next turn: Move {max(1, hovered.move_range - 2 - hovered.cargo_penalty)} · may still attack." if pin_survives else
                       f"Pinned: Move {hovered.effective_move_range} · may still attack." if hovered.pinned else
                       "Brace strikes first against melee." if hovered.stance == "brace" else
@@ -1744,7 +1830,8 @@ class BattleScene(Screen):
             # Only the miniature moves. Picking, health and tactical status stay
             # on the original cell while its authoritative damage is immediate.
             with self.screen_layer(max(5, layer) if dx or dy else layer):
-                art.piece(self, cx + dx, cy + dy + size * .22, s.hero.hero_class if u.id == 0 else u.kind, u.team, scale=min(1, size / 56),
+                art.piece(self, cx + dx, cy + dy + size * .22, s.hero.hero_class if u.id == self.hero_id else u.kind,
+                          'player' if u.team == self.team else 'enemy', scale=min(1, size / 56),
                           selected=u.id == self.selected, spent=u.acted)
             with self.screen_layer(10):
                 if u.stance:
@@ -1763,7 +1850,7 @@ class BattleScene(Screen):
                 self.draw_rect(cx - width / 2, top, width, height, INK, radius=3)
                 self.text(u.hp, cx, top, size=min(10, size * .27), center=True)
                 self.bar(cx - width / 2 + 3, top + height - 4, width - 6, u.hp, u.max_hp,
-                         TEAL if u.team == "player" else RED)
+                         TEAL if u.team == self.team else RED)
         with self.screen_layer(8):
             self.draw_effects()
         with self.screen_layer(9):
@@ -1799,6 +1886,15 @@ class SaveScene(Screen):
         self._shown_diagnostic = None
         self._next_anchor = None
         self._page_indices = [()]
+
+    def on_enter(self):
+        if self.root is not None and getattr(self.root, 'live_match', False):
+            from eador.diagnostics import DiagnosticScene
+            self.root.save_game()
+            self.game.replace(DiagnosticScene(self.root.message, title='Live room',
+                                              return_label='Return to game', body_color=TEXT))
+        else:
+            super().on_enter()
 
     @property
     def visible_entries(self):
@@ -2151,7 +2247,7 @@ class HeroScene(Screen):
                     spacing=12)
         recovery = s.recovery_preview()
         rest = label(recovery.blocked_reason or
-                     f"Rest before rival acts: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.",
+                     f"Next campaign day: hero +{recovery.hero_hp} HP · surviving troops up to {recovery.army_hp} HP each · mana +{recovery.mana}.",
                      11, width=896, color=RED if recovery.blocked_reason else MUTED)
         quote = s.infusion_preview()
         infusion = Row(Column(Row(label('Tower infusion', 14, width=260, color=TEAL),
@@ -2163,7 +2259,7 @@ class HeroScene(Screen):
                                   label('Available', 11, width=108),
                                   metric('crystals', s.crystals, width=124, size=11 * scale, detail='Available before infusion.'),
                                   metric('actions', s.actions_left, width=124, size=11 * scale, detail='Available before infusion.'), width=818, spacing=12),
-                              label(quote.blocked_reason or "Recover mana now; time and the rival advance only when you end the turn.",
+                              label(quote.blocked_reason or "Recover mana now. Spends one campaign action without advancing the day.",
                                     11, width=818, color=RED if quote.blocked_reason else MUTED), spacing=4),
                        Button("Infuse mana", width=222, height=40, shortcut="I", on_click=self.infuse,
                               enabled=quote.blocked_reason is None), spacing=24)

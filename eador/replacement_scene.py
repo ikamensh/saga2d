@@ -116,7 +116,8 @@ class ReplacementScene(Screen):
                               label(f'{UNITS[new.kind].name} #{new.id}', 20, width=520, color=TEXT),
                               label(f'Rank {new.level} · {new.xp} XP · {new.hp}/{new.max_hp} HP', width=520), spacing=10)
             price = f'{quote.gold} gold · {quote.crystals} crystals · {quote.actions} campaign action'
-            content = Column(Row(old_text, new_text, spacing=24), label(self.description),
+            content = Column(Row(old_text, new_text, spacing=24),
+                             *([label(self.description)] if self.description else []),
                              label('No refund, no reserve and no experience transfers. The recruit takes the same army slot.'),
                              label(('Paid: ' if self.applied else 'Cost: ') + price, 15, color=GOLD),
                              label(f'Army upkeep: {quote.upkeep_before} → {quote.upkeep_after} gold per turn.\n'

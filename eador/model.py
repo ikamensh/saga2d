@@ -33,6 +33,10 @@ class State(Realm):
     theme: str = 'frontier'
     campaign: Campaign | None = None
 
+    @property
+    def capital(self) -> Pos:
+        return (-2, 0)
+
     @classmethod
     def new(cls, seed: int = 7, hero_class: str = 'Commander', *, theme: str = 'frontier',
             difficulty: str = 'standard') -> State:

@@ -279,12 +279,19 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
         scene.draw_text(data.name, x, y + 35 * s, font_size=max(9, round(10 * s)), color=TEXT,
                         anchor_x="center", anchor_y="center")
     if hero:
-        hx, hy = x - 40 * s, y - 29 * s
-        banner = [(hx + dx * s, hy + dy * s) for dx, dy in
-                  ((-17, -18), (17, -18), (17, 10), (0, 22), (-17, 10))]
-        scene.draw_polygon(banner, INK)
-        outline(scene, banner, TEAL, 1.5)
-        scene.draw_image(icon_path('hero'), hx - 15 * s, hy - 16 * s, 30 * s, 30 * s)
+        hero_banner(scene, grid, pos)
+
+
+def hero_banner(scene, grid, pos, *, color=TEAL):
+    """Locate an army without covering the province's landmark or name."""
+    x, y = grid.center(pos)
+    s = grid.size / 78
+    hx, hy = x - 40 * s, y - 29 * s
+    banner = [(hx + dx * s, hy + dy * s) for dx, dy in
+              ((-17, -18), (17, -18), (17, 10), (0, 22), (-17, 10))]
+    scene.draw_polygon(banner, INK)
+    outline(scene, banner, color, 1.5)
+    scene.draw_image(icon_path('hero'), hx - 15 * s, hy - 16 * s, 30 * s, 30 * s)
 
 
 def travel_arrow(scene, grid, origin, destination):

@@ -9,7 +9,7 @@ from eador.battle_audio import event_cues
 from eador.battle_effects import health_notices
 from eador.preferences import reading_scale, reduced_motion
 from eador.scene import BattleScene, Screen
-from eador.style import GOLD, MUTED, TEAL, TEXT
+from eador.style import GOLD, MUTED, RED, TEAL, TEXT
 
 
 class BattlePlayback:
@@ -44,6 +44,9 @@ class BattlePlayback:
     def _apply(self, frame):
         self.view.units = [replace(self.view.unit(unit.id), **asdict(unit)) for unit in frame.units]
         self.view.mana, self.view.round = frame.mana, frame.round
+        self.view.active_team = frame.active_team
+        if self.view.enemy_magic is not None:
+            self.view.enemy_magic.mana = frame.enemy_mana
         self.view.objective.progress = frame.progress
         self.view.outcome, self.view.outcome_reason = frame.outcome, frame.outcome_reason
         self.view.smoke_clouds = [SmokeCloud(*cloud) for cloud in frame.smoke]
@@ -116,12 +119,19 @@ class BattlePlaybackScene(BattleScene):
         def label(text, size=12, color=MUTED):
             return Label(text, width=300, wrap=True, font='Verdana', font_size=round(size * scale), text_color=color)
         event = self.playback.event
+        description = event.text
+        if self.battle.enemy_magic is not None:
+            if event.kind == 'result' and event.after.outcome is not None:
+                description = 'Victory.' if event.after.outcome == self.team else 'Defeat.'
+            elif event.kind == 'phase' and event.before.active_team != event.after.active_team:
+                description = 'Your phase.' if event.after.active_team == self.team else 'Opponent’s phase.'
         lines = [label(f'Action {self.playback.index + 1} of {len(self.playback.trace.events)}', color=GOLD),
-                 label(event.text, 15, TEXT)]
+                 label(description, 15, TEXT)]
         if event.actor_id is not None:
             unit = self.battle.unit(event.actor_id)
-            side = "Enemy" if unit.team == "enemy" else "Your"
-            lines.append(label(f'{side} {unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL))
+            local = unit.team == self.team
+            side = 'Your' if local else 'Enemy'
+            lines.append(label(f'{side} {unit.name}: {unit.hp}/{unit.max_hp} HP', color=TEAL if local else RED))
         lines.extend([label('Watch each move, ability and reaction in order.'),
                       label('Space, Enter or Esc finishes playback.'),
                       label('Saving records the outcome of these orders. Loading skips their animation.', 11)])
@@ -154,10 +164,14 @@ class BattlePlaybackScene(BattleScene):
 
     def _play_contacts(self, stop):
         for event in self.playback.trace.events[self._contact_cursor:stop]:
-            _, contact = event_cues(self.battle, event, self.root.state.hero.hero_class)
+            _, contact = self._event_cues(event)
             if contact:
                 self.game.audio.play_sound(contact)
         self._contact_cursor = stop
+
+    def _event_cues(self, event):
+        local = event.actor_id is not None and self.battle.unit(event.actor_id).team == self.team
+        return event_cues(self.battle, event, self.root.state.hero.hero_class if local else 'Hero')
 
     def _announce(self):
         shown = self.playback.index, self.playback.applied
@@ -165,7 +179,7 @@ class BattlePlaybackScene(BattleScene):
             return
         self._play_contacts(self.playback.index)
         event = self.playback.event
-        release, _ = event_cues(self.battle, event, self.root.state.hero.hero_class)
+        release, _ = self._event_cues(event)
         if self._shown is None or self._shown[0] != shown[0]:
             if release:
                 self.game.audio.play_sound(release)
@@ -183,7 +197,7 @@ class BattlePlaybackScene(BattleScene):
             self.finish()
             return
         self._announce()
-        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game)):
+        if self._reading_view != (self.hover, self.message, self.game.window_size, reading_scale(self.game), self.battle.active_team):
             self.refresh()
 
     def _feedback_event(self):

@@ -130,3 +130,20 @@ def test_complete_replacement_reading_and_saved_manual_rescue(tmp_path):
     """Every offered role reflows; file errors preserve all roster rows and the paid Warden rescues a real flank."""
     from tools.verify_eador_replacement import verify
     verify(tmp_path, backend='mock')
+
+
+def test_replacement_without_a_special_ability_uses_only_visible_reading_rows(tmp_path):
+    """An ordinary Swordsman has no ability paragraph; its review must still have valid text bounds."""
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        game.push(ShardScene(State.new(7)))
+        player = PlayerInput(game)
+        player.press('b')
+        player.press('1')
+        player.press('escape')
+        before = player.state.to_json()
+        review(player, 1, 'swordsman')
+        check_reading_layout(game.scene)
+        assert player.state.to_json() == before
+    finally:
+        game.close()

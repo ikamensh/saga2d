@@ -62,7 +62,7 @@ BUILDINGS = {
     'barracks': BuildingSpec('Barracks', 45, 0, 'Recruit swordsmen, defensive pikemen and extracting wardens.'),
     'archery': BuildingSpec('Archery Range', 55, 0, 'Recruit pinning archers and mobile rangers.'),
     'temple': BuildingSpec('Temple', 65, 0, 'Recruit acolytes; learn Heal; faster recovery.'),
-    'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana. In your territory, H then I spends 3 crystals and 1 action to restore up to 8 mana. Encirclement blocks infusion at Westwatch.'),
+    'mage_tower': BuildingSpec('Mage Tower', 75, 2, 'Learn Arcane Bolt; +4 maximum mana. In your territory, H then I spends 3 crystals and 1 action to restore up to 8 mana. Encirclement blocks infusion at your capital.'),
     'market': BuildingSpec('Marketplace', 60, 0, '+8 gold income each turn.'),
 }
 
@@ -178,4 +178,3 @@ class Province:
     site_crystals: int = 0
     guard_hp: list[int] = field(default_factory=list)
     site_guard_hp: list[int] = field(default_factory=list)
-
