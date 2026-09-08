@@ -1,0 +1,25 @@
+{
+  "release": "https://github.com/ikamensh/saga2d/releases/tag/warband-v0.1.0-preview.4",
+  "source_commit": "6f58eca12b7f4a969a063227267637256413c8ae",
+  "fetched_at_utc": "2026-09-08T13:13:00Z",
+  "fetched_without_authentication": true,
+  "files": {
+    "Warband-0.1.0-preview.4-darwin-arm64-app.zip": {
+      "bytes": 22360734,
+      "sha256": "03ab70b254f76897cd252a54612fab1a8599ec13786e5e16b888828e39e3b81a"
+    },
+    "Warband-0.1.0-preview.4-windows-x64-portable.zip": {
+      "bytes": 37346719,
+      "sha256": "64b878f94e52cf0a72289a53053a3716e0bc1010cfbd3abd54ea411e5bf88f9e"
+    },
+    "Warband-0.1.0-preview.4-windows-x64-setup.exe": {
+      "bytes": 27065857,
+      "sha256": "d03cc766d54b264de41b771a975881b82a4a1d061157fb483647d262a6fd8e53"
+    }
+  },
+  "windows_ci_run": "https://github.com/ikamensh/saga2d/actions/runs/34229830340",
+  "installed_mac_app": {
+    "path": "/Applications/Warband.app",
+    "executable_sha256": "4bcf481cf5084bba430e9c561f0c9a66ca28a12f90cd6ef59d97b44ae2b1a17d"
+  }
+}

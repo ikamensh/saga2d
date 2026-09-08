@@ -1,0 +1,52 @@
+{
+  "native": {
+    "backend": "pyglet",
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/warband-extracted-6ibnznlh/Warband/Warband",
+    "executable_sha256": "75fcd1922f48c2ea66b52d976d61e21b393d0862b877019f0b0d629d81684d50",
+    "images": [
+      "native-title.png",
+      "native-multiplayer.png",
+      "native-room-code.png",
+      "native-paste-code.png",
+      "native-online-match.png",
+      "native-settlement-train.png",
+      "native-settlement-plans.png",
+      "native-match-menu.png",
+      "native.png"
+    ],
+    "live_match_menu": true,
+    "native_clipboard_join": true,
+    "native_multiplayer_input": true,
+    "native_settlement_planning": true,
+    "opengl_version": "4.1 Metal - 90.5",
+    "passed": true,
+    "renderer": "Apple M4",
+    "sound_catalogue": 87,
+    "source_commit": "6f58eca12b7f4a969a063227267637256413c8ae",
+    "vendor": "Apple",
+    "version": "0.1.0-preview.4"
+  },
+  "passed": true,
+  "portable": {
+    "bundled_fonts": true,
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/warband-extracted-6ibnznlh/Warband/Warband",
+    "executable_sha256": "75fcd1922f48c2ea66b52d976d61e21b393d0862b877019f0b0d629d81684d50",
+    "frozen": true,
+    "online": {
+      "assembly_point": true,
+      "authoritative_movement": true,
+      "automatic_plan_builder": true,
+      "cancel_plans": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "global_production": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "6f58eca12b7f4a969a063227267637256413c8ae",
+    "version": "0.1.0-preview.4"
+  },
+  "scope": "Loopback authority; isolated profile on the named CI host",
+  "source_commit": "6f58eca12b7f4a969a063227267637256413c8ae",
+  "version": "0.1.0-preview.4"
+}

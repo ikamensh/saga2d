@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "source_commit": "6f58eca12b7f4a969a063227267637256413c8ae",
+  "version": "0.1.0-preview.4",
+  "frozen": true,
+  "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/warband-extracted-6ibnznlh/Warband/Warband",
+  "executable_sha256": "75fcd1922f48c2ea66b52d976d61e21b393d0862b877019f0b0d629d81684d50",
+  "bundled_fonts": true,
+  "online": {
+    "create_join": true,
+    "foreign_order_rejected": true,
+    "authoritative_movement": true,
+    "private_seat_rejoin": true,
+    "global_production": true,
+    "automatic_plan_builder": true,
+    "assembly_point": true,
+    "cancel_plans": true
+  }
+}
