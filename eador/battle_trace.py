@@ -5,7 +5,7 @@ participates in rules, persistence, or the decision to resolve a battle.
 """
 from dataclasses import dataclass
 
-from eador.model import Pos
+from eador.entities import Pos
 
 
 @dataclass(frozen=True)
@@ -32,13 +32,16 @@ class BattleFrame:
     outcome: str | None
     outcome_reason: str | None
     smoke: tuple[tuple[Pos, str], ...]
+    active_team: str = 'player'
+    enemy_mana: int | None = None
 
     @classmethod
     def capture(cls, battle):
         return cls(tuple(UnitFrame(*(getattr(unit, name) for name in UnitFrame.__dataclass_fields__))
                          for unit in battle.units), battle.mana, battle.round, battle.objective.progress,
                    battle.outcome, battle.outcome_reason,
-                   tuple((cloud.pos, cloud.expires_before_team) for cloud in battle.smoke_clouds))
+                   tuple((cloud.pos, cloud.expires_before_team) for cloud in battle.smoke_clouds),
+                   battle.active_team, battle.enemy_magic.mana if battle.enemy_magic is not None else None)
 
     def unit(self, ident):
         return next(unit for unit in self.units if unit.id == ident)

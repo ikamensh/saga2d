@@ -1,4 +1,4 @@
-"""Earned PvE army progression and surviving defenders, separate from world ownership."""
+"""Earned army progression and surviving defenders, separate from world ownership."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -35,8 +35,8 @@ def persist_province_defenders(province: Province, battle: Battle, *, kind: str)
 
 
 def apply_army_result(hero: Hero, battle: Battle, *, hero_level_cap: int | None = None,
-                      troop_level_cap: int | None = None) -> ArmyResult:
-    """Mutate the supplied hero/army once from its completed ordinary PvE battle.
+                      troop_level_cap: int | None = None, team: str = 'player') -> ArmyResult:
+    """Mutate the supplied hero/army once from its completed battle on the given side.
 
     The battle is read-only. The caller owns claims, rewards, choice creation and
     recording/clearing the encounter so its result cannot be applied twice.
@@ -44,17 +44,20 @@ def apply_army_result(hero: Hero, battle: Battle, *, hero_level_cap: int | None 
     """
     if battle.outcome is None:
         raise RuleError('The battle is not finished.')
-    hero.hp = battle.unit(0).hp
-    hero.mana = battle.mana
+    magic = battle._magic(team)
+    hero.hp = battle.unit(magic.hero_id).hp
+    hero.mana = magic.mana
+    combatants = {unit.source_id if battle.enemy_magic is not None else unit.id: unit
+                  for unit in battle.units if unit.team == team}
     casualties, survivors, levels = [], [], []
     for troop in hero.army:
-        troop.hp = battle.unit(troop.id).hp
+        troop.hp = combatants[troop.id].hp
         if troop.hp <= 0:
             casualties.append(UNITS[troop.kind].name)
         else:
             survivors.append(troop)
     hero.army = survivors
-    if battle.outcome == 'player':
+    if battle.outcome == team:
         if hero_level_cap is None or hero.level < hero_level_cap:
             hero.xp += 8
         while hero.xp >= hero.level * 12 and (hero_level_cap is None or hero.level < hero_level_cap):

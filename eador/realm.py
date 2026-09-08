@@ -84,10 +84,10 @@ class Realm:
                       'relic', relic)
 
     def apply_battle_progression(self, battle: Battle, *, hero_level_cap: int | None = None,
-                                 troop_level_cap: int | None = None) -> ArmyResult:
+                                 troop_level_cap: int | None = None, team: str = 'player') -> ArmyResult:
         """Apply earned wounds and ranks, queuing skill choices before encounter rewards."""
         result = apply_army_result(self.hero, battle, hero_level_cap=hero_level_cap,
-                                   troop_level_cap=troop_level_cap)
+                                   troop_level_cap=troop_level_cap, team=team)
         for level in result.hero_levels:
             self.log.append(f'{self.hero.name} reached level {level}.')
             choice = self._skill_choice()

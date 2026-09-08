@@ -8,7 +8,7 @@ from dataclasses import asdict, dataclass, field, replace
 
 from saga2d import HexGrid
 
-from eador.model import Hero, Pos, RuleError, UNITS
+from eador.entities import Hero, Pos, RuleError, UNITS
 from eador.encounters import ENCOUNTERS
 from eador.content import RELICS
 from eador.sight import line_of_sight
@@ -132,6 +132,16 @@ class BattleObjective:
 
 
 @dataclass
+class BattleMagic:
+    """One human army's hero and shared spell resources."""
+    hero_id: int
+    mana: int
+    spells: set[str]
+    spell_costs: dict[str, int]
+    spell_power: dict[str, int]
+
+
+@dataclass
 class Battle:
     units: list[BattleUnit]
     terrain: dict[Pos, str]
@@ -147,6 +157,8 @@ class Battle:
     outcome_reason: str | None = None
     sight_rules: str = 'terrain'
     smoke_clouds: list[SmokeCloud] = field(default_factory=list)
+    enemy_magic: BattleMagic | None = None
+    active_team: str = 'player'
     _observer: _Recorder | None = field(default=None, init=False, repr=False, compare=False)
 
     def trace(self, command: Callable[[], None]) -> BattleTrace:
@@ -222,6 +234,27 @@ class Battle:
         return {(q, r): (rng.choice(('plains', terrain, terrain)) if abs(q) < 2 else 'plains')
                 for q in range(-3, 4) for r in range(-3, 4) if abs(q + r) <= 3}
 
+    @classmethod
+    def create_duel(cls, attacker: Hero, defender: Hero, terrain: str,
+                    attacker_spells: set[str], defender_spells: set[str], seed: int = 0) -> Battle:
+        """Deploy two real heroes with their own ranks, relics and shared mana.
+
+        Canonical combat IDs are unique; source IDs retain each realm's troop
+        identity. Construction never modifies either campaign army.
+        """
+        battle = cls.create(attacker, [], terrain, attacker_spells, seed)
+        opposing = cls.create(defender, [], terrain, defender_spells, seed)
+        for unit in battle.units:
+            unit.source_id = unit.id
+        first_enemy = max(unit.id for unit in battle.units) + 1
+        for ident, unit in enumerate(opposing.units, first_enemy):
+            unit.source_id, unit.id, unit.team = unit.id, ident, 'enemy'
+            unit.pos = (-unit.pos[0], -unit.pos[1])
+        battle.units.extend(opposing.units)
+        battle.enemy_magic = BattleMagic(first_enemy, opposing.mana, opposing.spells,
+                                         opposing.spell_costs, opposing.spell_power)
+        return battle
+
     @staticmethod
     def _deploy(army: list[tuple[str, int]], positions, team: str, first_id: int) -> list[BattleUnit]:
         if len(army) > len(positions):
@@ -261,7 +294,7 @@ class Battle:
         unit = self.unit(unit_id)
         if not unit.alive:
             raise RuleError('That unit has fallen.')
-        if unit.team != 'player':
+        if unit.team != self.active_team:
             raise RuleError('Choose one of your units.')
         return unit
 
@@ -522,21 +555,30 @@ class Battle:
             self._emit('retaliation', target.id, unit.id, text=self.log[-1])
         self._check_outcome()
 
+    def _magic(self, team: str | None = None) -> Battle | BattleMagic:
+        team = self.active_team if team is None else team
+        if team == 'player':
+            return self
+        if team == 'enemy' and self.enemy_magic is not None:
+            return self.enemy_magic
+        raise RuleError('This army has no spellcasting hero or shared mana.')
+
     def spell_cost(self, spell: str) -> int:
         if spell not in SPELLS:
             raise RuleError('Unknown spell.')
-        return self.spell_costs[spell]
+        return self._magic().spell_costs[spell]
 
     def _caster(self, spell: str, caster_id: int | None) -> BattleUnit:
-        if self.hero_id is None:
+        magic = self._magic()
+        if magic.hero_id is None:
             raise RuleError('This army has no spellcasting hero or shared mana.')
-        caster = self._actor(self.hero_id if caster_id is None else caster_id)
-        learned = spell in self.spells if caster.id == self.hero_id else spell == 'heal' and caster.can_heal
+        caster = self._actor(magic.hero_id if caster_id is None else caster_id)
+        learned = spell in magic.spells if caster.id == magic.hero_id else spell == 'heal' and caster.can_heal
         if spell not in SPELLS or not learned:
             raise RuleError('That spell has not been learned by this unit.')
         if caster.acted:
             raise RuleError('That unit has already acted.')
-        if self.mana < self.spell_cost(spell):
+        if magic.mana < self.spell_cost(spell):
             raise RuleError('Not enough mana.')
         return caster
 
@@ -558,14 +600,14 @@ class Battle:
         target = self.unit(target_id)
         if target not in self.spell_targets(spell, caster_id=caster_id):
             raise RuleError('Choose a visible wounded ally for Heal or an enemy for Bolt within 4 hexes.')
-        return min(self.spell_power[spell], target.max_hp - target.hp if spell == 'heal' else target.hp)
+        return min(self._magic().spell_power[spell], target.max_hp - target.hp if spell == 'heal' else target.hp)
 
     def cast(self, spell: str, target_id: int, *, caster_id: int | None = None) -> None:
         """Cast with the hero, or let a capable Acolyte spend the same mana on Heal."""
         caster = self._caster(spell, caster_id)
         amount = self.spell_preview(spell, target_id, caster_id=caster.id)
         target = self.unit(target_id)
-        self.mana -= self.spell_cost(spell)
+        self._magic().mana -= self.spell_cost(spell)
         caster.acted = caster.moved = True
         if spell == 'bolt':
             target.hp -= amount
@@ -581,9 +623,10 @@ class Battle:
         if (self.hero_id is not None and not self.unit(self.hero_id).alive) or not any(u.alive and u.team == 'player' for u in self.units):
             self.outcome = 'enemy'
             self.outcome_reason = 'hero_death' if self.hero_id is not None else 'rout'
-        elif not any(u.alive and u.team == 'enemy' for u in self.units):
+        elif ((self.enemy_magic is not None and not self.unit(self.enemy_magic.hero_id).alive)
+              or not any(u.alive and u.team == 'enemy' for u in self.units)):
             self.outcome = 'player'
-            self.outcome_reason = 'rout'
+            self.outcome_reason = 'hero_death' if self.enemy_magic is not None else 'rout'
         if self.outcome != before:
             self._emit('result', text='Victory.' if self.outcome == 'player' else 'Defeat.')
 
@@ -875,23 +918,37 @@ class Battle:
             elif unit.kind == 'pikeman':
                 self._guard(unit)
 
-    def end_turn(self) -> None:
-        if self.outcome:
-            raise RuleError('The battle is over.')
-        self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != 'enemy']
-        # Enemy actions begin fresh; retaliation refreshes once per full round.
+    def _finish_phase(self, team: str) -> None:
         for unit in self.units:
-            if unit.team == 'player':
+            if unit.team == team:
                 unit.pinned = False
-            else:
+
+    def _begin_phase(self, team: str) -> None:
+        self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != team]
+        if team == 'player':
+            self.round += 1
+        # Actions reset for the incoming army; reactions once per full round.
+        for unit in self.units:
+            if team == 'player':
+                unit.moved = unit.acted = unit.retaliated = False
+            if unit.team == team:
                 unit.pin_cooldown = max(0, unit.pin_cooldown - 1)
                 unit.moved = unit.acted = False
                 unit.stance = None
+
+    def end_turn(self) -> None:
+        if self.outcome:
+            raise RuleError('The battle is over.')
+        self._finish_phase(self.active_team)
+        if self.enemy_magic is not None:
+            self.active_team = 'enemy' if self.active_team == 'player' else 'player'
+            self._begin_phase(self.active_team)
+            self._emit('phase', text=f'{self.active_team.capitalize()} army turn.')
+            return
+        self._begin_phase('enemy')
         self._emit('phase', text='Enemy turn. Expired effects are cleared.')
         self._play_team('enemy')
-        for unit in self.units:
-            if unit.team == 'enemy':
-                unit.pinned = False
+        self._finish_phase('enemy')
         if not self.outcome:
             self._objective_turn()
             if self.objective.kind in ('hold', 'extract'):
@@ -902,13 +959,7 @@ class Battle:
             else:
                 self._emit('phase', text='Enemy effects expire.')
         if not self.outcome:
-            self.smoke_clouds = [cloud for cloud in self.smoke_clouds if cloud.expires_before_team != 'player']
-            self.round += 1
-            for unit in self.units:
-                unit.moved = unit.acted = unit.retaliated = False
-                if unit.team == 'player':
-                    unit.stance = None
-                    unit.pin_cooldown = max(0, unit.pin_cooldown - 1)
+            self._begin_phase('player')
             if self.round > 80:
                 self.outcome = 'enemy'
                 self.outcome_reason = 'exhaustion'
@@ -918,21 +969,28 @@ class Battle:
     def auto_turn(self) -> None:
         if self.outcome:
             raise RuleError('The battle is over.')
+        if self.enemy_magic is not None:
+            raise RuleError('Both human armies must give their own orders.')
         self._play_team('player')
         if not self.outcome:
             self.end_turn()
 
     def to_dict(self) -> dict:
-        return {'units': [asdict(unit) for unit in self.units],
+        data = {'units': [asdict(unit) for unit in self.units],
                 'terrain': [{'pos': list(pos), 'kind': kind} for pos, kind in self.terrain.items()],
                 'mana': self.mana, 'spells': sorted(self.spells), 'round': self.round,
                 'outcome': self.outcome, 'log': list(self.log),
                 'spell_costs': dict(self.spell_costs), 'spell_power': dict(self.spell_power), 'hero_id': self.hero_id,
                 'objective': asdict(self.objective), 'outcome_reason': self.outcome_reason,
                 'sight_rules': self.sight_rules, 'smoke_clouds': [asdict(cloud) for cloud in self.smoke_clouds]}
+        if self.enemy_magic is not None:
+            data['enemy_magic'] = {**asdict(self.enemy_magic), 'spells': sorted(self.enemy_magic.spells)}
+            data['active_team'] = self.active_team
+        return data
 
     @classmethod
     def from_dict(cls, data: dict) -> Battle:
+        enemy_magic = data.get('enemy_magic')
         return cls(units=[BattleUnit(**{**u, 'pos': tuple(u['pos']), 'abilities': tuple(u['abilities']), 'spent_abilities': tuple(u['spent_abilities'])}) for u in data['units']],
                    terrain={tuple(t['pos']): t['kind'] for t in data['terrain']},
                    mana=data['mana'], spells=set(data['spells']), round=data['round'],
@@ -941,4 +999,8 @@ class Battle:
                    objective=BattleObjective(**{**data['objective'], 'target': tuple(data['objective']['target']) if data['objective']['target'] is not None else None,
                                                 'exits': tuple(tuple(pos) for pos in data['objective']['exits'])}),
                    outcome_reason=data['outcome_reason'], sight_rules=data['sight_rules'],
-                   smoke_clouds=[SmokeCloud(tuple(cloud['pos']), cloud['expires_before_team']) for cloud in data['smoke_clouds']])
+                   smoke_clouds=[SmokeCloud(tuple(cloud['pos']), cloud['expires_before_team']) for cloud in data['smoke_clouds']],
+                   enemy_magic=BattleMagic(**{**enemy_magic, 'spells': set(enemy_magic['spells']),
+                                              'spell_costs': dict(enemy_magic['spell_costs']),
+                                              'spell_power': dict(enemy_magic['spell_power'])}) if enemy_magic is not None else None,
+                   active_team=data['active_team'] if enemy_magic is not None else 'player')
