@@ -396,33 +396,33 @@ class ShardScene(Screen):
             return y + height
 
         # Treasury and the hero remain visible while province commands are reviewed.
-        economy = [label('WESTWATCH ENCIRCLED' if s.encircled else 'YOUR DOMINION', 390,
+        economy = [label('WESTWATCH ENCIRCLED' if s.encircled else 'YOUR DOMINION', 414,
                          size=10, color=RED if s.encircled else MUTED),
-                   Row(metric('gold', s.gold, width=170, size=18 * scale, color=GOLD,
+                   Row(metric('gold', s.gold, width=115, size=16 * scale, color=GOLD,
                               detail='Spend on troops, buildings and recovery.'),
-                       metric('crystals', s.crystals, width=210, size=18 * scale, color=BLUE,
-                              detail='Spend on magical investment, special troops and adventure choices.'), spacing=10),
-                   Row(metric('income', f'+{s.income}', width=190, size=12 * scale, color=MUTED,
+                       metric('crystals', s.crystals, width=80, size=16 * scale, color=BLUE,
+                              detail='Spend on magical investment, special troops and adventure choices.'),
+                       metric('income', f'+{s.income}', width=100, size=12 * scale, color=MUTED,
                               detail='Gold earned each campaign turn.'),
-                       metric('upkeep', f'−{s.upkeep}', width=190, size=12 * scale,
+                       metric('upkeep', f'−{s.upkeep}', width=95, size=12 * scale,
                               color=RED if s.upkeep_shortfall else MUTED,
-                              detail='Gold paid each turn to maintain your army.'), spacing=10),
-                   label(f'Realm gold yield: {s.rules.gold_percent}% of base production', 390, size=10, color=MUTED)]
+                              detail='Gold paid each turn to maintain your army.'), spacing=8),
+                   label(f'Realm gold yield: {s.rules.gold_percent}% of base production', 414, size=10, color=MUTED)]
         if s.upkeep_shortfall:
             economy.append(label(f'{s.upkeep_shortfall} gold short: unpaid troops will leave.', 390, color=RED))
         elif s.encircled:
             economy.append(label('Capital supply blocked · V for breakout routes', 390, color=RED))
-        treasury_bottom = column(economy, 390, 26, 108)
+        treasury_bottom = column(economy, 414, 26, 108)
         hero_bottom = column([
-            label(f'{s.hero.name}, the {s.hero.hero_class}', 390, size=18, serif=True),
-            Row(metric('level', s.hero.level, width=100, size=12 * scale, color=GOLD),
-                metric('xp', s.hero.xp, width=130, size=12 * scale, color=GOLD),
-                metric('actions', s.actions_left, width=140, size=12 * scale, color=GOLD,
-                       detail='Travel and exploration spend an action; End turn restores them.'), spacing=10),
-            Row(metric('health', f'{s.hero.hp} / {s.hero.max_hp}', width=185, size=12 * scale, color=TEAL),
-                metric('mana', f'{s.hero.mana} / {s.hero.max_mana}', width=195, size=12 * scale, color=BLUE), spacing=10),
-            label(f'At {s.provinces[s.hero.pos].name}', 390, size=11, color=MUTED),
-        ], 390, 452, 108)
+            label(f'{s.hero.name}, the {s.hero.hero_class}', 402, size=16, serif=True),
+            Row(metric('health', f'{s.hero.hp} / {s.hero.max_hp}', width=140, size=12 * scale, color=TEAL),
+                metric('mana', f'{s.hero.mana} / {s.hero.max_mana}', width=140, size=12 * scale, color=BLUE),
+                metric('actions', s.actions_left, width=106, size=12 * scale, color=GOLD,
+                       detail='Travel and exploration spend an action; End turn restores them.'), spacing=8),
+            Row(label(f'At {s.provinces[s.hero.pos].name}', 216, size=10, color=MUTED),
+                metric('level', s.hero.level, width=65, size=10 * scale, color=GOLD),
+                metric('xp', s.hero.xp, width=105, size=10 * scale, color=GOLD), spacing=8),
+        ], 402, 452, 108)
         self._summary_bottom = max(treasury_bottom, hero_bottom) + 16
 
         p = s.provinces[self.selected]
@@ -444,7 +444,7 @@ class ShardScene(Screen):
             details.append(label('Defenders: ' + (guards or 'None'), width, color=RED))
         site = (p.site + (' · cleared' if p.explored else '')) if p.site else 'No ruins in this province'
         details.append(label(site, width, color=MUTED if p.explored else GOLD))
-        hint = 'Select a neighboring province. Tab cycles neighbors; Home selects your hero.'
+        hint = 'Tab: nearby provinces · Home: hero'
         if not s.actions_left:
             hint = 'No actions left. End the turn.'
         elif not here and not adjacent:
@@ -467,21 +467,21 @@ class ShardScene(Screen):
         self.button('Explore current province', x + width - 80, y, 80, self.explore, hotkey='X',
                     icon='explore', show_text=False, tooltip='Explore (X). ' + explore_hint,
                     enabled=can_act and current.owner == 'player' and current.site is not None and not current.explored)
-        y = column([label('YOUR STRONGHOLD', width, size=10, color=MUTED),
-                    label(f'{len(s.buildings)}/{len(BUILDINGS)} buildings · {len(s.hero.army)}/{s.hero.max_army} troops',
-                          width, color=MUTED)], width, x, y + 70) + 12
-        self.button('Build stronghold', x, y, 80, self.buildings, hotkey='B', enabled=playing,
+        y += 58
+        column([label('STRONGHOLD', 170, size=10, color=MUTED),
+                    label(f'{len(s.buildings)}/{len(BUILDINGS)} buildings',
+                          170, size=10, color=MUTED)], 170, x, y)
+        self.button('Build stronghold', x + 180, y, 80, self.buildings, hotkey='B', enabled=playing,
                     icon='build', show_text=False,
                     tooltip='Build stronghold (B). Review permanent buildings and their costs.')
-        self.button('Recruit troops', x + 92, y, 80, self.recruitment, hotkey='R', enabled=playing,
+        self.button('Recruit troops', x + 276, y, 80, self.recruitment, hotkey='R', enabled=playing,
                     icon='recruit', show_text=False,
                     tooltip='Recruit troops (R). Review troops, abilities and recruitment costs.')
-        self.button('End turn', x, y + 70, 80, self.end_turn, hotkey='E', primary=True, enabled=playing,
+        self.button('End turn', x, h - 66, 176, self.end_turn, hotkey='E', primary=True, enabled=playing,
                     icon='end_turn', show_text=False,
                     tooltip='End turn (E). Collect income, pay upkeep, recover and let the rival act.')
-        column([label(f'Turn {s.turn}', width - 96, size=13, color=GOLD)], width - 96, x + 96, y + 80)
-        column([label(f'Rival expedition: {len(s.rival.army)} troops', width,
-                      size=11, color=MUTED)], width, x, y + 126)
+        column([label(f'Turn {s.turn}', width - 196, size=13, color=GOLD)], width - 196, x + 196, h - 56)
+        objective_top = y + 62
 
         self.icon_button('guide', 'Guide', 788, 28, self.help, hotkey='F1')
         self.icon_button('hero', 'Hero', 878, 28, self.hero_details, hotkey='H')
@@ -494,24 +494,28 @@ class ShardScene(Screen):
         column([label(f'{THEMES[s.theme].name.upper()} / SHARD {s.seed} / {s.rules.title.upper()}', 540, size=10, color=GOLD)],
                540, 26, 64)
 
-        # Current objectives sit outside the map; selecting a province does not replace them.
-        y = self._summary_bottom + 12
+        # The inspector carries the full objective, leaving the board its own space.
+        y = objective_top
         if s.campaign:
-            self.icon_button('campaign', 'Campaign', 644, y, self.campaign_plan, shortcut='J',
+            self.icon_button('campaign', 'Campaign', x + width - 80, y, self.campaign_plan, shortcut='J',
                              tooltip='Campaign (J). Review your route, objectives and veteran carryover.')
-            y = column([label(f'Stage {s.campaign.stage} of 3', 210, size=11, color=MUTED),
-                        label(s.campaign.objective, 210, size=12, color=GOLD)],
-                       210, 644, y + 48) + 12
+            column([label('CAMPAIGN', width - 96, size=10, color=MUTED),
+                    label(f'Stage {s.campaign.stage} of 3', width - 96, size=11, color=MUTED)],
+                   width - 96, x, y)
+            y = column([label(s.campaign.objective, width, size=12, color=GOLD)],
+                       width, x, y + 50) + 14
         else:
-            y = column([label('Capture Duskspire', 210, size=14, color=GOLD, serif=True),
-                        label('Protect Westwatch', 210, size=12, color=MUTED)], 210, 644, y) + 16
-        self.icon_button('rival', 'Rival plan', 644, y, self.rival_details, shortcut='V',
+            y = column([label('Capture Duskspire', width, size=14, color=GOLD, serif=True),
+                        label('Protect Westwatch', width, size=12, color=MUTED)], width, x, y) + 14
+        self.icon_button('rival', 'Rival plan', x + width - 80, y, self.rival_details, shortcut='V',
                          tooltip='Rival plan (V). Inspect the expedition, its troops and next attack.')
-        column([label(rival_order(s), 210, size=11, color=RED)], 210, 644, y + 50)
+        column([label('RIVAL EXPEDITION', width - 96, size=10, color=MUTED),
+                label(f'{len(s.rival.army)} troops', width - 96, size=11, color=MUTED)], width - 96, x, y)
+        column([label(rival_order(s), width, size=11, color=RED)], width, x, y + 50)
 
         army_top = h - 158
         self.grid = HexGrid(s.provinces, size=min(59, (army_top - self._summary_bottom - 24) / 8),
-                            origin=(326, (self._summary_bottom + army_top) / 2))
+                            origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
         self._province_name_boxes = []
         for pos, province in s.provinces.items():
             if pos not in ((-2, 0), (2, 0)):
@@ -526,7 +530,7 @@ class ShardScene(Screen):
             self._province_name_boxes.append((left, top - 1, name_width, name_height + 2))
         self._hover_name = None
         self._update_hover_label()
-        column([label('YOUR ARMY', self.edge - 52, size=10, color=MUTED)],
+        column([label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', self.edge - 52, size=10, color=MUTED)],
                self.edge - 52, 26, army_top)
         army_y = army_top + round(22 * scale)
         self._army_art = []
