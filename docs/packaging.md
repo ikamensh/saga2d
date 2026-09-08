@@ -12,6 +12,16 @@ LaunchServices smoke and local ad-hoc signature verification. Its ordinary UI-on
 check stopped at the locked Mac; this does not establish clean-account, Windows,
 human playtest/listening or co-op connectivity acceptance.
 
+## Installed local copy
+
+`/Applications/Shardbound.app` is the extracted `Shardbound-macos-arm64.zip`
+from clean source `5ba80b8`, installed 2026-09-08. The installed executable
+hash matches the dist build and manifest, `codesign --verify --deep --strict`
+passes for the ad-hoc signature, and the installed app passed the full packaged
+smoke journey launched through LaunchServices from `/Applications`. To update
+it, rebuild, extract the new archive and replace the app in Finder; saves and
+settings live in the game's data directory and are preserved.
+
 ## Build locally
 
 From the repository root, with uv installed:
