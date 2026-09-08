@@ -1,0 +1,51 @@
+{
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "game": "warband",
+  "rooms": [
+    {
+      "code": "yiwhi97qi263",
+      "ready_seconds": 0.481
+    },
+    {
+      "code": "2bxj3icircdv",
+      "ready_seconds": 0.4
+    },
+    {
+      "code": "zymjldgfsyjk",
+      "ready_seconds": 0.421
+    },
+    {
+      "code": "7xxvoauyfi41",
+      "ready_seconds": 0.461
+    }
+  ],
+  "health_ms": [
+    132.9,
+    105.8,
+    90.6,
+    117.4,
+    140.2,
+    97.6,
+    137.8,
+    170.4,
+    139.4
+  ],
+  "seats": 8,
+  "load_seconds": 90.0,
+  "orders_sent": 716,
+  "order_errors": 0,
+  "error_examples": [],
+  "state_updates": 7841,
+  "state_gap_ms": {
+    "p50": 97.9,
+    "p95": 123.7,
+    "max": 325.4
+  },
+  "disconnects": 0,
+  "total_seconds": 91.8,
+  "simulation_ticks_per_second": {
+    "min": 19.35,
+    "max": 19.62,
+    "expected": 20
+  }
+}

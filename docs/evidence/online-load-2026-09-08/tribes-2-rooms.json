@@ -1,0 +1,34 @@
+{
+  "endpoint": "wss://games.tachyon-ai.eu/play",
+  "game": "tribes",
+  "rooms": [
+    {
+      "code": "cvahu54mjzix",
+      "ready_seconds": 0.368
+    },
+    {
+      "code": "ewsqbnlfxp6e",
+      "ready_seconds": 0.383
+    }
+  ],
+  "health_ms": [
+    138.8,
+    98.6,
+    101.1,
+    102.1,
+    95.3
+  ],
+  "seats": 4,
+  "load_seconds": 45.0,
+  "orders_sent": 178,
+  "order_errors": 0,
+  "error_examples": [],
+  "state_updates": 178,
+  "state_gap_ms": {
+    "p50": 1006.5,
+    "p95": 1225.7,
+    "max": 1927.7
+  },
+  "disconnects": 0,
+  "total_seconds": 45.8
+}
