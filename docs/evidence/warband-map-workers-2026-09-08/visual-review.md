@@ -1,10 +1,16 @@
 # Independent visual review — 8 September 2026
 
-Reviewed all 19 final native pyglet captures at a 1280 × 800 logical canvas:
+Reviewed all 19 source native pyglet captures at a 1280 × 800 logical canvas:
 ten map views and nine Settlement UI views, after inspecting earlier captures
 and reporting defects. The final files in `native/` and `settlement/` replace
 those earlier captures. Survey views deliberately reveal fog and freeze the
-simulation; they are inspection views.
+simulation; they are inspection views. The Settlement overlays were rechecked
+after the final camera fix at `85becd0fda8493fffc14ad33baee32f4fccdee64`.
+
+Also inspected all nine final Mac portable frames and all nine installed-app
+frames from that same source and version `0.1.0-preview.3`. The installed
+[receipt and image list](mac-package/installed-native.json) identify the actual
+`/Applications/Warband.app` executable and Apple M4 renderer.
 
 ## Confirmed findings and fixes
 
@@ -39,6 +45,22 @@ simulation; they are inspection views.
   and “Training 8%” for the Town Hall's Peasant, matching the visible foundation
   and queued production.
 
+- **Transparent overlays preserve the map camera.** A later packaged
+  Crimson-seat capture exposed the underlying map jumping to the origin when
+  Plans opened. This was less obvious in the earlier Azure-seat fixture. The
+  shared renderer now retains the visible game scene's camera under a
+  transparent menu. The final installed [Train catalogue](mac-package/installed-native-settlement-train.png),
+  [Plans panel](mac-package/installed-native-settlement-plans.png) and
+  [Match menu](mac-package/installed-native-match-menu.png) keep the Crimson
+  base at the same screen position. The portable sequence and refreshed
+  source Settlement overlays also show stable map placement.
+- **Packaged menu flow remains readable.** Both final Mac sequences show the
+  title, Multiplayer menu, copied room code, pasted code, joined match, Train,
+  Plans, Match menu and a fresh offline match. Room controls, costs, waiting
+  reason, cancellation and menu labels are legible. The horizontal blue rules
+  in the first offline frame belong to the temporary opening banner; they
+  are distinct from the resolved terrain seams.
+
 ## Optional art refinements
 
 Winter's per-tile brightness changes still give clearings a subtle checkerboard
@@ -49,7 +71,10 @@ separate from the resolved rendering seams.
 
 The larger meadow, forest, pond and rocky regions are visually distinct.
 Buildings, trees and resources remain legible in all three palettes. This
-review establishes the appearance of the inspected captures, not packaged
-release acceptance, animation/performance coverage or a complete match.
+review establishes the appearance of the inspected source and Mac package
+captures. The [runtime receipt](mac-package/mac-verification.json) separately
+records successful native input and public-network checks; screenshots alone
+do not establish animation/performance coverage, physical Windows GPU
+compatibility or a complete match.
 The Plans screenshots contain up to four entries; they do not establish
 every pagination or long-message layout.
