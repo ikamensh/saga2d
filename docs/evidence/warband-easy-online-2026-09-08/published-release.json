@@ -1,0 +1,48 @@
+{
+  "checked_at_utc": "2026-09-08T09:30:40.773524+00:00",
+  "version": "0.1.0-preview.2",
+  "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+  "release_url": "https://github.com/ikamensh/saga2d/releases/tag/warband-v0.1.0-preview.2",
+  "release_id": 384591504,
+  "published_at_utc": "2026-09-08T09:20:57Z",
+  "public_unauthenticated_download": true,
+  "download_method": "curl --disable --fail --location; no authentication headers, cookies or credentials; curl config disabled",
+  "comparison_directory": "dist/warband-release-0.1.0-preview.2",
+  "scope": "Public distribution/download integrity check of all three shipping assets. Runtime acceptance is recorded separately in the package evidence.",
+  "passed": true,
+  "assets": [
+    {
+      "file": "Warband-0.1.0-preview.2-darwin-arm64-app.zip",
+      "url": "https://github.com/ikamensh/saga2d/releases/download/warband-v0.1.0-preview.2/Warband-0.1.0-preview.2-darwin-arm64-app.zip",
+      "asset_id": 550210195,
+      "bytes": 22299590,
+      "sha256": "d16680716754002a8ce6debfb7a2730b0fe64f616fa8c50c7eb6b74960e7a3bf",
+      "matches_local_artifact": true,
+      "matches_checksum_file": true,
+      "matches_build_manifest": true,
+      "matches_public_release_metadata": true
+    },
+    {
+      "file": "Warband-0.1.0-preview.2-windows-x64-portable.zip",
+      "url": "https://github.com/ikamensh/saga2d/releases/download/warband-v0.1.0-preview.2/Warband-0.1.0-preview.2-windows-x64-portable.zip",
+      "asset_id": 550210158,
+      "bytes": 37285395,
+      "sha256": "766de3deb94e49a8781bee57e94d613daeff946aafd50aaa11f6f97a24955b9d",
+      "matches_local_artifact": true,
+      "matches_checksum_file": true,
+      "matches_build_manifest": true,
+      "matches_public_release_metadata": true
+    },
+    {
+      "file": "Warband-0.1.0-preview.2-windows-x64-setup.exe",
+      "url": "https://github.com/ikamensh/saga2d/releases/download/warband-v0.1.0-preview.2/Warband-0.1.0-preview.2-windows-x64-setup.exe",
+      "asset_id": 550210156,
+      "bytes": 27006651,
+      "sha256": "c4f749b167f1ed797487a08e8851f9f8ae31312e1bb6065366d76e4936f5f295",
+      "matches_local_artifact": true,
+      "matches_checksum_file": true,
+      "matches_build_manifest": true,
+      "matches_public_release_metadata": true
+    }
+  ]
+}
