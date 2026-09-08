@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+  "version": "0.1.0-preview.1",
+  "frozen": true,
+  "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/extracted-package-s9qhkcb2/Tribes/Tribes",
+  "executable_sha256": "bbf7237821809321e1d31fe294111b542f25c51c374791b72b80965e0f19af4a",
+  "bundled_fonts": true,
+  "online": {
+    "create_join": true,
+    "foreign_turn_rejected": true,
+    "authoritative_turns": true,
+    "private_seat_rejoin": true
+  }
+}

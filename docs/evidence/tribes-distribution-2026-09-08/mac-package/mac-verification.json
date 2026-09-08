@@ -1,0 +1,46 @@
+{
+  "native": {
+    "backend": "pyglet",
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/extracted-package-s9qhkcb2/Tribes/Tribes",
+    "executable_sha256": "bbf7237821809321e1d31fe294111b542f25c51c374791b72b80965e0f19af4a",
+    "images": [
+      "native-title.png",
+      "native-multiplayer.png",
+      "native-room-code.png",
+      "native-paste-code.png",
+      "native-online-match.png",
+      "native-pause-menu.png",
+      "native.png"
+    ],
+    "native_clipboard_join": true,
+    "native_invite_link": true,
+    "native_multiplayer_input": true,
+    "native_turn_exchange": true,
+    "opengl_version": "4.1 Metal - 90.5",
+    "passed": true,
+    "renderer": "Apple M4",
+    "sound_catalogue": 17,
+    "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+    "vendor": "Apple",
+    "version": "0.1.0-preview.1"
+  },
+  "passed": true,
+  "portable": {
+    "bundled_fonts": true,
+    "executable": "/private/var/folders/nd/kyv94clx4psdrhs6wz131gz40000gn/T/extracted-package-s9qhkcb2/Tribes/Tribes",
+    "executable_sha256": "bbf7237821809321e1d31fe294111b542f25c51c374791b72b80965e0f19af4a",
+    "frozen": true,
+    "online": {
+      "authoritative_turns": true,
+      "create_join": true,
+      "foreign_turn_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+    "version": "0.1.0-preview.1"
+  },
+  "scope": "Loopback authority; isolated profile on the named CI host",
+  "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+  "version": "0.1.0-preview.1"
+}

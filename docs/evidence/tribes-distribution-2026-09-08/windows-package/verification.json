@@ -1,0 +1,85 @@
+{
+  "install_shortcut_uninstall": true,
+  "installed": {
+    "bundled_fonts": true,
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\extracted-package-kbf21nm_\\Installed Tribes\\Tribes.exe",
+    "executable_sha256": "fb3077efdb4fac10da52ca4dd9aae4cf623f88426a83e4dabfd8d6671b2a92bc",
+    "frozen": true,
+    "online": {
+      "authoritative_turns": true,
+      "create_join": true,
+      "foreign_turn_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+    "version": "0.1.0-preview.1"
+  },
+  "native": {
+    "backend": "pyglet",
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\extracted-package-kbf21nm_\\Installed Tribes\\Tribes.exe",
+    "executable_sha256": "fb3077efdb4fac10da52ca4dd9aae4cf623f88426a83e4dabfd8d6671b2a92bc",
+    "graphics_test_context": {
+      "dll_sha256": {
+        "libgallium_wgl.dll": "1a2e49cd5fdb1a857d98117ab04240d723b57da5dffe6d07f5386f42014557c1",
+        "opengl32.dll": "33b217ed7947b48684baa987914475898a2b4d7d64cce96b078216c67a633582"
+      },
+      "driver": "Mesa llvmpipe (test only)"
+    },
+    "images": [
+      "native-title.png",
+      "native-multiplayer.png",
+      "native-room-code.png",
+      "native-paste-code.png",
+      "native-online-match.png",
+      "native-pause-menu.png",
+      "native.png"
+    ],
+    "native_clipboard_join": true,
+    "native_invite_link": true,
+    "native_multiplayer_input": true,
+    "native_turn_exchange": true,
+    "opengl_version": "4.6 (Compatibility Profile) Mesa 26.2.0 (git-aacd123e02)",
+    "passed": true,
+    "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "sound_catalogue": 17,
+    "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+    "vendor": "Mesa",
+    "version": "0.1.0-preview.1"
+  },
+  "passed": true,
+  "portable": {
+    "bundled_fonts": true,
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\extracted-package-kbf21nm_\\Tribes\\Tribes.exe",
+    "executable_sha256": "fb3077efdb4fac10da52ca4dd9aae4cf623f88426a83e4dabfd8d6671b2a92bc",
+    "frozen": true,
+    "online": {
+      "authoritative_turns": true,
+      "create_join": true,
+      "foreign_turn_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+    "version": "0.1.0-preview.1"
+  },
+  "public_server": {
+    "bundled_fonts": true,
+    "endpoint": "wss://games.tachyon-ai.eu/play",
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\extracted-package-kbf21nm_\\Installed Tribes\\Tribes.exe",
+    "executable_sha256": "fb3077efdb4fac10da52ca4dd9aae4cf623f88426a83e4dabfd8d6671b2a92bc",
+    "frozen": true,
+    "online": {
+      "authoritative_turns": true,
+      "create_join": true,
+      "foreign_turn_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+    "version": "0.1.0-preview.1"
+  },
+  "scope": "Loopback authority; isolated profile on the named CI host",
+  "source_commit": "ea5a2a2ece444885edb29034ce34f029cce664d9",
+  "version": "0.1.0-preview.1"
+}
