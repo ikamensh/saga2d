@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import logging
 import signal
+import sys
 
 from online_server import run
 
@@ -21,16 +22,20 @@ def main():
     logging.basicConfig(level=logging.WARNING)
 
     async def start():
-        task = asyncio.current_task()
-        for signum in (signal.SIGTERM, signal.SIGINT):
-            asyncio.get_running_loop().add_signal_handler(signum, task.cancel)
+        # Windows event loops don't support add_signal_handler; asyncio.run
+        # already cancels the main task on Ctrl-C there. Unix services also
+        # need graceful SIGTERM cancellation to flush their room checkpoints.
+        if sys.platform != 'win32':
+            task = asyncio.current_task()
+            for signum in (signal.SIGTERM, signal.SIGINT):
+                asyncio.get_running_loop().add_signal_handler(signum, task.cancel)
         await run(args.host, args.port, state_dir=args.state_dir, room_ttl=args.room_ttl,
                   max_rooms=args.max_rooms, max_connections=args.max_connections,
                   trusted_proxy=args.trusted_proxy)
 
     try:
         asyncio.run(start())
-    except asyncio.CancelledError:
+    except (asyncio.CancelledError, KeyboardInterrupt):
         pass
 
 

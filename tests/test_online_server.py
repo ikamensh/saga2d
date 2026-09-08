@@ -3,13 +3,28 @@ from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
-import select
+import queue
 import subprocess
 import sys
+import threading
 import time
 
 import pytest
 from websockets.sync.client import connect
+
+
+def first_stdout_line(process, timeout=15):
+    """Wait for subprocess readiness on every platform; kill a timed-out child."""
+    lines = queue.Queue(maxsize=1)
+    reader = threading.Thread(target=lambda: lines.put(process.stdout.readline()), daemon=True)
+    reader.start()
+    try:
+        return lines.get(timeout=timeout)
+    except queue.Empty:
+        process.kill()
+        raise AssertionError('subprocess startup timed out') from None
+    finally:
+        reader.join(timeout=5)
 
 
 @contextmanager
@@ -22,13 +37,12 @@ def running_server(*arguments):
         env={**os.environ, 'PYTHONUNBUFFERED': '1'},
     )
     try:
-        readable, _, _ = select.select([process.stdout, process.stderr], [], [], 15)
-        assert process.stdout in readable, process.stderr.readline() if readable else 'server startup timed out'
-        endpoint = process.stdout.readline().strip()
+        endpoint = first_stdout_line(process).strip()
         assert endpoint.startswith('LISTENING ws://'), endpoint
         yield endpoint.removeprefix('LISTENING '), process
     finally:
-        process.terminate()
+        if process.poll() is None:
+            process.terminate()
         try:
             _, errors = process.communicate(timeout=5)
         except subprocess.TimeoutExpired:
