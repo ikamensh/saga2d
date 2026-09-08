@@ -30,8 +30,9 @@ def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tm
         assert name.bounds[1] > 100, 'Hover name belongs beside the map, clear of the title toolbar'
         x, y, width, height = name.bounds
         cx, cy = game.scene.grid.center(province.pos)
-        assert x <= cx <= x + width and y <= cy <= y + height, (
-            'The revealed name must belong visually to the hovered province, not its neighbor')
+        assert x <= cx <= x + width and cy < y < y + height < cy + game.scene.grid.size, (
+            'A slim name caption sits below the landmark, inside the hovered province')
+        assert height < game.scene.grid.size / 2, 'Names must leave most of the terrain visible'
         game.backend.inject_mouse_move(2, 2)
         game.tick(1 / 60)
         assert province.name not in visible_names()

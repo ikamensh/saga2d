@@ -680,17 +680,14 @@ class ShardScene(Screen):
             self._hover_name = None
         if self.hover is not None:
             title = self.state.provinces[self.hover].name
-            font_size = round(11 * reading_scale(self.game) / 100)
-            word_width = max(self.measure(Label(word, font='Verdana', font_size=font_size))[0]
-                             for word in title.split())
-            name = Label(title, font='Verdana', font_size=font_size, text_color=TEXT,
-                         width=max(round(self.grid.size * 1.4), word_width), wrap=True, align='center')
+            name = Label(title, font='Verdana', font_size=round(10 * reading_scale(self.game) / 100),
+                         text_color=TEXT, align='center')
             width, height = self.measure(name)
             cx, cy = self.grid.center(self.hover)
             # This is a reading annotation; the province underneath receives input.
             self._hover_name = Column(name, anchor=Anchor.TOP_LEFT, enabled=False,
-                                     margin=(round(cx - width / 2 - 6), round(cy - height / 2 - 6)),
-                                     style=Style(padding=6, background_color=INK, border_color=LINE,
+                                     margin=(round(cx - width / 2 - 4), round(cy + self.grid.size * .60 - height - 4)),
+                                     style=Style(padding=4, background_color=INK, border_color=LINE,
                                                  border_width=1, radius=4))
             self.ui.add(self._hover_name)
 

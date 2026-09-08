@@ -121,7 +121,7 @@ def verify(output, *, backend='pyglet', budget=None):
             assert len(labels) == 1 and labels[0].text == root.state.provinces[pos].name
             x, y, width, height = box.bounds
             cx, cy = root.grid.center(pos)
-            assert x <= cx <= x + width and y <= cy <= y + height
+            assert x <= cx <= x + width and cy < y < y + height < cy + root.grid.size
             assert 26 <= x < x + width <= root.edge - 26
             assert root._summary_bottom <= y < y + height <= game.height - 158
             lx, ly, lw, lh = labels[0].bounds
