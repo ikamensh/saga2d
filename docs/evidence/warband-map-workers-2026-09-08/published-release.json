@@ -1,0 +1,76 @@
+{
+  "checked_at_utc": "2026-09-08T11:21:11.901172+00:00",
+  "version": "0.1.0-preview.3",
+  "source_commit": "85becd0fda8493fffc14ad33baee32f4fccdee64",
+  "release_url": "https://github.com/ikamensh/saga2d/releases/tag/warband-v0.1.0-preview.3",
+  "release_id": 384645366,
+  "published_at_utc": "2026-09-08T10:44:22Z",
+  "public_tag_matches_source": true,
+  "public_unauthenticated_download": true,
+  "download_method": "curl --disable --fail --location; no authentication headers, cookies or credentials; curl config disabled",
+  "comparison_directory": "dist/warband-release-0.1.0-preview.3",
+  "scope": "Public distribution/download integrity check of all three shipping assets. Runtime acceptance is recorded separately in the package evidence.",
+  "passed": true,
+  "assets": [
+    {
+      "file": "Warband-0.1.0-preview.3-darwin-arm64-app.zip",
+      "url": "https://github.com/ikamensh/saga2d/releases/download/warband-v0.1.0-preview.3/Warband-0.1.0-preview.3-darwin-arm64-app.zip",
+      "asset_id": 550318278,
+      "bytes": 22355812,
+      "sha256": "4b968c2d3f1aea2c06c0dae2e1916585dc32256340757ac5baf6528f1688c356",
+      "matches_local_artifact": true,
+      "matches_checksum_file": true,
+      "matches_build_manifest": true,
+      "matches_public_release_metadata": true
+    },
+    {
+      "file": "Warband-0.1.0-preview.3-windows-x64-portable.zip",
+      "url": "https://github.com/ikamensh/saga2d/releases/download/warband-v0.1.0-preview.3/Warband-0.1.0-preview.3-windows-x64-portable.zip",
+      "asset_id": 550318275,
+      "bytes": 37340330,
+      "sha256": "945fcccc5055781d43c6c725b4c0da94bcff1ca406e90fa17ef8bb172bae2de7",
+      "matches_local_artifact": true,
+      "matches_checksum_file": true,
+      "matches_build_manifest": true,
+      "matches_public_release_metadata": true
+    },
+    {
+      "file": "Warband-0.1.0-preview.3-windows-x64-setup.exe",
+      "url": "https://github.com/ikamensh/saga2d/releases/download/warband-v0.1.0-preview.3/Warband-0.1.0-preview.3-windows-x64-setup.exe",
+      "asset_id": 550318274,
+      "bytes": 27055132,
+      "sha256": "10a1a78748f9b2954fa3a18119dee359d8254d4e36efb8226032e1fd1d190a26",
+      "matches_local_artifact": true,
+      "matches_checksum_file": true,
+      "matches_build_manifest": true,
+      "matches_public_release_metadata": true
+    }
+  ],
+  "public_metadata": [
+    {
+      "file": "SHA256SUMS",
+      "sha256": "68a406d92dbd9c761d446258cbe0d98d88defc29beac9c5a0cdd279c22b97998",
+      "matches_local": true
+    },
+    {
+      "file": "mac-build-manifest.json",
+      "sha256": "38af91e178fbe0e40b347e429425a2de5a8aba830dfd60df2c2bfea973bedc30",
+      "matches_local": true
+    },
+    {
+      "file": "windows-build-manifest.json",
+      "sha256": "d4b567e469f5cd8dbdbea2f024c69fb0c9df0d75bde403e22fc54b6eeedfca10",
+      "matches_local": true
+    },
+    {
+      "file": "mac-verification.json",
+      "sha256": "07778b26d15566f6f05194d57632e15ee9c5adad2064bf8eb00ff73706d4f531",
+      "matches_local": true
+    },
+    {
+      "file": "windows-verification.json",
+      "sha256": "05399a0d28b98c6186320b2600ec0d34ea81a111fad46cccf1b94bc93412f207",
+      "matches_local": true
+    }
+  ]
+}
