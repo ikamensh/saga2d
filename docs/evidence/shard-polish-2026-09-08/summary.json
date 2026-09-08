@@ -1,0 +1,45 @@
+{
+  "accepted_source": "3e1e75bd163443f0f353b0e6fb05f7bdc7d03d3f",
+  "accepted_source_matches_native_receipt": true,
+  "targeted_tests": [
+    {
+      "paths": [
+        "tests/eador/test_shard_map.py",
+        "tests/eador/test_shard_reading.py",
+        "tests/eador/test_scene.py"
+      ],
+      "passed": 22,
+      "pytest_seconds": 14.51,
+      "wall_seconds": 14.765,
+      "cpu_seconds": 3.677,
+      "scope": "After second visual cycle"
+    },
+    {
+      "paths": [
+        "tests/eador/test_shard_map.py",
+        "tests/eador/test_shard_reading.py"
+      ],
+      "passed": 7,
+      "pytest_seconds": 8.9,
+      "wall_seconds": 9.181,
+      "cpu_seconds": 2.288,
+      "scope": "After final arrow and base-income changes"
+    }
+  ],
+  "native_cpu_percent_of_one_core": 25.160160569719032,
+  "native_final_frames_inspected": [
+    "linked-opening-125-home.png",
+    "linked-opening-125-hover.png",
+    "linked-opening-125-neighbor.png",
+    "linked-opening-125-north.png",
+    "linked-opening-125-south.png",
+    "longest-contract-125-home.png",
+    "no-actions-125-home.png",
+    "paid-full-army-125-home.png",
+    "ruins-opening-125-home.png",
+    "saved-encircled-125-home.png",
+    "solo-opening-100-home.png"
+  ],
+  "independent_review": "Accepted: cycle-2 map/full-army/encirclement and all three final adjacent movement cues. No material concerns.",
+  "scope": "Source-game presentation only. Existing preserved Mac archive was not rebuilt. No campaign rules or Saga2D API changes in the visual commits."
+}

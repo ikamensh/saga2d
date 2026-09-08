@@ -9,6 +9,15 @@ apply to their named source snapshots, not to today's build.
 
 ## Current source work — 2026-09-08
 
+**3e1e75b** adds three further shard critique cycles: a quieter province inspector,
+compass site markers, a helmet banner for the hero, connected terrain edges,
+separate army cards and a direction cue for an available selected journey.
+[Native frames and validation](evidence/shard-polish-2026-09-08/README.md) include
+22 targeted integration tests, seven final shard tests, 133 native selections,
+133 hover checks and four exact command comparisons. All 11 final PNGs were
+inspected; the native job averaged 25.16% of one core and closed successfully.
+This additional polish is newer than the preserved Mac archive below.
+
 **ed27f24** completes three native screenshot/critique/improvement passes on
 the shard map: compact landmark labels and full names on demand, a centered
 board, consolidated summaries, wider objective text and clearer contextual
@@ -27,6 +36,11 @@ restoration and rejected duplicate/contested orders, with 119 solo compatibility
 checks and 14 concurrent/co-op/server checks passing. This source change is
 newer than the packaged archive below. Pending human conflicts and playable
 network presentation remain open; selectable multiplayer is still shared-realm co-op.
+
+**96eb221** adds the underlying alternating human battle kernel: two heroes,
+separate magic pools, correct source troop IDs, both armies' results and a saved
+active side. Its 119 focused duel/solo compatibility tests pass. This is a model
+checkpoint; campaign encounter integration and playable PvP remain unfinished.
 
 ## Current packaged checkpoint — 2026-09-08
 

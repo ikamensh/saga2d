@@ -1,0 +1,240 @@
+{
+  "backend": "pyglet",
+  "cpu_percent_requested": 25.0,
+  "source_revision": "dc6df32986ff820523afc9ceea5b07fbeb32dcb7",
+  "source_sha256": {
+    "eador/scene.py": "aa240e9e5a8ae31caa1055adb4bab5b1c32f53c0fb9c7d1b38265b5cf7386637",
+    "eador/art.py": "91c7b6bebcf8871878c88d9564570411d9d568ebf433ebcfd263ff7a7a179358",
+    "eador/ui.py": "f24bd1d3dcab4a57e237bd31be3d34e4e3af96ee03592260675c27dccca61e74",
+    "tools/verify_eador_shard_look.py": "f1671607dc45833acf11e7e9c52a50f1a78c7de4603348c5d3be13a9a32b9563",
+    "tools/verify_eador_shard_reading.py": "60b7960f4dab15e75795e4af0a2d935b72dd932c0c9cbf7df9608cc8d0bb21f9"
+  },
+  "cases": [
+    {
+      "name": "solo-opening",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "dc02e2f21269badffe47afac0df8648353e7ae8f247c163174c108e1fdb89899"
+    },
+    {
+      "name": "linked-opening",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "9d3f86c7ea0b1be684b11526fc33eacd040ade8e7ed4f40054b3832515b6df45"
+    },
+    {
+      "name": "ruins-opening",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "69f90bd89dd75b00a6b6a5bea1c6a53e609361c0dea5d616e2cdfe6a3f7db6c8"
+    },
+    {
+      "name": "no-actions",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "f1127da800a0ba71ff2b4b8b7c2d0fc847e03694f3c8d4f3332d795f5d6b71ba"
+    },
+    {
+      "name": "paid-full-army",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "08188bcd71dd32fc8d72d5b80cea01eea0b321a46f097eb9e66e0a3dcf83a95b"
+    },
+    {
+      "name": "saved-encircled",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "ed098314b3bae7b7c195bc591dc114d0aa6c752f402f4a602b3b470cd183c856"
+    },
+    {
+      "name": "longest-contract",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "4faf46854ebb25c38554166f7bce7c040dc298966ea22a8c5e61e10cea7e03f5"
+    }
+  ],
+  "captures": [
+    {
+      "name": "solo-opening-100-home",
+      "case": "solo-opening",
+      "percent": 100,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-home",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-hover",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-neighbor",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -1,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-north",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -1,
+        -1
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-south",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -2,
+        1
+      ],
+      "png": true
+    },
+    {
+      "name": "ruins-opening-125-home",
+      "case": "ruins-opening",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "no-actions-125-home",
+      "case": "no-actions",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "paid-full-army-125-home",
+      "case": "paid-full-army",
+      "percent": 125,
+      "selected": [
+        0,
+        -2
+      ],
+      "png": true
+    },
+    {
+      "name": "saved-encircled-125-home",
+      "case": "saved-encircled",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "longest-contract-125-home",
+      "case": "longest-contract",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    }
+  ],
+  "command_checks": [
+    {
+      "action": "explore",
+      "exact": true
+    },
+    {
+      "action": "retreat",
+      "exact": true
+    },
+    {
+      "action": "end_turn",
+      "exact": true
+    },
+    {
+      "action": "travel",
+      "exact": true
+    }
+  ],
+  "historical_contract": {
+    "history": "docs/evidence/shardbound-army-plans-cd351a9/control.json.gz",
+    "command_index": 283,
+    "offer": "gate",
+    "sha256": "6609eb4f334a956f6d6873e378b0b87bdd6901f3ad2f4688226265b8ede0b72a",
+    "historical_preparation_includes_autoplay": true
+  },
+  "input_activations": 454,
+  "game_closed": true,
+  "source_unchanged": true,
+  "wall_seconds": 39.74311679089442,
+  "cpu_seconds": 9.999432
+}

@@ -147,6 +147,10 @@ terrain. Hover a province to read its full name, or select it to inspect its
 defenders and adventure in the right panel. At your hero's location, the large
 Explore button enters the local adventure; selecting a neighbor exposes Travel
 or Invade instead. End turn stays at the bottom of the panel.
+The helmet banner locates your hero, small compasses mark uncleared adventure
+sites, and a short gold arrow points toward a selected neighbor when its travel
+order is available. Province income is shown as base production; hover its coin
+icon for the explanation. Each army card groups one troop's name, rank and health.
 
 | Screen | Input | Action |
 |---|---|---|
