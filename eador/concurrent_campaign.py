@@ -10,8 +10,8 @@ from copy import deepcopy
 from dataclasses import asdict, dataclass, field, fields
 import json
 
-from saga2d import CommandError
-from eador.content import AdventureAttempt, Choice, ChoiceOption
+from saga2d import CommandError, HexGrid
+from eador.content import AdventureAttempt, Choice, ChoiceOption, SITES
 from eador.difficulty import DIFFICULTIES
 from eador.economy import income_preview, recovery_preview, settle_realm
 from eador.entities import Hero, Pos, Province, RuleError, SaveFormatError, Troop
@@ -143,6 +143,24 @@ class ConcurrentCampaign:
 
     def _dispatch(self, seat, action, args, kwargs):
         realm = self.realms[seat]
+        if action.startswith('battle.'):
+            from eador.orders import BATTLE_ORDERS, invoke_order
+
+            action = action.removeprefix('battle.')
+            if action not in BATTLE_ORDERS:
+                raise RuleError('Unknown battle order.')
+            if realm.battle is None:
+                raise RuleError('There is no active battle.')
+            invoke_order(realm.battle, action, args, kwargs)
+            return {seat}
+        if action == 'explore':
+            if args or set(kwargs) - {'approach'}:
+                raise RuleError('Choose an offered adventure approach.')
+            approach = kwargs.get('approach')
+            if approach is not None and not isinstance(approach, str):
+                raise RuleError('Choose an offered adventure approach.')
+            self._explore(seat, approach)
+            return {seat}
         if kwargs:
             raise RuleError('Unknown campaign order option.')
         if action in ('build', 'recruit'):
@@ -152,6 +170,25 @@ class ConcurrentCampaign:
                 realm.build(args[0])
             else:
                 realm.purchase_recruit(args[0], province=self.provinces[realm.hero.pos], owner=realm.owner)
+        elif action == 'travel':
+            if (len(args) != 1 or not isinstance(args[0], (list, tuple)) or len(args[0]) != 2
+                    or any(type(n) is not int for n in args[0])):
+                raise RuleError('Choose a province on this shard.')
+            self._travel(seat, tuple(args[0]))
+        elif action in ('retreat', 'resolve_battle'):
+            if args:
+                raise RuleError('Battle results take no arguments.')
+            if action == 'retreat':
+                if realm.battle is None:
+                    raise RuleError('There is no battle to retreat from.')
+                if realm.battle.outcome is not None:
+                    raise RuleError('The battle is over; accept its result.')
+                realm.battle.outcome = 'enemy'
+            self._resolve_battle(seat)
+        elif action in ('choose', 'equip'):
+            if len(args) != 1 or not (isinstance(args[0], str) or action == 'equip' and args[0] is None):
+                raise RuleError('Choose a skill or relic.')
+            getattr(realm, action)(args[0])
         elif action == 'ready':
             if args:
                 raise RuleError('Ready takes no arguments.')
@@ -163,6 +200,98 @@ class ConcurrentCampaign:
         else:
             raise RuleError('Unknown campaign order.')
         return {seat}
+
+    def _available(self, seat: int, position: Pos) -> None:
+        if position in self.claims:
+            raise RuleError('That province is claimed by an active encounter. No action was spent.')
+        opponent = self.realms[1 - seat]
+        if position == opponent.hero.pos or self.provinces[position].owner == opponent.owner:
+            raise RuleError('Human army conflicts are not available in this development mode yet.')
+
+    def _travel(self, seat: int, destination: Pos) -> None:
+        realm = self.realms[seat]
+        realm._ready(action=True)
+        if destination not in HexGrid(self.provinces).neighbors(realm.hero.pos):
+            raise RuleError('Travel to an adjacent province.')
+        self._available(seat, destination)
+        province = self.provinces[destination]
+        realm.actions_left -= 1
+        if province.owner == realm.owner:
+            realm.hero.pos = destination
+            realm.log.append(f'Travelled to {province.name}.')
+        elif province.guards:
+            self._start_battle(seat, province, 'conquest')
+        else:
+            province.owner = realm.owner
+            realm.hero.pos = destination
+            realm.log.append(f'Claimed unguarded {province.name}.')
+
+    def _explore(self, seat: int, approach: str | None) -> None:
+        from eador.adventures import quote_adventure
+
+        realm = self.realms[seat]
+        realm._ready(action=True)
+        province = self.provinces[realm.hero.pos]
+        if province.owner != realm.owner:
+            raise RuleError('Explore a province you control.')
+        if province.explored or province.site is None:
+            raise RuleError('This province has no unexplored site.')
+        self._available(seat, province.pos)
+        quote = quote_adventure(province, gold=realm.gold, crystals=realm.crystals, approach=approach)
+        realm.battle_adventure = quote.attempt
+        self._start_battle(seat, province, 'site')
+        realm.actions_left -= 1
+        realm.gold -= quote.gold
+        realm.crystals -= quote.crystals
+
+    def _start_battle(self, seat: int, province: Province, kind: str) -> None:
+        from eador.battle import Battle
+
+        realm = self.realms[seat]
+        site = kind == 'site'
+        attempt = realm.battle_adventure
+        encounter = SITES[province.site_kind].encounter if site and province.site_kind else None
+        if attempt:
+            encounter = attempt.encounter
+        realm.battle = Battle.create(realm.hero, province.site_guards if site else province.guards,
+                                    province.terrain, realm.spells,
+                                    seed=self.seed + self.day * 37 + province.pos[0] * 7 + province.pos[1],
+                                    enemy_hp=province.site_guard_hp if site else province.guard_hp,
+                                    encounter=encounter, cargo_penalty=attempt.cargo_penalty if attempt else 0)
+        realm.battle_kind, realm.battle_province = kind, province.pos
+        self.claims[province.pos] = seat
+        realm.log.append(f'Battle at {province.site if site else province.name}.')
+
+    def _resolve_battle(self, seat: int) -> None:
+        from eador.battle_results import persist_province_defenders
+
+        realm = self.realms[seat]
+        battle = realm.battle
+        if battle is None or battle.outcome is None:
+            raise RuleError('The battle is not finished.')
+        if self.claims.get(realm.battle_province) != seat:
+            raise RuleError('This realm does not own the encounter claim.')
+        province = self.provinces[realm.battle_province]
+        persist_province_defenders(province, battle, kind=realm.battle_kind)
+        result = realm.apply_battle_progression(battle)
+        if battle.outcome == 'player':
+            if realm.battle_kind == 'site':
+                message = realm.reward_site(province)
+            else:
+                province.owner = realm.owner
+                province.guards, province.guard_hp = [], []
+                realm.hero.pos = province.pos
+                realm.gold += 25
+                message = f'Claimed {province.name}: +25 gold.'
+        else:
+            lost_gold = min(max(0, realm.gold), 20)
+            realm.gold -= lost_gold
+            message = f'Retreated. Lost {lost_gold} gold; the survivors keep their wounds.'
+        if result.casualties:
+            realm.log.append('Fallen: ' + ', '.join(result.casualties) + '.')
+        realm.log.append(message)
+        del self.claims[province.pos]
+        realm.battle = realm.battle_kind = realm.battle_province = realm.battle_adventure = None
 
     def _advance_day(self):
         quotes = [self.income(seat) for seat in (0, 1)]
@@ -213,6 +342,24 @@ class ConcurrentCampaign:
         if any(type(seat) is not int or seat not in (0, 1) or pos not in provinces
                for pos, seat in claims.items()):
             raise SaveFormatError('Invalid encounter claim.')
+        active = {}
+        for realm in realms:
+            if realm.battle is None:
+                if any(value is not None for value in (realm.battle_kind, realm.battle_province, realm.battle_adventure)):
+                    raise SaveFormatError('Saved encounter context has no active battle.')
+                continue
+            position = realm.battle_province
+            if (realm.ready or realm.battle_kind not in ('site', 'conquest')
+                    or position not in provinces or position in active):
+                raise SaveFormatError('Invalid saved encounter context.')
+            if realm.battle_kind == 'site':
+                if realm.hero.pos != position or provinces[position].owner != realm.owner:
+                    raise SaveFormatError('Saved site encounter does not belong to its realm.')
+            elif position not in HexGrid(provinces).neighbors(realm.hero.pos):
+                raise SaveFormatError('Saved conquest encounter is not adjacent to its army.')
+            active[position] = realm.seat
+        if claims != active:
+            raise SaveFormatError('Saved encounter claims do not match the active battles.')
         return cls(data['seed'], data['theme'], provinces, realms, data['day'], claims, data['winner'])
 
     def snapshot(self, seat: int) -> dict:
