@@ -1,6 +1,6 @@
 """Verify an extracted Warband archive and Windows install/launch/uninstall.
 
-    uv run python tools/verify_warband_package.py dist/warband --native
+    uv run python tools/verify_warband_package.py dist/warband --native --public-server wss://games.tachyon-ai.eu/play
 
 Uses the production RoomServer over real loopback WebSockets. The application
 process runs outside the checkout with an isolated profile and no Python on
@@ -111,7 +111,9 @@ def executable_smoke(executable: Path, endpoint: str, report: Path, manifest: di
         return result
 
 
-def verify(output: Path, *, native=False) -> dict:
+def verify(output: Path, *, native=False, public_server: str | None = None) -> dict:
+    if public_server is not None and not public_server.startswith("wss://"):
+        raise ValueError("Public-server acceptance requires an explicit wss:// TLS endpoint")
     output = output.resolve()
     manifest = json.loads((output / "build-manifest.json").read_text(encoding="utf-8"))
     for item in manifest["artifacts"]:
@@ -119,6 +121,8 @@ def verify(output: Path, *, native=False) -> dict:
         assert path.stat().st_size == item["bytes"] and sha256(path) == item["sha256"], path
     archive = next(output / item["file"] for item in manifest["artifacts"] if item["file"].endswith(".zip"))
     installers = [output / item["file"] for item in manifest["artifacts"] if item["file"].endswith("-setup.exe")]
+    if public_server is not None and not installers:
+        raise ValueError("Public-server acceptance requires the Windows installer artifact")
     evidence = output / "verification"
     evidence.mkdir(exist_ok=True)
     report = {"source_commit": manifest["source_commit"], "version": manifest["version"], "scope": "Loopback authority; isolated profile on the named CI host"}
@@ -142,6 +146,9 @@ def verify(output: Path, *, native=False) -> dict:
                 assert shortcut.is_file(), shortcut
                 executable = installed / "Warband.exe"
                 report["installed"] = executable_smoke(executable, endpoint, evidence / "installed.json", manifest)
+                if public_server is not None:
+                    report["public_server"] = {"endpoint": public_server,
+                                               **executable_smoke(executable, public_server, evidence / "public-server.json", manifest)}
                 if native:
                     report["native"] = executable_smoke(executable, endpoint, evidence / "native.json", manifest, native=True)
             finally:
@@ -163,5 +170,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
     parser.add_argument("--native", action="store_true")
+    parser.add_argument("--public-server", help="Also require the installed executable to pass its online check over this wss:// endpoint")
     args = parser.parse_args()
-    verify(args.output, native=args.native)
+    verify(args.output, native=args.native, public_server=args.public_server)

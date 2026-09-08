@@ -75,10 +75,10 @@ jobs:
           } | ConvertTo-Json | Set-Content dist/warband/workflow-build.json -Encoding utf8
       - name: Verify extracted and installed executables over real sockets
         run: |
-          uv run --locked --python 3.13.2 python tools/verify_warband_package.py dist/warband --native
+          uv run --locked --python 3.13.2 python tools/verify_warband_package.py dist/warband --native --public-server wss://games.tachyon-ai.eu/play
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $result = Get-Content dist/warband/verification.json -Raw | ConvertFrom-Json
-          if (-not $result.passed -or -not $result.install_shortcut_uninstall -or $result.source_commit -ne $env:GITHUB_SHA) {
+          if (-not $result.passed -or -not $result.install_shortcut_uninstall -or -not $result.public_server.passed -or $result.source_commit -ne $env:GITHUB_SHA) {
             throw 'Package verification did not accept the dispatched build.'
           }
           @(
@@ -90,6 +90,7 @@ jobs:
             'For internet play choose Multiplayer, create a room, and share its code.'
             ''
             'CI verified the extracted and installed applications against an authoritative WebSocket server, including accepted movement, rejected foreign orders and seat reconnection; shortcut creation and uninstall also passed.'
+            "The installed Windows executable also passed those multiplayer checks over TLS against $($result.public_server.endpoint)."
             "Native rendering passed: $($result.native.passed). Native result: $($result.native.status)"
             'The installer is unsigned. CI host checks are recorded in verification.json; they do not establish GPU or audio quality on every Windows PC.'
           ) | Set-Content dist/warband/release-notes.md -Encoding utf8
