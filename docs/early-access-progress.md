@@ -19,10 +19,14 @@ were inspected; the accepted native run averaged about 25% of one CPU core.
 This visual work is included in the preserved Mac archive below.
 
 The development-only concurrent campaign model now supports two independent
-realms buying buildings/troops and settling a shared day after both mark Ready.
-Shared realm purchases and solo compatibility are checkpointed. Independent
-PvE encounters, conflict claims, human PvP and playable network presentation
-remain open; the selectable multiplayer mode is still shared-realm co-op.
+realms developing, fighting separate ordinary PvE battles and settling a shared
+day after both finish their rewards and mark Ready. One shared map retains
+claims, surviving defenders and earned rewards. [Integration evidence](evidence/concurrent-pve/README.md)
+covers both active battles over real loopback sockets, trusted checkpoint
+restoration and rejected duplicate/contested orders, with 119 solo compatibility
+checks and 14 concurrent/co-op/server checks passing. This source change is
+newer than the packaged archive below. Pending human conflicts and playable
+network presentation remain open; selectable multiplayer is still shared-realm co-op.
 
 ## Current packaged checkpoint — 2026-09-08
 

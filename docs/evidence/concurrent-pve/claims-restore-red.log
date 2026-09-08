@@ -1,0 +1,112 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_____ test_checkpoint_rejects_encounter_claims_that_cannot_resume[missing] _____
+
+corruption = 'missing'
+
+    @pytest.mark.parametrize('corruption', ['missing', 'orphan', 'wrong_owner', 'ready_battle'])
+    def test_checkpoint_rejects_encounter_claims_that_cannot_resume(corruption):
+        """A saved claim must belong to its active battle; otherwise the map can lock permanently."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+        from eador.model import SaveFormatError
+    
+        match = ConcurrentCampaign.new(7)
+        order(match, 0, 'explore')
+        saved = match.checkpoint()
+        if corruption == 'missing':
+            saved['claims'] = []
+        elif corruption == 'orphan':
+            saved['claims'].append({'pos': [0, 0], 'seat': 1})
+        elif corruption == 'wrong_owner':
+            saved['claims'][0]['seat'] = 1
+        else:
+            saved['realms'][0]['ready'] = True
+>       with pytest.raises(SaveFormatError, match='encounter'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'eador.entities.SaveFormatError'>
+
+tests/eador/test_concurrent_campaign.py:178: Failed
+_____ test_checkpoint_rejects_encounter_claims_that_cannot_resume[orphan] ______
+
+corruption = 'orphan'
+
+    @pytest.mark.parametrize('corruption', ['missing', 'orphan', 'wrong_owner', 'ready_battle'])
+    def test_checkpoint_rejects_encounter_claims_that_cannot_resume(corruption):
+        """A saved claim must belong to its active battle; otherwise the map can lock permanently."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+        from eador.model import SaveFormatError
+    
+        match = ConcurrentCampaign.new(7)
+        order(match, 0, 'explore')
+        saved = match.checkpoint()
+        if corruption == 'missing':
+            saved['claims'] = []
+        elif corruption == 'orphan':
+            saved['claims'].append({'pos': [0, 0], 'seat': 1})
+        elif corruption == 'wrong_owner':
+            saved['claims'][0]['seat'] = 1
+        else:
+            saved['realms'][0]['ready'] = True
+>       with pytest.raises(SaveFormatError, match='encounter'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'eador.entities.SaveFormatError'>
+
+tests/eador/test_concurrent_campaign.py:178: Failed
+___ test_checkpoint_rejects_encounter_claims_that_cannot_resume[wrong_owner] ___
+
+corruption = 'wrong_owner'
+
+    @pytest.mark.parametrize('corruption', ['missing', 'orphan', 'wrong_owner', 'ready_battle'])
+    def test_checkpoint_rejects_encounter_claims_that_cannot_resume(corruption):
+        """A saved claim must belong to its active battle; otherwise the map can lock permanently."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+        from eador.model import SaveFormatError
+    
+        match = ConcurrentCampaign.new(7)
+        order(match, 0, 'explore')
+        saved = match.checkpoint()
+        if corruption == 'missing':
+            saved['claims'] = []
+        elif corruption == 'orphan':
+            saved['claims'].append({'pos': [0, 0], 'seat': 1})
+        elif corruption == 'wrong_owner':
+            saved['claims'][0]['seat'] = 1
+        else:
+            saved['realms'][0]['ready'] = True
+>       with pytest.raises(SaveFormatError, match='encounter'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'eador.entities.SaveFormatError'>
+
+tests/eador/test_concurrent_campaign.py:178: Failed
+__ test_checkpoint_rejects_encounter_claims_that_cannot_resume[ready_battle] ___
+
+corruption = 'ready_battle'
+
+    @pytest.mark.parametrize('corruption', ['missing', 'orphan', 'wrong_owner', 'ready_battle'])
+    def test_checkpoint_rejects_encounter_claims_that_cannot_resume(corruption):
+        """A saved claim must belong to its active battle; otherwise the map can lock permanently."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+        from eador.model import SaveFormatError
+    
+        match = ConcurrentCampaign.new(7)
+        order(match, 0, 'explore')
+        saved = match.checkpoint()
+        if corruption == 'missing':
+            saved['claims'] = []
+        elif corruption == 'orphan':
+            saved['claims'].append({'pos': [0, 0], 'seat': 1})
+        elif corruption == 'wrong_owner':
+            saved['claims'][0]['seat'] = 1
+        else:
+            saved['realms'][0]['ready'] = True
+>       with pytest.raises(SaveFormatError, match='encounter'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'eador.entities.SaveFormatError'>
+
+tests/eador/test_concurrent_campaign.py:178: Failed
+=========================== short test summary info ============================
+FAILED tests/eador/test_concurrent_campaign.py::test_checkpoint_rejects_encounter_claims_that_cannot_resume[missing]
+FAILED tests/eador/test_concurrent_campaign.py::test_checkpoint_rejects_encounter_claims_that_cannot_resume[orphan]
+FAILED tests/eador/test_concurrent_campaign.py::test_checkpoint_rejects_encounter_claims_that_cannot_resume[wrong_owner]
+FAILED tests/eador/test_concurrent_campaign.py::test_checkpoint_rejects_encounter_claims_that_cannot_resume[ready_battle]
+4 failed, 3 deselected in 0.05s

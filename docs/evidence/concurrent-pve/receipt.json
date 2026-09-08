@@ -1,0 +1,17 @@
+{
+  "source_commit": "2d53ca38beb2d9e075dc6a00147a920ad0f0c21a",
+  "shared_rules_commit": "724f14f",
+  "source_sha256": {
+    "eador/concurrent_campaign.py": "20ab1423c3bca9ff78e0c6aab7f022eb1534f1932ba56fcb27a3c90f2a29c5c0",
+    "eador/orders.py": "1fad53d326cd7de447cd1eb9619529990131b99af73d32e426445563f04fc17b",
+    "eador/multiplayer.py": "5a90bced886d2b230e0bbc2d3ce554997cbfbc8d0095edb4e3aebc734197b6c0",
+    "eador/realm.py": "8e4c47ab4404988c1492ce3270baa8e60c9a785cb64bc17b109dfd3b889591bb",
+    "eador/model.py": "55e4033aa7c6c78a2311b323641060e83d83afe58059cd032f5a4ff90b040983",
+    "eador/battle_results.py": "99a233786e180a0702a638974910a3864b39901198560562c01e5dec9c75ddb2",
+    "tests/eador/test_concurrent_campaign.py": "f795cbed03beaeeadc4edf891ee857a68ae42545cbe6df08bcb7fbc6264f175f",
+    "tests/eador/test_concurrent_network.py": "bd57156a987c1761c05e96071258129cd77a1a1a714eabb2011139fab99f92ee"
+  },
+  "scope": "Development model and loopback TCP; no selectable concurrent UI or direct human combat.",
+  "review": "Independent source review found no immediate ownership, atomicity, claim, reward or Ready blocker.",
+  "execution": "119 compatibility and14 integration cases exited0; final8concurrent cases exited0 after readability cleanup. Native jobs were not started."
+}

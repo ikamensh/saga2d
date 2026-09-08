@@ -1,0 +1,113 @@
+Installed 10 packages in 38ms
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_two_active_pve_battles_keep_their_own_orders_and_survive_a_checkpoint __
+
+self = ConcurrentCampaign(seed=7, theme='frontier', provinces={(-2, 0): Province(pos=(-2, 0), name='Westwatch', terrain='hill...dventure=None, rules_id='standard-1', seat=1, capital=(2, 0), ready=False, revision=0)], day=1, claims={}, winner=None)
+seat = 0
+command = {'action': 'explore', 'args': [], 'day': 1, 'kwargs': {}, ...}
+
+    def apply(self, seat: int, command: dict) -> None:
+        """Commit one authenticated realm order atomically, without a global revision lock."""
+        if type(seat) is not int or seat not in (0, 1):
+            raise CommandError('Unknown realm.')
+        if not isinstance(command, dict) or set(command) != {
+                'day', 'realm_revision', 'action', 'args', 'kwargs'}:
+            raise CommandError('Invalid campaign order.')
+        realm = self.realms[seat]
+        if type(command['day']) is not int or command['day'] != self.day:
+            raise CommandError('The campaign day changed. Refresh this order.')
+        if type(command['realm_revision']) is not int or command['realm_revision'] != realm.revision:
+            raise CommandError('Your realm changed. Refresh this order.')
+        if self.winner is not None:
+            raise CommandError('This campaign has ended.')
+        if realm.ready:
+            raise CommandError('Your realm is ready for the next day.')
+        if (not isinstance(command['action'], str) or not isinstance(command['args'], list)
+                or not isinstance(command['kwargs'], dict)):
+            raise CommandError('Invalid campaign order arguments.')
+        trial = deepcopy(self)
+        try:
+>           changed = trial._dispatch(seat, command['action'], command['args'], command['kwargs'])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+eador/concurrent_campaign.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ConcurrentCampaign(seed=7, theme='frontier', provinces={(-2, 0): Province(pos=(-2, 0), name='Westwatch', terrain='hill...dventure=None, rules_id='standard-1', seat=1, capital=(2, 0), ready=False, revision=0)], day=1, claims={}, winner=None)
+seat = 0, action = 'explore', args = [], kwargs = {}
+
+    def _dispatch(self, seat, action, args, kwargs):
+        realm = self.realms[seat]
+        if kwargs:
+            raise RuleError('Unknown campaign order option.')
+        if action in ('build', 'recruit'):
+            if len(args) != 1 or not isinstance(args[0], str):
+                raise RuleError('Choose a building or troop.')
+            if action == 'build':
+                realm.build(args[0])
+            else:
+                realm.purchase_recruit(args[0], province=self.provinces[realm.hero.pos], owner=realm.owner)
+        elif action == 'ready':
+            if args:
+                raise RuleError('Ready takes no arguments.')
+            realm._ready()
+            realm.ready = True
+            if all(player.ready for player in self.realms):
+                self._advance_day()
+                return {0, 1}
+        else:
+>           raise RuleError('Unknown campaign order.')
+E           eador.entities.RuleError: Unknown campaign order.
+
+eador/concurrent_campaign.py:164: RuleError
+
+The above exception was the direct cause of the following exception:
+
+    def test_two_active_pve_battles_keep_their_own_orders_and_survive_a_checkpoint():
+        """Both players fight locally; a peer's turn cannot alter or stale the other battle."""
+        from eador.concurrent_campaign import ConcurrentCampaign
+    
+        match = ConcurrentCampaign.new(7, heroes=('Warrior', 'Wizard'))
+>       order(match, 0, 'explore')
+
+tests/eador/test_concurrent_campaign.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/eador/test_concurrent_campaign.py:13: in order
+    match.apply(seat, message)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ConcurrentCampaign(seed=7, theme='frontier', provinces={(-2, 0): Province(pos=(-2, 0), name='Westwatch', terrain='hill...dventure=None, rules_id='standard-1', seat=1, capital=(2, 0), ready=False, revision=0)], day=1, claims={}, winner=None)
+seat = 0
+command = {'action': 'explore', 'args': [], 'day': 1, 'kwargs': {}, ...}
+
+    def apply(self, seat: int, command: dict) -> None:
+        """Commit one authenticated realm order atomically, without a global revision lock."""
+        if type(seat) is not int or seat not in (0, 1):
+            raise CommandError('Unknown realm.')
+        if not isinstance(command, dict) or set(command) != {
+                'day', 'realm_revision', 'action', 'args', 'kwargs'}:
+            raise CommandError('Invalid campaign order.')
+        realm = self.realms[seat]
+        if type(command['day']) is not int or command['day'] != self.day:
+            raise CommandError('The campaign day changed. Refresh this order.')
+        if type(command['realm_revision']) is not int or command['realm_revision'] != realm.revision:
+            raise CommandError('Your realm changed. Refresh this order.')
+        if self.winner is not None:
+            raise CommandError('This campaign has ended.')
+        if realm.ready:
+            raise CommandError('Your realm is ready for the next day.')
+        if (not isinstance(command['action'], str) or not isinstance(command['args'], list)
+                or not isinstance(command['kwargs'], dict)):
+            raise CommandError('Invalid campaign order arguments.')
+        trial = deepcopy(self)
+        try:
+            changed = trial._dispatch(seat, command['action'], command['args'], command['kwargs'])
+        except RuleError as error:
+>           raise CommandError(str(error)) from error
+E           saga2d.network.CommandError: Unknown campaign order.
+
+eador/concurrent_campaign.py:139: CommandError
+=========================== short test summary info ============================
+FAILED tests/eador/test_concurrent_campaign.py::test_two_active_pve_battles_keep_their_own_orders_and_survive_a_checkpoint
+1 failed, 1 deselected in 0.03s

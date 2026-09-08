@@ -51,6 +51,25 @@ rewards, choices and encounter cleanup. The shared-world room still needs to
 coordinate those changes against its claims.
 Keep campaign PvP rules in `eador`; transport must not know heroes or battles.
 
+The development `ConcurrentCampaign` now supports separate site and neutral
+conquest battles on its single map. The ordinary `Battle` handles each realm's
+`battle.*` commands. `Realm.apply_battle_progression`, `Realm.reward_site` and
+`persist_province_defenders` share the same earned army, reward and survivor
+rules with solo play. There is no copied solo world or second combat engine.
+
+An active encounter claims its destination until its result is accepted.
+A competing arrival is currently rejected with an explicit reason before any
+action is spent; retreat persists defenders before releasing the claim.
+Opponent-owned land and the other hero's occupied origin are also blocked
+until human encounters are implemented. This does **not** yet implement the
+pending army conflict described above. Earned choices block only their own
+realm's Ready, and both realms must finish before the shared day advances.
+
+[Current integration evidence](evidence/concurrent-pve/README.md) exercises
+both active battles over loopback sockets, restores the authority from its
+trusted checkpoint, resolves both rewards and crosses the Ready barrier.
+This is model/transport evidence, not a selectable mode or a native UI playtest.
+
 The existing socket interfaces already accept commands without a global
 revision precondition. New campaign commands should validate the global day,
 the sender's own realm revision, and relevant shared claims. Unrelated enemy

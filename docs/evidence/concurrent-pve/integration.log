@@ -1,0 +1,13 @@
+Installed 10 packages in 41ms
+SELECTION
+tests/eador/test_concurrent_campaign.py
+tests/eador/test_concurrent_network.py
+tests/test_multiplayer_games.py::test_shardbound_partners_share_campaign_and_tactical_orders
+tests/test_multiplayer_games.py::test_shardbound_offline_save_controls_preserve_the_live_match
+tests/test_multiplayer_games.py::test_shardbound_guest_can_depart_to_the_next_campaign_shard
+tests/test_multiplayer_games.py::test_guest_controls_reach_host_and_accepted_state_returns_to_the_scene[eador]
+tests/test_online_server.py::test_shardbound_coop_runs_campaign_and_battle_rules_for_both_partners
+tests/test_online_server.py::test_rooms_and_private_seats_survive_server_restart[shardbound-v1]
+..............                                                           [100%]
+14 passed in 2.09s
+RECEIPT wall=3.0730s cpu=0.4809s requested=25% checkpoint=per-test

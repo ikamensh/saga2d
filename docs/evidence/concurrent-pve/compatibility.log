@@ -1,0 +1,17 @@
+SELECTION
+tests/eador/test_model.py
+tests/eador/test_progression.py
+tests/eador/test_pressure.py
+tests/eador/test_difficulty.py
+tests/eador/test_realm.py
+tests/eador/test_adventure_quote.py
+tests/eador/test_realm_settlement.py
+tests/eador/test_army_results.py
+tests/eador/test_campaign.py::test_a_real_shard_victory_caps_advancement_and_opens_persistent_choices
+tests/eador/test_observatory.py::test_purchased_observatory_army_holds_the_cleared_lane_and_survives_every_saved_order
+tests/eador/test_extraction.py::test_paid_entry_is_atomic_saved_once_and_retry_preserves_defender_wounds
+tests/eador/test_vault.py::test_crystals_buy_a_shorter_route_past_a_stationary_or_rescuing_warden[fresh]
+........................................................................ [ 60%]
+...............................................                          [100%]
+119 passed in 7.86s
+RECEIPT wall=7.9183s cpu=1.9401s requested=25% checkpoint=per-test
