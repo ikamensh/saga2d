@@ -523,8 +523,9 @@ class ShardScene(Screen):
         column([label(rival_order(s), width, size=11, color=RED)], width, x, y + 50)
 
         army_top = h - 158
-        self.grid = HexGrid(s.provinces, size=min(67, (army_top - self._summary_bottom - 24) / 8),
-                            origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
+        self.grid = HexGrid(s.provinces, size=min(67, (army_top - self._summary_bottom - 48) / 8),
+                            origin=(self.edge / 2, (self._summary_bottom + army_top - 24) / 2))
+        self._shard_relief = art.shard_relief(self.grid)
         self._territory_borders = art.territory_borders(self.grid, s.provinces)
         self._province_name_boxes = []
         landmarks = {(-2, 0), (2, 0)}
@@ -544,9 +545,11 @@ class ShardScene(Screen):
         self._hover_name = None
         self._update_hover_label()
         column([Row(label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', 320, size=10, color=MUTED),
-                    label(f'At {s.provinces[s.hero.pos].name}', 300, size=10, color=MUTED),
+                    label(f'At {s.provinces[s.hero.pos].name}', 280, size=10, color=MUTED),
+                    Image(icon_path('hero'), width=20, height=20, tooltip='Hero level and experience'),
                     metric('level', s.hero.level, width=65, size=10 * scale, color=GOLD),
-                    metric('xp', s.hero.xp, width=105, size=10 * scale, color=GOLD), spacing=8)],
+                    metric('xp', s.hero.xp, width=105, size=10 * scale, color=GOLD), spacing=8,
+                    width=self.edge - 52)],
                self.edge - 52, 26, army_top)
         army_y = army_top + round(22 * scale)
         self._army_art = []
@@ -692,13 +695,22 @@ class ShardScene(Screen):
             self.ui.add(self._hover_name)
 
     def draw(self):
-        with self.screen_layer(2):
+        with self.screen_layer(2 + len(self.state.provinces)):
             self.draw_content()
 
     def draw_map_frame(self):
         """The shared atlas frame leaves the province inspector and orders to each mode."""
         h = self.game.height
         art.backdrop(self, self.edge, h)
+        with self.screen_layer(1):
+            for points, color in self._shard_relief:
+                self.draw_polygon(points, color)
+        # Texture batches need explicit depth: a lower row covers the previous
+        # row's baked sidewall, independent of which atlas holds either image.
+        for index, pos in enumerate(sorted(self.state.provinces, key=lambda p: self.grid.center(p)[1])):
+            province = self.state.provinces[pos]
+            art.terrain_tile(self, self.grid, pos, province.terrain,
+                             mode='ground' if province.capital else 'province', inset=.99, layer=2 + index)
         self.draw_rect(self.edge, 64, self.game.width - self.edge, h - 64, PANEL)
         self.draw_line(self.edge, 64, self.edge, h, LINE)
         self.draw_rect(0, 0, self.game.width, 64, INK)
@@ -713,7 +725,7 @@ class ShardScene(Screen):
             self.rule(self.edge + 22, y, 356)
         for pos in sorted(s.provinces, key=lambda c: self.grid.center(c)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
-                         hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)
+                         hero=pos == s.hero.pos, hover=pos == self.hover)
         for start, end, color in self._territory_borders:
             self.draw_line(*start, *end, color, 1.5)
         if self._travel_destination is not None:

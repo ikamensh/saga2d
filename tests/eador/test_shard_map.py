@@ -6,6 +6,30 @@ from eador.scene import ShardScene
 from tools.eador_ui import PlayerInput
 
 
+def test_nearer_provinces_cover_rear_sidewalls_but_never_selection_markers(tmp_path):
+    """Terrain depth must survive texture batching; province markers stay above every tile."""
+    from eador.app import ASSETS
+    from eador.style import GOLD
+
+    game = create_game(backend='mock', save_dir=tmp_path / 'saves')
+    try:
+        terrain = {game.assets.image(str(path)) for path in (ASSETS / 'images/terrain').glob('*.png')}
+        for theme in ('frontier', 'ruins', 'elderwild'):
+            state = State.new(7, theme=theme)
+            game.clear_and_push(ShardScene(state))
+            game.tick(0)
+            tiles = [image for image in game.backend.images if image['image'] in terrain]
+            assert len(tiles) == len(state.provinces)
+            for rear in tiles:
+                for front in tiles:
+                    if front['y'] > rear['y'] + 1:
+                        assert front['order'] > rear['order'], 'A rear sidewall can overpaint nearer terrain'
+            selection = [line for line in game.backend.lines if line['color'] == GOLD]
+            assert selection and min(line['order'] for line in selection) > max(tile['order'] for tile in tiles)
+    finally:
+        game.close()
+
+
 def test_province_names_reveal_on_hover_and_keyboard_selection_without_orders(tmp_path):
     """Ordinary provinces do not cover the terrain; pointing or Tab reveals their full name."""
     game = create_game(backend='mock', save_dir=tmp_path / 'saves')

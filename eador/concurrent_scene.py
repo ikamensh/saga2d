@@ -302,8 +302,9 @@ class ConcurrentShardScene(ShardScene):
                         tooltip='Commit your day. Both players must be ready before income, upkeep and rest.')
         army_top = h - 158
         from saga2d import HexGrid
-        self.grid = HexGrid(s.provinces, size=min(67, (army_top - self._summary_bottom - 24) / 8),
-                            origin=(self.edge / 2, (self._summary_bottom + army_top) / 2))
+        self.grid = HexGrid(s.provinces, size=min(67, (army_top - self._summary_bottom - 48) / 8),
+                            origin=(self.edge / 2, (self._summary_bottom + army_top - 24) / 2))
+        self._shard_relief = art.shard_relief(self.grid)
         self._territory_borders = art.territory_borders(self.grid, s.provinces)
         self._province_name_boxes = []
         for pos in (s.capital, tuple(peer['capital'])):
@@ -316,7 +317,8 @@ class ConcurrentShardScene(ShardScene):
         self._hover_name = None
         self._update_hover_label()
         block([Row(label(f'YOUR ARMY · {len(s.hero.army)}/{s.hero.max_army}', 320, 10, MUTED),
-                   label('At ' + s.provinces[s.hero.pos].name, 300, 10, MUTED), spacing=8)],
+                   label('At ' + s.provinces[s.hero.pos].name, 300, 10, MUTED), spacing=8,
+                   width=self.edge - 52)],
               26, army_top, self.edge - 52)
         self._army_art, self._army_cards = [], []
         army_y = army_top + round(22 * scale)
@@ -341,7 +343,7 @@ class ConcurrentShardScene(ShardScene):
         self.draw_map_frame()
         for pos in sorted(s.provinces, key=lambda cell: self.grid.center(cell)[1]):
             art.province(self, self.grid, pos, s.provinces[pos], selected=pos == self.selected,
-                         hero=pos == s.hero.pos, hover=pos == self.hover, name_label=False)
+                         hero=pos == s.hero.pos, hover=pos == self.hover)
         for start, end, color in self._territory_borders:
             self.draw_line(*start, *end, color, 1.5)
         if self._travel_destination is not None:

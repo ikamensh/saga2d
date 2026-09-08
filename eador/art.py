@@ -227,13 +227,13 @@ def castle(scene, x, y, color, scale=1):
                         (x, y - 63 * scale)], color)
 
 
-def terrain_tile(scene, grid, pos, terrain, *, mode='ground', inset=.95):
+def terrain_tile(scene, grid, pos, terrain, *, mode='ground', inset=.95, layer=1):
     """Paint one prebuilt diorama below interactive shapes; picking stays on HexGrid."""
     terrain = {'swamp': 'marsh', 'mountain': 'mountains'}.get(terrain, terrain)
     variant = (pos[0] * 7 + pos[1] * 11) % 4
     x, y = grid.center(pos)
     scale = grid.size * inset / 150
-    with scene.screen_layer(1):
+    with scene.screen_layer(layer):
         scene.draw_image(str(IMAGES / 'terrain' / f'{mode}-{terrain}-{variant}.png'),
                          x - 160 * scale, y - 160 * scale, 320 * scale, 352 * scale)
 
@@ -257,13 +257,33 @@ def territory_borders(grid, provinces):
     return borders
 
 
-def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False, name_label=True):
-    """Draw a province; compact maps may lay out the complete name separately."""
+def shard_relief(grid):
+    """Prepare shallow stone facets only at the island's exposed shoreline."""
+    facets = []
+    depth = grid.size * .22
+    for pos in grid.cells:
+        x, y = grid.center(pos)
+        points = grid.corners(pos)
+        for a, b in zip(points, points[1:] + points[:1]):
+            mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+            if grid.cell_at(x + (mx - x) * 1.05, y + (my - y) * 1.05) is not None:
+                continue
+            if a[0] == b[0]:  # Vertical edges have no visible face in this projection.
+                continue
+            bottom = [(px, py + depth) for px, py in (b, a)]
+            facets.append(([a, b, *bottom], (46, 55, 52, 255)))
+            lip = [(px, py + depth * .45) for px, py in (b, a)]
+            color = (85, 87, 69, 255) if a[1] < b[1] else (62, 73, 67, 255)
+            facets.append(([a, b, *lip], color))
+    return facets
+
+
+def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False):
+    """Landmarks and order markers, above the separately depth-sorted terrain."""
     x, y = grid.center(pos)
     s = grid.size / 78
     points = grid.corners(pos)
     inner = [(x + (px - x) * .99, y + (py - y) * .99) for px, py in points]
-    terrain_tile(scene, grid, pos, data.terrain, mode='ground' if data.capital else 'province', inset=.99)
     if hover:
         scene.draw_polygon(inner, (238, 220, 165, 27))
     if selected:
@@ -274,10 +294,6 @@ def province(scene, grid, pos, data, *, selected=False, hero=False, hover=False,
     if data.site and not data.explored and (data.owner == 'player' or selected or hover):
         sx, sy = x + 39 * s, y - 24 * s
         scene.draw_image(icon_path('explore'), sx - 11 * s, sy - 11 * s, 22 * s, 22 * s)
-    if data.name and name_label:
-        scene.draw_rect(x - 53 * s, y + 25 * s, 106 * s, 21 * s, (23, 37, 33, 218), radius=3)
-        scene.draw_text(data.name, x, y + 35 * s, font_size=max(9, round(10 * s)), color=TEXT,
-                        anchor_x="center", anchor_y="center")
     if hero:
         hero_banner(scene, grid, pos)
 
