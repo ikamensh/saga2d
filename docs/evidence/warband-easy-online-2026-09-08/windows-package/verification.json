@@ -1,0 +1,84 @@
+{
+  "install_shortcut_uninstall": true,
+  "installed": {
+    "bundled_fonts": true,
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\warband-extracted-orwrpep4\\Installed Warband\\Warband.exe",
+    "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820",
+    "frozen": true,
+    "online": {
+      "authoritative_movement": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+    "version": "0.1.0-preview.2"
+  },
+  "native": {
+    "backend": "pyglet",
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\warband-extracted-orwrpep4\\Installed Warband\\Warband.exe",
+    "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820",
+    "graphics_test_context": {
+      "dll_sha256": {
+        "libgallium_wgl.dll": "1a2e49cd5fdb1a857d98117ab04240d723b57da5dffe6d07f5386f42014557c1",
+        "opengl32.dll": "33b217ed7947b48684baa987914475898a2b4d7d64cce96b078216c67a633582"
+      },
+      "driver": "Mesa llvmpipe (test only)"
+    },
+    "images": [
+      "native-title.png",
+      "native-multiplayer.png",
+      "native-room-code.png",
+      "native-paste-code.png",
+      "native-online-match.png",
+      "native-match-menu.png",
+      "native.png"
+    ],
+    "live_match_menu": true,
+    "native_clipboard_join": true,
+    "native_multiplayer_input": true,
+    "opengl_version": "4.6 (Compatibility Profile) Mesa 26.2.0 (git-aacd123e02)",
+    "passed": true,
+    "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "sound_catalogue": 87,
+    "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+    "vendor": "Mesa",
+    "version": "0.1.0-preview.2"
+  },
+  "passed": true,
+  "portable": {
+    "bundled_fonts": true,
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\warband-extracted-orwrpep4\\Warband\\Warband.exe",
+    "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820",
+    "frozen": true,
+    "online": {
+      "authoritative_movement": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+    "version": "0.1.0-preview.2"
+  },
+  "public_server": {
+    "bundled_fonts": true,
+    "endpoint": "wss://games.tachyon-ai.eu/play",
+    "executable": "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\warband-extracted-orwrpep4\\Installed Warband\\Warband.exe",
+    "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820",
+    "frozen": true,
+    "online": {
+      "authoritative_movement": true,
+      "create_join": true,
+      "foreign_order_rejected": true,
+      "private_seat_rejoin": true
+    },
+    "passed": true,
+    "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+    "version": "0.1.0-preview.2"
+  },
+  "scope": "Loopback authority; isolated profile on the named CI host",
+  "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+  "version": "0.1.0-preview.2"
+}

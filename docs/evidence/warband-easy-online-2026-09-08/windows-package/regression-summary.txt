@@ -1,0 +1,2 @@
+build	Run Warband and shared transport regression tests	﻿2026-09-08T09:11:21.9292355Z ##[group]Run uv run --locked --python 3.13.2 --extra dev python -m pytest tests/warband tests/framework/test_render3d.py tests/framework/test_network.py tests/test_multiplayer_games.py tests/test_online_menu.py -q
+build	Run Warband and shared transport regression tests	2026-09-08T09:14:03.1551112Z 293 passed in 158.99s (0:02:38)

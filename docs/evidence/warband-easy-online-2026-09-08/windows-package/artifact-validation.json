@@ -1,0 +1,58 @@
+{
+  "validated_at": "2026-09-08T09:19:14.473180+00:00",
+  "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+  "version": "0.1.0-preview.2",
+  "run_id": 34208548272,
+  "artifact_id": 10048970669,
+  "artifacts": {
+    "Warband-0.1.0-preview.2-windows-x64-portable.zip": {
+      "bytes": 37285395,
+      "sha256": "766de3deb94e49a8781bee57e94d613daeff946aafd50aaa11f6f97a24955b9d"
+    },
+    "Warband-0.1.0-preview.2-windows-x64-setup.exe": {
+      "bytes": 27006651,
+      "sha256": "c4f749b167f1ed797487a08e8851f9f8ae31312e1bb6065366d76e4936f5f295"
+    }
+  },
+  "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820",
+  "diagnostics": {
+    "portable.json": {
+      "passed": true,
+      "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+      "version": "0.1.0-preview.2",
+      "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820"
+    },
+    "installed.json": {
+      "passed": true,
+      "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+      "version": "0.1.0-preview.2",
+      "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820"
+    },
+    "public-server.json": {
+      "passed": true,
+      "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+      "version": "0.1.0-preview.2",
+      "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820"
+    },
+    "native.json": {
+      "passed": true,
+      "source_commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+      "version": "0.1.0-preview.2",
+      "executable_sha256": "437d4a2d0361f1db42727fedcbd13d0ff1be0dda0f3447b1ddffc2e0af4f5820"
+    }
+  },
+  "all_diagnostics_match_executable": true,
+  "embedded_build_info_matches_manifest": true,
+  "mesa_dlls_absent_from_portable_zip": true,
+  "mesa_dlls_absent_from_installer_extraction_log": true,
+  "installer_mesa_scope": "Installer uses the same pre-Mesa build directory as the portable ZIP. CI also refused to overwrite pre-existing installed driver DLLs; test DLLs were removed after native acceptance.",
+  "screenshots_visually_inspected": [
+    "native-title.png",
+    "native-multiplayer.png",
+    "native-room-code.png",
+    "native-paste-code.png",
+    "native-online-match.png",
+    "native-match-menu.png",
+    "native.png"
+  ]
+}

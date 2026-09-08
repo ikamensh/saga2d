@@ -1,0 +1,86 @@
+{
+  "databaseId": 34208548272,
+  "headSha": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/ikamensh/saga2d/actions/runs/34208548272",
+  "workflowName": "Warband Windows installer",
+  "createdAt": "2026-09-08T09:10:43Z",
+  "updatedAt": "2026-09-08T09:15:35Z",
+  "jobs": [
+    {
+      "name": "build",
+      "id": 102003784844,
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Preserve source bytes",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+          "conclusion": "success"
+        },
+        {
+          "name": "Resolve exact release identity",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run Warband and shared transport regression tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build pinned runtime, portable ZIP and per-user installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Prepare pinned Mesa WGL driver for native CI checks only",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify extracted and installed executables over real sockets",
+          "conclusion": "success"
+        },
+        {
+          "name": "Retain build and verification evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "publish",
+      "id": 102005251273,
+      "conclusion": "skipped",
+      "steps": []
+    }
+  ],
+  "artifact": {
+    "id": 10048970669,
+    "name": "warband-windows-02377270d59fcf2ee6e9b0eef897303c1a5c0903-1",
+    "size_in_bytes": 68161713,
+    "digest": "sha256:4538c9d8505ced75a808d8e51117df4655597f03aecb66fbe17b1fc750af3003",
+    "created_at": "2026-09-08T09:15:31Z",
+    "expires_at": "2026-10-08T09:15:28Z",
+    "expired": false
+  }
+}

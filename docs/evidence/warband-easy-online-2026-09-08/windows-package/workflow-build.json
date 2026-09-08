@@ -1,0 +1,7 @@
+{
+  "commit": "02377270d59fcf2ee6e9b0eef897303c1a5c0903",
+  "runner_image": "win25-vs2026",
+  "run_url": "https://github.com/ikamensh/saga2d/actions/runs/34208548272",
+  "runner_image_version": "20260824.214.3",
+  "inno_setup": "0.0.0.0"
+}
