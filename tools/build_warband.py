@@ -89,6 +89,7 @@ def build(args) -> None:
     release = source / "release"
     release.mkdir()
     for origin, name in ((ROOT / "LICENSE", "LICENSE"), (ROOT / "docs/windows-warband.md", "windows-warband.md"),
+                         (ROOT / "docs/warband-play-together.md", "warband-play-together.md"),
                          (ROOT / "uv.lock", "uv.lock"), (ROOT / "packaging/requirements.txt", "build-tools.txt")):
         shutil.copyfile(origin, release / name)
     copy_licenses(release / "licenses")
