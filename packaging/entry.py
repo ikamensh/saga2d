@@ -471,19 +471,29 @@ if __name__ == "__main__":
         parser.add_argument("--recovery", action="store_true")
         args = parser.parse_args()
         run(args.campaign_check, phase=args.phase, recovery=args.recovery)
-    elif "--online-smoke" in sys.argv:
-        parser = argparse.ArgumentParser(description="Verify the packaged Shardbound co-op client")
-        parser.add_argument("--online-smoke", required=True, type=Path)
-        parser.add_argument("--endpoint", required=True)
-        args = parser.parse_args()
-        online_report(args.online_smoke, args.endpoint)
-    elif "--smoke-image" in sys.argv:
+    elif "--online-smoke" in sys.argv or "--smoke-image" in sys.argv:
+        # A windowed PyInstaller build turns an unhandled exception into a blocking
+        # dialog, so diagnostics record their failure and exit instead.
+        import traceback
         parser = argparse.ArgumentParser(description="Verify the packaged Shardbound runtime")
-        parser.add_argument("--smoke-image", required=True, type=Path)
+        parser.add_argument("--online-smoke", type=Path)
+        parser.add_argument("--endpoint")
+        parser.add_argument("--smoke-image", type=Path)
         parser.add_argument('--forecast-save', type=Path,
                             help='also inspect the earned Control casualty forecast from this plain State JSON')
         args = parser.parse_args()
-        smoke(args.smoke_image, forecast_save=args.forecast_save)
+        report = args.online_smoke if args.online_smoke is not None else args.smoke_image.with_suffix(".json")
+        try:
+            if args.online_smoke is not None:
+                online_report(args.online_smoke, args.endpoint)
+            else:
+                smoke(args.smoke_image, forecast_save=args.forecast_save)
+        except Exception as exc:
+            report.parent.mkdir(parents=True, exist_ok=True)
+            report.write_text(json.dumps({"passed": False, "error_type": type(exc).__name__, "error": str(exc),
+                                          "traceback": traceback.format_exc()}, indent=2) + "\n")
+            print(traceback.format_exc(), file=sys.stderr)
+            raise SystemExit(1) from exc
     else:
         from eador.__main__ import main
         main()
