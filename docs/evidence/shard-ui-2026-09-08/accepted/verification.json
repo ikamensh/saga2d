@@ -1,0 +1,174 @@
+{
+  "backend": "pyglet",
+  "cpu_percent_requested": 25.0,
+  "source_revision": "763820a8cd4c951a9acbb4009f579ff3c0658c12",
+  "source_sha256": {
+    "eador/scene.py": "76f40349d9720558144b526b9794f8bbf6c3ad5d932b7556bce4c1bdcf1793ed",
+    "tools/verify_eador_shard_look.py": "8b8407b4e04ed2e77bc8875b120ab3432632eba2b6b93347b73c203e0f76f894",
+    "tools/verify_eador_shard_reading.py": "5191c5637c1918c8a0b18ac2a7c0052c8a6f67c10449c0c47e59c3cf8fadecf7"
+  },
+  "cases": [
+    {
+      "name": "solo-opening",
+      "percent": 100,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "dc02e2f21269badffe47afac0df8648353e7ae8f247c163174c108e1fdb89899"
+    },
+    {
+      "name": "linked-opening",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "9d3f86c7ea0b1be684b11526fc33eacd040ade8e7ed4f40054b3832515b6df45"
+    },
+    {
+      "name": "paid-full-army",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "08188bcd71dd32fc8d72d5b80cea01eea0b321a46f097eb9e66e0a3dcf83a95b"
+    },
+    {
+      "name": "saved-encircled",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "ed098314b3bae7b7c195bc591dc114d0aa6c752f402f4a602b3b470cd183c856"
+    },
+    {
+      "name": "longest-contract",
+      "percent": 125,
+      "window": [
+        1280,
+        720
+      ],
+      "selected_count": 19,
+      "hover_count": 19,
+      "state_unchanged": true,
+      "state_sha256": "4faf46854ebb25c38554166f7bce7c040dc298966ea22a8c5e61e10cea7e03f5"
+    }
+  ],
+  "captures": [
+    {
+      "name": "solo-opening-100-home",
+      "case": "solo-opening",
+      "percent": 100,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-home",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-hover",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "linked-opening-125-neighbor",
+      "case": "linked-opening",
+      "percent": 125,
+      "selected": [
+        -1,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "paid-full-army-125-home",
+      "case": "paid-full-army",
+      "percent": 125,
+      "selected": [
+        0,
+        -2
+      ],
+      "png": true
+    },
+    {
+      "name": "saved-encircled-125-home",
+      "case": "saved-encircled",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    },
+    {
+      "name": "longest-contract-125-home",
+      "case": "longest-contract",
+      "percent": 125,
+      "selected": [
+        -2,
+        0
+      ],
+      "png": true
+    }
+  ],
+  "command_checks": [
+    {
+      "action": "explore",
+      "exact": true
+    },
+    {
+      "action": "retreat",
+      "exact": true
+    },
+    {
+      "action": "end_turn",
+      "exact": true
+    },
+    {
+      "action": "travel",
+      "exact": true
+    }
+  ],
+  "historical_contract": {
+    "history": "docs/evidence/shardbound-army-plans-cd351a9/control.json.gz",
+    "command_index": 283,
+    "offer": "gate",
+    "sha256": "6609eb4f334a956f6d6873e378b0b87bdd6901f3ad2f4688226265b8ede0b72a",
+    "historical_preparation_includes_autoplay": true
+  },
+  "input_activations": 324,
+  "game_closed": true,
+  "source_unchanged": true,
+  "wall_seconds": 29.19288491702173,
+  "cpu_seconds": 7.351031
+}

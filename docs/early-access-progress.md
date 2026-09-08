@@ -7,7 +7,24 @@ the current goal is substantially broader.
 The current checkpoint comes first. Historical measurements and feature gaps
 apply to their named source snapshots, not to today's build.
 
-## Current playable checkpoint — 2026-09-07
+## Current source work — 2026-09-08
+
+**ed27f24** completes three native screenshot/critique/improvement passes on
+the shard map: compact landmark labels and full names on demand, a centered
+board, consolidated summaries, wider objective text and clearer contextual
+actions. [Before/after frames and validation](evidence/shard-ui-2026-09-08/README.md)
+include 25 targeted tests, a bounded input audit, and five native cases with
+95 province selections and four exact command comparisons. Seven final PNGs
+were inspected; the accepted native run averaged about 25% of one CPU core.
+This source work is newer than the preserved Mac archive below.
+
+The development-only concurrent campaign model now supports two independent
+realms buying buildings/troops and settling a shared day after both mark Ready.
+Shared realm purchases and solo compatibility are checkpointed. Independent
+PvE encounters, conflict claims, human PvP and playable network presentation
+remain open; the selectable multiplayer mode is still shared-realm co-op.
+
+## Current packaged checkpoint — 2026-09-07
 
 The latest preserved Mac development archive is clean source **2d9520a**:
 [runnable artifact, exact source and inspected packaged frames](evidence/shardbound-package-2d9520a/README.md).
