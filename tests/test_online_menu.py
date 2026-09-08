@@ -156,3 +156,69 @@ def test_online_code_paste_replaces_input_and_rejects_unrelated_clipboard(tmp_pa
             assert 'Copy just the room code' in game.scene.message
     finally:
         game.close()
+
+
+def test_installed_games_offer_the_download_page_when_a_newer_release_is_published(tmp_path, monkeypatch):
+    """The menu names the update and opens its page; source checkouts show nothing."""
+    from tests.test_release import CATALOG, catalog_site
+
+    opened = []
+    monkeypatch.setattr('saga2d.multiplayer_ui.open_page', opened.append)
+    with catalog_site(CATALOG) as url:
+        monkeypatch.setenv('SAGA2D_CATALOG_URL', url)
+        monkeypatch.setattr('saga2d.release.build_info', lambda: {'version': '0.1.0'})
+        game = Game('update menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'saves')
+        try:
+            game.push(MatchMenu('Warband multiplayer', 'warband-v1', None, None))
+            deadline = time.monotonic() + 10
+            while game.scene.update_check.status in ('checking',) and time.monotonic() < deadline:
+                game.tick(.03)
+            game.tick(.03)
+            text = '\n'.join(item['text'] for item in game.backend.texts)
+            assert 'Update available: Warband 0.2.0' in text
+            button = next(b for b in game.scene.ui.walk() if getattr(b, 'text', '') == 'Open download page')
+            x, y, w, h = button.bounds
+            game.backend.inject_click(x + w / 2, y + h / 2)
+            game.tick(.03)
+            assert opened == ['https://games.example.test/warband/']
+        finally:
+            game.close()
+        monkeypatch.setattr('saga2d.release.build_info', lambda: None)
+        game = Game('source menu', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'source-saves')
+        try:
+            game.push(MatchMenu('Warband multiplayer', 'warband-v1', None, None))
+            game.tick(.03)
+            assert game.scene.update_check.status == 'source'
+            assert 'Update available' not in '\n'.join(item['text'] for item in game.backend.texts)
+        finally:
+            game.close()
+
+
+def test_incompatible_clients_are_told_to_update_instead_of_retrying(server_url, tmp_path, monkeypatch):
+    """A rejected old client sees an update notice and a button to the download site."""
+    from saga2d.multiplayer_ui import MatchLobby
+
+    opened = []
+    monkeypatch.setattr('saga2d.multiplayer_ui.open_page', opened.append)
+    monkeypatch.setattr('saga2d.online.PROTOCOL', 999)
+    monkeypatch.setenv('SAGA2D_SERVER_URL', server_url)
+    game = Game('old client', backend='mock', resolution=(1280, 800), save_dir=tmp_path / 'saves')
+    try:
+        game.push(MatchMenu('Tribes multiplayer', 'tribes-v1', None, None, create_options=lambda: {'size': 11}))
+        game.tick(.03)
+        game.scene.host()
+        deadline = time.monotonic() + 10
+        while not game.scene.session.closed and time.monotonic() < deadline:
+            game.tick(.03)
+        game.tick(.03)
+        assert isinstance(game.scene, MatchLobby) and game.scene.session.incompatible
+        text = '\n'.join(item['text'] for item in game.backend.texts)
+        assert 'Update required' in text and 'Update your game client' in text
+        assert 'Copy room code' not in text
+        button = next(b for b in game.scene.ui.walk() if getattr(b, 'text', '') == 'Open download page')
+        x, y, w, h = button.bounds
+        game.backend.inject_click(x + w / 2, y + h / 2)
+        game.tick(.03)
+        assert opened == [server_url.replace('ws://', 'http://').removesuffix('/play') + '/']
+    finally:
+        game.close()

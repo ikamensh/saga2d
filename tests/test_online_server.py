@@ -325,3 +325,63 @@ def test_only_configured_loopback_proxy_can_supply_client_ip(trusted):
                 else:
                     receive(host, 'welcome')
                     assert receive(host)['state']
+
+
+def test_incompatible_clients_learn_to_update_rather_than_retry():
+    """Version mismatches carry a machine-readable reason so games can offer the download page."""
+    with running_server() as (url, process):
+        for fields in ({'protocol': 2}, {'game': 'tribes-v999'}):
+            with connect(url, proxy=None) as old:
+                old.send(json.dumps({'type': 'create', 'protocol': 1, 'game': 'tribes-v1', **fields}))
+                rejection = receive(old, 'reject')
+                assert rejection['reason'] == 'incompatible' and 'Update' in rejection['error']
+        with connect(url, proxy=None) as stranger:
+            stranger.send(json.dumps({'type': 'join', 'protocol': 1, 'game': 'tribes-v1', 'room': 'nowhere'}))
+            assert 'reason' not in receive(stranger, 'reject')
+
+
+def test_campaigns_wait_for_a_late_partner_and_report_their_retention():
+    """A lone campaign seat is not expired like a match room; both games learn their retention."""
+    with running_server('--room-ttl', '.15', '--campaign-ttl', '5') as (url, process):
+        with connect(url, proxy=None) as host, connect(url, proxy=None) as match_host:
+            campaign = handshake(host, game='shardbound-v1', options={'campaign': True})
+            assert campaign['retention'] == 5
+            receive(host)
+            assert handshake(match_host, game='tribes-v1', options={'size': 11})['retention'] == .15
+            receive(match_host)
+            time.sleep(.3)
+            assert 'expired' in receive(match_host, 'reject')['error']
+            with connect(url, proxy=None) as guest:
+                handshake(guest, 'join', game='shardbound-v1', room=campaign['room'])
+                assert receive(host, predicate=lambda message: message['ready'])['ready']
+
+
+def test_suspended_campaigns_leave_memory_and_resume_days_later_even_after_restart(tmp_path):
+    """Storage, not the room limit, holds an absent campaign; it returns for either seat."""
+    arguments = ('--state-dir', tmp_path, '--room-ttl', '.15', '--campaign-ttl', '1.5', '--max-rooms', '1')
+    with running_server(*arguments) as (url, process):
+        with connect(url, proxy=None) as host:
+            seat = handshake(host, game='shardbound-v1', options={'campaign': True, 'seed': 11})
+            before = receive(host)['state']
+        time.sleep(.3)  # Both seats absent beyond the match TTL: the campaign is suspended.
+        with connect(url, proxy=None) as other:
+            handshake(other, game='tribes-v1', options={'size': 11})  # The single room slot is free again.
+            receive(other)
+    time.sleep(.3)  # The abandoned match expires in storage; the campaign is retained.
+    with running_server(*arguments) as (url, process):
+        with connect(url, proxy=None) as other:
+            handshake(other, game='tribes-v1', options={'size': 11})  # Suspended campaigns stay unloaded.
+            receive(other)
+        time.sleep(.3)  # The abandoned match expires, freeing the slot for the campaign.
+        with connect(url, proxy=None) as returned, connect(url, proxy=None) as guest:
+            resumed = handshake(returned, 'resume', game='shardbound-v1', room=seat['room'],
+                                resume_token=seat['resume_token'])
+            assert resumed['player'] == 0 and resumed['retention'] == 1.5
+            assert receive(returned)['state'] == before
+            handshake(guest, 'join', game='shardbound-v1', room=seat['room'])
+            assert receive(guest)['ready']
+        time.sleep(1.7)  # Longer than the campaign retention since the last visit.
+        with connect(url, proxy=None) as late:
+            late.send(json.dumps({'type': 'resume', 'protocol': 1, 'game': 'shardbound-v1',
+                                  'room': seat['room'], 'resume_token': seat['resume_token']}))
+            assert 'not found' in receive(late, 'reject')['error']

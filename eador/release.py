@@ -1,8 +1,6 @@
 """Player-facing build facts; packaging supplies the identity of a frozen app."""
 
-import json
-from pathlib import Path
-import sys
+from saga2d.release import build_info
 
 
 VERSION = '0.1.0-development'
@@ -10,9 +8,9 @@ VERSION = '0.1.0-development'
 
 def build_label():
     """Source launches say so; installed apps identify their recorded source."""
-    if not getattr(sys, 'frozen', False):
+    info = build_info()
+    if info is None:
         return f'{VERSION} · source checkout'
-    info = json.loads((Path(sys._MEIPASS) / 'release' / 'build-info.json').read_text(encoding='utf-8'))
     modified = ' · modified source' if info['working_tree_dirty'] else ''
     return f"{info['version']} · {info['source_commit'][:12]}{modified}"
 

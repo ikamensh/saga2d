@@ -28,6 +28,8 @@ from online_server.storage import RoomStore
 PROTOCOL = 1
 MAX_MESSAGE = 16_384
 MAX_SNAPSHOT = 8 * 1024 * 1024
+# Campaigns span sessions: their seats survive for days, suspended to storage between visits.
+CAMPAIGN_GAMES = frozenset({'shardbound-v1', 'shardbound-pvp-v1'})
 LOG = logging.getLogger(__name__)
 
 
@@ -59,6 +61,10 @@ def decode(data):
     return message
 
 
+class IncompatibleClient(CommandError):
+    """The client's protocol or game version cannot join any room on this server."""
+
+
 class Peer:
     """Bounded control messages and one replaceable snapshot per connection."""
     def __init__(self, websocket):
@@ -84,11 +90,15 @@ class Peer:
             self.reject('Connection cannot keep up with the match.')
         self.wake.set()
 
-    def reject(self, error):
+    def reject(self, error, reason=None):
+        """End the connection; ``reason`` lets clients react beyond showing the text."""
         self.closing = True
         self.state = None
         self.controls.clear()
-        self.controls.append(json.dumps({'type': 'reject', 'error': error}))
+        message = {'type': 'reject', 'error': error}
+        if reason is not None:
+            message['reason'] = reason
+        self.controls.append(json.dumps(message))
         self.wake.set()
 
     def check_rate(self):
@@ -143,12 +153,17 @@ class Room:
 
 
 class RoomServer:
-    def __init__(self, *, max_rooms=64, max_connections=128, room_ttl=900,
+    """Matches expire after ``room_ttl`` without both players; campaigns are retained
+    for ``campaign_ttl`` and leave memory after ``room_ttl`` until a seat returns."""
+    def __init__(self, *, max_rooms=64, max_connections=128, room_ttl=900, campaign_ttl=7 * 86400,
                  state_dir=None, trusted_proxy=False):
         if max_rooms < 1 or max_connections < 2 or not math.isfinite(room_ttl) or room_ttl <= 0:
             raise ValueError('Room and connection limits must be positive.')
+        if not math.isfinite(campaign_ttl) or campaign_ttl < room_ttl:
+            raise ValueError('Campaign retention must be at least the match room retention.')
         self.rooms = {}
-        self.max_rooms, self.max_connections, self.room_ttl = max_rooms, max_connections, room_ttl
+        self.max_rooms, self.max_connections = max_rooms, max_connections
+        self.room_ttl, self.campaign_ttl = room_ttl, campaign_ttl
         self.connections = set()
         self.by_ip = {}
         self.creations = {}
@@ -157,16 +172,39 @@ class RoomServer:
         self.last_keep_alive = time.monotonic()
         if self.store is not None:
             for saved in self.store.load():
-                room = Room(saved['game'], restore_match(saved['game'], saved['state']), saved['code'],
-                            tokens=saved['tokens'], revision=saved['revision'])
-                remaining = saved['expires_at'] - time.time()
-                room.disconnected_at = time.monotonic() - (self.room_ttl - remaining)
-                self.rooms[room.code] = room
+                self.rooms[saved['code']] = self.restore(saved)
+
+    def retention(self, game):
+        return self.campaign_ttl if game in CAMPAIGN_GAMES else self.room_ttl
+
+    def restore(self, saved):
+        room = Room(saved['game'], restore_match(saved['game'], saved['state']), saved['code'],
+                    tokens=saved['tokens'], revision=saved['revision'])
+        remaining = saved['expires_at'] - time.time()
+        room.disconnected_at = time.monotonic() - (self.retention(room.game) - remaining)
+        return room
 
     def checkpoint(self, room, *, force=False):
         if self.store is not None and (force or time.monotonic() - room.checkpointed_at >= 5):
-            self.store.save(room, self.room_ttl)
+            self.store.save(room, self.retention(room.game))
             room.checkpointed_at = time.monotonic()
+
+    def suspend(self, room):
+        """Keep a campaign's seats in storage only, freeing memory and the room limit."""
+        self.store.suspend(room, self.retention(room.game))
+        del self.rooms[room.code]
+
+    def find_room(self, code, game):
+        room = self.rooms.get(code) if isinstance(code, str) else None
+        if room is None and self.store is not None and isinstance(code, str):
+            saved = self.store.suspended(code)
+            if saved is not None and saved['game'] == game:
+                if len(self.rooms) >= self.max_rooms:
+                    raise CommandError('The server is full. Please try again later.')
+                room = self.rooms[code] = self.restore(saved)
+        if room is None or room.game != game:
+            raise CommandError('Room not found for this game. Check the room code.')
+        return room
 
     def client_address(self, websocket):
         address = websocket.remote_address[0]
@@ -183,10 +221,10 @@ class RoomServer:
 
     def enter(self, message, address):
         if type(message.get('protocol')) is not int or message['protocol'] != PROTOCOL:
-            raise CommandError('Incompatible multiplayer protocol. Update your game client.')
+            raise IncompatibleClient('Incompatible multiplayer protocol. Update your game client.')
         game, kind = message.get('game'), message.get('type')
         if game not in GAME_IDS:
-            raise CommandError('Unknown game version. Update your game client.')
+            raise IncompatibleClient('Unknown game version. Update your game client.')
         if kind == 'create':
             if len(self.rooms) >= self.max_rooms:
                 raise CommandError('The server is full. Please try again later.')
@@ -205,10 +243,7 @@ class RoomServer:
             room = Room(game, match, code)
             self.rooms[code] = room
             return room, 0
-        code = message.get('room')
-        room = self.rooms.get(code) if isinstance(code, str) else None
-        if room is None or room.game != game:
-            raise CommandError('Room not found for this game. Check the room code.')
+        room = self.find_room(message.get('room'), game)
         if kind == 'join':
             if room.tokens[1] is not None:
                 raise CommandError('Both seats are claimed. Reconnect using your saved seat.')
@@ -266,7 +301,8 @@ class RoomServer:
             message = decode(await asyncio.wait_for(websocket.recv(), timeout=10))
             room, player = self.enter(message, address)
             peer.send({'type': 'welcome', 'room': room.code, 'resume_token': room.tokens[player],
-                       'player': player, 'protocol': PROTOCOL, 'game': room.game})
+                       'player': player, 'protocol': PROTOCOL, 'game': room.game,
+                       'retention': self.retention(room.game)})
             room.peers[player] = peer
             room.publish()
             self.checkpoint(room, force=True)
@@ -279,6 +315,9 @@ class RoomServer:
                     self.apply(room, player, message)
                 except CommandError as exc:
                     peer.send({'type': 'error', 'error': str(exc)})
+        except IncompatibleClient as exc:
+            peer.reject(str(exc), reason='incompatible')
+            await writer
         except CommandError as exc:
             peer.reject(str(exc))
             await writer
@@ -319,8 +358,12 @@ class RoomServer:
             for room in list(self.rooms.values()):
                 try:
                     if not room.ready:
-                        if started - room.disconnected_at >= self.room_ttl:
+                        idle = started - room.disconnected_at
+                        if idle >= self.retention(room.game):
                             self.fail_room(room, 'This room expired while waiting for players. Create a new room.')
+                        elif (self.store is not None and room.game in CAMPAIGN_GAMES and idle >= self.room_ttl
+                                and all(peer is None for peer in room.peers)):
+                            self.suspend(room)
                     elif room.game == 'warband-v1':
                         room.match.step()
                         room.ticks += 1
@@ -331,7 +374,9 @@ class RoomServer:
                     LOG.exception('Simulation failed in %s room', room.game)
                     self.fail_room(room, 'The match failed on the server. Please create a new room.')
             if self.store is not None and started - self.last_keep_alive >= min(60, self.room_ttl / 3):
-                self.store.keep_alive([room.code for room in self.rooms.values() if room.ready], self.room_ttl)
+                self.store.keep_alive([(room.code, self.retention(room.game))
+                                       for room in self.rooms.values() if room.ready])
+                self.store.purge()
                 self.last_keep_alive = started
             self.creations = {address: times for address, times in self.creations.items()
                               if times and times[-1] > started - 60}
