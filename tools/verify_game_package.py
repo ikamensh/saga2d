@@ -1,6 +1,6 @@
-"""Verify an extracted Warband archive and Windows install/launch/uninstall.
+"""Verify an extracted Tribes or Warband archive and Windows install/launch/uninstall.
 
-    uv run python tools/verify_warband_package.py dist/warband --native --public-server wss://games.tachyon-ai.eu/play
+    uv run python tools/verify_game_package.py warband dist/warband --native --public-server wss://games.tachyon-ai.eu/play
 
 Uses the production RoomServer over real loopback WebSockets. The application
 process runs outside the checkout with an isolated profile and no Python on
@@ -24,7 +24,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.build_warband import sha256, write_json
+from tools.build_game import GAMES, sha256, write_json
 
 
 @contextmanager
@@ -57,7 +57,7 @@ def local_server():
             errors.put(exc)
             ready.put(None)
 
-    thread = threading.Thread(target=worker, name="warband-package-authority", daemon=True)
+    thread = threading.Thread(target=worker, name="package-authority", daemon=True)
     thread.start()
     started = ready.get(timeout=15)
     if started is None:
@@ -112,7 +112,7 @@ def mesa_test_context(executable: Path, mesa_dir: Path):
 
 def executable_smoke(executable: Path, endpoint: str, report: Path, manifest: dict, *, native=False, mesa_dir: Path | None = None) -> dict:
     context = mesa_test_context(executable, mesa_dir) if mesa_dir is not None else nullcontext({})
-    with tempfile.TemporaryDirectory(prefix="warband-clean-profile-") as directory, context as graphics:
+    with tempfile.TemporaryDirectory(prefix="clean-profile-") as directory, context as graphics:
         profile = Path(directory)
         env = isolated_environment(profile)
         if graphics:
@@ -136,13 +136,16 @@ def executable_smoke(executable: Path, endpoint: str, report: Path, manifest: di
         return result
 
 
-def verify(output: Path, *, native=False, public_server: str | None = None, mesa_dir: Path | None = None) -> dict:
+def verify(game: str, output: Path, *, native=False, public_server: str | None = None, mesa_dir: Path | None = None) -> dict:
+    product = GAMES[game]["product"]
     if public_server is not None and not public_server.startswith("wss://"):
         raise ValueError("Public-server acceptance requires an explicit wss:// TLS endpoint")
     if mesa_dir is not None and not native:
         raise ValueError("A Mesa test context requires --native")
     output = output.resolve()
     manifest = json.loads((output / "build-manifest.json").read_text(encoding="utf-8"))
+    if manifest["product"] != product:
+        raise ValueError(f"{output} holds a {manifest['product']} build, not {product}")
     for item in manifest["artifacts"]:
         path = output / item["file"]
         assert path.stat().st_size == item["bytes"] and sha256(path) == item["sha256"], path
@@ -153,28 +156,28 @@ def verify(output: Path, *, native=False, public_server: str | None = None, mesa
     evidence = output / "verification"
     evidence.mkdir(exist_ok=True)
     report = {"source_commit": manifest["source_commit"], "version": manifest["version"], "scope": "Loopback authority; isolated profile on the named CI host"}
-    with tempfile.TemporaryDirectory(prefix="warband-extracted-") as directory, local_server() as endpoint:
+    with tempfile.TemporaryDirectory(prefix="extracted-package-") as directory, local_server() as endpoint:
         extracted = Path(directory)
         with zipfile.ZipFile(archive) as bundle:
             bundle.extractall(extracted)
-        executable = extracted / "Warband" / ("Warband.exe" if os.name == "nt" else "Warband")
+        executable = extracted / product / (f"{product}.exe" if os.name == "nt" else product)
         if os.name != "nt":
             executable.chmod(executable.stat().st_mode | 0o111)
         report["portable"] = executable_smoke(executable, endpoint, evidence / "portable.json", manifest)
         if installers:
             if os.name != "nt":
                 raise RuntimeError("Installer verification requires Windows")
-            installed = extracted / "Installed Warband"
+            installed = extracted / f"Installed {product}"
             # DisableProgramGroupPage=yes makes Inno ignore /GROUP. Check the
             # same standard per-user shortcut that a normal install creates.
-            shortcut = Path(os.environ["APPDATA"]) / "Microsoft/Windows/Start Menu/Programs/Warband/Warband.lnk"
+            shortcut = Path(os.environ["APPDATA"]) / f"Microsoft/Windows/Start Menu/Programs/{product}/{product}.lnk"
             if shortcut.exists():
-                raise RuntimeError("Run installer verification in a Windows account without an existing Warband installation")
+                raise RuntimeError(f"Run installer verification in a Windows account without an existing {product} installation")
             try:
                 subprocess.run([str(installers[0]), "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-",
                                 f"/DIR={installed}", f"/LOG={evidence / 'install.log'}"], check=True, timeout=120)
                 assert shortcut.is_file(), shortcut
-                executable = installed / "Warband.exe"
+                executable = installed / f"{product}.exe"
                 report["installed"] = executable_smoke(executable, endpoint, evidence / "installed.json", manifest)
                 if public_server is not None:
                     report["public_server"] = {"endpoint": public_server,
@@ -198,9 +201,10 @@ def verify(output: Path, *, native=False, public_server: str | None = None, mesa
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("game", choices=sorted(GAMES))
     parser.add_argument("output", type=Path)
     parser.add_argument("--native", action="store_true")
     parser.add_argument("--public-server", help="Also require the installed executable to pass its online check over this wss:// endpoint")
     parser.add_argument("--mesa-dir", type=Path, help="Test-only x64 Mesa WGL DLLs for CI hosts without a graphics driver")
     args = parser.parse_args()
-    verify(args.output, native=args.native, public_server=args.public_server, mesa_dir=args.mesa_dir)
+    verify(args.game, args.output, native=args.native, public_server=args.public_server, mesa_dir=args.mesa_dir)
