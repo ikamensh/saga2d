@@ -371,3 +371,30 @@ def test_a_hard_brain_presses_even_before_its_first_wave() -> None:
             break
     assert brain.attacking
     assert _attacks(brain) != []
+
+
+def test_difficulty_ladder_profiles_and_counter_shifts() -> None:
+    easy, normal, hard = (PROFILES[Difficulty.EASY], PROFILES[Difficulty.NORMAL], PROFILES[Difficulty.HARD])
+    assert easy.first_wave > normal.first_wave >= hard.first_wave
+    assert easy.think_every > normal.think_every
+    world = mapgen.generate(seed=5, players=2, human=None, races=[Race.HUMAN, None])
+    _rich(world)
+    barracks = _military_building(world, 0, BuildingType.BARRACKS)
+    stables = _military_building(world, 0, BuildingType.STABLES)
+    world.update_vision()
+    plain_easy = Brain(0, Difficulty.EASY)._choose_unit(world, stables, {t: 2 for t in UnitType})
+    plain_easy_barracks = Brain(0, Difficulty.EASY)._choose_unit(world, barracks, {t: 2 for t in UnitType})
+    plain_normal_barracks = Brain(0, Difficulty.NORMAL)._choose_unit(world, barracks, {t: 2 for t in UnitType})
+    hall = world.player_buildings(0, BuildingType.TOWN_HALL)[0]
+    for i in range(6):
+        world.spawn_unit(1, UnitType.ARCHER, (hall.center[0] + 2, hall.center[1] + i * 0.7))
+    world.update_vision()
+    shifted_easy = Brain(0, Difficulty.EASY)._choose_unit(world, stables, {t: 2 for t in UnitType})
+    shifted_easy_barracks = Brain(0, Difficulty.EASY)._choose_unit(world, barracks, {t: 2 for t in UnitType})
+    shifted_normal = Brain(0, Difficulty.NORMAL)._choose_unit(world, stables, {t: 2 for t in UnitType})
+    shifted_normal_barracks = Brain(0, Difficulty.NORMAL)._choose_unit(world, barracks, {t: 2 for t in UnitType})
+    assert shifted_easy == plain_easy  # Easy follows its plain race plan whatever it sees
+    assert shifted_easy not in (UnitType.SCOUT, UnitType.KNIGHT)
+    assert shifted_easy_barracks == plain_easy_barracks
+    assert shifted_normal in (UnitType.SCOUT, UnitType.KNIGHT)
+    assert shifted_normal_barracks != plain_normal_barracks  # Normal shifts towards counters
