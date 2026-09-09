@@ -1,4 +1,14 @@
-# Saga2D
+# Saga2D (archived monorepo)
+
+**This repository was split on 2026-09-10.** Active development continues in
+six repositories, checked out side by side under `~/saga/`:
+[saga2d-framework](https://github.com/ikamensh/saga2d-framework) (the framework),
+[sagaforge](https://github.com/ikamensh/sagaforge) (procedural assets),
+[tribes](https://github.com/ikamensh/tribes), [warband](https://github.com/ikamensh/warband),
+[shardbound](https://github.com/ikamensh/shardbound) (the games) and
+[saga-online](https://github.com/ikamensh/saga-online) (server, catalog, website).
+This repository keeps the pre-split history, the published preview releases and
+the verification evidence under `docs/evidence/`.
 
 A small Python framework for 2D games, exercised by three games built on
 it: **Tribes**, a Polytopia-style turn-based strategy game; **Warband**, a
