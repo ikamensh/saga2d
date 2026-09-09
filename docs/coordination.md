@@ -235,3 +235,14 @@ know about, and read it before touching shared files.
   host-clock check. Native separate-process evidence for all three games is in
   `docs/evidence/multiplayer-2026-09-06`. Main's checkout was not fast-forwarded,
   following the ownership protocol above.
+
+- 2026-09-09 (hive administrator, Claude session): a hive plan
+  (`docs/hive/warband-plan-2026-09-09.toml`, project `warband`) lands commits
+  built by OpenCode's free Muse Spark model directly on `origin/main`, one item
+  at a time, each after an agent review and the Warband suite passing on a
+  pushed `hive/plan-*` branch.  Pull before pushing; expect small merges in
+  `warband/ai.py`, `warband/model.py` and `warband/title.py` over the next
+  hours.  `origin/main` was red from `4e9e9db` (the three tower killing-blow
+  cases in `tests/warband/test_battle_audio.py`) until `7bd152d`; that commit
+  was pushed from this tree by the hive administrator because the landing
+  validation runs the whole Warband suite and nothing could land on a red main.
