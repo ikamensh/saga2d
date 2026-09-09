@@ -12,7 +12,7 @@ def create_match(game, options):
         raise CommandError('Match options must be an object.')
     allowed = {'seed'} | {
         'tribes-v1': {'size'},
-        'warband-v1': {'width', 'height', 'theme'},
+        'warband-v1': {'width', 'height', 'theme', 'races'},
         'shardbound-v1': {'hero', 'theme', 'difficulty', 'campaign'},
         'shardbound-pvp-v1': {'heroes', 'theme', 'difficulty'},
     }[game]
@@ -37,10 +37,15 @@ def create_match(game, options):
         return TribesMatch(seed, size=integer('size', 14, 11, 18))
     if game == 'warband-v1':
         from warband.multiplayer import WarbandMatch
-        from warband.rules import MapTheme
+        from warband.rules import MapTheme, Race
+        races = options.get('races', [None, None])
+        if (not isinstance(races, list) or len(races) != 2
+                or any(race is not None and (not isinstance(race, str) or race not in {r.value for r in Race}) for race in races)):
+            raise CommandError('races must name two seats, each a race or null.')
         return WarbandMatch(seed, width=integer('width', 48, 40, 64),
                             height=integer('height', 40, 32, 48),
-                            theme=MapTheme(choice('theme', 'summer', {t.value for t in MapTheme})))
+                            theme=MapTheme(choice('theme', 'summer', {t.value for t in MapTheme})),
+                            races=[Race(race) if race is not None else None for race in races])
     from eador.model import HERO_CLASSES
     from eador.worldgen import THEMES
     from eador.difficulty import DIFFICULTIES
