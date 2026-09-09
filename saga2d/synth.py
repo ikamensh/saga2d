@@ -21,6 +21,7 @@ import wave
 import numpy as np
 
 SAMPLE_RATE = 44_100
+_TABLE = 4096  # samples in one period of a held voice's waveform
 
 _NOTE_INDEX = {"C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5, "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11}
 
@@ -67,15 +68,21 @@ def tone(note: str | float, length: float, *, attack: float = 0.005, tau: float 
     return out / sum(amp for _, amp in partials)
 
 
+def _fft_size(n: int) -> int:
+    """The power of two at or above *n*: pocketfft is many times slower on awkward lengths."""
+    return 1 << max(0, n - 1).bit_length()
+
+
 def noise(length: float, low: float, high: float, *, attack: float = 0.002, tau: float = 0.03, seed: int = 0) -> np.ndarray:
     """Band-limited noise burst between *low* and *high* Hz (soft 8th-order edges)."""
     n = int(round(length * SAMPLE_RATE))
-    spectrum = np.fft.rfft(np.random.default_rng(seed).standard_normal(n))
-    freqs = np.fft.rfftfreq(n, 1 / SAMPLE_RATE)
+    size = _fft_size(n)
+    spectrum = np.fft.rfft(np.random.default_rng(seed).standard_normal(n), size)
+    freqs = np.fft.rfftfreq(size, 1 / SAMPLE_RATE)
     mask = np.zeros_like(freqs)
     f = freqs[1:]
     mask[1:] = 1 / (1 + (f / high) ** 8) / (1 + (low / f) ** 8)
-    burst = np.fft.irfft(spectrum * mask, n)
+    burst = np.fft.irfft(spectrum * mask, size)[:n]
     return level(burst, 1) * envelope(length, attack, tau)
 
 
@@ -162,14 +169,21 @@ def sustained(note: str | float, length: float, *, partials=PAD, attack: float =
     rng = np.random.default_rng(seed)
     rate, depth = vibrato
     onset = np.minimum(1.0, t / max(attack, 0.25))
+    cycle = np.arange(_TABLE) / _TABLE
     out = np.zeros_like(t)
     for voice in range(voices):
         spread = 0.0 if voices == 1 else detune * (2 * voice / (voices - 1) - 1)
-        wobble = 1 + depth * onset * np.sin(2 * np.pi * rate * t + rng.uniform(0, 2 * np.pi))
-        phase = 2 * np.pi * np.cumsum(freq * (1 + spread) * wobble) / SAMPLE_RATE
+        # One period of this voice's partials (each at its own phase), read by a wavering phase.
+        table = np.zeros(_TABLE)
         for k, amp in partials:
             if freq * k * (1 + abs(spread)) < SAMPLE_RATE / 2:
-                out += amp * np.sin(k * phase + rng.uniform(0, 2 * np.pi))
+                table += amp * np.sin(2 * np.pi * k * cycle + rng.uniform(0, 2 * np.pi))
+        wobble = 1 + depth * onset * np.sin(2 * np.pi * rate * t + rng.uniform(0, 2 * np.pi))
+        position = np.cumsum(freq * (1 + spread) * wobble) * (_TABLE / SAMPLE_RATE)
+        index = position.astype(np.int64)
+        fraction = position - index
+        index %= _TABLE
+        out += table[index] * (1 - fraction) + table[(index + 1) % _TABLE] * fraction
     return out * adsr(length, attack, decay, sustain, release) / (voices * sum(amp for _, amp in partials))
 
 
@@ -187,7 +201,7 @@ def pluck(note: str | float, length: float, *, brightness: float = 0.6, tau: flo
         raise ValueError("A pluck needs at least two samples")
     burst = np.random.default_rng(seed).uniform(-1, 1, max(2, int(round(SAMPLE_RATE / freq))))
     burst -= burst.mean()
-    size = 1 << (2 * count - 1).bit_length()
+    size = _fft_size(2 * count)
     w = 2 * np.pi * np.arange(size // 2 + 1) / size
     hertz = w * SAMPLE_RATE / (2 * np.pi)
     delay = SAMPLE_RATE / freq - 0.5  # the two-tap average adds half a sample
@@ -196,6 +210,8 @@ def pluck(note: str | float, length: float, *, brightness: float = 0.6, tau: flo
     comb /= np.sqrt(1 + (hertz / (freq * 2 ** (1 + 4 * brightness))) ** 2)  # the pick's edge: 2× to 32× the pitch
     comb /= np.sqrt(1 + (freq / 2 / np.maximum(hertz, 1e-9)) ** 8)  # nothing below the string's own pitch
     out = np.fft.irfft(np.fft.rfft(burst, size) * comb, size)[:count]
+    edge = min(count // 2, int(0.0015 * SAMPLE_RATE))  # a real pluck takes a moment to speak; no click
+    out[:edge] *= np.linspace(0.0, 1.0, edge)
     tail = min(count, int(0.005 * SAMPLE_RATE))
     out[-tail:] *= np.linspace(1.0, 0.0, tail)
     return level(out, 1.0)
@@ -206,10 +222,11 @@ def _shape_spectrum(clip: np.ndarray, gain: Callable[[np.ndarray], np.ndarray]) 
     if clip.ndim not in (1, 2) or not clip.size:
         raise ValueError("Filters take a nonempty mono or stereo clip")
     n = len(clip)
-    mask = gain(np.fft.rfftfreq(n, 1 / SAMPLE_RATE))
+    size = _fft_size(n)
+    mask = gain(np.fft.rfftfreq(size, 1 / SAMPLE_RATE))
     if clip.ndim == 2:
         mask = mask[:, None]
-    return np.fft.irfft(np.fft.rfft(clip, axis=0) * mask, n, axis=0)
+    return np.fft.irfft(np.fft.rfft(clip, size, axis=0) * mask, size, axis=0)[:n]
 
 
 def lowpass(clip: np.ndarray, cutoff: float, order: int = 4) -> np.ndarray:
@@ -264,7 +281,7 @@ def reverb(clip: np.ndarray, *, decay: float = 2.0, mix: float = 0.3, predelay: 
     tail /= np.sqrt(np.sum(tail ** 2, axis=0))
     impulse = np.concatenate([np.zeros((int(round(predelay * SAMPLE_RATE)), 2)), tail])
     n = len(dry)
-    size = 1 << (n + len(impulse) - 1).bit_length()
+    size = _fft_size(n + len(impulse))
     wet = np.fft.irfft(np.fft.rfft(dry, size, axis=0) * np.fft.rfft(impulse, size, axis=0), size, axis=0)[:n + len(impulse)]
     if wrap:
         out = dry + wet[:n] * mix

@@ -116,8 +116,10 @@ def test_filters_and_formants_shape_the_spectrum_in_place():
     raw = np.abs(np.fft.rfft(rich))
     low = np.abs(np.fft.rfft(lowpass(rich, 600)))
     assert low[freqs > 2000].sum() < 0.05 * raw[freqs > 2000].sum() and low[freqs < 300].sum() > 0.9 * raw[freqs < 300].sum()
-    offset = rich + 0.3
-    assert abs(highpass(offset, 60).mean()) < 1e-3 and abs(offset.mean()) > 0.29
+    rumble = rich + 0.3 * np.sin(2 * np.pi * 20 * np.arange(len(rich)) / SAMPLE_RATE) * np.hanning(len(rich))
+    cleaned = np.abs(np.fft.rfft(highpass(rumble, 60)))
+    assert cleaned[freqs < 30].max() < 0.02 * np.abs(np.fft.rfft(rumble))[freqs < 30].max()
+    assert cleaned[freqs > 100].sum() == pytest.approx(raw[freqs > 100].sum(), rel=0.02)
     stereo = highpass(pan(rich, 0.2), 60)
     assert stereo.shape == (len(rich), 2)
     vowel = np.abs(np.fft.rfft(formant(rich, AH)))
