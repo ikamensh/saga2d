@@ -9,10 +9,10 @@
       "description": "32 seconds: bowed low ostinato, skin drums, dry rattles and alternating flute/lute answers.",
       "frames": 1411200,
       "peak": 0.17999817,
-      "rms": 0.02263274,
+      "rms": 0.02249914,
       "seam_step": 0.00122074,
       "seconds": 32.0,
-      "sha256": "2ca436c4e9c805bf368608754e7cc4f8f02c9df4ecd52917ea96e60e9ee9750d"
+      "sha256": "c318f30b8a462787b63e05578bac36c1fda1bf2d24591d74154de5c623ac4374"
     },
     "music/campaign.wav": {
       "bytes": 8467244,
@@ -20,10 +20,10 @@
       "description": "48 seconds: bowed harmonic fields, wooden lute figures, flute answers and a soft hand drum.",
       "frames": 2116800,
       "peak": 0.16000855,
-      "rms": 0.0295022,
+      "rms": 0.02950232,
       "seam_step": 0.00076296,
       "seconds": 48.0,
-      "sha256": "771d3d1cb73e5a9068d7d253ce81af4c491c615cbcca57ae0795c011a7e8fc67"
+      "sha256": "84bccc76a1aa86a715e8909d21a9f8eadb03bf003d1a1c578675f2f99e0bbb0a"
     },
     "sounds/attack_arrow.wav": {
       "bytes": 26944,
@@ -34,7 +34,7 @@
       "rms": 0.05586208,
       "seam_step": 0.0,
       "seconds": 0.304989,
-      "sha256": "99fbe5c9483ebe4bd75e7e4fd31711885a2e671fe1025c79b306a78fc4b359e5"
+      "sha256": "6e381f7efbf6fc5ee9ba19b773f57d4fb3e28129e561f28dc20412d447d91f6e"
     },
     "sounds/attack_heavy.wav": {
       "bytes": 44320,
@@ -42,10 +42,10 @@
       "description": "A weighty shield or polearm impact with a deep body and loose armour rattle.",
       "frames": 22138,
       "peak": 0.64000366,
-      "rms": 0.11589116,
+      "rms": 0.11588665,
       "seam_step": 0.0,
       "seconds": 0.501995,
-      "sha256": "770f6b5cb41e1616dac95349ae740bba1e2d0af62a8a3722e0df3d64f705ac12"
+      "sha256": "30a4eed10d5e55b46f3a2ade505f4bf025573a9b013f69f832bbd0f90fd91b2a"
     },
     "sounds/attack_hit.wav": {
       "bytes": 27386,
@@ -53,10 +53,10 @@
       "description": "An edged strike: short metal scrape, a wooden crack and low contact.",
       "frames": 13671,
       "peak": 0.62001404,
-      "rms": 0.08786799,
+      "rms": 0.08786798,
       "seam_step": 0.0,
       "seconds": 0.31,
-      "sha256": "359f020027cef8a8fa67047172971ec8d5d17862b976142c93b26ae08869b679"
+      "sha256": "9f2f3379b7bc716e4b9172abb5b609abfd3b5c2487da2da64e10142d82895697"
     },
     "sounds/bolt.wav": {
       "bytes": 43262,
@@ -67,7 +67,7 @@
       "rms": 0.09975866,
       "seam_step": 0.0,
       "seconds": 0.49,
-      "sha256": "d2bbd1d5c6bec673c9fc34eecacfb0f2fec2cb3a8389bb8376cdbe350697028c"
+      "sha256": "160bd00061cc422611166e3236e5274b2c798b0b615bbb60f6a64c224ecb4d24"
     },
     "sounds/confirm.wav": {
       "bytes": 26064,
@@ -75,10 +75,10 @@
       "description": "Two small wooden E\u2013B plucks, with a delicate metallic overtone.",
       "frames": 13010,
       "peak": 0.41999573,
-      "rms": 0.06581704,
+      "rms": 0.06581703,
       "seam_step": 0.0,
       "seconds": 0.295011,
-      "sha256": "bddf784fb5dfde4584fe88fcef924400ec5bcf9445c1b3ab91832205c688cdc4"
+      "sha256": "57210ab7abb3d3700609ff1ad24f8d19d9793aae9a7a7c71979962802f93df39"
     },
     "sounds/defeat.wav": {
       "bytes": 160568,
@@ -86,10 +86,10 @@
       "description": "A bowed descent to unresolved B, with a low wind tail.",
       "frames": 80262,
       "peak": 0.46000549,
-      "rms": 0.12764339,
+      "rms": 0.12764338,
       "seam_step": 0.0,
       "seconds": 1.82,
-      "sha256": "20105eecbcee0637966b6234cc309a98b31bb4fb766c147cccc004e6785beca2"
+      "sha256": "cdc5523f0be0f9e14e0b0037d7c7557d39c7a4292097a67435ba8aca6738f6d7"
     },
     "sounds/end_turn.wav": {
       "bytes": 54728,
@@ -97,10 +97,10 @@
       "description": "A woodblock tick and two muted lute notes close the command phase.",
       "frames": 27342,
       "peak": 0.4000061,
-      "rms": 0.04972687,
+      "rms": 0.04972725,
       "seam_step": 0.0,
       "seconds": 0.62,
-      "sha256": "f8e8b9df41e83c1660ace884be4b093c0d4602f762084fddd3d9b9d46887c73a"
+      "sha256": "5a829fc9191511a59a55c83aeca54dbb9f061e958e7183f13f0784b56e46e453"
     },
     "sounds/guard.wav": {
       "bytes": 41498,
@@ -108,10 +108,10 @@
       "description": "A hollow shield knock followed by damped, inharmonic iron resonance.",
       "frames": 20727,
       "peak": 0.50001526,
-      "rms": 0.08655123,
+      "rms": 0.0865482,
       "seam_step": 0.0,
       "seconds": 0.47,
-      "sha256": "af073d45fb9c35ea0b3b2ff8e97b5060883bfa38ff993319388ca1925a7cc393"
+      "sha256": "cbc60bb44f306375c9dc8e3130336ce61c125b64c5cb30295cdaf0a9d27bb5aa"
     },
     "sounds/heal.wav": {
       "bytes": 75014,
@@ -119,10 +119,10 @@
       "description": "A breathed opening minor triad over gently resonating strings.",
       "frames": 37485,
       "peak": 0.46998505,
-      "rms": 0.11636107,
+      "rms": 0.11636108,
       "seam_step": 0.0,
       "seconds": 0.85,
-      "sha256": "814b9e92639e58346d23a5c79f1e78a4105e24824f6980a04b19f77c9eb75e27"
+      "sha256": "1ed62540d6fc0937d4dcc6da0cf187ba5a671178513f5a99d6cd1e406971343c"
     },
     "sounds/level_up.wav": {
       "bytes": 112940,
@@ -130,10 +130,10 @@
       "description": "A rising lute figure opens into a short breathed high tonic.",
       "frames": 56448,
       "peak": 0.56001465,
-      "rms": 0.11192023,
+      "rms": 0.11192024,
       "seam_step": 0.0,
       "seconds": 1.28,
-      "sha256": "ea0de7ac685e05a56d5f2babd1bddfb8cae17731135eeb0bbe4a7fada3bb32d6"
+      "sha256": "219359a23ad5693cc239dcbb7c9df3064105ed322704af094e2f4f07ea99593e"
     },
     "sounds/move.wav": {
       "bytes": 30914,
@@ -141,10 +141,10 @@
       "description": "Two weighted bootfalls with leather creak and distinct gravel grains.",
       "frames": 15435,
       "peak": 0.4300058,
-      "rms": 0.07785791,
+      "rms": 0.07768261,
       "seam_step": 0.0,
       "seconds": 0.35,
-      "sha256": "c9a88c645ec428f2ed613da41ad177c0be0daec527ced293352935a70471135a"
+      "sha256": "ee8e796b6db2dfc6e03469908a6559754fa90b1ac57ab940c19d94d9c5df27e9"
     },
     "sounds/refuse.wav": {
       "bytes": 26944,
@@ -155,7 +155,7 @@
       "rms": 0.0746495,
       "seam_step": 0.0,
       "seconds": 0.304989,
-      "sha256": "79ea4b91d918d5a52dfd784326058895a2ac7ea544616e3e34c71adddadf0690"
+      "sha256": "1a55af965c755b605c2d56c1cd2b6c20cda0b2e2e92ec5eb9e413dffafc10b7d"
     },
     "sounds/reward.wav": {
       "bytes": 60902,
@@ -163,10 +163,10 @@
       "description": "Three bright hammered strings, with a small coin-like shimmer.",
       "frames": 30429,
       "peak": 0.49000519,
-      "rms": 0.0836517,
+      "rms": 0.08365171,
       "seam_step": 0.0,
       "seconds": 0.69,
-      "sha256": "38d3b2a520cf4b3760304c0e13a375215acaa323df9238a70ec6b7d06058cc3f"
+      "sha256": "796ac5f7ff04cf8b5be3a5202212a7cb4314e9c78e24c8890eb83c6608f86498"
     },
     "sounds/seal_gain.wav": {
       "bytes": 62666,
@@ -177,7 +177,7 @@
       "rms": 0.08738769,
       "seam_step": 0.0,
       "seconds": 0.71,
-      "sha256": "47b51154c7e6faa1e357158d467259d196b1770d20bc77b6635cb812a66bf52b"
+      "sha256": "6e893da10ccdec4d3b9745376f8494a2ae3dfd4210fbd3cfb2d91c78b2a58931"
     },
     "sounds/seal_loss.wav": {
       "bytes": 51200,
@@ -185,10 +185,10 @@
       "description": "A short falling pair of damped bells and escaping air mark broken seal progress.",
       "frames": 25578,
       "peak": 0.43998535,
-      "rms": 0.06957543,
+      "rms": 0.06957545,
       "seam_step": 0.0,
       "seconds": 0.58,
-      "sha256": "73ce572afe153bf114abe4026ee3010a86ecbd4d019de08700ac3d278743397d"
+      "sha256": "3b8a7db7db47f3f729695c331a83f477ef2c7f3ae8536290f2ad39bfee8c4e5f"
     },
     "sounds/victory.wav": {
       "bytes": 200258,
@@ -196,10 +196,10 @@
       "description": "The shard motif resolves into an open minor-add-nine bowed chord and low drum.",
       "frames": 100107,
       "peak": 0.5999939,
-      "rms": 0.08179525,
+      "rms": 0.08179522,
       "seam_step": 0.0,
       "seconds": 2.27,
-      "sha256": "faeccdac45e107aeb54c599673947d0f18519e7d84e788472de95d931c0ff6d8"
+      "sha256": "7c638a071f39d95ed965fb946fbbc9595be0201a6d625278db1c519fd8a6526d"
     }
   },
   "generator_version": "3",
@@ -247,14 +247,14 @@
       "victory": 9.946984
     },
     "peak": 0.64000366,
-    "rms": 0.05081418,
+    "rms": 0.05079514,
     "seam_step": 0.0,
     "seconds": 51.446984,
-    "sha256": "dcb45eddd7713c27e80709ea547221e5d2a558a0ebda4edd5a05c3581e23fece"
+    "sha256": "23cd8e0e6b2cbc8ec9caf85aeca82a896bb154d7472db7d19501e9446afd4261"
   },
   "source_sha256": {
     "eador/sound.py": "368e13a022d0971718c326ead2d6b1bc90ffcdd554779603d47d93ee12d9c7cf",
-    "saga2d/synth.py": "9fc71c6224316eb1ee4b625e413be452b21fd447a4d5de2c50a820ea67478730",
+    "saga2d/synth.py": "d7e3c7c984e4fa5ce7bb48011b0ee5076dcc0ff269154288f5eb34f833f02963",
     "tools/build_eador_audio.py": "91e460f01000a48519194197fa403b337c9112e92624ed615239b7ebabd061a0",
     "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"
   }
