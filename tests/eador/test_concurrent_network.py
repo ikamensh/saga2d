@@ -6,7 +6,7 @@ import pytest
 
 from saga2d import CommandError, MatchClient, MatchHost
 from eador.concurrent_campaign import ConcurrentCampaign
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def converge(host, client, until):

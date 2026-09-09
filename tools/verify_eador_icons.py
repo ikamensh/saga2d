@@ -24,16 +24,17 @@ from eador.preferences import reading_scale
 from eador.scene import BattleScene, ShardScene, TitleScene
 from eador.ui import icon_path
 from saga2d import Button, Image, Label, Row
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 
 
 def _fingerprints():
-    paths = {Path(__file__), ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py',
-             *(ROOT / 'eador').glob('*.py'), *(ROOT / 'saga2d').rglob('*.py'),
+    paths = {Path(__file__), ROOT / 'tools/eador_ui.py',
+             *(ROOT / 'eador').glob('*.py'), *framework_sources(),
              *(ROOT / 'eador/assets').rglob('*.json')}
     paths.update((ROOT / 'eador/assets/images/icons').glob('*.png'))
-    return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+    return {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest()
             for path in sorted(paths)}
 
 

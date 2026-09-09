@@ -12,7 +12,8 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import HERO_CLASSES, State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import source_name
 from tools.eador_linked_campaign import lose_shard, play_linked, play_stage, travel_selection
 
 
@@ -30,9 +31,8 @@ def main():
     except ValueError as error:
         parser.error(str(error))
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__),
-               ROOT / 'tools/eador_campaign.py', ROOT / 'tools/eador_linked_campaign.py',
-               ROOT / 'tools/cpu_budget.py']
-    before = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+               ROOT / 'tools/eador_campaign.py', ROOT / 'tools/eador_linked_campaign.py']
+    before = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     runs = []
     started = time.monotonic()
     for seed in range(args.seeds):
@@ -55,7 +55,7 @@ def main():
                     state = play_stage(state, budget=budget)
                     runs.append(dict(seed=seed, hero=hero, middle=middle, finale='gate', recovery=True,
                                      phase=state.campaign.phase, stages=[asdict(record) for record in state.campaign.completed]))
-    after = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    after = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     assert before == after, 'source changed while auditing'
     report = dict(source_sha256=before, elapsed_seconds=round(time.monotonic() - started, 2),
                   cpu_percent=budget.percent,

@@ -20,7 +20,8 @@ from eador.model import State
 from eador.persistence import AUTO_SLOTS
 from eador.preferences import reading_scale
 from eador.scene import HeroScene, ShardScene, TitleScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_campaign import finish_battle, play_campaign
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
@@ -70,12 +71,11 @@ def hero_pages(player, *, capture_prefix=None):
 def verify(output, *, backend='pyglet', budget=None):
     budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
-    paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    paths = [*ROOT.glob('eador/**/*.py'), *framework_sources(),
              ROOT / 'tools/verify_eador_hero.py', ROOT / 'tools/eador_ui.py',
              ROOT / 'tools/eador_campaign.py', ROOT / 'tools/verify_eador_guidance.py',
-             ROOT / 'tools/cpu_budget.py',
              ROOT / 'tests/eador/fixtures/v11_relic_collection.json']
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     native, metrics, outcomes = backend == 'pyglet', [], []
     with TemporaryDirectory(prefix='eador-hero-') as directory:
         saves = Path(directory) / 'saves'

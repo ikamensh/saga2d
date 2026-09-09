@@ -145,7 +145,7 @@ def test_all_heroes_can_win_opening_adventures_and_each_adjacent_conquest_in_eve
     from eador.model import HERO_CLASSES
     from eador.worldgen import THEMES
     from tools.eador_campaign import finish_battle
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
     budget = CpuBudget(25)
     for theme in THEMES:
         for seed in range(100):

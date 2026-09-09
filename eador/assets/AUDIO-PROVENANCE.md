@@ -2,7 +2,7 @@
 
 These WAV files are original Shardbound compositions generated from
 `eador/sound.py` by `tools/build_eador_audio.py`, using the project's shared
-`saga2d.synth` sample primitives. No external recordings, sampled instruments,
+`sagaforge.synth` sample primitives. No external recordings, sampled instruments,
 Eador assets or externally sourced melodies are included.
 
 Generator 3 builds sixteen effects and two stereo arrangements from bowed

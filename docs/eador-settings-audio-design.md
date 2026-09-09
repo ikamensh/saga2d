@@ -20,7 +20,7 @@ or a framework-wide animation switch.
 | Capability | Main | Committed Warband offering / consequence |
 |---|---|---|
 | Playback and mixing | `AudioManager` has master/music/sfx levels, mute, pitched effects, looping music and live music-volume changes. `Game` stops its own manager's music at teardown. | Same mechanism; reuse it. |
-| Audio assets | `AssetManager` caches decoded effects and opens fresh music streams; WAV/OGG/MP3 paths are conventional. Mock backend records playback. | `saga2d.synth` extracts reusable tone/noise/mix/envelope/WAV-generation functions from the existing procedural-audio approach. |
+| Audio assets | `AssetManager` caches decoded effects and opens fresh music streams; WAV/OGG/MP3 paths are conventional. Mock backend records playback. | `sagaforge.synth` extracts reusable tone/noise/mix/envelope/WAV-generation functions from the existing procedural-audio approach. |
 | Preferences | No dedicated settings store. Tribes embeds its options in campaign saves and passes dictionaries between scenes. | `Settings(path, defaults)` and `game.settings(defaults)` provide a shared mapping and `settings.json`; `game.data_dir` locates it. Harden before adopting. |
 | Options UI | `Scene`, `Column`, `Row`, reactive `Label`, `Button.shortcut`, `draw_paragraph` suffice. Tribes already has keyboard-selectable volume rows. | Warband has a similar game-owned options screen. Copy the interaction pattern, not its game-specific rows. |
 | Display | Startup logical resolution/fullscreen, aspect-preserving viewport, HiDPI rendering and inverse mouse-coordinate mapping exist. | `Game.set_fullscreen(bool)` delegates to the backend and recomputes the viewport. Useful to adopt with its verification. |
@@ -55,7 +55,7 @@ the pre-edit runtime values. Do not perform fallible file writes in
 Warband's settings screen reaches `settings.save()` through `apply_settings()`.
 
 Keep sound composition in `eador/sound.py`, with descriptive game cue names
-and a small event-to-cue mapping. Use the pure `saga2d.synth` functions once
+and a small event-to-cue mapping. Use the pure `sagaforge.synth` functions once
 merged; do not import `tribes.sound` or `warband.sound`. Generate original WAVs
 at build time and ship them under the game's asset root with the generator,
 version and provenance. This avoids first-launch synthesis and cache writes

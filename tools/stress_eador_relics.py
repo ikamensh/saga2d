@@ -19,12 +19,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from eador.model import State
+from tools.eador_sources import source_name
 from tools.eador_campaign import finish_battle
 from tools.eador_extraction_campaign import AdventureOrders
 from tools.eador_relic_campaign import (drum_watch_route, prepare_censer_watch,
                                         prepare_relic_gate)
 from tools.stress_eador_control import exercise
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def earned_checkpoints(*, budget=None):
@@ -63,8 +64,8 @@ def main():
     budget = CpuBudget(args.cpu_percent)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *ROOT.joinpath('tools').glob('eador*campaign.py'), Path(__file__).resolve(),
-                      ROOT / 'tools/stress_eador_control.py', ROOT / 'tools/cpu_budget.py'])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                      ROOT / 'tools/stress_eador_control.py'])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'source_sha256': hashes, 'policies_per_checkpoint': args.policies,

@@ -18,6 +18,7 @@ from eador.codex import CodexScene
 from eador.encounter_scene import EncounterScene
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
+from tools.eador_sources import source_name
 from tools.audit_eador_extraction import PaidState
 from tools.eador_screen_campaign import (prepare_screen, screen_western_route,
                                           screen_northern_route, screen_scout_route, screen_scout_opening)
@@ -178,7 +179,7 @@ def verify(output, *, backend='pyglet', plan='western'):
                           'eador_roles_campaign.py', 'eador_screen_campaign.py', 'audit_eador_extraction.py',
                           'eador_ui.py', 'verify_eador_extraction.py', 'verify_eador_control.py',
                           'verify_eador_guidance.py', 'verify_eador_reading.py', 'verify_eador_screen.py')]])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     started = perf_counter()

@@ -58,7 +58,7 @@ jobs:
           }
       - name: Run packaging, save and online regression tests
         run: |
-          uv run --locked --python 3.13.2 --extra dev python -m pytest tests/packaging/test_eador_build.py tests/packaging/test_eador_smoke.py tests/packaging/test_eador_campaign.py tests/test_online_server.py tests/test_online_checkpoints.py tests/test_online_menu.py tests/test_release.py -q
+          uv run --locked --python 3.13.2 --extra dev python -m pytest tests/packaging/test_eador_build.py tests/packaging/test_eador_smoke.py tests/packaging/test_eador_campaign.py tests/eador/test_online.py tests/eador/test_online_pvp.py tests/framework/test_online_menu.py tests/framework/test_release.py -q
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build pinned runtime, portable ZIP and per-user installer
         run: |

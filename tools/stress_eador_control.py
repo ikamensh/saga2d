@@ -22,8 +22,9 @@ sys.path.insert(0, str(ROOT))
 from eador.battle import Battle
 from eador.model import BUILDINGS, HERO_CLASSES, Hero, State, Troop, UNITS
 from eador.worldgen import THEMES
+from tools.eador_sources import source_name
 from tools.audit_eador_economy import Trial
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 PLANS = {
     'control': (('build', 'market'), ('recruit', 'sapper'), ('build', 'mage_tower'),
@@ -191,8 +192,8 @@ def main():
         parser.error(str(error))
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       Path(__file__).resolve(), ROOT / 'tools/audit_eador_economy.py',
-                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                      ROOT / 'tools/eador_campaign.py'])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'source_sha256': hashes, 'plans': PLANS, 'seed': args.seed, 'battles': args.battles,

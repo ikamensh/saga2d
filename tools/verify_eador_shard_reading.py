@@ -23,6 +23,7 @@ from eador.preferences import reading_scale
 from eador.rival_scene import rival_order
 from eador.scene import BattleScene, ShardScene
 from eador.ui import icon_path
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 from tools.verify_eador_rival_reading import prepared_rivals
@@ -116,8 +117,8 @@ def check_shard(scene):
 
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
-    sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    sources = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py')]
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     matrix, retained = [], {'standard-opening', 'paid-full-army', 'saved-encircled',
                            'linked-opening', 'saved-challenge-1', 'standard-announced-attack'}
     with TemporaryDirectory(prefix='shardbound-map-reading-') as directory:

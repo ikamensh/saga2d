@@ -580,7 +580,7 @@ Encirclement and unpaid upkeep are the next isolated rules increment.
   save retains their exact bytes for recovery. Preferences and campaign saves
   share private durable file mechanics. See [framework-settings.md](framework-settings.md).
   The Shardbound options screen is separate work in progress.
-- `saga2d.synth` extracts pure sample composition/WAV export from the existing
+- `sagaforge.synth` extracts pure sample composition/WAV export from the existing
   games. Tribes imports the shared functions and all 18 of its generated WAVs
   remain byte-identical. An independent native compose → WAV → playback example
   passed. Invalid audio is rejected before replacing an asset. Sound composition,

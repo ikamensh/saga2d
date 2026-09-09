@@ -16,6 +16,7 @@ os.environ['SAGA2D_SILENT'] = '1'
 from eador.app import create_game
 from eador.content import RELICS
 from eador.scene import ResultScene, TitleScene
+from tools.eador_sources import source_name
 from tools.eador_relic_campaign import (censer_watch_route, prepare_censer_watch,
     prepare_relic_gate, porter_gate_route, mirror_gate_route, prepare_drum_watch, drum_watch_route)
 from tools.eador_ui import PlayerInput
@@ -29,7 +30,7 @@ def verify(output, *, backend='pyglet', relic='veil_censer'):
                           'eador_roles_campaign.py', 'eador_extraction_campaign.py', 'eador_linked_campaign.py',
                           'eador_relic_campaign.py', 'eador_ui.py', 'verify_eador_control.py',
                           'verify_eador_extraction.py', 'verify_eador_relics.py')]])
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     with TemporaryDirectory(prefix='shardbound-earned-relic-') as directory:
         game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')

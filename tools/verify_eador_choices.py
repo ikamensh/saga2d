@@ -20,8 +20,8 @@ from eador.preferences import reading_scale
 from eador.scene import ChoiceScene, ShardScene
 from tools.eador_campaign import play_campaign
 from tools.eador_ui import PlayerInput
-from tools.cpu_budget import CpuBudget
-from tools.native_frames import tick
+from saga2d.testing.cpu_budget import CpuBudget
+from saga2d.testing.native_frames import tick
 from tools.verify_eador_guidance import check_reading_layout
 
 

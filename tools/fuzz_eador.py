@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from saga2d import Button# noqa: E402
 
-from tools.cpu_budget import CpuBudget  # noqa: E402
+from saga2d.testing.cpu_budget import CpuBudget  # noqa: E402
 from eador.app import create_game# noqa: E402
 from eador.battle_playback_scene import BattlePlaybackScene
 from eador.diagnostics import DiagnosticScene
@@ -841,7 +841,7 @@ def main() -> None:
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=project, text=True).splitlines()
     source_files = [*project.joinpath('eador').glob('*.py'), *project.joinpath('saga2d').rglob('*.py'), Path(__file__).resolve(),
-                    project / 'tools/eador_campaign.py', project / 'tools/eador_linked_campaign.py', project / 'tools/cpu_budget.py']
+                    project / 'tools/eador_campaign.py', project / 'tools/eador_linked_campaign.py']
     source_hashes = {str(path.relative_to(project)): hashlib.sha256(path.read_bytes()).hexdigest()
                      for path in sorted(source_files)}
     for index, seed in enumerate(range(args.seed, args.seed + campaign_count)):

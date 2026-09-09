@@ -19,6 +19,7 @@ from eador.model import HERO_CLASSES
 from eador.preferences import reading_scale
 from eador.scene import ShardScene, TitleScene
 from eador.worldgen import THEMES
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 from tools.verify_eador_saves import select_slot
@@ -34,8 +35,8 @@ def files(path):
 
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
-    sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    sources = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py')]
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     native, matrix = backend == 'pyglet', []
     about_views = []
     with TemporaryDirectory(prefix='shardbound-title-reading-') as directory:

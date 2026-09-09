@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from eador.model import State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 @pytest.fixture
@@ -23,9 +23,9 @@ def clock(monkeypatch):
         samples['sleeps'].append(seconds)
         samples['wall'] += seconds
 
-    monkeypatch.setattr('tools.cpu_budget.time.process_time', process_time)
-    monkeypatch.setattr('tools.cpu_budget.time.monotonic', lambda: samples['wall'])
-    monkeypatch.setattr('tools.cpu_budget.time.sleep', sleep)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.process_time', process_time)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.monotonic', lambda: samples['wall'])
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.sleep', sleep)
     return samples
 
 

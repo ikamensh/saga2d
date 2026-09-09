@@ -27,7 +27,8 @@ from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import ShardScene, TitleScene
 from saga2d import Button
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 from tools.verify_eador_reading import check_page, visible_labels
@@ -46,12 +47,12 @@ BASELINE = {
 
 
 def _fingerprints():
-    paths = {Path(__file__), ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py',
+    paths = {Path(__file__), ROOT / 'tools/eador_ui.py',
              ROOT / 'tools/verify_eador_guidance.py', ROOT / 'tools/verify_eador_reading.py',
-             *(ROOT / 'eador').glob('*.py'), *(ROOT / 'saga2d').rglob('*.py'),
+             *(ROOT / 'eador').glob('*.py'), *framework_sources(),
              *(ROOT / path for path in FIXED)}
     paths.update(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())
-    return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
+    return {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
 
 
 def _fixed_state(path):

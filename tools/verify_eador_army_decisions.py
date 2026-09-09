@@ -17,6 +17,7 @@ from saga2d import Label
 from eador.__main__ import create_session
 from eador.model import State
 from eador.persistence import CampaignSaves
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 
@@ -52,10 +53,10 @@ def inspect(player, warning):
 
 def verify(input_report, output, *, backend='pyglet'):
     """Replay one current audit report; historical journals remain provenance only."""
-    paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    paths = [*ROOT.glob('eador/**/*.py'), *framework_sources(),
              ROOT / 'tools/verify_eador_army_decisions.py', ROOT / 'tools/eador_ui.py',
              ROOT / 'tools/verify_eador_guidance.py']
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
     input_bytes = input_report.read_bytes()
     source = json.loads(gzip.decompress(input_bytes))
     required = {'plan', 'source', 'initial_state', 'manual', 'auto', 'source_commit', 'source_sha256'}

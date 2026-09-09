@@ -24,10 +24,11 @@ from eador.model import State
 from eador.persistence import AUTO_SLOTS, CampaignSaves
 from eador.preferences import reading_scale, reduced_motion
 from eador.scene import ResultScene, SaveScene, ShardScene
+from tools.eador_sources import framework_sources, source_name
 from tools.capture_eador_gameplay import AudioLog
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_ui import PlayerInput
-from tools.native_frames import tick
+from saga2d.testing.native_frames import tick
 
 SOURCE = ROOT / 'docs/evidence/gameplay-movie/capture.json.gz'
 SOURCE_SHA = 'd269952ac585c4df998c5e4b5da121f3f5f89a8c41abad2edebfb76dcdde2c80'
@@ -64,10 +65,10 @@ def verify(output, *, backend='pyglet', budget=None):
     budget = CpuBudget(25) if budget is None else budget
     started, cpu_started = time.monotonic(), time.process_time()
     paths = {Path(__file__).resolve(), SOURCE, *(ROOT / 'eador').glob('*.py'),
-             *(ROOT / 'saga2d').rglob('*.py'), *(ROOT / 'tools' / name for name in
-             ('eador_ui.py', 'native_frames.py', 'cpu_budget.py', 'capture_eador_gameplay.py'))}
+             *framework_sources(), *(ROOT / 'tools' / name for name in
+             ('eador_ui.py', 'capture_eador_gameplay.py'))}
     paths.update(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
     order = earned_last_arrow()
     report = dict(source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, backend=backend, cpu_percent_requested=budget.percent, fps=30,

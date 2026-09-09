@@ -16,8 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import BUILDINGS, HERO_CLASSES, State
 from eador.worldgen import THEMES
+from tools.eador_sources import source_name
 from tools.eador_campaign import CampaignMetrics, finish_battle
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 PLANS = {
     'economy': (('build', 'market'), ('build', 'barracks'), ('recruit', 'swordsman'), ('build', 'temple')),
@@ -223,8 +224,8 @@ def main(argv=None):
         parser.error('--seeds must be positive')
     budget = CpuBudget(args.cpu_percent)
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__),
-               ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py']
-    fingerprints = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+               ROOT / 'tools/eador_campaign.py']
+    fingerprints = lambda: {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     before = fingerprints()
     runs = []
     started = time.monotonic()

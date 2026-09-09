@@ -17,10 +17,11 @@ from eador.app import create_game
 from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ShardScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_observatory_campaign import prepare_observatory
 from tools.eador_ui import PlayerInput
-from tools.native_frames import tick
+from saga2d.testing.native_frames import tick
 
 CASES = ('arrow', 'bolt', 'melee', 'heal', 'swap', 'smoke')
 
@@ -32,10 +33,10 @@ def verify(output, *, backend='pyglet', budget=None, case=None):
     budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
     started, cpu_started = time.monotonic(), time.process_time()
-    paths = [*ROOT.glob('eador/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    paths = [*ROOT.glob('eador/*.py'), *framework_sources(),
              *ROOT.glob('tools/eador_*.py'), *ROOT.glob('eador/assets/*manifest.json'),
              Path(__file__).resolve()]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     prepared = prepare_observatory(budget=budget)
     budget.checkpoint()
     report = {'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),

@@ -7,7 +7,7 @@ Game.audio; importing this module generates nothing and opens no files.
 
 import numpy as np
 
-from saga2d.synth import SAMPLE_RATE, envelope, hz, level, mix, noise, pan, seconds, thump, tone
+from sagaforge.synth import SAMPLE_RATE, envelope, hz, level, mix, noise, pan, seconds, thump, tone
 
 GENERATOR_VERSION = '3'
 

@@ -428,7 +428,7 @@ def test_complete_campaign_and_saved_victory_through_player_input(tmp_path):
     from eador.encounter_scene import EncounterScene
     from eador.model import BUILDINGS, UNITS
     from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
 
     budget = CpuBudget(25)
     game = create_game("Shardbound test", backend="mock", save_dir=tmp_path)

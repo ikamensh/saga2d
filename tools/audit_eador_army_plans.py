@@ -20,8 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from eador.model import BUILDINGS, State, UNITS
+from tools.eador_sources import source_name
 from tools.audit_eador_economy import Trial
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 @dataclass(frozen=True)
@@ -230,8 +231,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     paths = [*ROOT.glob('eador/**/*.py'), ROOT / 'tools/audit_eador_army_plans.py',
-             ROOT / 'tools/audit_eador_economy.py', ROOT / 'tools/cpu_budget.py']
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+             ROOT / 'tools/audit_eador_economy.py']
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     report = journey(args.plan, seed=args.seed, difficulty=args.difficulty, middle=args.middle,
                      finale=args.finale, cpu_percent=args.cpu_percent)
     assert all(hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == value for path, value in hashes.items())

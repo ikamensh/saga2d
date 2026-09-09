@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 
 from eador.app import create_game
 from eador.scene import BattleScene, ChoiceScene, ResultScene, TitleScene
+from tools.eador_sources import source_name
 from tools.audit_eador_extraction import PaidState
 from tools.eador_hunt_campaign import prepare_pack_hunt, hunt_route, prepare_hunt_spears, spear_hunt_route
 from tools.eador_ui import PlayerInput
@@ -33,7 +34,7 @@ def verify(output, *, backend='pyglet', plan='compact'):
                       *[ROOT / 'tools' / name for name in (
                           'eador_campaign.py', 'eador_extraction_campaign.py', 'audit_eador_extraction.py',
                           'eador_ui.py', 'eador_hunt_campaign.py', 'verify_eador_extraction.py', 'verify_eador_pack_hunt.py')]])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     started = time.perf_counter()

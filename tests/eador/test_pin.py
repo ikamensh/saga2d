@@ -174,7 +174,7 @@ def test_real_adventures_award_equip_and_activate_both_relic_capabilities(theme)
     """All three sources are obtainable through battles, choices and travel in every theme."""
     from dataclasses import replace
     from eador.model import State
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
     from tools.eador_campaign import finish_battle, provision_army, rest, march_to, site_position
 
     budget = CpuBudget(25)

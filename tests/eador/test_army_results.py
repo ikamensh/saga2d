@@ -5,7 +5,7 @@ import json
 import pytest
 
 from eador.model import RuleError, State, UNITS
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_campaign import finish_battle
 
 

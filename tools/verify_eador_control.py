@@ -18,6 +18,7 @@ os.environ['SAGA2D_SILENT'] = '1'
 from eador.app import create_game
 from eador.model import State
 from eador.scene import ResultScene, ShardScene, TitleScene
+from tools.eador_sources import source_name
 from tools.eador_control_campaign import prepare_control_watch, watch_control_route
 from tools.eador_extraction_campaign import crossing_route, prepare_adventure
 from tools.eador_ui import PlayerInput
@@ -68,7 +69,7 @@ def verify(output, *, backend='pyglet', scenario='smoke', player_type=PlayerInpu
                       *[ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_control_campaign.py',
                           'eador_extraction_campaign.py', 'eador_roles_campaign.py', 'eador_ui.py',
                           'verify_eador_control.py', 'verify_eador_extraction.py')]])
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     started = perf_counter()

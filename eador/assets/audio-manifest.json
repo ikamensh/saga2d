@@ -253,9 +253,8 @@
     "sha256": "23cd8e0e6b2cbc8ec9caf85aeca82a896bb154d7472db7d19501e9446afd4261"
   },
   "source_sha256": {
-    "eador/sound.py": "368e13a022d0971718c326ead2d6b1bc90ffcdd554779603d47d93ee12d9c7cf",
-    "saga2d/synth.py": "d7e3c7c984e4fa5ce7bb48011b0ee5076dcc0ff269154288f5eb34f833f02963",
-    "tools/build_eador_audio.py": "91e460f01000a48519194197fa403b337c9112e92624ed615239b7ebabd061a0",
-    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"
+    "eador/sound.py": "60112f11c8092591cfccecd70f59b65e86ed52f57eb9d91217e4a13c99ce4e67",
+    "sagaforge/synth.py": "d7e3c7c984e4fa5ce7bb48011b0ee5076dcc0ff269154288f5eb34f833f02963",
+    "tools/build_eador_audio.py": "d16755e19533735861f6974c85e2bcb580808c61d0c706913dfa0ef32788ee54"
   }
 }

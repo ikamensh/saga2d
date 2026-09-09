@@ -19,7 +19,7 @@ def run(output: Path, *, phase: int, recovery=False, backend='pyglet') -> dict:
     from eador.campaign_scene import CampaignScene
     from eador.preferences import reading_scale
     from eador.scene import ShardScene, TitleScene
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
     from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
     from tools.eador_ui import PlayerInput
 

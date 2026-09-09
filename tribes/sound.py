@@ -28,7 +28,7 @@ from pathlib import Path
 import numpy as np
 
 from saga2d import AssetManager, AudioManager, Game
-from saga2d.synth import (BELL, DARK, GLASS, PAD, SAMPLE_RATE,
+from sagaforge.synth import (BELL, DARK, GLASS, PAD, SAMPLE_RATE,
                          hz, level, mix, noise, seconds as _time, thump, tone, write_wav)
 
 SOUND_VERSION = "1"

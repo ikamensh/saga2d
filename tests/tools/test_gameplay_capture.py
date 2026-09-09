@@ -6,7 +6,7 @@ import pytest
 
 from eador.model import State
 from tools.capture_eador_gameplay import FPS, RATE, capture, digest, mix_audio
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def test_directed_movie_reaches_an_earned_reward_without_skipping_enemy_playback(tmp_path):

@@ -23,7 +23,8 @@ from eador.battle_playback_scene import BattlePlaybackScene
 from eador.model import State
 from eador.scene import ShardScene
 from saga2d import Button, Label
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 
 
@@ -44,9 +45,9 @@ def verify(output, *, backend='pyglet', budget=None):
     output.mkdir(parents=True, exist_ok=True)
     budget = CpuBudget(25) if budget is None else budget
     started, cpu_started = time.monotonic(), time.process_time()
-    paths = sorted((ROOT / 'eador').glob('*.py')) + sorted((ROOT / 'saga2d').rglob('*.py'))
-    paths += [Path(__file__).resolve(), ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py']
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    paths = sorted((ROOT / 'eador').glob('*.py')) + framework_sources()
+    paths += [Path(__file__).resolve(), ROOT / 'tools/eador_ui.py']
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     attacker, defender = State.new(7, 'Wizard'), State.new(12, 'Wizard')
     for action, args in [('end_turn', ()), ('build', ('temple',)), ('recruit', ('healer',))]:
         getattr(defender, action)(*args)
@@ -132,7 +133,7 @@ def verify(output, *, backend='pyglet', budget=None):
         else:
             assert not game.backend.is_running
         report['input_activations'] = len(player.events)
-    assert hashes == {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    assert hashes == {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     report.update(source_unchanged=True, game_closed=True, wall_seconds=time.monotonic() - started,
                   cpu_seconds=time.process_time() - cpu_started)
     for name, data in [('initial-battle', initial), ('final-battle', battle.to_dict()), ('verification', report)]:

@@ -27,7 +27,8 @@ from eador.rival_scene import RivalScene
 from eador.scene import CatalogScene, HeroScene, ShardScene, TitleScene
 from eador.ui import icon_path
 from saga2d import Button, Image, Label, Row
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_observatory_campaign import prepare_observatory
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
@@ -87,10 +88,10 @@ def verify(output, *, backend='pyglet', budget=None):
     output.mkdir(parents=True, exist_ok=True)
     budget = CpuBudget(25) if budget is None else budget
     started, cpu_started = time.monotonic(), time.process_time()
-    paths = {Path(__file__).resolve(), *(ROOT / 'eador').glob('*.py'), *(ROOT / 'saga2d').rglob('*.py'),
-             *(ROOT / 'tools').glob('eador_*.py'), ROOT / 'tools/cpu_budget.py', ROOT / 'tools/verify_eador_guidance.py'}
+    paths = {Path(__file__).resolve(), *(ROOT / 'eador').glob('*.py'), *framework_sources(),
+             *(ROOT / 'tools').glob('eador_*.py'), ROOT / 'tools/verify_eador_guidance.py'}
     paths.update(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
     report = dict(source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   dirty_at_start=subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
                   source_sha256=hashes, backend=backend, cpu_percent_requested=budget.percent, native_fps=30,

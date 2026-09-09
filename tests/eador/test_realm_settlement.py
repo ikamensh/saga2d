@@ -3,7 +3,7 @@ from dataclasses import asdict
 import json
 
 from eador.model import State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_campaign import finish_battle
 
 

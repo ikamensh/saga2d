@@ -22,8 +22,9 @@ from eador.app import create_game
 from eador.model import State
 from eador.preferences import reading_scale as current_reading_scale, reduced_motion
 from eador.scene import BattleScene, HelpScene, ResultScene, ShardScene
+from tools.eador_sources import framework_sources, source_name
 from tools.capture_eador_gameplay import FPS, HEIGHT, WIDTH, MovieInput, digest, encode, mix_audio
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_observatory_campaign import prepare_observatory
 from tools.verify_eador_final_blow import SOURCE, SOURCE_SHA, earned_last_arrow
 
@@ -41,11 +42,10 @@ def capture(output, *, backend='pyglet', ffmpeg=None, cpu_percent=25, reading_sc
         raise FileExistsError('Choose an empty directory; retain earlier previews separately')
     budget = CpuBudget(cpu_percent)
     paths = {Path(__file__).resolve(), SOURCE, *(ROOT / 'eador').glob('*.py'),
-             *(ROOT / 'saga2d').rglob('*.py'), *(ROOT / 'tools').glob('eador_*.py'),
-             *(ROOT / 'tools' / name for name in ('cpu_budget.py', 'native_frames.py',
-               'capture_eador_gameplay.py', 'verify_eador_final_blow.py'))}
+             *framework_sources(), *(ROOT / 'tools').glob('eador_*.py'),
+             *(ROOT / 'tools' / name for name in ('capture_eador_gameplay.py', 'verify_eador_final_blow.py'))}
     paths.update(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())
-    sources = {str(path.relative_to(ROOT)): digest(path) for path in sorted(paths)}
+    sources = {source_name(path): digest(path) for path in sorted(paths)}
     started, cpu_started = time.monotonic(), time.process_time()
     prepared = prepare_observatory(budget=budget).to_json()
     final_order = earned_last_arrow()

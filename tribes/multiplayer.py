@@ -2,6 +2,7 @@
 from copy import deepcopy
 
 from saga2d import CommandError
+from saga2d.server.games import GameSpec, option_int, option_keys, option_seed
 from tribes import mapgen
 from tribes.model import World, RuleError
 from tribes.rules import UnitType, Tech, Reward
@@ -64,6 +65,25 @@ class TribesMatch:
         except (RuleError, ValueError) as exc:
             raise CommandError(str(exc)) from exc
         self.world = world
+
+
+def _create(options):
+    """Validate resource-bounded creation options before generating any map."""
+    option_keys(options, {'seed', 'size'})
+    return TribesMatch(option_seed(options, 7), size=option_int(options, 'size', 14, 11, 18))
+
+
+def _checkpoint(match):
+    return {'seed': match.seed, 'world': deepcopy(match.world.to_dict())}
+
+
+def _restore(snapshot):
+    match = TribesMatch.__new__(TribesMatch)
+    match.seed, match.world = snapshot['seed'], World.from_dict(snapshot['world'])
+    return match
+
+
+ONLINE = {'tribes-v1': GameSpec(_create, _checkpoint, _restore)}
 
 
 from tribes.scene import MapScene, TechScene, RewardScene

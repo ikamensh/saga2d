@@ -6,7 +6,7 @@ import json
 import pytest
 
 from eador.model import State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 @pytest.fixture
@@ -23,9 +23,9 @@ def clock(monkeypatch):
         samples['sleeps'].append(seconds)
         samples['wall'] += seconds
 
-    monkeypatch.setattr('tools.cpu_budget.time.process_time', process_time)
-    monkeypatch.setattr('tools.cpu_budget.time.monotonic', lambda: samples['wall'])
-    monkeypatch.setattr('tools.cpu_budget.time.sleep', sleep)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.process_time', process_time)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.monotonic', lambda: samples['wall'])
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.sleep', sleep)
     return samples
 
 
@@ -54,7 +54,7 @@ def test_selected_resource_audit_cli_paces_observed_and_baseline_campaigns(clock
     main(args)
     report = json.loads(path.read_text())
     assert report['cpu_percent'] == 25 and report['campaigns'] == 1
-    assert 'tools/cpu_budget.py' in report['source_sha256']
+    assert 'tools/audit_eador_resource_breakpoints.py' in report['source_sha256']
     assert clock['sleeps'], 'The selected observed/baseline pair bypassed its CPU allowance'
     assert json.loads(gzip.decompress(path.with_suffix('.rows.json.gz').read_bytes())) == expected
 

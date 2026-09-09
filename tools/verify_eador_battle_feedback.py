@@ -16,6 +16,7 @@ from eador.app import create_game
 from eador.battle_playback_scene import BattlePlaybackScene
 from eador.model import State
 from eador.scene import BattleScene, ResultScene, TitleScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_relief_campaign import prepare_relief, relief_forward_opening, relief_passive_route
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_control import ControlOrders
@@ -87,10 +88,10 @@ class WatchedOrders(ControlOrders):
 
 def verify(output, *, backend='pyglet', scenario='rally', still=False, scale=100):
     output.mkdir(parents=True, exist_ok=True)
-    paths = sorted([*ROOT.glob('eador/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/eador_*.py'),
+    paths = sorted([*ROOT.glob('eador/*.py'), *framework_sources(), *ROOT.glob('tools/eador_*.py'),
                     ROOT / 'tools/verify_eador_battle_feedback.py', ROOT / 'tools/verify_eador_control.py',
                     ROOT / 'tools/verify_eador_extraction.py'])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     with TemporaryDirectory(prefix='shardbound-feedback-') as temporary:

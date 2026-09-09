@@ -92,10 +92,10 @@ def test_packaged_map_controls_read_and_spend_real_orders_then_restore_the_smoke
 
 def test_packaged_online_diagnostic_shares_one_campaign_and_reclaims_a_seat():
     """The frozen co-op check uses the production room server rules over real sockets."""
-    from tools.verify_game_package import local_server
+    from saga2d.packaging.verify import local_server
 
     online_smoke = runpy.run_path(str(ENTRY))['online_smoke']
-    with local_server() as endpoint:
+    with local_server('eador.multiplayer:ONLINE') as endpoint:
         result = online_smoke(endpoint)
     assert result == {'create_join': True, 'shared_realm_orders': True, 'private_seat_rejoin': True,
                       'campaign_retention_seconds': 7 * 86400}

@@ -22,7 +22,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.build_eador import check_shipped_audio, clean_environment, extract_archive, run_smoke, sha256, write_json  # noqa: E402
-from tools.verify_game_package import local_server, mesa_test_context  # noqa: E402
+from saga2d.packaging.verify import local_server, mesa_test_context  # noqa: E402
 
 
 def online_check(executable: Path, endpoint: str, report: Path, env: dict, manifest: dict) -> dict:
@@ -81,7 +81,7 @@ def verify(output: Path, *, public_server: str | None = None, mesa_dir: Path | N
     report = {"source_commit": manifest["source_commit"], "version": manifest["version"],
               "scope": "Isolated profile on the named host; loopback authority plus the requested public endpoint"}
     macos = sys.platform == "darwin"
-    with tempfile.TemporaryDirectory(prefix="shardbound-extracted-") as directory, local_server() as loopback:
+    with tempfile.TemporaryDirectory(prefix="shardbound-extracted-") as directory, local_server("eador.multiplayer:ONLINE") as loopback:
         extracted = Path(directory)
         executable = extract_archive(archive, extracted, macos)
         report["portable"] = application_checks(executable, extracted, evidence, "portable", manifest,

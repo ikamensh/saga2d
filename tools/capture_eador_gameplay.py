@@ -34,9 +34,10 @@ from eador.app import create_game  # noqa: E402
 from eador.battle_playback_scene import BattlePlaybackScene  # noqa: E402
 from eador.model import State  # noqa: E402
 from eador.scene import BattleScene, ChoiceScene, ResultScene, ShardScene, TitleScene  # noqa: E402
-from tools.cpu_budget import CpuBudget  # noqa: E402
+from saga2d.testing.cpu_budget import CpuBudget  # noqa: E402
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput  # noqa: E402
-from tools.native_frames import tick  # noqa: E402
+from saga2d.testing.native_frames import tick  # noqa: E402
 
 FPS, WIDTH, HEIGHT, RATE = 30, 1280, 800, 44100
 
@@ -322,11 +323,10 @@ def capture(output, *, backend='pyglet', ffmpeg=None, cpu_percent=25):
         raise FileExistsError('Choose an empty capture directory so older media cannot enter this receipt')
     if backend == 'pyglet' and ffmpeg is None:
         raise ValueError('Native capture requires an explicit ffmpeg executable')
-    files = [Path(__file__), ROOT / 'tools/eador_ui.py', ROOT / 'tools/native_frames.py',
-             ROOT / 'tools/cpu_budget.py', *(ROOT / 'eador').glob('*.py'),
-             *(ROOT / 'saga2d').rglob('*.py'),
+    files = [Path(__file__), ROOT / 'tools/eador_ui.py', *(ROOT / 'eador').glob('*.py'),
+             *framework_sources(),
              *(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())]
-    sources = {str(path.relative_to(ROOT)): digest(path) for path in files}
+    sources = {source_name(path): digest(path) for path in files}
     budget = CpuBudget(cpu_percent)
     started, cpu_started = time.monotonic(), time.process_time()
     report = dict(scope=__doc__, source_revision=subprocess.check_output(

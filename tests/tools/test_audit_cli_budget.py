@@ -21,9 +21,9 @@ def test_audit_cli_yields_and_preserves_the_paid_campaign(tmp_path, monkeypatch,
         samples['sleeps'].append(seconds)
         samples['wall'] += seconds
 
-    monkeypatch.setattr('tools.cpu_budget.time.process_time', process_time)
-    monkeypatch.setattr('tools.cpu_budget.time.monotonic', lambda: samples['wall'])
-    monkeypatch.setattr('tools.cpu_budget.time.sleep', sleep)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.process_time', process_time)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.monotonic', lambda: samples['wall'])
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.sleep', sleep)
     report = tmp_path / (audit + '.json')
     args = ['--seeds', '1', '--heroes', 'Commander', '--themes', 'ruins',
             '--plans', 'economy']

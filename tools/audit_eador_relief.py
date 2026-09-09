@@ -12,8 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from eador.model import RuleError, State
+from tools.eador_sources import framework_sources, source_name
 from tools.audit_eador_aerie import Purchases, RecordedOrders
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_relief_campaign import (prepare_relief, relief_forward_route, relief_western_route,
                                          relief_passive_route, relief_scout_route,
                                          relief_failed_support, relief_retry_route)
@@ -46,10 +47,10 @@ def settle_once(play, *, budget=None):
 
 def measure(*, budget=None):
     budget = CpuBudget(25) if budget is None else budget
-    sources = sorted([*ROOT.glob('eador/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    sources = sorted([*ROOT.glob('eador/*.py'), *framework_sources(),
                       *ROOT.glob('tools/eador_*.py'), Path(__file__).resolve(),
-                      ROOT/'tools/audit_eador_aerie.py', ROOT/'tools/audit_eador_extraction.py', ROOT/'tools/cpu_budget.py'])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                      ROOT/'tools/audit_eador_aerie.py', ROOT/'tools/audit_eador_extraction.py'])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     parties, plans = {}, {}

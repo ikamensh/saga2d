@@ -19,7 +19,7 @@ from eador.app import create_game  # noqa: E402
 from eador.preferences import DEFAULTS, load_preferences, reduced_motion  # noqa: E402
 from eador.scene import HelpScene, TitleScene  # noqa: E402
 from eador.settings_scene import SettingsScene  # noqa: E402
-from tools.native_frames import tick
+from saga2d.testing.native_frames import tick
 from saga2d import Button  # noqa: E402
 from pyglet.window import key, mouse  # noqa: E402
 

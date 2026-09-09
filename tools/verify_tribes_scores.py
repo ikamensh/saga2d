@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pyglet.window import key, mouse
 from saga2d import Game, fonts
-from tools.native_frames import tick
+from saga2d.testing.native_frames import tick
 from tribes import mapgen
 from tribes.scene import GameOverScene, MapScene, load_game
 from tribes.score_scene import HighScoresScene

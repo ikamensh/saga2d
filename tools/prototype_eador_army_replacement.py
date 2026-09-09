@@ -24,8 +24,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import BUILDINGS, RECRUITABLE, RuleError, State, UNITS
+from tools.eador_sources import source_name
 from tools.audit_eador_difficulty import DifficultyTrial
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def prototype_replace(state, outgoing_id, kind):
@@ -219,8 +220,8 @@ def main():
     examples['late_all_buildings'] = dict(state=json.loads(complete_camp.to_json()))
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__),
                       *[ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                                                         'stress_eador_control.py', 'eador_campaign.py', 'cpu_budget.py')]])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                                                         'stress_eador_control.py', 'eador_campaign.py')]])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     runs = {}
     for name, variants in {
         'late_all_buildings': ((None, False), (None, True), ('pikeman', False),

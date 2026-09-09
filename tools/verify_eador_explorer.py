@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 from eador.app import create_game
 from eador.scene import BattleScene, ChoiceScene, ResultScene, TitleScene
+from tools.eador_sources import source_name
 from tools.audit_eador_extraction import PaidState
 from tools.eador_explorer_campaign import (prepare_explorer, explorer_route,
                                            explorer_healer_route, explorer_scout_route)
@@ -35,7 +36,7 @@ def verify(output, *, backend='pyglet', plan='commander-north'):
                           'eador_extraction_campaign.py', 'eador_explorer_campaign.py',
                           'audit_eador_extraction.py', 'eador_ui.py', 'verify_eador_extraction.py',
                           'verify_eador_explorer.py')]])
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     with TemporaryDirectory(prefix='shardbound-explorer-') as directory:
         game = create_game(backend=backend, visible=False, save_dir=Path(directory) / 'saves')

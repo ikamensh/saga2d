@@ -21,8 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from eador.model import State
+from tools.eador_sources import framework_sources, source_name
 from tools.audit_eador_army_plans import SavedCommands
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_extraction_campaign import AdventureOrders
 from tools.eador_vault_campaign import prepare_vault, vault_route
 
@@ -244,11 +245,11 @@ def main():
     parser.add_argument('--campaign-order-limit', type=int, default=24)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    paths = [*ROOT.glob('eador/**/*.py'), *framework_sources(),
              *(ROOT / 'tools' / name for name in ('audit_eador_vault_continuation.py',
                  'audit_eador_army_plans.py', 'audit_eador_economy.py', 'eador_vault_campaign.py',
-                 'eador_extraction_campaign.py', 'eador_roles_campaign.py', 'eador_campaign.py', 'cpu_budget.py'))]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+                 'eador_extraction_campaign.py', 'eador_roles_campaign.py', 'eador_campaign.py'))]
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     started = time.monotonic()
     report = compare(cpu_percent=args.cpu_percent, campaign_order_limit=args.campaign_order_limit)

@@ -20,10 +20,11 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.eador_sources import source_path
 
 from eador.sound import CUES, GENERATOR_VERSION, TRACKS  # noqa: E402
-from saga2d.synth import SAMPLE_RATE, mix, write_wav  # noqa: E402
-from tools.cpu_budget import CpuBudget  # noqa: E402
+from sagaforge.synth import SAMPLE_RATE, mix, write_wav  # noqa: E402
+from saga2d.testing.cpu_budget import CpuBudget  # noqa: E402
 
 
 def digest(path):
@@ -78,8 +79,8 @@ def build_assets(directory: Path, *, sampler: Path, budget: CpuBudget | None = N
         'license': 'Repository MIT license; see LICENSE.',
         'review_status': 'Technical verification only; listening and artistic approval remain required.',
         'runtime': {'python': '.'.join(map(str, sys.version_info[:3])), 'numpy': np.__version__},
-        'source_sha256': {name: digest(ROOT / name) for name in
-                          ('eador/sound.py', 'saga2d/synth.py', 'tools/build_eador_audio.py', 'tools/cpu_budget.py')},
+        'source_sha256': {name: digest(source_path(name)) for name in
+                          ('eador/sound.py', 'sagaforge/synth.py', 'tools/build_eador_audio.py')},
         'files': files,
         'sampler': {**describe(sampler), 'order': order, 'music_excerpts': music_excerpts},
     }

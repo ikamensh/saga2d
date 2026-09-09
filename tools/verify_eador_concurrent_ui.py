@@ -16,7 +16,7 @@ from eador.app import create_game
 from eador.concurrent_campaign import ConcurrentCampaign
 from eador.concurrent_scene import ConcurrentShardScene
 from eador.scene import BattleScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.verify_eador_shard_look import PacedInput
 
 

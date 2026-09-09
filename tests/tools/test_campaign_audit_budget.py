@@ -1,6 +1,6 @@
 """Campaign audit pacing must preserve the public policy's complete saved outcome."""
 
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_linked_campaign import play_linked
 
 

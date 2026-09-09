@@ -11,6 +11,7 @@ see tools/verify_shardbound_package.py and .github/workflows/shardbound-windows.
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import importlib
 from importlib import metadata
 import json
 import os
@@ -26,7 +27,7 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.release import VERSION
-from tools.build_game import version as release_version
+from saga2d.packaging import version as release_version
 
 TOOL_VERSIONS = {"pyinstaller": "6.22.2", "pyinstaller-hooks-contrib": "2026.7"}
 RUNTIME_PACKAGES = ("numpy", "Pillow", "pyglet", "websockets")
@@ -80,14 +81,14 @@ def snapshot_sources(source: Path) -> dict:
     if source.exists():
         shutil.rmtree(source)
     source.mkdir(parents=True)
-    for package in ("saga2d", "eador"):
-        shutil.copytree(ROOT / package, source / package,
+    for package in ("saga2d", "sagaforge", "eador"):
+        shutil.copytree(Path(importlib.import_module(package).__file__).resolve().parent, source / package,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for name in ("entry.py", "campaign_check.py", "shardbound.spec"):
         shutil.copyfile(ROOT / "packaging" / name, source / name)
     (source / "tools").mkdir()
     (source / "tools" / "__init__.py").write_text('"""Frozen public-input verification helpers."""\n')
-    for name in ("build_eador.py", "build_eador_audio.py", "cpu_budget.py", "eador_ui.py",
+    for name in ("build_eador.py", "build_eador_audio.py", "eador_ui.py",
                  "eador_campaign.py", "eador_linked_campaign.py"):
         shutil.copyfile(ROOT / "tools" / name, source / "tools" / name)
     validate_audio(source)

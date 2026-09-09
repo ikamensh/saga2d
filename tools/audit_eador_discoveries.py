@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 from eador.content import SITES
 from eador.model import State
 from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 BASELINE = ROOT / 'docs/evidence/adventure-variety/baseline-worlds.json.gz'
 BASELINE_SHA256 = 'ce949cade506f8d341c74abe4c082cff719afadd13dafaeccb497ab78617a6e0'
@@ -37,7 +37,7 @@ SOURCE_FILES = (
     'eador/model.py', 'eador/battle.py', 'eador/battle_trace.py', 'eador/campaign.py',
     'eador/content.py', 'eador/difficulty.py', 'eador/encounters.py', 'eador/rival.py',
     'eador/sight.py', 'eador/worldgen.py', 'saga2d/hexgrid.py',
-    'tools/audit_eador_discoveries.py', 'tools/cpu_budget.py',
+    'tools/audit_eador_discoveries.py',
 )
 
 

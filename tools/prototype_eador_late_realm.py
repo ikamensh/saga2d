@@ -19,8 +19,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import State, UNITS
+from tools.eador_sources import source_name
 from tools.audit_eador_difficulty import DifficultyTrial
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_campaign import finish_battle
 
 
@@ -197,8 +198,8 @@ def main():
     examples = json.loads(example_path.read_text())
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__).resolve(),
                       *(ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                                                         'stress_eador_control.py', 'eador_campaign.py', 'cpu_budget.py'))])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                                                         'stress_eador_control.py', 'eador_campaign.py'))])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     plans = []
     for seed, hero, theme, mode in ((0, 'Commander', 'frontier', 'standard'),
                                   (0, 'Commander', 'frontier', 'challenge'),

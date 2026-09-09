@@ -19,7 +19,8 @@ from eador.model import State
 from eador.persistence import CampaignSaves
 from eador.preferences import reading_scale
 from eador.scene import TitleScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PLAYER_COMMANDS, PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 
@@ -102,10 +103,10 @@ def verify(input_report, output, *, backend='pyglet', cpu_percent=25):
     """Replay exact input and F5/F9 continuation, with isolated saves and cooperative pacing."""
     budget = CpuBudget(cpu_percent)
     started, cpu_started = time.monotonic(), time.process_time()
-    paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
-             Path(__file__), ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py',
+    paths = [*ROOT.glob('eador/**/*.py'), *framework_sources(),
+             Path(__file__), ROOT / 'tools/eador_ui.py',
              ROOT / 'tools/verify_eador_guidance.py']
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
     blob = input_report.read_bytes()
     source = load_journal(blob, hashes, budget)
     captures = []

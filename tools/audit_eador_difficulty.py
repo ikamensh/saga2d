@@ -22,9 +22,10 @@ sys.path.insert(0, str(ROOT))
 from eador.difficulty import DIFFICULTIES, RULESETS
 from eador.model import HERO_CLASSES, State
 from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
+from tools.eador_sources import source_name
 from tools.audit_eador_economy import PLANS, Trial
 from tools.stress_eador_control import PLANS as SPECIALIST_PLANS, ControlTrial
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 ROUTES = {'direct': None, 'north': NORTH_ROAD, 'south': SOUTH_ROAD}
 
@@ -160,8 +161,8 @@ def main(argv=None):
     budget = CpuBudget(args.cpu_percent)
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__).resolve(),
                       ROOT / 'tools/audit_eador_economy.py', ROOT / 'tools/stress_eador_control.py',
-                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+                      ROOT / 'tools/eador_campaign.py'])
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     started, rows = time.perf_counter(), []
     cases = [(seed, hero, theme, plan, mode, route) for seed in range(args.seeds)
              for theme in args.themes for hero in args.heroes for route in args.routes

@@ -3,7 +3,7 @@ from collections import Counter
 
 import pytest
 
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 @pytest.mark.parametrize('scenario', ['control', 'roles', 'relic_preparation'])
@@ -37,8 +37,8 @@ def test_random_orders_yield_without_changing_saved_battles(monkeypatch, scenari
         sleeps.append(seconds)
         clock['wall'] += seconds
 
-    monkeypatch.setattr('tools.cpu_budget.time.process_time', process_time)
-    monkeypatch.setattr('tools.cpu_budget.time.monotonic', lambda: clock['wall'])
-    monkeypatch.setattr('tools.cpu_budget.time.sleep', sleep)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.process_time', process_time)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.monotonic', lambda: clock['wall'])
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.sleep', sleep)
     assert run(CpuBudget(25)) == expected
     assert sleeps, 'The random tactical orders completed without yielding CPU'

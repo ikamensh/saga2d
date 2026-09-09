@@ -186,7 +186,6 @@
   "runtime": "Prebuilt transparent PNGs only; icon composition does not run during play.",
   "source_sha256": {
     "eador/icon_art.py": "061c458f8ceaab8469606eccf54a74f2eb74b3df9c4c109e369efa91a60147b2",
-    "tools/build_eador_icons.py": "ef8000f3c79e79892203cf12e40a5d2cd27fb2db64f4e673b7f730d88c9021c8",
-    "tools/cpu_budget.py": "78c063e88dff755f2a9114ac920317e274f9b5ed0dd60b72aecda18c7a2823c2"
+    "tools/build_eador_icons.py": "cce6c5e6306e0a5f3dc7d92c9a46ae04e642c3b558765bed7148cd2b2a219a7c"
   }
 }

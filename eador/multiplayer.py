@@ -1,6 +1,10 @@
 """Shared-realm co-op: both partners issue orders, the host resolves them in order."""
 from saga2d import CommandError
-from eador.model import State, RuleError
+from saga2d.server.games import GameSpec, option_choice, option_keys, option_seed
+from eador.concurrent_campaign import ConcurrentCampaign
+from eador.difficulty import DIFFICULTIES
+from eador.model import HERO_CLASSES, State, RuleError
+from eador.worldgen import THEMES
 from eador.orders import BATTLE_ORDERS, invoke_order
 
 STATE_ORDERS = {'build', 'recruit', 'replace_troop', 'travel', 'explore', 'end_turn', 'choose', 'equip',
@@ -29,6 +33,43 @@ class ShardboundMatch:
             raise CommandError('There is no active battle.')
         invoke_order(receiver, action, args, kwargs)
         self.state = trial
+
+
+def _create_coop(options):
+    option_keys(options, {'seed', 'hero', 'theme', 'difficulty', 'campaign'})
+    campaign = options.get('campaign', False)
+    if type(campaign) is not bool:
+        raise CommandError('campaign must be true or false.')
+    return ShardboundMatch(option_seed(options, 7), hero=option_choice(options, 'hero', 'Commander', HERO_CLASSES),
+                           theme=option_choice(options, 'theme', 'frontier', THEMES),
+                           difficulty=option_choice(options, 'difficulty', 'standard', DIFFICULTIES),
+                           campaign=campaign)
+
+
+def _restore_coop(snapshot):
+    match = ShardboundMatch.__new__(ShardboundMatch)
+    match.state = State.from_json(snapshot['campaign'])
+    return match
+
+
+def _create_pvp(options):
+    option_keys(options, {'seed', 'heroes', 'theme', 'difficulty'})
+    heroes = options.get('heroes', ('Commander', 'Commander'))
+    if (not isinstance(heroes, (list, tuple)) or len(heroes) != 2
+            or any(not isinstance(hero, str) or hero not in HERO_CLASSES for hero in heroes)):
+        raise CommandError('Choose two supported heroes.')
+    return ConcurrentCampaign.new(option_seed(options, 7), heroes=heroes,
+                                  theme=option_choice(options, 'theme', 'frontier', THEMES),
+                                  difficulty=option_choice(options, 'difficulty', 'standard', DIFFICULTIES))
+
+
+# Campaigns span sessions: their seats survive for days, suspended to storage between visits.
+ONLINE = {
+    'shardbound-v1': GameSpec(_create_coop, lambda match: {'campaign': match.state.to_json()}, _restore_coop,
+                              campaign=True),
+    'shardbound-pvp-v1': GameSpec(_create_pvp, ConcurrentCampaign.checkpoint, ConcurrentCampaign.restore,
+                                  campaign=True),
+}
 
 
 from eador.scene import ShardScene, OrderPending, BattleScene, CatalogScene, HeroScene

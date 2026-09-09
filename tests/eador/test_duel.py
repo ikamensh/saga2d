@@ -6,7 +6,7 @@ import pytest
 
 from eador.battle import Battle
 from eador.model import RuleError, State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def duel(attacker='Wizard', defender='Wizard'):

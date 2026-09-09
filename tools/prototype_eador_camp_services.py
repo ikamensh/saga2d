@@ -18,7 +18,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import RuleError, State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import source_name
 from tools.eador_campaign import CampaignMetrics, finish_battle
 
 
@@ -127,8 +128,8 @@ def main():
         parser.error(str(error))
     examples = json.loads(args.examples.read_text())
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__),
-                      ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py'])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                      ROOT / 'tools/eador_campaign.py'])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     runs = {}
     variants = {'pre_assault_mana': ('assault_now', 'rest_once', 'rest_reserve', 'infusion', 'treatment'),
                 'pursuit_last_action': ('intercept_now', 'rest_once', 'tower_intercept',

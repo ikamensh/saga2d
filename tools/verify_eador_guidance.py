@@ -16,7 +16,7 @@ from eador.app import create_game
 from eador.encounter_scene import EncounterScene
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, HelpScene, ShardScene, TitleScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_ui import PlayerInput
 
 

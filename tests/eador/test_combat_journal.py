@@ -7,7 +7,7 @@ import pytest
 from saga2d import CommandError
 from eador.concurrent_campaign import ConcurrentCampaign
 from eador.combat_journal import MAX_BYTES, MAX_RECORDS, replay_combat
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def order(match, seat, action, *args, **kwargs):

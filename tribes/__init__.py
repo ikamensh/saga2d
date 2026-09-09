@@ -6,7 +6,7 @@
 * ``model``   — the world state and every rule that mutates it.
 * ``mapgen``  — procedural map generation.
 * ``ai``      — computer opponents driving the model.
-* ``textures``— isometric tiles, props and units pre-rendered with ``saga2d.render3d``.
+* ``textures``— isometric tiles, props and units pre-rendered with ``sagaforge.render3d``.
 * ``view``    — isometric layout and sprite reconciliation for the map.
 * ``effects`` — transient animations (damage numbers, pulses, banners).
 * ``sound``   — procedurally synthesised effects and ambient music.

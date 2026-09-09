@@ -17,6 +17,7 @@ from eador.app import create_game
 from eador.encounter_scene import EncounterScene
 from eador.model import State
 from eador.scene import ResultScene, ShardScene, TitleScene
+from tools.eador_sources import framework_sources, source_name
 from tools.audit_eador_aerie import Purchases
 from tools.eador_causeway_campaign import (prepare_causeway, causeway_focus_route,
     causeway_guard_route, causeway_scout_route, causeway_failed_attempt, causeway_retry_route)
@@ -80,12 +81,12 @@ def inspect_briefing(player):
 
 def verify(output, *, backend='pyglet', plan='focus'):
     output.mkdir(parents=True, exist_ok=True)
-    sources = sorted([*ROOT.glob('eador/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    sources = sorted([*ROOT.glob('eador/*.py'), *framework_sources(),
                       *ROOT.glob('tools/eador_*.py'), *[ROOT / 'tools' / name for name in (
                           'audit_eador_aerie.py', 'audit_eador_extraction.py', 'verify_eador_causeway.py',
                           'verify_eador_control.py', 'verify_eador_extraction.py',
                           'verify_eador_guidance.py', 'verify_eador_reading.py')]])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     with TemporaryDirectory(prefix='shardbound-causeway-') as directory:

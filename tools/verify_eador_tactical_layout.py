@@ -28,7 +28,8 @@ from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ShardScene, TitleScene
 from eador.ui import icon_path
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_guidance import check_reading_layout
 
@@ -72,11 +73,11 @@ def _fixed_states():
 
 
 def _fingerprints():
-    paths = {Path(__file__), ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py',
+    paths = {Path(__file__), ROOT / 'tools/eador_ui.py',
              ROOT / 'tools/verify_eador_guidance.py', *(ROOT / 'eador').glob('*.py'),
-             *(ROOT / 'saga2d').rglob('*.py'), *(ROOT / path for path in FIXED)}
+             *framework_sources(), *(ROOT / path for path in FIXED)}
     paths.update(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())
-    return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
+    return {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
 
 
 def _centers(scene):

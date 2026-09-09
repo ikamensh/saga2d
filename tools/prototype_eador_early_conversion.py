@@ -18,8 +18,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.eador_sources import source_name
 from eador.model import BUILDINGS, RuleError, State, UNITS
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 ROLES = ((4, 'sapper'), (5, 'adept'), (6, 'skyrider'))
 
@@ -423,8 +424,8 @@ def authored_comparison(args, *, budget=None):
     target_by_theme = {'frontier': 'relief_column', 'elderwild': 'supply_cache', 'ruins': 'runebound_causeway'}
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve(),
                *(ROOT / 'tools' / name for name in ('audit_eador_difficulty.py', 'audit_eador_economy.py',
-                 'audit_eador_resource_breakpoints.py', 'stress_eador_control.py', 'eador_campaign.py', 'cpu_budget.py'))]
-    fingerprints = lambda: {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+                 'audit_eador_resource_breakpoints.py', 'stress_eador_control.py', 'eador_campaign.py'))]
+    fingerprints = lambda: {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     before = fingerprints()
     rows, skipped = [], []
     for seed in args.seeds:
@@ -554,7 +555,7 @@ def main():
         return
     state, input_path = input_state()
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__).resolve()]
-    fingerprints = lambda: {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    fingerprints = lambda: {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     before = fingerprints()
     cases = [(plan, 'auto', False) for plan in ('keep_now', 'keep_rest1', 'tower_now', 'tower_rest1',
              'sapper', 'adept', 'skyrider', 'full_staged', 'keep_rest3', 'tower_rest3', 'full_fund_first')]

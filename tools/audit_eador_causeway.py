@@ -21,8 +21,9 @@ sys.path.insert(0, str(ROOT))
 
 from eador.model import RuleError, State
 from eador.worldgen import generate
+from tools.eador_sources import framework_sources, source_name
 from tools.audit_eador_aerie import Purchases, RecordedOrders
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_causeway_campaign import (prepare_causeway, causeway_focus_route,
     causeway_guard_route, causeway_scout_route, causeway_failed_attempt, causeway_retry_route)
 
@@ -115,10 +116,9 @@ def settle_once(play, *, budget=None):
 
 def measure(*, budget=None):
     budget = CpuBudget(25) if budget is None else budget
-    sources = sorted([*ROOT.glob('eador/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/eador_*.py'),
-                      ROOT / 'tools/audit_eador_aerie.py', ROOT / 'tools/audit_eador_extraction.py',
-                      ROOT / 'tools/cpu_budget.py', Path(__file__).resolve()])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    sources = sorted([*ROOT.glob('eador/*.py'), *framework_sources(), *ROOT.glob('tools/eador_*.py'),
+                      ROOT / 'tools/audit_eador_aerie.py', ROOT / 'tools/audit_eador_extraction.py', Path(__file__).resolve()])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     parties, plans = {}, {}
     for hero, mana in (('Commander', 0), ('Commander', 12), ('Commander', 16), ('Scout', 0), ('Scout', 8)):
         paid = PaidTravel(State.new(7, hero, theme='ruins'), budget=budget)

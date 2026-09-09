@@ -1,7 +1,7 @@
 """Adventure quotes disclose real entry fees without spending campaign progress."""
 import pytest
 
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 @pytest.mark.parametrize('approach, fee', [(None, 0), ('unseal', 2)])

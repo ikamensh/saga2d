@@ -18,10 +18,11 @@ from PIL import Image, __version__ as pillow_version
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
+from tools.eador_sources import source_path
 sys.path.insert(0,str(ROOT))
 
 from eador.landscape import GENERATOR_VERSION, MODES, SIZE, TERRAINS, VARIANTS, render_tile  # noqa: E402
-from tools.cpu_budget import CpuBudget  # noqa: E402
+from saga2d.testing.cpu_budget import CpuBudget  # noqa: E402
 
 
 def _digest(path):
@@ -52,8 +53,8 @@ def build_assets(directory: Path, *, terrains=TERRAINS, modes=MODES,
         'license':'Repository MIT license; see LICENSE.',
         'runtime':'Prebuilt PNGs only. The game does not execute the composition module.',
         'generator_dependencies':{'pillow':pillow_version,'numpy':np.__version__},
-        'source_sha256':{name:_digest(ROOT/name) for name in
-                         ('eador/landscape.py','tools/build_eador_art.py','tools/cpu_budget.py')},
+        'source_sha256':{name:_digest(source_path(name)) for name in
+                         ('eador/landscape.py','tools/build_eador_art.py')},
         'files':files,
     }
     (directory/'terrain-art-manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
@@ -79,7 +80,7 @@ def verify_assets(directory: Path, *, budget: CpuBudget | None = None) -> int:
                 raise ValueError(f'Invalid terrain image geometry: {name}')
         budget.checkpoint()
     for name,digest in manifest['source_sha256'].items():
-        if _digest(ROOT/name) != digest:
+        if _digest(source_path(name)) != digest:
             raise ValueError(f'SHA256 mismatch: {name}')
         budget.checkpoint()
     return len(expected)

@@ -106,7 +106,7 @@ def _scout_disables_sapper():
 
 def test_retreat_keeps_dead_sapper_and_wounded_guards_when_changing_assembly():
     from tools.eador_campaign import march_to, rest
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
 
     play = _scout_disables_sapper()
     destination = play.state.hero.pos
@@ -134,7 +134,7 @@ def test_retreat_keeps_dead_sapper_and_wounded_guards_when_changing_assembly():
 
 def test_real_defeat_keeps_casualties_and_cannot_reward_the_sapper_kill_until_a_paid_retry_wins():
     from tools.eador_campaign import rest, march_to
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
 
     play = _scout_disables_sapper()
     pos = play.state.hero.pos

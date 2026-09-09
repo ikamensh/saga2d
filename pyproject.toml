@@ -24,10 +24,10 @@ dev = ["pytest>=9.0.2"]
 ai-verify = ["anthropic>=0.39.0"]
 
 [tool.setuptools.packages.find]
-include = ["saga2d*"]
+include = ["saga2d*", "sagaforge*"]
 
 [tool.setuptools.package-data]
-saga2d = ["assets/fonts/*.ttf", "assets/fonts/OFL.txt"]
+saga2d = ["assets/fonts/*.ttf", "assets/fonts/OFL.txt", "packaging/game.spec", "packaging/game.iss"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

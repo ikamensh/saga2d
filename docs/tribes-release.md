@@ -6,7 +6,7 @@ downloads with installation steps; the same files are on the published
 the [Windows installer](https://github.com/ikamensh/saga2d/releases/download/tribes-v0.1.0-preview.1/Tribes-0.1.0-preview.1-windows-x64-setup.exe)
 and [Apple Silicon Mac app](https://github.com/ikamensh/saga2d/releases/download/tribes-v0.1.0-preview.1/Tribes-0.1.0-preview.1-darwin-arm64-app.zip),
 built from `ea5a2a2ece444885edb29034ce34f029cce664d9` with the shared recipe in
-`tools/build_game.py`. Online play follows the [online multiplayer guide](online-multiplayer.md):
+`tools/package.py` (the shared `saga2d.packaging` recipe). Online play follows the [online multiplayer guide](online-multiplayer.md):
 Multiplayer → Create room → Copy invite link; the partner pastes the code and
 joins. Saves, settings and generated sounds live in `~/.tribes` (Windows:
 `%USERPROFILE%\.tribes`).

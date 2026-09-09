@@ -6,7 +6,7 @@ import wave
 import numpy as np
 
 from saga2d import Game
-from saga2d.synth import SAMPLE_RATE, write_wav
+from sagaforge.synth import SAMPLE_RATE, write_wav
 from eador.sound import confirm
 
 
@@ -99,7 +99,7 @@ def test_build_catalogue_decodes_routes_and_regenerates_identically(tmp_path, mo
     import json
     from eador.sound import CUES, TRACKS, set_music
     from tools.build_eador_audio import build_assets
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
 
     clock = {'cpu': 0., 'wall': 0., 'sleeps': []}
 
@@ -112,9 +112,9 @@ def test_build_catalogue_decodes_routes_and_regenerates_identically(tmp_path, mo
         clock['sleeps'].append(seconds)
         clock['wall'] += seconds
 
-    monkeypatch.setattr('tools.cpu_budget.time.process_time', process_time)
-    monkeypatch.setattr('tools.cpu_budget.time.monotonic', lambda: clock['wall'])
-    monkeypatch.setattr('tools.cpu_budget.time.sleep', sleep)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.process_time', process_time)
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.monotonic', lambda: clock['wall'])
+    monkeypatch.setattr('saga2d.testing.cpu_budget.time.sleep', sleep)
 
     root = tmp_path / 'assets'
     sampler = tmp_path / 'sampler.wav'

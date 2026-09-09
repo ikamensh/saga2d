@@ -22,6 +22,7 @@ from eador.model import RECRUITABLE, State
 from eador.persistence import AUTO_SLOTS, CampaignSaves
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ShardScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_control_campaign import prepare_control_watch
 from tools.eador_explorer_campaign import prepare_explorer
 from tools.eador_roles_campaign import prepare_support_watch
@@ -76,8 +77,8 @@ def inspect_body(scene, unit):
 
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
-    paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    paths = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py')]
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines()
     native, matrix, roles, orders = backend == 'pyglet', [], set(), []

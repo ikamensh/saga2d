@@ -15,10 +15,11 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.eador_sources import source_name
 
 from eador.battle import Battle
 from eador.model import HERO_CLASSES, RECRUITABLE, Hero, Troop, UNITS
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def fixture(seed, metrics):
@@ -126,8 +127,8 @@ def main():
     except ValueError as error:
         parser.error(str(error))
     sources = [*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
-               Path(__file__).resolve(), ROOT / 'tools/cpu_budget.py']
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(sources)}
+               Path(__file__).resolve()]
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(sources)}
     report = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'dirty_at_start': subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True).splitlines(),
               'python': platform.python_version(), 'platform': platform.platform(), 'seed': args.seed,

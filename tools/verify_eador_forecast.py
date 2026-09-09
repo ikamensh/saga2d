@@ -16,6 +16,7 @@ from saga2d import Label
 from eador.app import create_game
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ShardScene, TitleScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_control import verify as verify_control
 from tools.verify_eador_extraction import verify as verify_extraction
@@ -104,8 +105,8 @@ class ForecastInput(PlayerInput):
 
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
-    sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    sources = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py')]
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     seen, layouts, routes = set(), [], []
 
     def player_type(*args, **kwargs):

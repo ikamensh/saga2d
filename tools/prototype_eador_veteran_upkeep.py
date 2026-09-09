@@ -17,8 +17,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from eador.model import State, RuleError, UNITS
+from tools.eador_sources import source_name
 from tools.prototype_eador_late_realm import MeasuredState, paid_plan, snapshot
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_linked_campaign import play_stage, travel_selection, lose_shard
 from tools.eador_campaign import finish_battle
 
@@ -156,8 +157,8 @@ def main():
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), Path(__file__).resolve(),
                       *(ROOT / 'tools' / name for name in ('prototype_eador_late_realm.py', 'audit_eador_difficulty.py',
                       'audit_eador_economy.py', 'eador_linked_campaign.py', 'eador_campaign.py',
-                      'stress_eador_control.py', 'cpu_budget.py'))])
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                      'stress_eador_control.py'))])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     examples_path = ROOT / 'docs/evidence/crystal-service-comparison.examples.json'
     examples = json.loads(examples_path.read_text())
     plans = []

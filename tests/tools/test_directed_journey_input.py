@@ -8,7 +8,7 @@ import pytest
 
 from eador.model import State
 from tools.audit_eador_army_plans import SavedCommands
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -89,9 +89,9 @@ existing games or change their on-disk checkpoint formats.
 ## Development checks
 
 ```sh
-uv run python -m online_server --host 127.0.0.1 --port 8765
+uv run python -m saga2d.server --games tribes.multiplayer:ONLINE warband.multiplayer:ONLINE eador.multiplayer:ONLINE --host 127.0.0.1 --port 8765
 SAGA2D_SERVER_URL=ws://127.0.0.1:8765 uv run python -m tribes
-uv run python -m pytest tests/test_online_server.py tests/test_online_checkpoints.py tests/test_online_client.py tests/test_online_menu.py -q
+uv run python -m pytest tests/framework/test_server.py tests/framework/test_online_client.py tests/framework/test_online_menu.py -q
 SAGA2D_SILENT=1 uv run python tools/verify_online.py /tmp/saga2d-online
 ```
 

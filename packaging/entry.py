@@ -160,7 +160,7 @@ def verify_shard_controls(game, image_path: Path, *, backend='pyglet', budget=No
     from eador.model import State
     from eador.preferences import load_preferences, reading_scale
     from eador.scene import BattleScene, ShardScene
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
     from tools.eador_ui import PlayerInput
 
     budget = CpuBudget(25) if budget is None else budget

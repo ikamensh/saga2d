@@ -23,7 +23,8 @@ from eador.concurrent_scene import ConcurrentShardScene
 from eador.concurrent_playback import RecordedCombatPlayback
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ChoiceScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.verify_eador_shard_look import PacedInput
 
 
@@ -32,10 +33,10 @@ def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=False)
     budget = CpuBudget(25)
     started, cpu_started = time.monotonic(), time.process_time()
-    paths = sorted((ROOT / 'eador').glob('*.py')) + sorted((ROOT / 'saga2d').rglob('*.py'))
+    paths = sorted((ROOT / 'eador').glob('*.py')) + framework_sources()
     paths += [Path(__file__).resolve(), ROOT / 'tools/verify_eador_shard_look.py',
-              ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py']
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+              ROOT / 'tools/eador_ui.py']
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     match = ConcurrentCampaign.new(7, heroes=('Warrior', 'Warrior'))
     report = dict(backend=backend, local_seat=1, peer_seat=0, completed=False,
                   source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),

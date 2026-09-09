@@ -15,8 +15,9 @@ sys.path.insert(0, str(ROOT))
 
 from eador.battle import Battle
 from eador.model import RuleError, State
+from tools.eador_sources import source_name
 from tools.audit_eador_extraction import PaidState
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.eador_aerie_campaign import (prepare_aerie, aerie_western_route, aerie_northern_route,
                                        aerie_scout_route, aerie_failed_sortie, aerie_retry_route)
 from tools.eador_extraction_campaign import AdventureOrders
@@ -115,8 +116,8 @@ def measure(*, budget=None):
     budget = CpuBudget(25) if budget is None else budget
     sources = sorted([*ROOT.joinpath('eador').glob('*.py'), *ROOT.joinpath('saga2d').rglob('*.py'),
                       *ROOT.joinpath('tools').glob('eador_*.py'), Path(__file__).resolve(),
-                      ROOT/'tools/audit_eador_extraction.py', ROOT/'tools/cpu_budget.py'])
-    hashes = {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+                      ROOT/'tools/audit_eador_extraction.py'])
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     commander = prepare_aerie(state=Purchases(State.new(7, theme='ruins')), budget=budget)
     scout = prepare_aerie('Scout', party='ground', state=Purchases(State.new(7, 'Scout', theme='ruins')), budget=budget)
     parties = {name:dict(snapshot=json.loads(paid.to_json()), purchases=paid.purchases)

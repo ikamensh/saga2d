@@ -67,7 +67,7 @@ know about, and read it before touching shared files.
   earlier delegates requires an explicit choice instead of retaining two
   definitions and silently overriding size restoration or headless checks.
 
-- 2026-09-06 (Shardbound root): adopting the pure `saga2d.synth` sample
+- 2026-09-06 (Shardbound root): adopting the pure `sagaforge.synth` sample
   functions from committed Warband `f478e89`, with a public compose → WAV →
   playback test. Tribes will import these shared functions instead of keeping
   duplicate synthesis code; its compositions and SoundBank remain game-owned.
@@ -151,7 +151,7 @@ know about, and read it before touching shared files.
   overlays are candidates for `shortcut` later. Warband's peasants now
   repair; `tools/map_report.py`, `tools/perf_warband.py` and
   `saga2d.testing.FrameTimer` are new.
-- 2026-09-06 (Warband agent): merged main's settings store, pure `saga2d.synth`
+- 2026-09-06 (Warband agent): merged main's settings store, pure `sagaforge.synth`
   and the Tribes bank rewrite. Warband adopted `Settings` as is and moved its
   `SynthBank` (render-once WAV cache with a version marker, playback,
   aliases, pitch variation) into `warband/sound.py`. Note the duplication:

@@ -4,7 +4,7 @@ import json
 import pytest
 
 from saga2d import CommandError
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 
 
 def order(match, seat, action, *args, **kwargs):

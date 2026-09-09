@@ -11,7 +11,7 @@ Quick orientation:
   space, triangle soup for shapes, cached labels, texture atlas.
 - `saga2d/backends/mock_backend.py` — recording backend for tests.
 - `saga2d/ui/` — components, layout math, theme.
-- `saga2d/render3d.py`, `effects.py`, `synth.py`, `fonts.py`, `ui/minimap.py`
+- `sagaforge/render3d.py`, `effects.py`, `synth.py`, `fonts.py`, `ui/minimap.py`
   — pieces both games share: low-poly renderer, transient effects,
   procedural sound, the bundled font, the minimap component.
 - `tribes/` — the turn-based game: `model.py` (rules), `mapgen.py`, `ai.py`,

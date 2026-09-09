@@ -27,7 +27,8 @@ from eador.app import create_game
 from eador.model import State
 from eador.persistence import CampaignSaves
 from eador.scene import SaveScene, ShardScene, TitleScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 
 JOURNAL = 'docs/evidence/adventure-variety/route-seed5.json.gz'
@@ -51,11 +52,11 @@ def _sha(data):
 
 
 def _fingerprints():
-    paths = {Path(__file__), ROOT / 'tools/eador_ui.py', ROOT / 'tools/cpu_budget.py',
-             *(ROOT / 'eador').glob('*.py'), *(ROOT / 'saga2d').rglob('*.py'),
+    paths = {Path(__file__), ROOT / 'tools/eador_ui.py',
+             *(ROOT / 'eador').glob('*.py'), *framework_sources(),
              *(ROOT / name for name in FIXED)}
     paths.update(path for path in (ROOT / 'eador/assets').rglob('*') if path.is_file())
-    return {str(path.relative_to(ROOT)): _sha(path.read_bytes()) for path in sorted(paths)}
+    return {source_name(path): _sha(path.read_bytes()) for path in sorted(paths)}
 
 
 def _earned(name):

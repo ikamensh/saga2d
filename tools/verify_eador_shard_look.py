@@ -24,7 +24,8 @@ from eador.app import create_game
 from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ShardScene
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_shard_reading import check_shard, prepared_shards
 
@@ -79,7 +80,7 @@ def verify(output, *, backend='pyglet', budget=None):
     started, cpu_started = time.monotonic(), time.process_time()
     paths = (ROOT / 'eador/scene.py', ROOT / 'eador/art.py', ROOT / 'eador/ui.py',
              Path(__file__).resolve(), ROOT / 'tools/verify_eador_shard_reading.py')
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     report = dict(backend=backend, cpu_percent_requested=budget.percent,
                   source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, cases=[], captures=[], command_checks=[])

@@ -17,6 +17,7 @@ from eador.__main__ import create_session
 from eador.model import State
 from eador.persistence import CampaignSaves
 from eador.scene import BattleScene, ResultScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_control import ControlOrders
 
@@ -28,11 +29,11 @@ def verify(input_report, output, *, backend='pyglet'):
     check starts at its saved round-three decision, not at a new campaign.
     """
     original = json.loads(gzip.decompress(input_report.read_bytes()))
-    files = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    files = [*ROOT.glob('eador/**/*.py'), *framework_sources(),
              *(ROOT / 'tools' / name for name in ('verify_eador_investment_choice.py',
                'eador_ui.py', 'verify_eador_control.py', 'verify_eador_extraction.py',
                'eador_extraction_campaign.py'))]
-    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
+    hashes = {source_name(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     rows = []
     for branch in original['branches']:
         command = branch['command']

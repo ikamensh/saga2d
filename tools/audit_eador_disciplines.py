@@ -22,7 +22,8 @@ os.environ.setdefault('SAGA2D_SILENT', '1')
 
 from eador.content import SKILLS
 from eador.model import State
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_campaign import CampaignMetrics
 from tools.eador_linked_campaign import lose_shard, play_stage, travel_selection
 
@@ -120,11 +121,10 @@ def journey(skill, *, seed=7, recovery=False, player=None, budget=None):
 
 def verify(output, *, skills=tuple(SKILLS), backend='model', recovery=False, seed=7, budget=None):
     output.mkdir(parents=True, exist_ok=True)
-    paths = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'),
+    paths = [*ROOT.glob('eador/**/*.py'), *framework_sources(),
              ROOT / 'tools/audit_eador_disciplines.py', ROOT / 'tools/eador_campaign.py',
-             ROOT / 'tools/eador_linked_campaign.py', ROOT / 'tools/eador_ui.py',
-             ROOT / 'tools/cpu_budget.py']
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+             ROOT / 'tools/eador_linked_campaign.py', ROOT / 'tools/eador_ui.py']
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     results = []
     for skill in skills:
         if backend == 'model':

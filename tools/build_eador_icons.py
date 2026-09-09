@@ -17,9 +17,10 @@ from PIL import Image, __version__ as pillow_version
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.eador_sources import source_path
 
 from eador.icon_art import GENERATOR_VERSION, ICONS, SIZE, render_icon  # noqa: E402
-from tools.cpu_budget import CpuBudget  # noqa: E402
+from saga2d.testing.cpu_budget import CpuBudget  # noqa: E402
 
 
 def _digest(path):
@@ -47,8 +48,8 @@ def build_assets(directory: Path, *, budget: CpuBudget | None = None) -> dict:
         'license': 'Repository MIT license; see LICENSE.',
         'runtime': 'Prebuilt transparent PNGs only; icon composition does not run during play.',
         'generator_dependencies': {'pillow': pillow_version},
-        'source_sha256': {name: _digest(ROOT / name) for name in
-                          ('eador/icon_art.py', 'tools/build_eador_icons.py', 'tools/cpu_budget.py')},
+        'source_sha256': {name: _digest(source_path(name)) for name in
+                          ('eador/icon_art.py', 'tools/build_eador_icons.py')},
         'files': files,
     }
     (directory / 'icon-art-manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
@@ -73,7 +74,7 @@ def verify_assets(directory: Path, *, budget: CpuBudget | None = None) -> int:
                 raise ValueError(f'Invalid icon geometry: {name}')
         budget.checkpoint()
     for name, digest in manifest['source_sha256'].items():
-        if _digest(ROOT / name) != digest:
+        if _digest(source_path(name)) != digest:
             raise ValueError(f'SHA256 mismatch: {name}')
         budget.checkpoint()
     return len(expected)

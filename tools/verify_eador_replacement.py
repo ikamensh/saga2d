@@ -22,6 +22,7 @@ from eador.persistence import AUTO_SLOTS
 from eador.preferences import reading_scale
 from eador.replacement_scene import ReplacementScene
 from eador.scene import CatalogScene, ShardScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_campaign import finish_battle
 from tools.eador_ui import PlayerInput
 from tools.verify_eador_extraction import PlayerOrders
@@ -63,9 +64,9 @@ def open_review(player, outgoing_id, kind, *, mouse=False):
 
 def verify(output, *, backend='pyglet'):
     output.mkdir(parents=True, exist_ok=True)
-    sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py'),
+    sources = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py'),
                ROOT / 'docs/evidence/crystal-service-comparison.examples.json']
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     native, metrics, purchases = backend == 'pyglet', [], []
     with TemporaryDirectory(prefix='shardbound-replacement-') as directory:
         saves = Path(directory) / 'saves'

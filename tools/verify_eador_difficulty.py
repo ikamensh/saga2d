@@ -16,6 +16,7 @@ from eador.difficulty import DIFFICULTIES
 from eador.model import State
 from eador.persistence import CampaignSaves
 from eador.scene import TitleScene
+from tools.eador_sources import source_name
 from tools.eador_campaign import finish_battle
 from tools.eador_linked_campaign import travel_selection
 from tools.eador_save_expectations import expected_rootward_arrival
@@ -71,7 +72,7 @@ def verify(output, *, backend='pyglet'):
                       *[ROOT / 'tools' / name for name in ('eador_campaign.py', 'eador_ui.py',
                           'verify_eador_difficulty.py', 'verify_eador_campaign.py', 'eador_linked_campaign.py', 'eador_save_expectations.py')],
                       RECORDED_CHALLENGE])
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     report = dict(source_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   source_sha256=hashes, backend=backend, platform=platform.platform(), modes=[])
     for index, (mode, rules) in enumerate(DIFFICULTIES.items()):

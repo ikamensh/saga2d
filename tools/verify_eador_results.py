@@ -20,11 +20,12 @@ from eador.app import create_game
 from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, ResultScene, ShardScene, TitleScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_campaign import finish_battle, play_campaign
 from tools.eador_extraction_campaign import AdventureOrders, prepare_adventure, crossing_route
 from tools.eador_observatory_campaign import prepare_observatory, observatory_route
 from tools.eador_ui import PlayerInput
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
 from tools.verify_eador_guidance import check_reading_layout
 
 
@@ -103,8 +104,8 @@ def prepared_results(*, budget=None):
 def verify(output, *, backend='pyglet', budget=None):
     budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
-    sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py')]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    sources = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py')]
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     metrics, native = [], backend == 'pyglet'
     with TemporaryDirectory(prefix='eador-results-') as directory:
         saves = Path(directory) / 'saves'

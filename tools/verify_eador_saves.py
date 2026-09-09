@@ -19,10 +19,11 @@ from eador.app import create_game
 from eador.model import State
 from eador.preferences import reading_scale
 from eador.scene import BattleScene, SaveScene, ShardScene, TitleScene
+from tools.eador_sources import framework_sources, source_name
 from tools.eador_linked_campaign import lose_shard, play_linked, play_stage, travel_selection
 from tools.eador_ui import PlayerInput
-from tools.cpu_budget import CpuBudget
-from tools.native_frames import tick
+from saga2d.testing.cpu_budget import CpuBudget
+from saga2d.testing.native_frames import tick
 from tools.verify_eador_guidance import check_reading_layout
 
 
@@ -88,9 +89,9 @@ def select_slot(player, slot, *, backup=False):
 def verify(output, *, backend='pyglet', budget=None):
     budget = CpuBudget(25) if budget is None else budget
     output.mkdir(parents=True, exist_ok=True)
-    sources = [*ROOT.glob('eador/**/*.py'), *ROOT.glob('saga2d/**/*.py'), *ROOT.glob('tools/*.py'),
+    sources = [*ROOT.glob('eador/**/*.py'), *framework_sources(), *ROOT.glob('tools/*.py'),
                *ROOT.glob('tests/eador/fixtures/*.json')]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
+    hashes = {source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources}
     native, metrics = backend == 'pyglet', []
     with TemporaryDirectory(prefix='shardbound-save-reading-') as directory:
         saves_path = Path(directory) / 'saves'

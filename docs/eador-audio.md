@@ -3,7 +3,7 @@
 The shipping catalogue contains sixteen original cues and two stereo loops.
 `eador/sound.py` owns the compositions and instrument voices: note sequences,
 voicings, timing, stereo reflections, balance and deterministic noise seeds.
-`saga2d.synth` supplies sample primitives and PCM encoding. No recorded samples,
+`sagaforge.synth` supplies sample primitives and PCM encoding. No recorded samples,
 borrowed Eador assets or externally sourced melodies were used. Source and
 assets use the repository MIT license. The exact files, source hashes,
 generator version and runtime versions are in `eador/assets/audio-manifest.json`.
@@ -93,9 +93,9 @@ overlays should not replay them.
 
 ## Regeneration of 2026-09-09
 
-`saga2d.synth` changed for Warband's soundtrack (band-limited noise is now
+`sagaforge.synth` changed for Warband's soundtrack (band-limited noise is now
 filtered at a power-of-two FFT size, and held voices, plucks, filters and a
-reverb were added).  The audio manifest pins the hash of `saga2d/synth.py`, so
+reverb were added).  The audio manifest pins the hash of `sagaforge/synth.py`, so
 the catalogue was rebuilt with the unchanged generator 3: eighteen WAVs and the
 review sampler were regenerated and the manifest records the new source hash.
 The compositions are the same; only the noise realisations differ slightly.

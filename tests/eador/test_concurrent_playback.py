@@ -125,7 +125,7 @@ def test_inbox_baselines_rejoins_and_explicitly_catches_up_after_gaps_overflow_a
     from eador.concurrent_playback import CombatInbox
     from eador.combat_journal import MAX_RECORDS, MAX_BYTES
     from tests.eador.test_combat_journal import order
-    from tools.cpu_budget import CpuBudget
+    from saga2d.testing.cpu_budget import CpuBudget
     match, budget = ConcurrentCampaign.restore(earned_duel), CpuBudget(25)
     initial = match.snapshot(0)['presentation']
     reader = CombatInbox(initial)

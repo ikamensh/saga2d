@@ -15,7 +15,8 @@ sys.path.insert(0, str(ROOT))
 
 from eador.model import HERO_CLASSES, State
 from eador.worldgen import NORTH_ROAD, SOUTH_ROAD, THEMES
-from tools.cpu_budget import CpuBudget
+from saga2d.testing.cpu_budget import CpuBudget
+from tools.eador_sources import source_name
 from tools.eador_campaign import CampaignMetrics, play_campaign
 
 
@@ -40,9 +41,9 @@ def audit(seed_count: int, *, budget=None) -> dict:
                     **{column: round(mean(row[column] for row in group), 2) for column in columns})
                for (theme, route), group in groups.items()]
     sources = [*sorted((ROOT / 'eador').glob('*.py')), Path(__file__),
-               ROOT / 'tools/eador_campaign.py', ROOT / 'tools/cpu_budget.py']
+               ROOT / 'tools/eador_campaign.py']
     return dict(seed_count=seed_count, campaigns=len(rows), cpu_percent=budget.percent if budget else None,
-                source_sha256={str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                source_sha256={source_name(path): hashlib.sha256(path.read_bytes()).hexdigest()
                                for path in sources},
                 policy='Explore itinerary sites; buy Barracks/Swordsman, then Temple (Wizard tower first); '
                        'choose first skill option; use first relic in battle, Merchant Seal when recruiting; '

@@ -1,4 +1,4 @@
-"""Procedural textures: low-poly props pre-rendered with :mod:`saga2d.render3d`.
+"""Procedural textures: low-poly props pre-rendered with :mod:`sagaforge.render3d`.
 
 The map is drawn in a fixed dimetric view: every tile is a block whose
 top face is a 2:1 diamond ``ISO_W`` wide and ``ISO_H`` tall; terrain
@@ -28,8 +28,8 @@ from dataclasses import dataclass
 from PIL import Image, ImageDraw, ImageFilter
 
 from saga2d import Game
-from saga2d import render3d as r3
-from saga2d.render3d import Mesh
+from sagaforge import render3d as r3
+from sagaforge.render3d import Mesh
 from tribes.rules import Resource, Terrain, UnitType
 
 TILE = 64  # base size: the top-face diamond is 2×TILE wide and TILE tall
